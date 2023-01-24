@@ -80,7 +80,7 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :', saveInURLParams
   const onAddFilter = () => onChange([...filters, {}], saveInURLParams);
   const filterFields = base.filter((_filter) => _filter.field !== 'alertness').map((f) => ({ label: f.label, field: f.field, type: f.type }));
 
-  function getFilterValuesByField(field, base, index) {
+  function getFilterOptionsByField(field, base, index) {
     if (!field) return [];
     const current = base.find((filter) => filter.field === field);
     if (!current) {
@@ -97,78 +97,118 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :', saveInURLParams
     return ['Non renseigné'];
   }
 
-  return (
-    <div className="border-b tw-z-50 tw-mb-8 tw-flex tw-w-full tw-justify-center tw-self-center tw-border-gray-300 tw-pb-4">
-      <div className="tw-w-full">
-        <div className="tw-flex tw-flex-wrap">
-          <div className="tw-basis-5/6">
-            <p className="tw-m-0">{title}</p>
-          </div>
-          <div className="tw-basis-1/6 tw-pl-8">
-            <button
-              type="button"
-              className="tw-h-full tw-w-full tw-rounded tw-border tw-border-gray-300 tw-bg-white tw-text-main disabled:tw-opacity-20"
-              onClick={onAddFilter}
-              disabled={filters.find((f) => !f.field)}>
-              + Ajouter
-              <br />
-              un filtre
-            </button>
-          </div>
-        </div>
-        {filters.map((filter, index) => {
-          // filter: field, value, type
-          const filterValues = getFilterValuesByField(filter.field, base, index);
-          const onChangeField = (newField) => {
-            onChange(
-              filters.map((_filter, i) => (i === index ? { field: newField?.field, value: null, type: newField?.type } : _filter)),
-              saveInURLParams
-            );
-          };
-          const onChangeValue = (newValue) => {
-            onChange(
-              filters.map((f, i) => (i === index ? { field: filter.field, value: newValue, type: filter.type } : f)),
-              saveInURLParams
-            );
-          };
-          const onRemoveFilter = () => {
-            onChange(
-              filters.filter((_f, i) => i !== index),
-              saveInURLParams
-            );
-          };
+  function getFilterValue(filterValue) {
+    if (typeof filterValue === 'object') {
+      if (filterValue?.date != null) {
+        if (filterValue.comparator === 'unfilled') return 'Non renseigné';
+        if (filterValue.comparator === 'before') return `Avant le ${dayjsInstance(filterValue.date).format('DD/MM/YYYY')}`;
+        if (filterValue.comparator === 'after') return `Après le ${dayjsInstance(filterValue.date).format('DD/MM/YYYY')}`;
+        if (filterValue.comparator === 'equals') return `Le ${dayjsInstance(filterValue.date).format('DD/MM/YYYY')}`;
+        return '';
+      }
+      if (filterValue?.number != null) {
+        if (filterValue.comparator === 'unfilled') return 'Non renseigné';
+        if (filterValue.comparator === 'between') return `Entre ${filterValue.number} et ${filterValue.number2}`;
+        if (filterValue.comparator === 'equals') return `Égal à ${filterValue.number}`;
+        if (filterValue.comparator === 'lower') return `Inférieur à ${filterValue.number}`;
+        if (filterValue.comparator === 'greater') return `Supérieur à ${filterValue.number}`;
+      }
+      return '';
+    }
+    return filterValue;
+  }
 
-          return (
-            <div className="-tw-mx-4 tw-mb-2.5 tw-flex tw-flex-wrap" key={`${filter.field || 'empty'}${index}`}>
-              <div className="tw-basis-1/3 tw-px-4">
-                <SelectCustom
-                  options={filterFields}
-                  value={filter.field ? filter : null}
-                  onChange={onChangeField}
-                  getOptionLabel={(_option) => filterFields.find((_filter) => _filter.field === _option.field)?.label}
-                  getOptionValue={(_option) => _option.field}
-                  isClearable={true}
-                  isMulti={false}
-                />
-              </div>
-              <div className="tw-basis-1/3 tw-px-4">
-                <ValueSelector field={filter.field} filterValues={filterValues} value={filter.value} base={base} onChangeValue={onChangeValue} />
-              </div>
-              <div className="tw-basis-1/6 tw-pl-4">
-                {!!filters.filter((_filter) => Boolean(_filter.field)).length && (
-                  <button
-                    type="button"
-                    className="tw-h-full tw-w-full tw-rounded tw-border tw-border-gray-300 tw-bg-white tw-text-red-500"
-                    onClick={onRemoveFilter}>
-                    Retirer
-                  </button>
-                )}
-              </div>
-            </div>
-          );
-        })}
+  return (
+    <>
+      <div className="printonly tw-flex tw-gap-2">
+        <p>Filtres:</p>
+        <ul>
+          {filters.map((filter, index) => {
+            if (!filter?.field) return null;
+            const current = base.find((_filter) => _filter.field === filter.field);
+            if (!current) return null;
+            const filterValue = getFilterValue(filter.value);
+            if (!filterValue) return null;
+            return (
+              <li key={index} className="tw-list-disc">
+                {current.label}: {filterValue}
+              </li>
+            );
+          })}
+        </ul>
       </div>
-    </div>
+      <div className="border-b noprint tw-z-50 tw-mb-8 tw-flex tw-w-full tw-justify-center tw-self-center tw-border-gray-300 tw-pb-4">
+        <div className="tw-w-full">
+          <div className="tw-flex tw-flex-wrap">
+            <div className="tw-basis-5/6">
+              <p className="tw-m-0">{title}</p>
+            </div>
+            <div className="tw-basis-1/6 tw-pl-8">
+              <button
+                type="button"
+                className="tw-h-full tw-w-full tw-rounded tw-border tw-border-gray-300 tw-bg-white tw-text-main disabled:tw-opacity-20"
+                onClick={onAddFilter}
+                disabled={filters.find((f) => !f.field)}>
+                + Ajouter
+                <br />
+                un filtre
+              </button>
+            </div>
+          </div>
+          {filters.map((filter, index) => {
+            // filter: field, value, type
+            const filterValues = getFilterOptionsByField(filter.field, base, index);
+            const onChangeField = (newField) => {
+              onChange(
+                filters.map((_filter, i) => (i === index ? { field: newField?.field, value: null, type: newField?.type } : _filter)),
+                saveInURLParams
+              );
+            };
+            const onChangeValue = (newValue) => {
+              onChange(
+                filters.map((f, i) => (i === index ? { field: filter.field, value: newValue, type: filter.type } : f)),
+                saveInURLParams
+              );
+            };
+            const onRemoveFilter = () => {
+              onChange(
+                filters.filter((_f, i) => i !== index),
+                saveInURLParams
+              );
+            };
+
+            return (
+              <div className="-tw-mx-4 tw-mb-2.5 tw-flex tw-flex-wrap" key={`${filter.field || 'empty'}${index}`}>
+                <div className="tw-basis-1/3 tw-px-4">
+                  <SelectCustom
+                    options={filterFields}
+                    value={filter.field ? filter : null}
+                    onChange={onChangeField}
+                    getOptionLabel={(_option) => filterFields.find((_filter) => _filter.field === _option.field)?.label}
+                    getOptionValue={(_option) => _option.field}
+                    isClearable={true}
+                    isMulti={false}
+                  />
+                </div>
+                <div className="tw-basis-1/3 tw-px-4">
+                  <ValueSelector field={filter.field} filterValues={filterValues} value={filter.value} base={base} onChangeValue={onChangeValue} />
+                </div>
+                <div className="tw-basis-1/6 tw-pl-4">
+                  {!!filters.filter((_filter) => Boolean(_filter.field)).length && (
+                    <button
+                      type="button"
+                      className="tw-h-full tw-w-full tw-rounded tw-border tw-border-gray-300 tw-bg-white tw-text-red-500"
+                      onClick={onRemoveFilter}>
+                      Retirer
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </>
   );
 };
 

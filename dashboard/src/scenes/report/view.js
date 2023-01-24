@@ -347,7 +347,7 @@ const View = () => {
     if (process.env.REACT_APP_TEST === 'true') return null;
     return (
       <div className="printonly">
-        <div style={{ fontSize: 24, lineHeight: '32px', fontWeight: 'bold', padding: '16px 32px' }}>
+        <div className="tw-py-4 tw-px-8 tw-text-2xl tw-font-bold">
           {selectedTeams.length === 1 ? getPeriodTitle(dateString, selectedTeams[0]?.nightSession) : formatDateWithNameOfDay(dateString).capitalize()}
           <br />
           Compte rendu {viewAllOrganisationData ? <>de toutes les équipes</> : <>{selectedTeamIds.length > 1 ? 'des équipes ' : "de l'équipe "}</>}

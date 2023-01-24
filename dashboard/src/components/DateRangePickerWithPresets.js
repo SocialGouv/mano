@@ -1,10 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import styled from 'styled-components';
 import OutsideClickHandler from 'react-outside-click-handler';
-import DatePicker from 'react-datepicker';
 import { dayjsInstance, dateForDatePicker } from '../services/date';
-import { theme } from '../config';
-import { useLocalStorage } from 'react-use';
+import DatePicker from 'react-datepicker';
 
 const getOffsetFromToday = (value, unit, end) => {
   const a = dayjsInstance();
@@ -77,10 +74,19 @@ const periods = [
   },
 ];
 
+export const formatPeriod = ({ preset, period }) => {
+  if (!!preset) return preset;
+  if (!!period.startDate && !!period.endDate) {
+    const startFormatted = dayjsInstance(period.startDate).format('D MMM YYYY');
+    const endFormatted = dayjsInstance(period.endDate).format('D MMM YYYY');
+    if (startFormatted === endFormatted) return startFormatted;
+    return `Du ${startFormatted} au ${endFormatted}`;
+  }
+  return `Entre... et le...`;
+};
 // https://reactdatepicker.com/#example-date-range
-const DateRangePickerWithPresets = ({ period, setPeriod }) => {
+const DateRangePickerWithPresets = ({ period, setPeriod, preset, setPreset }) => {
   const [showDatePicker, setShowDatepicker] = useState(false);
-  const [preset, setPreset] = useLocalStorage('stats-date-preset', null);
   const [numberOfMonths, setNumberOfMonths] = useState(() => (window.innerWidth < 1100 ? 1 : 2));
 
   const handleWindowResize = useCallback(() => {
@@ -119,30 +125,28 @@ const DateRangePickerWithPresets = ({ period, setPeriod }) => {
     closeDatePicker();
   };
 
-  const renderLabel = () => {
-    if (!!preset) return preset;
-    if (!!period.startDate && !!period.endDate) {
-      const startFormatted = dayjsInstance(period.startDate).format('D MMM YYYY');
-      const endFormatted = dayjsInstance(period.endDate).format('D MMM YYYY');
-      if (startFormatted === endFormatted) return startFormatted;
-      return `${startFormatted} -> ${endFormatted}`;
-    }
-    return `Entre... et le...`;
-  };
-
   return (
-    <Container>
-      <OpenPickerButton onClick={openDatePicker}>{renderLabel()}</OpenPickerButton>
+    <div className="noprint tw-relative tw-min-w-[15rem]">
+      <button
+        type="button"
+        className="tw-min-w-[15rem] tw-rounded-lg tw-border tw-border-gray-300 tw-bg-transparent tw-py-1 tw-px-4 tw-shadow-none"
+        onClick={openDatePicker}>
+        {formatPeriod({ preset, period })}
+      </button>
       {!!showDatePicker && (
         <OutsideClickHandler onOutsideClick={closeDatePicker}>
-          <PickerContainer>
-            <Presets>
+          <div className="stats-datepicker tw-absolute tw-top-12 tw-z-50 tw-flex tw-flex-nowrap tw-items-center tw-justify-end tw-overflow-x-auto tw-rounded-lg tw-border tw-border-gray-300 tw-bg-white tw-pl-56 lg:tw-min-w-[45rem]">
+            <div className="tw-absolute tw-top-0 tw-left-0 tw-bottom-0 tw-ml-2 tw-box-border tw-flex tw-max-h-full tw-w-56 tw-flex-1 tw-flex-col tw-items-start tw-justify-start tw-overflow-y-scroll">
               {periods.map((p) => (
-                <PresetButton key={p.label} onClick={() => setPresetRequest(p)}>
+                <button
+                  type="button"
+                  className="tw-w-full tw-rounded-lg tw-border-0 tw-bg-white tw-p-1 tw-text-center hover:tw-bg-main25"
+                  key={p.label}
+                  onClick={() => setPresetRequest(p)}>
                   {p.label}
-                </PresetButton>
+                </button>
               ))}
-            </Presets>
+            </div>
             <DatePicker
               monthsShown={numberOfMonths}
               selectsRange
@@ -154,89 +158,11 @@ const DateRangePickerWithPresets = ({ period, setPeriod }) => {
               startDate={dateForDatePicker(period.startDate)}
               endDate={dateForDatePicker(period.endDate)}
             />
-          </PickerContainer>
+          </div>
         </OutsideClickHandler>
       )}
-    </Container>
+    </div>
   );
 };
-
-const Container = styled.div`
-  position: relative;
-  min-width: 15rem;
-`;
-
-const OpenPickerButton = styled.button`
-  padding: 5px 15px;
-  border-radius: 8px;
-  background-color: transparent;
-  box-shadow: none;
-  min-width: 15rem;
-  border: 1px solid #ccc;
-`;
-
-const Presets = styled.div`
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-  overflow-y: scroll;
-  box-sizing: border-box;
-  flex: 1;
-  max-height: 100%;
-  width: 14rem;
-  top: 0px;
-  left: 0px;
-  bottom: 0px;
-  margin-left: 0.4rem;
-`;
-
-const PresetButton = styled.button`
-  padding: 5px;
-  border: none;
-  background-color: white;
-  border-radius: 8px;
-  text-align: center;
-  width: 100%;
-  :hover {
-    background-color: ${theme.main25};
-  }
-`;
-
-const PickerContainer = styled.div`
-  position: absolute;
-  z-index: 1000;
-  top: 50px;
-  @media (min-width: 1100px) {
-    min-width: 45rem;
-  }
-  padding-left: 14rem;
-  background-color: #fff;
-  border-radius: 0.5rem;
-  border: 1px solid #aeaeae;
-  overflow-x: auto;
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  justify-content: flex-end;
-  .react-datepicker {
-    border: none;
-    border-left: 1px solid #aeaeae;
-    border-radius: 0px;
-  }
-  .react-datepicker__day--outside-month {
-    opacity: 0.3;
-  }
-  .react-datepicker__day--in-range,
-  .react-datepicker__day--selected,
-  .react-datepicker__day--keyboard-selected,
-  .react-datepicker__day--in-selecting-range {
-    background-color: ${theme.main};
-  }
-  .react-datepicker__navigation-icon {
-    font-size: 10px;
-  }
-`;
 
 export default DateRangePickerWithPresets;
