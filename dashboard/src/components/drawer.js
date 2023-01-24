@@ -161,8 +161,8 @@ const Drawer = () => {
         )}
       </div>
       <p className="tw-mt-auto tw-flex tw-flex-col tw-justify-between tw-text-[0.65rem] tw-text-main">
-        <span>Version: {packageInfo.version}</span>
-        <span>Accessibilité: partielle</span>
+        <span>Version&nbsp;: {packageInfo.version}</span>
+        <span>Accessibilité&nbsp;: partielle</span>
         <SessionCountDownLimiter />
       </p>
     </nav>
