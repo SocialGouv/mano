@@ -236,14 +236,14 @@ const ActionView = () => {
                   <div className="tw-mb-4">
                     <label htmlFor="dueAt">À faire le</label>
                     <div>
-                      <DatePicker
+                      <input
                         id="dueAt"
-                        locale="fr"
                         className="form-control"
-                        selected={dateForDatePicker(values.dueAt ?? new Date())}
-                        onChange={(date) => handleChange({ target: { value: date, name: 'dueAt' } })}
-                        dateFormat={values.withTime ? 'dd/MM/yyyy HH:mm' : 'dd/MM/yyyy'}
-                        showTimeInput={values.withTime}
+                        type={values.withTime ? 'datetime-local' : 'date'}
+                        value={dayjsInstance(values.dueAt).format(values.withTime ? 'YYYY-MM-DDTHH:mm' : 'YYYY-MM-DD')}
+                        onChange={handleChange}
+                        min="1901-01-01"
+                        max="2200-01-01"
                       />
                     </div>
                     <div>
