@@ -87,7 +87,7 @@ const OutOfActiveList = ({ person }) => {
         color={'warning'}
       />
       <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
-        <ModalHeader toggle={() => setOpen(false)}>Sortie de file active de {person.name}</ModalHeader>
+        <ModalHeader className="tw-break-all" toggle={() => setOpen(false)}>Sortie de file active de {person.name}</ModalHeader>
         <ModalBody>
           <Formik
             initialValues={{ ...person, outOfActiveListDate: dateForDatePicker(Date.now()), outOfActiveListReasons: [] }}
