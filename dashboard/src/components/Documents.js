@@ -101,7 +101,8 @@ const Documents = ({
                     color="primary"
                     title="Télécharger"
                     style={{ margin: '0 auto' }}
-                    onClick={async () => {
+                    onClick={async (e) => {
+                      e.stopPropagation();
                       try {
                         const file = await API.download({
                           path: document.downloadPath ?? `/person/${personId}/document/${document.file.filename}`,
