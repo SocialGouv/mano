@@ -1,6 +1,7 @@
 import React from 'react';
 import BackButton from '../backButton';
 import { useDataLoader } from '../DataLoader';
+import ButtonCustom from '../ButtonCustom';
 
 export const Header = ({ title, refreshButton = false, style = {}, titleStyle = {}, className = '' }) => {
   return (
@@ -11,13 +12,11 @@ export const Header = ({ title, refreshButton = false, style = {}, titleStyle = 
   );
 };
 
-export const RefreshButton = () => {
+export const RefreshButton = ({ className }) => {
   const { refresh, isLoading } = useDataLoader();
   return (
     <>
-      <button type="button" className="button-link tw-mr-2.5" disabled={isLoading} onClick={refresh}>
-        Rafraichir
-      </button>
+      <ButtonCustom color="link" className={className} title="Rafraichir" onClick={() => refresh()} disabled={isLoading} />
     </>
   );
 };

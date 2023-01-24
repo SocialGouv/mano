@@ -38,6 +38,7 @@ import ObservationsStats from './Observations';
 import ReportsStats from './Reports';
 import ConsultationsStats from './Consultations';
 import MedicalFilesStats from './MedicalFiles';
+import ButtonCustom from '../../components/ButtonCustom';
 
 const tabs = [
   'Général',
@@ -448,8 +449,9 @@ const Stats = () => {
         <div className="tw-min-w-[15rem] tw-shrink-0 tw-basis-1/3 tw-p-0">
           <DateRangePickerWithPresets period={period} setPeriod={setPeriod} preset={preset} setPreset={setPreset} />
         </div>
-        <div className="tw-flex tw-basis-2/3 tw-justify-end">
-          <RefreshButton />
+        <div className="tw-flex tw-basis-2/3 tw-items-center tw-justify-end">
+          <ButtonCustom color="link" title="Imprimer" onClick={window.print} />
+          <RefreshButton className="tw-mr-4" />
           <ExportFormattedData
             personCreated={personsForStats}
             personUpdated={personsUpdatedForStats}
