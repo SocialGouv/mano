@@ -11,7 +11,7 @@ import { formatDateWithFullMonth, dayjsInstance } from '../../../services/date';
 // this function removes those entries
 export const cleanHistory = (history) => {
   return history.filter((h) => {
-    if (JSON.stringify(h.data).includes('_id')) return false;
+    if (JSON.stringify(h.data).includes('encryptedEntityKey')) return false;
     return true;
   });
 };
