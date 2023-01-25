@@ -1,3 +1,10 @@
+## [1.231.3](https://github.com/SocialGouv/mano/compare/v1.231.2...v1.231.3) (2023-01-25)
+
+
+### Bug Fixes
+
+* **dashboard:** commit précédent sur l'historique pushé en toute confiance sans tester, les tests échouent, je corrige ([#1253](https://github.com/SocialGouv/mano/issues/1253)) ([03711d3](https://github.com/SocialGouv/mano/commit/03711d36c6ed316c2a378b9c03aecaf711673eb6))
+
 ## [1.231.2](https://github.com/SocialGouv/mano/compare/v1.231.1...v1.231.2) (2023-01-25)
 
 
