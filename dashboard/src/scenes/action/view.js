@@ -183,7 +183,7 @@ const ActionView = () => {
             }
           }
         }}>
-        {({ values, handleChange, handleSubmit, isSubmitting, setFieldValue }) => {
+        {({ values, handleChange, handleSubmit, isSubmitting }) => {
           const canToggleGroupCheck =
             !!organisation.groupsEnabled && !!values.person && groups.find((group) => group.persons.includes(values.person));
           return (

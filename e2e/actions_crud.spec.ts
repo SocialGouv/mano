@@ -44,7 +44,7 @@ test("Actions", async ({ page }) => {
 
     await page.getByLabel("Action prioritaire Cette action sera mise en avant par rapport aux autres").check();
     await page.getByLabel("Montrer l'heure").check();
-    await page.getByLabel("À faire le").fill("11/12/2002");
+    await page.getByLabel("À faire le").fill("2002-12-11T00:00");
 
     await page.getByRole("button", { name: "Mettre à jour" }).click();
     await page.getByText("Mise à jour !").click();
@@ -54,7 +54,7 @@ test("Actions", async ({ page }) => {
     await page.getByRole("button", { name: "Mettre à jour" }).click();
     await page.getByText("Mise à jour !").click();
 
-    await page.getByLabel("À faire le").fill("12/12/2002");
+    await page.getByLabel("À faire le").fill("2002-12-12T00:00");
 
     await page.getByRole("button", { name: "Mettre à jour" }).click();
     await page.getByText("Mise à jour !").click();
