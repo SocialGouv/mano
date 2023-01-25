@@ -119,7 +119,11 @@ test("Create action with comments", async ({ page }) => {
 
   await page.getByRole("button", { name: "Actions et commentaires urgents et vigilance" }).click();
 
-  await page.getByRole("dialog", { name: "Commentaires urgents et vigilance" }).getByRole("cell", { name: "action avec commentaire" }).click();
+  await page
+    .getByRole("dialog", { name: "Commentaires urgents et vigilance" })
+    .getByRole("cell", { name: "action avec commentaire" })
+    .first()
+    .click();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/action\/.*/);
 
   await expect(page.getByRole("heading", { name: "action avec commentaire (créée par User Admin Test - 7)" })).toBeVisible();
