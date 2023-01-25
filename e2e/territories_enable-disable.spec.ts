@@ -76,8 +76,9 @@ test("Territories - enable - disable", async ({ page }) => {
     await page.waitForTimeout(1000);
 
     await page.getByRole("link", { name: "Statistiques" }).click();
-    await expect(page.getByRole("button", { name: "Observations" })).toBeVisible();
-    await page.getByRole("button", { name: "Observations" }).click();
+    await expect(page.getByRole("button", { name: "Observations" }).first()).toBeVisible();
+    await page.getByRole("button", { name: "Observations" }).first().click();
+    await expect(page.getByText("Nombre d'observations de territoire ?")).toBeVisible();
 
     await page.getByRole("link", { name: "Comptes rendus" }).click();
     await page.getByRole("button", { name: dayjs().format("YYYY-MM-DD") }).click();
