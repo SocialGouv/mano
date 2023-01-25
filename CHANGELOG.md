@@ -1,3 +1,10 @@
+# [1.231.0](https://github.com/SocialGouv/mano/compare/v1.230.0...v1.231.0) (2023-01-25)
+
+
+### Features
+
+* **app:** modification de l'intitulé de déconnexion avec supression du cache ([#1250](https://github.com/SocialGouv/mano/issues/1250)) ([e2c5616](https://github.com/SocialGouv/mano/commit/e2c5616b3176018b9cf1fee34a49a8017419077e))
+
 # [1.230.0](https://github.com/SocialGouv/mano/compare/v1.229.5...v1.230.0) (2023-01-24)
 
 
