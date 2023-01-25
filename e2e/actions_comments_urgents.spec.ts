@@ -14,8 +14,8 @@ test.beforeAll(async () => {
 });
 
 test("Create action with comments", async ({ page }) => {
-  const person1Name = nanoid();
-  const person2Name = nanoid();
+  const person1Name = "personne 1";
+  const person2Name = "personne 2";
   const actionFor2PersonName = nanoid();
 
   await loginWith(page, "admin7@example.org");
@@ -29,14 +29,11 @@ test("Create action with comments", async ({ page }) => {
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*/);
-  await page.getByRole("link", { name: "Personnes suivies" }).click();
-  await expect(page).toHaveURL("http://localhost:8090/person");
   await page.getByRole("button", { name: "Ajouter un commentaire" }).click();
   await page.getByRole("textbox", { name: "Commentaire" }).fill("commentaire prioritaire pour une personne");
-  await page.getByLabel("Commentaire prioritaire Ce commentaire sera mis en avant par rapport aux autres").check();
+  await page.getByText("Commentaire prioritaire Ce commentaire sera mis en avant par rapport aux autres").click();
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Commentaire enregistré").click();
-  await page.getByRole("button", { name: "Fermer" }).click();
 
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await expect(page).toHaveURL("http://localhost:8090/person");
@@ -101,5 +98,85 @@ test("Create action with comments", async ({ page }) => {
 
   await page.getByRole("link", { name: "Comptes rendus" }).click();
   await page.getByRole("button", { name: dayjs().format("YYYY-MM-DD") }).click();
-  await page.getByText("Commentaires (3)").click();
+  await page.getByText("Commentaires (4)").click();
+
+  /*
+
+
+
+
+
+
+
+
+
+  start here
+
+
+
+
+  */
+
+  await page.getByRole("button", { name: "Actions et commentaires urgents et vigilance" }).click();
+
+  await page.getByRole("dialog", { name: "Commentaires urgents et vigilance" }).getByRole("cell", { name: "action avec commentaire" }).click();
+  await expect(page).toHaveURL(/http:\/\/localhost:8090\/action\/.*/);
+
+  await expect(page.getByRole("heading", { name: "action avec commentaire (créée par User Admin Test - 7)" })).toBeVisible();
+
+  await page.getByRole("button", { name: "Actions et commentaires urgents et vigilance" }).click();
+  await page.getByRole("dialog", { name: "Commentaires urgents et vigilance" }).getByText(person1Name).first().click();
+  await expect(page.getByRole("dialog", { name: "Commentaires urgents et vigilance" })).not.toBeVisible();
+  await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*/);
+  await page.locator(`[data-test-id="${person1Name}Résumé"]`).getByText(person1Name).click();
+
+  await page.getByRole("button", { name: "Actions et commentaires urgents et vigilance" }).click();
+  await page.getByRole("dialog", { name: "Commentaires urgents et vigilance" }).getByText(person1Name).nth(1).click();
+  await expect(page.getByRole("dialog", { name: "Commentaires urgents et vigilance" })).not.toBeVisible();
+  await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*/);
+  await page.locator(`[data-test-id="${person1Name}Résumé"]`).getByText(person1Name).click();
+
+  await page.getByRole("button", { name: "Actions et commentaires urgents et vigilance" }).click();
+  await page.getByRole("dialog", { name: "Commentaires urgents et vigilance" }).getByText(person1Name).nth(2).click();
+  await expect(page.getByRole("dialog", { name: "Commentaires urgents et vigilance" })).not.toBeVisible();
+  await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*/);
+  await page.locator(`[data-test-id="${person1Name}Résumé"]`).getByText(person1Name).click();
+
+  await page.getByRole("button", { name: "Actions et commentaires urgents et vigilance" }).click();
+  await page.getByRole("dialog", { name: "Commentaires urgents et vigilance" }).getByText("commentaire prioritaire pour une personne").click();
+  await expect(page.getByRole("dialog", { name: "Commentaires urgents et vigilance" })).not.toBeVisible();
+  await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*/);
+  await expect(page.locator(`[data-test-id="${person1Name}Résumé"]`).getByText("commentaire prioritaire pour une personne")).toBeVisible();
+
+  await page.getByRole("button", { name: "Actions et commentaires urgents et vigilance" }).click();
+  await page.getByRole("dialog", { name: "Commentaires urgents et vigilance" }).getByText("Une personne avec un commentaire prioritaire").click();
+  await expect(page.getByRole("dialog", { name: "Commentaires urgents et vigilance" })).not.toBeVisible();
+  await expect(page).toHaveURL(/http:\/\/localhost:8090\/action\/.*/);
+  await page.getByRole("heading", { name: "action avec commentaire (créée par User Admin Test - 7)" }).click();
+  await expect(page.getByText("Une personne avec un commentaire prioritaire")).toBeVisible();
+
+  await page.getByRole("button", { name: "Actions et commentaires urgents et vigilance" }).click();
+  await page
+    .getByRole("dialog", { name: "Commentaires urgents et vigilance" })
+    .locator('[data-test-id="action avec commentaire"]')
+    .getByRole("button", { name: "Déprioriser" })
+    .click();
+  await page
+    .getByRole("dialog", { name: "Commentaires urgents et vigilance" })
+    .locator('[data-test-id="commentaire prioritaire pour une personne"]')
+    .getByRole("button", { name: "Déprioriser" })
+    .click();
+  await page.locator('[data-test-id="Une personne avec un commentaire prioritaire"]').getByRole("button", { name: "Déprioriser" }).click();
+  await expect(page.getByRole("dialog", { name: "Commentaires urgents et vigilance" })).not.toBeVisible();
+
+  await page.getByRole("heading", { name: "action avec commentaire (créée par User Admin Test - 7)" }).click();
+  await expect(page.getByText("Une personne avec un commentaire prioritaire")).toBeVisible();
+
+  await page.getByRole("link", { name: "Personnes suivies" }).click();
+  await expect(page).toHaveURL("http://localhost:8090/person");
+
+  await page.getByText(person1Name).click();
+  await expect(page.getByText("commentaire prioritaire pour une personne")).toBeVisible();
+
+  await expect(page.getByRole("button", { name: "Actions et commentaires urgents et vigilance" })).not.toBeVisible();
 });
