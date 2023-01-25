@@ -1,3 +1,10 @@
+## [1.231.2](https://github.com/SocialGouv/mano/compare/v1.231.1...v1.231.2) (2023-01-25)
+
+
+### Bug Fixes
+
+* **dashboard:** dépriorisation d'un commentaire de dashboard conserve le commentaire lié à la personne ([1987678](https://github.com/SocialGouv/mano/commit/198767811c3ebdbe9f12e814a2fb78ac61c2d2c0))
+
 ## [1.231.1](https://github.com/SocialGouv/mano/compare/v1.231.0...v1.231.1) (2023-01-25)
 
 

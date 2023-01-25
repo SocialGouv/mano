@@ -1,6 +1,6 @@
 {
   "name": "website",
-  "version": "1.231.1",
+  "version": "1.231.2",
   "mobileAppVersion": "2.30.0",
   "private": true,
   "engines": {
