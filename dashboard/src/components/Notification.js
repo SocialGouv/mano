@@ -1,9 +1,8 @@
 import dayjs from 'dayjs';
 import React, { useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Modal, ModalBody, ModalHeader } from 'reactstrap';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import styled from 'styled-components';
+import { useLocalStorage } from 'react-use';
 import { theme } from '../config';
 import { actionsState, CANCEL, DONE, prepareActionForEncryption, sortActionsOrConsultations, TODO } from '../recoil/actions';
 import { currentTeamState } from '../recoil/auth';
@@ -14,8 +13,9 @@ import ButtonCustom from './ButtonCustom';
 import DateBloc from './DateBloc';
 import Table from './table';
 import UserName from './UserName';
-import { useLocalStorage } from 'react-use';
 import API from '../services/api';
+import { ModalContainer, ModalBody, ModalHeader, ModalFooter } from './tailwind/Modal';
+import PersonName from './PersonName';
 
 export default function Notification() {
   const [showModal, setShowModal] = useState(false);
@@ -49,19 +49,19 @@ export default function Notification() {
           const commentPopulated = { ...comment };
           if (comment.person) {
             const id = comment?.person;
-            commentPopulated.person = persons.find((p) => p._id === id);
+            commentPopulated.personPopulated = persons.find((p) => p._id === id);
             commentPopulated.type = 'person';
           }
           if (comment.action) {
             const id = comment?.action;
             const action = actions.find((p) => p._id === id);
-            commentPopulated.action = action;
-            commentPopulated.person = persons.find((p) => p._id === action?.person);
+            commentPopulated.actionPopulated = action;
+            commentPopulated.personPopulated = persons.find((p) => p._id === action?.person);
             commentPopulated.type = 'action';
           }
           return commentPopulated;
         })
-        .filter((c) => c.action || c.person)
+        .filter((c) => c.actionPopulated || c.personPopulated)
         .sort((a, b) => dayjs(a.createdAt).diff(dayjs(b.createdAt))),
     [comments, persons, actions]
   );
@@ -87,34 +87,34 @@ export default function Notification() {
           <span className="badge badge-pill badge-danger">{actionsFiltered.length + commentsFiltered.length}</span>
         </div>
       </div>
-      <StyledModal isOpen={showModal} toggle={() => setShowModal(false)} size="lg">
-        <div>
-          <Actions
-            setShowModal={setShowModal}
-            actions={actionsFiltered}
-            setSortOrder={setActionsSortOrder}
-            setSortBy={setActionsSortBy}
-            sortBy={actionsSortBy}
-            sortOrder={actionsSortOrder}
-          />
-          <Comments setShowModal={setShowModal} comments={commentsFiltered} />
-          <ButtonCustom style={{ margin: '1rem auto' }} title="OK, merci" onClick={() => setShowModal(false)} />
-        </div>
-      </StyledModal>
+      <ModalContainer open={showModal} onClose={() => setShowModal(false)} size="full">
+        <Actions
+          setShowModal={setShowModal}
+          actions={actionsFiltered}
+          setSortOrder={setActionsSortOrder}
+          setSortBy={setActionsSortBy}
+          sortBy={actionsSortBy}
+          sortOrder={actionsSortOrder}
+        />
+        <Comments setShowModal={setShowModal} comments={commentsFiltered} />
+
+        <ModalFooter>
+          <ButtonCustom className="tw-my-4 tw-mx-auto" title="OK, merci" onClick={() => setShowModal(false)} />
+        </ModalFooter>
+      </ModalContainer>
     </>
   );
 }
 
 const Actions = ({ setShowModal, actions, setSortOrder, setSortBy, sortBy, sortOrder }) => {
   const history = useHistory();
-  const persons = useRecoilValue(personsState);
   const setActions = useSetRecoilState(actionsState);
 
   if (!actions.length) return null;
   return (
     <>
-      <ModalHeader toggle={() => setShowModal(false)}>Actions urgentes et vigilance</ModalHeader>
-      <ModalBody>
+      <ModalHeader title="Actions urgentes et vigilance" />
+      <ModalBody className="tw-p-8">
         <Table
           data={actions}
           rowKey={'_id'}
@@ -150,7 +150,15 @@ const Actions = ({ setShowModal, actions, setSortOrder, setSortBy, sortBy, sortO
               onSortBy: setSortBy,
               sortBy,
               sortOrder,
-              render: (action) => <>{persons.find((p) => p._id === action.person)?.name}</>,
+              render: (action) => (
+                <PersonName
+                  item={action}
+                  onClick={() => {
+                    setShowModal(false);
+                    history.push(`/person/${action.person}?tab=Résumé`);
+                  }}
+                />
+              ),
             },
             {
               title: '',
@@ -197,14 +205,14 @@ const Comments = ({ setShowModal, comments }) => {
   if (!comments.length) return null;
   return (
     <>
-      <ModalHeader>Commentaires urgents et vigilance</ModalHeader>
-      <ModalBody>
+      <ModalHeader title="Commentaires urgents et vigilance" />
+      <ModalBody className="tw-p-4">
         <Table
           data={comments}
           rowKey={'_id'}
           onRowClick={(comment) => {
             setShowModal(false);
-            history.push(`/${comment.type}/${comment[comment.type]._id}?tab=Résumé`);
+            history.push(`/${comment.type}/${comment[comment.type]}?tab=Résumé`);
           }}
           columns={[
             {
@@ -234,14 +242,24 @@ const Comments = ({ setShowModal, comments }) => {
               dataKey: 'person',
               render: (comment) => (
                 <>
-                  <b></b>
-                  <b>{comment[comment.type]?.name}</b>
                   {comment.type === 'action' && (
                     <>
+                      <b>{comment.actionPopulated?.name}</b>
                       <br />
-                      <i>(pour {comment.person?.name || ''})</i>
+                      <i>
+                        (pour{' '}
+                        <PersonName
+                          item={comment}
+                          onClick={() => {
+                            setShowModal(false);
+                            history.push(`/person/${comment.personPopulated._id}?tab=Résumé`);
+                          }}
+                        />
+                        )
+                      </i>
                     </>
                   )}
+                  {comment.type === 'person' && <b>{<PersonName item={comment} />}</b>}
                 </>
               ),
             },
@@ -303,13 +321,3 @@ const Comments = ({ setShowModal, comments }) => {
     </>
   );
 };
-
-const StyledModal = styled(Modal)`
-  width: 1000px;
-  max-width: 90vw;
-  max-height: 90vh;
-  > div {
-    overflow: auto;
-    max-height: 90vh;
-  }
-`;
