@@ -89,6 +89,7 @@ const List = () => {
             onSortBy: setSortBy,
             sortOrder,
             sortBy,
+            render: (territory) => <b>{territory.name}</b>,
           },
           {
             title: 'Types',
