@@ -1,3 +1,10 @@
+## [1.231.1](https://github.com/SocialGouv/mano/compare/v1.231.0...v1.231.1) (2023-01-25)
+
+
+### Bug Fixes
+
+* **dashboard:** remise au propre de l'affichage de l'historique ([257d8df](https://github.com/SocialGouv/mano/commit/257d8dfb7564f6781c66033b9b318d8988b5eff5))
+
 # [1.231.0](https://github.com/SocialGouv/mano/compare/v1.230.0...v1.231.0) (2023-01-25)
 
 
