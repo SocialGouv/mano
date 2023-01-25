@@ -19,7 +19,7 @@ export const cleanHistory = (history) => {
 const History = ({ person }) => {
   const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
   const teams = useRecoilValue(teamsState);
-  const history = useMemo(() => cleanHistory([...(person.history || [])]).reverse(), [person.history]);
+  const history = useMemo(() => cleanHistory(person.history || []).reverse(), [person.history]);
 
   return (
     <div>

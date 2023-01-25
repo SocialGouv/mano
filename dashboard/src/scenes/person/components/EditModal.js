@@ -20,6 +20,7 @@ import ButtonCustom from '../../../components/ButtonCustom';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
 import API from '../../../services/api';
+import { cleanHistory } from './History';
 
 export default function EditModal({ person, selectedPanel, onClose }) {
   const [openPanels, setOpenPanels] = useState([selectedPanel]);
@@ -54,7 +55,7 @@ export default function EditModal({ person, selectedPanel, onClose }) {
               if (!allowedFieldsInHistory.includes(key)) continue;
               if (body[key] !== person[key]) historyEntry.data[key] = { oldValue: person[key], newValue: body[key] };
             }
-            if (!!Object.keys(historyEntry.data).length) body.history = [...(person.history || []), historyEntry];
+            if (!!Object.keys(historyEntry.data).length) body.history = [...cleanHistory(person.history || []), historyEntry];
 
             const response = await API.put({
               path: `/person/${person._id}`,
