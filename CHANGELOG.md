@@ -1,3 +1,10 @@
+## [1.231.4](https://github.com/SocialGouv/mano/compare/v1.231.3...v1.231.4) (2023-01-25)
+
+
+### Bug Fixes
+
+* **dsahboard:** font-size in index.scss was making the build crashes and not deploy ([9b8dc77](https://github.com/SocialGouv/mano/commit/9b8dc77e3181235b928b35298d3bd48c34b7aae0))
+
 ## [1.231.3](https://github.com/SocialGouv/mano/compare/v1.231.2...v1.231.3) (2023-01-25)
 
 
