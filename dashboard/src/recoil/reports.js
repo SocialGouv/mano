@@ -67,9 +67,6 @@ const encryptedFields = ['description', 'services', 'team', 'date', 'collaborati
 
 export const prepareReportForEncryption = (report) => {
   try {
-    if (!looseUuidRegex.test(report.person)) {
-      throw new Error('Report is missing person');
-    }
     if (!looseUuidRegex.test(report.team)) {
       throw new Error('Report is missing team');
     }

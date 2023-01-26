@@ -15,7 +15,7 @@ const encryptedFields = ['comment', 'person', 'action', 'group', 'team', 'user',
 
 export const prepareCommentForEncryption = (comment) => {
   try {
-    if (!looseUuidRegex.test(comment.person) || !looseUuidRegex.test(comment.action)) {
+    if (!looseUuidRegex.test(comment.person) && !looseUuidRegex.test(comment.action)) {
       throw new Error('Comment is missing person or action');
     }
     if (!looseUuidRegex.test(comment.team)) {

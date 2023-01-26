@@ -49,8 +49,10 @@ export const prepareActionForEncryption = (action) => {
     if (!looseUuidRegex.test(action.person)) {
       throw new Error('Action is missing person');
     }
-    if (!looseUuidRegex.test(action.team)) {
-      throw new Error('Action is missing team');
+    for (const team of action.teams) {
+      if (!looseUuidRegex.test(team)) {
+        throw new Error('Action is missing teams');
+      }
     }
     if (!looseUuidRegex.test(action.user)) {
       throw new Error('Action is missing user');
