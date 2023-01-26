@@ -189,7 +189,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
 
   await page.locator(`data-test-id=${testObsTerritoryField}`).getByLabel(teamExcludeCustomFieldName).uncheck();
 
-  await page.getByRole("button", { name: "Mettre à jour" }).click();
+  await page.getByRole("button", { name: "Mettre à jour" }).nth(1).click();
   await page.locator(".Toastify__close-button").last().click();
 
   /*

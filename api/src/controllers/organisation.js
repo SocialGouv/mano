@@ -270,6 +270,7 @@ router.put(
         encryptedVerificationKey: z.optional(z.string().min(1)),
         encryptionEnabled: z.optional(z.boolean()),
         receptionEnabled: z.optional(z.boolean()),
+        territoriesEnabled: z.optional(z.boolean()),
         groupsEnabled: z.optional(z.boolean()),
         services: z.optional(z.array(z.string().min(1))),
       };
@@ -330,6 +331,7 @@ router.put(
     if (req.body.hasOwnProperty("encryptionEnabled")) updateOrg.encryptionEnabled = req.body.encryptionEnabled;
     if (req.body.hasOwnProperty("encryptionLastUpdateAt")) updateOrg.encryptionLastUpdateAt = req.body.encryptionLastUpdateAt;
     if (req.body.hasOwnProperty("receptionEnabled")) updateOrg.receptionEnabled = req.body.receptionEnabled;
+    if (req.body.hasOwnProperty("territoriesEnabled")) updateOrg.territoriesEnabled = req.body.territoriesEnabled;
     if (req.body.hasOwnProperty("groupsEnabled")) updateOrg.groupsEnabled = req.body.groupsEnabled;
     if (req.body.hasOwnProperty("services")) updateOrg.services = req.body.services;
 

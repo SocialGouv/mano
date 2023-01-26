@@ -10,6 +10,7 @@ function serializeOrganisation(organisation) {
     encryptionEnabled: organisation.encryptionEnabled,
     encryptionLastUpdateAt: organisation.encryptionLastUpdateAt,
     receptionEnabled: organisation.receptionEnabled,
+    territoriesEnabled: organisation.territoriesEnabled,
     encryptedVerificationKey: organisation.encryptedVerificationKey,
     migrations: organisation.migrations,
     migrationLastUpdateAt: organisation.migrationLastUpdateAt,

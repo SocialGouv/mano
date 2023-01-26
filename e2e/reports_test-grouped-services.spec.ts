@@ -33,11 +33,19 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Accueil de jour" }).click();
 
   await expect(page.getByRole("link", { name: "Accueil" })).toBeVisible();
-  await page.getByText("Activer l'accueil de jour").click();
+  await page
+    .getByText(
+      `Activer l'accueil de jour, pour pouvoir enregistrer les services proposés par votre oranisation. Un menu "Accueil" apparaîtra sur la barre de navigation latérale.`
+    )
+    .click();
   await page.getByRole("button", { name: "Mettre à jour" }).click();
   await page.getByText("Mise à jour !").click();
   await expect(page.getByRole("link", { name: "Accueil" })).not.toBeVisible();
-  await page.getByText("Activer l'accueil de jour").click();
+  await page
+    .getByText(
+      `Activer l'accueil de jour, pour pouvoir enregistrer les services proposés par votre oranisation. Un menu "Accueil" apparaîtra sur la barre de navigation latérale.`
+    )
+    .click();
   await page.getByRole("button", { name: "Mettre à jour" }).click();
   await page.getByText("Mise à jour !").click();
   await expect(page.getByRole("link", { name: "Accueil" })).toBeVisible();
