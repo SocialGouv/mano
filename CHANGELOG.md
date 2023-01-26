@@ -1,3 +1,10 @@
+# [1.232.0](https://github.com/SocialGouv/mano/compare/v1.231.4...v1.232.0) (2023-01-26)
+
+
+### Features
+
+* possibilité d'activer/désactiver les territoires ([#1248](https://github.com/SocialGouv/mano/issues/1248)) ([7a98fd3](https://github.com/SocialGouv/mano/commit/7a98fd3eb44abf41f480de3f098e89dbceb3c8cd))
+
 ## [1.231.4](https://github.com/SocialGouv/mano/compare/v1.231.3...v1.231.4) (2023-01-25)
 
 

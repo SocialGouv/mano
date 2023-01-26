@@ -596,7 +596,7 @@ const View = () => {
               onClick={() => setActiveTab('rencontres')}>
               Rencontres ({rencontres.length})
             </DrawerLink>
-            {!['restricted-access'].includes(user.role) && (
+            {!['restricted-access'].includes(user.role) && !!organisation.territoriesEnabled && (
               <>
                 <hr />
                 <DrawerLink
@@ -605,6 +605,10 @@ const View = () => {
                   onClick={() => setActiveTab('territory-observations')}>
                   Observations ({observations.length})
                 </DrawerLink>
+              </>
+            )}
+            {!['restricted-access'].includes(user.role) && (
+              <>
                 <hr />
                 <DrawerLink
                   id="report-button-persons-created"

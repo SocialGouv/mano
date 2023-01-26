@@ -1,13 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as Sentry from '@sentry/react-native';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
-import { Alert, InteractionManager } from 'react-native';
+import { Alert, InteractionManager, AppState } from 'react-native';
 import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useMMKVNumber } from 'react-native-mmkv';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AgendaIcon, PersonIcon, TerritoryIcon } from './icons';
-import { AppState } from 'react-native';
 import { RecoilRoot, useRecoilValue, useResetRecoilState } from 'recoil';
 import logEvents from './services/logEvents';
 import Login from './scenes/Login/Login';
@@ -192,67 +191,73 @@ const MenuNavigator = () => {
 
 const Tab = createBottomTabNavigator();
 
-const TabNavigator = () => (
-  <Tab.Navigator
-    initialRouteName="Agenda"
-    screenOptions={{
-      gestureEnabled: false,
-      headerShown: false,
-      tabBarActiveTintColor: colors.app.color,
-      tabBarnactiveTintColor: '#aaa',
-    }}>
-    <Tab.Screen
-      lazy
-      name="Agenda"
-      component={ActionsNavigator}
-      options={{
-        tabBarIcon: ({ size, color }) => <AgendaIcon size={size} color={color} />,
-        tabBarLabel: 'AGENDA',
-        tabBarTestID: 'tab-bar-actions',
-      }}
-    />
-    <Tab.Screen
-      lazy
-      name="Territories"
-      component={TerritoriesNavigator}
-      options={{
-        tabBarIcon: ({ size, color }) => <TerritoryIcon size={size} color={color} />,
-        tabBarLabel: 'TERRITOIRES',
-        tabBarTestID: 'tab-bar-territories',
-      }}
-    />
-    <Tab.Screen
-      lazy
-      name="Persons"
-      component={PersonsNavigator}
-      options={{
-        tabBarIcon: ({ size, color }) => <PersonIcon size={size} color={color} />,
-        tabBarLabel: 'PERSONNES',
-        tabBarTestID: 'tab-bar-persons',
-      }}
-    />
-    <Tab.Screen
-      lazy
-      name="Notifications"
-      component={NotificationsNavigator}
-      options={{
-        tabBarIcon: ({ size, color }) => <BellWithNotifications size={size} color={color} />,
-        tabBarLabel: 'PRIORITÉS',
-        tabBarTestID: 'tab-bar-notifications',
-      }}
-    />
-    <Tab.Screen
-      lazy
-      name="MenuTab"
-      component={MenuNavigator}
-      options={{
-        tabBarIcon: ({ size, color }) => <DotsIcon size={size} color={color} />,
-        tabBarLabel: 'MENU',
-        tabBarTestID: 'tab-bar-profil',
-      }}
-    />
-  </Tab.Navigator>
-);
+const TabNavigator = () => {
+  const organisation = useRecoilValue(organisationState);
+
+  return (
+    <Tab.Navigator
+      initialRouteName="Agenda"
+      screenOptions={{
+        gestureEnabled: false,
+        headerShown: false,
+        tabBarActiveTintColor: colors.app.color,
+        tabBarnactiveTintColor: '#aaa',
+      }}>
+      <Tab.Screen
+        lazy
+        name="Agenda"
+        component={ActionsNavigator}
+        options={{
+          tabBarIcon: AgendaIcon,
+          tabBarLabel: 'AGENDA',
+          tabBarTestID: 'tab-bar-actions',
+        }}
+      />
+      {!!organisation?.territoriesEnabled && (
+        <Tab.Screen
+          lazy
+          name="Territories"
+          component={TerritoriesNavigator}
+          options={{
+            tabBarIcon: TerritoryIcon,
+            tabBarLabel: 'TERRITOIRES',
+            tabBarTestID: 'tab-bar-territories',
+          }}
+        />
+      )}
+      <Tab.Screen
+        lazy
+        name="Persons"
+        component={PersonsNavigator}
+        options={{
+          tabBarIcon: PersonIcon,
+          tabBarLabel: 'PERSONNES',
+          tabBarTestID: 'tab-bar-persons',
+        }}
+      />
+      <Tab.Screen
+        lazy
+        name="Notifications"
+        component={NotificationsNavigator}
+        options={{
+          tabBarIcon: BellWithNotifications,
+          tabBarLabel: 'PRIORITÉS',
+          tabBarTestID: 'tab-bar-notifications',
+        }}
+      />
+      <Tab.Screen
+        lazy
+        name="MenuTab"
+        component={MenuNavigator}
+        options={{
+          tabBarIcon: DotsIcon,
+          tabBarLabel: 'MENU',
+          tabBarTestID: 'tab-bar-profil',
+        }}
+      />
+    </Tab.Navigator>
+  );
+};
 
 const LoginStack = createStackNavigator();
 const LoginNavigator = () => (

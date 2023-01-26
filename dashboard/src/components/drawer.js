@@ -66,7 +66,7 @@ const Drawer = () => {
             </NavLink>
           </li>
         )}
-        {['admin', 'normal'].includes(role) && (
+        {['admin', 'normal'].includes(role) && !!organisation.territoriesEnabled && (
           <li>
             <NavLink to="/territory" activeClassName="active">
               Territoires
