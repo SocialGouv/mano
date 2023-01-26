@@ -48,11 +48,21 @@ const searchablePersonsSelector = selector({
   },
 });
 
+// This function is used to filter persons by search string. It ignores diacritics and accents.
 const filterEasySearch = (search, items = []) => {
-  search = removeDiatricsAndAccents(search.toLocaleLowerCase());
-  const firstItems = items.filter((item) => item.searchString.startsWith(search));
+  const searchNormalized = removeDiatricsAndAccents((search || '').toLocaleLowerCase());
+  const searchTerms = searchNormalized.split(' ');
+  // Items that have exact match in the beginning of the search string are first.
+  const firstItems = items.filter((item) => item.searchString.startsWith(searchNormalized));
   const firstItemsIds = new Set(firstItems.map((item) => item._id));
-  const secondItems = items.filter((item) => !firstItemsIds.has(item._id)).filter((item) => item.searchString.includes(search));
+  // Items that have all words in search (the order does not matter) are second.
+  const secondItems = items.filter(
+    (item) =>
+      // Include only items that are not already in firstItems…
+      !firstItemsIds.has(item._id) &&
+      //  … and that have all words in search (the order does not matter).
+      searchTerms.every((e) => item.searchString.includes(e))
+  );
   return [...firstItems, ...secondItems];
 };
 
@@ -121,8 +131,7 @@ const SelectAndCreatePerson = ({ value, onChange, inputId, classNamePrefix }) =>
   return (
     <AsyncSelect
       loadOptions={(inputValue) => {
-        const formattedInputValue = removeDiatricsAndAccents(inputValue).toLowerCase();
-        const options = personsToOptions(filterEasySearch(formattedInputValue, searchablePersons), lastActions, lastPassages, lastRencontres);
+        const options = personsToOptions(filterEasySearch(inputValue, searchablePersons), lastActions, lastPassages, lastRencontres);
         optionsExist.current = options.length;
         return Promise.resolve(options);
       }}
