@@ -6,7 +6,9 @@ import { changeReactSelectValue, clickOnEmptyReactSelect, loginWith, logOut } fr
 test.beforeAll(async () => {
   await populate();
 });
+
 test.setTimeout(45000);
+
 test("test", async ({ page }) => {
   const personName = nanoid();
 

@@ -69,7 +69,11 @@ export default function Notification() {
   if (!actionsFiltered.length && !commentsFiltered.length) return null;
   return (
     <>
-      <div style={{ alignSelf: 'center', display: 'flex', cursor: 'pointer' }} onClick={() => setShowModal(true)}>
+      <button
+        type="button"
+        aria-label="Actions et commentaires urgents et vigilance"
+        className="tw-flex tw-self-center"
+        onClick={() => setShowModal(true)}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -86,7 +90,7 @@ export default function Notification() {
         <div style={{ marginTop: '-0.75rem', marginLeft: '-0.75rem' }}>
           <span className="badge badge-pill badge-danger">{actionsFiltered.length + commentsFiltered.length}</span>
         </div>
-      </div>
+      </button>
       <ModalContainer open={showModal} onClose={() => setShowModal(false)} size="full">
         <Actions
           setShowModal={setShowModal}
@@ -118,6 +122,7 @@ const Actions = ({ setShowModal, actions, setSortOrder, setSortBy, sortBy, sortO
         <Table
           data={actions}
           rowKey={'_id'}
+          dataTestId="name"
           onRowClick={(action) => {
             setShowModal(false);
             history.push(`/action/${action._id}`);
@@ -210,9 +215,10 @@ const Comments = ({ setShowModal, comments }) => {
         <Table
           data={comments}
           rowKey={'_id'}
+          dataTestId="comment"
           onRowClick={(comment) => {
             setShowModal(false);
-            history.push(`/${comment.type}/${comment[comment.type]}?tab=Résumé`);
+            history.push(`/${comment.type}/${comment[comment.type]}`);
           }}
           columns={[
             {
@@ -259,7 +265,19 @@ const Comments = ({ setShowModal, comments }) => {
                       </i>
                     </>
                   )}
-                  {comment.type === 'person' && <b>{<PersonName item={comment} />}</b>}
+                  {comment.type === 'person' && (
+                    <b>
+                      {
+                        <PersonName
+                          onClick={() => {
+                            setShowModal(false);
+                            history.push(`/person/${comment.person}?tab=Résumé`);
+                          }}
+                          item={comment}
+                        />
+                      }
+                    </b>
+                  )}
                 </>
               ),
             },

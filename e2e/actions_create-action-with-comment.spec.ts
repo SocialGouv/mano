@@ -43,6 +43,7 @@ test("Create action with comments", async ({ page }) => {
   await page.getByRole("button", { name: "Créer une nouvelle action" }).click();
   await page.getByLabel("Nom de l'action").click();
   await page.getByLabel("Nom de l'action").fill("action avec commentaire");
+  await page.getByText("Action prioritaire Cette action sera mise en avant par rapport aux autres").click();
   await changeReactSelectValue(page, "create-action-person-select", person1Name);
   await page.getByLabel("Description").click();
   await page.getByLabel("Description").fill("Une seule personne");
