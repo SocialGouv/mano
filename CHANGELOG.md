@@ -1,3 +1,10 @@
+## [1.232.1](https://github.com/SocialGouv/mano/compare/v1.232.0...v1.232.1) (2023-01-26)
+
+
+### Bug Fixes
+
+* **dashboard:** retire une entrée buggée de l'historique, où on enregistrait la personne entière ([#1252](https://github.com/SocialGouv/mano/issues/1252)) ([b49485f](https://github.com/SocialGouv/mano/commit/b49485f3bbaec977dd2c34ca4c6eb47da0dbcf84))
+
 # [1.232.0](https://github.com/SocialGouv/mano/compare/v1.231.4...v1.232.0) (2023-01-26)
 
 
