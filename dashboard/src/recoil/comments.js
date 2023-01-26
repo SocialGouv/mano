@@ -15,7 +15,6 @@ const encryptedFields = ['comment', 'person', 'action', 'group', 'team', 'user',
 
 export const prepareCommentForEncryption = (comment) => {
   try {
-    const decrypted = {};
     if (!looseUuidRegex.test(comment.person) || !looseUuidRegex.test(comment.action)) {
       throw new Error('Comment is missing person or action');
     }
@@ -25,21 +24,24 @@ export const prepareCommentForEncryption = (comment) => {
     if (!looseUuidRegex.test(comment.user)) {
       throw new Error('Comment is missing user');
     }
-    for (let field of encryptedFields) {
-      decrypted[field] = comment[field];
-    }
-    return {
-      _id: comment._id,
-      createdAt: comment.createdAt,
-      updatedAt: comment.updatedAt,
-      organisation: comment.organisation,
-
-      decrypted,
-      entityKey: comment.entityKey,
-    };
   } catch (error) {
-    toast.error("Le commentaire n'a pas été sauvegardé car son format était incorrect. Vous pouvez vérifier son contenu et tenter de le sauvegarder à nouveau. L'équipe technique a été prévenue et va travailler sur un correctif.");
+    toast.error(
+      "Le commentaire n'a pas été sauvegardé car son format était incorrect. Vous pouvez vérifier son contenu et tenter de le sauvegarder à nouveau. L'équipe technique a été prévenue et va travailler sur un correctif."
+    );
     capture(error, { extra: { comment } });
     throw error;
   }
+  const decrypted = {};
+  for (let field of encryptedFields) {
+    decrypted[field] = comment[field];
+  }
+  return {
+    _id: comment._id,
+    createdAt: comment.createdAt,
+    updatedAt: comment.updatedAt,
+    organisation: comment.organisation,
+
+    decrypted,
+    entityKey: comment.entityKey,
+  };
 };

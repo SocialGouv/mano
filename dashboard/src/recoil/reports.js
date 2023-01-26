@@ -2,6 +2,8 @@ import { setCacheItem } from '../services/dataManagement';
 import { atom, selector } from 'recoil';
 import { capture } from '../services/sentry';
 import { organisationState } from './auth';
+import { dateRegex, looseUuidRegex } from '../utils';
+import { toast } from 'react-toastify';
 
 const collectionName = 'report';
 export const reportsState = atom({
@@ -64,6 +66,23 @@ export const flattenedServicesSelector = selector({
 const encryptedFields = ['description', 'services', 'team', 'date', 'collaborations', 'oldDateSystem'];
 
 export const prepareReportForEncryption = (report) => {
+  try {
+    if (!looseUuidRegex.test(report.person)) {
+      throw new Error('Report is missing person');
+    }
+    if (!looseUuidRegex.test(report.team)) {
+      throw new Error('Report is missing team');
+    }
+    if (!dateRegex.test(report.date)) {
+      throw new Error('Report is missing date');
+    }
+  } catch (error) {
+    toast.error(
+      "Le compte-rendu n'a pas été sauvegardé car son format était incorrect. Vous pouvez vérifier son contenu et tenter de le sauvegarder à nouveau. L'équipe technique a été prévenue et va travailler sur un correctif."
+    );
+    capture(error, { extra: { report } });
+    throw error;
+  }
   const decrypted = {};
   for (let field of encryptedFields) {
     decrypted[field] = report[field];

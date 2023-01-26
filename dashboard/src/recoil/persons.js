@@ -1,6 +1,8 @@
 import { setCacheItem } from '../services/dataManagement';
 import { atom, selector, useRecoilValue } from 'recoil';
 import { organisationState } from './auth';
+import { toast } from 'react-toastify';
+import { capture } from '../services/sentry';
 
 const collectionName = 'person';
 export const personsState = atom({
@@ -119,6 +121,17 @@ export const usePreparePersonForEncryption = () => {
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
   const personFields = useRecoilValue(personFieldsSelector);
   const preparePersonForEncryption = (person) => {
+    try {
+      if (!person.name) {
+        throw new Error('Person is missing name');
+      }
+    } catch (error) {
+      toast.error(
+        "La personne n'a pas été sauvegardée car son format était incorrect. Vous pouvez vérifier son contenu et tenter de la sauvegarder à nouveau. L'équipe technique a été prévenue et va travailler sur un correctif."
+      );
+      capture(error, { extra: { person } });
+      throw error;
+    }
     const encryptedFields = personFields.filter((f) => f.encrypted).map((f) => f.name);
     const encryptedFieldsIncludingCustom = [
       ...customFieldsSocial.map((f) => f.name),
