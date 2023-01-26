@@ -38,7 +38,7 @@ export const prepareCommentForEncryption = (comment) => {
       entityKey: comment.entityKey,
     };
   } catch (error) {
-    toast.error("Désolé, une erreur technique est survenue, l'équipe technique a été prévenue.");
+    toast.error("Le commentaire n'a pas été sauvegardé car son format était incorrect. Vous pouvez vérifier son contenu et tenter de le sauvegarder à nouveau. L'équipe technique a été prévenue et va travailler sur un correctif.");
     capture(error, { extra: { comment } });
     throw error;
   }
