@@ -4,6 +4,13 @@ const isNullOrUndefined = (value) => {
   return false;
 };
 
+export const looseUuidRegex = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
+export const cryptoHexRegex = /^[A-Fa-f0-9]{16,128}$/;
+export const positiveIntegerRegex = /^\d+$/;
+export const jwtRegex = /^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/;
+export const headerJwtRegex = /JWT ^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/;
+export const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+
 // Download a file in browser.
 function download(file, fileName) {
   if (window.navigator.msSaveOrOpenBlob) {
