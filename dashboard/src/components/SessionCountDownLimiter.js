@@ -109,7 +109,6 @@ const ReloadModal = ({ open, onSuccess }) => {
           }}>
           <label htmlFor="orgEncryptionKey">Clé de chiffrement d'organisation</label>
           <PasswordInput
-            InputComponent="input"
             className={[
               'focus:tw-shadow-outline tw-mb-1 tw-block tw-w-full tw-rounded tw-border tw-border-teal-500 tw-bg-transparent tw-p-2 tw-leading-5 tw-text-gray-900 tw-outline-none tw-transition-all tw-duration-200 focus:tw-border-main50 focus:tw-outline-none',
               !showPassword ? 'tw-font-[password] tw-text-xs tw-tracking-widest' : '',

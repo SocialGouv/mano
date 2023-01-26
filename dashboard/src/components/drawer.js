@@ -160,11 +160,11 @@ const Drawer = () => {
           </>
         )}
       </div>
-      <p className="tw-mt-auto tw-flex tw-flex-col tw-justify-between tw-text-[0.65rem] tw-text-main">
-        <span>Version&nbsp;: {packageInfo.version}</span>
-        <span>Accessibilité&nbsp;: partielle</span>
+      <div className="tw-mt-auto tw-mb-4 tw-flex tw-flex-col tw-justify-between tw-text-[0.65rem] tw-text-main">
+        <p className="m-0">Version&nbsp;: {packageInfo.version}</p>
+        <p className="m-0">Accessibilité&nbsp;: partielle</p>
         <SessionCountDownLimiter />
-      </p>
+      </div>
     </nav>
   );
 };

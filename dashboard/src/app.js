@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { RecoilRoot, useRecoilValue } from 'recoil';
+import { RecoilEnv, RecoilRoot, useRecoilValue } from 'recoil';
 import RecoilNexus from 'recoil-nexus';
 import { Router, Switch, Redirect } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
@@ -37,6 +37,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import SentryRoute from './components/Sentryroute';
 import { ENV, VERSION } from './config';
 import DuplicatedReportsTestChecker from './components/DuplicatedReportsTestChecker';
+
+RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = false;
 
 const ToastifyFastTransition = cssTransition({
   enter: 'Toastify--animate Toastify__hack-force-fast Toastify__bounce-enter',
