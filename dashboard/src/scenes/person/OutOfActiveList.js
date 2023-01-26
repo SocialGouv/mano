@@ -10,13 +10,14 @@ import API from '../../services/api';
 import DatePicker from 'react-datepicker';
 import { dateForDatePicker } from '../../services/date';
 import SelectCustom from '../../components/SelectCustom';
+import { cleanHistory } from './components/History';
 
 const OutOfActiveList = ({ person }) => {
   const [open, setOpen] = useState(false);
-  
+
   const preparePersonForEncryption = usePreparePersonForEncryption();
   const user = useRecoilValue(userState);
-  
+
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
   const setPersons = useSetRecoilState(personsState);
 
@@ -30,8 +31,8 @@ const OutOfActiveList = ({ person }) => {
         outOfActiveListDate: { oldValue: person.outOfActiveListDate, newValue: null },
       },
     };
-    
-    const history = [...(person.history || []), historyEntry];
+
+    const history = [...(cleanHistory(person.history) || []), historyEntry];
     const response = await API.put({
       path: `/person/${person._id}`,
       body: preparePersonForEncryption({ ...person, outOfActiveList: false, outOfActiveListReasons: [], outOfActiveListDate: null, history }),
@@ -61,7 +62,7 @@ const OutOfActiveList = ({ person }) => {
       },
     };
 
-    updatedPerson.history = [...(person.history || []), historyEntry];
+    updatedPerson.history = [...(cleanHistory(person.history) || []), historyEntry];
     const response = await API.put({
       path: `/person/${person._id}`,
       body: preparePersonForEncryption(updatedPerson),
@@ -77,7 +78,7 @@ const OutOfActiveList = ({ person }) => {
       toast.success(person.name + ' est hors de la file active');
     }
   };
-  
+
   return (
     <>
       <ButtonCustom
@@ -87,7 +88,9 @@ const OutOfActiveList = ({ person }) => {
         color={'warning'}
       />
       <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
-        <ModalHeader className="tw-break-all" toggle={() => setOpen(false)}>Sortie de file active de {person.name}</ModalHeader>
+        <ModalHeader className="tw-break-all" toggle={() => setOpen(false)}>
+          Sortie de file active de {person.name}
+        </ModalHeader>
         <ModalBody>
           <Formik
             initialValues={{ ...person, outOfActiveListDate: dateForDatePicker(Date.now()), outOfActiveListReasons: [] }}
