@@ -1,7 +1,7 @@
 import { organisationState } from './auth';
 import { atom, selector } from 'recoil';
 import { setCacheItem } from '../services/dataManagement';
-import { dateRegex, looseUuidRegex } from '../utils';
+import { looseUuidRegex } from '../utils';
 import { toast } from 'react-toastify';
 import { capture } from '../services/sentry';
 
@@ -94,7 +94,7 @@ export const prepareObsForEncryption = (customFields) => (obs) => {
     if (!looseUuidRegex.test(obs.team)) {
       throw new Error('Observation is missing team');
     }
-    if (!dateRegex.test(obs.observedAt)) {
+    if (!obs.observedAt) {
       throw new Error('Observation is missing observedAt');
     }
   } catch (error) {

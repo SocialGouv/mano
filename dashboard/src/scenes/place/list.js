@@ -11,7 +11,7 @@ import Table from '../../components/table';
 import Search from '../../components/search';
 import Page from '../../components/pagination';
 import { filterBySearch } from '../search/utils';
-import { currentTeamState, organisationState } from '../../recoil/auth';
+import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { personsState } from '../../recoil/persons';
 import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { placesState, preparePlaceForEncryption } from '../../recoil/places';
@@ -106,6 +106,7 @@ const List = () => {
 const Create = () => {
   const [open, setOpen] = useState(false);
   const currentTeam = useRecoilValue(currentTeamState);
+  const user = useRecoilValue(userState);
   const setPlaces = useSetRecoilState(placesState);
 
   const { isLoading, refresh } = useDataLoader();
@@ -128,6 +129,7 @@ const Create = () => {
           <Formik
             initialValues={{ name: '', organisation: '' }}
             onSubmit={async (body, actions) => {
+              body.user = user._id;
               const response = await API.post({ path: '/place', body: preparePlaceForEncryption(body) });
               if (response.ok) {
                 setPlaces((places) => [response.decryptedData, ...places].sort((p1, p2) => p1.name.localeCompare(p2.name)));

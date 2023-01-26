@@ -155,7 +155,7 @@ const RelPersonPlaceModal = ({ open, setOpen, person, relPersonPlaceModal, setPl
       return;
     }
     setUpdating(true);
-    const response = await API.post({ path: '/place', body: preparePlaceForEncryption({ name }) });
+    const response = await API.post({ path: '/place', body: preparePlaceForEncryption({ name, user: me._id }) });
     setUpdating(false);
     if (response.error) {
       toast.error(response.error);
@@ -277,6 +277,7 @@ const RelPersonPlaceModal = ({ open, setOpen, person, relPersonPlaceModal, setPl
 const EditRelPersonPlaceModal = ({ open, setOpen, placeToEdit }) => {
   const [places, setPlaces] = useRecoilState(placesState);
   const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
+  const user = useRecoilValue(userState);
 
   const [updating, setUpdating] = useState(false);
 
@@ -297,7 +298,7 @@ const EditRelPersonPlaceModal = ({ open, setOpen, placeToEdit }) => {
     setUpdating(true);
     const response = await API.put({
       path: `/place/${placeToEdit._id}`,
-      body: preparePlaceForEncryption({ ...placeToEdit, name }),
+      body: preparePlaceForEncryption({ ...placeToEdit, user: placeToEdit.user || user._id, name }),
     });
     setUpdating(false);
     if (response.error) {

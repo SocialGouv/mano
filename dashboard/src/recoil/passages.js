@@ -1,6 +1,6 @@
 import { setCacheItem } from '../services/dataManagement';
 import { atom } from 'recoil';
-import { dateRegex, looseUuidRegex } from '../utils';
+import { looseUuidRegex } from '../utils';
 import { toast } from 'react-toastify';
 import { capture } from '../services/sentry';
 
@@ -24,7 +24,7 @@ export const preparePassageForEncryption = (passage) => {
     if (!looseUuidRegex.test(passage.user)) {
       throw new Error('Passage is missing user');
     }
-    if (!dateRegex.test(passage.date)) {
+    if (!passage.date) {
       throw new Error('Passage is missing date');
     }
   } catch (error) {

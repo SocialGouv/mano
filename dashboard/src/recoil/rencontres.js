@@ -1,6 +1,6 @@
 import { setCacheItem } from '../services/dataManagement';
 import { atom } from 'recoil';
-import { dateRegex, looseUuidRegex } from '../utils';
+import { looseUuidRegex } from '../utils';
 import { toast } from 'react-toastify';
 import { capture } from '../services/sentry';
 
@@ -24,7 +24,7 @@ export const prepareRencontreForEncryption = (rencontre) => {
     if (!looseUuidRegex.test(rencontre.user)) {
       throw new Error('Rencontre is missing user');
     }
-    if (!dateRegex.test(rencontre.date)) {
+    if (!rencontre.date) {
       throw new Error('Rencontre is missing date');
     }
   } catch (error) {
