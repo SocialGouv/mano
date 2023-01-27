@@ -34,9 +34,10 @@ export const filterBySearch = (search, items = []) => {
   const searchNormalized = search.toLocaleLowerCase();
   const searchTerms = searchNormalized.split(' ');
   // Add lowerCaseName once to items for faster search.
-  const itemsWithLowerCaseName = items.map((item) => ({ ...item, lowerCaseName: item?.name?.toLocaleLowerCase() }));
+  const itemsWithLowerCaseName = items.map((item) => ({ ...item, lowerCaseName: item?.name?.toLocaleLowerCase() || '' }));
   // Items that have exact match in the beginning of the search string are first.
   const firstItems = itemsWithLowerCaseName.filter((item) => item.lowerCaseName.startsWith(searchNormalized));
+
   const firstItemsIds = new Set(firstItems.map((item) => item._id));
   // Items that have all words in search (the order does not matter) are second.
   const secondItems = itemsWithLowerCaseName.filter(
