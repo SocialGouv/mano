@@ -33,39 +33,41 @@ export const filterData = (data, filters, returnWholeArray = false) => {
           if (['date-with-time', 'date'].includes(filter.type)) {
             const { date, comparator } = filter.value;
             if (comparator === 'unfilled') return !itemValue ? item : null;
-            if (!itemValue || [null, undefined].includes(itemValue)) return null;
+            if (!itemValue) return null;
             if (comparator === 'before') return dayjsInstance(itemValue).isBefore(date) ? item : null;
             if (comparator === 'after') return dayjsInstance(itemValue).isAfter(date) ? item : null;
             if (comparator === 'equals') return isOnSameDay(itemValue, date) ? item : null;
           }
-          if (!itemValue || [null, undefined].includes(itemValue)) return filter.value === 'Non renseigné' ? item : null;
+
           if (typeof itemValue === 'boolean') {
+            if (!itemValue) return filter.value === 'Non renseigné' ? item : null;
             return itemValue === (filter.value === 'Oui') ? item : null;
           }
 
-          if (typeof itemValue === 'string') {
-            // For type text we trim and lower case the value.
-            if (
-              filter.type === 'text' &&
-              (itemValue || '')
-                .trim()
-                .toLowerCase()
-                .includes((filter.value || '').trim().toLowerCase())
-            )
-              return item;
-            if (itemValue === filter.value) return item;
-            return null;
-          }
-          // type is array
-          if (!itemValue.length && filter.value === 'Non renseigné') return item;
-          if (itemValue?.includes?.(filter.value)) {
-            if (returnWholeArray) return item;
-            let newValues = itemValue.filter((value) => value !== filter.value);
-            if (!newValues.length) newValues = ['Uniquement'];
-            return {
-              ...item,
-              [filter.field]: newValues,
-            };
+          const arrayFilterValue = Array.isArray(filter.value) ? filter.value : [filter.value];
+          console.log({ arrayFilterValue });
+          if (!arrayFilterValue.length) return item;
+          for (const filterValue of arrayFilterValue) {
+            if (!itemValue?.length && filterValue === 'Non renseigné') return item;
+            if (typeof itemValue === 'string') {
+              // For type text we trim and lower case the value.
+              if (filter.type === 'text') {
+                const trimmedItemValue = (itemValue || '').trim().toLowerCase();
+                const trimmedFilterValue = (filterValue || '').trim().toLowerCase();
+                if (trimmedItemValue.includes(trimmedFilterValue)) return item;
+              }
+              if (itemValue === filterValue) return item;
+            } else {
+              if (itemValue?.includes?.(filterValue)) {
+                if (returnWholeArray) return item;
+                let newValues = itemValue.filter((value) => value !== filterValue);
+                if (!newValues.length) newValues = ['Uniquement'];
+                return {
+                  ...item,
+                  [filter.field]: newValues,
+                };
+              }
+            }
           }
           return null;
         })
@@ -361,6 +363,25 @@ const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
         )}
       </div>
     );
+  }
+
+  if (['enum', 'multi-choice'].includes(type)) {
+    try {
+      return (
+        <SelectCustom
+          options={filterValues.map((_value) => ({ label: _value, value: _value }))}
+          value={value?.map((_value) => ({ label: _value, value: _value })) || []}
+          getOptionLabel={(f) => f.label}
+          getOptionValue={(f) => f.value}
+          onChange={(newValue) => onChangeValue(newValue?.map((option) => option.value))}
+          isClearable={!value?.length}
+          isMulti
+        />
+      );
+    } catch (e) {
+      console.log(e);
+    }
+    return null;
   }
 
   return (
