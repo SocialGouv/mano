@@ -9,7 +9,7 @@ import { formatDateWithFullMonth, dayjsInstance } from '../../../services/date';
 
 // FIX: there was a bug in history at some point, where the whole person was saved in the history
 // this function removes those entries
-export const cleanHistory = (history) => {
+export const cleanHistory = (history = []) => {
   return history.filter((h) => {
     if (JSON.stringify(h.data).includes('encryptedEntityKey')) return false;
     return true;
