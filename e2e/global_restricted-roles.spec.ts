@@ -41,9 +41,9 @@ test("test restricted accesses", async ({ page }) => {
     await page.getByLabel("Description").fill("cool man");
     await page.getByLabel("Personne très vulnérable, ou ayant besoin d'une attention particulière").check();
     await page.getByRole("dialog").getByText("Informations sociales").click();
-    await clickOnEmptyReactSelect(page, "person-select-personalSituation", "Homme isolé");
+    await clickOnEmptyReactSelect(page, "person-custom-select-situation-personnelle", "Homme isolé");
     await page.getByRole("dialog").getByText("Informations médicales").click();
-    await clickOnEmptyReactSelect(page, "person-select-healthInsurances", "Régime Général");
+    await clickOnEmptyReactSelect(page, "person-custom-select-couvertures-médicales", "Régime Général");
     await page.getByRole("button", { name: "Enregistrer" }).click();
     await page.getByText("Mis à jour !").click();
 
@@ -357,7 +357,6 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.getByText(`Suivi·e depuis le : ${dayjs().format("DD/MM/YYYY")}`)).toBeVisible();
 
     await page.getByRole("button", { name: "Dossier Médical" }).click();
-
     await expect(page.getByText("Régime Général").nth(1)).toBeVisible();
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${treatment1} 1` }) })).toBeVisible();
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1} Médicale` }) })).toBeVisible();
@@ -396,7 +395,6 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.getByText("En rue depuis le : 12/11/2001")).toBeVisible();
 
     await page.getByRole("button", { name: "Dossier Médical" }).click();
-
     await expect(page.getByText("Régime Général").nth(1)).toBeVisible();
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${treatment1} 1` }) })).toBeVisible();
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1} Médicale` }) })).toBeVisible();

@@ -389,6 +389,19 @@ const EditCustomField = ({ data, editingField, onClose, onSaveField, isNewField,
                   value={(field.options || []).map((opt) => ({ value: opt, label: opt }))}
                   onChange={(v) => setField({ ...field, options: v.map((v) => v.value) })}
                 />
+                <div>
+                  <label className="tw-text-sm">
+                    <input
+                      type="checkbox"
+                      className="tw-mr-2 tw-mt-2"
+                      name="allowCreateOption"
+                      id="allowCreateOption"
+                      checked={field.allowCreateOption}
+                      onChange={(e) => setField({ ...field, allowCreateOption: e.target.checked })}
+                    />
+                    <span>Autoriser la création d'option à la volée</span>
+                  </label>
+                </div>
               </>
             )}
           </div>

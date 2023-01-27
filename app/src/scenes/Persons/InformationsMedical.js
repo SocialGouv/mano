@@ -38,18 +38,6 @@ const InformationsMedical = ({ navigation, editable, onChange, onUpdatePerson, o
       <SubHeader center backgroundColor={backgroundColor || colors.app.color} onBack={navigation.goBack} caption="Informations médicales" />
       <ScrollContainer ref={scrollViewRef} backgroundColor={backgroundColor || colors.app.color}>
         <View>
-          <HealthInsuranceMultiCheckBox
-            values={person.healthInsurances}
-            onChange={(healthInsurances) => onChange({ healthInsurances })}
-            editable={editable}
-          />
-          <InputLabelled
-            label="Structure de suivi médical"
-            onChangeText={(structureMedical) => onChange({ structureMedical })}
-            value={person.structureMedical || (editable ? null : '-- Non renseignée --')}
-            placeholder="Renseignez la structure médicale le cas échéant"
-            editable={editable}
-          />
           {!editable && <Spacer />}
           {(customFieldsPersonsMedical || [])
             .filter((f) => f)

@@ -50,22 +50,22 @@ test("Create and modify a person", async ({ page }) => {
   await page.getByLabel("Description").fill("Test de description");
 
   await page.getByRole("dialog").getByText("Informations sociales").click();
-  await clickOnEmptyReactSelect(page, "person-select-personalSituation", "Famille");
+  await clickOnEmptyReactSelect(page, "person-custom-select-situation-personnelle", "Famille");
   await page.getByLabel("Structure de suivi social").click();
   await page.getByLabel("Structure de suivi social").fill("aucune");
-  await page.locator(".person-select-animals__value-container").click();
+  await page.locator(".person-custom-select-avec-animaux__value-container").click();
   await page.getByText("Oui", { exact: true }).click();
-  await page.locator(".person-select-address__value-container").click();
-  await page.locator(".person-select-address__menu").getByText("Oui", { exact: true }).click();
-  await page.locator(".person-select-addressDetail__value-container").click();
+  await page.locator(".person-custom-select-hébergement__value-container").click();
+  await page.locator(".person-custom-select-hébergement__menu").getByText("Oui", { exact: true }).click();
+  await page.locator(".person-custom-select-type-dhébergement__value-container").click();
   await page.getByText("Logement", { exact: true }).click();
-  await page.locator(".person-select-nationalitySituation__value-container").click();
+  await page.locator(".person-custom-select-nationalité__value-container").click();
   await page.getByText("UE", { exact: true }).click();
-  await page.locator(".person-select-employment__value-container").click();
+  await page.locator(".person-custom-select-emploi__value-container").click();
   await page.getByText("CDD", { exact: true }).click();
-  await page.locator(".person-select-resources__value-container").click();
+  await page.locator(".person-custom-select-ressources__value-container").click();
   await page.getByText("SANS", { exact: true }).click();
-  await page.locator(".person-select-reasons__value-container").click();
+  await page.locator(".person-custom-select-motif-de-la-situation-en-rue__value-container").click();
   await page.getByText("Départ de région", { exact: true }).click();
 
   await page.getByRole("dialog").getByText("Informations médicales").click();
