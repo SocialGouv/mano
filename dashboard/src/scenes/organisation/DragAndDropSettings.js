@@ -194,7 +194,7 @@ const Group = ({
           className="service-group tw-flex tw-min-h-full tw-flex-col tw-rounded-2xl tw-bg-main tw-bg-opacity-10 tw-p-4">
           <summary className="tw-basis-full tw-text-sm tw-font-bold tw-tracking-wide tw-text-gray-700">
             <div className="tw-group tw-inline-flex tw-w-11/12 tw-shrink tw-justify-between">
-              <span className="category-group-title tw-pl-2">
+              <span className="group-title tw-pl-2">
                 {groupTitle} ({items.length})
               </span>
               {!!onGroupTitleChange && (

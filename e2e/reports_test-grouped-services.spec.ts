@@ -50,7 +50,7 @@ test("test", async ({ page }) => {
   await page.getByText("Mise à jour !").click();
   await expect(page.getByRole("link", { name: "Accueil" })).toBeVisible();
 
-  await page.hover(".service-group-title");
+  await page.hover(".group-title");
   await page.getByRole("button", { name: "Modifier le groupe Tous mes services" }).click();
   await page.getByPlaceholder("Tous mes services").fill("Nouveau nom pour tous");
   await page.getByRole("button", { name: "Enregistrer" }).click();
@@ -65,12 +65,12 @@ test("test", async ({ page }) => {
   await page.getByRole("link", { name: "Organisation" }).click();
   await page.getByRole("button", { name: "Accueil de jour" }).click();
   await page.getByRole("button", { name: "Ajouter un groupe" }).click();
-  await page.getByPlaceholder("Injection").click();
-  await page.getByRole("dialog", { name: "Ajouter un groupe de services" }).getByRole("button", { name: "Ajouter" }).click();
-  await page.getByText("Le titre du groupe de services est obligatoire").click();
-  await page.getByPlaceholder("Injection").click();
-  await page.getByPlaceholder("Injection").fill("Le deux");
-  await page.getByRole("dialog", { name: "Ajouter un groupe de services" }).getByRole("button", { name: "Ajouter" }).click();
+  await page.getByPlaceholder("Titre du groupe").click();
+  await page.getByRole("dialog", { name: "Ajouter un groupe" }).getByRole("button", { name: "Ajouter" }).click();
+  await page.getByText("Le titre du groupe est obligatoire").click();
+  await page.getByPlaceholder("Titre du groupe").click();
+  await page.getByPlaceholder("Titre du groupe").fill("Le deux");
+  await page.getByRole("dialog", { name: "Ajouter un groupe" }).getByRole("button", { name: "Ajouter" }).click();
   await page.locator('div[role="alert"]:has-text("Groupe ajouté")').click();
   await page.locator("details[data-group='Le deux']").getByPlaceholder("Ajouter un service").click();
   await page.locator("details[data-group='Le deux']").getByPlaceholder("Ajouter un service").fill("essai 1");
@@ -81,8 +81,8 @@ test("test", async ({ page }) => {
   await page.locator("details[data-group='Le deux']").getByPlaceholder("Ajouter un service").fill("test 12ED");
   await page.locator("details[data-group='Le deux']").getByRole("button", { name: "Ajouter" }).click();
   await page.getByRole("button", { name: "Ajouter un groupe" }).click();
-  await page.getByPlaceholder("Injection").fill("Trois");
-  await page.getByRole("dialog", { name: "Ajouter un groupe de services" }).getByRole("button", { name: "Ajouter" }).click();
+  await page.getByPlaceholder("Titre du groupe").fill("Trois");
+  await page.getByRole("dialog", { name: "Ajouter un groupe" }).getByRole("button", { name: "Ajouter" }).click();
   await page.locator('div[role="alert"]:has-text("Groupe ajouté")').click();
   await page.locator("details[data-group='Trois']").getByPlaceholder("Ajouter un service").click();
   await page.locator("details[data-group='Trois']").getByPlaceholder("Ajouter un service").fill("dans le trois");
@@ -139,5 +139,5 @@ test("test", async ({ page }) => {
   await page.getByRole("link", { name: "Organisation" }).click();
   await page.getByRole("button", { name: "Accueil de jour" }).click();
   await page.getByText("essai 1").click({ clickCount: 3 });
-  await page.locator("#service-groups").click();
+  await page.locator("#groups-grid").click();
 });
