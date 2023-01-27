@@ -1,3 +1,10 @@
+# [1.236.0](https://github.com/SocialGouv/mano/compare/v1.235.0...v1.236.0) (2023-01-27)
+
+
+### Features
+
+* pouvoir sélectionner plusieurs valeurs dans les filtres ([#1256](https://github.com/SocialGouv/mano/issues/1256)) ([beaa0e9](https://github.com/SocialGouv/mano/commit/beaa0e986c0fc0c77a330ce2f25d8f49ddcfae9a))
+
 # [1.235.0](https://github.com/SocialGouv/mano/compare/v1.234.1...v1.235.0) (2023-01-27)
 
 
