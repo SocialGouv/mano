@@ -1,3 +1,10 @@
+## [1.233.1](https://github.com/SocialGouv/mano/compare/v1.233.0...v1.233.1) (2023-01-27)
+
+
+### Bug Fixes
+
+* **dashboard,app:** possibilité de rechercher plusieurs mots dans le désordre pour retrouver par exemple une personne via nom prénom ou prénom nom ([#1259](https://github.com/SocialGouv/mano/issues/1259)) ([8c74bf9](https://github.com/SocialGouv/mano/commit/8c74bf945126bb47365d0dac293678419ff529ba))
+
 # [1.233.0](https://github.com/SocialGouv/mano/compare/v1.232.1...v1.233.0) (2023-01-27)
 
 
