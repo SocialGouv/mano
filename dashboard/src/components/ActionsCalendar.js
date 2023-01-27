@@ -138,11 +138,7 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
           sortBy,
           sortOrder,
           dataKey: 'person',
-          render: (action) => (
-            <div className="tw-font-bold">
-              <PersonName item={action} />
-            </div>
-          ),
+          render: (action) => <PersonName item={action} />,
         },
         {
           title: 'Statut',
