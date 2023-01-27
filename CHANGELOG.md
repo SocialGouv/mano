@@ -1,3 +1,10 @@
+## [1.236.2](https://github.com/SocialGouv/mano/compare/v1.236.1...v1.236.2) (2023-01-27)
+
+
+### Bug Fixes
+
+* **dashboard:** default history should be [] not null ([a838964](https://github.com/SocialGouv/mano/commit/a8389640e15c2d83b14420d0fef017cd5520e3cf))
+
 ## [1.236.1](https://github.com/SocialGouv/mano/compare/v1.236.0...v1.236.1) (2023-01-27)
 
 
