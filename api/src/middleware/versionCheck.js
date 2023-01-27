@@ -26,13 +26,12 @@ module.exports = ({ headers: { version, platform } }, res, next) => {
         ok: false,
         message: "Veuillez mettre à jour votre application!",
         inAppMessage: [
-          `Veuillez mettre à jour votre application !`,
-          `Les fonctionnalités de cette nouvelle version sont:
-- Possibilité, depuis le navigateur web, de choisir les champs à afficher pour une personne (exemple: ne pas afficher "Avec animaux")
-- Possibilité de rajouter des pdfs dans les documents d'une personne
-
-Appuyez sur ok pour télécharger la dernière application`,
-          [{ text: "Télécharger", link: "https://mano-app.fabrique.social.gouv.fr/download" }],
+          `Veuillez mettre à jour votre application\u00A0!`,
+          `Les fonctionnalités de cette nouvelle version sont\u00A0:
+- Compatibilité avec la personnalissation intégrale du dossier des personnes suivies (paramétrage sur navigateur)
+- Possibilité de rajouter des pdfs dans les documents d'une personne suivie
+- Possibilité de rechercher avec plusieurs mots différents dans la liste des personnes suivies.`,
+          [{ text: "Télécharger la dernière version", link: "https://mano-app.fabrique.social.gouv.fr/download" }],
         ],
       });
     }
