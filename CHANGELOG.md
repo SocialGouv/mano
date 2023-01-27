@@ -1,3 +1,10 @@
+# [1.234.0](https://github.com/SocialGouv/mano/compare/v1.233.1...v1.234.0) (2023-01-27)
+
+
+### Features
+
+* **api,dashboard,app:** rendre certains champs des personnes suivies customisables ([#1216](https://github.com/SocialGouv/mano/issues/1216)) ([b218e9e](https://github.com/SocialGouv/mano/commit/b218e9ef157cea97db759834d439f034dd673781))
+
 ## [1.233.1](https://github.com/SocialGouv/mano/compare/v1.233.0...v1.233.1) (2023-01-27)
 
 
