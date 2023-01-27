@@ -1,7 +1,7 @@
 import { useRecoilState } from 'recoil';
 import { teamsState } from '../recoil/auth';
 
-export default function TableCustomFieldteamSelector({ field, onUpdate }) {
+export default function TableCustomFieldTeamSelector({ field, onUpdate }) {
   const [teams] = useRecoilState(teamsState);
   return (
     <div className="text-left">

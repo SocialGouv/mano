@@ -10,7 +10,7 @@ test.setTimeout(120000);
 const createGroup = async (page: Page, groupName: string) => {
   await page.getByRole("button", { name: "Ajouter un groupe" }).click();
   await page.getByLabel("Titre du groupe").fill(groupName);
-  await page.getByRole("dialog", { name: "Ajouter un groupe de catégories" }).getByRole("button", { name: "Ajouter" }).click();
+  await page.getByRole("dialog", { name: "Ajouter un groupe" }).getByRole("button", { name: "Ajouter" }).click();
   await page.getByText("Groupe ajouté").click();
 };
 
@@ -68,11 +68,11 @@ test("Actions", async ({ page }) => {
 
     await page.getByLabel("Titre du groupe").fill(group1Name);
 
-    await page.getByRole("dialog", { name: "Ajouter un groupe de catégories" }).getByRole("button", { name: "Ajouter" }).click();
+    await page.getByRole("dialog", { name: "Ajouter un groupe" }).getByRole("button", { name: "Ajouter" }).click();
 
     await page.getByText("Ce groupe existe déjà").click();
 
-    await page.getByRole("dialog", { name: "Ajouter un groupe de catégories" }).getByRole("button", { name: "Annuler" }).click();
+    await page.getByRole("dialog", { name: "Ajouter un groupe" }).getByRole("button", { name: "Annuler" }).click();
   });
 
   await test.step("Create second group", async () => {
@@ -124,7 +124,7 @@ test("Actions", async ({ page }) => {
 
   await test.step("Drag and drop group works", async () => {
     await expect(page.locator(".category-group-title").nth(1)).not.toHaveText(group1Name);
-    await page.locator(`id=${group1Name}`).dragTo(page.locator(`id=category-groups`), {
+    await page.locator(`id=${group1Name}`).dragTo(page.locator(`id=groups-grid`), {
       sourcePosition: { x: 5, y: 5 },
       targetPosition: { x: 10, y: 20 },
     });
