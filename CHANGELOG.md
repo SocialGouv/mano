@@ -1,3 +1,10 @@
+## [1.236.1](https://github.com/SocialGouv/mano/compare/v1.236.0...v1.236.1) (2023-01-27)
+
+
+### Bug Fixes
+
+* **api,dashboard:** optimisation du chargement des organisations en superadmin + log pour comprendre pourquoi c'est si lent ([2069e55](https://github.com/SocialGouv/mano/commit/2069e555d45fbc1a6ffde9154133c40223abcfac))
+
 # [1.236.0](https://github.com/SocialGouv/mano/compare/v1.235.0...v1.236.0) (2023-01-27)
 
 
