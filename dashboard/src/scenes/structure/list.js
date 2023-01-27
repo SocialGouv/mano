@@ -79,7 +79,7 @@ const List = () => {
           setCurrentStructureOpen(true);
         }}
         columns={[
-          { title: 'Nom', dataKey: 'name' },
+          { title: 'Nom', dataKey: 'name', render: (structures) => <b>{structures.name}</b> },
           { title: 'Téléphone', dataKey: 'phone' },
           { title: 'Adresse', dataKey: 'adresse' },
           { title: 'Code postal', dataKey: 'postcode' },
