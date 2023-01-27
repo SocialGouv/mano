@@ -1,3 +1,10 @@
+# [1.233.0](https://github.com/SocialGouv/mano/compare/v1.232.1...v1.233.0) (2023-01-27)
+
+
+### Features
+
+* upload pdf in app ([#1237](https://github.com/SocialGouv/mano/issues/1237)) ([a971e33](https://github.com/SocialGouv/mano/commit/a971e3389c128a54d0fdcecef2eb351d80e9cc05))
+
 ## [1.232.1](https://github.com/SocialGouv/mano/compare/v1.232.0...v1.232.1) (2023-01-26)
 
 
