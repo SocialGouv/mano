@@ -299,3 +299,16 @@ export async function populate() {
     console.error(err);
   }
 }
+
+export async function deleteAllPersons() {
+  try {
+    const client = new pg.Client({
+      connectionString: `${process.env.PGBASEURL}/manotest`,
+    });
+    await client.connect();
+    await client.query(`DELETE FROM mano."Person"`);
+    await client.end();
+  } catch (err) {
+    console.error(err);
+  }
+}
