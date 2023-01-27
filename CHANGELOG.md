@@ -1,3 +1,10 @@
+# [1.237.0](https://github.com/SocialGouv/mano/compare/v1.236.2...v1.237.0) (2023-01-27)
+
+
+### Features
+
+* **dashboard:** noms des personnes suivies mise en gras ([#1251](https://github.com/SocialGouv/mano/issues/1251)) ([97272a3](https://github.com/SocialGouv/mano/commit/97272a3cdbe4dcb6eaf632f4997cdb93b757dff8))
+
 ## [1.236.2](https://github.com/SocialGouv/mano/compare/v1.236.1...v1.236.2) (2023-01-27)
 
 
