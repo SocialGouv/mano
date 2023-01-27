@@ -3,6 +3,7 @@ import { HOST, SCHEME, VERSION } from '../config';
 import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey, encryptFile, decryptFile } from './encryption';
 import { capture } from './sentry';
 import ReactNativeBlobUtil from 'react-native-blob-util';
+const RNFS = require('react-native-fs');
 import {
   getApiLevel,
   getBrand,
@@ -25,7 +26,7 @@ import {
   isTablet,
 } from 'react-native-device-info';
 import { Alert, Linking } from 'react-native';
-const RNFS = require('react-native-fs');
+
 class ApiService {
   getUrl = (path, query = {}) => {
     return new URI().scheme(SCHEME).host(HOST).path(path).setSearch(query).toString();
