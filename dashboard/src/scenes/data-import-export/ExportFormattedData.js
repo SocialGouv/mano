@@ -4,12 +4,13 @@ import { useRecoilValue } from 'recoil';
 import { personFieldsIncludingCustomFieldsSelector, personsState } from '../../recoil/persons';
 import { utils, writeFile } from 'xlsx';
 import { dayjsInstance } from '../../services/date';
-import { teamsState } from '../../recoil/auth';
+import { teamsState, userState } from '../../recoil/auth';
 
 // Source: https://tailwindui.com/components/application-ui/elements/dropdowns
 export default function ExportFormattedData({ personCreated, personUpdated, actions }) {
   const teams = useRecoilValue(teamsState);
   const persons = useRecoilValue(personsState);
+  const user = useRecoilValue(userState);
   const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
 
   function transformPerson(person) {
@@ -62,14 +63,15 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
   return (
     <Menu as="div" className="tw-relative tw-inline-block tw-text-left">
       <div>
-        <Menu.Button className="tw-inline-flex tw-w-full tw-justify-center tw-rounded-md tw-border tw-border-gray-300 tw-bg-main tw-py-2 tw-px-4 tw-text-sm tw-font-medium tw-text-white focus:tw-outline-none">
-          Télécharger un export
-          <div className="-tw-mr-1 -tw-mt-1 tw-ml-2 tw-h-5 tw-w-5" aria-hidden="true">
-            ⌄
-          </div>
-        </Menu.Button>
+        {['admin'].includes(user.role) && (
+          <Menu.Button className="tw-inline-flex tw-w-full tw-justify-center tw-rounded-md tw-border tw-border-gray-300 tw-bg-main tw-py-2 tw-px-4 tw-text-sm tw-font-medium tw-text-white focus:tw-outline-none">
+            Télécharger un export
+            <div className="-tw-mr-1 -tw-mt-1 tw-ml-2 tw-h-5 tw-w-5" aria-hidden="true">
+              ⌄
+            </div>
+          </Menu.Button>
+      )}
       </div>
-
       <Transition
         as={Fragment}
         enter="tw-transition tw-ease-out tw-duration-100"
