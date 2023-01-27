@@ -1,3 +1,10 @@
+## [1.234.1](https://github.com/SocialGouv/mano/compare/v1.234.0...v1.234.1) (2023-01-27)
+
+
+### Bug Fixes
+
+* **api:** forçage de MAJ du dashboard vers 1.234.0 ([79fbca4](https://github.com/SocialGouv/mano/commit/79fbca4f6bb6fc358af73a46f98ad0010134aca0))
+
 # [1.234.0](https://github.com/SocialGouv/mano/compare/v1.233.1...v1.234.0) (2023-01-27)
 
 
