@@ -1,3 +1,10 @@
+# [1.235.0](https://github.com/SocialGouv/mano/compare/v1.234.1...v1.235.0) (2023-01-27)
+
+
+### Features
+
+* **dashboard:** nom des structures et des territoires en gras ([#1254](https://github.com/SocialGouv/mano/issues/1254)) ([67345ee](https://github.com/SocialGouv/mano/commit/67345ee4b65c363f7e581315402ed1dd9e56d994))
+
 ## [1.234.1](https://github.com/SocialGouv/mano/compare/v1.234.0...v1.234.1) (2023-01-27)
 
 
