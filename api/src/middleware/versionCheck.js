@@ -1,6 +1,6 @@
 const { VERSION, MINIMUM_DASHBOARD_VERSION } = require("../config");
 
-const MINIMUM_MOBILE_APP_VERSION = [2, 30, 0];
+const MINIMUM_MOBILE_APP_VERSION = [2, 31, 0];
 
 module.exports = ({ headers: { version, platform } }, res, next) => {
   if (platform === "website") return next();
@@ -28,8 +28,9 @@ module.exports = ({ headers: { version, platform } }, res, next) => {
         inAppMessage: [
           `Veuillez mettre à jour votre application !`,
           `Les fonctionnalités de cette nouvelle version sont:
-- Compatibilité avec les actions multi-équipes (paramétrage sur navigateur)
-- Possibilité de n'enregistrer un lieu fréquenté qu'une fois par personne.
+- Possibilité, depuis le navigateur web, de choisir les champs à afficher pour une personne (exemple: ne pas afficher "Avec animaux")
+- Possibilité de rajouter des pdfs dans les documents d'une personne
+
 Appuyez sur ok pour télécharger la dernière application`,
           [{ text: "Télécharger", link: "https://mano-app.fabrique.social.gouv.fr/download" }],
         ],
