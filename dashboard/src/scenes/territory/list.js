@@ -89,7 +89,13 @@ const List = () => {
             onSortBy: setSortBy,
             sortOrder,
             sortBy,
-            render: (territory) => <b>{territory.name}</b>,
+            render: (territory) => {
+              return (
+                <div className="tw-break-all">
+                  <b>{territory.name}</b>
+                </div>
+              );
+            },
           },
           {
             title: 'Types',
