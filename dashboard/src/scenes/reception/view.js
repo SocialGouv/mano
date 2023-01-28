@@ -410,6 +410,7 @@ const PassagesWrapper = styled.div`
 const ServicesWrapper = styled.div`
   text-align: center;
   background-color: #f8f8f8;
+  overflow-wrap: anywhere;
   border-radius: 5px;
   padding: 2rem 1rem;
   margin-bottom: 1rem;
