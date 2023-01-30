@@ -245,7 +245,7 @@ test("Actions", async ({ page }) => {
 
     await expect(page.locator(`data-test-id=${action2Name}${groupe2cat2Renamed}`)).toBeVisible();
 
-    await expect(page.locator(`data-test-id=${action3Name}${groupe3cat1ToBeDeleted}`)).not.toBeVisible();
+    await expect(page.locator(`data-test-id=${action3Name}${groupe3cat1ToBeDeleted}`)).toBeVisible();
 
     await expect(page.locator(`data-test-id=${action3Name}${groupe2cat2Renamed}`)).toBeVisible();
   });

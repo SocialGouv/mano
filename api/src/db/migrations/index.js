@@ -1,4 +1,5 @@
 (async () => {
+  await require("./2023-01-24_can-disable-territories")();
   await require("./2021-08-18_encrypt-relPersonPlace")();
   await require("./2021-09-07_terms-acceptance")();
   await require("./2021-09-10_add-maraude-in-report")();
@@ -29,5 +30,4 @@
   await require("./2023-01-16_add-index-everywhere")();
   await require("./2023-01-18-gave-feedback-2023")();
   await require("./2023-01-19_custom-fields-person")();
-  await require("./2023-01-24_can-disable-territories")();
 })();
