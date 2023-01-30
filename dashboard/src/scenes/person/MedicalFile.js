@@ -113,9 +113,6 @@ export function MedicalFile({ person }) {
     return [...ordonnances, ...consultationsDocs, ...otherDocs].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   }, [consultations, medicalFile?.documents, treatments]);
 
-  console.log(customFieldsPersonsMedical);
-  console.log(customFieldsPersonsMedical.find((e) => e.name === 'structureMedical'));
-  console.log(Boolean(customFieldsPersonsMedical.find((e) => e.name === 'structureMedical')));
   return (
     <>
       <h1 className="printonly">Dossier médical de {person?.name}</h1>

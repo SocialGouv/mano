@@ -122,6 +122,7 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 4, di
               inputId={id}
               classNamePrefix={id}
               isDisabled={disabled}
+              formatCreateLabel={(inputValue) => `Autre : "${inputValue}"`}
             />
           )}
           {!!['multi-choice'].includes(field.type) && (
@@ -141,6 +142,7 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 4, di
               getOptionValue={(i) => i.value}
               getOptionLabel={(i) => i.label}
               isDisabled={disabled}
+              formatCreateLabel={(inputValue) => `Autre : "${inputValue}"`}
             />
           )}
         </FormGroup>
