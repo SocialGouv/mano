@@ -15,9 +15,9 @@ const encryptedFields = ['person', 'team', 'user', 'date', 'comment'];
 
 export const preparePassageForEncryption = (passage) => {
   try {
-    if (!looseUuidRegex.test(passage.person)) {
-      throw new Error('Passage is missing person');
-    }
+    // if (!looseUuidRegex.test(passage.person)) {
+    //   throw new Error('Passage is missing person');
+    // }
     if (!looseUuidRegex.test(passage.team)) {
       throw new Error('Passage is missing team');
     }
