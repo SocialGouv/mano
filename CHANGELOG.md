@@ -1,3 +1,10 @@
+## [1.238.1](https://github.com/SocialGouv/mano/compare/v1.238.0...v1.238.1) (2023-01-30)
+
+
+### Bug Fixes
+
+* **dashboard:** autorise les passages sans personne ([14315ea](https://github.com/SocialGouv/mano/commit/14315ea8e6bdd56328b6d48c15d63c92a8a86491))
+
 # [1.238.0](https://github.com/SocialGouv/mano/compare/v1.237.0...v1.238.0) (2023-01-30)
 
 
