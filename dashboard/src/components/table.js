@@ -79,6 +79,7 @@ const Table = ({
                 <button aria-label="Changer l'ordre de tri" type="button" onClick={!!onSortBy ? onNameClick : null}>
                   {column.title}
                 </button>
+                {column.help && <>{column.help}</>}
                 {!!onSortBy && (sortBy === sortableKey || sortBy === dataKey) && (
                   <button onClick={!!onSortBy ? onNameClick : null} type="button" aria-label="Changer l'ordre de tri">
                     {sortOrder === 'ASC' && <span className="tw-mx-4" onClick={() => onSortOrder('DESC')}>{`\u00A0\u2193`}</span>}

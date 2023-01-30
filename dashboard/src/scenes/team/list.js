@@ -70,12 +70,8 @@ const List = () => {
             render: (i) => formatDateWithFullMonth(i.createdAt),
           },
           {
-            title: (
-              <>
-                <span>Maraude de nuit</span>
-                <NightSessionModale />
-              </>
-            ),
+            title: 'Maraude de nuit',
+            help: <NightSessionModale />,
             dataKey: 'nightSession',
             onSortOrder: setSortOrder,
             onSortBy: setSortBy,
