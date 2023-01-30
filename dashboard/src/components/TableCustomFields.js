@@ -399,7 +399,7 @@ const EditCustomField = ({ data, editingField, onClose, onSaveField, isNewField,
                       checked={field.allowCreateOption}
                       onChange={(e) => setField({ ...field, allowCreateOption: e.target.checked })}
                     />
-                    <span>Autoriser la création d'option à la volée</span>
+                    <span>Autoriser la saisie libre</span>
                   </label>
                 </div>
               </>
