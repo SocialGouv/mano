@@ -5,15 +5,14 @@ import ButtonCustom from '../../components/ButtonCustom';
 import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from '../../components/tailwind/Modal';
 import { capture } from '../../services/sentry';
 
-/*
-data: [
-  {
-    groupTitle: string,
-    items: [any]
-  }
-]
-*/
-
+/**
+ * @typedef {Object} DragAndDropSettingsProps
+ * @property {Array<{groupTitle: string, items: Array}>} data
+ */
+/**
+ * @param {DragAndDropSettingsProps} props
+ * @returns {JSX.Element}
+ */
 const DragAndDropSettings = ({
   title,
   data,
