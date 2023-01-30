@@ -38,7 +38,7 @@ import SentryRoute from './components/Sentryroute';
 import { ENV, VERSION } from './config';
 import DuplicatedReportsTestChecker from './components/DuplicatedReportsTestChecker';
 
-RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = false;
+RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = process.env.REACT_APP_DISABLE_RECOIL_DUPLICATE_ATOM_KEY_CHECKING ? false : true;
 
 const ToastifyFastTransition = cssTransition({
   enter: 'Toastify--animate Toastify__hack-force-fast Toastify__bounce-enter',
