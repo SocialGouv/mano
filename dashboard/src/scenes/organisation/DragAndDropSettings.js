@@ -62,9 +62,6 @@ const DragAndDropSettings = ({
       capture('Drag and drop categories error', { extra: { groups, data, title } });
       return toast.error('Désolé, une erreur est survenue lors du glisser/déposer', "L'équipe technique a été prévenue. Vous pouvez réessayer");
     }
-    // /* there is a bug sometimes with the drag and drop, where some items are duplicated or even groups disappear...
-    //   we need to check that drag-n-drop only drag-n-dropped and didn't add/remove anything
-    // */
     setIsDisabled(true);
     await onDragAndDrop(groups);
     setIsDisabled(false);
