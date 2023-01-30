@@ -49,7 +49,7 @@ const NewPlaceForm = ({ route, navigation }) => {
 
   const onCreatePlace = async () => {
     setPosting(true);
-    const response = await API.post({ path: '/place', body: preparePlaceForEncryption({ name }) });
+    const response = await API.post({ path: '/place', body: preparePlaceForEncryption({ name, user: user._id }) });
     if (response.error) {
       setPosting(false);
       Alert.alert(response.error);

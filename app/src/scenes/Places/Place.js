@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, View } from 'react-native';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import ScrollContainer from '../../components/ScrollContainer';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
@@ -12,10 +12,12 @@ import { placesState, preparePlaceForEncryption } from '../../recoil/places';
 import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import API from '../../services/api';
 import { sortByName } from '../../utils/sortByName';
+import { userState } from '../../recoil/auth';
 
 const Place = ({ navigation, route }) => {
   const [name, setName] = useState(false);
   const [updating, setUpdating] = useState(false);
+  const user = useRecoilValue(userState);
 
   const [places, setPlaces] = useRecoilState(placesState);
   const placeDB = useMemo(() => places.find((p) => p._id === route.params._id), [places, route?.params?._id]);
@@ -44,6 +46,7 @@ const Place = ({ navigation, route }) => {
       body: preparePlaceForEncryption({
         name: name.trim(),
         _id: placeDB._id,
+        user: placeDB.user || user._id,
         entityKey: placeDB.entityKey,
       }),
     });
