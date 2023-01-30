@@ -18,9 +18,6 @@ export const preparePlaceForEncryption = (place) => {
     if (!place.name) {
       throw new Error('Place is missing name');
     }
-    // CAREFUL: there are too many places where we didn't setup the user for places...
-    // but we fixed it in the dashboard: is no user, then current user
-    // so we can test here
     if (!looseUuidRegex.test(place.user)) {
       throw new Error('Place is missing user');
     }
@@ -28,7 +25,6 @@ export const preparePlaceForEncryption = (place) => {
     toast.error(
       "Le lieu n'a pas été sauvegardé car son format était incorrect. Vous pouvez vérifier son contenu et tenter de le sauvegarder à nouveau. L'équipe technique a été prévenue et va travailler sur un correctif."
     );
-    console.log('place', place);
     capture(error, { extra: { place } });
     throw error;
   }
