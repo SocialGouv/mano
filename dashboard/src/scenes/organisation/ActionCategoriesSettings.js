@@ -261,7 +261,7 @@ const ActionCategoriesGroup = ({ groupTitle, categories, onDragAndDrop }) => {
 
   return (
     <>
-      <div className="tw-min-h-full tw-basis-1/2 tw-p-1 xl:tw-basis-1/3 tw-break-all">
+      <div className="tw-min-h-full tw-basis-1/2 tw-break-all tw-p-1 xl:tw-basis-1/3">
         <details
           open
           key={groupTitle}
@@ -270,7 +270,7 @@ const ActionCategoriesGroup = ({ groupTitle, categories, onDragAndDrop }) => {
           className="service-group tw-flex tw-min-h-full tw-flex-col tw-rounded-2xl tw-bg-main tw-bg-opacity-10 tw-p-4">
           <summary className="tw-basis-full tw-text-sm tw-font-bold tw-tracking-wide tw-text-gray-700">
             <div className="tw-group tw-inline-flex tw-w-11/12 tw-shrink tw-justify-between">
-              <span className="category-group-title tw-pl-2"> 
+              <span className="category-group-title tw-pl-2">
                 {groupTitle} ({categories.length})
               </span>
               <button
@@ -353,7 +353,7 @@ const Category = ({ category, groupTitle }) => {
     }
     const encryptedActions = await Promise.all(
       actions
-        .filter((a) => a.categories.includes(oldCategory))
+        .filter((a) => a.categories?.includes(oldCategory))
         .map((action) => ({
           ...action,
           categories: [...new Set(action.categories.map((cat) => (cat === oldCategory ? newCategory.trim() : cat)))],
@@ -397,16 +397,6 @@ const Category = ({ category, groupTitle }) => {
         categories: group.categories.filter((cat) => cat !== category),
       };
     });
-    const encryptedActions = await Promise.all(
-      actions
-        .filter((a) => a.categories.includes(category))
-        .map((action) => ({
-          ...action,
-          categories: action.categories.filter((cat) => cat !== category),
-        }))
-        .map(prepareActionForEncryption)
-        .map(encryptItem)
-    );
     const oldOrganisation = organisation;
     setOrganisation({ ...organisation, actionsGroupedCategories: newActionsGroupedCategories }); // optimistic UI
 
@@ -414,7 +404,6 @@ const Category = ({ category, groupTitle }) => {
       path: `/category`,
       body: {
         actionsGroupedCategories: newActionsGroupedCategories,
-        actions: encryptedActions,
       },
     });
     if (response.ok) {
