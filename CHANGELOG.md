@@ -1,3 +1,10 @@
+## [1.238.4](https://github.com/SocialGouv/mano/compare/v1.238.3...v1.238.4) (2023-01-30)
+
+
+### Bug Fixes
+
+* saisie libre ([#1273](https://github.com/SocialGouv/mano/issues/1273)) ([3a1b2bd](https://github.com/SocialGouv/mano/commit/3a1b2bd52cdb5012646c97cf83060ce00ec39e63))
+
 ## [1.238.3](https://github.com/SocialGouv/mano/compare/v1.238.2...v1.238.3) (2023-01-30)
 
 
