@@ -1,5 +1,8 @@
 import { setCacheItem } from '../services/dataManagement';
 import { atom } from 'recoil';
+import { looseUuidRegex } from '../utils';
+import { toast } from 'react-toastify';
+import { capture } from '../services/sentry';
 
 const collectionName = 'passage';
 export const passagesState = atom({
@@ -11,6 +14,26 @@ export const passagesState = atom({
 const encryptedFields = ['person', 'team', 'user', 'date', 'comment'];
 
 export const preparePassageForEncryption = (passage) => {
+  try {
+    if (!looseUuidRegex.test(passage.person)) {
+      throw new Error('Passage is missing person');
+    }
+    if (!looseUuidRegex.test(passage.team)) {
+      throw new Error('Passage is missing team');
+    }
+    if (!looseUuidRegex.test(passage.user)) {
+      throw new Error('Passage is missing user');
+    }
+    if (!passage.date) {
+      throw new Error('Passage is missing date');
+    }
+  } catch (error) {
+    toast.error(
+      "Le passage n'a pas été sauvegardé car son format était incorrect. Vous pouvez vérifier son contenu et tenter de le sauvegarder à nouveau. L'équipe technique a été prévenue et va travailler sur un correctif."
+    );
+    capture(error, { extra: { passage } });
+    throw error;
+  }
   const decrypted = {};
   for (let field of encryptedFields) {
     decrypted[field] = passage[field];

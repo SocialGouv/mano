@@ -1,6 +1,9 @@
 import { setCacheItem } from '../services/dataManagement';
 import { atom, selector } from 'recoil';
 import { organisationState } from './auth';
+import { looseUuidRegex } from '../utils';
+import { toast } from 'react-toastify';
+import { capture } from '../services/sentry';
 
 const collectionName = 'action';
 export const actionsState = atom({
@@ -42,6 +45,25 @@ const encryptedFields = [
 ];
 
 export const prepareActionForEncryption = (action) => {
+  try {
+    if (!looseUuidRegex.test(action.person)) {
+      throw new Error('Action is missing person');
+    }
+    for (const team of action.teams) {
+      if (!looseUuidRegex.test(team)) {
+        throw new Error('Action is missing teams');
+      }
+    }
+    if (!looseUuidRegex.test(action.user)) {
+      throw new Error('Action is missing user');
+    }
+  } catch (error) {
+    toast.error(
+      "L'action n'a pas été sauvegardée car son format était incorrect. Vous pouvez vérifier son contenu et tenter de la sauvegarder à nouveau. L'équipe technique a été prévenue et va travailler sur un correctif."
+    );
+    capture(error, { extra: { action } });
+    throw error;
+  }
   const decrypted = {};
   for (let field of encryptedFields) {
     decrypted[field] = action[field];

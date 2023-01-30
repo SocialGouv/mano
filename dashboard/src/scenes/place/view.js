@@ -15,6 +15,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import API from '../../services/api';
 import useTitle from '../../services/useTitle';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
+import { userState } from '../../recoil/auth';
 
 const View = () => {
   const { id } = useParams();
@@ -22,6 +23,7 @@ const View = () => {
   const [places, setPlaces] = useRecoilState(placesState);
   const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
   const persons = useRecoilValue(personsState);
+  const user = useRecoilValue(userState);
 
   const place = places.find((p) => p._id === id);
   useTitle(`${place?.name} - Lieu fréquenté`);
@@ -35,6 +37,7 @@ const View = () => {
         initialValues={place}
         enableReinitialize
         onSubmit={async (body) => {
+          if (!body.user) body.user = user._id;
           const response = await API.put({
             path: `/place/${place._id}`,
             body: preparePlaceForEncryption(body),

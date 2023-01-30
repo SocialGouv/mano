@@ -1,6 +1,9 @@
 import { organisationState } from './auth';
 import { atom, selector } from 'recoil';
 import { setCacheItem } from '../services/dataManagement';
+import { looseUuidRegex } from '../utils';
+import { toast } from 'react-toastify';
+import { capture } from '../services/sentry';
 
 const collectionName = 'territory-observation';
 export const territoryObservationsState = atom({
@@ -81,6 +84,26 @@ export const defaultCustomFields = [
 const compulsoryEncryptedFields = ['territory', 'user', 'team', 'observedAt'];
 
 export const prepareObsForEncryption = (customFields) => (obs) => {
+  try {
+    if (!looseUuidRegex.test(obs.territory)) {
+      throw new Error('Observation is missing territory');
+    }
+    if (!looseUuidRegex.test(obs.user)) {
+      throw new Error('Observation is missing user');
+    }
+    if (!looseUuidRegex.test(obs.team)) {
+      throw new Error('Observation is missing team');
+    }
+    if (!obs.observedAt) {
+      throw new Error('Observation is missing observedAt');
+    }
+  } catch (error) {
+    toast.error(
+      "L'observation n'a pas été sauvegardée car son format était incorrect. Vous pouvez vérifier son contenu et tenter de la sauvegarder à nouveau. L'équipe technique a été prévenue et va travailler sur un correctif."
+    );
+    capture(error, { extra: { obs } });
+    throw error;
+  }
   const encryptedFields = [...customFields.map((f) => f.name), ...compulsoryEncryptedFields];
   const decrypted = {};
   for (let field of encryptedFields) {
