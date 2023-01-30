@@ -18,7 +18,7 @@ Voir le `README.md` de chacun des services.
 
 ## Tests
 
-Les tests sont faits avec [playwright](https://playwright.dev/) (historiquement jest-puppetter).
+Les tests sont faits avec [playwright](https://playwright.dev/).
 
 ### Préparation
 
@@ -51,7 +51,7 @@ yarn test:start-api-for-record
 yarn test:start-dashboard-for-record
 ```
 
-Ensuite lancer la commande `Record new` depuis VSCode. Pour chaque test, on peut utiliser un des 50 admins (idéalement utiliser un admin différent pour chaque test pour éviter les conflits en cas de lancement simultanés de tests).
+Ensuite lancer la commande `Record new` depuis VSCode. Pour chaque test, on peut utiliser un des 12 admins.
 
 - Email : `admin1@example.org`, `admin2@example.org`, etc.
 - Mot de passe : `secret`
