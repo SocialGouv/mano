@@ -1,3 +1,10 @@
+## [1.238.2](https://github.com/SocialGouv/mano/compare/v1.238.1...v1.238.2) (2023-01-30)
+
+
+### Bug Fixes
+
+* **app:** bug des champs personnalisés d'une personne pour le champ healthInsurances ([#1272](https://github.com/SocialGouv/mano/issues/1272)) ([ebd8ab7](https://github.com/SocialGouv/mano/commit/ebd8ab78f862989f2611a1772cf9bb91a485b588))
+
 ## [1.238.1](https://github.com/SocialGouv/mano/compare/v1.238.0...v1.238.1) (2023-01-30)
 
 
