@@ -1,3 +1,10 @@
+## [1.238.3](https://github.com/SocialGouv/mano/compare/v1.238.2...v1.238.3) (2023-01-30)
+
+
+### Bug Fixes
+
+* **dashboard:** lorsqu'on supprime une catégorie d'action, on ne la retire pas des actions sur lesquelles elle est enregistrée ([#1274](https://github.com/SocialGouv/mano/issues/1274)) ([dade610](https://github.com/SocialGouv/mano/commit/dade610adc0fb25b9cebb4f588f45cea329e9717))
+
 ## [1.238.2](https://github.com/SocialGouv/mano/compare/v1.238.1...v1.238.2) (2023-01-30)
 
 
