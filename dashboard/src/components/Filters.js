@@ -365,7 +365,7 @@ const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
     );
   }
 
-  if (['enum', 'multi-choice'].includes(type)) {
+  if (['enum', 'multi-choice'].includes(type) && name !== 'outOfActiveList') {
     try {
       return (
         <SelectCustom
