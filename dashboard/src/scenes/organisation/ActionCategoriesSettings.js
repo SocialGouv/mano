@@ -18,8 +18,6 @@ const ActionCategoriesSettings = () => {
     }));
   }, [actionsGroupedCategories]);
 
-  const actions = useRecoilValue(actionsState);
-
   const { refresh } = useDataLoader();
 
   const onAddGroup = async (groupTitle) => {
@@ -63,27 +61,6 @@ const ActionCategoriesSettings = () => {
 
   const onDeleteGroup = async (groupTitle) => {
     const newActionsGroupedCategories = actionsGroupedCategories.filter((group) => group.groupTitle !== groupTitle);
-    const categoriesToDelete = actionsGroupedCategories.find((group) => group.groupTitle === groupTitle).categories;
-    // QUESTION: should we delete the categories from the actions or just remove them from the group?
-    // I forgot the spec
-    const encryptedActions = await Promise.all(
-      actions
-        .map((a) => {
-          for (const category of a.categories || []) {
-            if (categoriesToDelete.includes(category)) {
-              return a;
-            }
-          }
-          return null;
-        })
-        .filter(Boolean)
-        .map((action) => ({
-          ...action,
-          categories: (action.categories || []).map((category) => (categoriesToDelete.includes(category) ? null : category)).filter(Boolean),
-        }))
-        .map(prepareActionForEncryption)
-        .map(encryptItem)
-    );
 
     const oldOrganisation = organisation;
     setOrganisation({ ...organisation, actionsGroupedCategories: newActionsGroupedCategories }); // optimistic UI
@@ -92,7 +69,6 @@ const ActionCategoriesSettings = () => {
       path: `/category`,
       body: {
         actionsGroupedCategories: newActionsGroupedCategories,
-        actions: encryptedActions,
       },
     });
     if (response.ok) {
