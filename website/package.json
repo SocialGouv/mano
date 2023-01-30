@@ -1,7 +1,7 @@
 {
   "name": "website",
+  "mobileAppVersion": "2.31.1",
   "version": "1.238.1",
-  "mobileAppVersion": "2.31.0",
   "private": true,
   "engines": {
     "npm": "please-use-yarn",
