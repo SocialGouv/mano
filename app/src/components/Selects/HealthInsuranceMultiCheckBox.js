@@ -1,15 +1,15 @@
 import React from 'react';
 import { useRecoilValue } from 'recoil';
-import { personFieldsSelector } from '../../recoil/persons';
+import { customFieldsPersonsMedicalSelector, personFieldsSelector } from '../../recoil/persons';
 import MultiCheckBoxes from '../MultiCheckBoxes/MultiCheckBoxes';
 
 const HealthInsuranceMultiCheckBox = ({ values, onChange, editable }) => {
-  const personFields = useRecoilValue(personFieldsSelector);
+  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
 
   return (
     <MultiCheckBoxes
       label="Couverture(s) médicale(s)"
-      source={personFields.find((f) => f.name === 'healthInsurances').options}
+      source={customFieldsPersonsMedical.find((f) => f.name === 'healthInsurances').options}
       values={values}
       onChange={onChange}
       editable={editable}
