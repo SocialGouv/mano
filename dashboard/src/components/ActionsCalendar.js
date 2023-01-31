@@ -131,7 +131,7 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
           dataKey: 'name',
           render: (action) => {
             return (
-              <div className="tw-break-all">
+              <div className="tw-break-words">
                 <ActionOrConsultationName item={action} />
             </div>
             );
@@ -146,7 +146,7 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
           dataKey: 'person',
           render: (action) => {
             return (
-              <div className="tw-break-all">
+              <div className="tw-break-words">
                 <PersonName item={action} />
               </div>
             );
