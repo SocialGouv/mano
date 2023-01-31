@@ -1,3 +1,10 @@
+## [1.238.5](https://github.com/SocialGouv/mano/compare/v1.238.4...v1.238.5) (2023-01-31)
+
+
+### Bug Fixes
+
+* **dashboard:** le filtre sortie de file active sur les stats ne marchait plus ([#1275](https://github.com/SocialGouv/mano/issues/1275)) ([b390211](https://github.com/SocialGouv/mano/commit/b390211e05e043089e8b2c9c6aed34a813f2b2f5))
+
 ## [1.238.4](https://github.com/SocialGouv/mano/compare/v1.238.3...v1.238.4) (2023-01-30)
 
 
