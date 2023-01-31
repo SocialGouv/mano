@@ -91,7 +91,7 @@ const List = () => {
             sortBy,
             render: (territory) => {
               return (
-                <div className="tw-break-all">
+                <div className="tw-break-words">
                   <b>{territory.name}</b>
                 </div>
               );
