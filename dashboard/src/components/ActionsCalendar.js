@@ -133,7 +133,7 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
             return (
               <div className="tw-break-words">
                 <ActionOrConsultationName item={action} />
-            </div>
+              </div>
             );
           },
         },
