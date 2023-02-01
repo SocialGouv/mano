@@ -1,3 +1,10 @@
+## [1.238.7](https://github.com/SocialGouv/mano/compare/v1.238.6...v1.238.7) (2023-02-01)
+
+
+### Bug Fixes
+
+* **dashboard:** migration des services ([d7dd0ea](https://github.com/SocialGouv/mano/commit/d7dd0ea40d38f399bf10f8c07f72f91c57e29483))
+
 ## [1.238.6](https://github.com/SocialGouv/mano/compare/v1.238.5...v1.238.6) (2023-02-01)
 
 
