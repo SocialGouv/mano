@@ -13,7 +13,9 @@ const IncrementorSmall = ({ service, team, date, count: initialValue, onUpdated,
   useDebounce(
     function updateServiceInDatabase() {
       if (value === initialValue || disabled) return;
-      if (!date || !team) return capture('Missing params for initServices in IncrementorSmall', { extra: { date, team, service, initialValue } });
+      if (!date || !team || date === 'undefined') {
+        return capture('Missing params for initServices in IncrementorSmall', { extra: { date, team, service, initialValue } });
+      }
       API.post({ path: `/service/team/${team}/date/${date}`, body: { count: value, service } }).then((res) => {
         if (res.ok) onUpdated(res.data.count);
       });
