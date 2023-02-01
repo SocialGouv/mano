@@ -1,5 +1,5 @@
 import React from 'react';
-import { CustomResponsivePie} from './charts';
+import { CustomResponsivePie } from './charts';
 import { getPieData } from './utils';
 import { AgeRangeBar } from './Persons';
 
