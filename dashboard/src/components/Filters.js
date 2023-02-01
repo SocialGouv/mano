@@ -45,7 +45,6 @@ export const filterData = (data, filters, returnWholeArray = false) => {
           }
 
           const arrayFilterValue = Array.isArray(filter.value) ? filter.value : [filter.value];
-          console.log({ arrayFilterValue });
           if (!arrayFilterValue.length) return item;
           for (const filterValue of arrayFilterValue) {
             if (!itemValue?.length && filterValue === 'Non renseigné') return item;
