@@ -1,6 +1,7 @@
 import React from 'react';
-import { CustomResponsivePie } from './charts';
+import { CustomResponsivePie} from './charts';
 import { getPieData } from './utils';
+import { AgeRangeBar } from './Persons';
 
 const PassagesStats = ({ passages, personFields, personsInPassagesOfPeriod, personsInPassagesBeforePeriod }) => {
   return (
@@ -36,6 +37,7 @@ const PassagesStats = ({ passages, personFields, personsInPassagesOfPeriod, pers
           { options: [...personFields.find((f) => f.name === 'gender').options, 'Non précisé'] }
         )}
       />
+      <AgeRangeBar persons={ personsInPassagesOfPeriod } />
     </>
   );
 };
