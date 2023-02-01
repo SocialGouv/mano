@@ -1,3 +1,11 @@
+## [1.238.6](https://github.com/SocialGouv/mano/compare/v1.238.5...v1.238.6) (2023-02-01)
+
+
+### Bug Fixes
+
+* **dashboard:** log plus d'infos pour comprendre le bug de date undefined dans le GET services/team/:teamId/date/:date ([#1280](https://github.com/SocialGouv/mano/issues/1280)) ([d23de20](https://github.com/SocialGouv/mano/commit/d23de2001700d3885d72d72ba121958890ca62a6))
+* **dashboard:** stats - filtre les consultations sur les dates prévues - date réalisées ([#1281](https://github.com/SocialGouv/mano/issues/1281)) ([4bff016](https://github.com/SocialGouv/mano/commit/4bff0161d4b8290d3befd55f2787feae477942f6))
+
 ## [1.238.5](https://github.com/SocialGouv/mano/compare/v1.238.4...v1.238.5) (2023-01-31)
 
 
