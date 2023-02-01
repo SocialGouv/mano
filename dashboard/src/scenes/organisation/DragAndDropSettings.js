@@ -8,6 +8,16 @@ import { capture } from '../../services/sentry';
 /**
  * @typedef {Object} DragAndDropSettingsProps
  * @property {Array<{groupTitle: string, items: Array}>} data
+ * @property {string} title
+ * @property {function} onDragAndDrop
+ * @property {string} addButtonCaption
+ * @property {JSX.Element} ItemComponent
+ * @property {function} onGroupTitleChange
+ * @property {JSX.Element} NewItemComponent
+ * @property {function} dataItemKey
+ * @property {string} sectionId
+ * @property {function} onAddGroup
+ * @property {function} onDeleteGroup
  */
 /**
  * @param {DragAndDropSettingsProps} props
@@ -101,6 +111,7 @@ const DragAndDropSettings = ({
               onGroupTitleChange={onGroupTitleChange}
               onDeleteGroup={onDeleteGroup}
               NewItemComponent={NewItemComponent}
+              isAlone={data.length === 1}
             />
           ))}
         </div>
@@ -141,6 +152,7 @@ const Group = ({
   sectionId,
   NewItemComponent,
   dataItemKey,
+  isAlone,
 }) => {
   if (!groupTitle) throw new Error('groupTitle is required');
   if (!items) throw new Error('items is required');
@@ -181,7 +193,7 @@ const Group = ({
 
   return (
     <>
-      <div className="tw-min-h-full tw-basis-1/2 tw-break-all tw-p-1 xl:tw-basis-1/3">
+      <div className={['tw-min-h-full tw-break-all tw-p-1 ', isAlone ? '' : 'tw-basis-1/2 xl:tw-basis-1/3'].join(' ')}>
         <details
           open
           key={groupTitle}

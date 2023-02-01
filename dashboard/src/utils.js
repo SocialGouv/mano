@@ -9,6 +9,29 @@ export const cryptoHexRegex = /^[A-Fa-f0-9]{16,128}$/;
 export const positiveIntegerRegex = /^\d+$/;
 export const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
 
+// custom fields
+export const typeOptions = [
+  { value: 'text', label: 'Texte' },
+  { value: 'textarea', label: 'Zone de texte multi-lignes' },
+  { value: 'number', label: 'Nombre' },
+  { value: 'date', label: 'Date sans heure' },
+  { value: 'date-with-time', label: 'Date avec heure' },
+  { value: 'yes-no', label: 'Oui/Non' },
+  { value: 'enum', label: 'Choix dans une liste' },
+  { value: 'multi-choice', label: 'Choix multiple dans une liste' },
+  { value: 'boolean', label: 'Case à cocher' },
+];
+
+export const newCustomField = () => ({
+  // Todo: I guess could use crypto here.
+  name: `custom-${new Date().toISOString().split('.').join('-').split(':').join('-')}`,
+  label: '',
+  type: 'text',
+  enabled: true,
+  required: false,
+  showInStats: true,
+});
+
 // Download a file in browser.
 function download(file, fileName) {
   if (window.navigator.msSaveOrOpenBlob) {

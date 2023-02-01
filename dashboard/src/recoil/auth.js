@@ -10,7 +10,12 @@ export const userState = atom({
 export const organisationState = atom({
   key: 'organisationState',
   default: {},
-  effects: [({ onSet }) => onSet((organisation) => AppSentry.setTag('organisationId', organisation._id))],
+  effects: [
+    ({ onSet }) =>
+      onSet((organisation) => {
+        AppSentry.setTag('organisationId', organisation._id);
+      }),
+  ],
 });
 
 export const teamsState = atom({
