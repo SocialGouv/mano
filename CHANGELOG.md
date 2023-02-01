@@ -1,3 +1,10 @@
+## [1.238.8](https://github.com/SocialGouv/mano/compare/v1.238.7...v1.238.8) (2023-02-01)
+
+
+### Bug Fixes
+
+* **api:** un accès restreint peut modifier une personne suivie - le backend autorise tout changement, le front autorise seulement les infos générales ([#1279](https://github.com/SocialGouv/mano/issues/1279)) ([a80b7b6](https://github.com/SocialGouv/mano/commit/a80b7b653e5acd4871db42fde89f8ec0ba1e031d))
+
 ## [1.238.7](https://github.com/SocialGouv/mano/compare/v1.238.6...v1.238.7) (2023-02-01)
 
 
