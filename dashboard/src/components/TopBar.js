@@ -28,10 +28,12 @@ const TopBar = () => {
   const { resetCache } = useDataLoader();
 
   return (
-    <TopBarFull>
+    <div className="tw-w-full">
       <TopBarStyled className="noprint" title="Choix de l'équipe et menu déroulant pour le Profil">
-        <TopBarOrganistionTeamBox>
-          <Organisation>{['superadmin'].includes(user.role) ? 'Support' : organisation?.name}</Organisation>
+        <div className="tw-flex tw-justify-start tw-items-center">
+          <div className="tw-font-semibold tw-w-max tw-text-sm tw-mr-4 tw-text-left tw-tracking-tighter">
+            {['superadmin'].includes(user.role) ? 'Support' : organisation?.name}
+          </div>
           {!['superadmin'].includes(user.role) && (
             <SelectTeam
               style={{ maxWidth: '250px', fontSize: '13px' }}
@@ -41,7 +43,7 @@ const TopBar = () => {
               inputId="team-selector-topBar"
             />
           )}
-        </TopBarOrganistionTeamBox>
+        </div>
         <TopBarLogo>
           <Logo size={60} />
         </TopBarLogo>
@@ -105,17 +107,17 @@ const TopBar = () => {
           </ButtonDropdown>
         </TopBarAccount>
       </TopBarStyled>
-      <TopBarColorTeam>             
+      <div className="tw-w-full">             
         {Array.isArray(currentTeam?._id) ? teams.map((e) => <ColorHeadband key={e} teamId={e} />) : <ColorHeadband teamId={currentTeam?._id} />}
-      </TopBarColorTeam >
-    </TopBarFull>  
+      </div>
+    </div>  
   );
 };
 
 const ColorHeadband = ({ teamId }) => {
   const teams = useRecoilValue(teamsState);
   const teamIndex = teams?.findIndex((t) => t._id === teamId);
-  const team = teams?.find((t) => t._id === teamId);
+  const team = teams[teamIndex]
   if (!team) return null;
   return (
     <div
@@ -138,22 +140,12 @@ const TopBarLogo = styled.div`
   }
 `;
 
-const TopBarFull = styled.div`
-width: 100%;
-`;
-
 const TopBarAccount = styled.div`
   display: flex;
   justify-content: flex-end;
   .dropdown-menu.show {
     z-index: 10000;
   }
-`;
-
-const TopBarOrganistionTeamBox = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
 `;
 
 const TopBarStyled = styled.aside`
@@ -182,16 +174,6 @@ const Logo = styled.div`
   background-size: cover;
 `;
 
-const Organisation = styled.div`
-  font-weight: 600;
-  width: max-content;
-  font-size: 14px;
-  line-height: 22px;
-  margin-right: 1rem;
-  text-align: left;
-  letter-spacing: -0.01em;
-`;
-
 const DropdownToggleStyled = styled(DropdownToggle)`
   border-radius: 40px !important;
   padding: 4px 16px;
@@ -217,10 +199,6 @@ const Burger = styled.div`
     background-color: #fff;
     display: block;
   }
-`;
-
-const TopBarColorTeam= styled.div`
-  width: 100%;
 `;
 
 export default TopBar;
