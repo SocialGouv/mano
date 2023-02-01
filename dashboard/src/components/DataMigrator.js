@@ -198,10 +198,10 @@ export default function useDataMigrator() {
           return [...acc, ...services];
         }, []);
 
-        const encryptedActionsToMigrate = await Promise.all(reportsWithoutServicesProperty.map(prepareActionForEncryption).map(encryptItem));
+        const encryptedReportsToMigrate = await Promise.all(reportsWithoutServicesProperty.map(prepareReportForEncryption).map(encryptItem));
         const response = await API.put({
           path: `/migration/services-in-services-table`,
-          body: { reportsToUpdate: encryptedActionsToMigrate, servicesToSaveInDB },
+          body: { reportsToUpdate: encryptedReportsToMigrate, servicesToSaveInDB },
           query: { migrationLastUpdateAt },
         });
         if (response.ok) {
