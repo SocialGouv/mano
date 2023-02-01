@@ -291,7 +291,14 @@ const Stats = () => {
     if (!actions.length) return 0;
     return Math.round((actions.length / personsWithActions.length) * 10) / 10;
   }, [actions.length, personsWithActions.length]);
-  const consultations = useMemo(() => getDataForPeriod(allConsultations, period, selectedTeams, true), [allConsultations, period, selectedTeams]);
+  const consultations = useMemo(
+    () =>
+      getDataForPeriod(allConsultations, period, selectedTeams, true, {
+        field: 'completedAt',
+        backupField: 'dueAt',
+      }),
+    [allConsultations, period, selectedTeams]
+  );
   const observations = useMemo(
     () =>
       getDataForPeriod(
