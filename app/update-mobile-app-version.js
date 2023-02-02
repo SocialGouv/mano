@@ -1,6 +1,7 @@
 const semver = require('semver');
 const fs = require('fs');
-const currentVersion = require('./package.json').version;
+const currentBuildNumber = require('./app.json').version.buildNumber; // ex: 127
+const currentVersion = require('./app.json').version.buildName; // ex: 2.1.1
 
 let release = process.argv[2] || 'minor';
 const validRelease = ['minor', 'major', 'patch'];
@@ -10,6 +11,7 @@ if (!validRelease.includes(release)) {
 }
 
 const newVersion = semver.inc(currentVersion, release);
+const newBuildNumber = currentBuildNumber + 1;
 
 // Replace the version in the package.json file via regex and save it
 const packageJson = fs.readFileSync('package.json', 'utf8');
@@ -18,12 +20,17 @@ fs.writeFileSync('package.json', newPackageJson);
 
 // Replace the version in the app.json file via regex and save it
 const appJson = fs.readFileSync('app.json', 'utf8');
-const newAppJson = appJson.replace(/"version": "[^"]+"/, `"version": "${newVersion}"`);
+const newAppJson = appJson
+  .replace(/"buildName": "[^"]+"/, `"buildName": "${newVersion}"`)
+  .replace(/"buildNumber": [^"]+,/, `"buildNumber": ${newBuildNumber},`);
 fs.writeFileSync('app.json', newAppJson);
 
 // Replace the version in the android/app/build.graddle file via regex and save it
 const buildGradle = fs.readFileSync('android/app/build.gradle', 'utf8');
-const newBuildGradle = buildGradle.replace(/versionName "[^"]+"/, `versionName "${newVersion}"`);
+const newBuildGradle = buildGradle
+  .replace(/versionName "[^"]+"/, `versionName "${newVersion}"`)
+  .replace(/versionCode [^"]+[\n]/, `versionCode ${newBuildNumber}\n`);
+fs.writeFileSync('android/app/build.gradle', newBuildGradle);
 fs.writeFileSync('android/app/build.gradle', newBuildGradle);
 
 // Replace the mobileAppVersion in the ../api/package.json file via regex and save it
