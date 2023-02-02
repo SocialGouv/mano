@@ -224,6 +224,7 @@ const RelPersonPlaceModal = ({ open, setOpen, person, relPersonPlaceModal, setPl
               isDisabled={posting}
               value={places.find((p) => p._id === placeId)}
               creatable
+              required
               onCreateOption={onCreatePlace}
               getOptionValue={(i) => i._id}
               getOptionLabel={(i) => i.name}
