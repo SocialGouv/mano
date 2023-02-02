@@ -1,3 +1,10 @@
+# [1.239.0](https://github.com/SocialGouv/mano/compare/v1.238.8...v1.239.0) (2023-02-02)
+
+
+### Features
+
+* **dashboard:** affichage de la couleur de l'équipe dans le bandeau ([#1278](https://github.com/SocialGouv/mano/issues/1278)) ([95fce92](https://github.com/SocialGouv/mano/commit/95fce92921334d6cd787774f899c94f7f8362f7c))
+
 ## [1.238.8](https://github.com/SocialGouv/mano/compare/v1.238.7...v1.238.8) (2023-02-01)
 
 
