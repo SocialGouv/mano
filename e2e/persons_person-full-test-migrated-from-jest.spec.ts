@@ -219,10 +219,7 @@ test("test", async ({ page }) => {
     await dialog.accept();
   });
 
-  await page
-    .locator(`div[role="document"]:has-text("Voulez-vous vraiment supprimer la personne ${personName}×Cette opération")`)
-    .getByRole("button", { name: "Supprimer" })
-    .click();
+  await page.locator('div[role="dialog"]:has-text("Voulez-vous vraiment supprimer la personne")').getByRole("button", { name: "Supprimer" }).click();
   await expect(page).toHaveURL("http://localhost:8090/person");
 
   await page.getByText("Suppression réussie").click();

@@ -4,10 +4,10 @@ import { useRecoilValue } from 'recoil';
 import { teamsState } from '../recoil/auth';
 
 const CustomFieldSetting = ({ customField }) => {
-  const { name, type, label, options = [], enabledTeams, enabled } = customField;
+  const { type, label, options = [], enabledTeams, enabled } = customField;
   const teams = useRecoilValue(teamsState);
   return (
-    <div className="tw-flex tw-flex-col tw-items-start tw-justify-start" id={name}>
+    <div className="tw-flex tw-flex-col tw-items-start tw-justify-start" id={label} data-test-id={label}>
       <p className="tw-m-0 tw-break-keep">{label}</p>
       <p className="tw-m-0 tw-break-keep tw-pl-8 tw-text-xs  tw-opacity-50">
         {typeOptions.find((opt) => opt.value === type)?.label}

@@ -98,7 +98,7 @@ const AddField = () => {
         onClick={() => {
           setIsAddingField(true);
         }}>
-        Ajouter un nouveau champ
+        Ajouter un champ
       </button>
       <EditCustomField
         isNewField
@@ -219,7 +219,7 @@ const ObservationCustomField = ({ item: customField }) => {
         <CustomFieldSetting customField={customField} />
         <button
           type="button"
-          aria-label={`Éditer le champ ${customField.label}`}
+          aria-label={`Modifier le champ ${customField.label}`}
           className="tw-invisible tw-ml-auto tw-inline-flex tw-pl-2 group-hover:tw-visible"
           onClick={() => setIsEditingField(true)}>
           ✏️
