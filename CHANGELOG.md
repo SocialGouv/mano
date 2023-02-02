@@ -1,3 +1,10 @@
+# [1.240.0](https://github.com/SocialGouv/mano/compare/v1.239.1...v1.240.0) (2023-02-02)
+
+
+### Features
+
+* **dashboard:** possibilité de chercher dans "Autres pseudos" depuis accueil ([#1283](https://github.com/SocialGouv/mano/issues/1283)) ([6c1d924](https://github.com/SocialGouv/mano/commit/6c1d92471a6c1ac436a8abdebf4988636f3efab5))
+
 ## [1.239.1](https://github.com/SocialGouv/mano/compare/v1.239.0...v1.239.1) (2023-02-02)
 
 
