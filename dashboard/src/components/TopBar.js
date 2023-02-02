@@ -32,7 +32,7 @@ const TopBar = () => {
       <aside
         className="noprint tw-flex tw-w-full tw-shrink-0 tw-items-center tw-justify-between tw-bg-white tw-py-3 tw-px-5 print:tw-relative print:tw-hidden"
         title="Choix de l'équipe et menu déroulant pour le Profil">
-        <div className="tw-flex tw-items-center tw-justify-start">
+        <div className="tw-flex tw-flex-1 tw-items-center tw-justify-start">
           <div className="tw-mr-4 tw-w-max tw-text-left tw-text-sm tw-font-semibold tw-tracking-tighter">
             {['superadmin'].includes(user.role) ? 'Support' : organisation?.name}
           </div>
@@ -46,7 +46,7 @@ const TopBar = () => {
             />
           )}
         </div>
-        <div className="tw-hidden lg:tw-flex">
+        <div className="tw-flex-1 tw-hidden lg:tw-flex">
           <div
             className="tw-mx-auto tw-my-0 tw-h-9 tw-w-14 tw-bg-cover tw-bg-center tw-bg-no-repeat"
             style={{
@@ -54,15 +54,15 @@ const TopBar = () => {
             }}
           />
         </div>
-        <div className="tw-flex tw-justify-end [&_.dropdown-menu.show]:tw-z-[10000]">
+        <div className="tw-flex-1 tw-flex tw-justify-end [&_.dropdown-menu.show]:tw-z-[10000]">
           {!['restricted-access'].includes(user.role) && <Notification />}
           <ButtonDropdown direction="down" isOpen={dropdownOpen} toggle={() => setDropdownOpen(!dropdownOpen)}>
             <DropdownToggleStyled>
               {user?.name}
-              <div className="tw-ml-2.5 tw-flex tw-h-3 tw-w-3 tw-flex-col tw-justify-between">
-                <div className="tw-block tw-h-px tw-w-full tw-bg-white" />
-                <div className="tw-block tw-h-px tw-w-full tw-bg-white" />
-                <div className="tw-block tw-h-px tw-w-full tw-bg-white" />
+              <div className="tw-flex-1 tw-ml-2.5 tw-flex tw-h-3 tw-w-3 tw-flex-col tw-justify-between tw-flex-1">
+                <div className="tw-flex-1 tw-block tw-h-px tw-w-full tw-bg-white" />
+                <div className="tw-flex-1 tw-block tw-h-px tw-w-full tw-bg-white" />
+                <div className="tw-flex-1 tw-block tw-h-px tw-w-full tw-bg-white" />
               </div>
             </DropdownToggleStyled>
             <DropdownMenu>
@@ -143,6 +143,7 @@ const DropdownToggleStyled = styled(DropdownToggle)`
   padding: 4px 16px;
   display: flex;
   font-size: 12px;
+  flex: 1;
   justify-content: space-between;
   align-items: center;
   background-color: ${theme.main};
