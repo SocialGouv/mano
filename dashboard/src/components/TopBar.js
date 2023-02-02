@@ -29,9 +29,11 @@ const TopBar = () => {
 
   return (
     <div className="tw-w-full">
-      <TopBarStyled className="noprint" title="Choix de l'équipe et menu déroulant pour le Profil">
-        <div className="tw-flex tw-justify-start tw-items-center">
-          <div className="tw-font-semibold tw-w-max tw-text-sm tw-mr-4 tw-text-left tw-tracking-tighter">
+      <aside
+        className="noprint tw-flex tw-w-full tw-shrink-0 tw-items-center tw-justify-between tw-bg-white tw-py-3 tw-px-5 print:tw-relative print:tw-hidden"
+        title="Choix de l'équipe et menu déroulant pour le Profil">
+        <div className="tw-flex tw-items-center tw-justify-start">
+          <div className="tw-mr-4 tw-w-max tw-text-left tw-text-sm tw-font-semibold tw-tracking-tighter">
             {['superadmin'].includes(user.role) ? 'Support' : organisation?.name}
           </div>
           {!['superadmin'].includes(user.role) && (
@@ -44,20 +46,24 @@ const TopBar = () => {
             />
           )}
         </div>
-        <TopBarLogo>
-          <Logo size={60} />
-        </TopBarLogo>
-        
-        <TopBarAccount>
+        <div className="tw-hidden lg:tw-flex">
+          <div
+            className="tw-mx-auto tw-my-0 tw-h-9 tw-w-14 tw-bg-cover tw-bg-center tw-bg-no-repeat"
+            style={{
+              backgroundImage: `url(${logo})`,
+            }}
+          />
+        </div>
+        <div className="tw-flex tw-justify-end [&_.dropdown-menu.show]:tw-z-[10000]">
           {!['restricted-access'].includes(user.role) && <Notification />}
           <ButtonDropdown direction="down" isOpen={dropdownOpen} toggle={() => setDropdownOpen(!dropdownOpen)}>
             <DropdownToggleStyled>
               {user?.name}
-              <Burger>
-                <div />
-                <div />
-                <div />
-              </Burger>
+              <div className="tw-ml-2.5 tw-flex tw-h-3 tw-w-3 tw-flex-col tw-justify-between">
+                <div className="tw-block tw-h-px tw-w-full tw-bg-white" />
+                <div className="tw-block tw-h-px tw-w-full tw-bg-white" />
+                <div className="tw-block tw-h-px tw-w-full tw-bg-white" />
+              </div>
             </DropdownToggleStyled>
             <DropdownMenu>
               <DropdownItem header disabled>
@@ -96,28 +102,27 @@ const TopBar = () => {
               </DropdownItem>
               <DropdownItem
                 onClick={() => {
-                  resetCache()
-                    .then(() => {
-                      return API.logout();
-                    })
+                  resetCache().then(() => {
+                    return API.logout();
+                  });
                 }}>
                 Se déconnecter et vider le cache
               </DropdownItem>
             </DropdownMenu>
           </ButtonDropdown>
-        </TopBarAccount>
-      </TopBarStyled>
-      <div className="tw-w-full">             
+        </div>
+      </aside>
+      <div className="tw-w-full">
         {Array.isArray(currentTeam?._id) ? teams.map((e) => <ColorHeadband key={e} teamId={e} />) : <ColorHeadband teamId={currentTeam?._id} />}
       </div>
-    </div>  
+    </div>
   );
 };
 
 const ColorHeadband = ({ teamId }) => {
   const teams = useRecoilValue(teamsState);
   const teamIndex = teams?.findIndex((t) => t._id === teamId);
-  const team = teams[teamIndex]
+  const team = teams[teamIndex];
   if (!team) return null;
   return (
     <div
@@ -126,53 +131,12 @@ const ColorHeadband = ({ teamId }) => {
         backgroundColor: teamsColors[teamIndex % teamsColors?.length],
         borderColor: borderColors[teamIndex % borderColors?.length],
       }}
-      className="tw-border tw-py-0.5">
-    </div>
+      className="tw-border tw-py-0.5"></div>
   );
 };
 
 const teamsColors = ['#255c99cc', '#74776bcc', '#00c6a5cc', '#ff4b64cc', '#ef798acc'];
 const borderColors = ['#255c99', '#74776b', '#00c6a5', '#ff4b64', '#ef798a'];
-
-const TopBarLogo = styled.div`
-  @media (max-width: 1024px) {
-    display: none;
-  }
-`;
-
-const TopBarAccount = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  .dropdown-menu.show {
-    z-index: 10000;
-  }
-`;
-
-const TopBarStyled = styled.aside`
-  background-color: ${theme.white};
-  width: 100%;
-  padding: 12px 18px;
-  flex-shrink: 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  > div {
-    flex: 1;
-  }
-  @media print {
-    position: relative;
-  }
-`;
-
-const Logo = styled.div`
-  width: ${(props) => props.size}px;
-  height: ${(props) => (props.size * 2) / 3}px;
-  margin: 0 auto;
-  background-image: url(${logo});
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-`;
 
 const DropdownToggleStyled = styled(DropdownToggle)`
   border-radius: 40px !important;
@@ -184,21 +148,6 @@ const DropdownToggleStyled = styled(DropdownToggle)`
   background-color: ${theme.main};
   border-color: ${theme.main};
   margin: 0 0 0 1rem;
-`;
-
-const Burger = styled.div`
-  width: 12px;
-  margin-left: 10px;
-  height: 12px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  div {
-    height: 1px;
-    width: 100%;
-    background-color: #fff;
-    display: block;
-  }
 `;
 
 export default TopBar;
