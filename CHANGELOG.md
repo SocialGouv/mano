@@ -1,3 +1,10 @@
+## [1.239.1](https://github.com/SocialGouv/mano/compare/v1.239.0...v1.239.1) (2023-02-02)
+
+
+### Bug Fixes
+
+* rendre le champ Lieu obligatoire dans l'ajout d'un lieu fréquenté ([#1287](https://github.com/SocialGouv/mano/issues/1287)) ([dde10bd](https://github.com/SocialGouv/mano/commit/dde10bd907a419cf2bdf995c2d9dd3ff0a8bfb46))
+
 # [1.239.0](https://github.com/SocialGouv/mano/compare/v1.238.8...v1.239.0) (2023-02-02)
 
 
