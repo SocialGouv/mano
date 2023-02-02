@@ -1,5 +1,4 @@
 import React, { useMemo, useRef, useState } from 'react';
-import styled from 'styled-components';
 import { toast } from 'react-toastify';
 import { personsState, usePreparePersonForEncryption } from '../../recoil/persons';
 import { selector, useRecoilState, useRecoilValue } from 'recoil';
@@ -42,7 +41,9 @@ const searchablePersonsSelector = selector({
     return persons.map((person) => {
       return {
         ...person,
-        searchString: [removeDiatricsAndAccents(person.name), formatBirthDate(person.birthdate)].join(' ').toLowerCase(),
+        searchString: [removeDiatricsAndAccents(person.name), removeDiatricsAndAccents(person.otherNames), formatBirthDate(person.birthdate)]
+          .join(' ')
+          .toLowerCase(),
       };
     });
   },
@@ -213,10 +214,11 @@ const Person = ({ person }) => {
   const history = useHistory();
   const user = useRecoilValue(userState);
   return (
-    <PersonWrapper>
-      <PersonMainInfo>
-        <div className="person-name">
+    <div className="-tw-mt-2 tw-border-t tw-border-t-gray-300 tw-pt-2.5 tw-pb-1">
+      <div className="tw-mb-1 tw-flex tw-gap-1">
+        <div className="tw-grow">
           {person.outOfActiveList ? <b style={{ color: theme.black25 }}>Sortie de file active : {person.name}</b> : <b>{person.name}</b>}
+          {person.otherNames ? <small className="text-muted"> - {person.otherNames}</small> : null}
           {person.birthdate ? <small className="text-muted"> - {formatBirthDate(person.birthdate)}</small> : null}
           {!!person.alertness && (
             <ExclamationMarkButton
@@ -234,17 +236,17 @@ const Person = ({ person }) => {
           title="Accéder au dossier"
           padding="0px"
         />
-      </PersonMainInfo>
+      </div>
       {person.outOfActiveList && (
-        <AdditionalInfoWrapper>
+        <div className="tw-flex tw-gap-1 tw-text-xs">
           <AdditionalInfo
             label="Date de sortie de file active"
             value={person.outOfActiveListDate ? formatCalendarDate(person.outOfActiveListDate) : 'Non renseignée'}
           />
           <AdditionalInfo label="Motif" value={person.outOfActiveListReasons?.join(', ')} />
-        </AdditionalInfoWrapper>
+        </div>
       )}
-      <AdditionalInfoWrapper>
+      <div className="tw-flex tw-gap-1 tw-text-xs">
         <AdditionalInfo
           label="Dernière action"
           value={
@@ -257,8 +259,8 @@ const Person = ({ person }) => {
         />
         <AdditionalInfo label="Dernier passage" value={person.lastPassage?.date ? formatCalendarDate(person.lastPassage?.date) : null} />
         <AdditionalInfo label="Tel" value={person.phone} />
-      </AdditionalInfoWrapper>
-    </PersonWrapper>
+      </div>
+    </div>
   );
 };
 
@@ -266,38 +268,10 @@ const AdditionalInfo = ({ label, value }) => {
   if (!value) return null;
   return (
     <div>
-      <AdditionalInfoLabel>{label}</AdditionalInfoLabel>
+      <p className="tw-m-0 tw-mr-2 tw-text-gray-400">{label}</p>
       {value}
     </div>
   );
 };
-
-const AdditionalInfoLabel = styled.span`
-  font-weight: bold;
-  color: #aaa;
-  margin-right: 7px;
-`;
-
-const AdditionalInfoWrapper = styled.div`
-  display: flex;
-  gap: 1rem;
-  font-size: 12px;
-`;
-
-const PersonWrapper = styled.div`
-  border-top: 1px solid #ddd;
-  margin-top: -9px;
-  padding-top: 10px;
-  padding-bottom: 5px;
-`;
-
-const PersonMainInfo = styled.div`
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 4px;
-  .person-name {
-    flex-grow: 1;
-  }
-`;
 
 export default SelectAndCreatePerson;
