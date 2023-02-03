@@ -1,3 +1,10 @@
+## [1.240.2](https://github.com/SocialGouv/mano/compare/v1.240.1...v1.240.2) (2023-02-03)
+
+
+### Bug Fixes
+
+* **app:** la création d'une nouvelle consultation sans personne sélectionnée affichait undefined ([#1293](https://github.com/SocialGouv/mano/issues/1293)) ([19123d3](https://github.com/SocialGouv/mano/commit/19123d339ea041556f8316c45ee8553616f57834))
+
 ## [1.240.1](https://github.com/SocialGouv/mano/compare/v1.240.0...v1.240.1) (2023-02-03)
 
 
