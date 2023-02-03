@@ -38,7 +38,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
 
   await page.getByLabel("Non").check();
 
-  await page.getByRole("button", { name: "Créer" }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Créer" }).click();
   await page.locator(".Toastify__close-button").last().click();
 
   /*
@@ -185,6 +185,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
 
   await page.getByRole("button", { name: "Territoires" }).click();
 
+  await expect(page.locator(`[data-test-id=${testObsTerritoryField}]`)).toBeVisible();
   await page.hover(`[data-test-id=${testObsTerritoryField}]`);
   await page
     .getByRole("button", {
