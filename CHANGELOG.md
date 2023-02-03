@@ -1,3 +1,10 @@
+## [1.240.1](https://github.com/SocialGouv/mano/compare/v1.240.0...v1.240.1) (2023-02-03)
+
+
+### Bug Fixes
+
+* **dashboard:** logo qui bouge dans topbar quand on change d'équipe ([#1292](https://github.com/SocialGouv/mano/issues/1292)) ([ebdd53b](https://github.com/SocialGouv/mano/commit/ebdd53b27b98ef0205ec1a36d5c6b04f95f3a26d))
+
 # [1.240.0](https://github.com/SocialGouv/mano/compare/v1.239.1...v1.240.0) (2023-02-02)
 
 
