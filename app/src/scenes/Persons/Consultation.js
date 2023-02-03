@@ -200,7 +200,7 @@ const Consultation = ({ navigation, route }) => {
     <SceneContainer testID="consultation-form">
       <ScreenTitle
         title={`${isNew ? `Nouvelle consultation${person?.name ? ' pour' : ''}` : `Modifier la consultation ${consultation?.name} de`} ${
-          person?.name
+          person?.name || ''
         }`}
         onBack={onGoBackRequested}
         testID="consultation"
