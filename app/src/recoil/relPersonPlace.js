@@ -25,7 +25,7 @@ export const prepareRelPersonPlaceForEncryption = (relPersonPlace) => {
     }
   } catch (error) {
     Alert.alert(
-      "Le lieu n'a pas été sauvegardé car son format était incorrect.",
+      "La relation entre le lieu et la personne n'a pas été sauvegardée car son format était incorrect.",
       "Vous pouvez vérifier son contenu et tenter de le sauvegarder à nouveau. L'équipe technique a été prévenue et va travailler sur un correctif."
     );
     capture(error, { extra: { relPersonPlace } });
