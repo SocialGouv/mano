@@ -41,6 +41,7 @@ export default function EditModal({ person, selectedPanel, onClose }) {
           enableReinitialize
           initialValues={person}
           onSubmit={async (body) => {
+            console.log(body);
             if (!body.name?.trim()?.length) return toast.error('Une personne doit avoir un nom');
             if (!body.followedSince) body.followedSince = person.createdAt;
             if (outOfBoundariesDate(body.followedSince)) return toast.error('La date de suivi est hors limites (entre 1900 et 2100)');
@@ -127,7 +128,7 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                           <FormGroup>
                             <Label htmlFor="person-birthdate">Date de naissance</Label>
                             <div>
-                              <DatePicker id="person-birthdate" defaultValue={values.birthdate} onChange={handleChange} />
+                              <DatePicker name="birthdate" id="person-birthdate" defaultValue={values.birthdate} onChange={handleChange} />
                             </div>
                           </FormGroup>
                         </Col>
@@ -135,7 +136,7 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                           <FormGroup>
                             <Label htmlFor="person-wanderingAt">En rue depuis le</Label>
                             <div>
-                              <DatePicker id="person-wanderingAt" defaultValue={values.wanderingAt} onChange={handleChange} />
+                              <DatePicker name="wanderingAt" id="person-wanderingAt" defaultValue={values.wanderingAt} onChange={handleChange} />
                             </div>
                           </FormGroup>
                         </Col>
@@ -143,7 +144,12 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                           <FormGroup>
                             <Label htmlFor="person-followedSince">Suivi(e) depuis le / Créé(e) le</Label>
                             <div>
-                              <DatePicker id="person-followedSince" defaultValue={values.followedSince} onChange={handleChange} />
+                              <DatePicker
+                                id="person-followedSince"
+                                name="followedSince"
+                                defaultValue={values.followedSince || values.createdAt}
+                                onChange={handleChange}
+                              />
                             </div>
                           </FormGroup>
                         </Col>

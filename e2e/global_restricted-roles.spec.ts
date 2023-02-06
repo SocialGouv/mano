@@ -34,9 +34,9 @@ test("test restricted accesses", async ({ page }) => {
     await page.getByRole("button", { name: "Modifier" }).click();
     await page.locator(".person-select-gender__value-container").click();
     await page.locator("#react-select-gender-option-1").click();
-    await page.getByLabel("Date de naissance").fill("11/11/2001");
-    await page.getByLabel("En rue depuis le").fill("12/11/2001");
-    await page.getByLabel("Suivi(e) depuis le / Créé(e) le").fill("13/11/2001");
+    await page.getByLabel("Date de naissance").fill("2001-11-11");
+    await page.getByLabel("En rue depuis le").fill("2001-11-12");
+    await page.getByLabel("Suivi(e) depuis le / Créé(e) le").fill("2001-11-13");
     await page.getByLabel("Téléphone").fill("123456");
     await page.getByLabel("Description").fill("cool man");
     await page.getByLabel("Personne très vulnérable, ou ayant besoin d'une attention particulière").check();
