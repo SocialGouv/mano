@@ -1,3 +1,10 @@
+## [1.241.1](https://github.com/SocialGouv/mano/compare/v1.241.0...v1.241.1) (2023-02-06)
+
+
+### Bug Fixes
+
+* **dashboard:** nom de l'utilisateur au lieu de nom d'orga dans la modale de suppression d'un utilisateur ([#1300](https://github.com/SocialGouv/mano/issues/1300)) ([62c11ed](https://github.com/SocialGouv/mano/commit/62c11edcf2c3a2b8493ba4c6137e65d9707d46ef))
+
 # [1.241.0](https://github.com/SocialGouv/mano/compare/v1.240.3...v1.241.0) (2023-02-06)
 
 
