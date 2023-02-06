@@ -1,3 +1,10 @@
+## [1.240.3](https://github.com/SocialGouv/mano/compare/v1.240.2...v1.240.3) (2023-02-06)
+
+
+### Bug Fixes
+
+* **dashboard:** controle de la presente d'une équipe au minimum sur une action ([#1294](https://github.com/SocialGouv/mano/issues/1294)) ([ced7ab7](https://github.com/SocialGouv/mano/commit/ced7ab7dd7dcffd2e8110855406ec7c04cbc079c))
+
 ## [1.240.2](https://github.com/SocialGouv/mano/compare/v1.240.1...v1.240.2) (2023-02-03)
 
 
