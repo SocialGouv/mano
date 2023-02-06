@@ -91,7 +91,7 @@ const List = () => {
             sortBy,
             render: (territory) => {
               return (
-                <div className="tw-break-words">
+                <div style={{overflowWrap: 'anywhere'}}>
                   <b>{territory.name}</b>
                 </div>
               );
@@ -140,7 +140,7 @@ const CreateTerritory = () => {
   const { refresh, isLoading } = useDataLoader();
 
   return (
-    <CreateStyle>
+    <div className="t-w-full t-flex t-justify-end">
       <LinkButton disabled={isLoading} onClick={() => refresh} color="link" style={{ marginRight: 10 }}>
         Rafraichir
       </LinkButton>
@@ -211,14 +211,8 @@ const CreateTerritory = () => {
           </Formik>
         </ModalBody>
       </Modal>
-    </CreateStyle>
+    </div>
   );
 };
-
-const CreateStyle = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: flex-end;
-`;
 
 export default List;
