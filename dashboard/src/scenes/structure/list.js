@@ -84,7 +84,7 @@ const List = () => {
             dataKey: 'name', 
             render: (structures) => {
               return (
-                <div className="tw-break-words">
+                <div style={{overflowWrap: 'anywhere'}}>
                   <b>{structures.name}</b>
                 </div> 
               );
@@ -96,7 +96,7 @@ const List = () => {
             dataKey: 'adresse',
             render: (structures) => {
               return (
-                <div className="tw-break-words">
+                <div style={{overflowWrap: 'anywhere'}}>
                   {structures.adresse}
                 </div>
               );
