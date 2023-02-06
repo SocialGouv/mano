@@ -82,6 +82,19 @@ export function dateForDatePicker(date) {
   return date && dayjs(date).isValid() ? dayjs(date).toDate() : null;
 }
 
+export function dateForInputDate(date, withTime = false) {
+  return date && dayjs(date).isValid()
+    ? dayjs(date)
+        .format(withTime ? 'YYYY-MM-DDTHH:mm' : 'YYYY-MM-DD')
+        .padStart(withTime ? 16 : 10, '0')
+    : '';
+}
+export const LEFT_BOUNDARY_DATE = '1900-01-01';
+export const RIGHT_BOUNDARY_DATE = '2100-01-01';
+export function outOfBoundariesDate(date) {
+  return dayjs(date).isBefore(dayjs(LEFT_BOUNDARY_DATE)) || dayjs(date).isAfter(dayjs(RIGHT_BOUNDARY_DATE));
+}
+
 export function getMonths() {
   const startOfThisMonth = dayjs().startOf('month');
   return Array.from({ length: 12 }, (_, index) => startOfThisMonth.subtract(index, 'month'));

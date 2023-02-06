@@ -3,9 +3,8 @@ import { Col, FormGroup, Input, Label } from 'reactstrap';
 import styled from 'styled-components';
 import SelectAsInput from './SelectAsInput';
 import SelectCustom from './SelectCustom';
-import DatePicker from 'react-datepicker';
-import { dateForDatePicker } from '../services/date';
 import { capture } from '../services/sentry';
+import DatePicker from './DatePicker';
 
 const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 4, disabled, hideLabel = false }) => {
   const id = useMemo(() => {
@@ -75,14 +74,10 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 4, di
           {!!['date-with-time', 'date'].includes(field.type) && (
             <div>
               <DatePicker
-                locale="fr"
-                className="form-control"
+                withTime={field.type === 'date-with-time'}
                 id={id}
-                selected={dateForDatePicker(values[field.name] ? values[field.name] : field.required ? new Date() : null)}
-                onChange={(date) => handleChange({ target: { value: date, name: field.name } })}
-                timeInputLabel="Heure :"
-                dateFormat={`dd/MM/yyyy${field.type === 'date-with-time' ? ' HH:mm' : ''}`}
-                showTimeInput={field.type === 'date-with-time'}
+                defaultValue={values[field.name] ? values[field.name] : field.required ? new Date() : null}
+                onChange={(e) => handleChange({ target: { value: e.taget.value, name: field.name } })}
                 disabled={disabled}
               />
             </div>

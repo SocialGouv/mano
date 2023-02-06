@@ -2,13 +2,12 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { FormGroup, Input, Label, Row, Col, Modal, ModalHeader, ModalBody } from 'reactstrap';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
-import DatePicker from 'react-datepicker';
 import { useRecoilValue, useSetRecoilState, useRecoilState } from 'recoil';
 import { v4 as uuidv4 } from 'uuid';
 import ButtonCustom from '../../components/ButtonCustom';
 import { personsState, usePreparePersonForEncryption, personFieldsSelector, customFieldsPersonsMedicalSelector } from '../../recoil/persons';
 import { currentTeamState, organisationState, usersState, userState } from '../../recoil/auth';
-import { dateForDatePicker, dayjsInstance, formatDateWithFullMonth, formatTime } from '../../services/date';
+import { dateForDatePicker, dayjsInstance, formatDateWithFullMonth, formatTime, outOfBoundariesDate } from '../../services/date';
 import API from '../../services/api';
 import useSearchParamState from '../../services/useSearchParamState';
 import SelectAsInput from '../../components/SelectAsInput';
@@ -28,6 +27,7 @@ import ActionOrConsultationName from '../../components/ActionOrConsultationName'
 import { useLocalStorage } from 'react-use';
 import ConsultationModal from '../../components/ConsultationModal';
 import { consultationsState, disableConsultationRow } from '../../recoil/consultations';
+import DatePicker from '../../components/DatePicker';
 
 export function MedicalFile({ person }) {
   const setPersons = useSetRecoilState(personsState);
@@ -168,6 +168,8 @@ export function MedicalFile({ person }) {
           enableReinitialize
           initialValues={person}
           onSubmit={async (body) => {
+            if (body.birthdate && outOfBoundariesDate(body.birthdate))
+              return toast.error('La date de naissance est hors limites (entre 1900 et 2100)');
             const response = await API.put({
               path: `/person/${person._id}`,
               body: preparePersonForEncryption({ ...person, ...body }),
@@ -189,14 +191,7 @@ export function MedicalFile({ person }) {
                     <FormGroup>
                       <Label htmlFor="person-birthdate">Date de naissance</Label>
                       <div>
-                        <DatePicker
-                          locale="fr"
-                          className="form-control"
-                          selected={dateForDatePicker(values.birthdate)}
-                          onChange={(date) => handleChange({ target: { value: date, name: 'birthdate' } })}
-                          dateFormat="dd/MM/yyyy"
-                          id="person-birthdate"
-                        />
+                        <DatePicker id="person-birthdate" name="birthdate" defaultValue={values.birthdate} onChange={handleChange} />
                       </div>
                     </FormGroup>
                   </Col>
@@ -741,6 +736,11 @@ export function MedicalFile({ person }) {
             if (!values.frequency) errors.frequency = 'La fréquence est obligatoire';
             if (!values.indication) errors.indication = "L'indication est obligatoire";
             if (!values.startDate) errors.startDate = 'La date de début est obligatoire';
+            if (!errors.startDate && outOfBoundariesDate(values.startDate))
+              errors.startDate = 'La date de début de traitement est hors limites (entre 1900 et 2100)';
+            if (values.endDate && outOfBoundariesDate(values.endDate))
+              errors.endDate = 'La date de fin de traitement est hors limites (entre 1900 et 2100)';
+
             return errors;
           }}
           onSubmit={async (values) => {
@@ -833,14 +833,7 @@ export function MedicalFile({ person }) {
                     <FormGroup>
                       <Label htmlFor="startDate">Date de début</Label>
                       <div>
-                        <DatePicker
-                          id="startDate"
-                          locale="fr"
-                          className="form-control"
-                          selected={dateForDatePicker(values.startDate)}
-                          onChange={(date) => handleChange({ target: { value: date, name: 'startDate' } })}
-                          dateFormat={'dd/MM/yyyy'}
-                        />
+                        <DatePicker id="startDate" defaultValue={values.startDate} onChange={handleChange} />
                       </div>
                       {touched.startDate && errors.startDate && <span className="tw-text-xs tw-text-red-500">{errors.startDate}</span>}
                     </FormGroup>
@@ -849,14 +842,7 @@ export function MedicalFile({ person }) {
                     <FormGroup>
                       <Label htmlFor="endDate">Date de fin</Label>
                       <div>
-                        <DatePicker
-                          id="endDate"
-                          locale="fr"
-                          className="form-control"
-                          selected={dateForDatePicker(values.endDate)}
-                          onChange={(date) => handleChange({ target: { value: date, name: 'endDate' } })}
-                          dateFormat={'dd/MM/yyyy'}
-                        />
+                        <DatePicker id="endDate" defaultValue={values.endDate} onChange={handleChange} />
                       </div>
                       {touched.endDate && errors.endDate && <span className="tw-text-xs tw-text-red-500">{errors.endDate}</span>}
                     </FormGroup>

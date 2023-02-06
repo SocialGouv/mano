@@ -1,7 +1,7 @@
 import React from 'react';
 import SelectCustom from './SelectCustom';
-import DatePicker from 'react-datepicker';
 import { dayjsInstance, isOnSameDay } from '../services/date';
+import DatePicker from './DatePicker';
 
 export const filterData = (data, filters, returnWholeArray = false) => {
   if (!!filters?.filter((f) => Boolean(f?.value)).length) {
@@ -295,12 +295,9 @@ const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
         {value?.comparator !== 'unfilled' && (
           <div className="tw-basis-1/2 tw-px-4">
             <DatePicker
-              locale="fr"
-              dateFormat="dd/MM/yyyy"
-              className="form-control"
-              name={name}
-              selected={value?.date ? new Date(value?.date) : null}
-              onChange={(date) => onChangeValue({ date, comparator })}
+              id={name}
+              defaultValue={value?.date ? new Date(value?.date) : null}
+              onChange={(date) => onChangeValue({ date: date.target.value, comparator })}
             />
           </div>
         )}

@@ -8,8 +8,7 @@ import {
   personsState,
   usePreparePersonForEncryption,
 } from '../../../recoil/persons';
-import { dateForDatePicker } from '../../../services/date';
-import DatePicker from 'react-datepicker';
+import { outOfBoundariesDate } from '../../../services/date';
 import SelectTeamMultiple from '../../../components/SelectTeamMultiple';
 import { currentTeamState, userState } from '../../../recoil/auth';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
@@ -20,6 +19,7 @@ import { Formik } from 'formik';
 import { toast } from 'react-toastify';
 import API from '../../../services/api';
 import { cleanHistory } from './History';
+import DatePicker from '../../../components/DatePicker';
 
 export default function EditModal({ person, selectedPanel, onClose }) {
   const [openPanels, setOpenPanels] = useState([selectedPanel]);
@@ -43,6 +43,12 @@ export default function EditModal({ person, selectedPanel, onClose }) {
           onSubmit={async (body) => {
             if (!body.name?.trim()?.length) return toast.error('Une personne doit avoir un nom');
             if (!body.followedSince) body.followedSince = person.createdAt;
+            if (outOfBoundariesDate(body.followedSince)) return toast.error('La date de suivi est hors limites (entre 1900 et 2100)');
+            if (body.birthdate && outOfBoundariesDate(body.birthdate))
+              return toast.error('La date de naissance est hors limites (entre 1900 et 2100)');
+            if (body.wanderingAt && outOfBoundariesDate(body.wanderingAt))
+              return toast.error('La date temps passé en rue est hors limites (entre 1900 et 2100)');
+
             body.entityKey = person.entityKey;
 
             const historyEntry = {
@@ -121,14 +127,7 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                           <FormGroup>
                             <Label htmlFor="person-birthdate">Date de naissance</Label>
                             <div>
-                              <DatePicker
-                                locale="fr"
-                                className="form-control"
-                                selected={dateForDatePicker(values.birthdate)}
-                                onChange={(date) => handleChange({ target: { value: date, name: 'birthdate' } })}
-                                dateFormat="dd/MM/yyyy"
-                                id="person-birthdate"
-                              />
+                              <DatePicker id="person-birthdate" defaultValue={values.birthdate} onChange={handleChange} />
                             </div>
                           </FormGroup>
                         </Col>
@@ -136,14 +135,7 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                           <FormGroup>
                             <Label htmlFor="person-wanderingAt">En rue depuis le</Label>
                             <div>
-                              <DatePicker
-                                locale="fr"
-                                className="form-control"
-                                selected={dateForDatePicker(values.wanderingAt)}
-                                onChange={(date) => handleChange({ target: { value: date, name: 'wanderingAt' } })}
-                                dateFormat="dd/MM/yyyy"
-                                id="person-wanderingAt"
-                              />
+                              <DatePicker id="person-wanderingAt" defaultValue={values.wanderingAt} onChange={handleChange} />
                             </div>
                           </FormGroup>
                         </Col>
@@ -151,14 +143,7 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                           <FormGroup>
                             <Label htmlFor="person-followedSince">Suivi(e) depuis le / Créé(e) le</Label>
                             <div>
-                              <DatePicker
-                                locale="fr"
-                                className="form-control"
-                                selected={dateForDatePicker(values.followedSince || values.createdAt)}
-                                onChange={(date) => handleChange({ target: { value: date, name: 'followedSince' } })}
-                                dateFormat="dd/MM/yyyy"
-                                id="person-followedSince"
-                              />
+                              <DatePicker id="person-followedSince" defaultValue={values.followedSince} onChange={handleChange} />
                             </div>
                           </FormGroup>
                         </Col>
