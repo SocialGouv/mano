@@ -124,8 +124,8 @@ const View = () => {
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
               {id !== user._id && (
                 <DeleteButtonAndConfirmModal
-                  title={`Voulez-vous vraiment supprimer l'utilisateur ${organisation.name}`}
-                  textToConfirm={organisation.name}
+                  title={`Voulez-vous vraiment supprimer l'utilisateur ${values.name}`}
+                  textToConfirm={values.name}
                   onConfirm={async () => {
                     const res = await API.delete({ path: `/user/${id}` });
                     if (!res.ok) return;
