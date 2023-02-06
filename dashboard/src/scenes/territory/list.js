@@ -140,7 +140,7 @@ const CreateTerritory = () => {
   const { refresh, isLoading } = useDataLoader();
 
   return (
-    <div className="t-w-full t-flex t-justify-end">
+    <div className="tw-w-full tw-flex tw-justify-end">
       <LinkButton disabled={isLoading} onClick={() => refresh} color="link" style={{ marginRight: 10 }}>
         Rafraichir
       </LinkButton>
