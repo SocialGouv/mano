@@ -53,6 +53,7 @@ export const prepareActionForEncryption = (action) => {
         throw new Error('Action is missing teams');
       }
     }
+    if (!action.teams.length) throw new Error('Action is missing teams');
     if (!looseUuidRegex.test(action.user)) {
       throw new Error('Action is missing user');
     }
