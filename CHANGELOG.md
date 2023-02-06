@@ -1,3 +1,10 @@
+# [1.241.0](https://github.com/SocialGouv/mano/compare/v1.240.3...v1.241.0) (2023-02-06)
+
+
+### Features
+
+* **dashboard:** ajout de 10 couleurs supplémentaires pour différenciation des équipes ([#1296](https://github.com/SocialGouv/mano/issues/1296)) ([dfbfb94](https://github.com/SocialGouv/mano/commit/dfbfb9446fa471760ae923464031fa8eb832bb4d))
+
 ## [1.240.3](https://github.com/SocialGouv/mano/compare/v1.240.2...v1.240.3) (2023-02-06)
 
 
