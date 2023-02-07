@@ -13,7 +13,7 @@ export function InfosMain({ person }) {
       {Boolean(editModal) && <EditModal person={person} selectedPanel={'main'} onClose={() => setEditModal(false)} />}
       <div className="card !tw-rounded-lg !tw-bg-main" data-test-id={person._id}>
         <div className="card-body">
-          <div className="person-name">
+          <div className="person-name [overflow-wrap:anywhere]">
             {person.alertness && <ExclamationMarkButton className="tw-mr-2" />}
             <b>{person.name}</b>
             {person.otherNames && <span> ({person.otherNames})</span>}
