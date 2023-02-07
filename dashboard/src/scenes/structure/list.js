@@ -79,9 +79,29 @@ const List = () => {
           setCurrentStructureOpen(true);
         }}
         columns={[
-          { title: 'Nom', dataKey: 'name', render: (structures) => <b>{structures.name}</b> },
+          { 
+            title: 'Nom', 
+            dataKey: 'name', 
+            render: (structures) => {
+              return (
+                <div style={{overflowWrap: 'anywhere'}}>
+                  <b>{structures.name}</b>
+                </div> 
+              );
+            },
+          },
           { title: 'Téléphone', dataKey: 'phone' },
-          { title: 'Adresse', dataKey: 'adresse' },
+          { 
+            title: 'Adresse', 
+            dataKey: 'adresse',
+            render: (structures) => {
+              return (
+                <div style={{overflowWrap: 'anywhere'}}>
+                  {structures.adresse}
+                </div>
+              );
+            },
+          },
           { title: 'Code postal', dataKey: 'postcode' },
           { title: 'Ville', dataKey: 'city' },
           {
