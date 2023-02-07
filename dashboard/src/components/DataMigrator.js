@@ -164,7 +164,7 @@ export default function useDataMigrator() {
           return { ...action, teams: action.teams?.length ? action.teams : [team] };
         });
         const encryptedActionsToMigrate = await Promise.all(
-          actionsToUpdate.map((action) => prepareActionForEncryption({ ...action, action: action.user || user._id })).map(encryptItem)
+          actionsToUpdate.map((action) => prepareActionForEncryption({ ...action, user: action.user || user._id })).map(encryptItem)
         );
         const response = await API.put({
           path: `/migration/action-with-multiple-team`,
