@@ -19,7 +19,7 @@ import { placesState, preparePlaceForEncryption } from '../recoil/places';
 import { prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from '../recoil/relPersonPlace';
 import { encryptVerificationKey } from '../services/encryption';
 import { capture } from '../services/sentry';
-import API, { setOrgEncryptionKey, encryptItem } from '../services/api';
+import API, { setOrgEncryptionKey, encryptItem, getHashedOrgEncryptionKey } from '../services/api';
 import { passagesState, preparePassageForEncryption } from '../recoil/passages';
 import { prepareRencontreForEncryption, rencontresState } from '../recoil/rencontres';
 import { consultationsState, prepareConsultationForEncryption } from '../recoil/consultations';
@@ -97,13 +97,48 @@ const EncryptionKey = ({ isMain }) => {
       if (!values.encryptionKey) return toast.error('La clé est obligatoire');
       if (!values.encryptionKeyConfirm) return toast.error('La validation de la clé est obligatoire');
       if (values.encryptionKey !== values.encryptionKeyConfirm) return toast.error('Les clés ne sont pas identiques');
+      const previousKey = getHashedOrgEncryptionKey();
+      console.log(String(previousKey));
       setEncryptionKey(values.encryptionKey.trim());
       const hashedOrgEncryptionKey = await setOrgEncryptionKey(values.encryptionKey.trim());
+      console.log(String(hashedOrgEncryptionKey));
+      console.log(String(previousKey));
       setEncryptingStatus('Chiffrement des données...');
       const encryptedVerificationKey = await encryptVerificationKey(hashedOrgEncryptionKey);
-      const encryptedPersons = await Promise.all(persons.map(preparePersonForEncryption).map(encryptItem));
-      const encryptedGroups = await Promise.all(groups.map(prepareGroupForEncryption).map(encryptItem));
 
+      // Sauvegarde des fichiers des personnes.
+      const mutPersons = [...persons.map((person) => ({ ...person }))];
+      for (const person of mutPersons.filter((p) => p.documents && p.documents.length)) {
+        const updatedDocuments = [];
+        for (const d of person.documents) {
+          const content = await API.download(
+            {
+              path: d.downloadPath,
+              encryptedEntityKey: d.encryptedEntityKey,
+            },
+            previousKey
+          );
+          const docResult = await API.upload({
+            path: `/person/${person._id}/document`,
+            file: new File([content], d.file.originalname, { type: d.file.mimetype }),
+          });
+          const { data: file, encryptedEntityKey } = docResult;
+          updatedDocuments.push({
+            _id: file.filename,
+            name: d.file.originalname,
+            encryptedEntityKey,
+            createdAt: d.createdAt,
+            createdBy: d.createdBy,
+            downloadPath: `/person/${person._id}/document/${file.filename}`,
+            file,
+          });
+        }
+        person.documents = updatedDocuments;
+      }
+      // Fin de la sauvegarde des fichier des personnes.
+
+      const encryptedPersons = await Promise.all(mutPersons.map(preparePersonForEncryption).map(encryptItem));
+      const encryptedGroups = await Promise.all(groups.map(prepareGroupForEncryption).map(encryptItem));
       const encryptedActions = await Promise.all(actions.map(prepareActionForEncryption).map(encryptItem));
       const encryptedConsultations = await Promise.all(
         consultations.map(prepareConsultationForEncryption(organisation.consultations)).map(encryptItem)
@@ -152,6 +187,7 @@ const EncryptionKey = ({ isMain }) => {
           changeMasterKey: true,
         },
       });
+
       clearInterval(elpasedBarInterval);
       if (res.ok) {
         setEncryptingProgress(totalDurationOnServer);
@@ -277,8 +313,8 @@ const EncryptionKey = ({ isMain }) => {
   if (organisation.encryptionEnabled && !user.healthcareProfessional)
     return (
       <em>
-        Vous ne pouvez pas changer la clé de chiffrement car vous n'êtes pas déclaré·e comme administrateur·trice de type professionel·le de santé. Il est
-        nécessaire d'avoir accès à l'ensemble des données de l'organisation pour pouvoir changer son chiffrement.
+        Vous ne pouvez pas changer la clé de chiffrement car vous n'êtes pas déclaré·e comme administrateur·trice de type professionel·le de santé. Il
+        est nécessaire d'avoir accès à l'ensemble des données de l'organisation pour pouvoir changer son chiffrement.
       </em>
     );
 
