@@ -138,7 +138,7 @@ const ActionView = () => {
           delete body.team;
           const actionResponse = await API.put({
             path: `/action/${body._id}`,
-            body: prepareActionForEncryption(body),
+            body: prepareActionForEncryption({ ...body, user: body.user || user._id }),
           });
           if (actionResponse.ok) {
             const newAction = actionResponse.decryptedData;
