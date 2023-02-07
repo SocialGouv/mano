@@ -1,3 +1,10 @@
+# [1.242.0](https://github.com/SocialGouv/mano/compare/v1.241.3...v1.242.0) (2023-02-07)
+
+
+### Features
+
+* **app:** on s'assure de la présence des champs obligatoires avant le chiffrement ([#1271](https://github.com/SocialGouv/mano/issues/1271)) ([7604fb2](https://github.com/SocialGouv/mano/commit/7604fb2400a34b3a3b64d00ec13d5f3cd2570d3d))
+
 ## [1.241.3](https://github.com/SocialGouv/mano/compare/v1.241.2...v1.241.3) (2023-02-07)
 
 
