@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert } from 'react-native';
-import { useSetRecoilState } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import ScrollContainer from '../../components/ScrollContainer';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
@@ -8,10 +8,12 @@ import InputLabelled from '../../components/InputLabelled';
 import Button from '../../components/Button';
 import API from '../../services/api';
 import { prepareTerritoryForEncryption, territoriesState } from '../../recoil/territory';
+import { userState } from '../../recoil/auth';
 
 const NewTerritoryForm = ({ navigation, route }) => {
   const [name, setName] = useState('');
   const [posting, setPosting] = useState(false);
+  const user = useRecoilValue(userState);
 
   const setTerritories = useSetRecoilState(territoriesState);
 
@@ -37,7 +39,7 @@ const NewTerritoryForm = ({ navigation, route }) => {
 
   const onCreateTerritory = async () => {
     setPosting(true);
-    const response = await API.post({ path: '/territory', body: prepareTerritoryForEncryption({ name }) });
+    const response = await API.post({ path: '/territory', body: prepareTerritoryForEncryption({ name, user: user?._id }) });
     if (response.error) {
       setPosting(false);
       Alert.alert(response.error);

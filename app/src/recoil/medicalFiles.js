@@ -1,5 +1,8 @@
 import { atom, selector } from 'recoil';
 import { organisationState } from './auth';
+import { looseUuidRegex } from '../utils/regex';
+import { capture } from '../services/sentry';
+import { Alert } from 'react-native';
 
 const collectionName = 'medical-file';
 export const medicalFileState = atom({
@@ -18,8 +21,20 @@ export const customFieldsMedicalFileSelector = selector({
 
 const encryptedFields = ['person', 'documents'];
 
-export const prepareMedicalFileForEncryption = (customFieldsMedicalFileSelector) => (medicalFile) => {
-  const encryptedFieldsIncludingCustom = [...customFieldsMedicalFileSelector.map((f) => f.name), ...encryptedFields];
+export const prepareMedicalFileForEncryption = (customFieldsMedicalFile) => (medicalFile) => {
+  try {
+    if (!looseUuidRegex.test(medicalFile.person)) {
+      throw new Error('MedicalFile is missing person');
+    }
+  } catch (error) {
+    Alert.alert(
+      "Le dossier médical n'a pas été sauvegardé car son format était incorrect.",
+      "Vous pouvez vérifier son contenu et tenter de le sauvegarder à nouveau. L'équipe technique a été prévenue et va travailler sur un correctif."
+    );
+    capture(error, { extra: { medicalFile } });
+    throw error;
+  }
+  const encryptedFieldsIncludingCustom = [...customFieldsMedicalFile.map((f) => f.name), ...encryptedFields];
   const decrypted = {};
   for (let field of encryptedFieldsIncludingCustom) {
     decrypted[field] = medicalFile[field];

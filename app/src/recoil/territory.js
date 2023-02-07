@@ -1,5 +1,8 @@
 import { atom } from 'recoil';
 import { storage } from '../services/dataManagement';
+import { looseUuidRegex } from '../utils/regex';
+import { capture } from '../services/sentry';
+import { Alert } from 'react-native';
 
 export const territoriesState = atom({
   key: 'territoriesState',
@@ -10,6 +13,21 @@ export const territoriesState = atom({
 const encryptedFields = ['name', 'perimeter', 'types', 'user'];
 
 export const prepareTerritoryForEncryption = (territory) => {
+  try {
+    if (!territory.name) {
+      throw new Error('Territory is missing name');
+    }
+    if (!looseUuidRegex.test(territory.user)) {
+      throw new Error('Territory is missing user');
+    }
+  } catch (error) {
+    Alert.alert(
+      "Le territoire n'a pas été sauvegardé car son format était incorrect.",
+      "Vous pouvez vérifier son contenu et tenter de le sauvegarder à nouveau. L'équipe technique a été prévenue et va travailler sur un correctif."
+    );
+    capture(error, { extra: { territory } });
+    throw error;
+  }
   const decrypted = {};
   for (let field of encryptedFields) {
     decrypted[field] = territory[field];
