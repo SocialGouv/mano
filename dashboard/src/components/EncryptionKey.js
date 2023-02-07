@@ -98,11 +98,8 @@ const EncryptionKey = ({ isMain }) => {
       if (!values.encryptionKeyConfirm) return toast.error('La validation de la clé est obligatoire');
       if (values.encryptionKey !== values.encryptionKeyConfirm) return toast.error('Les clés ne sont pas identiques');
       const previousKey = getHashedOrgEncryptionKey();
-      console.log(String(previousKey));
       setEncryptionKey(values.encryptionKey.trim());
       const hashedOrgEncryptionKey = await setOrgEncryptionKey(values.encryptionKey.trim());
-      console.log(String(hashedOrgEncryptionKey));
-      console.log(String(previousKey));
       setEncryptingStatus('Chiffrement des données...');
       const encryptedVerificationKey = await encryptVerificationKey(hashedOrgEncryptionKey);
 
