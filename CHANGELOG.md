@@ -1,3 +1,10 @@
+## [1.241.2](https://github.com/SocialGouv/mano/compare/v1.241.1...v1.241.2) (2023-02-07)
+
+
+### Bug Fixes
+
+* **dashboard:** si un territoire précédemment créé n'avait pas d'utilisateur associé on lui rajoute l'utilisateur en cours lors de la modification ([#1301](https://github.com/SocialGouv/mano/issues/1301)) ([a463f64](https://github.com/SocialGouv/mano/commit/a463f641952c5b586769963d781c1864fc00f4de))
+
 ## [1.241.1](https://github.com/SocialGouv/mano/compare/v1.241.0...v1.241.1) (2023-02-06)
 
 
