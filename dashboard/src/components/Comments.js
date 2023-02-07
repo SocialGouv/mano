@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import { Modal, Input, Button as CloseButton, Col, Row, ModalHeader, ModalBody, FormGroup, Label } from 'reactstrap';
+import { Input, Button as CloseButton, Col, Row, FormGroup, Label } from 'reactstrap';
 import { toast } from 'react-toastify';
 import DatePicker from 'react-datepicker';
 
@@ -21,6 +21,7 @@ import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIf
 import { useParams } from 'react-router-dom';
 import { itemsGroupedByActionSelector, itemsGroupedByPersonSelector } from '../recoil/selectors';
 import { groupsState } from '../recoil/groups';
+import { ModalBody, ModalContainer, ModalHeader } from './tailwind/Modal';
 
 const commentsByActionOrPersonSelector = selectorFamily({
   key: 'commentsByActionOrPersonSelector',
@@ -200,9 +201,15 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment 
           <ButtonCustom title="Ajouter un commentaire" onClick={() => setOpen(true)} style={{ marginBottom: 20 }} />
         </div>
       )}
-      <Modal isOpen={!!open} toggle={onCancelRequest} size="lg" backdrop="static">
-        <ModalHeader toggle={onCancelRequest}>{newComment ? 'Créer un' : 'Éditer le'} commentaire</ModalHeader>
-        <ModalBody>
+      <ModalContainer
+        open={!!open}
+        onClose={() => {
+          window.sessionStorage.removeItem('currentComment');
+          onCancelRequest();
+        }}
+        size="lg">
+        <ModalHeader toggle={onCancelRequest} title={newComment ? 'Créer un commentaire' : 'Éditer le commentaire'} />
+        <ModalBody className="tw-px-4 tw-py-2">
           <Formik
             initialValues={{
               urgent: false,
@@ -306,19 +313,19 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment 
                     )}
                   </Row>
                   <div className="tw-mt-4 tw-flex tw-justify-end">
-                  <ButtonCustom
-                    type="submit"
-                    disabled={isSubmitting}
-                    onClick={() => !isSubmitting && handleSubmit()}
-                    title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}
-                  />
+                    <ButtonCustom
+                      type="submit"
+                      disabled={isSubmitting}
+                      onClick={() => !isSubmitting && handleSubmit()}
+                      title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}
+                    />
                   </div>
                 </React.Fragment>
               );
             }}
           </Formik>
         </ModalBody>
-      </Modal>
+      </ModalContainer>
     </>
   );
 };

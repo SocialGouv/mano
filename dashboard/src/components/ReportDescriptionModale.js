@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Col, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
+import { Col, FormGroup, Input, Label, Row } from 'reactstrap';
 
 import ButtonCustom from './ButtonCustom';
 import { Formik } from 'formik';
@@ -7,6 +7,7 @@ import { prepareReportForEncryption, reportsState } from '../recoil/reports';
 import API from '../services/api';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { lastLoadState, mergeItems } from './DataLoader';
+import { ModalBody, ModalContainer, ModalHeader } from './tailwind/Modal';
 
 const ReportDescriptionModale = ({ report }) => {
   const [reports, setReports] = useRecoilState(reportsState);
@@ -22,9 +23,15 @@ const ReportDescriptionModale = ({ report }) => {
         color={!report?.description?.length ? 'info' : 'link'}
         style={{ marginBottom: '0.5rem' }}
       />
-      <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
-        <ModalHeader toggle={() => setOpen(false)}>Description</ModalHeader>
-        <ModalBody>
+      <ModalContainer
+        open={open}
+        onClose={() => {
+          window.sessionStorage.removeItem('currentReportDescription');
+          setOpen(false);
+        }}
+        size="lg">
+        <ModalHeader toggle={() => setOpen(false)} title="Description" />
+        <ModalBody className="tw-px-4 tw-py-2">
           <Formik
             className="noprint"
             initialValues={{ ...report, description: report.description || window.sessionStorage.getItem('currentReportDescription') || '' }}
@@ -86,7 +93,7 @@ const ReportDescriptionModale = ({ report }) => {
             )}
           </Formik>
         </ModalBody>
-      </Modal>
+      </ModalContainer>
     </>
   );
 };

@@ -28,7 +28,13 @@ const CommentModal = ({ comment = {}, isNewComment, onClose, person }) => {
 
   return (
     <>
-      <ModalContainer open onClose={onClose} size="lg">
+      <ModalContainer
+        open
+        onClose={() => {
+          window.sessionStorage.removeItem('currentComment');
+          onClose();
+        }}
+        size="lg">
         <ModalHeader toggle={onClose} title={isNewComment ? 'Créer un commentaire' : 'Éditer le commentaire'} />
         <ModalBody className="tw-px-4 tw-py-2">
           <Formik
