@@ -9,6 +9,10 @@ module.exports = async () => {
     //    so the script can execut to migrate existing custom fields to the customFieldsPersons.
     // 2. If the organisation is new, it will have the `customPersonsFields by default so it won't need
     //    the 'custom-fields-persons-setup' migration, that's why we setup as default migration here.
+    //
+    // Note(2023-02-07): This migration is useless since the column is not re-created in production.
+    //                   'custom-fields-persons-setup' has to be added when the organisation is created.
+    //
     await sequelize.query(`
       ALTER TABLE "mano"."Organisation"
       ADD COLUMN IF NOT EXISTS "migrations" text[] default array['custom-fields-persons-setup'];
