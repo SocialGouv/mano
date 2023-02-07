@@ -747,11 +747,11 @@ export function MedicalFile({ person }) {
             const treatmentResponse = isNewTreatment
               ? await API.post({
                   path: '/treatment',
-                  body: prepareTreatmentForEncryption(values),
+                  body: prepareTreatmentForEncryption({ ...values, user: values.user || user._id }),
                 })
               : await API.put({
                   path: `/treatment/${currentTreatment._id}`,
-                  body: prepareTreatmentForEncryption(values),
+                  body: prepareTreatmentForEncryption({ ...values, user: values.user || user._id }),
                 });
             if (!treatmentResponse.ok) return;
             if (isNewTreatment) {

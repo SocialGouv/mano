@@ -108,7 +108,9 @@ const EncryptionKey = ({ isMain }) => {
       const encryptedConsultations = await Promise.all(
         consultations.map(prepareConsultationForEncryption(organisation.consultations)).map(encryptItem)
       );
-      const encryptedTreatments = await Promise.all(treatments.map(prepareTreatmentForEncryption).map(encryptItem));
+      const encryptedTreatments = await Promise.all(
+        treatments.map((t) => prepareTreatmentForEncryption({ ...t, user: t.user || user._id })).map(encryptItem)
+      );
       const encryptedMedicalFiles = await Promise.all(medicalFiles.map(prepareMedicalFileForEncryption(customFieldsMedicalFile)).map(encryptItem));
       const encryptedComments = await Promise.all(comments.map(prepareCommentForEncryption).map(encryptItem));
       const encryptedPassages = await Promise.all(passages.map(preparePassageForEncryption).map(encryptItem));
@@ -277,8 +279,8 @@ const EncryptionKey = ({ isMain }) => {
   if (organisation.encryptionEnabled && !user.healthcareProfessional)
     return (
       <em>
-        Vous ne pouvez pas changer la clé de chiffrement car vous n'êtes pas déclaré·e comme administrateur·trice de type professionel·le de santé. Il est
-        nécessaire d'avoir accès à l'ensemble des données de l'organisation pour pouvoir changer son chiffrement.
+        Vous ne pouvez pas changer la clé de chiffrement car vous n'êtes pas déclaré·e comme administrateur·trice de type professionel·le de santé. Il
+        est nécessaire d'avoir accès à l'ensemble des données de l'organisation pour pouvoir changer son chiffrement.
       </em>
     );
 
