@@ -1,3 +1,10 @@
+## [1.242.1](https://github.com/SocialGouv/mano/compare/v1.242.0...v1.242.1) (2023-02-07)
+
+
+### Bug Fixes
+
+* **dashboard:** retour a la ligne des noms ou adresses trop longues dans la liste des structures ([#1268](https://github.com/SocialGouv/mano/issues/1268)) ([39565fc](https://github.com/SocialGouv/mano/commit/39565fc223578378ba557a70bb47470fb3e7f7e8))
+
 # [1.242.0](https://github.com/SocialGouv/mano/compare/v1.241.3...v1.242.0) (2023-02-07)
 
 
