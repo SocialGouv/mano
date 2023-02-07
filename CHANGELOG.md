@@ -1,3 +1,10 @@
+## [1.241.3](https://github.com/SocialGouv/mano/compare/v1.241.2...v1.241.3) (2023-02-07)
+
+
+### Bug Fixes
+
+* **dasboard:** meilleure affichage console reinitialisation mdp + nouvelle équipe ([#1302](https://github.com/SocialGouv/mano/issues/1302)) ([2bde8e6](https://github.com/SocialGouv/mano/commit/2bde8e6f54d3f92fc9020f7ff4af500bcc5e6b48))
+
 ## [1.241.2](https://github.com/SocialGouv/mano/compare/v1.241.1...v1.241.2) (2023-02-07)
 
 
