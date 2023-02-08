@@ -266,10 +266,6 @@ const Loader = () => {
     }
 
     /*
-    Switch to not full screen
-    */
-    setFullScreen(false);
-    /*
     Get territories
     */
     if (initialLoad || response.data.territories) {
