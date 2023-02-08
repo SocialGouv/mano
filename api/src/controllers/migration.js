@@ -234,6 +234,36 @@ router.put(
           }
         }
 
+        if (req.params.migrationName === "comments-reset-person-id") {
+          try {
+            z.array(
+              z.object({
+                _id: z.string().regex(looseUuidRegex),
+                encrypted: z.string(),
+                encryptedEntityKey: z.string(),
+              })
+            ).parse(req.body.commentsToUpdate);
+          } catch (e) {
+            const error = new Error(`Invalid request in comments-reset-person-id migration: ${e}`);
+            error.status = 400;
+            throw error;
+          }
+          for (const { _id, encrypted, encryptedEntityKey } of req.body.commentsToUpdate) {
+            const comment = await Comment.findOne({ where: { _id, organisation: req.user.organisation }, transaction: tx });
+            if (comment) {
+              comment.set({ encrypted, encryptedEntityKey });
+              await comment.save();
+            }
+          }
+          if (req.body.commentsToUpdate.length > 0) {
+            capture(`comments-reset-person-id migration done with ${req.body.commentsToUpdate.length} comments`, {
+              extra: {
+                organisation: req.user.organisation,
+              },
+            });
+          }
+        }
+
         organisation.set({
           migrations: [...(organisation.migrations || []), req.params.migrationName],
           migrating: false,

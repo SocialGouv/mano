@@ -6,6 +6,8 @@ import { prepareReportForEncryption } from '../recoil/reports';
 import API, { encryptItem } from '../services/api';
 import { dayjsInstance } from '../services/date';
 import { loadingTextState } from './DataLoader';
+import { looseUuidRegex } from '../utils';
+import { prepareCommentForEncryption } from '../recoil/comments';
 
 const LOADING_TEXT = 'Mise à jour des données de votre organisation…';
 
@@ -202,6 +204,38 @@ export default function useDataMigrator() {
         const response = await API.put({
           path: `/migration/services-in-services-table`,
           body: { reportsToUpdate: encryptedReportsToMigrate, servicesToSaveInDB },
+          query: { migrationLastUpdateAt },
+        });
+        if (response.ok) {
+          setOrganisation(response.organisation);
+          migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
+        }
+      }
+
+      if (!organisation.migrations?.includes('comments-reset-person-id')) {
+        setLoadingText(LOADING_TEXT);
+        const res = await API.get({
+          path: '/comment',
+          query: { organisation: organisationId, after: 0, withDeleted: false },
+        });
+        const commentsWithPersonUuid = (res.decryptedData || [])
+          .filter((comment) => {
+            // we select only comments with person "populated"
+            if (!!comment.action) return false;
+            if (!comment.person) return false;
+            if (looseUuidRegex.test(comment.person)) return false;
+            if (!comment?.person?._id) return false;
+            return true;
+          })
+          .map((comment) => ({
+            ...comment,
+            person: comment.person._id,
+          }));
+
+        const encryptedCommentsToMigrate = await Promise.all(commentsWithPersonUuid.map(prepareCommentForEncryption).map(encryptItem));
+        const response = await API.put({
+          path: `/migration/comments-reset-person-id`,
+          body: { commentsToUpdate: encryptedCommentsToMigrate },
           query: { migrationLastUpdateAt },
         });
         if (response.ok) {
