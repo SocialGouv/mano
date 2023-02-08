@@ -127,10 +127,10 @@ const logout = async () => {
 };
 
 // Upload a file to a path.
-export const upload = async ({ file, path }) => {
+export const upload = async ({ file, path }, forceKey) => {
   // Prepare file.
   const tokenCached = getRecoil(authTokenState);
-  const { encryptedEntityKey, encryptedFile } = await encryptFile(file, hashedOrgEncryptionKey);
+  const { encryptedEntityKey, encryptedFile } = await encryptFile(file, forceKey || hashedOrgEncryptionKey);
   const formData = new FormData();
   formData.append('file', encryptedFile);
 

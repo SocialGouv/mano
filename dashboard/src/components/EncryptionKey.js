@@ -103,45 +103,19 @@ const EncryptionKey = ({ isMain }) => {
       setEncryptingStatus('Chiffrement des données...');
       const encryptedVerificationKey = await encryptVerificationKey(hashedOrgEncryptionKey);
 
-      // Sauvegarde des fichiers des personnes.
-      const mutPersons = [...persons.map((person) => ({ ...person }))];
-      for (const person of mutPersons.filter((p) => p.documents && p.documents.length)) {
-        const updatedDocuments = [];
-        for (const d of person.documents) {
-          const content = await API.download(
-            {
-              path: d.downloadPath,
-              encryptedEntityKey: d.encryptedEntityKey,
-            },
-            previousKey
-          );
-          const docResult = await API.upload({
-            path: `/person/${person._id}/document`,
-            file: new File([content], d.file.originalname, { type: d.file.mimetype }),
-          });
-          const { data: file, encryptedEntityKey } = docResult;
-          updatedDocuments.push({
-            _id: file.filename,
-            name: d.file.originalname,
-            encryptedEntityKey,
-            createdAt: d.createdAt,
-            createdBy: d.createdBy,
-            downloadPath: `/person/${person._id}/document/${file.filename}`,
-            file,
-          });
-        }
-        person.documents = updatedDocuments;
-      }
-      // Fin de la sauvegarde des fichier des personnes.
+      const mutPersons = await recryptPersonsDocuments(persons, previousKey, encryptedVerificationKey);
+      const mutTreatments = await recryptPersonsRelatedDocuments(treatments, previousKey, encryptedVerificationKey);
+      const mutConsultations = await recryptPersonsRelatedDocuments(consultations, previousKey, encryptedVerificationKey);
+      const mutMedicalFiles = await recryptPersonsRelatedDocuments(medicalFiles, previousKey, encryptedVerificationKey);
 
       const encryptedPersons = await Promise.all(mutPersons.map(preparePersonForEncryption).map(encryptItem));
       const encryptedGroups = await Promise.all(groups.map(prepareGroupForEncryption).map(encryptItem));
       const encryptedActions = await Promise.all(actions.map(prepareActionForEncryption).map(encryptItem));
       const encryptedConsultations = await Promise.all(
-        consultations.map(prepareConsultationForEncryption(organisation.consultations)).map(encryptItem)
+        mutConsultations.map(prepareConsultationForEncryption(organisation.consultations)).map(encryptItem)
       );
-      const encryptedTreatments = await Promise.all(treatments.map(prepareTreatmentForEncryption).map(encryptItem));
-      const encryptedMedicalFiles = await Promise.all(medicalFiles.map(prepareMedicalFileForEncryption(customFieldsMedicalFile)).map(encryptItem));
+      const encryptedTreatments = await Promise.all(mutTreatments.map(prepareTreatmentForEncryption).map(encryptItem));
+      const encryptedMedicalFiles = await Promise.all(mutMedicalFiles.map(prepareMedicalFileForEncryption(customFieldsMedicalFile)).map(encryptItem));
       const encryptedComments = await Promise.all(comments.map(prepareCommentForEncryption).map(encryptItem));
       const encryptedPassages = await Promise.all(passages.map(preparePassageForEncryption).map(encryptItem));
       const encryptedRencontres = await Promise.all(rencontres.map(prepareRencontreForEncryption).map(encryptItem));
@@ -195,6 +169,11 @@ const EncryptionKey = ({ isMain }) => {
         } else {
           toast.success('Données chiffrées ! Veuillez noter la clé puis vous reconnecter');
         }
+      } else {
+        await recryptPersonsDocuments(persons, previousKey, encryptedVerificationKey);
+        await recryptPersonsRelatedDocuments(treatments, previousKey, encryptedVerificationKey);
+        await recryptPersonsRelatedDocuments(consultations, previousKey, encryptedVerificationKey);
+        await recryptPersonsRelatedDocuments(medicalFiles, previousKey, encryptedVerificationKey);
       }
     } catch (orgEncryptionError) {
       capture('erreur in organisation encryption', orgEncryptionError);
@@ -345,6 +324,84 @@ const EncryptionKey = ({ isMain }) => {
       </StyledModal>
     </>
   );
+};
+
+const recryptPersonsDocuments = async (persons, oldKey, newKey) => {
+  const mutPersons = [...persons.map((person) => ({ ...person }))];
+  for (const person of mutPersons.filter((person) => person.documents && person.documents.length)) {
+    const updatedDocuments = [];
+    for (const doc of person.documents) {
+      try {
+        const content = await API.download(
+          {
+            path: doc.downloadPath ?? `/person/${person._id}/document/${doc.file.filename}`,
+            encryptedEntityKey: doc.encryptedEntityKey,
+          },
+          oldKey
+        );
+        const docResult = await API.upload(
+          {
+            path: `/person/${person._id}/document`,
+            file: new File([content], doc.file.originalname, { type: doc.file.mimetype }),
+          },
+          newKey
+        );
+        const { data: file, encryptedEntityKey } = docResult;
+        updatedDocuments.push({
+          _id: file.filename,
+          name: doc.file.originalname,
+          encryptedEntityKey,
+          createdAt: doc.createdAt,
+          createdBy: doc.createdBy,
+          downloadPath: `/person/${person._id}/document/${file.filename}`,
+          file,
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    person.documents = updatedDocuments;
+  }
+  return mutPersons;
+};
+
+const recryptPersonsRelatedDocuments = async (items, oldKey, newKey) => {
+  const mutedItems = [...items.map((treatment) => ({ ...treatment }))];
+  for (const item of mutedItems.filter((item) => item.documents && item.documents.length)) {
+    const updatedDocuments = [];
+    for (const doc of item.documents) {
+      try {
+        const content = await API.download(
+          {
+            path: doc.downloadPath ?? `/person/${item.person}/document/${doc.file.filename}`,
+            encryptedEntityKey: doc.encryptedEntityKey,
+          },
+          oldKey
+        );
+        const docResult = await API.upload(
+          {
+            path: `/person/${item.person}/document`,
+            file: new File([content], doc.file.originalname, { type: doc.file.mimetype }),
+          },
+          newKey
+        );
+        const { data: file, encryptedEntityKey } = docResult;
+        updatedDocuments.push({
+          _id: file.filename,
+          name: doc.file.originalname,
+          encryptedEntityKey,
+          createdAt: doc.createdAt,
+          createdBy: doc.createdBy,
+          downloadPath: `/person/${item.person}/document/${file.filename}`,
+          file,
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    item.documents = updatedDocuments;
+  }
+  return mutedItems;
 };
 
 const StyledModal = styled(Modal)`
