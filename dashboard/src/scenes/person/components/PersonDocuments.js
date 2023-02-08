@@ -44,7 +44,6 @@ const PersonDocuments = ({ person }) => {
             name="file"
             className="tw-hidden"
             onChange={async (e) => {
-              console.log('uploading file', e.target.files[0]);
               const docResponse = await API.upload({
                 path: `/person/${person._id}/document`,
                 file: e.target.files[0],
