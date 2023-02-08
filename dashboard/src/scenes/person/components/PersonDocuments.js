@@ -44,10 +44,12 @@ const PersonDocuments = ({ person }) => {
             name="file"
             className="tw-hidden"
             onChange={async (e) => {
+              console.log('uploading file', e.target.files[0]);
               const docResponse = await API.upload({
                 path: `/person/${person._id}/document`,
                 file: e.target.files[0],
               });
+              console.log('uploaded file', docResponse);
               if (!docResponse.ok || !docResponse.data) {
                 capture('Error uploading document', { extra: { docResponse } });
                 toast.error("Une erreur est survenue lors de l'envoi du document");

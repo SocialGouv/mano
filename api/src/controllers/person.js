@@ -56,6 +56,13 @@ router.post(
   catchErrors(async (req, res, next) => {
     const { file } = req;
     // Send back file information.
+    console.log({
+      originalname: file.originalname,
+      filename: file.filename,
+      size: file.size,
+      encoding: file.encoding,
+      mimetype: file.mimetype,
+    });
     res.send({
       ok: true,
       data: {

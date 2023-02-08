@@ -169,11 +169,6 @@ const EncryptionKey = ({ isMain }) => {
         } else {
           toast.success('Données chiffrées ! Veuillez noter la clé puis vous reconnecter');
         }
-      } else {
-        await recryptPersonsDocuments(persons, previousKey, encryptedVerificationKey);
-        await recryptPersonsRelatedDocuments(treatments, previousKey, encryptedVerificationKey);
-        await recryptPersonsRelatedDocuments(consultations, previousKey, encryptedVerificationKey);
-        await recryptPersonsRelatedDocuments(medicalFiles, previousKey, encryptedVerificationKey);
       }
     } catch (orgEncryptionError) {
       capture('erreur in organisation encryption', orgEncryptionError);
@@ -326,38 +321,53 @@ const EncryptionKey = ({ isMain }) => {
   );
 };
 
+const recryptDocument = async (doc, personId, { fromKey, toKey }) => {
+  const content = await API.download(
+    {
+      path: doc.downloadPath ?? `/person/${personId}/document/${doc.file.filename}`,
+      encryptedEntityKey: doc.encryptedEntityKey,
+    },
+    fromKey
+  );
+  const docResult = await API.upload(
+    {
+      path: `/person/${personId}/document`,
+      file: new File([content], doc.file.originalname, { type: doc.file.mimetype }),
+    },
+    toKey
+  );
+  const { data: file, encryptedEntityKey } = docResult;
+  return {
+    _id: file.filename,
+    name: doc.file.originalname,
+    encryptedEntityKey,
+    createdAt: doc.createdAt,
+    createdBy: doc.createdBy,
+    downloadPath: `/person/${personId}/document/${file.filename}`,
+    file,
+  };
+};
+
 const recryptPersonsDocuments = async (persons, oldKey, newKey) => {
   const mutPersons = [...persons.map((person) => ({ ...person }))];
   for (const person of mutPersons.filter((person) => person.documents && person.documents.length)) {
     const updatedDocuments = [];
     for (const doc of person.documents) {
       try {
-        const content = await API.download(
-          {
-            path: doc.downloadPath ?? `/person/${person._id}/document/${doc.file.filename}`,
-            encryptedEntityKey: doc.encryptedEntityKey,
-          },
-          oldKey
-        );
-        const docResult = await API.upload(
-          {
-            path: `/person/${person._id}/document`,
-            file: new File([content], doc.file.originalname, { type: doc.file.mimetype }),
-          },
-          newKey
-        );
-        const { data: file, encryptedEntityKey } = docResult;
-        updatedDocuments.push({
-          _id: file.filename,
-          name: doc.file.originalname,
-          encryptedEntityKey,
-          createdAt: doc.createdAt,
-          createdBy: doc.createdBy,
-          downloadPath: `/person/${person._id}/document/${file.filename}`,
-          file,
-        });
+        const recryptedDocument = await recryptDocument(doc, person._id, { fromKey: oldKey, toKey: newKey });
+        updatedDocuments.push(recryptedDocument);
       } catch (e) {
         console.error(e);
+        // we need a temporary hack, for the organisations which already changed their encryption key
+        // but not all the documents were recrypted
+        // we told them to change back from `newKey` to `oldKey` to retrieve the old documents
+        // and then change back to `newKey` to recrypt them in the new key
+        try {
+          const recryptedDocument = await recryptDocument(doc, person._id, { fromKey: newKey, toKey: oldKey });
+          updatedDocuments.push(recryptedDocument);
+        } catch (e) {
+          capture('CANNOT RECRYPT DOCUMENT', { extra: { personId: person._id, documentId: doc._id } });
+        }
       }
     }
     person.documents = updatedDocuments;
@@ -371,32 +381,20 @@ const recryptPersonsRelatedDocuments = async (items, oldKey, newKey) => {
     const updatedDocuments = [];
     for (const doc of item.documents) {
       try {
-        const content = await API.download(
-          {
-            path: doc.downloadPath ?? `/person/${item.person}/document/${doc.file.filename}`,
-            encryptedEntityKey: doc.encryptedEntityKey,
-          },
-          oldKey
-        );
-        const docResult = await API.upload(
-          {
-            path: `/person/${item.person}/document`,
-            file: new File([content], doc.file.originalname, { type: doc.file.mimetype }),
-          },
-          newKey
-        );
-        const { data: file, encryptedEntityKey } = docResult;
-        updatedDocuments.push({
-          _id: file.filename,
-          name: doc.file.originalname,
-          encryptedEntityKey,
-          createdAt: doc.createdAt,
-          createdBy: doc.createdBy,
-          downloadPath: `/person/${item.person}/document/${file.filename}`,
-          file,
-        });
+        const recryptedDocument = await recryptDocument(doc, item.person, { fromKey: oldKey, toKey: newKey });
+        updatedDocuments.push(recryptedDocument);
       } catch (e) {
         console.error(e);
+        // we need a temporary hack, for the organisations which already changed their encryption key
+        // but not all the documents were recrypted
+        // we told them to change back from `newKey` to `oldKey` to retrieve the old documents
+        // and then change back to `newKey` to recrypt them in the new key
+        try {
+          const recryptedDocument = await recryptDocument(doc, item.person, { fromKey: newKey, toKey: oldKey });
+          updatedDocuments.push(recryptedDocument);
+        } catch (e) {
+          capture('CANNOT RECRYPT DOCUMENT', { extra: { personId: item.person, documentId: doc._id } });
+        }
       }
     }
     item.documents = updatedDocuments;
