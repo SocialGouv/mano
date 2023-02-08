@@ -1,3 +1,10 @@
+## [1.242.2](https://github.com/SocialGouv/mano/compare/v1.242.1...v1.242.2) (2023-02-08)
+
+
+### Bug Fixes
+
+* **dashboard:** ne pas sauvegarder le commentaire en sessionStorage quand la fenetre de creation a été volontairement fermée ([#1306](https://github.com/SocialGouv/mano/issues/1306)) ([8913e9f](https://github.com/SocialGouv/mano/commit/8913e9fbf637b363e26937fe2eb01fbaf403e0df))
+
 ## [1.242.1](https://github.com/SocialGouv/mano/compare/v1.242.0...v1.242.1) (2023-02-07)
 
 
