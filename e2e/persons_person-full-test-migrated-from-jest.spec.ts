@@ -28,15 +28,19 @@ test("test", async ({ page }) => {
   await page.getByLabel("Autres pseudos").fill("test pseudo");
   await page.locator(".person-select-gender__value-container").click();
   await page.locator("#react-select-gender-option-2").click();
+  await page.getByLabel("Date de naissance").fill("11/11/2001");
   await page.getByLabel("Date de naissance").press("Enter");
   await page.getByLabel("En rue depuis le").fill("11/11/2001");
+  await page.getByLabel("En rue depuis le").press("Enter");
   await page.getByLabel("Suivi(e) depuis le / Créé(e) le").fill("12/11/2001");
+  await page.getByLabel("Suivi(e) depuis le / Créé(e) le").press("Enter");
   await page.getByLabel("Téléphone").fill("010203040506");
   await page.getByLabel("Description").fill("Description");
   await page.getByText("Personne très vulnérable, ou ayant besoin d'une attention particulière").click();
   await page.getByText("+").first().click();
   await page.locator(".person-custom-select-situation-personnelle__value-container").click();
   await page.locator("#react-select-personalSituation-option-0").click();
+  await page.getByLabel("Structure de suivi social").click();
   await page.getByLabel("Structure de suivi social").fill("social");
   await page.locator(".person-custom-select-avec-animaux__value-container").click();
   await page.locator("#react-select-hasAnimal-option-0").click();
@@ -90,6 +94,7 @@ test("test", async ({ page }) => {
   await page.getByLabel("Montrer l'heure").check();
   await page.getByLabel("À faire le").fill("11/12/2002");
   //  await page.locator('body:has-text("Orga Test - 1Team Test - 1User Test - 1User Test - 1 - adminBesoin d\'aide ? Donn")').press("Enter");
+  await page.getByLabel("Description").click();
   await page.getByLabel("Description").fill("tests description");
   await page.getByText("Action prioritaire Cette action sera mise en avant par rapport aux autres").click();
   await page.getByRole("button", { name: "Sauvegarder" }).click();
