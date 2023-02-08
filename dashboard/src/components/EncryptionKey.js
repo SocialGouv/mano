@@ -161,6 +161,7 @@ const EncryptionKey = ({ isMain }) => {
 
       clearInterval(elpasedBarInterval);
       if (res.ok) {
+        // TODO: clean unused person documents
         setEncryptingProgress(totalDurationOnServer);
         setEncryptingStatus('Données chiffrées !');
         setOrganisation(res.data);
