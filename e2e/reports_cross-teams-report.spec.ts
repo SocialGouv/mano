@@ -199,7 +199,7 @@ test("Cross teams report", async ({ page }) => {
     await page.locator(".Toastify__close-button").last().click();
 
     await page.getByRole("button", { name: "Ajouter une description" }).click();
-    await page.getByLabel("Description").fill(team1Description);
+    await page.getByRole("dialog").getByLabel("Description").fill(team1Description);
     await page.getByRole("button", { name: "Enregistrer" }).click();
   });
 
@@ -227,7 +227,7 @@ test("Cross teams report", async ({ page }) => {
 
     await page.getByRole("button", { name: "Ajouter une description" }).click();
 
-    await page.getByLabel("Description").fill(team2Description);
+    await page.getByRole("dialog").getByLabel("Description").fill(team2Description);
     await page.getByRole("button", { name: "Enregistrer" }).click();
   });
 
