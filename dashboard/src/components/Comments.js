@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import { Modal, Input, Button as CloseButton, Col, Row, ModalHeader, ModalBody, FormGroup, Label } from 'reactstrap';
+import { Input, Button as CloseButton, Col, Row, FormGroup, Label } from 'reactstrap';
 import { toast } from 'react-toastify';
 import DatePicker from 'react-datepicker';
 
@@ -21,6 +21,7 @@ import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIf
 import { useParams } from 'react-router-dom';
 import { itemsGroupedByActionSelector, itemsGroupedByPersonSelector } from '../recoil/selectors';
 import { groupsState } from '../recoil/groups';
+import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from './tailwind/Modal';
 
 const commentsByActionOrPersonSelector = selectorFamily({
   key: 'commentsByActionOrPersonSelector',
@@ -61,13 +62,13 @@ const Comments = ({ onUpdateResults }) => {
   }, [comments.length]);
 
   const deleteData = async (id) => {
-    const confirm = window.confirm('Êtes-vous sûr ?');
-    if (confirm) {
-      const res = await API.delete({ path: `/comment/${id}` });
-      if (res.ok) setComments((comments) => comments.filter((p) => p._id !== id));
-      if (!res.ok) return;
-      toast.success('Suppression réussie');
-    }
+    const confirm = window.confirm('Voulez-vous vraiment supprimer ce commentaire ?');
+    if (!confirm) return false;
+    const res = await API.delete({ path: `/comment/${id}` });
+    if (res.ok) setComments((comments) => comments.filter((p) => p._id !== id));
+    if (!res.ok) return false;
+    toast.success('Suppression réussie');
+    return true;
   };
 
   const addData = async ({ comment, urgent, group }) => {
@@ -167,12 +168,13 @@ const Comments = ({ onUpdateResults }) => {
         value={comments.find((c) => c._id === editingId)}
         onSubmit={updateData}
         onCancel={() => setEditing(null)}
+        onDelete={deleteData}
       />
     </React.Fragment>
   );
 };
 
-const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment }) => {
+const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, onDelete, newComment }) => {
   const user = useRecoilValue(userState);
   const { personId } = useParams();
   const groups = useRecoilValue(groupsState);
@@ -200,27 +202,33 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment 
           <ButtonCustom title="Ajouter un commentaire" onClick={() => setOpen(true)} style={{ marginBottom: 20 }} />
         </div>
       )}
-      <Modal isOpen={!!open} toggle={onCancelRequest} size="lg" backdrop="static">
-        <ModalHeader toggle={onCancelRequest}>{newComment ? 'Créer un' : 'Éditer le'} commentaire</ModalHeader>
-        <ModalBody>
-          <Formik
-            initialValues={{
-              urgent: false,
-              group: false,
-              ...value,
-              comment: value.comment || window.sessionStorage.getItem('currentComment'),
-            }}
-            onSubmit={async (body, actions) => {
-              if (!body.user && !newComment) return toast.error("L'utilisateur est obligatoire");
-              if (!body.date && !newComment) return toast.error('La date est obligatoire');
-              if (!body.comment) return toast.error('Le commentaire est obligatoire');
-              await onSubmit({ ...value, ...body });
-              actions.setSubmitting(false);
-              window.sessionStorage.removeItem('currentComment');
-            }}>
-            {({ values, handleChange, handleSubmit, isSubmitting }) => {
-              return (
-                <React.Fragment>
+      <ModalContainer
+        open={!!open}
+        onClose={() => {
+          window.sessionStorage.removeItem('currentComment');
+          onCancelRequest();
+        }}
+        size="lg">
+        <ModalHeader toggle={onCancelRequest} title={newComment ? 'Créer un commentaire' : 'Éditer le commentaire'} />
+        <Formik
+          initialValues={{
+            urgent: false,
+            group: false,
+            ...value,
+            comment: value.comment || window.sessionStorage.getItem('currentComment'),
+          }}
+          onSubmit={async (body, actions) => {
+            if (!body.user && !newComment) return toast.error("L'utilisateur est obligatoire");
+            if (!body.date && !newComment) return toast.error('La date est obligatoire');
+            if (!body.comment) return toast.error('Le commentaire est obligatoire');
+            await onSubmit({ ...value, ...body });
+            actions.setSubmitting(false);
+            window.sessionStorage.removeItem('currentComment');
+          }}>
+          {({ values, handleChange, handleSubmit, isSubmitting }) => {
+            return (
+              <React.Fragment>
+                <ModalBody className="tw-px-4 tw-py-2">
                   <Row>
                     {!newComment && (
                       <>
@@ -305,20 +313,42 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment 
                       </Col>
                     )}
                   </Row>
-                  <div className="tw-mt-4 tw-flex tw-justify-end">
-                  <ButtonCustom
-                    type="submit"
-                    disabled={isSubmitting}
-                    onClick={() => !isSubmitting && handleSubmit()}
-                    title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}
-                  />
-                  </div>
-                </React.Fragment>
-              );
-            }}
-          </Formik>
-        </ModalBody>
-      </Modal>
+                </ModalBody>
+                <ModalFooter>
+                  <button
+                    type="button"
+                    name="cancel"
+                    className="button-cancel"
+                    onClick={() => {
+                      window.sessionStorage.removeItem('currentComment');
+                      onCancelRequest();
+                    }}>
+                    Annuler
+                  </button>
+                  {!newComment && (
+                    <button
+                      type="button"
+                      className="button-destructive"
+                      disabled={isSubmitting}
+                      onClick={async () => {
+                        const isDeleted = await onDelete(commentId);
+                        if (isDeleted) {
+                          window.sessionStorage.removeItem('currentComment');
+                          onCancelRequest();
+                        }
+                      }}>
+                      Supprimer
+                    </button>
+                  )}
+                  <button type="submit" className="button-submit" onClick={handleSubmit} disabled={isSubmitting}>
+                    Enregistrer
+                  </button>
+                </ModalFooter>
+              </React.Fragment>
+            );
+          }}
+        </Formik>
+      </ModalContainer>
     </>
   );
 };
