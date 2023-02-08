@@ -32,7 +32,7 @@ test("Create action with comments", async ({ page }) => {
   await page.getByRole("button", { name: "Ajouter un commentaire" }).click();
   await page.getByRole("textbox", { name: "Commentaire" }).fill("commentaire prioritaire pour une personne");
   await page.getByText("Commentaire prioritaire Ce commentaire sera mis en avant par rapport aux autres").click();
-  await page.getByRole("button", { name: "Sauvegarder" }).click();
+  await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Commentaire enregistré").click();
 
   await page.getByRole("link", { name: "Personnes suivies" }).click();
@@ -64,7 +64,7 @@ test("Create action with comments", async ({ page }) => {
   await page.getByText("action avec commentaire").click();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/action\/.*/);
   await page.getByText("Une personne avec un commentaire prioritaire").click();
-  await page.getByRole("button", { name: "Sauvegarder" }).click();
+  await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Commentaire mis à jour").click();
 
   await page.getByRole("link", { name: "Agenda" }).click();
@@ -83,7 +83,7 @@ test("Create action with comments", async ({ page }) => {
   await page.getByText(actionFor2PersonName).click();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/action\/.*/);
   await page.getByText("Un commentaire pour tout le monde").click();
-  await page.getByRole("button", { name: "Sauvegarder" }).click();
+  await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Commentaire mis à jour").click();
 
   await page.getByRole("link", { name: "Agenda" }).click();
@@ -93,7 +93,7 @@ test("Create action with comments", async ({ page }) => {
   await page.getByText(actionFor2PersonName).click();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/action\/.*/);
   await page.getByText("Un commentaire pour tout le monde").click();
-  await page.getByRole("button", { name: "Sauvegarder" }).click();
+  await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Commentaire mis à jour").click();
 
   await page.getByRole("link", { name: "Comptes rendus" }).click();
