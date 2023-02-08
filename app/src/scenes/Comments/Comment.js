@@ -40,6 +40,8 @@ const Comment = ({ navigation, route, onCommentWrite }) => {
       path: `/comment/${commentDB._id}`,
       body: prepareCommentForEncryption({
         ...commentDB,
+        team: commentDB.team || currentTeam?._id,
+        user: commentDB.user || user?._id,
         comment: comment.trim(),
         urgent,
         group,
