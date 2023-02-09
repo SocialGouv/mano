@@ -3,8 +3,6 @@ import { useParams, useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Formik } from 'formik';
 
-import DatePicker from 'react-datepicker';
-
 import SelectPerson from '../../components/SelectPerson';
 
 import { SmallHeaderWithBackButton } from '../../components/header';
@@ -18,7 +16,7 @@ import SelectStatus from '../../components/SelectStatus';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { CANCEL, DONE, actionsState, mappedIdsToLabels, prepareActionForEncryption, TODO } from '../../recoil/actions';
 import { selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
-import { dateForDatePicker, dayjsInstance, now } from '../../services/date';
+import { dateForDatePicker, dayjsInstance, now, outOfBoundariesDate } from '../../services/date';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import API from '../../services/api';
 import useTitle from '../../services/useTitle';
@@ -28,6 +26,7 @@ import { itemsGroupedByActionSelector } from '../../recoil/selectors';
 import ActionsCategorySelect from '../../components/tailwind/ActionsCategorySelect';
 import { groupsState } from '../../recoil/groups';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
+import DatePicker from '../../components/DatePicker';
 
 const actionByIdSelector = selectorFamily({
   key: 'actionByIdSelector',
@@ -135,10 +134,14 @@ const ActionView = () => {
               body.completedAt = null;
             }
           }
+          if (body.completedAt && outOfBoundariesDate(body.completedAt))
+            return toast.error('La date de complétion est hors limites (entre 1900 et 2100)');
+          if (body.dueAt && outOfBoundariesDate(body.dueAt)) return toast.error("La date d'échéance est hors limites (entre 1900 et 2100)");
+
           delete body.team;
           const actionResponse = await API.put({
             path: `/action/${body._id}`,
-            body: prepareActionForEncryption(body),
+            body: prepareActionForEncryption({ ...body, user: body.user || user._id }),
           });
           if (actionResponse.ok) {
             const newAction = actionResponse.decryptedData;
@@ -236,15 +239,7 @@ const ActionView = () => {
                   <div className="tw-mb-4">
                     <label htmlFor="dueAt">À faire le</label>
                     <div>
-                      <DatePicker
-                        id="dueAt"
-                        locale="fr"
-                        className="form-control"
-                        selected={dateForDatePicker(values.dueAt ?? new Date())}
-                        onChange={(date) => handleChange({ target: { value: date, name: 'dueAt' } })}
-                        dateFormat={values.withTime ? 'dd/MM/yyyy HH:mm' : 'dd/MM/yyyy'}
-                        showTimeInput={values.withTime}
-                      />
+                      <DatePicker id="dueAt" withTime={values.withTime} defaultValue={values.dueAt ?? new Date()} onChange={handleChange} />
                     </div>
                     <div>
                       <input
@@ -301,16 +296,7 @@ const ActionView = () => {
                       {values.status === DONE && <label htmlFor="completedAt">Faite le</label>}
                       {values.status === CANCEL && <label htmlFor="completedAt">Annulée le</label>}
                       <div>
-                        <DatePicker
-                          id="completedAt"
-                          locale="fr"
-                          className="form-control"
-                          selected={dateForDatePicker(values.completedAt ?? new Date())}
-                          onChange={(date) => handleChange({ target: { value: date, name: 'completedAt' } })}
-                          timeInputLabel="Heure :"
-                          dateFormat="dd/MM/yyyy HH:mm"
-                          showTimeInput
-                        />
+                        <DatePicker withTime id="completedAt" defaultValue={values.completedAt ?? new Date()} onChange={handleChange} />
                       </div>
                     </div>
                   )}

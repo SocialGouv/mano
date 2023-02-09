@@ -2,12 +2,11 @@ import React from 'react';
 import { FormGroup, Input, Label } from 'reactstrap';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
-import DatePicker from 'react-datepicker';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 
 import { actionsState, CANCEL, DONE, prepareActionForEncryption, TODO } from '../recoil/actions';
 import { currentTeamState, organisationState, teamsState, userState } from '../recoil/auth';
-import { dateForDatePicker, dayjsInstance } from '../services/date';
+import { dateForDatePicker, dayjsInstance, outOfBoundariesDate } from '../services/date';
 import API from '../services/api';
 
 import SelectPerson from './SelectPerson';
@@ -19,6 +18,7 @@ import ActionsCategorySelect from './tailwind/ActionsCategorySelect';
 import { groupsState } from '../recoil/groups';
 import { ModalBody, ModalContainer, ModalHeader } from './tailwind/Modal';
 import SelectTeamMultiple from './SelectTeamMultiple';
+import DatePicker from './DatePicker';
 
 const CreateActionModal = ({ person = null, persons = null, isMulti = false, completedAt = null, dueAt, open = false, setOpen = () => {} }) => {
   const teams = useRecoilValue(teamsState);
@@ -73,6 +73,10 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
             if (!isMulti && !values.person) return toast.error('La personne suivie est obligatoire');
             if (isMulti && !values.person?.length) return toast.error('Une personne suivie est obligatoire');
             if (!values.dueAt) return toast.error("La date d'échéance est obligatoire");
+            if (outOfBoundariesDate(values.dueAt)) return toast.error("La date d'échéance est hors limites (entre 1900 et 2100)");
+            if (values.completedAt && outOfBoundariesDate(values.completedAt))
+              return toast.error('La date de complétion est hors limites (entre 1900 et 2100)');
+
             const body = {
               name: values.name,
               teams: values.teams,
@@ -191,16 +195,7 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
                     <FormGroup>
                       <Label htmlFor="dueAt">À faire le</Label>
                       <div>
-                        <DatePicker
-                          id="dueAt"
-                          name="dueAt"
-                          locale="fr"
-                          className="form-control"
-                          selected={dateForDatePicker(values.dueAt ?? new Date())}
-                          onChange={(date) => handleChange({ target: { value: date, name: 'dueAt' } })}
-                          dateFormat={values.withTime ? 'dd/MM/yyyy HH:mm' : 'dd/MM/yyyy'}
-                          showTimeInput={values.withTime}
-                        />
+                        <DatePicker withTime={values.withTime} id="dueAt" defaultValue={values.dueAt ?? new Date()} onChange={handleChange} />
                       </div>
                       <div>
                         <input
@@ -257,17 +252,7 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
                         {values.status === DONE && <Label htmlFor="completedAt">Faite le</Label>}
                         {values.status === CANCEL && <Label htmlFor="completedAt">Annulée le</Label>}
                         <div>
-                          <DatePicker
-                            id="completedAt"
-                            name="completedAt"
-                            locale="fr"
-                            className="form-control"
-                            selected={dateForDatePicker(values.completedAt ?? new Date())}
-                            onChange={(date) => handleChange({ target: { value: date, name: 'completedAt' } })}
-                            timeInputLabel="Heure :"
-                            dateFormat="dd/MM/yyyy HH:mm"
-                            showTimeInput
-                          />
+                          <DatePicker withTime id="completedAt" defaultValue={values.completedAt ?? new Date()} onChange={handleChange} />
                         </div>
                       </FormGroup>
                     )}

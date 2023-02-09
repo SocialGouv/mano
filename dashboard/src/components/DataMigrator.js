@@ -1,6 +1,6 @@
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { prepareActionForEncryption } from '../recoil/actions';
-import { organisationState } from '../recoil/auth';
+import { organisationState, userState } from '../recoil/auth';
 import { usePreparePersonForEncryption } from '../recoil/persons';
 import { prepareReportForEncryption } from '../recoil/reports';
 import API, { encryptItem } from '../services/api';
@@ -11,6 +11,7 @@ const LOADING_TEXT = 'Mise à jour des données de votre organisation…';
 
 export default function useDataMigrator() {
   const setLoadingText = useSetRecoilState(loadingTextState);
+  const user = useRecoilValue(userState);
   const [organisation, setOrganisation] = useRecoilState(organisationState);
 
   const organisationId = organisation?._id;
@@ -162,7 +163,9 @@ export default function useDataMigrator() {
           const { team, ...action } = a;
           return { ...action, teams: action.teams?.length ? action.teams : [team] };
         });
-        const encryptedActionsToMigrate = await Promise.all(actionsToUpdate.map(prepareActionForEncryption).map(encryptItem));
+        const encryptedActionsToMigrate = await Promise.all(
+          actionsToUpdate.map((action) => prepareActionForEncryption({ ...action, user: action.user || user._id })).map(encryptItem)
+        );
         const response = await API.put({
           path: `/migration/action-with-multiple-team`,
           body: { actionsToUpdate: encryptedActionsToMigrate },

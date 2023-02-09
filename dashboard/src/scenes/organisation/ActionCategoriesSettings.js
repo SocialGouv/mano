@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useDataLoader } from '../../components/DataLoader';
 import { actionsCategoriesSelector, flattenedCategoriesSelector, actionsState, prepareActionForEncryption } from '../../recoil/actions';
-import { organisationState } from '../../recoil/auth';
+import { organisationState, userState } from '../../recoil/auth';
 import API, { encryptItem } from '../../services/api';
 import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from '../../components/tailwind/Modal';
 import { toast } from 'react-toastify';
@@ -167,6 +167,7 @@ const AddCategory = ({ groupTitle }) => {
 
 const Category = ({ item: category, groupTitle }) => {
   const [isSelected, setIsSelected] = useState(false);
+  const user = useRecoilValue(userState);
   const [isEditingCategory, setIsEditingCategory] = useState(false);
   const actions = useRecoilValue(actionsState);
   const [organisation, setOrganisation] = useRecoilState(organisationState);
@@ -192,7 +193,7 @@ const Category = ({ item: category, groupTitle }) => {
           ...action,
           categories: [...new Set(action.categories.map((cat) => (cat === oldCategory ? newCategory.trim() : cat)))],
         }))
-        .map(prepareActionForEncryption)
+        .map((action) => prepareActionForEncryption({ ...action, user: action.user || user._id }))
         .map(encryptItem)
     );
     const newActionsGroupedCategories = actionsGroupedCategories.map((group) => {

@@ -100,7 +100,7 @@ const PersonDocuments = ({ person }) => {
                 setDocumentToEdit(doc);
               }}>
               <td className="tw-p-3">
-                <p className="tw-m-0 tw-flex tw-items-center tw-overflow-hidden tw-break-all tw-font-bold">
+                <p className="tw-m-0 tw-flex tw-items-center tw-overflow-hidden tw-font-bold">
                   {!!organisation.groupsEnabled && !!doc.group && (
                     <span className="tw-mr-2 tw-text-xl" aria-label="Commentaire familial" title="Commentaire familial">
                       👪
@@ -109,7 +109,7 @@ const PersonDocuments = ({ person }) => {
                   {doc.name}
                 </p>
                 {!!organisation.groupsEnabled && !!doc.group && !!doc.personPopulated && (
-                  <p className="tw-m-0 tw-mt-1 tw-text-xs">
+                  <p className="tw-m-0 tw-mt-1 tw--xs">
                     Ce document est lié à <PersonName item={doc} />
                   </p>
                 )}
@@ -158,7 +158,7 @@ function DocumentModal({ document, onClose, person }) {
   );
 
   return (
-    <ModalContainer open>
+    <ModalContainer open className="[overflow-wrap:anywhere]" >
       <ModalHeader title={document.name} />
       <ModalBody>
         <div className="tw-flex tw-w-full tw-flex-col tw-justify-between tw-gap-4 tw-px-8">

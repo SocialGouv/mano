@@ -38,15 +38,14 @@ test("Create and modify a person", async ({ page }) => {
   await page.getByRole("button", { name: "Modifier" }).click();
   await page.getByLabel("Autres pseudos").click();
   await page.getByLabel("Nom prénom ou Pseudonyme").click();
-  await page.getByLabel("Date de naissance").fill("10/10/2022");
+  await page.getByLabel("Date de naissance").fill("2022-10-10");
   await page.getByLabel("Date de naissance").press("Enter");
-  await page.getByLabel("En rue depuis le").fill("10/10/2022");
+  await page.getByLabel("En rue depuis le").fill("2022-10-10");
   await page.getByLabel("En rue depuis le").press("Enter");
   await page.getByLabel("Personne très vulnérable, ou ayant besoin d'une attention particulière").check();
   await page.getByLabel("Téléphone").click();
 
   await page.getByLabel("Téléphone").fill("0123456789");
-  await page.getByLabel("Description").click();
   await page.getByLabel("Description").fill("Test de description");
 
   await page.getByRole("dialog").getByText("Informations sociales").click();

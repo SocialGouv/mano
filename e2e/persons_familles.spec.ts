@@ -204,7 +204,7 @@ test("Familles", async ({ page }) => {
     await page.locator("button[aria-label='Ajouter un commentaire']").click();
     await page.getByRole("textbox", { name: "Commentaire" }).fill(comment1Name);
     await page.getByLabel("Commentaire familial Ce commentaire sera valable pour chaque membre de la famille").check();
-    await page.getByRole("button", { name: "Sauvegarder" }).click();
+    await page.getByRole("button", { name: "Enregistrer" }).click();
     await page.getByText("Commentaire enregistré").click();
 
     await page.getByRole("link", { name: "🔍 Recherche" }).click();

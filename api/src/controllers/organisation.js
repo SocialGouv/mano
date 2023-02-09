@@ -26,6 +26,7 @@ const Place = require("../models/place");
 const RelPersonPlace = require("../models/relPersonPlace");
 const TerritoryObservation = require("../models/territoryObservation");
 const { serializeOrganisation } = require("../utils/data-serializer");
+const { defaultSocialCustomFields, defaultMedicalCustomFields } = require("../utils/custom-fields/person");
 
 const JWT_MAX_AGE = 60 * 60 * 3; // 3 hours in s
 
@@ -121,7 +122,16 @@ router.post(
     const user = await User.findOne({ where: { email } });
     if (!!user) return res.status(400).send({ ok: false, error: "Cet email existe déjà dans une autre organisation" });
 
-    const organisation = await Organisation.create({ name: orgName }, { returning: true });
+    const organisation = await Organisation.create(
+      {
+        name: orgName,
+        // We have to add default custom fields on creation (search for "custom-fields-persons-setup" in code).
+        customFieldsPersonsSocial: defaultSocialCustomFields,
+        customFieldsPersonsMedical: defaultMedicalCustomFields,
+        migrations: ["custom-fields-persons-setup"],
+      },
+      { returning: true }
+    );
     const token = crypto.randomBytes(20).toString("hex");
     const adminUser = await User.create(
       {

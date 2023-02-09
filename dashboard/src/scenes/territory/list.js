@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Col, Button as LinkButton, FormGroup, Row, Modal, ModalBody, ModalHeader, Input, Label } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
-import styled from 'styled-components';
 import { toast } from 'react-toastify';
 import { Formik } from 'formik';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
@@ -89,7 +88,13 @@ const List = () => {
             onSortBy: setSortBy,
             sortOrder,
             sortBy,
-            render: (territory) => <b>{territory.name}</b>,
+            render: (territory) => {
+              return (
+                <div className="[overflow-wrap:anywhere]">
+                  <b>{territory.name}</b>,
+                </div>
+              );
+            },
           },
           {
             title: 'Types',
@@ -134,7 +139,7 @@ const CreateTerritory = () => {
   const { refresh, isLoading } = useDataLoader();
 
   return (
-    <CreateStyle>
+    <div className="tw-w-full tw-flex tw-justify-end">
       <LinkButton disabled={isLoading} onClick={() => refresh} color="link" style={{ marginRight: 10 }}>
         Rafraichir
       </LinkButton>
@@ -205,14 +210,8 @@ const CreateTerritory = () => {
           </Formik>
         </ModalBody>
       </Modal>
-    </CreateStyle>
+    </div>
   );
 };
-
-const CreateStyle = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: flex-end;
-`;
 
 export default List;

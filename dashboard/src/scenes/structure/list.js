@@ -84,7 +84,7 @@ const List = () => {
             dataKey: 'name', 
             render: (structures) => {
               return (
-                <div style={{overflowWrap: 'anywhere'}}>
+                <div className="[overflow-wrap:anywhere]">
                   <b>{structures.name}</b>
                 </div> 
               );
@@ -96,7 +96,7 @@ const List = () => {
             dataKey: 'adresse',
             render: (structures) => {
               return (
-                <div style={{overflowWrap: 'anywhere'}}>
+                <div className="[overflow-wrap:anywhere]">
                   {structures.adresse}
                 </div>
               );

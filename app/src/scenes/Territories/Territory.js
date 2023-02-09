@@ -64,7 +64,7 @@ const Territory = ({ route, navigation }) => {
     setUpdating(true);
     const response = await API.put({
       path: `/territory/${territoryDB._id}`,
-      body: prepareTerritoryForEncryption(castToTerritory(territory)),
+      body: prepareTerritoryForEncryption({ ...castToTerritory(territory), user: territory.user || user._id }),
     });
     if (response.error) {
       setUpdating(false);

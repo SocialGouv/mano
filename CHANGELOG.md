@@ -1,3 +1,53 @@
+## [1.242.8](https://github.com/SocialGouv/mano/compare/v1.242.7...v1.242.8) (2023-02-09)
+
+
+### Bug Fixes
+
+* **dashboard:** ajout d'une nouveau date picker avec controle des dates hors limite ([#1295](https://github.com/SocialGouv/mano/issues/1295)) ([a288718](https://github.com/SocialGouv/mano/commit/a288718a57efcb2cba6d18e12dba74e108c5557d))
+
+## [1.242.7](https://github.com/SocialGouv/mano/compare/v1.242.6...v1.242.7) (2023-02-09)
+
+
+### Bug Fixes
+
+* ajout de l'utilisateur courant lorsque pas d'utilisateur d'un territoire ([#1313](https://github.com/SocialGouv/mano/issues/1313)) ([901e01e](https://github.com/SocialGouv/mano/commit/901e01eb04171ec9e96a69c8bb8e071a946d0ae0))
+
+## [1.242.6](https://github.com/SocialGouv/mano/compare/v1.242.5...v1.242.6) (2023-02-09)
+
+
+### Bug Fixes
+
+* **dashboard:** ajout du user à la volée s'il n'était pas présent lors de la modification ou création d'un traitement ([#1305](https://github.com/SocialGouv/mano/issues/1305)) ([9f01646](https://github.com/SocialGouv/mano/commit/9f0164649269d499715be0ec9fd16d2d190fbe20))
+* **dashboard:** ajout du user à la volée s'il n'était pas présent lors de la modification ou création d'une action ([#1304](https://github.com/SocialGouv/mano/issues/1304)) ([9276fd7](https://github.com/SocialGouv/mano/commit/9276fd76a4ab165315ddb0846fe83678f9367fd1))
+
+## [1.242.5](https://github.com/SocialGouv/mano/compare/v1.242.4...v1.242.5) (2023-02-09)
+
+
+### Bug Fixes
+
+* **dashboard:** mots trop long - utilisation de overflow:anywhere ([#1307](https://github.com/SocialGouv/mano/issues/1307)) ([0c5aaed](https://github.com/SocialGouv/mano/commit/0c5aaedabb78349b0bd7ae8a08e3c9543333e967))
+
+## [1.242.4](https://github.com/SocialGouv/mano/compare/v1.242.3...v1.242.4) (2023-02-09)
+
+
+### Bug Fixes
+
+* **dashboard:** on ne vérifie plus les champs obligatoires lors d'un changement de clé - le but d'un changement de clé est de 'brouiller les pistes', pas de vérifier que tous les champs sont là - on ne garde la vérification que pour l'usage quotidien ([#1310](https://github.com/SocialGouv/mano/issues/1310)) ([ca71ced](https://github.com/SocialGouv/mano/commit/ca71ced50ed02d7c0fe81fdd99562cd8cd1b4850)), closes [#1315](https://github.com/SocialGouv/mano/issues/1315)
+
+## [1.242.3](https://github.com/SocialGouv/mano/compare/v1.242.2...v1.242.3) (2023-02-09)
+
+
+### Bug Fixes
+
+* **dashboard:** ajout des champs personnalisés par défaut lors de la création d'une nouvelle organisation ([#1303](https://github.com/SocialGouv/mano/issues/1303)) ([ae43734](https://github.com/SocialGouv/mano/commit/ae43734da52e0c50d2bb8bd135ae4ad2cb9761df))
+
+## [1.242.2](https://github.com/SocialGouv/mano/compare/v1.242.1...v1.242.2) (2023-02-08)
+
+
+### Bug Fixes
+
+* **dashboard:** ne pas sauvegarder le commentaire en sessionStorage quand la fenetre de creation a été volontairement fermée ([#1306](https://github.com/SocialGouv/mano/issues/1306)) ([8913e9f](https://github.com/SocialGouv/mano/commit/8913e9fbf637b363e26937fe2eb01fbaf403e0df))
+
 ## [1.242.1](https://github.com/SocialGouv/mano/compare/v1.242.0...v1.242.1) (2023-02-07)
 
 

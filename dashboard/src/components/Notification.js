@@ -5,7 +5,7 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { useLocalStorage } from 'react-use';
 import { theme } from '../config';
 import { actionsState, CANCEL, DONE, prepareActionForEncryption, sortActionsOrConsultations, TODO } from '../recoil/actions';
-import { currentTeamState } from '../recoil/auth';
+import { currentTeamState, userState } from '../recoil/auth';
 import { commentsState, prepareCommentForEncryption } from '../recoil/comments';
 import { personsState } from '../recoil/persons';
 import { formatTime } from '../services/date';
@@ -112,6 +112,7 @@ export default function Notification() {
 
 const Actions = ({ setShowModal, actions, setSortOrder, setSortBy, sortBy, sortOrder }) => {
   const history = useHistory();
+  const user = useRecoilValue(userState);
   const setActions = useSetRecoilState(actionsState);
 
   if (!actions.length) return null;
@@ -179,7 +180,7 @@ const Actions = ({ setShowModal, actions, setSortOrder, setSortBy, sortBy, sortO
                       e.stopPropagation();
                       const actionResponse = await API.put({
                         path: `/action/${action._id}`,
-                        body: prepareActionForEncryption({ ...action, urgent: false }),
+                        body: prepareActionForEncryption({ ...action, urgent: false, user: action.user || user._id }),
                       });
                       if (actionResponse.ok) {
                         const newAction = actionResponse.decryptedData;
