@@ -99,7 +99,7 @@ const PersonDocuments = ({ person }) => {
                 setDocumentToEdit(doc);
               }}>
               <td className="tw-p-3">
-                <p className="tw-m-0 tw-flex tw-items-center tw-overflow-hidden tw--all tw-font-bold">
+                <p className="tw-m-0 tw-flex tw-items-center tw-overflow-hidden tw-font-bold">
                   {!!organisation.groupsEnabled && !!doc.group && (
                     <span className="tw-mr-2 tw-text-xl" aria-label="Commentaire familial" title="Commentaire familial">
                       👪
