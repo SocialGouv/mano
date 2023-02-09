@@ -103,10 +103,10 @@ const EncryptionKey = ({ isMain }) => {
       setEncryptingStatus('Chiffrement des données...');
       const encryptedVerificationKey = await encryptVerificationKey(hashedOrgEncryptionKey);
 
-      const mutPersons = await recryptPersonsDocuments(persons, previousKey, encryptedVerificationKey);
-      const mutTreatments = await recryptPersonsRelatedDocuments(treatments, previousKey, encryptedVerificationKey);
-      const mutConsultations = await recryptPersonsRelatedDocuments(consultations, previousKey, encryptedVerificationKey);
-      const mutMedicalFiles = await recryptPersonsRelatedDocuments(medicalFiles, previousKey, encryptedVerificationKey);
+      const mutPersons = await recryptPersonsDocuments(persons, previousKey, hashedOrgEncryptionKey);
+      const mutTreatments = await recryptPersonsRelatedDocuments(treatments, previousKey, hashedOrgEncryptionKey);
+      const mutConsultations = await recryptPersonsRelatedDocuments(consultations, previousKey, hashedOrgEncryptionKey);
+      const mutMedicalFiles = await recryptPersonsRelatedDocuments(medicalFiles, previousKey, hashedOrgEncryptionKey);
 
       const encryptedPersons = await Promise.all(
         mutPersons.map((person) => preparePersonForEncryption(person, { checkRequiredFields: false })).map(encryptItem)
