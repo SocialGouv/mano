@@ -1,3 +1,10 @@
+## [1.242.8](https://github.com/SocialGouv/mano/compare/v1.242.7...v1.242.8) (2023-02-09)
+
+
+### Bug Fixes
+
+* **dashboard:** ajout d'une nouveau date picker avec controle des dates hors limite ([#1295](https://github.com/SocialGouv/mano/issues/1295)) ([a288718](https://github.com/SocialGouv/mano/commit/a288718a57efcb2cba6d18e12dba74e108c5557d))
+
 ## [1.242.7](https://github.com/SocialGouv/mano/compare/v1.242.6...v1.242.7) (2023-02-09)
 
 
