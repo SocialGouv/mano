@@ -392,12 +392,10 @@ const recryptPersonsDocuments = async (persons, oldKey, newKey) => {
         // but not all the documents were recrypted
         // we told them to change back from `newKey` to `oldKey` to retrieve the old documents
         // and then change back to `newKey` to recrypt them in the new key
-        try {
-          const recryptedDocument = await recryptDocument(doc, person._id, { fromKey: newKey, toKey: oldKey });
-          updatedDocuments.push(recryptedDocument);
-        } catch (e) {
-          capture('CANNOT RECRYPT DOCUMENT', { extra: { personId: person._id, documentId: doc._id } });
-        }
+        // SO
+        // if the recryption failed, we assume the document might have been encrypted with the newKey already
+        // so we push it
+        updatedDocuments.push(doc);
       }
     }
     person.documents = updatedDocuments;
@@ -419,12 +417,10 @@ const recryptPersonsRelatedDocuments = async (items, oldKey, newKey) => {
         // but not all the documents were recrypted
         // we told them to change back from `newKey` to `oldKey` to retrieve the old documents
         // and then change back to `newKey` to recrypt them in the new key
-        try {
-          const recryptedDocument = await recryptDocument(doc, item.person, { fromKey: newKey, toKey: oldKey });
-          updatedDocuments.push(recryptedDocument);
-        } catch (e) {
-          capture('CANNOT RECRYPT DOCUMENT', { extra: { personId: item.person, documentId: doc._id } });
-        }
+        // SO
+        // if the recryption failed, we assume the document might have been encrypted with the newKey already
+        // so we push it
+        updatedDocuments.push(doc);
       }
     }
     item.documents = updatedDocuments;
