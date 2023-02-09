@@ -1,3 +1,10 @@
+## [1.242.3](https://github.com/SocialGouv/mano/compare/v1.242.2...v1.242.3) (2023-02-09)
+
+
+### Bug Fixes
+
+* **dashboard:** ajout des champs personnalisés par défaut lors de la création d'une nouvelle organisation ([#1303](https://github.com/SocialGouv/mano/issues/1303)) ([ae43734](https://github.com/SocialGouv/mano/commit/ae43734da52e0c50d2bb8bd135ae4ad2cb9761df))
+
 ## [1.242.2](https://github.com/SocialGouv/mano/compare/v1.242.1...v1.242.2) (2023-02-08)
 
 
