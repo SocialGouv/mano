@@ -129,7 +129,13 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
           sortBy,
           sortOrder,
           dataKey: 'name',
-          render: (action) => <ActionOrConsultationName item={action} />,
+          render: (action) => {
+            return (
+              <div className="[overflow-wrap:anywhere]">
+                <ActionOrConsultationName item={action} />
+              </div>
+            );
+          },
         },
         {
           title: 'Personne suivie',
@@ -138,7 +144,13 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
           sortBy,
           sortOrder,
           dataKey: 'person',
-          render: (action) => <PersonName item={action} />,
+          render: (action) => {
+            return (
+              <div className="[overflow-wrap:anywhere]">
+                <PersonName item={action} />
+              </div>
+            );
+          },
         },
         {
           title: 'Statut',
