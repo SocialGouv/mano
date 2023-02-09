@@ -1,13 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { Dimensions } from 'react-native';
+import { sort, createNewSortInstance } from 'fast-sort';
 import API from '../services/api';
 import { MyText } from './MyText';
 import colors from '../utils/colors';
 import picture1 from '../assets/MANO_livraison_elements-04.png';
 import picture2 from '../assets/MANO_livraison_elements-05.png';
 import picture3 from '../assets/MANO_livraison_elements_Plan_de_travail.png';
-import { atom, useRecoilState, useSetRecoilState } from 'recoil';
+import { atom, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { appCurrentCacheKey, getData } from '../services/dataManagement';
 import { useMMKVNumber } from 'react-native-mmkv';
 import { organisationState, userState } from '../recoil/auth';
@@ -62,13 +63,12 @@ export const mergeItems = (oldItems, newItems) => {
   return [...oldItemsPurged, ...newItems];
 };
 
-const Loader = () => {
-  const [picture, setPicture] = useState([picture1, picture3, picture2][randomIntFromInterval(0, 2)]);
+export const DataLoader = () => {
   const [lastRefresh, setLastRefresh] = useMMKVNumber(appCurrentCacheKey);
 
-  const [loading, setLoading] = useRecoilState(loadingState);
-  const [progress, setProgress] = useRecoilState(progressState);
-  const [fullScreen, setFullScreen] = useRecoilState(loaderFullScreenState);
+  const setLoading = useSetRecoilState(loadingState);
+  const setProgress = useSetRecoilState(progressState);
+  const setFullScreen = useSetRecoilState(loaderFullScreenState);
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const setUser = useSetRecoilState(userState);
   const organisationId = organisation?._id;
@@ -134,6 +134,8 @@ const Loader = () => {
       response.data.groups +
       response.data.relsPersonPlace;
 
+    console.log({ total, lastRefresh });
+
     // medical data is never saved in cache
     // so we always have to download all at every page reload
     const medicalDataResponse = await API.get({
@@ -150,6 +152,8 @@ const Loader = () => {
 
     total = total + medicalDataResponse.data.consultations + medicalDataResponse.data.treatments + medicalDataResponse.data.medicalFiles;
 
+    console.log({ total });
+
     if (initialLoad) {
       const numberOfCollections = 9;
       total = total + numberOfCollections; // for the progress bar to be beautiful
@@ -158,23 +162,38 @@ const Loader = () => {
     /*
     Get persons
     */
-    if (initialLoad || response.data.persons) {
+    console.log('response.data.persons', response.data.persons, persons.length);
+    const now = Date.now();
+    if (response.data.persons) {
       setLoading('Chargement des personnes');
       const refreshedPersons = await getData({
         collectionName: 'person',
+        debug: now,
         data: persons,
         isInitialization: initialLoad,
-        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        setProgress: (batch) => {
+          console.log('UNE BATCH A LA FOIS', Date.now() - now);
+          setProgress((p) => (p * total + batch) / total);
+        },
         lastRefresh,
         setBatchData: (newPersons) => setPersons((oldPersons) => (initialLoad ? [...oldPersons, ...newPersons] : mergeItems(oldPersons, newPersons))),
         API,
       });
-      if (refreshedPersons) setPersons(refreshedPersons.map((p) => ({ ...p, followedSince: p.followedSince || p.createdAt })).sort(sortByName));
+      console.log('ON A TOUT FETCH', Date.now() - now);
+      if (refreshedPersons) {
+        const newPersons = refreshedPersons.map((p) => ({ ...p, followedSince: p.followedSince || p.createdAt }));
+        console.log('ON A TOUT MODIFIÉ', Date.now() - now);
+        const sortedPersons = newPersons.sort(sortByName);
+        console.log('ON A TOUT TRIÉ', Date.now() - now);
+        setPersons(sortedPersons);
+        console.log('ON A SET STATE', Date.now() - now);
+      }
     }
     /*
     Get groups
     */
-    if (initialLoad || response.data.groups) {
+    console.log('response.data.groups', response.data.groups);
+    if (response.data.groups) {
       setLoading('Chargement des familles');
       const refreshedGroups = await getData({
         collectionName: 'group',
@@ -192,6 +211,7 @@ const Loader = () => {
     /*
     Get consultations
     */
+    console.log('response.data.consultations', response.data.consultations);
     if (medicalDataResponse.data.consultations || initialLoad) {
       setLoading('Chargement des consultations');
       const refreshedConsultations = await getData({
@@ -213,6 +233,7 @@ const Loader = () => {
     /*
     Get treatments
     */
+    console.log('response.data.treatments', response.data.treatments);
     if (medicalDataResponse.data.treatments || initialLoad) {
       setLoading('Chargement des traitements');
       const refreshedTreatments = await getData({
@@ -230,6 +251,7 @@ const Loader = () => {
     /*
       Get medicalFiles
       */
+    console.log('response.data.medicalFiles', response.data.medicalFiles);
     if (medicalDataResponse.data.medicalFiles || initialLoad) {
       setLoading('Chargement des informations médicales');
       const refreshedMedicalFiles = await getData({
@@ -249,7 +271,8 @@ const Loader = () => {
     /*
     Get actions
     */
-    if (initialLoad || response.data.actions) {
+    console.log('response.data.actions', response.data.actions);
+    if (response.data.actions) {
       setLoading('Chargement des actions');
       const refreshedActions = await getData({
         collectionName: 'action',
@@ -268,7 +291,8 @@ const Loader = () => {
     /*
     Get territories
     */
-    if (initialLoad || response.data.territories) {
+    console.log('response.data.territories', response.data.territories);
+    if (response.data.territories) {
       setLoading('Chargement des territoires');
       const refreshedTerritories = await getData({
         collectionName: 'territory',
@@ -285,7 +309,8 @@ const Loader = () => {
     /*
     Get places
     */
-    if (initialLoad || response.data.places) {
+    console.log('response.data.places', response.data.places);
+    if (response.data.places) {
       setLoading('Chargement des lieux');
       const refreshedPlaces = await getData({
         collectionName: 'place',
@@ -298,7 +323,8 @@ const Loader = () => {
       });
       if (refreshedPlaces) setPlaces(refreshedPlaces.sort((p1, p2) => p1.name.localeCompare(p2.name)));
     }
-    if (initialLoad || response.data.relsPersonPlace) {
+    console.log('response.data.relsPersonPlace', response.data.relsPersonPlace);
+    if (response.data.relsPersonPlace) {
       const refreshedRelPersonPlaces = await getData({
         collectionName: 'relPersonPlace',
         data: relsPersonPlace,
@@ -314,7 +340,8 @@ const Loader = () => {
     /*
     Get observations territories
     */
-    if (initialLoad || response.data.territoryObservations) {
+    console.log('response.data.territoryObservations', response.data.territoryObservations);
+    if (response.data.territoryObservations) {
       setLoading('Chargement des observations');
       const refreshedObs = await getData({
         collectionName: 'territory-observation',
@@ -330,25 +357,34 @@ const Loader = () => {
     /*
     Get comments
     */
-    if (initialLoad || response.data.comments) {
+    console.log('response.data.comments', response.data.comments);
+    const now2 = Date.now();
+    if (response.data.comments) {
       setLoading('Chargement des commentaires');
       const refreshedComments = await getData({
         collectionName: 'comment',
         data: comments,
+        debug: now2,
         isInitialization: initialLoad,
-        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        setProgress: (batch) => {
+          setProgress((p) => (p * total + batch) / total);
+          console.log('ON A UNE BATCH', Date.now() - now2);
+        },
         lastRefresh,
         setBatchData: (newComments) =>
           setComments((oldComments) => (initialLoad ? [...oldComments, ...newComments] : mergeItems(oldComments, newComments))),
         API,
       });
+      console.log('ON A TOUS LES COMMENTAIRES', Date.now() - now2);
       if (refreshedComments) setComments(refreshedComments);
+      console.log('ON A TOUS LES COMMENTAIRES DEFINITOS', Date.now() - now2);
     }
 
     /*
     Get passages
     */
-    if (initialLoad || response.data.passages) {
+    console.log('response.data.passages', response.data.passages);
+    if (response.data.passages) {
       setLoading('Chargement des passages');
       const refreshedRencontres = await getData({
         collectionName: 'passage',
@@ -365,7 +401,8 @@ const Loader = () => {
     /*
     Get rencontres
     */
-    if (initialLoad || response.data.rencontres) {
+    console.log('response.data.rencontres', response.data.rencontres);
+    if (response.data.rencontres) {
       setLoading('Chargement des rencontres');
       const refreshedRencontres = await getData({
         collectionName: 'rencontre',
@@ -393,7 +430,8 @@ const Loader = () => {
     QUICK WIN: filter those reports from recoil state
     */
 
-    if (initialLoad || response.data.reports) {
+    console.log('response.data.reports', response.data.reports);
+    if (response.data.reports) {
       setLoading('Chargement des comptes-rendus');
       const refreshedReports = await getData({
         collectionName: 'report',
@@ -432,14 +470,22 @@ const Loader = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshTrigger.status]);
 
-  useEffect(() => {
-    setPicture([picture1, picture3, picture2][randomIntFromInterval(0, 2)]);
-  }, [fullScreen]);
+  return null;
+};
+
+export const LoaderProgress = () => {
+  const loading = useRecoilValue(loadingState);
+  const progress = useRecoilValue(progressState);
+  const fullScreen = useRecoilValue(loaderFullScreenState);
+  console.log('render Loader', { fullScreen, loading, progress });
+
+  const picture = useRef([picture1, picture3, picture2][randomIntFromInterval(0, 2)]);
 
   if (!loading) return null;
+
   return (
     <Container fullScreen={fullScreen} testID="loader">
-      {!!fullScreen && <ImageStyled source={picture} />}
+      {!!fullScreen && <ImageStyled source={picture.current} />}
       <Caption>{loading}</Caption>
       <ProgressContainer fullScreen={fullScreen}>
         <Progress progress={progress} />
@@ -485,5 +531,3 @@ const Progress = styled.View`
   height: 100%;
   background-color: #fff;
 `;
-
-export default Loader;

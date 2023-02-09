@@ -7,7 +7,7 @@ import { Alert } from 'react-native';
 
 export const territoryObservationsState = atom({
   key: 'territoryObservationsState',
-  default: [],
+  default: JSON.parse(storage.getString('territory-observation') || '[]'),
   effects: [({ onSet }) => onSet(async (newValue) => storage.set('territory-observation', JSON.stringify(newValue)))],
 });
 

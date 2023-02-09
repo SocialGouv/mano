@@ -6,7 +6,7 @@ import { Alert } from 'react-native';
 
 export const commentsState = atom({
   key: 'commentsState',
-  default: [],
+  default: JSON.parse(storage.getString('comment') || '[]'),
   effects: [({ onSet }) => onSet(async (newValue) => storage.set('comment', JSON.stringify(newValue)))],
 });
 

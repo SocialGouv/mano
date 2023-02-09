@@ -6,7 +6,7 @@ import { Alert } from 'react-native';
 
 export const passagesState = atom({
   key: 'passagesState',
-  default: [],
+  default: JSON.parse(storage.getString('passage') || '[]'),
   effects: [({ onSet }) => onSet(async (newValue) => storage.set('passage', JSON.stringify(newValue)))],
 });
 

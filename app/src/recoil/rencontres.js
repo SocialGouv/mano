@@ -4,11 +4,10 @@ import { looseUuidRegex } from '../utils/regex';
 import { capture } from '../services/sentry';
 import { Alert } from 'react-native';
 
-const collectionName = 'rencontre';
 export const rencontresState = atom({
-  key: collectionName,
-  default: [],
-  effects: [({ onSet }) => onSet(async (newValue) => storage.set(collectionName, JSON.stringify(newValue)))],
+  key: 'rencontresState',
+  default: JSON.parse(storage.getString('rencontre') || '[]'),
+  effects: [({ onSet }) => onSet(async (newValue) => storage.set('rencontre', JSON.stringify(newValue)))],
 });
 
 const encryptedFields = ['person', 'team', 'user', 'date', 'comment'];

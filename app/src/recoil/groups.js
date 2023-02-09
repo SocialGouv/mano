@@ -3,7 +3,7 @@ import { storage } from '../services/dataManagement';
 
 export const groupsState = atom({
   key: 'groupsState',
-  default: [],
+  default: JSON.parse(storage.getString('groupsState') || '[]'),
   effects: [({ onSet }) => onSet(async (newValue) => storage.set('group', JSON.stringify(newValue)))],
 });
 

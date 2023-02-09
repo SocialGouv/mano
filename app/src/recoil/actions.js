@@ -7,7 +7,7 @@ import { Alert } from 'react-native';
 
 export const actionsState = atom({
   key: 'actionsState',
-  default: [],
+  default: JSON.parse(storage.getString('action') || '[]'),
   effects: [({ onSet }) => onSet(async (newValue) => storage.set('action', JSON.stringify(newValue)))],
 });
 
