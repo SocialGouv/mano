@@ -747,7 +747,7 @@ export function MedicalFile({ person }) {
             const treatmentResponse = isNewTreatment
               ? await API.post({
                   path: '/treatment',
-                  body: prepareTreatmentForEncryption({ ...values, user: values.user || user._id }),
+                  body: prepareTreatmentForEncryption(values),
                 })
               : await API.put({
                   path: `/treatment/${currentTreatment._id}`,
