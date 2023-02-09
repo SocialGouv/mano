@@ -751,7 +751,7 @@ export function MedicalFile({ person }) {
                 })
               : await API.put({
                   path: `/treatment/${currentTreatment._id}`,
-                  body: prepareTreatmentForEncryption(values),
+                  body: prepareTreatmentForEncryption({ ...values, user: values.user || user._id }),
                 });
             if (!treatmentResponse.ok) return;
             if (isNewTreatment) {

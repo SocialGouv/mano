@@ -270,7 +270,7 @@ const MergeTwoPersons = ({ person }) => {
 
                 const mergedTreatments = treatments
                   .filter((t) => t.person === personToMergeAndDelete._id)
-                  .map((treatment) => prepareTreatmentForEncryption({ ...treatment, person: originPerson._id }));
+                  .map((treatment) => prepareTreatmentForEncryption({ ...treatment, person: originPerson._id, user: treatment.user || user._id }));
 
                 const { mergedMedicalFile, medicalFileToDeleteId } = (() => {
                   if (!!originPersonMedicalFile) {
