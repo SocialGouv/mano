@@ -1,3 +1,11 @@
+## [1.242.6](https://github.com/SocialGouv/mano/compare/v1.242.5...v1.242.6) (2023-02-09)
+
+
+### Bug Fixes
+
+* **dashboard:** ajout du user à la volée s'il n'était pas présent lors de la modification ou création d'un traitement ([#1305](https://github.com/SocialGouv/mano/issues/1305)) ([9f01646](https://github.com/SocialGouv/mano/commit/9f0164649269d499715be0ec9fd16d2d190fbe20))
+* **dashboard:** ajout du user à la volée s'il n'était pas présent lors de la modification ou création d'une action ([#1304](https://github.com/SocialGouv/mano/issues/1304)) ([9276fd7](https://github.com/SocialGouv/mano/commit/9276fd76a4ab165315ddb0846fe83678f9367fd1))
+
 ## [1.242.5](https://github.com/SocialGouv/mano/compare/v1.242.4...v1.242.5) (2023-02-09)
 
 
