@@ -119,7 +119,7 @@ const EncryptionKey = ({ isMain }) => {
       );
       const encryptedMedicalFiles = await Promise.all(
         medicalFiles
-          .map((medicalFile) => prepareMedicalFileForEncryption(medicalFile, { checkRequiredFields: false })(customFieldsMedicalFile))
+          .map((medicalFile) => prepareMedicalFileForEncryption(customFieldsMedicalFile)(medicalFile, { checkRequiredFields: false }))
           .map(encryptItem)
       );
       const encryptedComments = await Promise.all(
