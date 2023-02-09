@@ -1,3 +1,66 @@
+## [1.242.3](https://github.com/SocialGouv/mano/compare/v1.242.2...v1.242.3) (2023-02-09)
+
+
+### Bug Fixes
+
+* **dashboard:** ajout des champs personnalisés par défaut lors de la création d'une nouvelle organisation ([#1303](https://github.com/SocialGouv/mano/issues/1303)) ([ae43734](https://github.com/SocialGouv/mano/commit/ae43734da52e0c50d2bb8bd135ae4ad2cb9761df))
+
+## [1.242.2](https://github.com/SocialGouv/mano/compare/v1.242.1...v1.242.2) (2023-02-08)
+
+
+### Bug Fixes
+
+* **dashboard:** ne pas sauvegarder le commentaire en sessionStorage quand la fenetre de creation a été volontairement fermée ([#1306](https://github.com/SocialGouv/mano/issues/1306)) ([8913e9f](https://github.com/SocialGouv/mano/commit/8913e9fbf637b363e26937fe2eb01fbaf403e0df))
+
+## [1.242.1](https://github.com/SocialGouv/mano/compare/v1.242.0...v1.242.1) (2023-02-07)
+
+
+### Bug Fixes
+
+* **dashboard:** retour a la ligne des noms ou adresses trop longues dans la liste des structures ([#1268](https://github.com/SocialGouv/mano/issues/1268)) ([39565fc](https://github.com/SocialGouv/mano/commit/39565fc223578378ba557a70bb47470fb3e7f7e8))
+
+# [1.242.0](https://github.com/SocialGouv/mano/compare/v1.241.3...v1.242.0) (2023-02-07)
+
+
+### Features
+
+* **app:** on s'assure de la présence des champs obligatoires avant le chiffrement ([#1271](https://github.com/SocialGouv/mano/issues/1271)) ([7604fb2](https://github.com/SocialGouv/mano/commit/7604fb2400a34b3a3b64d00ec13d5f3cd2570d3d))
+
+## [1.241.3](https://github.com/SocialGouv/mano/compare/v1.241.2...v1.241.3) (2023-02-07)
+
+
+### Bug Fixes
+
+* **dasboard:** meilleure affichage console reinitialisation mdp + nouvelle équipe ([#1302](https://github.com/SocialGouv/mano/issues/1302)) ([2bde8e6](https://github.com/SocialGouv/mano/commit/2bde8e6f54d3f92fc9020f7ff4af500bcc5e6b48))
+
+## [1.241.2](https://github.com/SocialGouv/mano/compare/v1.241.1...v1.241.2) (2023-02-07)
+
+
+### Bug Fixes
+
+* **dashboard:** si un territoire précédemment créé n'avait pas d'utilisateur associé on lui rajoute l'utilisateur en cours lors de la modification ([#1301](https://github.com/SocialGouv/mano/issues/1301)) ([a463f64](https://github.com/SocialGouv/mano/commit/a463f641952c5b586769963d781c1864fc00f4de))
+
+## [1.241.1](https://github.com/SocialGouv/mano/compare/v1.241.0...v1.241.1) (2023-02-06)
+
+
+### Bug Fixes
+
+* **dashboard:** nom de l'utilisateur au lieu de nom d'orga dans la modale de suppression d'un utilisateur ([#1300](https://github.com/SocialGouv/mano/issues/1300)) ([62c11ed](https://github.com/SocialGouv/mano/commit/62c11edcf2c3a2b8493ba4c6137e65d9707d46ef))
+
+# [1.241.0](https://github.com/SocialGouv/mano/compare/v1.240.3...v1.241.0) (2023-02-06)
+
+
+### Features
+
+* **dashboard:** ajout de 10 couleurs supplémentaires pour différenciation des équipes ([#1296](https://github.com/SocialGouv/mano/issues/1296)) ([dfbfb94](https://github.com/SocialGouv/mano/commit/dfbfb9446fa471760ae923464031fa8eb832bb4d))
+
+## [1.240.3](https://github.com/SocialGouv/mano/compare/v1.240.2...v1.240.3) (2023-02-06)
+
+
+### Bug Fixes
+
+* **dashboard:** controle de la presente d'une équipe au minimum sur une action ([#1294](https://github.com/SocialGouv/mano/issues/1294)) ([ced7ab7](https://github.com/SocialGouv/mano/commit/ced7ab7dd7dcffd2e8110855406ec7c04cbc079c))
+
 ## [1.240.2](https://github.com/SocialGouv/mano/compare/v1.240.1...v1.240.2) (2023-02-03)
 
 

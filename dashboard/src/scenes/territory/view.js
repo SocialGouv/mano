@@ -11,15 +11,17 @@ import ButtonCustom from '../../components/ButtonCustom';
 import Observations from '../territory-observations/list';
 import SelectCustom from '../../components/SelectCustom';
 import { territoryTypes, territoriesState, prepareTerritoryForEncryption } from '../../recoil/territory';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import API from '../../services/api';
 import { territoryObservationsState } from '../../recoil/territoryObservations';
 import useTitle from '../../services/useTitle';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
+import { userState } from '../../recoil/auth';
 
 const View = () => {
   const { id } = useParams();
   const history = useHistory();
+  const user = useRecoilValue(userState);
   const [territories, setTerritories] = useRecoilState(territoriesState);
   const [territoryObservations, setTerritoryObservations] = useRecoilState(territoryObservationsState);
   const territory = territories.find((t) => t._id === id);
@@ -37,7 +39,7 @@ const View = () => {
         onSubmit={async (body) => {
           const res = await API.put({
             path: `/territory/${territory._id}`,
-            body: prepareTerritoryForEncryption(body),
+            body: prepareTerritoryForEncryption({ ...body, user: body.user || user._id }),
           });
           if (res.ok) {
             setTerritories((territories) =>

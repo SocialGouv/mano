@@ -17,6 +17,7 @@ import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirm
 
 const castToTerritory = (territory = {}) => ({
   name: territory.name?.trim() || '',
+  user: territory.user || '',
   types: territory.types || [],
   perimeter: territory.perimeter?.trim() || '',
   entityKey: territory.entityKey || '',

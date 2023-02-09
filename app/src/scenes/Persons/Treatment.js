@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, Keyboard, View } from 'react-native';
-import { useSetRecoilState } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import ScrollContainer from '../../components/ScrollContainer';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
@@ -14,12 +14,14 @@ import Spacer from '../../components/Spacer';
 import Label from '../../components/Label';
 import ButtonDelete from '../../components/ButtonDelete';
 import ButtonsContainer from '../../components/ButtonsContainer';
+import { userState } from '../../recoil/auth';
 
 const Treatment = ({ navigation, route }) => {
   const setAllTreatments = useSetRecoilState(treatmentsState);
   const personDB = route?.params?.personDB;
   const treatmentDB = route?.params?.treatmentDB;
   const isNew = !treatmentDB?._id;
+  const user = useRecoilValue(userState);
 
   const [name, setName] = useState(treatmentDB?.name || '');
   const [dosage, setDosage] = useState(treatmentDB?.dosage || '');
@@ -63,6 +65,7 @@ const Treatment = ({ navigation, route }) => {
       endDate,
       person: personDB._id,
       documents,
+      user: treatmentDB?.user ?? user._id,
     });
     const treatmentResponse = isNew ? await API.post({ path: '/treatment', body }) : await API.put({ path: `/treatment/${treatmentDB._id}`, body });
     if (!treatmentResponse.ok) return;

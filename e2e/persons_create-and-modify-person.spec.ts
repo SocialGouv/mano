@@ -46,7 +46,6 @@ test("Create and modify a person", async ({ page }) => {
   await page.getByLabel("Téléphone").click();
 
   await page.getByLabel("Téléphone").fill("0123456789");
-  await page.getByLabel("Description").click();
   await page.getByLabel("Description").fill("Test de description");
 
   await page.getByRole("dialog").getByText("Informations sociales").click();
