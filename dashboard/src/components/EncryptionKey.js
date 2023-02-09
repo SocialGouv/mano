@@ -101,25 +101,51 @@ const EncryptionKey = ({ isMain }) => {
       const hashedOrgEncryptionKey = await setOrgEncryptionKey(values.encryptionKey.trim());
       setEncryptingStatus('Chiffrement des données...');
       const encryptedVerificationKey = await encryptVerificationKey(hashedOrgEncryptionKey);
-      const encryptedPersons = await Promise.all(persons.map(preparePersonForEncryption).map(encryptItem));
-      const encryptedGroups = await Promise.all(groups.map(prepareGroupForEncryption).map(encryptItem));
+      const encryptedPersons = await Promise.all(
+        persons.map((person) => preparePersonForEncryption(person, { checkRequiredFields: false })).map(encryptItem)
+      );
+      const encryptedGroups = await Promise.all(
+        groups.map((group) => prepareGroupForEncryption(group, { checkRequiredFields: false })).map(encryptItem)
+      );
 
       const encryptedActions = await Promise.all(
-        actions.map((action) => prepareActionForEncryption({ ...action, user: action.user || user._id })).map(encryptItem)
+        actions.map((action) => prepareActionForEncryption(action, { checkRequiredFields: false })).map(encryptItem)
       );
       const encryptedConsultations = await Promise.all(
-        consultations.map(prepareConsultationForEncryption(organisation.consultations)).map(encryptItem)
+        consultations.map(prepareConsultationForEncryption(organisation.consultations, { checkRequiredFields: false })).map(encryptItem)
       );
-      const encryptedTreatments = await Promise.all(treatments.map(prepareTreatmentForEncryption).map(encryptItem));
-      const encryptedMedicalFiles = await Promise.all(medicalFiles.map(prepareMedicalFileForEncryption(customFieldsMedicalFile)).map(encryptItem));
-      const encryptedComments = await Promise.all(comments.map(prepareCommentForEncryption).map(encryptItem));
-      const encryptedPassages = await Promise.all(passages.map(preparePassageForEncryption).map(encryptItem));
-      const encryptedRencontres = await Promise.all(rencontres.map(prepareRencontreForEncryption).map(encryptItem));
-      const encryptedTerritories = await Promise.all(territories.map(prepareTerritoryForEncryption).map(encryptItem));
-      const encryptedTerritoryObservations = await Promise.all(observations.map(prepareObsForEncryption(customFieldsObs)).map(encryptItem));
-      const encryptedPlaces = await Promise.all(places.map(preparePlaceForEncryption).map(encryptItem));
-      const encryptedRelsPersonPlace = await Promise.all(relsPersonPlace.map(prepareRelPersonPlaceForEncryption).map(encryptItem));
-      const encryptedReports = await Promise.all(reports.map(prepareReportForEncryption).map(encryptItem));
+      const encryptedTreatments = await Promise.all(
+        treatments.map((treatment) => prepareTreatmentForEncryption(treatment, { checkRequiredFields: false })).map(encryptItem)
+      );
+      const encryptedMedicalFiles = await Promise.all(
+        medicalFiles
+          .map((medicalFile) => prepareMedicalFileForEncryption(customFieldsMedicalFile)(medicalFile, { checkRequiredFields: false }))
+          .map(encryptItem)
+      );
+      const encryptedComments = await Promise.all(
+        comments.map((comment) => prepareCommentForEncryption(comment, { checkRequiredFields: false })).map(encryptItem)
+      );
+      const encryptedPassages = await Promise.all(
+        passages.map((passage) => preparePassageForEncryption(passage, { checkRequiredFields: false })).map(encryptItem)
+      );
+      const encryptedRencontres = await Promise.all(
+        rencontres.map((rencontre) => prepareRencontreForEncryption(rencontre, { checkRequiredFields: false })).map(encryptItem)
+      );
+      const encryptedTerritories = await Promise.all(
+        territories.map((territorie) => prepareTerritoryForEncryption(territorie, { checkRequiredFields: false })).map(encryptItem)
+      );
+      const encryptedTerritoryObservations = await Promise.all(
+        observations.map((observation) => prepareObsForEncryption(customFieldsObs)(observation, { checkRequiredFields: false })).map(encryptItem)
+      );
+      const encryptedPlaces = await Promise.all(
+        places.map((place) => preparePlaceForEncryption(place, { checkRequiredFields: false })).map(encryptItem)
+      );
+      const encryptedRelsPersonPlace = await Promise.all(
+        relsPersonPlace.map((relsPersonPlac) => prepareRelPersonPlaceForEncryption(relsPersonPlac, { checkRequiredFields: false })).map(encryptItem)
+      );
+      const encryptedReports = await Promise.all(
+        reports.map((report) => prepareReportForEncryption(report, { checkRequiredFields: false })).map(encryptItem)
+      );
 
       setEncryptingStatus(
         'Sauvegarde des données nouvellement chiffrées en base de donnée. Ne fermez pas votre fenêtre, cela peut prendre quelques minutes...'

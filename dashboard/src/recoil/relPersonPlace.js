@@ -13,23 +13,25 @@ export const relsPersonPlaceState = atom({
 
 const encryptedFields = ['place', 'person', 'user'];
 
-export const prepareRelPersonPlaceForEncryption = (relPersonPlace) => {
-  try {
-    if (!looseUuidRegex.test(relPersonPlace.person)) {
-      throw new Error('RelPersonPlace is missing person');
+export const prepareRelPersonPlaceForEncryption = (relPersonPlace, { checkRequiredFields = true } = {}) => {
+  if (!!checkRequiredFields) {
+    try {
+      if (!looseUuidRegex.test(relPersonPlace.person)) {
+        throw new Error('RelPersonPlace is missing person');
+      }
+      if (!looseUuidRegex.test(relPersonPlace.place)) {
+        throw new Error('RelPersonPlace is missing place');
+      }
+      if (!looseUuidRegex.test(relPersonPlace.user)) {
+        throw new Error('RelPersonPlace is missing user');
+      }
+    } catch (error) {
+      toast.error(
+        "Le lieu n'a pas été sauvegardé car son format était incorrect. Vous pouvez vérifier son contenu et tenter de le sauvegarder à nouveau. L'équipe technique a été prévenue et va travailler sur un correctif."
+      );
+      capture(error, { extra: { relPersonPlace } });
+      throw error;
     }
-    if (!looseUuidRegex.test(relPersonPlace.place)) {
-      throw new Error('RelPersonPlace is missing place');
-    }
-    if (!looseUuidRegex.test(relPersonPlace.user)) {
-      throw new Error('RelPersonPlace is missing user');
-    }
-  } catch (error) {
-    toast.error(
-      "Le lieu n'a pas été sauvegardé car son format était incorrect. Vous pouvez vérifier son contenu et tenter de le sauvegarder à nouveau. L'équipe technique a été prévenue et va travailler sur un correctif."
-    );
-    capture(error, { extra: { relPersonPlace } });
-    throw error;
   }
   const decrypted = {};
   for (let field of encryptedFields) {
