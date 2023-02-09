@@ -1,3 +1,10 @@
+## [1.242.4](https://github.com/SocialGouv/mano/compare/v1.242.3...v1.242.4) (2023-02-09)
+
+
+### Bug Fixes
+
+* **dashboard:** on ne vérifie plus les champs obligatoires lors d'un changement de clé - le but d'un changement de clé est de 'brouiller les pistes', pas de vérifier que tous les champs sont là - on ne garde la vérification que pour l'usage quotidien ([#1310](https://github.com/SocialGouv/mano/issues/1310)) ([ca71ced](https://github.com/SocialGouv/mano/commit/ca71ced50ed02d7c0fe81fdd99562cd8cd1b4850)), closes [#1315](https://github.com/SocialGouv/mano/issues/1315)
+
 ## [1.242.3](https://github.com/SocialGouv/mano/compare/v1.242.2...v1.242.3) (2023-02-09)
 
 
