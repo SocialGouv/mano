@@ -135,7 +135,7 @@ const EncryptionKey = ({ isMain }) => {
         territories.map((territorie) => prepareTerritoryForEncryption(territorie, { checkRequiredFields: false })).map(encryptItem)
       );
       const encryptedTerritoryObservations = await Promise.all(
-        observations.map((observation) => prepareObsForEncryption(observation, { checkRequiredFields: false })(customFieldsObs)).map(encryptItem)
+        observations.map((observation) => prepareObsForEncryption(customFieldsObs)(observation, { checkRequiredFields: false })).map(encryptItem)
       );
       const encryptedPlaces = await Promise.all(
         places.map((place) => preparePlaceForEncryption(place, { checkRequiredFields: false })).map(encryptItem)
