@@ -108,7 +108,7 @@ const PersonDocuments = ({ person }) => {
                   {doc.name}
                 </p>
                 {!!organisation.groupsEnabled && !!doc.group && !!doc.personPopulated && (
-                  <p className="tw-m-0 tw-mt-1 tw-text-xs">
+                  <p className="tw-m-0 tw-mt-1 tw--xs">
                     Ce document est lié à <PersonName item={doc} />
                   </p>
                 )}
