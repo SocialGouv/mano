@@ -1,3 +1,10 @@
+## [1.242.5](https://github.com/SocialGouv/mano/compare/v1.242.4...v1.242.5) (2023-02-09)
+
+
+### Bug Fixes
+
+* **dashboard:** mots trop long - utilisation de overflow:anywhere ([#1307](https://github.com/SocialGouv/mano/issues/1307)) ([0c5aaed](https://github.com/SocialGouv/mano/commit/0c5aaedabb78349b0bd7ae8a08e3c9543333e967))
+
 ## [1.242.4](https://github.com/SocialGouv/mano/compare/v1.242.3...v1.242.4) (2023-02-09)
 
 
