@@ -1,3 +1,10 @@
+## [1.242.7](https://github.com/SocialGouv/mano/compare/v1.242.6...v1.242.7) (2023-02-09)
+
+
+### Bug Fixes
+
+* ajout de l'utilisateur courant lorsque pas d'utilisateur d'un territoire ([#1313](https://github.com/SocialGouv/mano/issues/1313)) ([901e01e](https://github.com/SocialGouv/mano/commit/901e01eb04171ec9e96a69c8bb8e071a946d0ae0))
+
 ## [1.242.6](https://github.com/SocialGouv/mano/compare/v1.242.5...v1.242.6) (2023-02-09)
 
 
