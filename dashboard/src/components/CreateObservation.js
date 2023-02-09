@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader, Label } from 'reactstrap';
-import DatePicker from 'react-datepicker';
 import styled from 'styled-components';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
@@ -13,9 +12,10 @@ import CustomFieldInput from './CustomFieldInput';
 import { currentTeamState, teamsState, userState } from '../recoil/auth';
 import { territoriesState } from '../recoil/territory';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { dateForDatePicker, dayjsInstance } from '../services/date';
+import { dayjsInstance, outOfBoundariesDate } from '../services/date';
 import API from '../services/api';
 import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
+import DatePicker from './DatePicker';
 export const policeSelect = ['Oui', 'Non'];
 export const atmosphereSelect = ['Violences', 'Tensions', 'RAS'];
 
@@ -73,6 +73,8 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
             onSubmit={async (values, actions) => {
               if (!values.team) return toast.error("L'équipe est obligatoire");
               if (!values.territory) return toast.error('Le territoire est obligatoire');
+              if (values.observedAt && outOfBoundariesDate(values.observedAt))
+                return toast.error("La date d'observation est hors limites (entre 1900 et 2100)");
               const body = {
                 observedAt: values.observedAt || dayjsInstance(),
                 team: values.team,
@@ -104,15 +106,11 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
                       <Label htmlFor="observation-observedat">Observation faite le</Label>
                       <div>
                         <DatePicker
-                          locale="fr"
-                          name="observedAt"
-                          className="form-control"
-                          selected={dateForDatePicker((values.observedAt || values.createdAt) ?? new Date())}
-                          onChange={(date) => handleChange({ target: { value: date, name: 'observedAt' } })}
-                          timeInputLabel="Heure :"
-                          dateFormat="dd/MM/yyyy HH:mm"
-                          showTimeInput
+                          withTime
                           id="observation-observedat"
+                          name="observedAt"
+                          defaultValue={(values.observedAt || values.createdAt) ?? new Date()}
+                          onChange={handleChange}
                         />
                       </div>
                     </FormGroup>

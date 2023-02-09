@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { Input, Button as CloseButton, Col, Row, FormGroup, Label } from 'reactstrap';
 import { toast } from 'react-toastify';
-import DatePicker from 'react-datepicker';
 
 import ButtonCustom from '../components/ButtonCustom';
 import UserName from './UserName';
@@ -13,7 +12,7 @@ import { Formik } from 'formik';
 import { currentTeamState, organisationState, userState } from '../recoil/auth';
 import { commentsState, prepareCommentForEncryption } from '../recoil/comments';
 import { selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
-import { formatDateTimeWithNameOfDay, dateForDatePicker } from '../services/date';
+import { formatDateTimeWithNameOfDay, dateForDatePicker, outOfBoundariesDate } from '../services/date';
 import API from '../services/api';
 import ExclamationMarkButton from './tailwind/ExclamationMarkButton';
 import { useDataLoader } from './DataLoader';
@@ -21,6 +20,7 @@ import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIf
 import { useParams } from 'react-router-dom';
 import { itemsGroupedByActionSelector, itemsGroupedByPersonSelector } from '../recoil/selectors';
 import { groupsState } from '../recoil/groups';
+import DatePicker from './DatePicker';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from './tailwind/Modal';
 
 const commentsByActionOrPersonSelector = selectorFamily({
@@ -221,6 +221,8 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, onDelete, n
             if (!body.user && !newComment) return toast.error("L'utilisateur est obligatoire");
             if (!body.date && !newComment) return toast.error('La date est obligatoire');
             if (!body.comment) return toast.error('Le commentaire est obligatoire');
+            if (body.date && outOfBoundariesDate(body.date)) return toast.error('La date est hors limites (entre 1900 et 2100)');
+
             await onSubmit({ ...value, ...body });
             actions.setSubmitting(false);
             window.sessionStorage.removeItem('currentComment');
@@ -247,17 +249,7 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, onDelete, n
                           <FormGroup>
                             <Label htmlFor="date">Créé le / Concerne le</Label>
                             <div>
-                              <DatePicker
-                                locale="fr"
-                                name="date"
-                                id="date"
-                                className="form-control"
-                                selected={dateForDatePicker((values.date || values.createdAt) ?? new Date())}
-                                onChange={(date) => handleChange({ target: { value: date, name: 'date' } })}
-                                timeInputLabel="Heure :"
-                                dateFormat="dd/MM/yyyy HH:mm"
-                                showTimeInput
-                              />
+                              <DatePicker withTime id="date" defaultValue={(values.date || values.createdAt) ?? new Date()} onChange={handleChange} />
                             </div>
                           </FormGroup>
                         </Col>

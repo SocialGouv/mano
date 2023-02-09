@@ -28,11 +28,16 @@ test("test", async ({ page }) => {
   await page.getByLabel("Autres pseudos").fill("test pseudo");
   await page.locator(".person-select-gender__value-container").click();
   await page.locator("#react-select-gender-option-2").click();
-  await page.getByLabel("Date de naissance").fill("11/11/2001");
+  await page.getByLabel("Date de naissance").click();
+  await page.getByLabel("Date de naissance").fill("2001-11-11");
   await page.getByLabel("Date de naissance").press("Enter");
-  await page.getByLabel("En rue depuis le").fill("11/11/2001");
+  await page.getByLabel("En rue depuis le").click();
+  await page.getByLabel("En rue depuis le").fill("2001-11-11");
   await page.getByLabel("En rue depuis le").press("Enter");
-  await page.getByLabel("Suivi(e) depuis le / Créé(e) le").fill("12/11/2001");
+  await page.getByLabel("Suivi(e) depuis le / Créé(e) le").click();
+  await page.getByLabel("Suivi(e) depuis le / Créé(e) le").press("Meta+a");
+  await page.getByLabel("Suivi(e) depuis le / Créé(e) le").fill("2001-12-11");
+
   await page.getByLabel("Suivi(e) depuis le / Créé(e) le").press("Enter");
   await page.getByLabel("Téléphone").fill("010203040506");
   await page.getByLabel("Description").fill("Description");
@@ -68,7 +73,7 @@ test("test", async ({ page }) => {
   await page.getByLabel("Informations complémentaires (antécédents)").fill("hello ionfo complémentaires");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Mis à jour !").click();
-  await page.getByText("Suivi·e depuis le : 12/11/2001").click();
+  await page.getByText("Suivi·e depuis le : 11/12/2001").click();
   await page.getByText("En rue depuis le : 11/11/2001").click();
   await page.getByText("Téléphone : 010203040506").click();
   await page.getByText("(test pseudo)").click();
@@ -92,7 +97,7 @@ test("test", async ({ page }) => {
   await page.getByLabel("Nom de l'action").click();
   await page.getByLabel("Nom de l'action").fill("hello action");
   await page.getByLabel("Montrer l'heure").check();
-  await page.getByLabel("À faire le").fill("11/12/2002");
+  await page.getByLabel("À faire le").fill("2002-12-11T11:11");
   //  await page.locator('body:has-text("Orga Test - 1Team Test - 1User Test - 1User Test - 1 - adminBesoin d\'aide ? Donn")').press("Enter");
   await page.getByLabel("Description").click();
   await page.getByLabel("Description").fill("tests description");
@@ -112,7 +117,7 @@ test("test", async ({ page }) => {
 
   await page.locator("button[aria-label='Ajouter un passage']").click();
   await page.getByLabel("Date").click();
-  await page.getByLabel("Date").fill("10/10/2004");
+  await page.getByLabel("Date").fill("2004-10-10T10:10");
   await page.getByLabel("Date").press("Enter");
   await page.getByLabel("Commentaire").click();
   await page.getByLabel("Commentaire").fill("hello commentaire passage je veux dire");
@@ -123,7 +128,7 @@ test("test", async ({ page }) => {
   await page.locator("button[aria-label='Ajouter une rencontre']").click();
   await page.getByLabel("Date").click();
   await page.getByLabel("Date").press("Meta+a");
-  await page.getByLabel("Date").fill("09/09/2006");
+  await page.getByLabel("Date").fill("2006-09-09T10:10");
   await page.getByLabel("Date").press("Enter");
   await page.getByLabel("Commentaire").click();
   await page.getByLabel("Commentaire").fill("BOUM");
@@ -148,11 +153,11 @@ test("test", async ({ page }) => {
   await page.getByPlaceholder("Angine").click();
   await page.getByPlaceholder("Angine").fill("dedededed");
   await page.getByLabel("Date de fin").click();
-  await page.getByLabel("Date de fin").fill("11/11/2000");
+  await page.getByLabel("Date de fin").fill("2000-11-11");
   await page.getByLabel("Date de fin").press("Enter");
   await page.getByLabel("Date de début").click();
   await page.getByLabel("Date de début").press("Meta+a");
-  await page.getByLabel("Date de début").fill("11/11/2009");
+  await page.getByLabel("Date de début").fill("2009-11-11");
   await page.getByLabel("Date de début").press("Enter");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Le dosage est obligatoire").click();

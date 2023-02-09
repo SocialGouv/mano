@@ -7,10 +7,10 @@ import { userState } from '../../recoil/auth';
 import ButtonCustom from '../../components/ButtonCustom';
 import { fieldsPersonsCustomizableOptionsSelector, personsState, usePreparePersonForEncryption } from '../../recoil/persons';
 import API from '../../services/api';
-import DatePicker from 'react-datepicker';
-import { dateForDatePicker } from '../../services/date';
+import { dateForDatePicker, outOfBoundariesDate } from '../../services/date';
 import SelectCustom from '../../components/SelectCustom';
 import { cleanHistory } from './components/History';
+import DatePicker from '../../components/DatePicker';
 
 const OutOfActiveList = ({ person }) => {
   const [open, setOpen] = useState(false);
@@ -51,6 +51,9 @@ const OutOfActiveList = ({ person }) => {
 
   const setOutOfActiveList = async (updatedPerson) => {
     updatedPerson.outOfActiveList = true;
+
+    if (updatedPerson.outOfActiveListDate && outOfBoundariesDate(updatedPerson.outOfActiveListDate))
+      return toast.error('La date de sortie de file active est hors limites (entre 1900 et 2100)');
 
     const historyEntry = {
       date: new Date(),
@@ -93,7 +96,7 @@ const OutOfActiveList = ({ person }) => {
         </ModalHeader>
         <ModalBody>
           <Formik
-            initialValues={{ ...person, outOfActiveListDate: dateForDatePicker(Date.now()), outOfActiveListReasons: [] }}
+            initialValues={{ ...person, outOfActiveListDate: Date.now(), outOfActiveListReasons: [] }}
             onSubmit={async (body) => {
               await setOutOfActiveList(body);
               setOpen(false);
@@ -131,14 +134,7 @@ const OutOfActiveList = ({ person }) => {
                     <FormGroup>
                       <Label htmlFor="person-birthdate">Date de sortie de file active</Label>
                       <div>
-                        <DatePicker
-                          locale="fr"
-                          className="form-control"
-                          selected={dateForDatePicker(values.outOfActiveListDate)}
-                          onChange={(date) => handleChange({ target: { value: date, name: 'outOfActiveListDate' } })}
-                          dateFormat="dd/MM/yyyy"
-                          id="outOfActiveListDate"
-                        />
+                        <DatePicker id="outOfActiveListDate" defaultValue={values.outOfActiveListDate} onChange={handleChange} />
                       </div>
                     </FormGroup>
                   </Col>

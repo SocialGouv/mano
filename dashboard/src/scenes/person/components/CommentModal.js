@@ -1,16 +1,16 @@
 import React, { useMemo } from 'react';
 import { Input, Col, Row, FormGroup, Label } from 'reactstrap';
 import { toast } from 'react-toastify';
-import DatePicker from 'react-datepicker';
 
 import SelectUser from '../../../components/SelectUser';
 import { Formik } from 'formik';
 import { currentTeamState, organisationState, userState } from '../../../recoil/auth';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { dateForDatePicker } from '../../../services/date';
 import { commentsState, prepareCommentForEncryption } from '../../../recoil/comments';
 import API from '../../../services/api';
 import { groupsState } from '../../../recoil/groups';
+import DatePicker from '../../../components/DatePicker';
+import { outOfBoundariesDate } from '../../../services/date';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../../components/tailwind/Modal';
 
 const CommentModal = ({ comment = {}, isNewComment, onClose, person }) => {
@@ -41,6 +41,8 @@ const CommentModal = ({ comment = {}, isNewComment, onClose, person }) => {
             if (!body.user && !isNewComment) return toast.error("L'utilisateur est obligatoire");
             if (!body.date && !isNewComment) return toast.error('La date est obligatoire');
             if (!body.comment) return toast.error('Le commentaire est obligatoire');
+            if (!isNewComment && (!body.date || outOfBoundariesDate(body.date)))
+                return toast.error('La date de création est hors limites (entre 1900 et 2100)');
 
             const commentBody = {
               comment: body.comment,
@@ -102,15 +104,11 @@ const CommentModal = ({ comment = {}, isNewComment, onClose, person }) => {
                           <Label htmlFor="date">Créé le / Concerne le</Label>
                           <div>
                             <DatePicker
-                              locale="fr"
-                              name="date"
+                              required
+                              withTime
                               id="date"
-                              className="form-control"
-                              selected={dateForDatePicker((values.date || values.createdAt) ?? new Date())}
-                              onChange={(date) => handleChange({ target: { value: date, name: 'date' } })}
-                              timeInputLabel="Heure :"
-                              dateFormat="dd/MM/yyyy HH:mm"
-                              showTimeInput
+                              defaultValue={(values.date || values.createdAt) ?? new Date()}
+                              onChange={handleChange}
                             />
                           </div>
                         </FormGroup>

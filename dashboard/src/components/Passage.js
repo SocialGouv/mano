@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Input, Col, Row, ModalHeader, ModalBody, FormGroup, Label } from 'reactstrap';
 import { toast } from 'react-toastify';
-import DatePicker from 'react-datepicker';
 import { Formik } from 'formik';
 
 import ButtonCustom from './ButtonCustom';
 import SelectUser from './SelectUser';
 import { teamsState, userState } from '../recoil/auth';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { dateForDatePicker } from '../services/date';
 import API from '../services/api';
 import { passagesState, preparePassageForEncryption } from '../recoil/passages';
 import SelectTeam from './SelectTeam';
 import SelectPerson from './SelectPerson';
 import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
+import DatePicker from './DatePicker';
+import { outOfBoundariesDate } from '../services/date';
 
 const Passage = ({ passage, onFinished }) => {
   const user = useRecoilValue(userState);
@@ -59,6 +59,7 @@ const Passage = ({ passage, onFinished }) => {
             onSubmit={async (body, actions) => {
               if (!body.user) return toast.error("L'utilisateur est obligatoire");
               if (!body.date) return toast.error('La date est obligatoire');
+              if (outOfBoundariesDate(body.date)) return toast.error('La date est hors limites (entre 1900 et 2100)');
               if (!body.team) return toast.error("L'équipe est obligatoire");
               if (body.anonymous && !body.anonymousNumberOfPassages) return toast.error('Veuillez spécifier le nombre de passages anonymes');
               if (!body.anonymous && (showMultiSelect ? !body.persons?.length : !body.person?.length))
@@ -156,16 +157,7 @@ const Passage = ({ passage, onFinished }) => {
                       <FormGroup>
                         <Label htmlFor="date">Date</Label>
                         <div>
-                          <DatePicker
-                            id="date"
-                            locale="fr"
-                            className="form-control"
-                            selected={dateForDatePicker(values.date)}
-                            onChange={(date) => handleChange({ target: { value: date, name: 'date' } })}
-                            timeInputLabel="Heure :"
-                            dateFormat="dd/MM/yyyy HH:mm"
-                            showTimeInput
-                          />
+                          <DatePicker withTime id="date" defaultValue={values.date} onChange={handleChange} />
                         </div>
                       </FormGroup>
                     </Col>
