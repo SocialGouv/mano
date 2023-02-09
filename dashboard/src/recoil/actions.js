@@ -44,26 +44,28 @@ const encryptedFields = [
   'urgent',
 ];
 
-export const prepareActionForEncryption = (action) => {
-  try {
-    if (!looseUuidRegex.test(action.person)) {
-      throw new Error('Action is missing person');
-    }
-    for (const team of action.teams) {
-      if (!looseUuidRegex.test(team)) {
-        throw new Error('Invalid team in Action');
+export const prepareActionForEncryption = (action, { checkRequiredFields = true } = {}) => {
+  if (!!checkRequiredFields) {
+    try {
+      if (!looseUuidRegex.test(action.person)) {
+        throw new Error('Action is missing person');
       }
+      for (const team of action.teams) {
+        if (!looseUuidRegex.test(team)) {
+          throw new Error('Invalid team in Action');
+        }
+      }
+      if (!action.teams.length) throw new Error('Action is missing teams');
+      if (!looseUuidRegex.test(action.user)) {
+        throw new Error('Action is missing user');
+      }
+    } catch (error) {
+      toast.error(
+        "L'action n'a pas été sauvegardée car son format était incorrect. Vous pouvez vérifier son contenu et tenter de la sauvegarder à nouveau. L'équipe technique a été prévenue et va travailler sur un correctif."
+      );
+      capture(error, { extra: { action } });
+      throw error;
     }
-    if (!action.teams.length) throw new Error('Action is missing teams');
-    if (!looseUuidRegex.test(action.user)) {
-      throw new Error('Action is missing user');
-    }
-  } catch (error) {
-    toast.error(
-      "L'action n'a pas été sauvegardée car son format était incorrect. Vous pouvez vérifier son contenu et tenter de la sauvegarder à nouveau. L'équipe technique a été prévenue et va travailler sur un correctif."
-    );
-    capture(error, { extra: { action } });
-    throw error;
   }
   const decrypted = {};
   for (let field of encryptedFields) {

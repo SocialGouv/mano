@@ -13,20 +13,22 @@ export const territoriesState = atom({
 
 const encryptedFields = ['name', 'perimeter', 'types', 'user'];
 
-export const prepareTerritoryForEncryption = (territory) => {
-  try {
-    if (!territory.name) {
-      throw new Error('Territory is missing name');
+export const prepareTerritoryForEncryption = (territory, { checkRequiredFields = true } = {}) => {
+  if (!!checkRequiredFields) {
+    try {
+      if (!territory.name) {
+        throw new Error('Territory is missing name');
+      }
+      if (!looseUuidRegex.test(territory.user)) {
+        throw new Error('Territory is missing user');
+      }
+    } catch (error) {
+      toast.error(
+        "Le territoire n'a pas été sauvegardé car son format était incorrect. Vous pouvez vérifier son contenu et tenter de le sauvegarder à nouveau. L'équipe technique a été prévenue et va travailler sur un correctif."
+      );
+      capture(error, { extra: { territory } });
+      throw error;
     }
-    if (!looseUuidRegex.test(territory.user)) {
-      throw new Error('Territory is missing user');
-    }
-  } catch (error) {
-    toast.error(
-      "Le territoire n'a pas été sauvegardé car son format était incorrect. Vous pouvez vérifier son contenu et tenter de le sauvegarder à nouveau. L'équipe technique a été prévenue et va travailler sur un correctif."
-    );
-    capture(error, { extra: { territory } });
-    throw error;
   }
   const decrypted = {};
   for (let field of encryptedFields) {

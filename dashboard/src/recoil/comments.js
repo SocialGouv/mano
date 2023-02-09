@@ -13,23 +13,25 @@ export const commentsState = atom({
 
 const encryptedFields = ['comment', 'person', 'action', 'group', 'team', 'user', 'date', 'urgent'];
 
-export const prepareCommentForEncryption = (comment) => {
-  try {
-    if (!looseUuidRegex.test(comment.person) && !looseUuidRegex.test(comment.action)) {
-      throw new Error('Comment is missing person or action');
+export const prepareCommentForEncryption = (comment, { checkRequiredFields = true } = {}) => {
+  if (!!checkRequiredFields) {
+    try {
+      if (!looseUuidRegex.test(comment.person) && !looseUuidRegex.test(comment.action)) {
+        throw new Error('Comment is missing person or action');
+      }
+      if (!looseUuidRegex.test(comment.team)) {
+        throw new Error('Comment is missing team');
+      }
+      if (!looseUuidRegex.test(comment.user)) {
+        throw new Error('Comment is missing user');
+      }
+    } catch (error) {
+      toast.error(
+        "Le commentaire n'a pas été sauvegardé car son format était incorrect. Vous pouvez vérifier son contenu et tenter de le sauvegarder à nouveau. L'équipe technique a été prévenue et va travailler sur un correctif."
+      );
+      capture(error, { extra: { comment } });
+      throw error;
     }
-    if (!looseUuidRegex.test(comment.team)) {
-      throw new Error('Comment is missing team');
-    }
-    if (!looseUuidRegex.test(comment.user)) {
-      throw new Error('Comment is missing user');
-    }
-  } catch (error) {
-    toast.error(
-      "Le commentaire n'a pas été sauvegardé car son format était incorrect. Vous pouvez vérifier son contenu et tenter de le sauvegarder à nouveau. L'équipe technique a été prévenue et va travailler sur un correctif."
-    );
-    capture(error, { extra: { comment } });
-    throw error;
   }
   const decrypted = {};
   for (let field of encryptedFields) {

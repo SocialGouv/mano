@@ -13,26 +13,28 @@ export const rencontresState = atom({
 
 const encryptedFields = ['person', 'team', 'user', 'date', 'comment'];
 
-export const prepareRencontreForEncryption = (rencontre) => {
-  try {
-    if (!looseUuidRegex.test(rencontre.person)) {
-      throw new Error('Rencontre is missing person');
+export const prepareRencontreForEncryption = (rencontre, { checkRequiredFields = true } = {}) => {
+  if (!!checkRequiredFields) {
+    try {
+      if (!looseUuidRegex.test(rencontre.person)) {
+        throw new Error('Rencontre is missing person');
+      }
+      if (!looseUuidRegex.test(rencontre.team)) {
+        throw new Error('Rencontre is missing team');
+      }
+      if (!looseUuidRegex.test(rencontre.user)) {
+        throw new Error('Rencontre is missing user');
+      }
+      if (!rencontre.date) {
+        throw new Error('Rencontre is missing date');
+      }
+    } catch (error) {
+      toast.error(
+        "La rencontre n'a pas été sauvegardée car son format était incorrect. Vous pouvez vérifier son contenu et tenter de la sauvegarder à nouveau. L'équipe technique a été prévenue et va travailler sur un correctif."
+      );
+      capture(error, { extra: { rencontre } });
+      throw error;
     }
-    if (!looseUuidRegex.test(rencontre.team)) {
-      throw new Error('Rencontre is missing team');
-    }
-    if (!looseUuidRegex.test(rencontre.user)) {
-      throw new Error('Rencontre is missing user');
-    }
-    if (!rencontre.date) {
-      throw new Error('Rencontre is missing date');
-    }
-  } catch (error) {
-    toast.error(
-      "La rencontre n'a pas été sauvegardée car son format était incorrect. Vous pouvez vérifier son contenu et tenter de la sauvegarder à nouveau. L'équipe technique a été prévenue et va travailler sur un correctif."
-    );
-    capture(error, { extra: { rencontre } });
-    throw error;
   }
   const decrypted = {};
   for (let field of encryptedFields) {
