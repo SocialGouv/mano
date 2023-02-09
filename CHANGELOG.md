@@ -1,3 +1,10 @@
+## [1.242.9](https://github.com/SocialGouv/mano/compare/v1.242.8...v1.242.9) (2023-02-09)
+
+
+### Bug Fixes
+
+* **dashboard:** les dates sur les champs persos ne s'enregistraient pas ([5d58ede](https://github.com/SocialGouv/mano/commit/5d58ede85e8999dba4097a8a9e2c60a2b5faad1e))
+
 ## [1.242.8](https://github.com/SocialGouv/mano/compare/v1.242.7...v1.242.8) (2023-02-09)
 
 
