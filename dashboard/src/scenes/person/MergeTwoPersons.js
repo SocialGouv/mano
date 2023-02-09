@@ -156,7 +156,9 @@ const MergeTwoPersons = ({ person }) => {
       if (!originValue?.length && !!mergeValue?.length) continue;
       if (!!originValue?.length && !mergeValue?.length) continue;
       if (JSON.stringify(originValue) === JSON.stringify(mergeValue)) continue;
-      alert('Les champs médicaux ne sont pas identiques. Vous devez être un·e professionnel·le de santé pour fusionner des dossiers médicaux différents.');
+      alert(
+        'Les champs médicaux ne sont pas identiques. Vous devez être un·e professionnel·le de santé pour fusionner des dossiers médicaux différents.'
+      );
       setPersonToMergeAndDelete(null);
       return;
     }
@@ -237,7 +239,7 @@ const MergeTwoPersons = ({ person }) => {
 
                 const mergedActions = actions
                   .filter((a) => a.person === personToMergeAndDelete._id)
-                  .map((comment) => prepareActionForEncryption({ ...comment, person: originPerson._id }));
+                  .map((action) => prepareActionForEncryption({ ...action, person: originPerson._id, user: action.user || user._id }));
 
                 const mergedComments = comments
                   .filter((c) => c.person === personToMergeAndDelete._id)
