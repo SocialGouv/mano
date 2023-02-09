@@ -12,7 +12,7 @@ import { Formik } from 'formik';
 import { currentTeamState, organisationState, userState } from '../recoil/auth';
 import { commentsState, prepareCommentForEncryption } from '../recoil/comments';
 import { selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
-import { formatDateTimeWithNameOfDay, dateForDatePicker, outOfBoundariesDate } from '../services/date';
+import { formatDateTimeWithNameOfDay, outOfBoundariesDate } from '../services/date';
 import API from '../services/api';
 import ExclamationMarkButton from './tailwind/ExclamationMarkButton';
 import { useDataLoader } from './DataLoader';

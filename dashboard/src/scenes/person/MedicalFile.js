@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import ButtonCustom from '../../components/ButtonCustom';
 import { personsState, usePreparePersonForEncryption, personFieldsSelector, customFieldsPersonsMedicalSelector } from '../../recoil/persons';
 import { currentTeamState, organisationState, usersState, userState } from '../../recoil/auth';
-import { dateForDatePicker, dayjsInstance, formatDateWithFullMonth, formatTime, outOfBoundariesDate } from '../../services/date';
+import { dayjsInstance, formatDateWithFullMonth, formatTime, outOfBoundariesDate } from '../../services/date';
 import API from '../../services/api';
 import useSearchParamState from '../../services/useSearchParamState';
 import SelectAsInput from '../../components/SelectAsInput';

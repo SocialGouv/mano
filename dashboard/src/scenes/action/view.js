@@ -16,7 +16,7 @@ import SelectStatus from '../../components/SelectStatus';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { CANCEL, DONE, actionsState, mappedIdsToLabels, prepareActionForEncryption, TODO } from '../../recoil/actions';
 import { selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
-import { dateForDatePicker, dayjsInstance, now, outOfBoundariesDate } from '../../services/date';
+import { dayjsInstance, now, outOfBoundariesDate } from '../../services/date';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import API from '../../services/api';
 import useTitle from '../../services/useTitle';
