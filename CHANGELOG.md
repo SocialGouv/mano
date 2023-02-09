@@ -1,3 +1,31 @@
+## [1.242.4](https://github.com/SocialGouv/mano/compare/v1.242.3...v1.242.4) (2023-02-09)
+
+
+### Bug Fixes
+
+* **dashboard:** on ne vérifie plus les champs obligatoires lors d'un changement de clé - le but d'un changement de clé est de 'brouiller les pistes', pas de vérifier que tous les champs sont là - on ne garde la vérification que pour l'usage quotidien ([#1310](https://github.com/SocialGouv/mano/issues/1310)) ([ca71ced](https://github.com/SocialGouv/mano/commit/ca71ced50ed02d7c0fe81fdd99562cd8cd1b4850)), closes [#1315](https://github.com/SocialGouv/mano/issues/1315)
+
+## [1.242.3](https://github.com/SocialGouv/mano/compare/v1.242.2...v1.242.3) (2023-02-09)
+
+
+### Bug Fixes
+
+* **dashboard:** ajout des champs personnalisés par défaut lors de la création d'une nouvelle organisation ([#1303](https://github.com/SocialGouv/mano/issues/1303)) ([ae43734](https://github.com/SocialGouv/mano/commit/ae43734da52e0c50d2bb8bd135ae4ad2cb9761df))
+
+## [1.242.2](https://github.com/SocialGouv/mano/compare/v1.242.1...v1.242.2) (2023-02-08)
+
+
+### Bug Fixes
+
+* **dashboard:** ne pas sauvegarder le commentaire en sessionStorage quand la fenetre de creation a été volontairement fermée ([#1306](https://github.com/SocialGouv/mano/issues/1306)) ([8913e9f](https://github.com/SocialGouv/mano/commit/8913e9fbf637b363e26937fe2eb01fbaf403e0df))
+
+## [1.242.1](https://github.com/SocialGouv/mano/compare/v1.242.0...v1.242.1) (2023-02-07)
+
+
+### Bug Fixes
+
+* **dashboard:** retour a la ligne des noms ou adresses trop longues dans la liste des structures ([#1268](https://github.com/SocialGouv/mano/issues/1268)) ([39565fc](https://github.com/SocialGouv/mano/commit/39565fc223578378ba557a70bb47470fb3e7f7e8))
+
 # [1.242.0](https://github.com/SocialGouv/mano/compare/v1.241.3...v1.242.0) (2023-02-07)
 
 
