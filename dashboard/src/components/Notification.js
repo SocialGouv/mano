@@ -207,6 +207,8 @@ const Actions = ({ setShowModal, actions, setSortOrder, setSortBy, sortBy, sortO
 const Comments = ({ setShowModal, comments }) => {
   const history = useHistory();
   const setComments = useSetRecoilState(commentsState);
+  const user = useRecoilValue(userState);
+  const currentTeam = useRecoilValue(currentTeamState);
 
   if (!comments.length) return null;
   return (
@@ -317,7 +319,12 @@ const Comments = ({ setShowModal, comments }) => {
                       e.stopPropagation();
                       const commentResponse = await API.put({
                         path: `/comment/${comment._id}`,
-                        body: prepareCommentForEncryption({ ...comment, urgent: false }),
+                        body: prepareCommentForEncryption({
+                          ...comment,
+                          user: comment.user || user._id,
+                          team: comment.team || currentTeam._id,
+                          urgent: false,
+                        }),
                       });
                       if (commentResponse.ok) {
                         const newComment = commentResponse.decryptedData;

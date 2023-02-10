@@ -316,8 +316,8 @@ const Action = ({ navigation, route }) => {
       const body = {
         comment: c.comment,
         action: response.decryptedData._id,
-        user: c.user,
-        team: c.team,
+        user: c.user || user._id,
+        team: c.team || currentTeam._id,
         organisation: c.organisation,
       };
       const res = await API.post({ path: '/comment', body: prepareCommentForEncryption(body) });
