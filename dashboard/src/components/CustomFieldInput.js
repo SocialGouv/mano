@@ -77,7 +77,9 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 4, di
                 withTime={field.type === 'date-with-time'}
                 id={id}
                 defaultValue={values[field.name] ? values[field.name] : field.required ? new Date() : null}
-                onChange={(e) => handleChange({ target: { value: e.taget.value, name: field.name } })}
+                onChange={(e) => {
+                  handleChange({ target: { value: e.target.value, name: field.name } });
+                }}
                 disabled={disabled}
               />
             </div>

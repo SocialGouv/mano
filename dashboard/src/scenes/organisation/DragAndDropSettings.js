@@ -209,7 +209,6 @@ const Group = ({
               <p className="tw-m-0 tw-text-xs tw-italic tw-opacity-30">Aucun élément dans ce groupe</p>
             ) : (
               items.map((item) => {
-                console.log(item);
                 return (
                   <div key={dataItemKey(item)} data-item={dataItemKey(item)}>
                     <ItemComponent item={item} groupTitle={groupTitle} />
