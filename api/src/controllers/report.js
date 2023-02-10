@@ -45,7 +45,7 @@ router.get(
 
     const data = await Report.findAll({
       ...query,
-      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "createdAt", "updatedAt", "deletedAt"],
+      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "createdAt", "updatedAt", "deletedAt", "date", "team"],
     });
     return res.status(200).send({ ok: true, data, hasMore: data.length === Number(limit), total });
   })
