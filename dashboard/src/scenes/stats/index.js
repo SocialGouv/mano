@@ -326,7 +326,7 @@ const Stats = () => {
       passagesIds[passage._id] = true;
     }
     const passagesNotIncludedInPeriod = allPassages
-      .filter((p) => !!passagesIds[p._id])
+      .filter((p) => !passagesIds[p._id])
       .filter((p) => dayjsInstance(p.date).isBefore(period.startDate));
     const personsOfPassages = {};
     for (const passage of passagesNotIncludedInPeriod) {
