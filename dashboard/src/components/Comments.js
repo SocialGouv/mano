@@ -224,7 +224,7 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, onDelete, n
             if (!body.comment) return toast.error('Le commentaire est obligatoire');
             if (body.date && outOfBoundariesDate(body.date)) return toast.error('La date est hors limites (entre 1900 et 2100)');
 
-            await onSubmit({ ...value, ...body, team: value.team ?? body.team ?? currentTeam._id });
+            await onSubmit({ ...value, ...body, team: body.team ?? value.team ?? currentTeam._id });
             actions.setSubmitting(false);
             window.sessionStorage.removeItem('currentComment');
           }}>
