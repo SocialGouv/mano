@@ -218,7 +218,7 @@ export default function useDataMigrator() {
           path: '/comment',
           query: { organisation: organisationId, after: 0, withDeleted: false },
         });
-        const commentsWithPersonUuid = (res.decryptedData || [])
+        const commentsTransformedFromPersonObjectToPersonUuid = (res.decryptedData || [])
           .filter((comment) => {
             // we select only comments with person "populated"
             if (!!comment.action) return false;
@@ -232,7 +232,9 @@ export default function useDataMigrator() {
             person: comment.person._id,
           }));
 
-        const encryptedCommentsToMigrate = await Promise.all(commentsWithPersonUuid.map(prepareCommentForEncryption).map(encryptItem));
+        const encryptedCommentsToMigrate = await Promise.all(
+          commentsTransformedFromPersonObjectToPersonUuid.map(prepareCommentForEncryption).map(encryptItem)
+        );
         const response = await API.put({
           path: `/migration/comments-reset-person-id`,
           body: { commentsToUpdate: encryptedCommentsToMigrate },
