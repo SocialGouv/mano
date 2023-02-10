@@ -1,3 +1,10 @@
+## [1.242.10](https://github.com/SocialGouv/mano/compare/v1.242.9...v1.242.10) (2023-02-10)
+
+
+### Bug Fixes
+
+* **api:** return uncrypted date and team fields ([#1316](https://github.com/SocialGouv/mano/issues/1316)) ([cdda2e0](https://github.com/SocialGouv/mano/commit/cdda2e0d3edc9829411bddec594d6ad4135a23aa))
+
 ## [1.242.9](https://github.com/SocialGouv/mano/compare/v1.242.8...v1.242.9) (2023-02-09)
 
 
