@@ -48,6 +48,7 @@ const PersonDocuments = ({ person }) => {
                 path: `/person/${person._id}/document`,
                 file: e.target.files[0],
               });
+              console.log('uploaded file', docResponse);
               if (!docResponse.ok || !docResponse.data) {
                 capture('Error uploading document', { extra: { docResponse } });
                 toast.error("Une erreur est survenue lors de l'envoi du document");
@@ -108,7 +109,7 @@ const PersonDocuments = ({ person }) => {
                   {doc.name}
                 </p>
                 {!!organisation.groupsEnabled && !!doc.group && !!doc.personPopulated && (
-                  <p className="tw-m-0 tw-mt-1 tw--xs">
+                  <p className="tw--xs tw-m-0 tw-mt-1">
                     Ce document est lié à <PersonName item={doc} />
                   </p>
                 )}
@@ -157,7 +158,7 @@ function DocumentModal({ document, onClose, person }) {
   );
 
   return (
-    <ModalContainer open className="[overflow-wrap:anywhere]" >
+    <ModalContainer open className="[overflow-wrap:anywhere]">
       <ModalHeader title={document.name} />
       <ModalBody>
         <div className="tw-flex tw-w-full tw-flex-col tw-justify-between tw-gap-4 tw-px-8">

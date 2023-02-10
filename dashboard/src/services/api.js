@@ -37,6 +37,10 @@ export const setOrgEncryptionKey = async (orgEncryptionKey, { encryptedVerificat
   return newHashedOrgEncryptionKey;
 };
 
+export function getHashedOrgEncryptionKey() {
+  return hashedOrgEncryptionKey;
+}
+
 export const encryptItem = async (item) => {
   if (item.decrypted) {
     if (!item.entityKey) item.entityKey = await generateEntityKey();
@@ -123,10 +127,10 @@ const logout = async () => {
 };
 
 // Upload a file to a path.
-export const upload = async ({ file, path }) => {
+export const upload = async ({ file, path }, forceKey) => {
   // Prepare file.
   const tokenCached = getRecoil(authTokenState);
-  const { encryptedEntityKey, encryptedFile } = await encryptFile(file, hashedOrgEncryptionKey);
+  const { encryptedEntityKey, encryptedFile } = await encryptFile(file, forceKey || hashedOrgEncryptionKey);
   const formData = new FormData();
   formData.append('file', encryptedFile);
 
@@ -144,7 +148,7 @@ export const upload = async ({ file, path }) => {
 };
 
 // Download a file from a path.
-export const download = async ({ path, encryptedEntityKey }) => {
+export const download = async ({ path, encryptedEntityKey }, forceKey) => {
   const tokenCached = getRecoil(authTokenState);
   const options = {
     method: 'GET',
@@ -155,7 +159,7 @@ export const download = async ({ path, encryptedEntityKey }) => {
   const url = getUrl(path);
   const response = await fetch(url, options);
   const blob = await response.blob();
-  const decrypted = await decryptFile(blob, encryptedEntityKey, hashedOrgEncryptionKey);
+  const decrypted = await decryptFile(blob, encryptedEntityKey, forceKey || hashedOrgEncryptionKey);
   return decrypted;
 };
 
