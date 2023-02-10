@@ -1,3 +1,10 @@
+## [1.242.11](https://github.com/SocialGouv/mano/compare/v1.242.10...v1.242.11) (2023-02-10)
+
+
+### Bug Fixes
+
+* **dashboard:** ne pas détruire les documents quand on change de clé ([#1308](https://github.com/SocialGouv/mano/issues/1308)) ([43936ec](https://github.com/SocialGouv/mano/commit/43936ecf046ff17cedace8494b59c352d24a2a9d))
+
 ## [1.242.10](https://github.com/SocialGouv/mano/compare/v1.242.9...v1.242.10) (2023-02-10)
 
 
