@@ -1,3 +1,12 @@
+## [1.242.12](https://github.com/SocialGouv/mano/compare/v1.242.11...v1.242.12) (2023-02-10)
+
+
+### Bug Fixes
+
+* ajout de l'utilisateur et de l'équipe actuels lorsqu'absent d'un commentaire ([#1311](https://github.com/SocialGouv/mano/issues/1311)) ([1e29ed7](https://github.com/SocialGouv/mano/commit/1e29ed7604585d6c41e769753e267a8ebb142db7))
+* **dashboard:** statistiques des nouvelles personnes passées ([#1318](https://github.com/SocialGouv/mano/issues/1318)) ([a09394d](https://github.com/SocialGouv/mano/commit/a09394d363773165ebf46cf3d08c79bf0fe78d70))
+* réparation d'un bug précédent qui avait retiré les personnes attachées à des commentaires dépriorisés: ces personnes n'étaient pas complètement perdues, on a pu les retrouver et les rattacher 🎉 ([#1312](https://github.com/SocialGouv/mano/issues/1312)) ([a5279d1](https://github.com/SocialGouv/mano/commit/a5279d128999ff3ce32cc5e985aee1d4c809536d))
+
 ## [1.242.11](https://github.com/SocialGouv/mano/compare/v1.242.10...v1.242.11) (2023-02-10)
 
 
