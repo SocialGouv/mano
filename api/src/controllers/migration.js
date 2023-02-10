@@ -234,6 +234,30 @@ router.put(
           }
         }
 
+        if (req.params.migrationName === "clean-reports-with-services") {
+          try {
+            z.array(
+              z.object({
+                _id: z.string().regex(looseUuidRegex),
+                encrypted: z.string(),
+                encryptedEntityKey: z.string(),
+              })
+            ).parse(req.body.reportsToUpdate);
+          } catch (e) {
+            const error = new Error(`Invalid request in clean-reports-with-services migration: ${e}`);
+            error.status = 400;
+            throw error;
+          }
+
+          for (const { _id, encrypted, encryptedEntityKey } of req.body.reportsToUpdate) {
+            const report = await Report.findOne({ where: { _id, organisation: req.user.organisation }, transaction: tx });
+            if (report) {
+              report.set({ encrypted, encryptedEntityKey });
+              await report.save();
+            }
+          }
+        }
+
         if (req.params.migrationName === "comments-reset-person-id") {
           try {
             z.array(

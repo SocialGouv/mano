@@ -248,6 +248,35 @@ export default function useDataMigrator() {
           migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
         }
       }
+
+      if (!organisation.migrations?.includes('clean-reports-with-services')) {
+        // this migration comes after the bug writtne in migration "services-in-services-table"
+        // https://github.com/SocialGouv/mano/commit/7a8ae27972157b77bd6334353201f0786ae1daac
+        // what we did to fix this bug is: we had a backp with good reports and we replaced the bad ones with the good ones
+        // so we need to clean the reports with services - and no need to save the services in services table
+        setLoadingText(LOADING_TEXT);
+        const res = await API.get({
+          path: '/report',
+          query: { organisation: organisationId, after: 0, withDeleted: false },
+        });
+        const reportsToUpdate = (res.decryptedData || []).filter((e) => e.services && Object.values(JSON.parse(e.services || '{}')).length);
+        const reportsWithoutServicesProperty = reportsToUpdate.map((e) => {
+          const { services, ...report } = e;
+          return report;
+        });
+        // Save all services in services table
+
+        const encryptedReportsToMigrate = await Promise.all(reportsWithoutServicesProperty.map(prepareReportForEncryption).map(encryptItem));
+        const response = await API.put({
+          path: `/migration/services-in-services-table`,
+          body: { reportsToUpdate: encryptedReportsToMigrate },
+          query: { migrationLastUpdateAt },
+        });
+        if (response.ok) {
+          setOrganisation(response.organisation);
+          migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
+        }
+      }
     },
   };
 }
