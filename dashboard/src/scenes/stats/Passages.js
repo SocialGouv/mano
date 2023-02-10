@@ -37,7 +37,7 @@ const PassagesStats = ({ passages, personFields, personsInPassagesOfPeriod, pers
           { options: [...personFields.find((f) => f.name === 'gender').options, 'Non précisé'] }
         )}
       />
-      <AgeRangeBar persons={ personsInPassagesOfPeriod } />
+      <AgeRangeBar persons={personsInPassagesOfPeriod} />
     </>
   );
 };
