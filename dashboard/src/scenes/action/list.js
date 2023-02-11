@@ -250,8 +250,8 @@ const List = () => {
       </div>
 
       {showAs === showAsOptions[2] && (
-        <div style={{ minHeight: '100vh' }}>
-          <ActionsWeekly
+        <div className="[overflow-wrap:anywhere] tw-min-h-screen">
+          <ActionsWeekly 
             actions={dataConsolidated}
             onCreateAction={(date) => {
               setActionDate(date);
@@ -262,14 +262,14 @@ const List = () => {
       )}
 
       {showAs === showAsOptions[0] && (
-        <div style={{ minHeight: '100vh' }}>
+        <div className="tw-min-h-screen">
           <ActionsCalendar actions={dataConsolidated} />
         </div>
       )}
       {showAs === showAsOptions[1] && (
-        <>
+        <div className="[overflow-wrap:anywhere]">
           <ActionsSortableList data={dataConsolidated} limit={20} />
-        </>
+        </div>
       )}
       <CreateActionModal dueAt={actionDate} open={modalOpen} setOpen={(value) => setModalOpen(value)} disabled={!currentTeam} isMulti refreshable />
       {showConsultationModal && (
