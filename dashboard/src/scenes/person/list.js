@@ -13,6 +13,7 @@ import {
   customFieldsPersonsSocialSelector,
   fieldsPersonsCustomizableOptionsSelector,
   filterPersonsBaseSelector,
+  filterConsultationSelector,
   sortPersons,
 } from '../../recoil/persons';
 import TagTeam from '../../components/TagTeam';
@@ -74,8 +75,11 @@ const filterPersonsWithAllFieldsSelector = selector({
     const customFieldsPersonsMedical = get(customFieldsPersonsMedicalSelector);
     const customFieldsMedicalFile = get(customFieldsMedicalFileSelector);
     const filterPersonsBase = get(filterPersonsBaseSelector);
+    const consultation = get(filterConsultationSelector); 
+    //console.log("custom: ", customFieldsPersonsSocial);
     return [
       ...filterPersonsBase,
+      ...consultation,
       ...fieldsPersonsCustomizableOptions.filter((a) => a.enabled || a.enabledTeams?.includes(team._id)).map((a) => ({ field: a.name, ...a })),
       ...customFieldsPersonsSocial.filter((a) => a.enabled || a.enabledTeams?.includes(team._id)).map((a) => ({ field: a.name, ...a })),
       ...customFieldsPersonsMedical.filter((a) => a.enabled || a.enabledTeams?.includes(team._id)).map((a) => ({ field: a.name, ...a })),
@@ -87,6 +91,12 @@ const filterPersonsWithAllFieldsSelector = selector({
         field: 'places',
         options: [...new Set(places.map((place) => place.name))],
       },
+      //{
+      //  label: 'Consultation1', 
+      //  filed: 'consultation1', 
+      //  type: 'date',
+      //  filterable: true,
+      //}
     ];
   },
 });

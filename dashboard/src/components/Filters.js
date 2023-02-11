@@ -4,11 +4,13 @@ import { dayjsInstance, isOnSameDay } from '../services/date';
 import DatePicker from './DatePicker';
 
 export const filterData = (data, filters, returnWholeArray = false) => {
+  console.log("data: ", data) // ce que l'on entre comme valeur pour le filtre 
   if (!!filters?.filter((f) => Boolean(f?.value)).length) {
     for (let filter of filters) {
       if (!filter.field || !filter.value) continue;
       data = data
         .map((item, index) => {
+          console.log("item: ", item); 
           const itemValue = item[filter.field];
           if (['number'].includes(filter.type)) {
             const { number, number2, comparator } = filter.value;
@@ -77,13 +79,22 @@ export const filterData = (data, filters, returnWholeArray = false) => {
 };
 
 const Filters = ({ onChange, base, filters, title = 'Filtres :', saveInURLParams = false }) => {
+  console.log ("filters1: ", filters); 
   filters = !!filters.length ? filters : [{ field: null, type: null, value: null }];
+  console.log ("filters2: ", filters); 
   const onAddFilter = () => onChange([...filters, {}], saveInURLParams);
   const filterFields = base.filter((_filter) => _filter.field !== 'alertness').map((f) => ({ label: f.label, field: f.field, type: f.type }));
-
+  console.log("base = ", base);
+  //console.log("filtre = ", filters);
+  //console.log("save = ", saveInURLParams);
+  //console.log("filterFields = ", filterFields);
+  
   function getFilterOptionsByField(field, base, index) {
+    console.log("field", field); // type de selecteur => consultation, autre pseudo, genre etc...
     if (!field) return [];
     const current = base.find((filter) => filter.field === field);
+    console.log("current: ", current); 
+    console.log("index: ", index);
     if (!current) {
       onChange(
         filters.filter((_f, i) => i !== index),
