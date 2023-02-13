@@ -249,10 +249,10 @@ router.put(
             throw error;
           }
 
-          for (const { _id, encrypted, encryptedEntityKey, date, team } of req.body.reportsToUpdate) {
+          for (const { _id, encrypted, encryptedEntityKey } of req.body.reportsToUpdate) {
             const report = await Report.findOne({ where: { _id, organisation: req.user.organisation }, transaction: tx });
             if (report) {
-              report.set({ encrypted, encryptedEntityKey, date, team });
+              report.set({ encrypted, encryptedEntityKey });
               await report.save();
             }
           }
