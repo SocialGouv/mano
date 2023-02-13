@@ -112,7 +112,6 @@ export const itemsGroupedByPersonSelector = selector({
         lastUpdateCheckForGDPR: person.updatedAt,
         formattedBirthDate: formatBirthDate(person.birthdate),
         age: formatAge(person.birthdate),
-        hasAtLeastOneConsultation: false,
       };
     }
     const actions = Object.values(get(actionsWithCommentsSelector));
@@ -125,7 +124,6 @@ export const itemsGroupedByPersonSelector = selector({
     const places = get(placesObjectSelector);
     const rencontres = get(rencontresState);
     const groups = get(groupsState);
-    //const hasAtLeastOneConsultation = false; 
 
     for (const group of groups) {
       for (const person of group.persons) {
@@ -203,8 +201,7 @@ export const itemsGroupedByPersonSelector = selector({
         if (!personsObject[consultation.person]) continue;
         personsObject[consultation.person].consultations = personsObject[consultation.person].consultations || [];
         personsObject[consultation.person].consultations.push(consultation);
-        personsObject[consultation.person].HasAtLeastOneConsultation = true;
-        console.log("test: ", consultation); 
+        personsObject[consultation.person].hasAtLeastOneConsultation = true;
         if (consultation.updatedAt > personsObject[consultation.person].lastUpdateCheckForGDPR) {
           personsObject[consultation.person].lastUpdateCheckForGDPR = consultation.updatedAt;
         }
@@ -241,7 +238,6 @@ export const itemsGroupedByPersonSelector = selector({
         personsObject[rencontre.person].lastUpdateCheckForGDPR = rencontre.updatedAt;
       }
     }
-    console.log("tableau de personne", personsObject);
     return personsObject;
   },
 });

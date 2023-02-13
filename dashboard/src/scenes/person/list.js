@@ -76,7 +76,6 @@ const filterPersonsWithAllFieldsSelector = selector({
     const customFieldsMedicalFile = get(customFieldsMedicalFileSelector);
     const filterPersonsBase = get(filterPersonsBaseSelector);
     const consultation = get(filterConsultationSelector); 
-    //console.log("custom: ", customFieldsPersonsSocial);
     return [
       ...filterPersonsBase,
       ...consultation,
@@ -91,12 +90,6 @@ const filterPersonsWithAllFieldsSelector = selector({
         field: 'places',
         options: [...new Set(places.map((place) => place.name))],
       },
-      //{
-      //  label: 'Consultation1', 
-      //  filed: 'consultation1', 
-      //  type: 'date',
-      //  filterable: true,
-      //}
     ];
   },
 });

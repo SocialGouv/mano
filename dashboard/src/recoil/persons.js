@@ -3,7 +3,6 @@ import { atom, selector, useRecoilValue } from 'recoil';
 import { organisationState } from './auth';
 import { toast } from 'react-toastify';
 import { capture } from '../services/sentry';
-//import { consultationsState } from '../recoil/consultations';
 
 const collectionName = 'person';
 export const personsState = atom({
@@ -113,50 +112,16 @@ export const filterPersonsBaseSelector = selector({
 export const filterConsultationSelector = selector({
   key: 'filterConsultationSelector',
   get: ({ get }) => {
-    //const consultations = get(consultationsState);
     return [
     {
-      field: 'Consultation',
-      label: 'Consultation',
-      type: 'date',
-      filterable: true,
-      encrypted: true,
-    }
-    ];
-  },
-});
-
-// fonctionne : 
-/*export const filterConsultationSelector = selector({
-  key: 'filterConsultationSelector',
-  get: ({ get }) => {
-    const filterPersonsBase = [];
-        filterPersonsBase.push({
-          field: 'Consultation',
-          label: 'Consultation',
-          type: 'date',
-          filterable: true,
-        });
-    return filterPersonsBase;
-  },
-});
-
-ou 
-
-export const filterConsultationSelector = selector({
-  key: 'filterConsultationSelector',
-  get: ({ get }) => {
-    return [
-    {
-      field: 'Consultation',
-      label: 'Consultation',
-      type: 'date',
+      field: 'consultations',
+      label: 'A eu une consultation',
+      type: 'boolean',
       filterable: true,
     }
     ];
   },
 });
-*/
 
 /*
 
