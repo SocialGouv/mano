@@ -201,6 +201,7 @@ export const itemsGroupedByPersonSelector = selector({
         if (!personsObject[consultation.person]) continue;
         personsObject[consultation.person].consultations = personsObject[consultation.person].consultations || [];
         personsObject[consultation.person].consultations.push(consultation);
+        personsObject[consultation.person].hasAtLeastOneConsultation = true;
         if (consultation.updatedAt > personsObject[consultation.person].lastUpdateCheckForGDPR) {
           personsObject[consultation.person].lastUpdateCheckForGDPR = consultation.updatedAt;
         }
