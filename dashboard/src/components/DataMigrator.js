@@ -267,7 +267,6 @@ export default function useDataMigrator() {
         // Save all services in services table
 
         const encryptedReportsToMigrate = await Promise.all(reportsWithoutServicesProperty.map(prepareReportForEncryption).map(encryptItem));
-        console.log({ reportsWithoutServicesProperty, encryptedReportsToMigrate });
         const response = await API.put({
           path: `/migration/clean-reports-with-services`,
           body: { reportsToUpdate: encryptedReportsToMigrate },
