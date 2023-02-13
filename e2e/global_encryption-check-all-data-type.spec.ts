@@ -1,6 +1,8 @@
 import { test, expect } from "@playwright/test";
 import { nanoid } from "nanoid";
 import { populate } from "./scripts/populate-db";
+import { logOut, loginWith } from "./utils";
+import dayjs from "dayjs";
 
 test.beforeAll(async () => {
   await populate();
@@ -13,11 +15,7 @@ test("test", async ({ page }) => {
   const testTerritoire = "testTerritoire-" + nanoid();
 
   await page.goto("http://localhost:8090/auth");
-  await page.getByPlaceholder("Cliquez ici pour entrer votre email").fill("admin1@example.org");
-  await page.getByPlaceholder("Cliquez ici pour entrer votre mot de passe").fill("secret");
-  await page.getByRole("button", { name: "Se connecter" }).click();
-  await page.getByLabel("Clé de chiffrement d'organisation").fill("plouf");
-  await page.getByRole("button", { name: "Se connecter" }).click();
+  await loginWith(page, "admin1@example.org", "secret", "plouf");
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
   await page.getByLabel("Nom").click();
@@ -127,7 +125,7 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Structure créée !").click();
   await page.getByRole("link", { name: "Comptes rendus" }).click();
-  await page.getByRole("button", { name: "2023-02-10" }).click();
+  await page.getByRole("button", { name: dayjs().format("YYYY-MM-DD") }).click();
   await page.locator(".report-select-collaboration__input-container").click();
   await page.locator("#react-select-collaborations-option-0").click();
   await page.getByRole("button", { name: "Mettre à jour" }).click();
@@ -153,13 +151,8 @@ test("test", async ({ page }) => {
   await page.locator('[data-test-id="encryption-modal"]').getByRole("button", { name: "Changer la clé de chiffrement" }).click();
   await page.getByText("Données chiffrées ! Veuillez noter la clé puis vous reconnecter").click();
   await page.locator('[data-test-id="encryption-modal"]').getByRole("button", { name: "Close" }).click();
-  await page.getByRole("button", { name: "User Admin Test - 1" }).click();
-  await page.getByRole("menuitem", { name: "Se déconnecter" }).first().click();
-  await page.getByPlaceholder("Cliquez ici pour entrer votre email").fill("admin1@example.org");
-  await page.getByPlaceholder("Cliquez ici pour entrer votre mot de passe").fill("secret");
-  await page.getByRole("button", { name: "Se connecter" }).click();
-  await page.getByLabel("Clé de chiffrement d'organisation").fill("plaf");
-  await page.getByRole("button", { name: "Se connecter" }).click();
+  await logOut(page, "User Admin Test - 1");
+  await loginWith(page, "admin1@example.org", "secret", "plaf");
   await page.getByRole("link", { name: "Agenda" }).click();
   await page.getByText("La consultation").click();
   await page.getByRole("button", { name: "Annuler" }).click();
@@ -170,6 +163,7 @@ test("test", async ({ page }) => {
   await page.getByLabel("Structure de suivi médical").click();
   await page.getByLabel("Numéro de sécurité sociale").click();
   await page.getByRole("button", { name: "Lieux fréquentés (1)" }).click();
+  await page.getByRole("button", { name: "Fermer" }).click();
   await page.locator('[data-test-id="test lieu"]').click();
   await page.getByRole("button", { name: "Liens familiaux (1)" }).click();
   await page.getByRole("cell", { name: premier + " et " + deuxieme }).click();
@@ -190,7 +184,7 @@ test("test", async ({ page }) => {
   await page.getByText("Avec un commentaire").click();
   await page.getByRole("button", { name: "Annuler" }).click();
   await page.getByRole("link", { name: "Comptes rendus" }).click();
-  await page.getByRole("button", { name: "2023-02-10" }).click();
+  await page.getByRole("button", { name: dayjs().format("YYYY-MM-DD") }).click();
   await page.getByText("La description").click();
   await page.getByText("Ma première collab").click();
   await page.getByText("Actions créées (1)").click();
@@ -210,15 +204,8 @@ test("test", async ({ page }) => {
   await page.locator('[data-test-id="encryption-modal"]').getByRole("button", { name: "Changer la clé de chiffrement" }).click();
   await page.getByText("Données chiffrées ! Veuillez noter la clé puis vous reconnecter").click();
   await page.locator('[data-test-id="encryption-modal"]').getByRole("button", { name: "Close" }).click();
-  await page.getByRole("button", { name: "User Admin Test - 1" }).click();
-  await page.getByRole("menuitem", { name: "Se déconnecter" }).first().click();
-  await page.getByPlaceholder("Cliquez ici pour entrer votre email").click();
-  await page.getByPlaceholder("Cliquez ici pour entrer votre email").fill("admin1@example.org");
-  await page.getByPlaceholder("Cliquez ici pour entrer votre mot de passe").click();
-  await page.getByPlaceholder("Cliquez ici pour entrer votre mot de passe").fill("secret");
-  await page.getByRole("button", { name: "Se connecter" }).click();
-  await page.getByLabel("Clé de chiffrement d'organisation").fill("plouf");
-  await page.getByRole("button", { name: "Se connecter" }).click();
+  await logOut(page, "User Admin Test - 1");
+  await loginWith(page, "admin1@example.org", "secret", "plouf");
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await page.getByText(deuxieme).click();
 });
