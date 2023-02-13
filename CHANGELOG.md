@@ -1,3 +1,10 @@
+## [1.242.13](https://github.com/SocialGouv/mano/compare/v1.242.12...v1.242.13) (2023-02-13)
+
+
+### Bug Fixes
+
+* remise en forme des comptes-rendus impactés par le bug de migration des services vers leur nouvelle table ([#1319](https://github.com/SocialGouv/mano/issues/1319)) ([057186d](https://github.com/SocialGouv/mano/commit/057186d4ce83821d72c3fa5c13a989142d04a883))
+
 ## [1.242.12](https://github.com/SocialGouv/mano/compare/v1.242.11...v1.242.12) (2023-02-10)
 
 
