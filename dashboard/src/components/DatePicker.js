@@ -1,4 +1,4 @@
-import { dateForInputDate, LEFT_BOUNDARY_DATE, RIGHT_BOUNDARY_DATE } from '../services/date';
+import { dateForInputDate, dateFromInputDate, LEFT_BOUNDARY_DATE, RIGHT_BOUNDARY_DATE } from '../services/date';
 
 /**
  * @typedef {Object} DatePickerProps
@@ -21,7 +21,9 @@ export default function DatePicker({ onChange, defaultValue, id, withTime = fals
       className="form-control"
       type={withTime ? 'datetime-local' : 'date'}
       defaultValue={dateForInputDate(defaultValue, withTime)}
-      onChange={onChange}
+      onChange={(e) => {
+        onChange({ ...e, target: { ...e.target, value: dateFromInputDate(e.target.value) } });
+      }}
       min={dateForInputDate(LEFT_BOUNDARY_DATE, withTime)}
       max={dateForInputDate(RIGHT_BOUNDARY_DATE, withTime)}
     />

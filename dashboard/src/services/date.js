@@ -94,6 +94,9 @@ export const RIGHT_BOUNDARY_DATE = '2100-01-01';
 export function outOfBoundariesDate(date) {
   return dayjs(date).isBefore(dayjs(LEFT_BOUNDARY_DATE)) || dayjs(date).isAfter(dayjs(RIGHT_BOUNDARY_DATE));
 }
+export function dateFromInputDate(date) {
+  return date && dayjs(date).isValid() ? dayjs(date).toDate() : null;
+}
 
 export function getMonths() {
   const startOfThisMonth = dayjs().startOf('month');
