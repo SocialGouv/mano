@@ -6,7 +6,7 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 
 import { actionsState, CANCEL, DONE, prepareActionForEncryption, TODO } from '../recoil/actions';
 import { currentTeamState, organisationState, teamsState, userState } from '../recoil/auth';
-import { dayjsInstance, dateFromInputDate, outOfBoundariesDate } from '../services/date';
+import { dayjsInstance, outOfBoundariesDate } from '../services/date';
 import API from '../services/api';
 
 import SelectPerson from './SelectPerson';
