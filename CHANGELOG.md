@@ -1,3 +1,10 @@
+# [1.243.0](https://github.com/SocialGouv/mano/compare/v1.242.15...v1.243.0) (2023-02-14)
+
+
+### Features
+
+* **dashboard:** restylisation des champs personnalisés pour les observations ([#1282](https://github.com/SocialGouv/mano/issues/1282)) ([ca6fd85](https://github.com/SocialGouv/mano/commit/ca6fd85a88fbbd0585824d548dfffbccdab3b04e))
+
 ## [1.242.15](https://github.com/SocialGouv/mano/compare/v1.242.14...v1.242.15) (2023-02-14)
 
 
