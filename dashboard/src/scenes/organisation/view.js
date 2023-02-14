@@ -360,33 +360,6 @@ const View = () => {
                       </div>
                       <hr />
                       <ObservationsSettings />
-                      {/* <Label>Champs personnalisés</Label>
-                        <TableCustomFields
-                          customFields="customFieldsObs"
-                          key={refreshErrorKey + 'customFieldsObs'}
-                          data={territoryObservations}
-                          fields={customFieldsObs}
-                          onEditChoice={async ({ oldChoice, newChoice, field, fields }) => {
-                            const updatedObservations = replaceOldChoiceByNewChoice(territoryObservations, oldChoice, newChoice, field);
-
-                            const response = await API.post({
-                              path: '/custom-field',
-                              body: {
-                                customFields: {
-                                  customFieldsObs: fields,
-                                },
-                                observations: await Promise.all(updatedObservations.map(prepareObsForEncryption(fields)).map(encryptItem)),
-                              },
-                            });
-                            if (response.ok) {
-                              toast.success('Choix mis à jour !');
-                              setOrganisation(response.data);
-                            } else {
-                              setRefreshErrorKey((k) => k + 1); // to reset the table to its original values
-                            }
-                            refresh();
-                          }}
-                        /> */}
                     </>
                   );
                 case 'persons':

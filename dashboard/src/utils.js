@@ -23,7 +23,6 @@ export const typeOptions = [
 ];
 
 export const newCustomField = () => ({
-  // Todo: I guess could use crypto here.
   name: `custom-${new Date().toISOString().split('.').join('-').split(':').join('-')}`,
   label: '',
   type: 'text',
