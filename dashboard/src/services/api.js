@@ -67,6 +67,14 @@ export const encryptItem = async (item) => {
   return item;
 };
 
+export async function decryptAndEncryptItem(item, oldHashedOrgEncryptionKey) {
+  const { content, entityKey } = await decrypt(item.encrypted, item.encryptedEntityKey, oldHashedOrgEncryptionKey);
+  const { encryptedContent, encryptedEntityKey } = await encrypt(content, entityKey, hashedOrgEncryptionKey);
+  item.encrypted = encryptedContent;
+  item.encryptedEntityKey = encryptedEntityKey;
+  return item;
+}
+
 const decryptDBItem = async (item, { path, encryptedVerificationKey = null } = {}) => {
   if (!enableEncrypt) return item;
   if (!item.encrypted) return item;
@@ -176,7 +184,7 @@ export const deleteFile = async ({ path }) => {
   return response.json();
 };
 
-const execute = async ({ method, path = '', body = null, query = {}, headers = {}, forceMigrationLastUpdate = null } = {}) => {
+const execute = async ({ method, path = '', body = null, query = {}, headers = {}, forceMigrationLastUpdate = null, skipDecrypt = false } = {}) => {
   const organisation = getRecoil(organisationState);
   const tokenCached = getRecoil(authTokenState);
   const { encryptionLastUpdateAt, encryptionEnabled, encryptedVerificationKey, migrationLastUpdateAt } = organisation;
@@ -246,7 +254,9 @@ const execute = async ({ method, path = '', body = null, query = {}, headers = {
           capture('api error unhandled', { extra: { res, path, query } });
         }
       }
-      if (!!res.data && Array.isArray(res.data)) {
+      if (skipDecrypt) {
+        return res;
+      } else if (!!res.data && Array.isArray(res.data)) {
         const decryptedData = await Promise.all(res.data.map((item) => decryptDBItem(item, { path, encryptedVerificationKey })));
         res.decryptedData = decryptedData;
         return res;

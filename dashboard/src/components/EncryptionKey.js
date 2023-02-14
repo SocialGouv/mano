@@ -44,7 +44,8 @@ const EncryptionKey = ({ isMain }) => {
 
   const user = useRecoilValue(userState);
 
-  const persons = useRecoilValue(personsState);
+  // const persons = useRecoilValue(personsState);
+
   const groups = useRecoilValue(groupsState);
   const actions = useRecoilValue(actionsState);
   const consultations = useRecoilValue(consultationsState);
@@ -71,26 +72,45 @@ const EncryptionKey = ({ isMain }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, encryptionKey]);
 
-  const totalToEncrypt =
-    persons.length +
-    groups.length +
-    actions.length +
-    consultations.length +
-    treatments.length +
-    medicalFiles.length +
-    comments.length +
-    passages.length +
-    rencontres.length +
-    territories.length +
-    observations.length +
-    relsPersonPlace.length +
-    places.length +
-    reports.length;
-  const totalDurationOnServer = totalToEncrypt * 0.005; // average 5 ms in server
-
   if (!['admin'].includes(user.role)) return null;
 
+  // const defaultNotEncryptableFields = ['_id', 'createdAt', 'updatedAt', 'organisation', 'encrypted', 'encryptedEntityKey'];
+
   const onEncrypt = async (values) => {
+    const persons = await API.get({
+      path: '/person',
+      query: {
+        organisation: organisation._id,
+        limit: String(Number.MAX_SAFE_INTEGER),
+        page: String(0),
+        after: String(0),
+        withDeleted: true,
+        skipDecrypt: true,
+      },
+    });
+
+    // await Promise.all(persons.map((person) => preparePersonForEncryption(person, { checkRequiredFields: false })).map(encryptItem));
+    // debugger;
+    // return;
+
+    const totalToEncrypt =
+      persons.length +
+      groups.length +
+      actions.length +
+      consultations.length +
+      treatments.length +
+      medicalFiles.length +
+      comments.length +
+      passages.length +
+      rencontres.length +
+      territories.length +
+      observations.length +
+      relsPersonPlace.length +
+      places.length +
+      reports.length;
+
+    const totalDurationOnServer = totalToEncrypt * 0.005; // average 5 ms in server
+
     try {
       // just for the button to show loading state, sorry Raph I couldn't find anything better
       await new Promise((resolve) => setTimeout(resolve, 100));
@@ -240,7 +260,7 @@ const EncryptionKey = ({ isMain }) => {
           <div
             style={{
               backgroundColor: theme.black,
-              width: `${(encryptingProgress / totalDurationOnServer) * 100}%`,
+              width: `${(encryptingProgress / 200) * 100}%`,
               height: '100%',
             }}
           />
