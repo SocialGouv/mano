@@ -38,7 +38,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
 
   await page.getByLabel("Non").check();
 
-  await page.getByRole("button", { name: "Créer", exact: true }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Créer" }).click();
   await page.locator(".Toastify__close-button").last().click();
 
   /*
@@ -185,12 +185,18 @@ test("Create custom fields filtered by team", async ({ page }) => {
 
   await page.getByRole("button", { name: "Territoires" }).click();
 
-  await page.locator(`data-test-id=${testObsTerritoryField}`).getByText("Toute l'organisation").click();
+  await expect(page.locator(`[data-test-id=${testObsTerritoryField}]`)).toBeVisible();
+  await page.hover(`[data-test-id=${testObsTerritoryField}]`);
+  await page
+    .getByRole("button", {
+      name: `Modifier le champ ${testObsTerritoryField}`,
+    })
+    .click();
 
-  await page.locator(`data-test-id=${testObsTerritoryField}`).getByLabel(teamExcludeCustomFieldName).uncheck();
-
-  await page.getByRole("button", { name: "Mettre à jour" }).nth(1).click();
-  await page.locator(".Toastify__close-button").last().click();
+  await page.getByLabel("Activé pour toute l'organisation").uncheck();
+  await changeReactSelectValue(page, "enabledTeams", "Team Test - 4");
+  await page.getByRole("button", { name: "Enregistrer" }).click();
+  await page.getByText("Mise à jour !").click();
 
   /*
 

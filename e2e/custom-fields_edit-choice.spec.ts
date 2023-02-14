@@ -233,7 +233,13 @@ test("test", async ({ page }) => {
     await page.getByText("Choix mis à jour !").click();
 
     await page.getByRole("button", { name: "Territoires" }).click();
-    await page.locator('[data-test-id="Policiers"]').getByRole("button", { name: "Modifier le champ" }).click();
+
+    await page.hover('[data-test-id="Policiers"]');
+    await page
+      .getByRole("button", {
+        name: "Modifier le champ Policiers",
+      })
+      .click();
     await page.getByRole("button", { name: "Modifier le choix Très beaucoup" }).click();
     await page.getByPlaceholder("Très beaucoup").fill("Plein");
     page.once("dialog", (dialog) => {

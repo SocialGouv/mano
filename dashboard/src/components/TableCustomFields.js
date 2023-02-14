@@ -10,18 +10,9 @@ import DeleteButtonAndConfirmModal from './DeleteButtonAndConfirmModal';
 import TableCustomFieldteamSelector from './TableCustomFieldTeamSelector';
 import SelectDraggableAndEditable from './SelectDraggableAndEditable';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from './tailwind/Modal';
+import { newCustomField, typeOptions } from '../utils';
+import SelectTeamMultiple from './SelectTeamMultiple';
 
-const typeOptions = [
-  { value: 'text', label: 'Texte' },
-  { value: 'textarea', label: 'Zone de texte multi-lignes' },
-  { value: 'number', label: 'Nombre' },
-  { value: 'date', label: 'Date sans heure' },
-  { value: 'date-with-time', label: 'Date avec heure' },
-  { value: 'yes-no', label: 'Oui/Non' },
-  { value: 'enum', label: 'Choix dans une liste' },
-  { value: 'multi-choice', label: 'Choix multiple dans une liste' },
-  { value: 'boolean', label: 'Case à cocher' },
-];
 const getValueFromType = (type) => typeOptions.find((opt) => opt.value === type);
 
 const sanitizeFields = (field) => {
@@ -225,8 +216,10 @@ const TableCustomFields = ({
         />
       </div>
       <EditCustomField
+        open={!!editingField || isNewField}
         editingField={editingField}
         data={data}
+        onDelete={onDelete}
         onEditChoice={({ oldChoice, newChoice, field }) => {
           const updatedFields = mutableData.map((_field) =>
             _field.name !== field.name
@@ -259,20 +252,9 @@ const TableCustomFields = ({
   );
 };
 
-const newField = () => ({
-  // Todo: I guess could use crypto here.
-  name: `custom-${new Date().toISOString().split('.').join('-').split(':').join('-')}`,
-  label: '',
-  type: 'text',
-  enabled: true,
-  required: false,
-  showInStats: true,
-});
-
-const EditCustomField = ({ data, editingField, onClose, onSaveField, isNewField, onEditChoice, onlyOptionsEditable }) => {
-  const open = Boolean(editingField) || isNewField;
-  const [field, setField] = useState(() => editingField || newField());
-  const fieldIsUsed = useMemo(() => !!data.find((p) => p[field?.name]), [data, field]);
+export const EditCustomField = ({ open, onDelete, data, editingField, onClose, onSaveField, isNewField, onEditChoice, onlyOptionsEditable }) => {
+  const [field, setField] = useState(() => editingField || newCustomField());
+  const fieldIsUsed = useMemo(() => !isNewField && !!data.find((p) => p[field?.name]), [data, field?.name, isNewField]);
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -405,12 +387,50 @@ const EditCustomField = ({ data, editingField, onClose, onSaveField, isNewField,
               </>
             )}
           </div>
+          <div className="tw-basis-full tw-p-4">
+            <label htmlFor="enabledTeams" className="form-text tailwindui">
+              Activé pour
+            </label>
+            <SelectTeamMultiple
+              colored
+              inputId="enabledTeams"
+              classNamePrefix="enabledTeams"
+              onChange={(teamIds) => setField({ ...field, enabledTeams: teamIds })}
+              value={field.enabled ? [] : field.enabledTeams ?? []}
+              isDisabled={field.enabled}
+            />
+            <div>
+              <label className="tw-text-sm">
+                <input
+                  type="checkbox"
+                  className="tw-mr-2 tw-mt-2"
+                  name="enabled"
+                  id="enabled"
+                  checked={field.enabled}
+                  onChange={(e) => setField({ ...field, enabled: e.target.checked })}
+                />
+                <span>Activé pour toute l'organisation</span>
+              </label>
+            </div>
+          </div>
         </form>
       </ModalBody>
       <ModalFooter>
         <button type="button" name="cancel" className="button-cancel" onClick={onClose}>
           Annuler
         </button>
+        {!isNewField && (
+          <DeleteButtonAndConfirmModal
+            title={`Voulez-vous vraiment supprimer le champ ${editingField?.label}`}
+            textToConfirm={editingField?.label}
+            onConfirm={async () => onDelete(editingField)}>
+            <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
+              Cette opération est irréversible
+              <br />
+              et entrainera la suppression définitive de toutes les données enregistrées sous ce champ.
+            </span>
+          </DeleteButtonAndConfirmModal>
+        )}
         <button type="submit" className="button-submit" form="custom-field-form">
           Enregistrer
         </button>

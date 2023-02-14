@@ -15,7 +15,6 @@ import {
   personsState,
   usePreparePersonForEncryption,
 } from '../../recoil/persons';
-import { customFieldsObsSelector, prepareObsForEncryption, territoryObservationsState } from '../../recoil/territoryObservations';
 import TableCustomFields from '../../components/TableCustomFields';
 import { organisationState, userState } from '../../recoil/auth';
 import API, { encryptItem } from '../../services/api';
@@ -31,6 +30,7 @@ import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileFo
 import { useDataLoader } from '../../components/DataLoader';
 import ActionCategoriesSettings from './ActionCategoriesSettings';
 import ServicesSettings from './ServicesSettings';
+import ObservationsSettings from './ObservationsSettings';
 
 const getSettingTitle = (tabId) => {
   if (tabId === 'infos') return 'Infos';
@@ -54,10 +54,8 @@ const View = () => {
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
-  const customFieldsObs = useRecoilValue(customFieldsObsSelector);
 
   const medicalFiles = useRecoilValue(medicalFileState);
-  const territoryObservations = useRecoilValue(territoryObservationsState);
   const persons = useRecoilValue(personsState);
   const preparePersonForEncryption = usePreparePersonForEncryption();
   const [refreshErrorKey, setRefreshErrorKey] = useState(0);
@@ -327,7 +325,7 @@ const View = () => {
                           />
                         </div>
                         <hr />
-                        <ServicesSettings />
+                        <ServicesSettings key="reception" />
                       </div>
                     </>
                   );
@@ -361,51 +359,7 @@ const View = () => {
                         />
                       </div>
                       <hr />
-                      {organisation.encryptionEnabled ? (
-                        <>
-                          <Label>Champs personnalisés</Label>
-                          <TableCustomFields
-                            customFields="customFieldsObs"
-                            key={refreshErrorKey + 'customFieldsObs'}
-                            data={territoryObservations}
-                            fields={customFieldsObs}
-                            onEditChoice={async ({ oldChoice, newChoice, field, fields }) => {
-                              const updatedObservations = replaceOldChoiceByNewChoice(territoryObservations, oldChoice, newChoice, field);
-
-                              const response = await API.post({
-                                path: '/custom-field',
-                                body: {
-                                  customFields: {
-                                    customFieldsObs: fields,
-                                  },
-                                  observations: await Promise.all(updatedObservations.map(prepareObsForEncryption(fields)).map(encryptItem)),
-                                },
-                              });
-                              if (response.ok) {
-                                toast.success('Choix mis à jour !');
-                                setOrganisation(response.data);
-                              } else {
-                                setRefreshErrorKey((k) => k + 1); // to reset the table to its original values
-                              }
-                              refresh();
-                            }}
-                          />
-                        </>
-                      ) : (
-                        <>
-                          <Row>
-                            <Col md={10}>
-                              <p>
-                                Désolé, cette fonctionnalité qui consiste à personnaliser les champs disponibles pour les observations de territoires
-                                n'existe que pour les organisations chiffrées.
-                              </p>
-                            </Col>
-                          </Row>
-                          <div className="tw-mb-10 tw-flex tw-justify-end">
-                            <EncryptionKey />
-                          </div>
-                        </>
-                      )}
+                      <ObservationsSettings />
                     </>
                   );
                 case 'persons':

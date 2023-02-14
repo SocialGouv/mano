@@ -1,13 +1,9 @@
 import React, { useState } from 'react';
-import { Col, Button, FormGroup, Row, Modal, ModalBody, ModalHeader, Input } from 'reactstrap';
-import styled from 'styled-components';
-import { Formik } from 'formik';
 import { toast } from 'react-toastify';
 
-import ButtonCustom from './ButtonCustom';
-import { theme } from '../config';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../recoil/auth';
+import { ModalBody, ModalContainer, ModalHeader, ModalFooter } from './tailwind/Modal';
 
 const DeleteButtonAndConfirmModal = ({
   title,
@@ -22,76 +18,63 @@ const DeleteButtonAndConfirmModal = ({
   const [open, setOpen] = useState(false);
   return (
     <>
-      <ButtonCustom
-        title="Supprimer"
-        color="danger"
+      <button
+        type="button"
+        className="button-destructive"
         onClick={() => {
           if (!roles.includes(user.role)) return toast.error(roleErrorMessage);
           setOpen(true);
         }}
-        width={buttonWidth}
-      />
-      <StyledModal isOpen={open} toggle={() => setOpen(false)} size="lg" centered>
-        <ModalHeader toggle={() => setOpen(false)} color="danger">
-          <span style={{ color: theme.redDark, textAlign: 'center', display: 'block' }}>{title}</span>
+        style={buttonWidth ? { width: buttonWidth } : {}}>
+        Supprimer
+      </button>
+      <ModalContainer open={open} toggle={() => setOpen(false)} size="3xl">
+        <ModalHeader>
+          <div className="tw-px-4">
+            <p className="tw-block tw-text-center tw-text-xl tw-text-red-500">{title}</p>
+          </div>
         </ModalHeader>
         <ModalBody>
           {children}
-          <p style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
+          <p className="tw-mb-8 tw-block tw-w-full tw-text-center">
             Veuillez taper le texte ci-dessous pour confirmer
             <br />
             en respectant les majuscules, minuscules ou accents
             <br />
           </p>
-          <p className="tw-flex tw-break-all tw-justify-center tw-text-center">
-            <b style={{color: theme.redDark}}>{textToConfirm}</b>
+          <p className="tw-flex tw-justify-center tw-break-all tw-text-center">
+            <b className="tw-block tw-text-center tw-text-red-500">{textToConfirm}</b>
           </p>
-          <Formik
-            initialValues={{ textToConfirm: '' }}
-            onSubmit={async (values, { setSubmitting }) => {
-              if (!values.textToConfirm) return toast.error('Veuillez rentrer le texte demandé');
-              if (values.textToConfirm.trim().toLocaleLowerCase() !== textToConfirm.trim().toLocaleLowerCase()) {
+          <form
+            id={`delete-${textToConfirm}`}
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const _textToConfirm = Object.fromEntries(new FormData(e.target))?.textToConfirm;
+              if (!_textToConfirm) return toast.error('Veuillez rentrer le texte demandé');
+              if (_textToConfirm.trim().toLocaleLowerCase() !== textToConfirm.trim().toLocaleLowerCase()) {
                 return toast.error('Le texte renseigné est incorrect');
               }
-              if (values.textToConfirm.trim() !== textToConfirm.trim()) {
+              if (_textToConfirm.trim() !== textToConfirm.trim()) {
                 return toast.error('Veuillez respecter les minuscules/majuscules');
               }
               await onConfirm();
               setOpen(false);
-              setSubmitting(false);
-            }}>
-            {({ values, handleChange, handleSubmit, isSubmitting }) => (
-              <React.Fragment>
-                <Row style={{ justifyContent: 'center' }}>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Input name="textToConfirm" value={values.textToConfirm} onChange={handleChange} />
-                    </FormGroup>
-                  </Col>
-                </Row>
-                <br />
-                <Row style={{ justifyContent: 'center' }}>
-                  <Button color="danger" disabled={isSubmitting} onClick={() => !isSubmitting && handleSubmit()}>
-                    Supprimer
-                  </Button>
-                </Row>
-              </React.Fragment>
-            )}
-          </Formik>
+            }}
+            className="tw-flex tw-w-full tw-items-center tw-justify-center tw-px-12">
+            <input className="form-text tailwindui tw-basis-1/2" name="textToConfirm" placeholder={textToConfirm} type="text" />
+          </form>
         </ModalBody>
-      </StyledModal>
+        <ModalFooter>
+          <button type="button" name="cancel" className="button-cancel" onClick={() => setOpen(false)}>
+            Annuler
+          </button>
+          <button type="submit" className="button-destructive" form={`delete-${textToConfirm}`}>
+            Supprimer
+          </button>
+        </ModalFooter>
+      </ModalContainer>
     </>
   );
 };
-
-const StyledModal = styled(Modal)`
-  align-items: center;
-  .modal-title {
-    width: 100%;
-    flex-grow: 1;
-    padding: auto;
-    overflow-wrap: break-word;
-  }
-`;
 
 export default DeleteButtonAndConfirmModal;

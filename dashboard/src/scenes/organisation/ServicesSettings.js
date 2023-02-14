@@ -157,7 +157,7 @@ const AddService = ({ groupTitle, services, onDragAndDrop }) => {
         type="text"
         id="newService"
         name="newService"
-        className="form-text tw-my-1  tw-w-full tw-rounded tw-bg-white/50 tw-px-1.5 tw-py-1 placeholder:tw-opacity-80"
+        className="form-text tw-my-1 tw-w-full tw-rounded tw-bg-white/50 tw-px-1.5 tw-py-1 placeholder:tw-opacity-80"
         placeholder="Ajouter un service"
       />
       <button type="submit" className="tw-ml-4 tw-break-normal tw-rounded tw-bg-transparent hover:tw-underline">
@@ -307,12 +307,12 @@ const Service = ({ item: service, groupTitle }) => {
         </button>
       </div>
       <ModalContainer open={isEditingService}>
-        <ModalHeader title={`Éditer le service: ${service}`} />
+        <ModalHeader title={`Modifier le service: ${service}`} />
         <ModalBody>
           <form id="edit-service-form" className="tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8" onSubmit={onEditService}>
             <div>
               <label htmlFor="newService" className="form-text tailwindui">
-                Nouveau nom de le service
+                Nouveau nom du service
               </label>
               <input className="form-text tailwindui" id="newService" name="newService" type="text" placeholder={service} />
             </div>
