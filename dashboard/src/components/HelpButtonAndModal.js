@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import QuestionMarkButton from './QuestionMarkButton';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from './tailwind/Modal';
-import { capture } from '../services/sentry';
 
 const HelpButtonAndModal = ({ title, help }) => {
   const [helpOpen, setHelpOpen] = useState(false);
@@ -31,29 +30,9 @@ const HelpModal = ({ open, setOpen, title, help }) => {
           name="cancel"
           className="button-cancel"
           onClick={() => {
-            capture(`Pas compris l'aide de: ${title}`);
             setOpen(false);
           }}>
           Fermer
-        </button>
-        <button
-          type="button"
-          name="not-understood"
-          className="button-destructive"
-          onClick={() => {
-            capture(`Pas compris l'aide de: ${title}`);
-            setOpen(false);
-          }}>
-          Je n'ai pas compris
-        </button>
-        <button
-          type="button"
-          name="ok"
-          className="button-submit"
-          onClick={() => {
-            setOpen(false);
-          }}>
-          OK merci !
         </button>
       </ModalFooter>
     </ModalContainer>
