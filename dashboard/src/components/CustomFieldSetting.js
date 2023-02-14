@@ -22,16 +22,16 @@ const CustomFieldSetting = ({ customField }) => {
 const VisibleBy = ({ customField }) => {
   const { enabledTeams, enabled } = customField;
   const teams = useRecoilValue(teamsState);
-  if (!enabled && !enabledTeams?.length) {
-    return <>Non activé</>;
-  }
-  if (enabled || enabledTeams?.length === teams.length) {
-    return <>Visible par tous</>;
-  }
-  if (!enabled && enabledTeams?.length) {
+  if (!enabled) {
+    if (!enabledTeams?.length) {
+      return <>Non activé</>;
+    }
+    if (enabledTeams?.length === teams.length) {
+      return <>Visible par tous</>;
+    }
     return <>Visible par {enabledTeams.map((teamId) => teams.find((_team) => _team._id === teamId)?.name).join(', ')}</>;
   }
-  return 'Cas non pris';
+  return <>Visible par tous</>;
 };
 
 export default CustomFieldSetting;
