@@ -41,7 +41,6 @@
     "base64-js": "^1.5.1",
     "buffer": "^6.0.3",
     "dayjs": "^1.11.7",
-    "fast-sort": "^3.2.1",
     "fast-text-encoding": "^1.0.3",
     "fetch-retry": "^5.0.3",
     "javascript-time-ago": "^2.5.9",
