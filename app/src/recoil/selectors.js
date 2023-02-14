@@ -89,7 +89,6 @@ export const itemsGroupedByPersonSelector = selector({
     }
     const actions = Object.values(get(actionsWithCommentsSelector));
     const comments = get(commentsState);
-    console.log('LIDO: ');
     const consultations = get(consultationsState);
     const treatments = get(treatmentsState);
     const medicalFiles = get(medicalFileState);

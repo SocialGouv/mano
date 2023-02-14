@@ -78,10 +78,8 @@ class ApiService {
       options.retryDelay = 1000;
 
       const url = this.getUrl(path, query);
-      if (debug) console.log('ON VA FETCHER AVEC LURL', Date.now() - debug);
       console.log({ url });
       const response = await this.fetch(url, options);
-      if (debug) console.log('ON A FETCHE AVEC LURL', Date.now() - debug);
       if (!response.ok && response.status === 401) {
         if (this.logout) this.logout('401');
         if (this.handleLogoutError) this.handleLogoutError();
@@ -107,13 +105,11 @@ class ApiService {
           return res;
         }
         if (!!res.data && Array.isArray(res.data)) {
-          if (debug) console.log('ON DECRYPTE', Date.now() - debug);
           const decryptedData = [];
           for (const item of res.data) {
             const decryptedItem = await this.decryptDBItem(item, { debug, path });
             decryptedData.push(decryptedItem);
           }
-          if (debug) console.log('ON A DECRYPTÉ', Date.now() - debug);
           res.decryptedData = decryptedData;
           return res;
         }

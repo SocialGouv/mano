@@ -22,10 +22,9 @@ export const initCacheAndcheckIfExpired = () => {
 initCacheAndcheckIfExpired();
 
 // Get data from cache or fetch from server.
-export async function getData({ collectionName, debug, setProgress = () => {}, lastRefresh = 0 }) {
+export async function getData({ collectionName, setProgress = () => {}, lastRefresh = 0 }) {
   const response = await API.get({
     path: `/${collectionName}`,
-    debug,
     batch: 2000,
     setProgress,
     query: { after: lastRefresh, withDeleted: Boolean(lastRefresh) },
