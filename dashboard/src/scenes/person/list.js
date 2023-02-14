@@ -87,11 +87,6 @@ const filterPersonsWithAllFieldsSelector = selector({
         field: 'places',
         options: [...new Set(places.map((place) => place.name))],
       },
-      {
-        field: 'hasAtLeastOneConsultation',
-        label: 'A eu une consultation',
-        type: 'boolean',
-        },
     ];
   },
 });
