@@ -1,3 +1,10 @@
+## [1.242.15](https://github.com/SocialGouv/mano/compare/v1.242.14...v1.242.15) (2023-02-14)
+
+
+### Bug Fixes
+
+* **dashoard:** mots trop longs dans l'affichage en mode liste et hebdo de l'agenda + suppression style{} ([#1322](https://github.com/SocialGouv/mano/issues/1322)) ([be41349](https://github.com/SocialGouv/mano/commit/be41349e0ff7d32e816df83c97100fb253bdb39b))
+
 ## [1.242.14](https://github.com/SocialGouv/mano/compare/v1.242.13...v1.242.14) (2023-02-14)
 
 
