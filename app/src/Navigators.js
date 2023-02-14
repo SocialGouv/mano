@@ -195,11 +195,8 @@ const TabNavigator = () => {
   const organisation = useRecoilValue(organisationState);
   const fullScreen = useRecoilValue(loaderFullScreenState);
 
-  console.log('lalilala');
-
   if (fullScreen) return null;
 
-  console.log('LALILALA');
   return (
     <Tab.Navigator
       initialRouteName="Agenda"

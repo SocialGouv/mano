@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { Dimensions } from 'react-native';
-import { sort, createNewSortInstance } from 'fast-sort';
 import API from '../services/api';
 import { MyText } from './MyText';
 import colors from '../utils/colors';
@@ -57,10 +56,10 @@ export const refreshTriggerState = atom({
   },
 });
 
-export const mergeItems = (oldItems, newItems) => {
-  const newItemsIds = newItems.map((i) => i._id);
+export const mergeItems = (oldItems, newItems = []) => {
+  const newItemsIds = newItems?.map((i) => i._id) || [];
   const oldItemsPurged = oldItems.filter((i) => !newItemsIds.includes(i._id));
-  return [...oldItemsPurged, ...newItems];
+  return [...oldItemsPurged, ...newItems].filter((e) => !e.deletedAt);
 };
 
 export const DataLoader = () => {
@@ -134,8 +133,6 @@ export const DataLoader = () => {
       response.data.groups +
       response.data.relsPersonPlace;
 
-    console.log({ total, lastRefresh });
-
     // medical data is never saved in cache
     // so we always have to download all at every page reload
     const medicalDataResponse = await API.get({
@@ -152,8 +149,6 @@ export const DataLoader = () => {
 
     total = total + medicalDataResponse.data.consultations + medicalDataResponse.data.treatments + medicalDataResponse.data.medicalFiles;
 
-    console.log({ total });
-
     if (initialLoad) {
       const numberOfCollections = 9;
       total = total + numberOfCollections; // for the progress bar to be beautiful
@@ -162,259 +157,196 @@ export const DataLoader = () => {
     /*
     Get persons
     */
-    console.log('response.data.persons', response.data.persons, persons.length);
-    const now = Date.now();
     if (response.data.persons) {
       setLoading('Chargement des personnes');
       const refreshedPersons = await getData({
         collectionName: 'person',
-        debug: now,
         data: persons,
-        isInitialization: initialLoad,
-        setProgress: (batch) => {
-          console.log('UNE BATCH A LA FOIS', Date.now() - now);
-          setProgress((p) => (p * total + batch) / total);
-        },
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
-        setBatchData: (newPersons) => setPersons((oldPersons) => (initialLoad ? [...oldPersons, ...newPersons] : mergeItems(oldPersons, newPersons))),
-        API,
       });
-      console.log('ON A TOUT FETCH', Date.now() - now);
       if (refreshedPersons) {
         const newPersons = refreshedPersons.map((p) => ({ ...p, followedSince: p.followedSince || p.createdAt }));
-        console.log('ON A TOUT MODIFIÉ', Date.now() - now);
-        const sortedPersons = newPersons.sort(sortByName);
-        console.log('ON A TOUT TRIÉ', Date.now() - now);
-        setPersons(sortedPersons);
-        console.log('ON A SET STATE', Date.now() - now);
+        setPersons((oldPersons) => mergeItems(oldPersons, newPersons).sort(sortByName));
       }
     }
     /*
     Get groups
     */
-    console.log('response.data.groups', response.data.groups);
     if (response.data.groups) {
       setLoading('Chargement des familles');
       const refreshedGroups = await getData({
         collectionName: 'group',
         data: groups,
-        isInitialization: initialLoad,
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
-        setBatchData: (newGroups) => {
-          setGroups((oldGroups) => (initialLoad ? [...oldGroups, ...newGroups] : mergeItems(oldGroups, newGroups)));
-        },
-        API,
       });
-      if (refreshedGroups) setGroups(refreshedGroups);
+      if (refreshedGroups) {
+        setGroups((oldGroups) => mergeItems(oldGroups, refreshedGroups));
+      }
     }
     /*
     Get consultations
     */
-    console.log('response.data.consultations', response.data.consultations);
     if (medicalDataResponse.data.consultations || initialLoad) {
       setLoading('Chargement des consultations');
       const refreshedConsultations = await getData({
         collectionName: 'consultation',
         data: consultations,
-        isInitialization: initialLoad,
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
-        setBatchData: (newConsultations) =>
-          setConsultations((oldConsultations) =>
-            initialLoad
-              ? [...oldConsultations, ...newConsultations.map(formatConsultation)]
-              : mergeItems(oldConsultations, newConsultations.map(formatConsultation))
-          ),
-        API,
       });
-      if (refreshedConsultations) setConsultations(refreshedConsultations.map(formatConsultation));
+      if (refreshedConsultations) {
+        setConsultations((oldConsultations) => mergeItems(oldConsultations, refreshedConsultations.map(formatConsultation)));
+      }
     }
     /*
     Get treatments
     */
-    console.log('response.data.treatments', response.data.treatments);
     if (medicalDataResponse.data.treatments || initialLoad) {
       setLoading('Chargement des traitements');
       const refreshedTreatments = await getData({
         collectionName: 'treatment',
         data: treatments,
-        isInitialization: initialLoad,
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
-        setBatchData: (newTreatments) =>
-          setTreatments((oldTreatments) => (initialLoad ? [...oldTreatments, ...newTreatments] : mergeItems(oldTreatments, newTreatments))),
-        API,
       });
-      if (refreshedTreatments) setTreatments(refreshedTreatments);
+      if (refreshedTreatments) {
+        setTreatments((oldTreatments) => mergeItems(oldTreatments, refreshedTreatments));
+      }
     }
     /*
       Get medicalFiles
       */
-    console.log('response.data.medicalFiles', response.data.medicalFiles);
     if (medicalDataResponse.data.medicalFiles || initialLoad) {
       setLoading('Chargement des informations médicales');
       const refreshedMedicalFiles = await getData({
         collectionName: 'medical-file',
         data: medicalFiles,
-        isInitialization: initialLoad,
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
-        setBatchData: (newMedicalFiles) =>
-          setMedicalFiles((oldMedicalFiles) =>
-            initialLoad ? [...oldMedicalFiles, ...newMedicalFiles] : mergeItems(oldMedicalFiles, newMedicalFiles)
-          ),
-        API,
       });
-      if (refreshedMedicalFiles) setMedicalFiles(refreshedMedicalFiles);
+      if (refreshedMedicalFiles) {
+        setMedicalFiles((oldMedicalFiles) => mergeItems(oldMedicalFiles, refreshedMedicalFiles));
+      }
     }
     /*
     Get actions
     */
-    console.log('response.data.actions', response.data.actions);
     if (response.data.actions) {
       setLoading('Chargement des actions');
       const refreshedActions = await getData({
         collectionName: 'action',
         data: actions,
-        isInitialization: initialLoad,
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
-        setBatchData: (newActions) => {
-          setActions((oldActions) => (initialLoad ? [...oldActions, ...newActions] : mergeItems(oldActions, newActions)));
-        },
-        API,
       });
-      if (refreshedActions) setActions(refreshedActions);
+      if (refreshedActions) {
+        setActions((oldActions) => mergeItems(oldActions, refreshedActions));
+      }
     }
 
     /*
     Get territories
     */
-    console.log('response.data.territories', response.data.territories);
     if (response.data.territories) {
       setLoading('Chargement des territoires');
       const refreshedTerritories = await getData({
         collectionName: 'territory',
         data: territories,
-        isInitialization: initialLoad,
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
-        setBatchData: (newTerritories) =>
-          setTerritories((oldTerritories) => (initialLoad ? [...oldTerritories, ...newTerritories] : mergeItems(oldTerritories, newTerritories))),
-        API,
       });
-      if (refreshedTerritories) setTerritories(refreshedTerritories);
+      if (refreshedTerritories) {
+        setTerritories((oldTerritories) => mergeItems(oldTerritories, refreshedTerritories));
+      }
     }
     /*
     Get places
     */
-    console.log('response.data.places', response.data.places);
     if (response.data.places) {
       setLoading('Chargement des lieux');
       const refreshedPlaces = await getData({
         collectionName: 'place',
         data: places,
-        isInitialization: initialLoad,
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
-        setBatchData: (newPlaces) => setPlaces((oldPlaces) => (initialLoad ? [...oldPlaces, ...newPlaces] : mergeItems(oldPlaces, newPlaces))),
-        API,
       });
-      if (refreshedPlaces) setPlaces(refreshedPlaces.sort((p1, p2) => p1.name.localeCompare(p2.name)));
+      if (refreshedPlaces) {
+        setPlaces((oldPlaces) => mergeItems(oldPlaces, refreshedPlaces).sort((p1, p2) => p1.name.localeCompare(p2.name)));
+      }
     }
-    console.log('response.data.relsPersonPlace', response.data.relsPersonPlace);
     if (response.data.relsPersonPlace) {
       const refreshedRelPersonPlaces = await getData({
         collectionName: 'relPersonPlace',
         data: relsPersonPlace,
-        isInitialization: initialLoad,
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
-        setBatchData: (newRelPerPlace) =>
-          setRelsPersonPlace((oldRelPerPlace) => (initialLoad ? [...oldRelPerPlace, ...newRelPerPlace] : mergeItems(oldRelPerPlace, newRelPerPlace))),
-        API,
       });
-      if (refreshedRelPersonPlaces) setRelsPersonPlace(refreshedRelPersonPlaces);
+      if (refreshedRelPersonPlaces) {
+        setRelsPersonPlace((oldRelsPersonPlace) => mergeItems(oldRelsPersonPlace, refreshedRelPersonPlaces));
+      }
     }
     /*
     Get observations territories
     */
-    console.log('response.data.territoryObservations', response.data.territoryObservations);
     if (response.data.territoryObservations) {
       setLoading('Chargement des observations');
       const refreshedObs = await getData({
         collectionName: 'territory-observation',
         data: territoryObservations,
-        isInitialization: initialLoad,
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
-        setBatchData: (newObs) => setTerritoryObs((oldObs) => (initialLoad ? [...oldObs, ...newObs] : mergeItems(oldObs, newObs))),
-        API,
       });
-      if (refreshedObs) setTerritoryObs(refreshedObs);
+      if (refreshedObs) {
+        setTerritoryObs((oldObs) => mergeItems(oldObs, refreshedObs));
+      }
     }
     /*
     Get comments
     */
-    console.log('response.data.comments', response.data.comments);
-    const now2 = Date.now();
     if (response.data.comments) {
       setLoading('Chargement des commentaires');
       const refreshedComments = await getData({
         collectionName: 'comment',
         data: comments,
-        debug: now2,
-        isInitialization: initialLoad,
-        setProgress: (batch) => {
-          setProgress((p) => (p * total + batch) / total);
-          console.log('ON A UNE BATCH', Date.now() - now2);
-        },
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
-        setBatchData: (newComments) =>
-          setComments((oldComments) => (initialLoad ? [...oldComments, ...newComments] : mergeItems(oldComments, newComments))),
-        API,
       });
-      console.log('ON A TOUS LES COMMENTAIRES', Date.now() - now2);
-      if (refreshedComments) setComments(refreshedComments);
-      console.log('ON A TOUS LES COMMENTAIRES DEFINITOS', Date.now() - now2);
+      if (refreshedComments) {
+        setComments((oldComments) => mergeItems(oldComments, refreshedComments));
+      }
     }
 
     /*
     Get passages
     */
-    console.log('response.data.passages', response.data.passages);
     if (response.data.passages) {
       setLoading('Chargement des passages');
       const refreshedRencontres = await getData({
         collectionName: 'passage',
         data: passages,
-        isInitialization: initialLoad,
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
-        setBatchData: (newPassages) =>
-          setPassages((oldPassages) => (initialLoad ? [...oldPassages, ...newPassages] : mergeItems(oldPassages, newPassages))),
-        API,
       });
-      if (refreshedRencontres) setPassages(refreshedRencontres);
+      if (refreshedRencontres) {
+        setPassages((oldPassages) => mergeItems(oldPassages, refreshedRencontres));
+      }
     }
     /*
     Get rencontres
     */
-    console.log('response.data.rencontres', response.data.rencontres);
     if (response.data.rencontres) {
       setLoading('Chargement des rencontres');
       const refreshedRencontres = await getData({
         collectionName: 'rencontre',
         data: rencontres,
-        isInitialization: initialLoad,
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
-        setBatchData: (newRencontres) =>
-          setRencontres((oldRencontres) => (initialLoad ? [...oldRencontres, ...newRencontres] : mergeItems(oldRencontres, newRencontres))),
-        API,
       });
-      if (refreshedRencontres) setRencontres(refreshedRencontres);
+      if (refreshedRencontres) {
+        setRencontres((oldRencontres) => mergeItems(oldRencontres, refreshedRencontres));
+      }
     }
 
     /*
@@ -430,22 +362,17 @@ export const DataLoader = () => {
     QUICK WIN: filter those reports from recoil state
     */
 
-    console.log('response.data.reports', response.data.reports);
     if (response.data.reports) {
       setLoading('Chargement des comptes-rendus');
       const refreshedReports = await getData({
         collectionName: 'report',
         data: reports,
-        isInitialization: initialLoad,
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
-        setBatchData: (newReports) => {
-          newReports = newReports.filter((r) => !!r.team && !!r.date);
-          setReports((oldReports) => (initialLoad ? [...oldReports, ...newReports] : mergeItems(oldReports, newReports)));
-        },
-        API,
       });
-      if (refreshedReports) setReports(refreshedReports.filter((r) => !!r.team && !!r.date));
+      if (refreshedReports) {
+        setReports((oldReports) => mergeItems(oldReports, refreshedReports).filter((r) => !!r.team && !!r.date));
+      }
     }
 
     /*
@@ -477,7 +404,6 @@ export const LoaderProgress = () => {
   const loading = useRecoilValue(loadingState);
   const progress = useRecoilValue(progressState);
   const fullScreen = useRecoilValue(loaderFullScreenState);
-  console.log('render Loader', { fullScreen, loading, progress });
 
   const picture = useRef([picture1, picture3, picture2][randomIntFromInterval(0, 2)]);
 
