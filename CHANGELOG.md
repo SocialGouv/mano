@@ -1,3 +1,10 @@
+## [1.242.14](https://github.com/SocialGouv/mano/compare/v1.242.13...v1.242.14) (2023-02-14)
+
+
+### Bug Fixes
+
+* **dashboard:** toujours ajouter un timezone français dans les dates du datepicker pour éviter les décalages ([#1327](https://github.com/SocialGouv/mano/issues/1327)) ([7eb5c73](https://github.com/SocialGouv/mano/commit/7eb5c7310c1f64b612e152e6bf6da5e29c7e6fa5))
+
 ## [1.242.13](https://github.com/SocialGouv/mano/compare/v1.242.12...v1.242.13) (2023-02-13)
 
 
