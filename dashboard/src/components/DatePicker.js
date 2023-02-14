@@ -22,7 +22,7 @@ export default function DatePicker({ onChange, defaultValue, id, withTime = fals
       type={withTime ? 'datetime-local' : 'date'}
       defaultValue={dateForInputDate(defaultValue, withTime)}
       onChange={(e) => {
-        onChange({ ...e, target: { ...e.target, value: dateFromInputDate(e.target.value) } });
+        onChange({ target: { name: e.target.name, value: dateFromInputDate(e.target.value) } });
       }}
       min={dateForInputDate(LEFT_BOUNDARY_DATE, withTime)}
       max={dateForInputDate(RIGHT_BOUNDARY_DATE, withTime)}
