@@ -42,7 +42,7 @@ export default function InfosSociales({ person }) {
 
 function InfoSocialeLine({ label, value, type = 'text' }) {
   return (
-    <div className="my-2">
+    <div className="my-2 [overflow-wrap:anywhere]">
       <div className="tw-text-sm tw-font-semibold tw-text-gray-600">{label}</div>
       <div>
         <CustomFieldDisplay type={type} value={value} />

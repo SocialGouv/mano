@@ -222,6 +222,8 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                         <div className="tw-flex-1">Informations sociales</div>
                         <div>{!openPanels.includes('social') ? '+' : '-'}</div>
                       </div>
+
+                      <div className="[overflow-wrap:anywhere]">
                       {openPanels.includes('social') && (
                         <Row>
                           {customFieldsPersonsSocial
@@ -231,6 +233,7 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                             ))}
                         </Row>
                       )}
+                      </div>
                     </div>
                   )}
                   {!['restricted-access'].includes(user.role) && (
@@ -247,6 +250,7 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                         <div className="tw-flex-1">Informations médicales</div>
                         <div>{!openPanels.includes('medical') ? '+' : '-'}</div>
                       </div>
+                      <div className="[overflow-wrap:anywhere]">
                       {openPanels.includes('medical') && (
                         <Row>
                           {customFieldsPersonsMedical
@@ -256,6 +260,7 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                             ))}
                         </Row>
                       )}
+                      </div>
                     </div>
                   )}
                 </div>
