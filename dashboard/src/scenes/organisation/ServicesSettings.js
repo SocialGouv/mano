@@ -96,8 +96,6 @@ const ServicesSettings = () => {
     [organisation._id, refresh, setOrganisation]
   );
 
-  console.log({ dataFormatted, groupedServices, organisation });
-
   return (
     <DragAndDropSettings
       title="Services"
