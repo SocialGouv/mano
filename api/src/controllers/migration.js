@@ -279,13 +279,6 @@ router.put(
               await comment.save();
             }
           }
-          if (req.body.commentsToUpdate.length > 0) {
-            capture(`comments-reset-person-id migration done with ${req.body.commentsToUpdate.length} comments`, {
-              extra: {
-                organisation: req.user.organisation,
-              },
-            });
-          }
         }
 
         organisation.set({
