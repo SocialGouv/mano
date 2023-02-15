@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { Animated } from 'react-native';
 import * as Sentry from '@sentry/react-native';
 import SceneContainer from '../../components/SceneContainer';
@@ -14,6 +14,19 @@ import { selector, selectorFamily, useRecoilState, useRecoilValue } from 'recoil
 import { loadingState, refreshTriggerState } from '../../components/Loader';
 import { formatBirthDate } from '../../services/dateDayjs';
 import { filterBySearch } from '../../utils/search';
+import { personsState } from '../../recoil/persons';
+
+const personsWithFormattedBirthDateSelector = selector({
+  key: 'personsWithFormattedBirthDateSelector',
+  get: ({ get }) => {
+    const persons = get(personsState);
+    const personsWithBirthdateFormatted = persons.map((person) => ({
+      ...person,
+      birthDate: formatBirthDate(person.birthDate),
+    }));
+    return personsWithBirthdateFormatted;
+  },
+});
 
 const arrayOfitemsGroupedByPersonSelector = selector({
   key: 'arrayOfitemsGroupedByPersonSelector',
@@ -65,7 +78,7 @@ const personsFilteredBySearchSelector = selectorFamily({
     ({ filterTeams, filterOutOfActiveList, filterAlertness, search }) =>
     ({ get }) => {
       if (!search?.length && !filterTeams.length && !filterOutOfActiveList && !filterAlertness) {
-        const persons = get(personsPopulatedWithFormattedBirthDateSelector);
+        const persons = get(personsWithFormattedBirthDateSelector);
         return persons;
       }
 
@@ -106,10 +119,10 @@ const PersonsList = ({ navigation, route }) => {
   const onFiltersPress = () => navigation.push('PersonsFilter', route.params);
 
   const keyExtractor = (person) => person._id;
-  const ListFooterComponent = () => {
+  const ListFooterComponent = useCallback(() => {
     if (!filteredPersons.length) return null;
     return <ListNoMorePersons />;
-  };
+  }, [filteredPersons.length]);
   const renderPersonRow = ({ item: person }) => {
     const onPress = () => {
       Sentry.setContext('person', { _id: person._id });
