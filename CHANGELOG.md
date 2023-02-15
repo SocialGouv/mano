@@ -1,3 +1,10 @@
+## [1.243.4](https://github.com/SocialGouv/mano/compare/v1.243.3...v1.243.4) (2023-02-15)
+
+
+### Bug Fixes
+
+* **app:** chargement plus rapide de la liste de personnes ([#1331](https://github.com/SocialGouv/mano/issues/1331)) ([3898085](https://github.com/SocialGouv/mano/commit/38980853592489c5821f788dcf0a9b8ea4ceb62f))
+
 ## [1.243.3](https://github.com/SocialGouv/mano/compare/v1.243.2...v1.243.3) (2023-02-15)
 
 
