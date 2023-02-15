@@ -87,6 +87,8 @@ export const itemsGroupedByPersonSelector = selector({
     for (const person of persons) {
       personsObject[person._id] = { ...person };
     }
+    const now = Date.now();
+    console.log('here');
     const actions = Object.values(get(actionsWithCommentsSelector));
     const comments = get(commentsState);
     const consultations = get(consultationsState);
