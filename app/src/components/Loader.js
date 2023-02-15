@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { Dimensions } from 'react-native';
 import API from '../services/api';
@@ -7,7 +7,7 @@ import colors from '../utils/colors';
 import picture1 from '../assets/MANO_livraison_elements-04.png';
 import picture2 from '../assets/MANO_livraison_elements-05.png';
 import picture3 from '../assets/MANO_livraison_elements_Plan_de_travail.png';
-import { atom, useRecoilState, useSetRecoilState } from 'recoil';
+import { atom, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { appCurrentCacheKey, getData } from '../services/dataManagement';
 import { useMMKVNumber } from 'react-native-mmkv';
 import { organisationState, userState } from '../recoil/auth';
@@ -56,19 +56,18 @@ export const refreshTriggerState = atom({
   },
 });
 
-export const mergeItems = (oldItems, newItems) => {
-  const newItemsIds = newItems.map((i) => i._id);
+export const mergeItems = (oldItems, newItems = []) => {
+  const newItemsIds = newItems?.map((i) => i._id) || [];
   const oldItemsPurged = oldItems.filter((i) => !newItemsIds.includes(i._id));
-  return [...oldItemsPurged, ...newItems];
+  return [...oldItemsPurged, ...newItems].filter((e) => !e.deletedAt);
 };
 
-const Loader = () => {
-  const [picture, setPicture] = useState([picture1, picture3, picture2][randomIntFromInterval(0, 2)]);
+export const DataLoader = () => {
   const [lastRefresh, setLastRefresh] = useMMKVNumber(appCurrentCacheKey);
 
-  const [loading, setLoading] = useRecoilState(loadingState);
-  const [progress, setProgress] = useRecoilState(progressState);
-  const [fullScreen, setFullScreen] = useRecoilState(loaderFullScreenState);
+  const setLoading = useSetRecoilState(loadingState);
+  const setProgress = useSetRecoilState(progressState);
+  const setFullScreen = useSetRecoilState(loaderFullScreenState);
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const setUser = useSetRecoilState(userState);
   const organisationId = organisation?._id;
@@ -158,36 +157,33 @@ const Loader = () => {
     /*
     Get persons
     */
-    if (initialLoad || response.data.persons) {
+    if (response.data.persons) {
       setLoading('Chargement des personnes');
       const refreshedPersons = await getData({
         collectionName: 'person',
         data: persons,
-        isInitialization: initialLoad,
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
-        setBatchData: (newPersons) => setPersons((oldPersons) => (initialLoad ? [...oldPersons, ...newPersons] : mergeItems(oldPersons, newPersons))),
-        API,
       });
-      if (refreshedPersons) setPersons(refreshedPersons.map((p) => ({ ...p, followedSince: p.followedSince || p.createdAt })).sort(sortByName));
+      if (refreshedPersons) {
+        const newPersons = refreshedPersons.map((p) => ({ ...p, followedSince: p.followedSince || p.createdAt }));
+        setPersons((oldPersons) => mergeItems(oldPersons, newPersons).sort(sortByName));
+      }
     }
     /*
     Get groups
     */
-    if (initialLoad || response.data.groups) {
+    if (response.data.groups) {
       setLoading('Chargement des familles');
       const refreshedGroups = await getData({
         collectionName: 'group',
         data: groups,
-        isInitialization: initialLoad,
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
-        setBatchData: (newGroups) => {
-          setGroups((oldGroups) => (initialLoad ? [...oldGroups, ...newGroups] : mergeItems(oldGroups, newGroups)));
-        },
-        API,
       });
-      if (refreshedGroups) setGroups(refreshedGroups);
+      if (refreshedGroups) {
+        setGroups((oldGroups) => mergeItems(oldGroups, refreshedGroups));
+      }
     }
     /*
     Get consultations
@@ -197,18 +193,12 @@ const Loader = () => {
       const refreshedConsultations = await getData({
         collectionName: 'consultation',
         data: consultations,
-        isInitialization: initialLoad,
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
-        setBatchData: (newConsultations) =>
-          setConsultations((oldConsultations) =>
-            initialLoad
-              ? [...oldConsultations, ...newConsultations.map(formatConsultation)]
-              : mergeItems(oldConsultations, newConsultations.map(formatConsultation))
-          ),
-        API,
       });
-      if (refreshedConsultations) setConsultations(refreshedConsultations.map(formatConsultation));
+      if (refreshedConsultations) {
+        setConsultations((oldConsultations) => mergeItems(oldConsultations, refreshedConsultations.map(formatConsultation)));
+      }
     }
     /*
     Get treatments
@@ -218,14 +208,12 @@ const Loader = () => {
       const refreshedTreatments = await getData({
         collectionName: 'treatment',
         data: treatments,
-        isInitialization: initialLoad,
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
-        setBatchData: (newTreatments) =>
-          setTreatments((oldTreatments) => (initialLoad ? [...oldTreatments, ...newTreatments] : mergeItems(oldTreatments, newTreatments))),
-        API,
       });
-      if (refreshedTreatments) setTreatments(refreshedTreatments);
+      if (refreshedTreatments) {
+        setTreatments((oldTreatments) => mergeItems(oldTreatments, refreshedTreatments));
+      }
     }
     /*
       Get medicalFiles
@@ -235,153 +223,130 @@ const Loader = () => {
       const refreshedMedicalFiles = await getData({
         collectionName: 'medical-file',
         data: medicalFiles,
-        isInitialization: initialLoad,
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
-        setBatchData: (newMedicalFiles) =>
-          setMedicalFiles((oldMedicalFiles) =>
-            initialLoad ? [...oldMedicalFiles, ...newMedicalFiles] : mergeItems(oldMedicalFiles, newMedicalFiles)
-          ),
-        API,
       });
-      if (refreshedMedicalFiles) setMedicalFiles(refreshedMedicalFiles);
+      if (refreshedMedicalFiles) {
+        setMedicalFiles((oldMedicalFiles) => mergeItems(oldMedicalFiles, refreshedMedicalFiles));
+      }
     }
     /*
     Get actions
     */
-    if (initialLoad || response.data.actions) {
+    if (response.data.actions) {
       setLoading('Chargement des actions');
       const refreshedActions = await getData({
         collectionName: 'action',
         data: actions,
-        isInitialization: initialLoad,
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
-        setBatchData: (newActions) => {
-          setActions((oldActions) => (initialLoad ? [...oldActions, ...newActions] : mergeItems(oldActions, newActions)));
-        },
-        API,
       });
-      if (refreshedActions) setActions(refreshedActions);
+      if (refreshedActions) {
+        setActions((oldActions) => mergeItems(oldActions, refreshedActions));
+      }
     }
 
     /*
-    Switch to not full screen
-    */
-    setFullScreen(false);
-    /*
     Get territories
     */
-    if (initialLoad || response.data.territories) {
+    if (response.data.territories) {
       setLoading('Chargement des territoires');
       const refreshedTerritories = await getData({
         collectionName: 'territory',
         data: territories,
-        isInitialization: initialLoad,
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
-        setBatchData: (newTerritories) =>
-          setTerritories((oldTerritories) => (initialLoad ? [...oldTerritories, ...newTerritories] : mergeItems(oldTerritories, newTerritories))),
-        API,
       });
-      if (refreshedTerritories) setTerritories(refreshedTerritories);
+      if (refreshedTerritories) {
+        setTerritories((oldTerritories) => mergeItems(oldTerritories, refreshedTerritories));
+      }
     }
     /*
     Get places
     */
-    if (initialLoad || response.data.places) {
+    if (response.data.places) {
       setLoading('Chargement des lieux');
       const refreshedPlaces = await getData({
         collectionName: 'place',
         data: places,
-        isInitialization: initialLoad,
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
-        setBatchData: (newPlaces) => setPlaces((oldPlaces) => (initialLoad ? [...oldPlaces, ...newPlaces] : mergeItems(oldPlaces, newPlaces))),
-        API,
       });
-      if (refreshedPlaces) setPlaces(refreshedPlaces.sort((p1, p2) => p1.name.localeCompare(p2.name)));
+      if (refreshedPlaces) {
+        setPlaces((oldPlaces) => mergeItems(oldPlaces, refreshedPlaces).sort((p1, p2) => p1.name.localeCompare(p2.name)));
+      }
     }
-    if (initialLoad || response.data.relsPersonPlace) {
+    if (response.data.relsPersonPlace) {
       const refreshedRelPersonPlaces = await getData({
         collectionName: 'relPersonPlace',
         data: relsPersonPlace,
-        isInitialization: initialLoad,
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
-        setBatchData: (newRelPerPlace) =>
-          setRelsPersonPlace((oldRelPerPlace) => (initialLoad ? [...oldRelPerPlace, ...newRelPerPlace] : mergeItems(oldRelPerPlace, newRelPerPlace))),
-        API,
       });
-      if (refreshedRelPersonPlaces) setRelsPersonPlace(refreshedRelPersonPlaces);
+      if (refreshedRelPersonPlaces) {
+        setRelsPersonPlace((oldRelsPersonPlace) => mergeItems(oldRelsPersonPlace, refreshedRelPersonPlaces));
+      }
     }
     /*
     Get observations territories
     */
-    if (initialLoad || response.data.territoryObservations) {
+    if (response.data.territoryObservations) {
       setLoading('Chargement des observations');
       const refreshedObs = await getData({
         collectionName: 'territory-observation',
         data: territoryObservations,
-        isInitialization: initialLoad,
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
-        setBatchData: (newObs) => setTerritoryObs((oldObs) => (initialLoad ? [...oldObs, ...newObs] : mergeItems(oldObs, newObs))),
-        API,
       });
-      if (refreshedObs) setTerritoryObs(refreshedObs);
+      if (refreshedObs) {
+        setTerritoryObs((oldObs) => mergeItems(oldObs, refreshedObs));
+      }
     }
     /*
     Get comments
     */
-    if (initialLoad || response.data.comments) {
+    if (response.data.comments) {
       setLoading('Chargement des commentaires');
       const refreshedComments = await getData({
         collectionName: 'comment',
         data: comments,
-        isInitialization: initialLoad,
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
-        setBatchData: (newComments) =>
-          setComments((oldComments) => (initialLoad ? [...oldComments, ...newComments] : mergeItems(oldComments, newComments))),
-        API,
       });
-      if (refreshedComments) setComments(refreshedComments);
+      if (refreshedComments) {
+        setComments((oldComments) => mergeItems(oldComments, refreshedComments));
+      }
     }
 
     /*
     Get passages
     */
-    if (initialLoad || response.data.passages) {
+    if (response.data.passages) {
       setLoading('Chargement des passages');
       const refreshedRencontres = await getData({
         collectionName: 'passage',
         data: passages,
-        isInitialization: initialLoad,
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
-        setBatchData: (newPassages) =>
-          setPassages((oldPassages) => (initialLoad ? [...oldPassages, ...newPassages] : mergeItems(oldPassages, newPassages))),
-        API,
       });
-      if (refreshedRencontres) setPassages(refreshedRencontres);
+      if (refreshedRencontres) {
+        setPassages((oldPassages) => mergeItems(oldPassages, refreshedRencontres));
+      }
     }
     /*
     Get rencontres
     */
-    if (initialLoad || response.data.rencontres) {
+    if (response.data.rencontres) {
       setLoading('Chargement des rencontres');
       const refreshedRencontres = await getData({
         collectionName: 'rencontre',
         data: rencontres,
-        isInitialization: initialLoad,
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
-        setBatchData: (newRencontres) =>
-          setRencontres((oldRencontres) => (initialLoad ? [...oldRencontres, ...newRencontres] : mergeItems(oldRencontres, newRencontres))),
-        API,
       });
-      if (refreshedRencontres) setRencontres(refreshedRencontres);
+      if (refreshedRencontres) {
+        setRencontres((oldRencontres) => mergeItems(oldRencontres, refreshedRencontres));
+      }
     }
 
     /*
@@ -397,21 +362,17 @@ const Loader = () => {
     QUICK WIN: filter those reports from recoil state
     */
 
-    if (initialLoad || response.data.reports) {
+    if (response.data.reports) {
       setLoading('Chargement des comptes-rendus');
       const refreshedReports = await getData({
         collectionName: 'report',
         data: reports,
-        isInitialization: initialLoad,
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
-        setBatchData: (newReports) => {
-          newReports = newReports.filter((r) => !!r.team && !!r.date);
-          setReports((oldReports) => (initialLoad ? [...oldReports, ...newReports] : mergeItems(oldReports, newReports)));
-        },
-        API,
       });
-      if (refreshedReports) setReports(refreshedReports.filter((r) => !!r.team && !!r.date));
+      if (refreshedReports) {
+        setReports((oldReports) => mergeItems(oldReports, refreshedReports).filter((r) => !!r.team && !!r.date));
+      }
     }
 
     /*
@@ -436,14 +397,21 @@ const Loader = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshTrigger.status]);
 
-  useEffect(() => {
-    setPicture([picture1, picture3, picture2][randomIntFromInterval(0, 2)]);
-  }, [fullScreen]);
+  return null;
+};
+
+export const LoaderProgress = () => {
+  const loading = useRecoilValue(loadingState);
+  const progress = useRecoilValue(progressState);
+  const fullScreen = useRecoilValue(loaderFullScreenState);
+
+  const picture = useRef([picture1, picture3, picture2][randomIntFromInterval(0, 2)]);
 
   if (!loading) return null;
+
   return (
     <Container fullScreen={fullScreen} testID="loader">
-      {!!fullScreen && <ImageStyled source={picture} />}
+      {!!fullScreen && <ImageStyled source={picture.current} />}
       <Caption>{loading}</Caption>
       <ProgressContainer fullScreen={fullScreen}>
         <Progress progress={progress} />
@@ -489,5 +457,3 @@ const Progress = styled.View`
   height: 100%;
   background-color: #fff;
 `;
-
-export default Loader;

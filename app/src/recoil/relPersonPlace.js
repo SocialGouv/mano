@@ -6,7 +6,7 @@ import { Alert } from 'react-native';
 
 export const relsPersonPlaceState = atom({
   key: 'relsPersonPlaceState',
-  default: [],
+  default: JSON.parse(storage.getString('relPersonPlace') || '[]'),
   effects: [({ onSet }) => onSet(async (newValue) => storage.set('relPersonPlace', JSON.stringify(newValue)))],
 });
 

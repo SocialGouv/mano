@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import * as Sentry from '@sentry/react-native';
 import { useRecoilState, useRecoilValue } from 'recoil';
+import { connectActionSheet } from '@expo/react-native-action-sheet';
 import ActionRow from '../../components/ActionRow';
 import Spinner from '../../components/Spinner';
 import { ListEmptyActions, ListNoMoreActions } from '../../components/ListEmptyContainer';
@@ -11,11 +12,11 @@ import { FlashListStyled } from '../../components/Lists';
 import { TODO } from '../../recoil/actions';
 import { actionsByStatusSelector, totalActionsByStatusSelector } from '../../recoil/selectors';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { refreshTriggerState, loadingState, loaderFullScreenState } from '../../components/Loader';
+import { refreshTriggerState, loadingState } from '../../components/Loader';
 import Button from '../../components/Button';
 import ConsultationRow from '../../components/ConsultationRow';
-import { connectActionSheet } from '@expo/react-native-action-sheet';
 import { userState } from '../../recoil/auth';
+import { Dimensions } from 'react-native';
 
 const keyExtractor = (action) => action._id;
 
@@ -24,7 +25,6 @@ const limitSteps = 100;
 const ActionsList = ({ showActionSheetWithOptions }) => {
   const navigation = useNavigation();
   const loading = useRecoilValue(loadingState);
-  const fullScreen = useRecoilValue(loaderFullScreenState);
   const user = useRecoilValue(userState);
 
   const status = useRoute().params.status;
@@ -106,10 +106,8 @@ const ActionsList = ({ showActionSheetWithOptions }) => {
 
   const getItemType = (item) => item.type || 'action';
 
-  if (fullScreen) return null;
-
   return (
-    <>
+    <Container>
       <FlashListStyled
         refreshing={refreshTrigger.status}
         onRefresh={onRefresh}
@@ -124,7 +122,7 @@ const ActionsList = ({ showActionSheetWithOptions }) => {
         ListFooterComponent={FlatListFooterComponent}
       />
       <FloatAddButton onPress={onPressFloatingButton} />
-    </>
+    </Container>
   );
 };
 
@@ -134,6 +132,12 @@ const SectionHeaderStyled = styled(MyText)`
   font-size: 25px;
   padding-left: 5%;
   background-color: #fff;
+`;
+
+const Container = styled.View`
+  flex: 1;
+  height: 100%;
+  min-height: ${Dimensions.get('window').height - 230}px;
 `;
 
 export default connectActionSheet(ActionsList);

@@ -1,19 +1,14 @@
 import React from 'react';
-import { Platform } from 'react-native';
+import { Platform, View } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
 import ActionsList from './ActionsList';
 import Tabs from '../../components/Tabs';
 import { CANCEL, DONE, TODO } from '../../recoil/actions';
-import { loaderFullScreenState } from '../../components/Loader';
-import { useRecoilValue } from 'recoil';
-
 const TabNavigator = createMaterialTopTabNavigator();
 
 const ActionsTabNavigator = () => {
-  const fullScreen = useRecoilValue(loaderFullScreenState);
-  if (fullScreen) return null;
   return (
     <SceneContainer>
       <TabNavigator.Navigator

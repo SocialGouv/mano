@@ -1,13 +1,12 @@
 import { storage } from '../services/dataManagement';
 import { atom, selector, useRecoilValue } from 'recoil';
 import { organisationState } from './auth';
-import { looseUuidRegex } from '../utils/regex';
 import { capture } from '../services/sentry';
 import { Alert } from 'react-native';
 
 export const personsState = atom({
   key: 'personsState',
-  default: [],
+  default: JSON.parse(storage.getString('person') || '[]'),
   effects: [({ onSet }) => onSet(async (newValue) => storage.set('person', JSON.stringify(newValue)))],
 });
 

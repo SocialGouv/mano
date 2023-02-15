@@ -3,9 +3,8 @@ import { looseUuidRegex } from '../utils/regex';
 import { capture } from '../services/sentry';
 import { Alert } from 'react-native';
 
-const collectionName = 'treatment';
 export const treatmentsState = atom({
-  key: collectionName,
+  key: 'treatmentsState',
   default: [],
 });
 

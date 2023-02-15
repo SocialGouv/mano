@@ -80,7 +80,6 @@ class ApiService {
       const url = this.getUrl(path, query);
       console.log({ url });
       const response = await this.fetch(url, options);
-
       if (!response.ok && response.status === 401) {
         if (this.logout) this.logout('401');
         if (this.handleLogoutError) this.handleLogoutError();
@@ -106,7 +105,11 @@ class ApiService {
           return res;
         }
         if (!!res.data && Array.isArray(res.data)) {
-          const decryptedData = await Promise.all(res.data.map((item) => this.decryptDBItem(item, { debug, path })));
+          const decryptedData = [];
+          for (const item of res.data) {
+            const decryptedItem = await this.decryptDBItem(item, { debug, path });
+            decryptedData.push(decryptedItem);
+          }
           res.decryptedData = decryptedData;
           return res;
         }
@@ -155,7 +158,6 @@ class ApiService {
         page = response.hasMore ? page + 1 : page;
         // at least 1 for showing progress
         if (args.setProgress) args.setProgress(response.decryptedData.length || 1);
-        if (args.setBatchData) args.setBatchData(response.decryptedData);
         await new Promise((res) => setTimeout(res, 50));
       }
       return { ok: true, data, decryptedData };
@@ -221,19 +223,19 @@ class ApiService {
       };
       return decryptedItem;
     } catch (errorDecrypt) {
-      capture(errorDecrypt, {
-        extra: {
-          message: 'ERROR DECRYPTING ITEM',
-          item,
-          path,
-        },
-      });
-      if (this.handleError) {
-        this.handleError(
-          "Désolé, un élément n'a pas pu être déchiffré",
-          "L'équipe technique a été prévenue, nous reviendrons vers vous dans les meilleurs délais."
-        );
-      }
+      // capture(errorDecrypt, {
+      //   extra: {
+      //     message: 'ERROR DECRYPTING ITEM',
+      //     item,
+      //     path,
+      //   },
+      // });
+      // if (this.handleError) {
+      //   this.handleError(
+      //     "Désolé, un élément n'a pas pu être déchiffré",
+      //     "L'équipe technique a été prévenue, nous reviendrons vers vous dans les meilleurs délais."
+      //   );
+      // }
     }
     return item;
   };

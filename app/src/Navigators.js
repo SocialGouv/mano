@@ -43,7 +43,7 @@ import EnvironmentIndicator from './components/EnvironmentIndicator';
 import API from './services/api';
 import Charte from './scenes/Menu/Charte';
 import CharteAcceptance from './scenes/Login/CharteAcceptance';
-import Loader from './components/Loader';
+import { DataLoader, LoaderProgress, loaderFullScreenState } from './components/Loader';
 import BellWithNotifications from './scenes/Notifications/BellWithNotifications';
 import DotsIcon from './icons/DotsIcon';
 import Notifications from './scenes/Notifications/Notifications';
@@ -193,6 +193,9 @@ const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
   const organisation = useRecoilValue(organisationState);
+  const fullScreen = useRecoilValue(loaderFullScreenState);
+
+  if (fullScreen) return null;
 
   return (
     <Tab.Navigator
@@ -358,7 +361,8 @@ const App = () => {
           <AppStack.Screen name="LoginStack" component={LoginNavigator} key={resetLoginStackKey} />
           {!!isLoggedIn && <AppStack.Screen name="Home" component={TabNavigator} />}
         </AppStack.Navigator>
-        <Loader />
+        <DataLoader />
+        <LoaderProgress />
         <EnvironmentIndicator />
       </NavigationContainer>
     </ActionSheetProvider>

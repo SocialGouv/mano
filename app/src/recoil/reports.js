@@ -7,7 +7,7 @@ import { Alert } from 'react-native';
 
 export const reportsState = atom({
   key: 'reportsState',
-  default: [],
+  default: JSON.parse(storage.getString('report') || '[]'),
   effects: [({ onSet }) => onSet(async (newValue) => storage.set('report', JSON.stringify(newValue)))],
 });
 
