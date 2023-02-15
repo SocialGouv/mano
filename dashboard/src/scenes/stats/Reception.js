@@ -40,18 +40,17 @@ const ReceptionStats = ({ passages, reportsServices, period, teamsId }) => {
         />
       </div>
       {servicesFromDatabase !== null && (
-        <div className="[overflow-wrap:anywhere]">
           <CustomResponsivePie
             title="Services"
             help={`Services enregistrés dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des services.`}
             data={organisation.services?.map((service) => {
               return {
+                id: service,
                 label: service,
                 value: reportsServices.reduce((serviceNumber, rep) => (rep?.[service] || 0) + serviceNumber, 0) + (servicesFromDatabase[service] || 0),
               };
             })}
           />
-        </div>
       )}
     </>
   );

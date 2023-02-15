@@ -32,7 +32,7 @@ export const CustomResponsivePie = ({ data = [], title, onItemClick, help }) => 
               .sort((a, b) => (a.value < b.value ? 1 : -1))
               .map(({ key, label, value }) => (
                 <tr key={key + label + value} onClick={() => onClick({ id: label })}>
-                  <td className="tw-border tw-border-zinc-400">{label}</td>
+                  <td className="tw-border tw-border-zinc-400 [overflow-wrap:anywhere]">{label}</td>
                   <td className="tw-border tw-border-zinc-400 tw-text-center">{value}</td>
                   {total ? <td className="tw-border tw-border-zinc-400 tw-text-center">{`${Math.round((value / total) * 1000) / 10}%`}</td> : <></>}
                 </tr>
