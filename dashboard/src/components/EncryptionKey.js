@@ -9,24 +9,10 @@ import { useHistory } from 'react-router-dom';
 import ButtonCustom from './ButtonCustom';
 import { theme } from '../config';
 import { organisationState, teamsState, userState } from '../recoil/auth';
-import { personsState, usePreparePersonForEncryption } from '../recoil/persons';
-import { actionsState, prepareActionForEncryption } from '../recoil/actions';
-import { commentsState, prepareCommentForEncryption } from '../recoil/comments';
-import { customFieldsObsSelector, prepareObsForEncryption, territoryObservationsState } from '../recoil/territoryObservations';
-import { prepareReportForEncryption, reportsState } from '../recoil/reports';
-import { prepareTerritoryForEncryption, territoriesState } from '../recoil/territory';
-import { placesState, preparePlaceForEncryption } from '../recoil/places';
-import { prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from '../recoil/relPersonPlace';
 import { encryptVerificationKey } from '../services/encryption';
 import { capture } from '../services/sentry';
-import API, { setOrgEncryptionKey, encryptItem, getHashedOrgEncryptionKey } from '../services/api';
-import { passagesState, preparePassageForEncryption } from '../recoil/passages';
-import { prepareRencontreForEncryption, rencontresState } from '../recoil/rencontres';
-import { consultationsState, prepareConsultationForEncryption } from '../recoil/consultations';
-import { prepareTreatmentForEncryption, treatmentsState } from '../recoil/treatments';
-import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../recoil/medicalFiles';
+import API, { setOrgEncryptionKey, getHashedOrgEncryptionKey, decryptAndEncryptItem } from '../services/api';
 import { useDataLoader } from './DataLoader';
-import { groupsState, prepareGroupForEncryption } from '../recoil/groups';
 
 const EncryptionKey = ({ isMain }) => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
@@ -44,25 +30,6 @@ const EncryptionKey = ({ isMain }) => {
 
   const user = useRecoilValue(userState);
 
-  // const persons = useRecoilValue(personsState);
-
-  const groups = useRecoilValue(groupsState);
-  const actions = useRecoilValue(actionsState);
-  const consultations = useRecoilValue(consultationsState);
-  const treatments = useRecoilValue(treatmentsState);
-  const medicalFiles = useRecoilValue(medicalFileState);
-  const comments = useRecoilValue(commentsState);
-  const passages = useRecoilValue(passagesState);
-  const rencontres = useRecoilValue(rencontresState);
-  const territories = useRecoilValue(territoriesState);
-  const observations = useRecoilValue(territoryObservationsState);
-  const customFieldsObs = useRecoilValue(customFieldsObsSelector);
-  const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
-  const preparePersonForEncryption = usePreparePersonForEncryption();
-  const places = useRecoilValue(placesState);
-  const relsPersonPlace = useRecoilValue(relsPersonPlaceState);
-  const reports = useRecoilValue(reportsState);
-
   const { isLoading, refresh } = useDataLoader();
 
   useEffect(() => {
@@ -74,43 +41,7 @@ const EncryptionKey = ({ isMain }) => {
 
   if (!['admin'].includes(user.role)) return null;
 
-  // const defaultNotEncryptableFields = ['_id', 'createdAt', 'updatedAt', 'organisation', 'encrypted', 'encryptedEntityKey'];
-
   const onEncrypt = async (values) => {
-    const persons = await API.get({
-      path: '/person',
-      query: {
-        organisation: organisation._id,
-        limit: String(Number.MAX_SAFE_INTEGER),
-        page: String(0),
-        after: String(0),
-        withDeleted: true,
-        skipDecrypt: true,
-      },
-    });
-
-    // await Promise.all(persons.map((person) => preparePersonForEncryption(person, { checkRequiredFields: false })).map(encryptItem));
-    // debugger;
-    // return;
-
-    const totalToEncrypt =
-      persons.length +
-      groups.length +
-      actions.length +
-      consultations.length +
-      treatments.length +
-      medicalFiles.length +
-      comments.length +
-      passages.length +
-      rencontres.length +
-      territories.length +
-      observations.length +
-      relsPersonPlace.length +
-      places.length +
-      reports.length;
-
-    const totalDurationOnServer = totalToEncrypt * 0.005; // average 5 ms in server
-
     try {
       // just for the button to show loading state, sorry Raph I couldn't find anything better
       await new Promise((resolve) => setTimeout(resolve, 100));
@@ -123,56 +54,67 @@ const EncryptionKey = ({ isMain }) => {
       setEncryptingStatus('Chiffrement des données...');
       const encryptedVerificationKey = await encryptVerificationKey(hashedOrgEncryptionKey);
 
-      const mutPersons = await recryptPersonsDocuments(persons, previousKey, hashedOrgEncryptionKey);
-      const mutTreatments = await recryptPersonsRelatedDocuments(treatments, previousKey, hashedOrgEncryptionKey);
-      const mutConsultations = await recryptPersonsRelatedDocuments(consultations, previousKey, hashedOrgEncryptionKey);
-      const mutMedicalFiles = await recryptPersonsRelatedDocuments(medicalFiles, previousKey, hashedOrgEncryptionKey);
+      async function recrypt(path, callback = null) {
+        setEncryptingStatus(`Chiffrement des données... (${path.replace('/', '')})`);
+        const cryptedItems = await API.get({
+          skipDecrypt: true,
+          path,
+          query: {
+            organisation: organisation._id,
+            limit: String(Number.MAX_SAFE_INTEGER),
+            page: String(0),
+            after: String(0),
+            withDeleted: true,
+          },
+        });
+        const encryptedItems = [];
+        for (const item of cryptedItems.data) {
+          const recrypted = await decryptAndEncryptItem(item, previousKey, callback);
+          if (recrypted) encryptedItems.push(recrypted);
+        }
+        return encryptedItems;
+      }
 
-      const encryptedPersons = await Promise.all(
-        mutPersons.map((person) => preparePersonForEncryption(person, { checkRequiredFields: false })).map(encryptItem)
+      const encryptedPersons = await recrypt('/person', async (data, item) =>
+        recryptPersonRelatedDocuments(data, item._id, previousKey, hashedOrgEncryptionKey)
       );
-      const encryptedGroups = await Promise.all(
-        groups.map((group) => prepareGroupForEncryption(group, { checkRequiredFields: false })).map(encryptItem)
+      const encryptedConsultations = await recrypt('/consultation', async (data, item) =>
+        recryptPersonRelatedDocuments(data, item.person, previousKey, hashedOrgEncryptionKey)
       );
+      const encryptedTreatments = await recrypt('/treatment', async (data, item) =>
+        recryptPersonRelatedDocuments(data, item.person, previousKey, hashedOrgEncryptionKey)
+      );
+      const encryptedMedicalFiles = await recrypt('/medical-file', async (data, item) =>
+        recryptPersonRelatedDocuments(data, item.person, previousKey, hashedOrgEncryptionKey)
+      );
+      const encryptedGroups = await recrypt('/group');
+      const encryptedActions = await recrypt('/action');
+      const encryptedComments = await recrypt('/comment');
+      const encryptedPassages = await recrypt('/passage');
+      const encryptedRencontres = await recrypt('/rencontre');
+      const encryptedTerritories = await recrypt('/territory');
+      const encryptedTerritoryObservations = await recrypt('/territory-observation');
+      const encryptedPlaces = await recrypt('/place');
+      const encryptedRelsPersonPlace = await recrypt('/relPersonPlace');
+      const encryptedReports = await recrypt('/report');
 
-      const encryptedActions = await Promise.all(
-        actions.map((action) => prepareActionForEncryption(action, { checkRequiredFields: false })).map(encryptItem)
-      );
-      const encryptedConsultations = await Promise.all(
-        mutConsultations.map(prepareConsultationForEncryption(organisation.consultations, { checkRequiredFields: false })).map(encryptItem)
-      );
-      const encryptedTreatments = await Promise.all(
-        mutTreatments.map((treatment) => prepareTreatmentForEncryption(treatment, { checkRequiredFields: false })).map(encryptItem)
-      );
-      const encryptedMedicalFiles = await Promise.all(
-        mutMedicalFiles
-          .map((medicalFile) => prepareMedicalFileForEncryption(customFieldsMedicalFile)(medicalFile, { checkRequiredFields: false }))
-          .map(encryptItem)
-      );
-      const encryptedComments = await Promise.all(
-        comments.map((comment) => prepareCommentForEncryption(comment, { checkRequiredFields: false })).map(encryptItem)
-      );
-      const encryptedPassages = await Promise.all(
-        passages.map((passage) => preparePassageForEncryption(passage, { checkRequiredFields: false })).map(encryptItem)
-      );
-      const encryptedRencontres = await Promise.all(
-        rencontres.map((rencontre) => prepareRencontreForEncryption(rencontre, { checkRequiredFields: false })).map(encryptItem)
-      );
-      const encryptedTerritories = await Promise.all(
-        territories.map((territorie) => prepareTerritoryForEncryption(territorie, { checkRequiredFields: false })).map(encryptItem)
-      );
-      const encryptedTerritoryObservations = await Promise.all(
-        observations.map((observation) => prepareObsForEncryption(customFieldsObs)(observation, { checkRequiredFields: false })).map(encryptItem)
-      );
-      const encryptedPlaces = await Promise.all(
-        places.map((place) => preparePlaceForEncryption(place, { checkRequiredFields: false })).map(encryptItem)
-      );
-      const encryptedRelsPersonPlace = await Promise.all(
-        relsPersonPlace.map((relsPersonPlac) => prepareRelPersonPlaceForEncryption(relsPersonPlac, { checkRequiredFields: false })).map(encryptItem)
-      );
-      const encryptedReports = await Promise.all(
-        reports.map((report) => prepareReportForEncryption(report, { checkRequiredFields: false })).map(encryptItem)
-      );
+      const totalToEncrypt =
+        encryptedPersons.length +
+        encryptedGroups.length +
+        encryptedActions.length +
+        encryptedConsultations.length +
+        encryptedTreatments.length +
+        encryptedMedicalFiles.length +
+        encryptedComments.length +
+        encryptedPassages.length +
+        encryptedRencontres.length +
+        encryptedTerritories.length +
+        encryptedTerritoryObservations.length +
+        encryptedRelsPersonPlace.length +
+        encryptedPlaces.length +
+        encryptedReports.length;
+
+      const totalDurationOnServer = totalToEncrypt * 0.005; // average 5 ms in server
 
       setEncryptingStatus(
         'Sauvegarde des données nouvellement chiffrées en base de donnée. Ne fermez pas votre fenêtre, cela peut prendre quelques minutes...'
@@ -398,54 +340,26 @@ const recryptDocument = async (doc, personId, { fromKey, toKey }) => {
   };
 };
 
-const recryptPersonsDocuments = async (persons, oldKey, newKey) => {
-  const mutPersons = [...persons.map((person) => ({ ...person }))];
-  for (const person of mutPersons.filter((person) => person.documents && person.documents.length)) {
-    const updatedDocuments = [];
-    for (const doc of person.documents) {
-      try {
-        const recryptedDocument = await recryptDocument(doc, person._id, { fromKey: oldKey, toKey: newKey });
-        updatedDocuments.push(recryptedDocument);
-      } catch (e) {
-        console.error(e);
-        // we need a temporary hack, for the organisations which already changed their encryption key
-        // but not all the documents were recrypted
-        // we told them to change back from `newKey` to `oldKey` to retrieve the old documents
-        // and then change back to `newKey` to recrypt them in the new key
-        // SO
-        // if the recryption failed, we assume the document might have been encrypted with the newKey already
-        // so we push it
-        updatedDocuments.push(doc);
-      }
+const recryptPersonRelatedDocuments = async (item, id, oldKey, newKey) => {
+  if (!item.documents || !item.documents.length) return item;
+  const updatedDocuments = [];
+  for (const doc of item.documents) {
+    try {
+      const recryptedDocument = await recryptDocument(doc, id, { fromKey: oldKey, toKey: newKey });
+      updatedDocuments.push(recryptedDocument);
+    } catch (e) {
+      console.error(e);
+      // we need a temporary hack, for the organisations which already changed their encryption key
+      // but not all the documents were recrypted
+      // we told them to change back from `newKey` to `oldKey` to retrieve the old documents
+      // and then change back to `newKey` to recrypt them in the new key
+      // SO
+      // if the recryption failed, we assume the document might have been encrypted with the newKey already
+      // so we push it
+      updatedDocuments.push(doc);
     }
-    person.documents = updatedDocuments;
   }
-  return mutPersons;
-};
-
-const recryptPersonsRelatedDocuments = async (items, oldKey, newKey) => {
-  const mutedItems = [...items.map((treatment) => ({ ...treatment }))];
-  for (const item of mutedItems.filter((item) => item.documents && item.documents.length)) {
-    const updatedDocuments = [];
-    for (const doc of item.documents) {
-      try {
-        const recryptedDocument = await recryptDocument(doc, item.person, { fromKey: oldKey, toKey: newKey });
-        updatedDocuments.push(recryptedDocument);
-      } catch (e) {
-        console.error(e);
-        // we need a temporary hack, for the organisations which already changed their encryption key
-        // but not all the documents were recrypted
-        // we told them to change back from `newKey` to `oldKey` to retrieve the old documents
-        // and then change back to `newKey` to recrypt them in the new key
-        // SO
-        // if the recryption failed, we assume the document might have been encrypted with the newKey already
-        // so we push it
-        updatedDocuments.push(doc);
-      }
-    }
-    item.documents = updatedDocuments;
-  }
-  return mutedItems;
+  return { ...item, documents: updatedDocuments };
 };
 
 const StyledModal = styled(Modal)`

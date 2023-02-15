@@ -67,8 +67,15 @@ export const encryptItem = async (item) => {
   return item;
 };
 
-export async function decryptAndEncryptItem(item, oldHashedOrgEncryptionKey) {
-  const { content, entityKey } = await decrypt(item.encrypted, item.encryptedEntityKey, oldHashedOrgEncryptionKey);
+export async function decryptAndEncryptItem(item, oldHashedOrgEncryptionKey, updateContentCallback = null) {
+  // Some old (mostly deleted) items don't have encrypted content. We ignore them forever to avoid crash.
+  if (!item.encrypted) return null;
+  // Decrypt items
+  let { content, entityKey } = await decrypt(item.encrypted, item.encryptedEntityKey, oldHashedOrgEncryptionKey);
+  // If we need to alterate the content, we do it here.
+  if (updateContentCallback) {
+    content = JSON.stringify(await updateContentCallback(JSON.parse(content), item));
+  }
   const { encryptedContent, encryptedEntityKey } = await encrypt(content, entityKey, hashedOrgEncryptionKey);
   item.encrypted = encryptedContent;
   item.encryptedEntityKey = encryptedEntityKey;
