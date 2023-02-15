@@ -1,3 +1,10 @@
+## [1.243.1](https://github.com/SocialGouv/mano/compare/v1.243.0...v1.243.1) (2023-02-15)
+
+
+### Bug Fixes
+
+* **dashboard:** mots trop longs -> editmodal + titre et texte info medicale et info sociale sur fiche d'une personne ([#1329](https://github.com/SocialGouv/mano/issues/1329)) ([0b7fb9e](https://github.com/SocialGouv/mano/commit/0b7fb9e1f035988a8d6854f74eaaba003a3c3d44))
+
 # [1.243.0](https://github.com/SocialGouv/mano/compare/v1.242.15...v1.243.0) (2023-02-14)
 
 
