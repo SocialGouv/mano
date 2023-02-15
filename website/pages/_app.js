@@ -16,7 +16,7 @@ class MyApp extends App {
     return (
       <>
         <Head>
-          <meta key='viewport' name='viewport' content='width=device-width, initial-scale=1' />
+          <meta key="viewport" name="viewport" content="width=device-width, initial-scale=1" />
         </Head>
         <Component {...pageProps} />
       </>
