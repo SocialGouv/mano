@@ -1,3 +1,10 @@
+## [1.243.3](https://github.com/SocialGouv/mano/compare/v1.243.2...v1.243.3) (2023-02-15)
+
+
+### Bug Fixes
+
+* **dashboard:** noms de services trop longs dans l'onglet Accueil de la page statistique ([#1323](https://github.com/SocialGouv/mano/issues/1323)) ([88264c4](https://github.com/SocialGouv/mano/commit/88264c4b7a28d60482bd4eb5f1b0e1302f8f2ba9))
+
 ## [1.243.2](https://github.com/SocialGouv/mano/compare/v1.243.1...v1.243.2) (2023-02-15)
 
 
