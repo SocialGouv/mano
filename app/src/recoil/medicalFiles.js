@@ -4,9 +4,8 @@ import { looseUuidRegex } from '../utils/regex';
 import { capture } from '../services/sentry';
 import { Alert } from 'react-native';
 
-const collectionName = 'medical-file';
 export const medicalFileState = atom({
-  key: collectionName,
+  key: 'medicalFilesState',
   default: [],
 });
 

@@ -4,7 +4,7 @@ import { capture } from '../services/sentry';
 import { Alert } from 'react-native';
 
 export const treatmentsState = atom({
-  key: 'treatment',
+  key: 'treatmentsState',
   default: [],
 });
 
