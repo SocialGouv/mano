@@ -1,3 +1,10 @@
+## [1.243.2](https://github.com/SocialGouv/mano/compare/v1.243.1...v1.243.2) (2023-02-15)
+
+
+### Bug Fixes
+
+* performances du loader de l'app ([#1314](https://github.com/SocialGouv/mano/issues/1314)) ([e1420a4](https://github.com/SocialGouv/mano/commit/e1420a4dc9585818f0e5583d2b052f9f063c0298))
+
 ## [1.243.1](https://github.com/SocialGouv/mano/compare/v1.243.0...v1.243.1) (2023-02-15)
 
 
