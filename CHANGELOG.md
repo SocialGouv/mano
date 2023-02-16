@@ -1,3 +1,10 @@
+## [1.243.7](https://github.com/SocialGouv/mano/compare/v1.243.6...v1.243.7) (2023-02-16)
+
+
+### Bug Fixes
+
+* remove CSP ([6389612](https://github.com/SocialGouv/mano/commit/6389612e35eb88c97210b1e464cf1b8cb212a88d))
+
 ## [1.243.6](https://github.com/SocialGouv/mano/compare/v1.243.5...v1.243.6) (2023-02-16)
 
 
