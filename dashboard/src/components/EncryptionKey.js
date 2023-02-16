@@ -77,14 +77,14 @@ const EncryptionKey = ({ isMain }) => {
       const encryptedPersons = await recrypt('/person', async (data, item) =>
         recryptPersonRelatedDocuments(data, item._id, previousKey, hashedOrgEncryptionKey)
       );
-      const encryptedConsultations = await recrypt('/consultation', async (data, item) =>
-        recryptPersonRelatedDocuments(data, item.person, previousKey, hashedOrgEncryptionKey)
+      const encryptedConsultations = await recrypt('/consultation', async (data) =>
+        recryptPersonRelatedDocuments(data, data.person, previousKey, hashedOrgEncryptionKey)
       );
-      const encryptedTreatments = await recrypt('/treatment', async (data, item) =>
-        recryptPersonRelatedDocuments(data, item.person, previousKey, hashedOrgEncryptionKey)
+      const encryptedTreatments = await recrypt('/treatment', async (data) =>
+        recryptPersonRelatedDocuments(data, data.person, previousKey, hashedOrgEncryptionKey)
       );
-      const encryptedMedicalFiles = await recrypt('/medical-file', async (data, item) =>
-        recryptPersonRelatedDocuments(data, item.person, previousKey, hashedOrgEncryptionKey)
+      const encryptedMedicalFiles = await recrypt('/medical-file', async (data) =>
+        recryptPersonRelatedDocuments(data, data.person, previousKey, hashedOrgEncryptionKey)
       );
       const encryptedGroups = await recrypt('/group');
       const encryptedActions = await recrypt('/action');
@@ -341,6 +341,7 @@ const recryptDocument = async (doc, personId, { fromKey, toKey }) => {
 
 const recryptPersonRelatedDocuments = async (item, id, oldKey, newKey) => {
   if (!item.documents || !item.documents.length) return item;
+  console.log(item, typeof item, id);
   const updatedDocuments = [];
   for (const doc of item.documents) {
     try {
