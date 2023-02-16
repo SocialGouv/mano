@@ -1,3 +1,10 @@
+## [1.243.6](https://github.com/SocialGouv/mano/compare/v1.243.5...v1.243.6) (2023-02-16)
+
+
+### Bug Fixes
+
+* **dashboard:** ajout des headers de sécurité (CSP et autres) ([#1332](https://github.com/SocialGouv/mano/issues/1332)) ([a47593c](https://github.com/SocialGouv/mano/commit/a47593c9177611693e117052a84911f852d23e55))
+
 ## [1.243.5](https://github.com/SocialGouv/mano/compare/v1.243.4...v1.243.5) (2023-02-16)
 
 
