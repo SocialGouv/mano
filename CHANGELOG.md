@@ -1,3 +1,10 @@
+## [1.243.5](https://github.com/SocialGouv/mano/compare/v1.243.4...v1.243.5) (2023-02-16)
+
+
+### Bug Fixes
+
+* **dashboard:** filtre a eu une consultation qui se repete ([#1333](https://github.com/SocialGouv/mano/issues/1333)) ([bffa8ef](https://github.com/SocialGouv/mano/commit/bffa8ef82b51b214d022aba7447cb9e24c8ea6b5))
+
 ## [1.243.4](https://github.com/SocialGouv/mano/compare/v1.243.3...v1.243.4) (2023-02-15)
 
 
