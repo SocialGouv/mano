@@ -4085,6 +4085,11 @@ event-target-shim@^5.0.0, event-target-shim@^5.0.1:
   resolved "https://registry.yarnpkg.com/event-target-shim/-/event-target-shim-5.0.1.tgz#5d4d3ebdf9583d63a5333ce2deb7480ab2b05789"
   integrity sha512-i/2XbnSz/uxRCU6+NdVJgKWDTM427+MqYbkQzD321DuCQJUqOuJKIA0IM2+W2xtYHdKOmZ4dR6fExsd4SXL+WQ==
 
+eventemitter3@^4.0.7:
+  version "4.0.7"
+  resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-4.0.7.tgz#2de9b68f6528d5644ef5c59526a1b4a07306169f"
+  integrity sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==
+
 exception-formatter@^1.0.4:
   version "1.0.7"
   resolved "https://registry.yarnpkg.com/exception-formatter/-/exception-formatter-1.0.7.tgz#3291616b86fceabefa97aee6a4708032c6e3b96d"
@@ -7481,6 +7486,13 @@ react-is@^17.0.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.2.tgz#e691d4a8e9c789365655539ab372762b0efb54f0"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
+react-native-background-actions@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/react-native-background-actions/-/react-native-background-actions-3.0.0.tgz#fbdaf31a5485cea68cff03358516da8ffc2a4fe0"
+  integrity sha512-O/KFdetp8n9cwSfPJQ7hPywTaEHO1ui7ISxKTGkzHxs3IVgEV+QOvKKLxAkTcQs1w5f68KK/LoQsEVwMpbVqew==
+  dependencies:
+    eventemitter3 "^4.0.7"
+
 react-native-base64@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/react-native-base64/-/react-native-base64-0.2.1.tgz#3d0e73a649c4c0129f7b7695d3912456aebae847"
@@ -7584,11 +7596,6 @@ react-native-mmkv@^2.6.1:
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/react-native-mmkv/-/react-native-mmkv-2.7.0.tgz#27d7a64b59064edbdf15eef922c5f904a7e36893"
   integrity sha512-T+i1bbLuevgX9lWfIinarxXK12B/xmH+uMQLsL0d5yi+bOEIup3i7CIjG2geoxteheE5ARCotMb+bTp/GBBxWw==
-
-react-native-multithreading@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/react-native-multithreading/-/react-native-multithreading-1.1.1.tgz#e1522ecd56115993d444a69c21bca49ca123bf4e"
-  integrity sha512-ceJQRZAPjH5LfrDjb5svF4F18Ne7QR7QLQUFO0huAe+9w0hd2C3PR12ATxljo+590GXCzWRt2ruR9pY3EstFAQ==
 
 react-native-pager-view@^5.4.25:
   version "5.4.25"

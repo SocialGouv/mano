@@ -21,6 +21,7 @@ import { currentTeamState, organisationState, teamsState, usersState, userState 
 import { clearCache, appCurrentCacheKey } from '../../services/dataManagement';
 import { refreshTriggerState } from '../../components/Loader';
 import { useIsFocused } from '@react-navigation/native';
+import BackgroundService from 'react-native-background-actions';
 
 const Login = ({ navigation }) => {
   const [authViaCookie, setAuthViaCookie] = useState(false);
@@ -47,6 +48,39 @@ const Login = ({ navigation }) => {
 
   useEffect(() => {
     if (!isFocused) return;
+    console.log('ici');
+    // check version
+    BackgroundService.start(
+      async () => {
+        console.log('la');
+        const fibonacci = (num) => {
+          if (num <= 1) return 1;
+          return fibonacci(num - 1) + fibonacci(num - 2);
+        };
+
+        const input = 50;
+        console.log(`calculating fibonacci for input: ${input} in JS-Runtime: ${global._LABEL}...`);
+        const fib = fibonacci(input);
+        console.log('finished calculating fibonacci!');
+        return fib;
+        console.log(`Fibonacci Result: ${result}`);
+      },
+      {
+        taskName: 'Example',
+        taskTitle: 'ExampleTask title',
+        taskDesc: 'ExampleTask description',
+        taskIcon: {
+          name: 'ic_launcher',
+          type: 'mipmap',
+        },
+        color: '#ff00ff',
+        linkingURI: 'yourSchemeHere://chat/jane', // See Deep Linking for more info
+        parameters: {
+          delay: 1000,
+        },
+      }
+    );
+
     const initTimeout = setTimeout(async () => {
       // check version
       const response = await API.get({ path: '/version' });
