@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader, Input, Label } from 'reactstrap';
 import styled from 'styled-components';
 import { Formik } from 'formik';
@@ -18,6 +18,7 @@ const EncryptionKey = ({ isMain }) => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const teams = useRecoilValue(teamsState);
   const user = useRecoilValue(userState);
+  const totalDurationOnServer = useRef(1);
 
   const onboardingForEncryption = isMain && !organisation.encryptionEnabled;
   const onboardingForTeams = !teams.length;
@@ -113,7 +114,7 @@ const EncryptionKey = ({ isMain }) => {
         encryptedPlaces.length +
         encryptedReports.length;
 
-      const totalDurationOnServer = totalToEncrypt * 0.005; // average 5 ms in server
+      totalDurationOnServer.current = totalToEncrypt * 0.005; // average 5 ms in server
 
       setEncryptingStatus(
         'Sauvegarde des données nouvellement chiffrées en base de donnée. Ne fermez pas votre fenêtre, cela peut prendre quelques minutes...'
@@ -152,7 +153,7 @@ const EncryptionKey = ({ isMain }) => {
       clearInterval(elpasedBarInterval);
       if (res.ok) {
         // TODO: clean unused person documents
-        setEncryptingProgress(totalDurationOnServer);
+        setEncryptingProgress(totalDurationOnServer.current);
         setEncryptingStatus('Données chiffrées !');
         setOrganisation(res.data);
         if (onboardingForTeams) {
@@ -201,7 +202,7 @@ const EncryptionKey = ({ isMain }) => {
           <div
             style={{
               backgroundColor: theme.black,
-              width: `${(encryptingProgress / 200) * 100}%`,
+              width: `${(encryptingProgress / totalDurationOnServer.current) * 100}%`,
               height: '100%',
             }}
           />
