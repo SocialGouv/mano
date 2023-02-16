@@ -67,6 +67,32 @@ router.get(
   })
 );
 
+router.get(
+  "/all",
+  passport.authenticate("user", { session: false }),
+  catchErrors(async (req, res, next) => {
+    const services = await Service.findAll({ where: { organisation: req.user.organisation } });
+
+    const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
+
+    const { groupedServices } = organisation;
+
+    const servicesIndexedByGroup = {};
+    for (const group of groupedServices) {
+      for (const service of group.services) {
+        servicesIndexedByGroup[service] = group.groupTitle;
+      }
+    }
+
+    const servicesWithGroups = services.map((serviceRow) => ({
+      ...serviceRow.dataValues,
+      group: servicesIndexedByGroup[serviceRow.dataValues.service],
+    }));
+
+    return res.status(200).send({ ok: true, data: servicesWithGroups });
+  })
+);
+
 // List sum of services for each day in a specific month.
 // This function is used for the month calendar of reports, in order to display bullets.
 // [{ date: "2021-01-01", count: 10 }, { date: "2021-01-02", count: 5 }, ...]

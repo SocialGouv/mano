@@ -13,6 +13,11 @@ import { territoriesState } from '../../recoil/territory';
 import { useRecoilValue } from 'recoil';
 import { passagesState } from '../../recoil/passages';
 import { rencontresState } from '../../recoil/rencontres';
+import { consultationsState } from '../../recoil/consultations';
+import { medicalFileState } from '../../recoil/medicalFiles';
+import { treatmentsState } from '../../recoil/treatments';
+import API from '../../services/api';
+import { toast } from 'react-toastify';
 
 const createSheet = (data) => {
   /*
@@ -72,18 +77,30 @@ const ExportData = () => {
 
   const allPersons = useRecoilValue(personsState);
   const allActions = useRecoilValue(actionsState);
-  const comments = useRecoilValue(commentsState);
+  const allComments = useRecoilValue(commentsState);
   const allReports = useRecoilValue(reportsState);
-  const territories = useRecoilValue(territoriesState);
+  const allTerritories = useRecoilValue(territoriesState);
   const allObservations = useRecoilValue(territoryObservationsState);
-  const places = useRecoilValue(placesState);
+  const allPlaces = useRecoilValue(placesState);
   const allPassages = useRecoilValue(passagesState);
+  const allConsultations = useRecoilValue(consultationsState);
+  const allMedicalFiles = useRecoilValue(medicalFileState);
+  const allTreatments = useRecoilValue(treatmentsState);
   const allRencontres = useRecoilValue(rencontresState);
 
   const onExportToCSV = async () => {
     setIsExporting(true);
     // just to trigger the loading state, sorry Raph :)
     await new Promise((res) => setTimeout(res));
+
+    const allServices = await API.get({ path: `/service/all` }).then((res) => {
+      if (!res.ok) {
+        toast.error("Erreur lors du chargement des services de l'accueil");
+        return [];
+      }
+      return res.data;
+    });
+
     const workbook = utils.book_new();
 
     const persons = allPersons.map((p) => ({ ...p, followedSince: p.followedSince || p.createdAt }));
@@ -102,15 +119,21 @@ const ExportData = () => {
     // actions
     utils.book_append_sheet(workbook, createSheet(allActions), 'actions');
     utils.book_append_sheet(workbook, createSheet(persons), 'personnes suivies');
-    utils.book_append_sheet(workbook, createSheet(comments), 'comments');
-    utils.book_append_sheet(workbook, createSheet(territories), 'territoires');
+    utils.book_append_sheet(workbook, createSheet(allComments), 'comments');
+    utils.book_append_sheet(workbook, createSheet(allTerritories), 'territoires');
     utils.book_append_sheet(workbook, createSheet(allObservations), 'observations de territoires');
-    utils.book_append_sheet(workbook, createSheet(places), 'lieux fréquentés');
+    utils.book_append_sheet(workbook, createSheet(allPlaces), 'lieux fréquentés');
     utils.book_append_sheet(workbook, createSheet(teams), 'équipes');
     utils.book_append_sheet(workbook, createSheet(users), 'utilisateurs');
     utils.book_append_sheet(workbook, createSheet(reports), 'comptes rendus');
     utils.book_append_sheet(workbook, createSheet(allPassages), 'passages');
+    utils.book_append_sheet(workbook, createSheet(allServices), 'services');
     utils.book_append_sheet(workbook, createSheet(allRencontres), 'rencontres');
+    if (user.healthcareProfessional) {
+      utils.book_append_sheet(workbook, createSheet(allConsultations), 'consultations');
+      utils.book_append_sheet(workbook, createSheet(allTreatments), 'treatments');
+      utils.book_append_sheet(workbook, createSheet(allMedicalFiles), 'medical-files');
+    }
     writeFile(workbook, 'data.xlsx');
     setIsExporting(false);
   };
