@@ -17,6 +17,7 @@ import { useDataLoader } from './DataLoader';
 const EncryptionKey = ({ isMain }) => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const teams = useRecoilValue(teamsState);
+  const user = useRecoilValue(userState);
 
   const onboardingForEncryption = isMain && !organisation.encryptionEnabled;
   const onboardingForTeams = !teams.length;
@@ -27,8 +28,6 @@ const EncryptionKey = ({ isMain }) => {
   const [encryptionKey, setEncryptionKey] = useState('');
   const [encryptingStatus, setEncryptingStatus] = useState('');
   const [encryptingProgress, setEncryptingProgress] = useState(0);
-
-  const user = useRecoilValue(userState);
 
   const { isLoading, refresh } = useDataLoader();
 
@@ -55,7 +54,7 @@ const EncryptionKey = ({ isMain }) => {
       const encryptedVerificationKey = await encryptVerificationKey(hashedOrgEncryptionKey);
 
       async function recrypt(path, callback = null) {
-        setEncryptingStatus(`Chiffrement des données... (${path.replace('/', '')})`);
+        setEncryptingStatus(`Chiffrement des données... (${path.replace('/', '')}s)`);
         const cryptedItems = await API.get({
           skipDecrypt: true,
           path,

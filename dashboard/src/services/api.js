@@ -74,6 +74,7 @@ export async function decryptAndEncryptItem(item, oldHashedOrgEncryptionKey, upd
   let { content, entityKey } = await decrypt(item.encrypted, item.encryptedEntityKey, oldHashedOrgEncryptionKey);
   // If we need to alterate the content, we do it here.
   if (updateContentCallback) {
+    // No try/catch here: if something is not decryptable, it should crash and stop the process.
     content = JSON.stringify(await updateContentCallback(JSON.parse(content), item));
   }
   const { encryptedContent, encryptedEntityKey } = await encrypt(content, entityKey, hashedOrgEncryptionKey);
