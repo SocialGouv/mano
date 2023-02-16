@@ -104,12 +104,12 @@ export const filterPersonsBaseSelector = selector({
           filterable: true,
         });
       }
-      filterPersonsBase.push({
-        field: 'hasAtLeastOneConsultation',
-        label: 'A eu une consultation',
-        type: 'boolean',
-      })
     }
+    filterPersonsBase.push({
+      field: 'hasAtLeastOneConsultation',
+      label: 'A eu une consultation',
+      type: 'boolean',
+    })
     return filterPersonsBase;
   },
 });
