@@ -98,7 +98,7 @@ const View = () => {
   const searchParams = new URLSearchParams(location.search);
   const [activeTab, setActiveTab] = useSearchParamState('tab', ['restricted-access'].includes(user.role) ? 'reception' : 'resume');
 
-  const { refresh, isLoading } = useDataLoader();
+  const { refresh } = useDataLoader();
 
   const selectedTeamsReports = useMemo(() => {
     return selectedTeams.map((team) => {
@@ -465,7 +465,6 @@ const View = () => {
                 : formatDateWithNameOfDay(dateString).capitalize()}
             </p>
             <div style={{ display: 'flex' }}>
-              <ButtonCustom color="link" className="noprint" title="Rafraichir" onClick={() => refresh()} disabled={isLoading} />
               <ButtonCustom color="link" className="noprint" title="Précédent" onClick={onPreviousReportRequest} />
               <ButtonCustom
                 color="link"

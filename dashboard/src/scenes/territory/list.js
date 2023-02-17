@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Col, Button as LinkButton, FormGroup, Row, Modal, ModalBody, ModalHeader, Input, Label } from 'reactstrap';
+import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader, Input, Label } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Formik } from 'formik';
@@ -136,13 +136,9 @@ const CreateTerritory = () => {
   const user = useRecoilValue(userState);
 
   const setTerritories = useSetRecoilState(territoriesState);
-  const { refresh, isLoading } = useDataLoader();
 
   return (
     <div className="tw-w-full tw-flex tw-justify-end">
-      <LinkButton disabled={isLoading} onClick={() => refresh} color="link" style={{ marginRight: 10 }}>
-        Rafraichir
-      </LinkButton>
       <ButtonCustom
         disabled={!currentTeam?._id}
         onClick={() => setOpen(true)}

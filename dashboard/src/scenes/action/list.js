@@ -91,7 +91,6 @@ const List = () => {
   const user = useRecoilValue(userState);
   const teams = useRecoilValue(teamsState);
 
-  const { isLoading, refresh } = useDataLoader();
   const [modalOpen, setModalOpen] = useState(false);
 
   const [showConsultationModal, setShowConsultationModal] = useState(false);
@@ -134,7 +133,6 @@ const List = () => {
       />
       <div className="tw-mb-5 tw-flex tw-flex-row tw-justify-center">
         <div className="noprint tw-flex tw-w-full tw-justify-end tw-gap-3">
-          <ButtonCustom onClick={() => refresh()} title="Rafraichir" disabled={isLoading} color="link" />
           <ButtonCustom
             icon={agendaIcon}
             disabled={!currentTeam}

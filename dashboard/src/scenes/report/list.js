@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import { Button } from 'reactstrap';
-import { HeaderStyled, RefreshButton, Title as HeaderTitle } from '../../components/header';
+import { HeaderStyled, Title as HeaderTitle } from '../../components/header';
 import { currentTeamState, teamsState } from '../../recoil/auth';
 import useTitle from '../../services/useTitle';
 import { useDataLoader } from '../../components/DataLoader';
@@ -98,9 +98,6 @@ const List = () => {
                 Comptes rendus de toutes les équipes
               </label>
             )}
-          </div>
-          <div style={{ marginLeft: 'auto' }}>
-            <RefreshButton />
           </div>
         </div>
       </HeaderStyled>

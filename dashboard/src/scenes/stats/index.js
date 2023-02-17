@@ -23,7 +23,7 @@ import { dayjsInstance, getIsDayWithinHoursOffsetOfPeriod } from '../../services
 import useTitle from '../../services/useTitle';
 import DateRangePickerWithPresets, { formatPeriod } from '../../components/DateRangePickerWithPresets';
 import { useDataLoader } from '../../components/DataLoader';
-import { HeaderStyled, RefreshButton, Title as HeaderTitle } from '../../components/header';
+import { HeaderStyled, Title as HeaderTitle } from '../../components/header';
 import Loading from '../../components/loading';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import ExportFormattedData from '../data-import-export/ExportFormattedData';
@@ -458,7 +458,6 @@ const Stats = () => {
         </div>
         <div className="tw-flex tw-basis-2/3 tw-items-center tw-justify-end">
           <ButtonCustom color="link" title="Imprimer" onClick={window.print} />
-          <RefreshButton className="tw-mr-4" />
           <ExportFormattedData
             personCreated={personsForStats}
             personUpdated={personsUpdatedForStats}

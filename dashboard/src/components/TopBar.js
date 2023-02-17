@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import logo from '../assets/logo-green.png';
-
+import { RefreshButton } from '../components/header';
 import SelectTeam from './SelectTeam';
 
 import { theme } from '../config';
@@ -57,6 +57,7 @@ const TopBar = () => {
         <div className="tw-flex tw-flex-1 tw-justify-end [&_.dropdown-menu.show]:tw-z-[10000]">
           {!['restricted-access'].includes(user.role) && <Notification />}
           <ButtonDropdown direction="down" isOpen={dropdownOpen} toggle={() => setDropdownOpen(!dropdownOpen)}>
+          <RefreshButton/>
             <DropdownToggleStyled>
               {user?.name}
               <div className="tw-ml-2.5 tw-flex tw-h-3 tw-w-3 tw-flex-1 tw-flex-col tw-justify-between">

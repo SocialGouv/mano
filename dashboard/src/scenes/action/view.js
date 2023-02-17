@@ -113,7 +113,7 @@ const ActionView = () => {
 
   return (
     <>
-      <SmallHeaderWithBackButton refreshButton />
+      <SmallHeaderWithBackButton/>
       <h2 className="tw-mb-5 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">
         {`${action?.name}`}
         <UserName className="tw-block tw-text-base tw-font-normal tw-italic" id={action.user} wrapper={(name) => ` (créée par ${name})`} />
