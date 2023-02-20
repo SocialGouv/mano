@@ -1,3 +1,10 @@
+## [1.244.1](https://github.com/SocialGouv/mano/compare/v1.244.0...v1.244.1) (2023-02-20)
+
+
+### Bug Fixes
+
+* deploy ([4ad72c2](https://github.com/SocialGouv/mano/commit/4ad72c23e14225e262572a315c615b649d0a4662))
+
 # [1.244.0](https://github.com/SocialGouv/mano/compare/v1.243.9...v1.244.0) (2023-02-20)
 
 
