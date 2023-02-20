@@ -11,7 +11,6 @@ import { personsState, usePreparePersonForEncryption } from '../../recoil/person
 import { useRecoilState, useRecoilValue } from 'recoil';
 import API from '../../services/api';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
-import { useDataLoader } from '../../components/DataLoader';
 import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
 import dayjs from 'dayjs';
 
@@ -23,16 +22,10 @@ const CreatePerson = ({ refreshable }) => {
   const [persons, setPersons] = useRecoilState(personsState);
   const preparePersonForEncryption = usePreparePersonForEncryption();
 
-  const { refresh, isLoading } = useDataLoader();
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   return (
     <>
-      {!!refreshable && (
-        <LinkButton onClick={() => refresh()} disabled={isLoading} color="link" style={{ marginRight: 10 }}>
-          Rafraichir
-        </LinkButton>
-      )}
       <ButtonCustom
         icon={personIcon}
         disabled={!currentTeam}

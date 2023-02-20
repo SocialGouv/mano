@@ -109,13 +109,8 @@ const Create = () => {
   const user = useRecoilValue(userState);
   const setPlaces = useSetRecoilState(placesState);
 
-  const { isLoading, refresh } = useDataLoader();
-
   return (
     <CreateWrapper style={{ marginBottom: 0 }}>
-      <LinkButton disabled={isLoading} onClick={() => refresh()} color="link" style={{ marginRight: 10 }}>
-        Rafraichir
-      </LinkButton>
       <ButtonCustom
         disabled={!currentTeam}
         onClick={() => setOpen(true)}

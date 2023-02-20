@@ -32,7 +32,7 @@ const View = () => {
 
   return (
     <>
-      <SmallHeaderWithBackButton refreshButton />
+      <SmallHeaderWithBackButton />
       <Formik
         initialValues={place}
         enableReinitialize
