@@ -230,7 +230,7 @@ const View = () => {
 
   return (
     <>
-      <Header title="Rechercher" refreshButton />
+      <Header title="Rechercher" />
       <div className="tw-mb-10 tw-flex tw-items-center tw-border-b tw-border-zinc-200 tw-pb-5">
         <Search placeholder="Par mot clé" value={search} onChange={setSearch} />
       </div>
