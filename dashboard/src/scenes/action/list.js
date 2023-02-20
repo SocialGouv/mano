@@ -14,7 +14,6 @@ import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
 import ButtonCustom from '../../components/ButtonCustom';
 import agendaIcon from '../../assets/icons/agenda-icon.svg';
-import { useDataLoader } from '../../components/DataLoader';
 import ActionsCategorySelect from '../../components/tailwind/ActionsCategorySelect';
 import { useLocalStorage } from 'react-use';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
@@ -248,8 +247,8 @@ const List = () => {
       </div>
 
       {showAs === showAsOptions[2] && (
-        <div className="[overflow-wrap:anywhere] tw-min-h-screen">
-          <ActionsWeekly 
+        <div className="tw-min-h-screen [overflow-wrap:anywhere]">
+          <ActionsWeekly
             actions={dataConsolidated}
             onCreateAction={(date) => {
               setActionDate(date);
