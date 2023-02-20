@@ -24,7 +24,7 @@ const personFields = [
   { name: "updatedAt", type: "date", label: "", encrypted: false, importable: false, filterable: false },
   {
     name: "outOfActiveList",
-    type: "yes-no",
+    type: "boolean",
     label: "Sortie de file active",
     encrypted: true,
     importable: false,
