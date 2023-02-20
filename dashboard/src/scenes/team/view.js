@@ -74,7 +74,7 @@ const View = () => {
                 <FormGroup>
                   <Label />
                   <div style={{ display: 'flex', marginLeft: 20, width: '80%' }}>
-                    <label htmlFor="nightSession">Maraude de nuit</label>
+                    <label htmlFor="nightSession">Équipe de nuit</label>
                     <Input type="checkbox" name="nightSession" id="nightSession" checked={values.nightSession} onChange={handleChange} />
                     <NightSessionModale />
                   </div>
