@@ -1,3 +1,10 @@
+# [1.244.0](https://github.com/SocialGouv/mano/compare/v1.243.9...v1.244.0) (2023-02-20)
+
+
+### Features
+
+* ajout des services/consultations/dossiers médicaux/traitements à l'export xls ([#1335](https://github.com/SocialGouv/mano/issues/1335)) ([4a20412](https://github.com/SocialGouv/mano/commit/4a20412379909a0ab8a7bab8c7623708d4ae39f0))
+
 ## [1.243.9](https://github.com/SocialGouv/mano/compare/v1.243.8...v1.243.9) (2023-02-16)
 
 
