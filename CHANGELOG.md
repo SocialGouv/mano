@@ -1,3 +1,10 @@
+## [1.244.2](https://github.com/SocialGouv/mano/compare/v1.244.1...v1.244.2) (2023-02-22)
+
+
+### Bug Fixes
+
+* **csp:** add headers on www ([#1340](https://github.com/SocialGouv/mano/issues/1340)) ([d43470c](https://github.com/SocialGouv/mano/commit/d43470c15689e3ad85c4a9369f6338a3c81097eb))
+
 ## [1.244.1](https://github.com/SocialGouv/mano/compare/v1.244.0...v1.244.1) (2023-02-20)
 
 
