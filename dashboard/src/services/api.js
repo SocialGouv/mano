@@ -23,8 +23,8 @@ let enableEncrypt = false;
 export const authTokenState = atom({ key: 'authTokenState', default: null });
 
 /* methods */
-export const setOrgEncryptionKey = async (orgEncryptionKey, { encryptedVerificationKey = null, name, _id } = {}) => {
-  const newHashedOrgEncryptionKey = await derivedMasterKey(orgEncryptionKey);
+export const setOrgEncryptionKey = async (orgEncryptionKey, { encryptedVerificationKey = null, needDerivation = true } = {}) => {
+  const newHashedOrgEncryptionKey = needDerivation ? await derivedMasterKey(orgEncryptionKey) : orgEncryptionKey;
   if (!!encryptedVerificationKey) {
     const encryptionKeyIsValid = await checkEncryptedVerificationKey(encryptedVerificationKey, newHashedOrgEncryptionKey);
     if (!encryptionKeyIsValid) {
@@ -71,6 +71,7 @@ export async function decryptAndEncryptItem(item, oldHashedOrgEncryptionKey, new
   // Some old (mostly deleted) items don't have encrypted content. We ignore them forever to avoid crash.
   if (!item.encrypted) return null;
   // Decrypt items
+  console.log('decryptAndEncryptItem', item);
   let { content, entityKey } = await decrypt(item.encrypted, item.encryptedEntityKey, oldHashedOrgEncryptionKey);
   // If we need to alterate the content, we do it here.
   if (updateContentCallback) {

@@ -19,6 +19,7 @@ const EncryptionKey = ({ isMain }) => {
   const teams = useRecoilValue(teamsState);
   const user = useRecoilValue(userState);
   const totalDurationOnServer = useRef(1);
+  const previousKey = useRef(null);
 
   const onboardingForEncryption = isMain && !organisation.encryptionEnabled;
   const onboardingForTeams = !teams.length;
@@ -29,7 +30,7 @@ const EncryptionKey = ({ isMain }) => {
   const [encryptionKey, setEncryptionKey] = useState('');
   const [encryptingStatus, setEncryptingStatus] = useState('');
   const [encryptingProgress, setEncryptingProgress] = useState(0);
-
+  const [encryptionDone, setEncryptionDone] = useState(false);
   const { isLoading, refresh } = useDataLoader();
 
   useEffect(() => {
@@ -48,7 +49,7 @@ const EncryptionKey = ({ isMain }) => {
       if (!values.encryptionKey) return toast.error('La clé est obligatoire');
       if (!values.encryptionKeyConfirm) return toast.error('La validation de la clé est obligatoire');
       if (values.encryptionKey !== values.encryptionKeyConfirm) return toast.error('Les clés ne sont pas identiques');
-      const previousKey = getHashedOrgEncryptionKey();
+      previousKey.current = getHashedOrgEncryptionKey();
       setEncryptionKey(values.encryptionKey.trim());
       const hashedOrgEncryptionKey = await setOrgEncryptionKey(values.encryptionKey.trim());
       setEncryptingStatus('Chiffrement des données...');
@@ -69,23 +70,30 @@ const EncryptionKey = ({ isMain }) => {
         });
         const encryptedItems = [];
         for (const item of cryptedItems.data) {
-          const recrypted = await decryptAndEncryptItem(item, previousKey, hashedOrgEncryptionKey, callback);
-          if (recrypted) encryptedItems.push(recrypted);
+          try {
+            const recrypted = await decryptAndEncryptItem(item, previousKey.current, hashedOrgEncryptionKey, callback);
+            if (recrypted) encryptedItems.push(recrypted);
+          } catch (e) {
+            capture(e);
+            throw new Error(
+              `Impossible de déchiffrer et rechiffrer l'élément suivant: ${path} ${item._id}. Notez le numéro affiché et fournissez le à l'équipe de support.`
+            );
+          }
         }
         return encryptedItems;
       }
 
       const encryptedPersons = await recrypt('/person', async (decryptedData, item) =>
-        recryptPersonRelatedDocuments(decryptedData, item._id, previousKey, hashedOrgEncryptionKey)
+        recryptPersonRelatedDocuments(decryptedData, item._id, previousKey.current, hashedOrgEncryptionKey)
       );
       const encryptedConsultations = await recrypt('/consultation', async (decryptedData) =>
-        recryptPersonRelatedDocuments(decryptedData, decryptedData.person, previousKey, hashedOrgEncryptionKey)
+        recryptPersonRelatedDocuments(decryptedData, decryptedData.person, previousKey.current, hashedOrgEncryptionKey)
       );
       const encryptedTreatments = await recrypt('/treatment', async (decryptedData) =>
-        recryptPersonRelatedDocuments(decryptedData, decryptedData.person, previousKey, hashedOrgEncryptionKey)
+        recryptPersonRelatedDocuments(decryptedData, decryptedData.person, previousKey.current, hashedOrgEncryptionKey)
       );
       const encryptedMedicalFiles = await recrypt('/medical-file', async (decryptedData) =>
-        recryptPersonRelatedDocuments(decryptedData, decryptedData.person, previousKey, hashedOrgEncryptionKey)
+        recryptPersonRelatedDocuments(decryptedData, decryptedData.person, previousKey.current, hashedOrgEncryptionKey)
       );
       const encryptedGroups = await recrypt('/group');
       const encryptedActions = await recrypt('/action');
@@ -156,6 +164,7 @@ const EncryptionKey = ({ isMain }) => {
         setEncryptingProgress(totalDurationOnServer.current);
         setEncryptingStatus('Données chiffrées !');
         setOrganisation(res.data);
+        setEncryptionDone(true);
         if (onboardingForTeams) {
           history.push('/team');
         } else {
@@ -164,9 +173,11 @@ const EncryptionKey = ({ isMain }) => {
       }
     } catch (orgEncryptionError) {
       capture('erreur in organisation encryption', orgEncryptionError);
-      toast.error(orgEncryptionError.message, { timeOut: 0 });
+      toast.error(orgEncryptionError.message, { autoClose: false, closeOnClick: false, draggable: false });
       setEncryptingProgress(0);
       setEncryptionKey('');
+      setEncryptionDone(false);
+      await setOrgEncryptionKey(previousKey.current, { needDerivation: false });
       setEncryptingStatus("Erreur lors du chiffrement, veuillez contacter l'administrateur");
     }
   };
@@ -201,13 +212,25 @@ const EncryptionKey = ({ isMain }) => {
           }}>
           <div
             style={{
-              backgroundColor: theme.black,
+              backgroundColor: theme.main,
               width: `${(encryptingProgress / totalDurationOnServer.current) * 100}%`,
               height: '100%',
             }}
           />
         </div>
       </div>
+      {!onboardingForTeams && encryptionDone && (
+        <div className="tw-flex tw-flex-col tw-items-center">
+          <div className="tw-mb-4 tw-text-red-600">Notez la clé avant de vous reconnecter</div>
+          <ButtonCustom
+            color="secondary"
+            onClick={async () => {
+              return API.logout();
+            }}
+            title={'Se déconnecter'}
+          />
+        </div>
+      )}
     </ModalBody>
   );
 
