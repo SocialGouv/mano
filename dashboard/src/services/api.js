@@ -71,7 +71,6 @@ export async function decryptAndEncryptItem(item, oldHashedOrgEncryptionKey, new
   // Some old (mostly deleted) items don't have encrypted content. We ignore them forever to avoid crash.
   if (!item.encrypted) return null;
   // Decrypt items
-  console.log('decryptAndEncryptItem', item);
   let { content, entityKey } = await decrypt(item.encrypted, item.encryptedEntityKey, oldHashedOrgEncryptionKey);
   // If we need to alterate the content, we do it here.
   if (updateContentCallback) {
