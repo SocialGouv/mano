@@ -70,7 +70,7 @@ const List = () => {
             render: (i) => formatDateWithFullMonth(i.createdAt),
           },
           {
-            title: 'Maraude de nuit',
+            title: 'Équipe de nuit',
             help: <NightSessionModale />,
             dataKey: 'nightSession',
             onSortOrder: setSortOrder,
