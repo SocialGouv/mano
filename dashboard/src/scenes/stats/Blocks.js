@@ -39,7 +39,7 @@ export const BlockTotal = ({ title, unit, data, field, help }) => {
         help={help}
         children={
           <span className="font-weight-normal">
-            Moyenne: <strong>{twoDecimals(avg)}</strong>
+            Moyenne: <strong>{isNaN(avg) ? '-' : twoDecimals(avg)}</strong>
           </span>
         }
       />
