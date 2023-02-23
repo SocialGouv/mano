@@ -1,3 +1,10 @@
+# [1.245.0](https://github.com/SocialGouv/mano/compare/v1.244.2...v1.245.0) (2023-02-23)
+
+
+### Features
+
+* **dashboard:** Terme équipe de nuit au lieu de Maraude de nuit ([c58b405](https://github.com/SocialGouv/mano/commit/c58b4051e39eed005944e0866d0817d697ca5977))
+
 ## [1.244.2](https://github.com/SocialGouv/mano/compare/v1.244.1...v1.244.2) (2023-02-22)
 
 
