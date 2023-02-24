@@ -1,3 +1,11 @@
+## [1.245.3](https://github.com/SocialGouv/mano/compare/v1.245.2...v1.245.3) (2023-02-24)
+
+
+### Bug Fixes
+
+* **dashboard:** seulement un admin peut supprimer une structure, fix mano-2h ([f875eb2](https://github.com/SocialGouv/mano/commit/f875eb2e1c1bb63ceff034d1e676535583db6b07))
+* **dashboard:** silence sur l'alerte mano-91 qui est gérée par ailleurs ([a70cfe1](https://github.com/SocialGouv/mano/commit/a70cfe1fa639ca9a0cee4d55fec1d239778c4bfb))
+
 ## [1.245.2](https://github.com/SocialGouv/mano/compare/v1.245.1...v1.245.2) (2023-02-24)
 
 
