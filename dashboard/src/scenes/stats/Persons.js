@@ -296,9 +296,13 @@ export const AgeRangeBar = ({ persons, onItemClick }) => {
     <CustomResponsiveBar
       title="Tranche d'âges"
       categories={categories.filter((c) => c !== 'Non renseigné')}
-      onItemClick={(item) => {
-        onItemClick(item, data[item]);
-      }}
+      onItemClick={
+        onItemClick
+          ? (item) => {
+              onItemClick(item, data[item]);
+            }
+          : null
+      }
       data={dataCount}
       axisTitleX="Tranche d'âge"
       axisTitleY="Nombre de personnes"
@@ -346,9 +350,13 @@ const StatsCreatedAtRangeBar = ({ persons, onItemClick }) => {
       title="Temps de suivi (par tranche)"
       categories={categories}
       data={dataCount}
-      onItemClick={(item) => {
-        onItemClick(item, data[item]);
-      }}
+      onItemClick={
+        onItemClick
+          ? (item) => {
+              onItemClick(item, data[item]);
+            }
+          : null
+      }
       axisTitleX="Temps de suivi"
       axisTitleY="Nombre de personnes"
       help={`Répartition des temps de suivi des personnes concernées, dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
@@ -399,9 +407,13 @@ const StatsWanderingAtRangeBar = ({ persons, onItemClick }) => {
       title="Temps d'errance (par tranche)"
       categories={categories}
       data={dataCount}
-      onItemClick={(item) => {
-        onItemClick(item, data[item]);
-      }}
+      onItemClick={
+        onItemClick
+          ? (item) => {
+              onItemClick(item, data[item]);
+            }
+          : null
+      }
       axisTitleX="Temps d'errance"
       axisTitleY="Nombre de personnes"
       help={`Répartition des temps d'errance des personnes concernées, dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
