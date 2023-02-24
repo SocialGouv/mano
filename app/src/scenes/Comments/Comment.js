@@ -13,6 +13,7 @@ import { currentTeamState, organisationState, userState } from '../../recoil/aut
 import API from '../../services/api';
 import CheckboxLabelled from '../../components/CheckboxLabelled';
 import { groupsState } from '../../recoil/groups';
+import DateAndTimeInput from '../../components/DateAndTimeInput';
 
 const Comment = ({ navigation, route, onCommentWrite }) => {
   const [comments, setComments] = useRecoilState(commentsState);
@@ -24,6 +25,7 @@ const Comment = ({ navigation, route, onCommentWrite }) => {
   const isNewComment = useMemo(() => !commentDB, [commentDB]);
   const [comment, setComment] = useState(route?.params?.comment?.split('\\n').join('\u000A') || '');
   const [urgent, setUrgent] = useState(route?.params?.urgent || false);
+  const [date, setDate] = useState((route?.params?.date || route?.params?.createdAt) ?? new Date());
   const [group, setGroup] = useState(route?.params?.group || false);
   const [updating, setUpdating] = useState(false);
 
@@ -31,8 +33,9 @@ const Comment = ({ navigation, route, onCommentWrite }) => {
     if ((commentDB?.comment || '') !== comment) return false;
     if ((commentDB?.urgent || false) !== urgent) return false;
     if ((commentDB?.group || false) !== group) return false;
+    if ((commentDB?.date || false) !== date) return false;
     return true;
-  }, [comment, commentDB, urgent, group]);
+  }, [comment, commentDB, urgent, group, date]);
 
   const onUpdateComment = async () => {
     setUpdating(true);
@@ -43,6 +46,7 @@ const Comment = ({ navigation, route, onCommentWrite }) => {
         team: commentDB.team || currentTeam?._id,
         user: commentDB.user || user?._id,
         comment: comment.trim(),
+        date,
         urgent,
         group,
       }),
@@ -178,6 +182,7 @@ const Comment = ({ navigation, route, onCommentWrite }) => {
             onPress={() => setUrgent((u) => !u)}
             value={urgent}
           />
+          {!isNewComment && <DateAndTimeInput label="Créé le / Concerne le" setDate={(a) => setDate(a)} date={date} showTime showDay withTime />}
           {!!canToggleGroupCheck && (
             <CheckboxLabelled
               label="Commentaire familial (ce commentaire sera visible pour toute la famille)"
