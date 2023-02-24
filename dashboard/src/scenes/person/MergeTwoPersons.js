@@ -90,7 +90,7 @@ const MergeTwoPersons = ({ person }) => {
 
   const personsToMergeWith = useMemo(() => persons.filter((p) => p._id !== originPerson?._id), [persons, originPerson]);
 
-  const originPersonMedicalFile = useMemo(() => medicalFiles.find((p) => p.person === originPerson._id), [medicalFiles, originPerson]);
+  const originPersonMedicalFile = useMemo(() => medicalFiles.find((p) => p.person === originPerson?._id), [medicalFiles, originPerson]);
   const personToMergeMedicalFile = useMemo(
     () => medicalFiles.find((p) => p.person === personToMergeAndDelete?._id),
     [medicalFiles, personToMergeAndDelete]
