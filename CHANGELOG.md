@@ -1,3 +1,10 @@
+## [1.245.2](https://github.com/SocialGouv/mano/compare/v1.245.1...v1.245.2) (2023-02-24)
+
+
+### Bug Fixes
+
+* **api:** export des services quand il n'y a pas de groupe ([d105fa0](https://github.com/SocialGouv/mano/commit/d105fa0a14d4b8b10c32d7ec876a74b5b8e67e7f))
+
 ## [1.245.1](https://github.com/SocialGouv/mano/compare/v1.245.0...v1.245.1) (2023-02-24)
 
 
