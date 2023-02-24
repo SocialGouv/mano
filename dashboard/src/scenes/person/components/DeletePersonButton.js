@@ -32,7 +32,7 @@ const DeletePersonButton = ({ person }) => {
   return (
     <DeleteButtonAndConfirmModal
       title={`Voulez-vous vraiment supprimer la personne ${person.name}`}
-      textToConfirm={person.name}
+      textToConfirm={person.name || 'Nom de la personne non renseigné'}
       roles={['normal', 'admin', 'superadmin']}
       roleErrorMessage="Désolé, seules les personnes autorisées peuvent supprimer des personnes"
       onConfirm={async () => {
