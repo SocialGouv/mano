@@ -10,6 +10,8 @@ import { formatDateWithFullMonth } from '../../services/date';
 import useTitle from '../../services/useTitle';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../components/tailwind/Modal';
 import SelectCustom from '../../components/SelectCustom';
+import { useRecoilValue } from 'recoil';
+import { userState } from '../../recoil/auth';
 
 const List = () => {
   const [structures, setStructures] = useState([]);
@@ -79,27 +81,23 @@ const List = () => {
           setCurrentStructureOpen(true);
         }}
         columns={[
-          { 
-            title: 'Nom', 
-            dataKey: 'name', 
+          {
+            title: 'Nom',
+            dataKey: 'name',
             render: (structures) => {
               return (
                 <div className="[overflow-wrap:anywhere]">
                   <b>{structures.name}</b>
-                </div> 
+                </div>
               );
             },
           },
           { title: 'Téléphone', dataKey: 'phone' },
-          { 
-            title: 'Adresse', 
+          {
+            title: 'Adresse',
             dataKey: 'adresse',
             render: (structures) => {
-              return (
-                <div className="[overflow-wrap:anywhere]">
-                  {structures.adresse}
-                </div>
-              );
+              return <div className="[overflow-wrap:anywhere]">{structures.adresse}</div>;
             },
           },
           { title: 'Code postal', dataKey: 'postcode' },
@@ -132,6 +130,7 @@ const List = () => {
 
 const Structure = ({ structure: initStructure, onSuccess, existingCategories, open, onClose, onOpen }) => {
   const structureRef = React.useRef(initStructure);
+  const user = useRecoilValue(userState);
   const [structure, setStructure] = useState(initStructure);
   const [disabled, setDisabled] = useState(false);
   const onResetAndClose = () => {
@@ -237,7 +236,7 @@ const Structure = ({ structure: initStructure, onSuccess, existingCategories, op
           <button type="button" name="cancel" className="button-cancel" onClick={onClose}>
             Annuler
           </button>
-          {Boolean(initStructure?._id) && (
+          {user.role === 'admin' && Boolean(initStructure?._id) && (
             <button type="button" className="button-destructive" onClick={onDeleteStructure}>
               Supprimer
             </button>
