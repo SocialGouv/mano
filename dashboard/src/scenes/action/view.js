@@ -53,7 +53,7 @@ const ActionView = () => {
 
   const { refresh } = useDataLoader();
 
-  useTitle(`${action?.name} - Action`);
+  useTitle('Action');
 
   if (!action) return <Loading />;
 
