@@ -1,3 +1,11 @@
+## [1.245.1](https://github.com/SocialGouv/mano/compare/v1.245.0...v1.245.1) (2023-02-24)
+
+
+### Bug Fixes
+
+* **dashboard:** correction de l'erreur MANO-AD qui faisait une erreur quand on cliquait sur certains graphiques depuis l'onglet des statitiques de passages ou de dossier médical ([#1346](https://github.com/SocialGouv/mano/issues/1346)) ([6ad421c](https://github.com/SocialGouv/mano/commit/6ad421cb1a9284890469106b4f71f8532015371e))
+* **dashboard:** ne plus afficher NaN dans la moyenne d'une stat quand il n'y a pas de données ([#1345](https://github.com/SocialGouv/mano/issues/1345)) ([1832538](https://github.com/SocialGouv/mano/commit/1832538249628db1343811c430226381700a8360))
+
 # [1.245.0](https://github.com/SocialGouv/mano/compare/v1.244.2...v1.245.0) (2023-02-23)
 
 
