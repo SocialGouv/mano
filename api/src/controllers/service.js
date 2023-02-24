@@ -75,8 +75,7 @@ router.get(
 
     const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
 
-    const { groupedServices } = organisation;
-
+    const groupedServices = organisation.groupedServices || [];
     const servicesIndexedByGroup = {};
     for (const group of groupedServices) {
       for (const service of group.services) {
