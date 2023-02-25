@@ -1,3 +1,10 @@
+# [1.246.0](https://github.com/SocialGouv/mano/compare/v1.245.3...v1.246.0) (2023-02-25)
+
+
+### Features
+
+* **dashboard:** suppression nom d'action dans l'onglet pour eviter les problemes de confidentialite par suggestion navigateur ([#1353](https://github.com/SocialGouv/mano/issues/1353)) ([b4e0d3f](https://github.com/SocialGouv/mano/commit/b4e0d3f199d45d0ae58e2f3a4a094e7f30732f1a))
+
 ## [1.245.3](https://github.com/SocialGouv/mano/compare/v1.245.2...v1.245.3) (2023-02-24)
 
 
