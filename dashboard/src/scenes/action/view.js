@@ -137,6 +137,7 @@ const ActionView = () => {
           if (body.completedAt && outOfBoundariesDate(body.completedAt))
             return toast.error('La date de complétion est hors limites (entre 1900 et 2100)');
           if (body.dueAt && outOfBoundariesDate(body.dueAt)) return toast.error("La date d'échéance est hors limites (entre 1900 et 2100)");
+          if (!body.dueAt) body.dueAt = body.completedAt || new Date();
 
           delete body.team;
           const actionResponse = await API.put({
