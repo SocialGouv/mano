@@ -1,3 +1,10 @@
+# [1.249.0](https://github.com/SocialGouv/mano/compare/v1.248.1...v1.249.0) (2023-02-27)
+
+
+### Features
+
+* **app:** possibilité d'éditer une rencontre sur l'app ([#1361](https://github.com/SocialGouv/mano/issues/1361)) ([23bcf88](https://github.com/SocialGouv/mano/commit/23bcf882371eac3484bf9022a059dc7a3aec6836))
+
 ## [1.248.1](https://github.com/SocialGouv/mano/compare/v1.248.0...v1.248.1) (2023-02-27)
 
 
