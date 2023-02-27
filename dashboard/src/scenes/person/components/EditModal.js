@@ -41,7 +41,6 @@ export default function EditModal({ person, selectedPanel, onClose }) {
           enableReinitialize
           initialValues={person}
           onSubmit={async (body) => {
-            console.log(body);
             if (!body.name?.trim()?.length) return toast.error('Une personne doit avoir un nom');
             if (!body.followedSince) body.followedSince = person.createdAt;
             if (outOfBoundariesDate(body.followedSince)) return toast.error('La date de suivi est hors limites (entre 1900 et 2100)');
@@ -224,15 +223,15 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                       </div>
 
                       <div className="[overflow-wrap:anywhere]">
-                      {openPanels.includes('social') && (
-                        <Row>
-                          {customFieldsPersonsSocial
-                            .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
-                            .map((field) => (
-                              <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
-                            ))}
-                        </Row>
-                      )}
+                        {openPanels.includes('social') && (
+                          <Row>
+                            {customFieldsPersonsSocial
+                              .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
+                              .map((field) => (
+                                <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
+                              ))}
+                          </Row>
+                        )}
                       </div>
                     </div>
                   )}
@@ -251,15 +250,15 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                         <div>{!openPanels.includes('medical') ? '+' : '-'}</div>
                       </div>
                       <div className="[overflow-wrap:anywhere]">
-                      {openPanels.includes('medical') && (
-                        <Row>
-                          {customFieldsPersonsMedical
-                            .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
-                            .map((field) => (
-                              <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
-                            ))}
-                        </Row>
-                      )}
+                        {openPanels.includes('medical') && (
+                          <Row>
+                            {customFieldsPersonsMedical
+                              .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
+                              .map((field) => (
+                                <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
+                              ))}
+                          </Row>
+                        )}
                       </div>
                     </div>
                   )}

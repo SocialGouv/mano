@@ -109,7 +109,7 @@ export const filterPersonsBaseSelector = selector({
       field: 'hasAtLeastOneConsultation',
       label: 'A eu une consultation',
       type: 'boolean',
-    })
+    });
     return filterPersonsBase;
   },
 });
