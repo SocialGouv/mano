@@ -14,6 +14,7 @@ import { customFieldsObsSelector, prepareObsForEncryption, territoryObservations
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import API from '../../services/api';
 import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
+import DateAndTimeInput from '../../components/DateAndTimeInput';
 
 const cleanValue = (value) => {
   if (typeof value === 'string') return (value || '').trim();
@@ -48,6 +49,9 @@ const TerritoryObservation = ({ route, navigation }) => {
   const [updating, setUpdating] = useState(false);
   const [editable, setEditable] = useState(route?.params?.editable || false);
   const [obs, setObs] = useState(castToTerritoryObservation(route.params.obs));
+  const [date, setDate] = useState(
+    castToTerritoryObservation(route.params.obs).observedAt || castToTerritoryObservation(route.params.obs).createdAt || Date.now()
+  );
   const onChange = (newProps) => setObs((o) => ({ ...o, ...newProps }));
 
   const onBack = () => {
@@ -112,7 +116,7 @@ const TerritoryObservation = ({ route, navigation }) => {
     const response = await API.put({
       path: `/territory-observation/${obsDB._id}`,
       body: prepareObsForEncryption(customFieldsObs)(
-        Object.assign({}, castToTerritoryObservation(obs), {
+        Object.assign({}, castToTerritoryObservation({ ...obs, observedAt: date }), {
           _id: obsDB._id,
           territory: route.params.territory._id,
           user: user._id,
@@ -169,12 +173,13 @@ const TerritoryObservation = ({ route, navigation }) => {
     const newTerritoryObservation = {
       ...obsDB,
       ...castToTerritoryObservation(obs),
+      observedAt: date,
     };
     if (JSON.stringify(castToTerritoryObservation(obsDB)) !== JSON.stringify(castToTerritoryObservation(newTerritoryObservation))) {
       return false;
     }
     return true;
-  }, [castToTerritoryObservation, obs, obsDB]);
+  }, [castToTerritoryObservation, obs, obsDB, date]);
 
   const onGoBackRequested = () => {
     if (isUpdateDisabled) return onBack();
@@ -225,7 +230,11 @@ const TerritoryObservation = ({ route, navigation }) => {
       />
       <ScrollContainer ref={scrollViewRef} testID="observation">
         <View>
-          <CreatedAt>{new Date(obs?.observedAt || obs?.createdAt || Date.now()).getLocaleDateAndTime('fr')}</CreatedAt>
+          {editable && obsDB?._id ? (
+            <DateAndTimeInput label="Observation faite le" setDate={(a) => setDate(a)} date={date} showTime showDay withTime />
+          ) : (
+            <CreatedAt>{new Date(date).getLocaleDateAndTime('fr')}</CreatedAt>
+          )}
           {customFieldsObs
             .filter((f) => f)
             .filter((f) => f.enabled || f.enabledTeams?.includes(currentTeam._id))
