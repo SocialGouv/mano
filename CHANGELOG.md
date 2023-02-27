@@ -1,3 +1,10 @@
+## [1.246.1](https://github.com/SocialGouv/mano/compare/v1.246.0...v1.246.1) (2023-02-27)
+
+
+### Bug Fixes
+
+* **dashboard:** faute d'orthographe dans help des consultations par statut ([#1352](https://github.com/SocialGouv/mano/issues/1352)) ([2c4155f](https://github.com/SocialGouv/mano/commit/2c4155fcf0bf2bb90d34662f95c0946ecfaececa))
+
 # [1.246.0](https://github.com/SocialGouv/mano/compare/v1.245.3...v1.246.0) (2023-02-25)
 
 
