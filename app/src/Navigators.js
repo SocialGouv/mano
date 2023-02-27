@@ -17,7 +17,7 @@ import PersonsSearch from './scenes/Persons/PersonsSearch';
 import NewPersonForm from './scenes/Persons/NewPersonForm';
 import Person from './scenes/Persons/Person';
 import PersonsOutOfActiveListReason from './scenes/Persons/PersonsOutOfActiveListReason';
-import AddRencontre from './scenes/Persons/AddRencontre';
+import Rencontre from './scenes/Persons/Rencontre';
 import PersonsFilter from './scenes/Persons/PersonsFilter';
 import StructuresList from './scenes/Structures/StructuresList';
 import NewStructureForm from './scenes/Structures/NewStructureForm';
@@ -72,7 +72,7 @@ const ActionsNavigator = () => {
 
       <ActionsStack.Screen name="Person" component={Person} />
       <ActionsStack.Screen name="PersonsOutOfActiveListReason" component={PersonsOutOfActiveListReason} />
-      <ActionsStack.Screen name="AddRencontre" component={AddRencontre} />
+      <ActionsStack.Screen name="Rencontre" component={Rencontre} />
       <ActionsStack.Screen name="PersonPlace" component={Place} />
       <ActionsStack.Screen name="NewPersonPlaceForm" component={NewPlaceForm} />
       <ActionsStack.Screen name="PersonComment" component={Comment} />
@@ -91,7 +91,7 @@ const PersonsNavigator = () => {
       <PersonsStack.Screen name="NewPersonForm" component={NewPersonForm} />
       <PersonsStack.Screen name="PersonsFilter" component={PersonsFilter} />
       <PersonsStack.Screen name="PersonsOutOfActiveListReason" component={PersonsOutOfActiveListReason} />
-      <PersonsStack.Screen name="AddRencontre" component={AddRencontre} />
+      <PersonsStack.Screen name="Rencontre" component={Rencontre} />
       <PersonsStack.Screen name="PersonPlace" component={Place} />
       <PersonsStack.Screen name="NewPersonPlaceForm" component={NewPlaceForm} />
       <PersonsStack.Screen name="PersonComment" component={Comment} />
@@ -157,7 +157,7 @@ const ReportsNavigator = () => {
 
       <ReportsStack.Screen name="Person" component={Person} />
       <ReportsStack.Screen name="PersonsOutOfActiveListReason" component={PersonsOutOfActiveListReason} />
-      <ReportsStack.Screen name="AddRencontre" component={AddRencontre} />
+      <ReportsStack.Screen name="Rencontre" component={Rencontre} />
       <ReportsStack.Screen name="PersonPlace" component={Place} />
       <ReportsStack.Screen name="NewPersonPlaceForm" component={NewPlaceForm} />
       <ReportsStack.Screen name="PersonComment" component={Comment} />

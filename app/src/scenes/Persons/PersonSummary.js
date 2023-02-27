@@ -70,7 +70,8 @@ const PersonSummary = ({
   };
 
   const onRemoveFromActiveList = async () => navigation.push('PersonsOutOfActiveListReason', { person: personDB, fromRoute: 'Person' });
-  const onAddRencontre = async () => navigation.push('AddRencontre', { person: personDB, fromRoute: 'Person' });
+  const onAddRencontre = async () => navigation.push('Rencontre', { person: personDB, fromRoute: 'Person' });
+  const onUpdateRencontre = async (rencontre) => navigation.push('Rencontre', { person: personDB, fromRoute: 'Person', rencontre: rencontre });
 
   const onGetBackToActiveList = async () => {
     await onUpdatePerson(false, { outOfActiveListReasons: [], outOfActiveList: false });
@@ -273,7 +274,7 @@ const PersonSummary = ({
         label="Rencontres"
         onAdd={onAddRencontre}
         data={rencontres}
-        renderItem={(rencontre) => <RencontreRow key={rencontre._id} rencontre={rencontre} />}
+        renderItem={(rencontre) => <RencontreRow key={rencontre._id} rencontre={rencontre} onUpdate={() => onUpdateRencontre(rencontre)} />}
         ifEmpty="Pas de rencontres"
       />
       <SubList
