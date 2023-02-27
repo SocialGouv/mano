@@ -94,7 +94,7 @@ const PersonFamily = ({ person }) => {
     const personId2Name = persons.find((p) => p._id === personId2)?.name;
     if (
       !window.confirm(
-        `Voulez-vous vraiment supprimer le lien familial entre ${personId1Name} et ${personId2Name} ? Cette opération erst irréversible.`
+        `Voulez-vous vraiment supprimer le lien familial entre ${personId1Name} et ${personId2Name} ? Cette opération est irréversible.`
       )
     ) {
       return;
