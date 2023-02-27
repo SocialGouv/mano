@@ -113,6 +113,11 @@ export const itemsGroupedByPersonSelector = selector({
         formattedBirthDate: formatBirthDate(person.birthdate),
         age: formatAge(person.birthdate),
       };
+      if (!person.history?.length) continue;
+      if (person.history[person.history.length - 1].date > personsObject[person._id].lastUpdateCheckForGDPR) {
+        personsObject[person._id].lastUpdateCheckForGDPR = person.history[person.history.length - 1].date;
+      }
+      console.log(person.documents);
     }
     const actions = Object.values(get(actionsWithCommentsSelector));
     const comments = get(commentsState);
@@ -130,13 +135,13 @@ export const itemsGroupedByPersonSelector = selector({
         if (!personsObject[person]) continue;
         personsObject[person].group = group;
       }
-    }
 
-    for (const person of persons) {
-      if (!person.documents?.length) continue;
-      if (!personsObject[person._id].group) continue;
-      for (const document of person.documents) {
-        if (!document.group) continue;
+      for (const person of persons) {
+        if (!person.documents?.length) continue;
+        if (!personsObject[person._id].group) continue;
+        for (const document of person.documents) {
+          if (!document.group) continue;
+        }
         for (const personIdInGroup of personsObject[person._id].group.persons) {
           if (personIdInGroup === person._id) continue;
           if (!personsObject[personIdInGroup]) continue;
