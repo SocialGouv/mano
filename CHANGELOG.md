@@ -1,3 +1,10 @@
+## [1.249.1](https://github.com/SocialGouv/mano/compare/v1.249.0...v1.249.1) (2023-02-27)
+
+
+### Bug Fixes
+
+* **dashboard:** coquille sur message alerte suppression lien familial ([#1359](https://github.com/SocialGouv/mano/issues/1359)) ([cadea2c](https://github.com/SocialGouv/mano/commit/cadea2c23242ad3fc7b49505020d0f3e99ba19e4))
+
 # [1.249.0](https://github.com/SocialGouv/mano/compare/v1.248.1...v1.249.0) (2023-02-27)
 
 
