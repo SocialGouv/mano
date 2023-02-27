@@ -26,7 +26,7 @@ const ConsultationsStats = ({ consultations }) => {
       <CustomResponsivePie
         title="Consultations par statut"
         data={getPieData(consultations, 'status')}
-        help={`Répartition par status des consultations réalisées dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des consultations.`}
+        help={`Répartition par statut des consultations réalisées dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des consultations.`}
       />
       {organisation.consultations.map((c) => {
         return (
