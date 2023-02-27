@@ -1,3 +1,18 @@
+# [1.248.0](https://github.com/SocialGouv/mano/compare/v1.247.0...v1.248.0) (2023-02-27)
+
+
+### Bug Fixes
+
+* **dashboard:** nouveau système de chiffrement et déchiffrement qui ignore le contenu et donc ne tente pas de l'altérer ([#1330](https://github.com/SocialGouv/mano/issues/1330)) ([5e81a18](https://github.com/SocialGouv/mano/commit/5e81a189cfa69aae9db85fc8288180b17530c74b))
+* **dashboard:** permettre de sauvegarder une action qui n'avait pas de date dueAt en utilisant le completedAt ([#1358](https://github.com/SocialGouv/mano/issues/1358)) ([0606c48](https://github.com/SocialGouv/mano/commit/0606c48d1542550e5954660885579d7334288f34))
+* **dashboard:** suppression d'une personne qui n'a pas de nom ([#1355](https://github.com/SocialGouv/mano/issues/1355)) ([2edbd29](https://github.com/SocialGouv/mano/commit/2edbd29e4c255fca70ff578184d174c2f8cabdbc))
+
+
+### Features
+
+* **app:** Possibilité de modifier la date d'un commentaire après sa création ([#1350](https://github.com/SocialGouv/mano/issues/1350)) ([e423692](https://github.com/SocialGouv/mano/commit/e423692c379609e009e0ac5eda7b860d17d906e5))
+* **app:** Possibilité de modifier la date d'une observation après sa création ([#1351](https://github.com/SocialGouv/mano/issues/1351)) ([cf5e5a3](https://github.com/SocialGouv/mano/commit/cf5e5a37b107b29a635afe4a9beeeeae6c1a3a84))
+
 # [1.247.0](https://github.com/SocialGouv/mano/compare/v1.246.1...v1.247.0) (2023-02-27)
 
 
