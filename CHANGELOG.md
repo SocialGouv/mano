@@ -1,3 +1,10 @@
+## [1.248.1](https://github.com/SocialGouv/mano/compare/v1.248.0...v1.248.1) (2023-02-27)
+
+
+### Bug Fixes
+
+* **deps:** update dependency sequelize to v6.28.1 [security] ([#1344](https://github.com/SocialGouv/mano/issues/1344)) ([24d3aad](https://github.com/SocialGouv/mano/commit/24d3aade3a93cdd1044c8cb38222b598d7230356))
+
 # [1.248.0](https://github.com/SocialGouv/mano/compare/v1.247.0...v1.248.0) (2023-02-27)
 
 
