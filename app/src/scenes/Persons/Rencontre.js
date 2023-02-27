@@ -12,11 +12,14 @@ import { currentTeamState, userState } from '../../recoil/auth';
 import { rencontresState, prepareRencontreForEncryption } from '../../recoil/rencontres';
 import API from '../../services/api';
 
-const AddRencontre = ({ navigation, route }) => {
+const Rencontre = ({ navigation, route }) => {
   const personId = route.params.person._id;
+  const isNewRencontre = !route.params.rencontre;
   const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
-  const [rencontre, setRencontre] = useState(() => ({ date: new Date().toISOString(), user: user._id, team: currentTeam._id, person: personId }));
+  const [rencontre, setRencontre] = useState(
+    () => route.params.rencontre || { date: new Date().toISOString(), user: user._id, team: currentTeam._id, person: personId }
+  );
   const [submitting, setSubmitting] = useState(false);
   const [rencontres, setRencontres] = useRecoilState(rencontresState);
 
@@ -34,9 +37,23 @@ const AddRencontre = ({ navigation, route }) => {
     return response;
   };
 
+  const updateRencontre = async () => {
+    const response = await API.put({
+      path: `/rencontre/${rencontre._id}`,
+      body: prepareRencontreForEncryption(rencontre),
+    });
+    if (response.ok) {
+      const updatedRencontre = response.decryptedData;
+
+      setRencontres((rencontres) => rencontres.map((r) => (r._id === updatedRencontre._id ? updatedRencontre : r)));
+      Alert.alert('Rencontre modifiée !');
+    }
+    return response;
+  };
+
   return (
     <SceneContainer>
-      <ScreenTitle title="Ajouter une rencontre" onBack={() => navigation.goBack()} />
+      <ScreenTitle title={isNewRencontre ? 'Ajouter une rencontre' : 'Modifier une rencontre'} onBack={() => navigation.goBack()} />
       <ScrollContainer keyboardShouldPersistTaps="handled">
         <View>
           <DateAndTimeInput
@@ -60,7 +77,8 @@ const AddRencontre = ({ navigation, route }) => {
               loading={submitting}
               onPress={async () => {
                 setSubmitting(true);
-                await createRencontre();
+                if (isNewRencontre) await createRencontre();
+                else await updateRencontre();
                 setSubmitting(false);
 
                 navigation.navigate(route.params.fromRoute, { person: route.params.person }, { merge: true });
@@ -77,4 +95,4 @@ const ButtonContainer = styled.View`
   margin-top: 30px;
 `;
 
-export default AddRencontre;
+export default Rencontre;

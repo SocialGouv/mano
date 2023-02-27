@@ -48,7 +48,7 @@ const PersonRow = ({ onPress, person, isPersonsSearchRow = false, showActionShee
       async (buttonIndex) => {
         Sentry.setContext('person', { _id: person._id });
         if (options[buttonIndex] === 'Ajouter une rencontre') {
-          navigation.push('AddRencontre', { person, commentTitle: person.name, fromRoute: 'PersonsList' });
+          navigation.push('Rencontre', { person, commentTitle: person.name, fromRoute: 'PersonsList' });
         }
         if (options[buttonIndex] === 'Ajouter une action') {
           navigation.push('NewActionForm', { person, commentTitle: person.name, fromRoute: 'PersonsList' });
