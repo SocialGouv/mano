@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useHistory } from 'react-router';
 import { useRecoilValue } from 'recoil';
 import { useLocalStorage } from 'react-use';
@@ -27,7 +27,10 @@ const PersonStats = ({
   groupsForPersons,
   personFields,
   flattenedCustomFieldsPersons,
+  statsTitle,
+  activeTab,
 }) => {
+  console.log({ title });
   const [personsModalOpened, setPersonsModalOpened] = useState(false);
   const [sliceField, setSliceField] = useState(null);
   const [sliceValue, setSliceValue] = useState(null);
@@ -147,6 +150,8 @@ const PersonStats = ({
           setSlicedData([]);
         }}
         title={`${sliceField?.label} : ${sliceValue} (${slicedData.length})`}
+        statsTitle={statsTitle}
+        activeTab={activeTab}
       />
     </>
   );
@@ -420,88 +425,167 @@ const Teams = ({ person: { _id, assignedTeams } }) => (
   </React.Fragment>
 );
 
-const SelectedPersonsModal = ({ open, onClose, persons, title, onAfterLeave, sliceField }) => {
+const SelectedPersonsModal = ({ open, onClose, persons, title, onAfterLeave, sliceField, statsTitle, activeTab }) => {
   const history = useHistory();
   const teams = useRecoilValue(teamsState);
   const organisation = useRecoilValue(organisationState);
 
+  const [isPrinting, setIsPrinting] = useState(false);
   const [sortBy, setSortBy] = useLocalStorage('person-sortBy', 'name');
   const [sortOrder, setSortOrder] = useLocalStorage('person-sortOrder', 'ASC');
   const data = useMemo(() => {
     return [...persons].sort(sortPersons(sortBy, sortOrder));
   }, [persons, sortBy, sortOrder]);
 
+  const printRef = useRef(null);
+  const onPrint = () => {
+    setIsPrinting(true);
+    setTimeout(() => {
+      const mywindow = window.open('', 'PRINT', `height=${window.innerHeight},width=${window.innerWidth}`);
+
+      // retrive all <style> tags from the document
+      // and copy them to the new window as a big string
+      const styles = document.querySelectorAll('style');
+      let styleString = '';
+      for (let i = 0; i < styles.length; i++) {
+        styleString += styles[i].outerHTML;
+      }
+
+      mywindow.document.write(`<html><head>${styleString}<title>${activeTab} - ${statsTitle}</title>`);
+      mywindow.document.write('</head><body>');
+      mywindow.document.write(printRef.current.innerHTML.replace('printonly', ''));
+      mywindow.document.write('</body></html>');
+
+      mywindow.document.close(); // necessary for IE >= 10
+      mywindow.focus(); // necessary for IE >= 10*/
+
+      mywindow.print();
+      mywindow.close();
+
+      setIsPrinting(false);
+      return true;
+    }, 100);
+  };
+
   if (!sliceField) return null;
 
   return (
-    <ModalContainer open={open} size="full" onClose={onClose} onAfterLeave={onAfterLeave}>
-      <ModalHeader title={title} />
-      <ModalBody>
-        <div className="tw-p-4">
-          <Table
-            data={data}
-            rowKey={'_id'}
-            noData="Pas de personne suivie"
-            onRowClick={(p) => history.push(`/person/${p._id}`)}
-            columns={[
-              {
-                title: '',
-                dataKey: 'group',
-                onSortOrder: setSortOrder,
-                onSortBy: setSortBy,
-                sortOrder,
-                sortBy,
-                small: true,
-                render: (person) => {
-                  if (!person.group) return null;
-                  return (
-                    <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
-                      <span className="tw-text-3xl" aria-label="Personne avec des liens familiaux" title="Personne avec des liens familiaux">
-                        👪
-                      </span>
-                    </div>
-                  );
-                },
-              },
-              {
-                title: 'Nom',
-                dataKey: 'name',
-                onSortOrder: setSortOrder,
-                onSortBy: setSortBy,
-                sortOrder,
-                sortBy,
-              },
-              {
-                title: sliceField.label,
-                dataKey: sliceField,
-                render: (person) => <CustomFieldDisplay type={sliceField.type} value={person[sliceField.field]} />,
-              },
-              { title: 'Équipe(s) en charge', dataKey: 'assignedTeams', render: (person) => <Teams teams={teams} person={person} /> },
-              {
-                title: 'Suivi(e) depuis le',
-                dataKey: 'followedSince',
-                onSortOrder: setSortOrder,
-                onSortBy: setSortBy,
-                sortOrder,
-                sortBy,
-                render: (p) => formatDateWithFullMonth(p.followedSince || p.createdAt || ''),
-              },
-            ].filter((c) => organisation.groupsEnabled || c.dataKey !== 'group')}
-          />
+    <>
+      {open && isPrinting && (
+        <div
+          ref={printRef}
+          className="magicomix printonly tw-fixed tw-top-0 tw-left-0 tw-bottom-0 tw-right-0 tw-z-[99999] tw-flex tw-min-h-full tw-flex-col tw-overflow-scroll tw-bg-white">
+          <div className="tw-relative tw-p-8">
+            <h2>
+              {activeTab} - {statsTitle}
+            </h2>
+            <h3>{title}</h3>
+          </div>
+          <div className="tw-relative tw-m-0 tw-flex tw-w-full tw-justify-between tw-border-b tw-border-gray-500">
+            <span className="tw-flex tw-shrink-0 tw-basis-20 tw-items-center tw-px-4" />
+            <span className="tw-flex tw-shrink-0 tw-basis-20 tw-items-center tw-border-r tw-border-gray-500 tw-px-4" />
+            <span className="tw-flex tw-basis-1/4 tw-items-center tw-border-r tw-border-gray-500 tw-px-4">Nom</span>
+            <span className="tw-flex tw-basis-1/4 tw-items-center tw-border-r tw-border-gray-500 tw-px-4">{sliceField.label}</span>
+            <span className="tw-flex tw-basis-1/4 tw-items-center tw-border-r tw-border-gray-500 tw-px-4">Équipe(s) en charge</span>
+            <span className="tw-flex tw-basis-1/4 tw-items-center tw-px-4">Suivi(e) depuis le</span>
+          </div>
+          {data.map((person, index) => (
+            <div key={person._id} className="tw-relative tw-m-0 tw-flex tw-w-full tw-justify-between tw-border-b tw-border-gray-500">
+              <span className="tw-flex tw-shrink-0 tw-basis-20 tw-items-center tw-border-r tw-border-gray-500 tw-px-4">{index + 1}</span>
+              <span className="tw-flex tw-shrink-0 tw-basis-20 tw-items-center tw-border-r tw-border-gray-500 tw-px-4">
+                {person.group ? '👪' : ''}
+              </span>
+              <span className="tw-flex tw-basis-1/4 tw-items-center tw-border-r tw-border-gray-500 tw-px-4">{person.name}</span>
+              <span className="tw-flex tw-basis-1/4 tw-items-center tw-border-r tw-border-gray-500 tw-px-4">
+                <CustomFieldDisplay type={sliceField.type} value={person[sliceField.field]} />
+              </span>
+              <span className="tw-flex tw-basis-1/4 tw-flex-col tw-items-center tw-justify-center tw-gap-1 tw-border-r tw-border-gray-500 tw-py-2 tw-px-4">
+                <Teams teams={teams} person={person} />
+              </span>
+              <span className="tw-flex tw-basis-1/4 tw-items-center tw-px-4">
+                {formatDateWithFullMonth(person.followedSince || person.createdAt || '')}
+              </span>
+            </div>
+          ))}
         </div>
-      </ModalBody>
-      <ModalFooter>
-        <button
-          type="button"
-          name="cancel"
-          className="button-cancel"
-          onClick={() => {
-            onClose(null);
-          }}>
-          Fermer
-        </button>
-      </ModalFooter>
-    </ModalContainer>
+      )}
+      <ModalContainer open={open} size="full" onClose={onClose} onAfterLeave={onAfterLeave}>
+        <ModalHeader
+          title={
+            <div className="tw-flex tw-w-full tw-justify-between">
+              {title}{' '}
+              <button onClick={onPrint} className="tw-text-md tw-ml-auto tw-mr-20">
+                Imprimer
+              </button>
+            </div>
+          }></ModalHeader>
+        <ModalBody>
+          <div className="tw-p-4">
+            <Table
+              data={data}
+              rowKey={'_id'}
+              noData="Pas de personne suivie"
+              onRowClick={(p) => history.push(`/person/${p._id}`)}
+              columns={[
+                {
+                  title: '',
+                  dataKey: 'group',
+                  onSortOrder: setSortOrder,
+                  onSortBy: setSortBy,
+                  sortOrder,
+                  sortBy,
+                  small: true,
+                  render: (person) => {
+                    if (!person.group) return null;
+                    return (
+                      <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
+                        <span className="tw-text-3xl" aria-label="Personne avec des liens familiaux" title="Personne avec des liens familiaux">
+                          👪
+                        </span>
+                      </div>
+                    );
+                  },
+                },
+                {
+                  title: 'Nom',
+                  dataKey: 'name',
+                  onSortOrder: setSortOrder,
+                  onSortBy: setSortBy,
+                  sortOrder,
+                  sortBy,
+                },
+                {
+                  title: sliceField.label,
+                  dataKey: sliceField,
+                  render: (person) => <CustomFieldDisplay type={sliceField.type} value={person[sliceField.field]} />,
+                },
+                { title: 'Équipe(s) en charge', dataKey: 'assignedTeams', render: (person) => <Teams teams={teams} person={person} /> },
+                {
+                  title: 'Suivi(e) depuis le',
+                  dataKey: 'followedSince',
+                  onSortOrder: setSortOrder,
+                  onSortBy: setSortBy,
+                  sortOrder,
+                  sortBy,
+                  render: (p) => formatDateWithFullMonth(p.followedSince || p.createdAt || ''),
+                },
+              ].filter((c) => organisation.groupsEnabled || c.dataKey !== 'group')}
+            />
+          </div>
+        </ModalBody>
+        <ModalFooter>
+          <button
+            type="button"
+            name="cancel"
+            className="button-cancel"
+            onClick={() => {
+              onClose(null);
+            }}>
+            Fermer
+          </button>
+        </ModalFooter>
+      </ModalContainer>
+    </>
   );
 };
 

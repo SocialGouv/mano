@@ -34,7 +34,7 @@ const ModalContainer = ({
       <Transition.Root show={open} as={Fragment}>
         <Dialog
           as="div"
-          className={['tw-relative tw-z-[3000]', className].join(' ')}
+          className={['noprint tw-relative tw-z-[3000]', className].join(' ')}
           // onClose={setOpen} // uncomment this if you want backdrop click to close modal
           onClose={nullFunction} // uncomment this if you want backdrop click to NOT close modal
         >

@@ -406,19 +406,18 @@ const Stats = () => {
     ...flattenedCustomFieldsPersons.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
   ];
 
+  const statsTitle = useMemo(() => {
+    const teamsTitle = viewAllOrganisationData
+      ? 'globales'
+      : `${selectedTeams.length > 1 ? 'des équipes' : "de l'équipe"} ${selectedTeams.map((t) => t.name).join(', ')}`;
+    return `Statistiques ${teamsTitle} - ${formatPeriod({ period, preset })}`;
+  }, [period, preset, selectedTeams, viewAllOrganisationData]);
+
   return (
     <>
       <HeaderStyled className=" !tw-py-4 tw-px-0">
         <div className="printonly tw-py-4 tw-px-8 tw-text-2xl tw-font-bold" aria-hidden>
-          Statistiques{' '}
-          {viewAllOrganisationData ? (
-            <>globales</>
-          ) : (
-            <>
-              {selectedTeams.length > 1 ? 'des équipes' : "de l'équipe"} {selectedTeams.map((t) => t.name).join(', ')}
-            </>
-          )}{' '}
-          - {formatPeriod({ period, preset })}
+          {statsTitle}
         </div>
         <div className="noprint tw-flex tw-grow">
           <HeaderTitle className="tw-w-64 tw-font-normal">
@@ -537,6 +536,8 @@ const Stats = () => {
             groupsForPersons={groupsForPersons}
             personFields={personFields}
             flattenedCustomFieldsPersons={flattenedCustomFieldsPersons}
+            statsTitle={statsTitle}
+            activeTab={activeTab}
           />
         )}
         {activeTab === 'Personnes suivies' && (
@@ -550,6 +551,8 @@ const Stats = () => {
             groupsForPersons={groupsForPersons}
             personFields={personFields}
             flattenedCustomFieldsPersons={flattenedCustomFieldsPersons}
+            statsTitle={statsTitle}
+            activeTab={activeTab}
           />
         )}
         {activeTab === 'Passages' && (
