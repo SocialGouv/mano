@@ -23,8 +23,8 @@ let enableEncrypt = false;
 export const authTokenState = atom({ key: 'authTokenState', default: null });
 
 /* methods */
-export const setOrgEncryptionKey = async (orgEncryptionKey, { encryptedVerificationKey = null, name, _id } = {}) => {
-  const newHashedOrgEncryptionKey = await derivedMasterKey(orgEncryptionKey);
+export const setOrgEncryptionKey = async (orgEncryptionKey, { encryptedVerificationKey = null, needDerivation = true } = {}) => {
+  const newHashedOrgEncryptionKey = needDerivation ? await derivedMasterKey(orgEncryptionKey) : orgEncryptionKey;
   if (!!encryptedVerificationKey) {
     const encryptionKeyIsValid = await checkEncryptedVerificationKey(encryptedVerificationKey, newHashedOrgEncryptionKey);
     if (!encryptionKeyIsValid) {
@@ -66,6 +66,22 @@ export const encryptItem = async (item) => {
   }
   return item;
 };
+
+export async function decryptAndEncryptItem(item, oldHashedOrgEncryptionKey, newHashedOrgEncryptionKey, updateContentCallback = null) {
+  // Some old (mostly deleted) items don't have encrypted content. We ignore them forever to avoid crash.
+  if (!item.encrypted) return null;
+  // Decrypt items
+  let { content, entityKey } = await decrypt(item.encrypted, item.encryptedEntityKey, oldHashedOrgEncryptionKey);
+  // If we need to alterate the content, we do it here.
+  if (updateContentCallback) {
+    // No try/catch here: if something is not decryptable, it should crash and stop the process.
+    content = JSON.stringify(await updateContentCallback(JSON.parse(content), item));
+  }
+  const { encryptedContent, encryptedEntityKey } = await encrypt(content, entityKey, newHashedOrgEncryptionKey);
+  item.encrypted = encryptedContent;
+  item.encryptedEntityKey = encryptedEntityKey;
+  return item;
+}
 
 const decryptDBItem = async (item, { path, encryptedVerificationKey = null } = {}) => {
   if (!enableEncrypt) return item;
@@ -176,7 +192,7 @@ export const deleteFile = async ({ path }) => {
   return response.json();
 };
 
-const execute = async ({ method, path = '', body = null, query = {}, headers = {}, forceMigrationLastUpdate = null } = {}) => {
+const execute = async ({ method, path = '', body = null, query = {}, headers = {}, forceMigrationLastUpdate = null, skipDecrypt = false } = {}) => {
   const organisation = getRecoil(organisationState);
   const tokenCached = getRecoil(authTokenState);
   const { encryptionLastUpdateAt, encryptionEnabled, encryptedVerificationKey, migrationLastUpdateAt } = organisation;
@@ -246,7 +262,9 @@ const execute = async ({ method, path = '', body = null, query = {}, headers = {
           capture('api error unhandled', { extra: { res, path, query } });
         }
       }
-      if (!!res.data && Array.isArray(res.data)) {
+      if (skipDecrypt) {
+        return res;
+      } else if (!!res.data && Array.isArray(res.data)) {
         const decryptedData = await Promise.all(res.data.map((item) => decryptDBItem(item, { path, encryptedVerificationKey })));
         res.decryptedData = decryptedData;
         return res;
