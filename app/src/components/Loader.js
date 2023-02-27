@@ -107,6 +107,7 @@ export const DataLoader = () => {
     /*
     Get number of data to download to show the appropriate loading progress bar
     */
+    const justChecked = Date.now();
     const response = await API.get({
       path: '/organisation/stats',
       query: { organisation: organisationId, after: lastRefresh, withDeleted: true },
@@ -380,7 +381,7 @@ export const DataLoader = () => {
     */
     initialLoadDone.current = true;
     await new Promise((res) => setTimeout(res, 150));
-    setLastRefresh(Date.now());
+    setLastRefresh(justChecked);
     setLoading('');
     setProgress(0);
     setFullScreen(false);
