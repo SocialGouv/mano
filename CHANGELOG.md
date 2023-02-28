@@ -1,3 +1,10 @@
+## [1.249.3](https://github.com/SocialGouv/mano/compare/v1.249.2...v1.249.3) (2023-02-28)
+
+
+### Bug Fixes
+
+* **dashboard:** Action le premier jour de la semaine qui ne s'affichait pas sur l'agenda hebdo ([#1363](https://github.com/SocialGouv/mano/issues/1363)) ([8c421e5](https://github.com/SocialGouv/mano/commit/8c421e506b74e22bcec8d2fe299c3a6c0735b92b))
+
 ## [1.249.2](https://github.com/SocialGouv/mano/compare/v1.249.1...v1.249.2) (2023-02-28)
 
 
