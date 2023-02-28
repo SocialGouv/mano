@@ -1,3 +1,10 @@
+## [1.249.2](https://github.com/SocialGouv/mano/compare/v1.249.1...v1.249.2) (2023-02-28)
+
+
+### Bug Fixes
+
+* **dashboard:** Historique des traitements à la place de Traitement en cours ([f5b33f9](https://github.com/SocialGouv/mano/commit/f5b33f970b9e5c49ca883b310f24d0a1270a56ad))
+
 ## [1.249.1](https://github.com/SocialGouv/mano/compare/v1.249.0...v1.249.1) (2023-02-27)
 
 
