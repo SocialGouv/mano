@@ -125,10 +125,19 @@ router.post(
     const organisation = await Organisation.create(
       {
         name: orgName,
-        // We have to add default custom fields on creation (search for "custom-fields-persons-setup" in code).
-        customFieldsPersonsSocial: defaultSocialCustomFields,
-        customFieldsPersonsMedical: defaultMedicalCustomFields,
-        migrations: ["custom-fields-persons-setup"],
+        // We have to add default custom fields on creation
+        // (search for "custom-fields-persons-setup" or "custom-fields-persons-refacto-regroup" in code).
+        customFieldsPersons: [
+          {
+            name: "Informations sociales",
+            fields: defaultSocialCustomFields,
+          },
+          {
+            name: "Informations médicales",
+            fields: defaultMedicalCustomFields,
+          },
+        ],
+        migrations: ["custom-fields-persons-setup", "custom-fields-persons-refacto-regroup"],
       },
       { returning: true }
     );
@@ -269,8 +278,14 @@ router.put(
         collaborations: z.optional(z.array(z.string().min(1))),
         customFieldsObs: z.optional(z.array(customFieldSchema)),
         fieldsPersonsCustomizableOptions: z.optional(z.array(customFieldSchema)),
-        customFieldsPersonsSocial: z.optional(z.array(customFieldSchema)),
-        customFieldsPersonsMedical: z.optional(z.array(customFieldSchema)),
+        customFieldsPersons: z.optional(
+          z.array(
+            z.object({
+              name: z.string().min(1),
+              fields: z.array(customFieldSchema),
+            })
+          )
+        ),
         customFieldsMedicalFile: z.optional(z.array(customFieldSchema)),
         consultations: z.optional(
           z.array(
@@ -327,14 +342,9 @@ router.put(
         typeof req.body.fieldsPersonsCustomizableOptions === "string"
           ? JSON.parse(req.body.fieldsPersonsCustomizableOptions)
           : req.body.fieldsPersonsCustomizableOptions;
-    if (req.body.hasOwnProperty("customFieldsPersonsSocial"))
-      updateOrg.customFieldsPersonsSocial =
-        typeof req.body.customFieldsPersonsSocial === "string" ? JSON.parse(req.body.customFieldsPersonsSocial) : req.body.customFieldsPersonsSocial;
-    if (req.body.hasOwnProperty("customFieldsPersonsMedical"))
-      updateOrg.customFieldsPersonsMedical =
-        typeof req.body.customFieldsPersonsMedical === "string"
-          ? JSON.parse(req.body.customFieldsPersonsMedical)
-          : req.body.customFieldsPersonsMedical;
+    if (req.body.hasOwnProperty("customFieldsPersons"))
+      updateOrg.customFieldsPersons =
+        typeof req.body.customFieldsPersons === "string" ? JSON.parse(req.body.customFieldsPersons) : req.body.customFieldsPersons;
     if (req.body.hasOwnProperty("customFieldsMedicalFile"))
       updateOrg.customFieldsMedicalFile =
         typeof req.body.customFieldsMedicalFile === "string" ? JSON.parse(req.body.customFieldsMedicalFile) : req.body.customFieldsMedicalFile;

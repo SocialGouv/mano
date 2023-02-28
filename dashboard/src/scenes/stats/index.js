@@ -2,11 +2,10 @@ import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useLocalStorage } from 'react-use';
 import { useRecoilValue } from 'recoil';
 import {
-  customFieldsPersonsSocialSelector,
-  customFieldsPersonsMedicalSelector,
   fieldsPersonsCustomizableOptionsSelector,
   filterPersonsBaseSelector,
   personFieldsSelector,
+  flattenedCustomFieldsPersonsSelector,
 } from '../../recoil/persons';
 import { customFieldsObsSelector, territoryObservationsState } from '../../recoil/territoryObservations';
 import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
@@ -103,8 +102,7 @@ const Stats = () => {
   const allGroups = useRecoilValue(groupsState);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
-  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
-  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
+  const flattenedCustomFieldsPersons = useRecoilValue(flattenedCustomFieldsPersonsSelector);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
   const personFields = useRecoilValue(personFieldsSelector);
   const territories = useRecoilValue(territoriesState);
@@ -405,8 +403,7 @@ const Stats = () => {
           }
     ),
     ...fieldsPersonsCustomizableOptions.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
-    ...customFieldsPersonsSocial.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
-    ...customFieldsPersonsMedical.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
+    ...flattenedCustomFieldsPersons.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
   ];
 
   return (
@@ -539,8 +536,7 @@ const Stats = () => {
             personsForStats={personsForStats}
             groupsForPersons={groupsForPersons}
             personFields={personFields}
-            customFieldsPersonsMedical={customFieldsPersonsMedical}
-            customFieldsPersonsSocial={customFieldsPersonsSocial}
+            flattenedCustomFieldsPersons={flattenedCustomFieldsPersons}
           />
         )}
         {activeTab === 'Personnes suivies' && (
@@ -553,8 +549,7 @@ const Stats = () => {
             personsForStats={personsUpdatedForStats}
             groupsForPersons={groupsForPersons}
             personFields={personFields}
-            customFieldsPersonsMedical={customFieldsPersonsMedical}
-            customFieldsPersonsSocial={customFieldsPersonsSocial}
+            flattenedCustomFieldsPersons={flattenedCustomFieldsPersons}
           />
         )}
         {activeTab === 'Passages' && (

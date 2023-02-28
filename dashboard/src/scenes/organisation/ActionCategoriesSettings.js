@@ -97,7 +97,7 @@ const ActionCategoriesSettings = () => {
 
   return (
     <DragAndDropSettings
-      title="Catégories d'action"
+      title={<h3 className="tw-mb-0 tw-text-xl tw-font-extrabold">Catégories d'action</h3>}
       data={dataFormatted}
       addButtonCaption="Ajouter un groupe"
       onAddGroup={onAddGroup}

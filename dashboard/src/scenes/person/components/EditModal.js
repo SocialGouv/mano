@@ -2,8 +2,7 @@ import { Col, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, Row } from
 import SelectAsInput from '../../../components/SelectAsInput';
 import {
   allowedFieldsInHistorySelector,
-  customFieldsPersonsMedicalSelector,
-  customFieldsPersonsSocialSelector,
+  customFieldsPersonsSelector,
   personFieldsSelector,
   personsState,
   usePreparePersonForEncryption,
@@ -24,8 +23,7 @@ import DatePicker from '../../../components/DatePicker';
 export default function EditModal({ person, selectedPanel, onClose }) {
   const [openPanels, setOpenPanels] = useState([selectedPanel]);
   const user = useRecoilValue(userState);
-  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
-  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
+  const customFieldsPersons = useRecoilValue(customFieldsPersonsSelector);
   const allowedFieldsInHistory = useRecoilValue(allowedFieldsInHistorySelector);
   const team = useRecoilValue(currentTeamState);
   const setPersons = useSetRecoilState(personsState);
@@ -207,61 +205,37 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                       </Row>
                     )}
                   </div>
-                  {!['restricted-access'].includes(user.role) && (
-                    <div>
-                      <div
-                        className="tw-mb-4 tw-flex tw-cursor-pointer tw-border-b tw-pb-2 tw-text-lg tw-font-semibold"
-                        onClick={() => {
-                          if (openPanels.includes('social')) {
-                            setOpenPanels(openPanels.filter((p) => p !== 'social'));
-                          } else {
-                            setOpenPanels([...openPanels, 'social']);
-                          }
-                        }}>
-                        <div className="tw-flex-1">Informations sociales</div>
-                        <div>{!openPanels.includes('social') ? '+' : '-'}</div>
-                      </div>
+                  {!['restricted-access'].includes(user.role) &&
+                    customFieldsPersons.map(({ name, fields }) => {
+                      return (
+                        <div>
+                          <div
+                            className="tw-mb-4 tw-flex tw-cursor-pointer tw-border-b tw-pb-2 tw-text-lg tw-font-semibold"
+                            onClick={() => {
+                              if (openPanels.includes(name)) {
+                                setOpenPanels(openPanels.filter((p) => p !== name));
+                              } else {
+                                setOpenPanels([...openPanels, name]);
+                              }
+                            }}>
+                            <div className="tw-flex-1">{name}</div>
+                            <div>{!openPanels.includes(name) ? '+' : '-'}</div>
+                          </div>
 
-                      <div className="[overflow-wrap:anywhere]">
-                        {openPanels.includes('social') && (
-                          <Row>
-                            {customFieldsPersonsSocial
-                              .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
-                              .map((field) => (
-                                <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
-                              ))}
-                          </Row>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                  {!['restricted-access'].includes(user.role) && (
-                    <div>
-                      <div
-                        className="tw-mb-4 tw-flex tw-cursor-pointer tw-border-b tw-pb-2 tw-text-lg tw-font-semibold"
-                        onClick={() => {
-                          if (openPanels.includes('medical')) {
-                            setOpenPanels(openPanels.filter((p) => p !== 'medical'));
-                          } else {
-                            setOpenPanels([...openPanels, 'medical']);
-                          }
-                        }}>
-                        <div className="tw-flex-1">Informations médicales</div>
-                        <div>{!openPanels.includes('medical') ? '+' : '-'}</div>
-                      </div>
-                      <div className="[overflow-wrap:anywhere]">
-                        {openPanels.includes('medical') && (
-                          <Row>
-                            {customFieldsPersonsMedical
-                              .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
-                              .map((field) => (
-                                <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
-                              ))}
-                          </Row>
-                        )}
-                      </div>
-                    </div>
-                  )}
+                          <div className="[overflow-wrap:anywhere]">
+                            {openPanels.includes(name) && (
+                              <Row>
+                                {fields
+                                  .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
+                                  .map((field) => (
+                                    <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
+                                  ))}
+                              </Row>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
                 </div>
                 <div className="tw-flex tw-items-end tw-justify-end tw-gap-2">
                   <ButtonCustom disabled={isSubmitting} color="secondary" onClick={onClose} title="Annuler" />

@@ -9,10 +9,9 @@ import Loading from '../../components/loading';
 import Table from '../../components/table';
 import CreatePerson from './CreatePerson';
 import {
-  customFieldsPersonsMedicalSelector,
-  customFieldsPersonsSocialSelector,
   fieldsPersonsCustomizableOptionsSelector,
   filterPersonsBaseSelector,
+  flattenedCustomFieldsPersonsSelector,
   sortPersons,
 } from '../../recoil/persons';
 import TagTeam from '../../components/TagTeam';
@@ -70,15 +69,13 @@ const filterPersonsWithAllFieldsSelector = selector({
     const user = get(userState);
     const team = get(currentTeamState);
     const fieldsPersonsCustomizableOptions = get(fieldsPersonsCustomizableOptionsSelector);
-    const customFieldsPersonsSocial = get(customFieldsPersonsSocialSelector);
-    const customFieldsPersonsMedical = get(customFieldsPersonsMedicalSelector);
+    const flattenedCustomFieldsPersons = get(flattenedCustomFieldsPersonsSelector);
     const customFieldsMedicalFile = get(customFieldsMedicalFileSelector);
     const filterPersonsBase = get(filterPersonsBaseSelector);
     return [
       ...filterPersonsBase,
       ...fieldsPersonsCustomizableOptions.filter((a) => a.enabled || a.enabledTeams?.includes(team._id)).map((a) => ({ field: a.name, ...a })),
-      ...customFieldsPersonsSocial.filter((a) => a.enabled || a.enabledTeams?.includes(team._id)).map((a) => ({ field: a.name, ...a })),
-      ...customFieldsPersonsMedical.filter((a) => a.enabled || a.enabledTeams?.includes(team._id)).map((a) => ({ field: a.name, ...a })),
+      ...flattenedCustomFieldsPersons.filter((a) => a.enabled || a.enabledTeams?.includes(team._id)).map((a) => ({ field: a.name, ...a })),
       ...(user.healthcareProfessional
         ? customFieldsMedicalFile.filter((a) => a.enabled || a.enabledTeams?.includes(team._id)).map((a) => ({ field: a.name, ...a }))
         : []),
@@ -224,12 +221,12 @@ const List = () => {
             render: (p) => {
               if (p.outOfActiveList)
                 return (
-                  <div className="tw-text-black50 tw-max-w-md">
+                  <div className="tw-max-w-md tw-text-black50">
                     <div className="tw-flex tw-font-bold [overflow-wrap:anywhere]">{p.name}</div>
                     <div>Sortie de file active : {p.outOfActiveListReasons?.join(', ')}</div>
                   </div>
                 );
-              return <div className="tw-max-w-md tw-flex tw-font-bold [overflow-wrap:anywhere]">{p.name}</div>
+              return <div className="tw-flex tw-max-w-md tw-font-bold [overflow-wrap:anywhere]">{p.name}</div>;
             },
           },
           {

@@ -21,14 +21,14 @@ import TreatmentRow from '../../components/TreatmentRow';
 import Document from '../../components/Document';
 import DocumentsManager from '../../components/DocumentsManager';
 import { MyText } from '../../components/MyText';
-import { customFieldsPersonsMedicalSelector } from '../../recoil/persons';
+import { flattenedCustomFieldsPersonsSelector } from '../../recoil/persons';
 
 const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, editable, onEdit, isUpdateDisabled, backgroundColor, onChange }) => {
   const organisation = useRecoilValue(organisationState);
   const currentTeam = useRecoilValue(currentTeamState);
 
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
-  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
+  const flattenedCustomFieldsPersons = useRecoilValue(flattenedCustomFieldsPersonsSelector);
 
   const allConsultations = useRecoilValue(consultationsState);
   const allTreatments = useRecoilValue(treatmentsState);
@@ -172,14 +172,14 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
         <InputLabelled label="Âge" value={displayBirthDate(person.birthdate, { reverse: true })} placeholder="JJ-MM-AAAA" editable={false} />
       )}
       {/* These custom fields are displayed by default, because they where displayed before they became custom fields */}
-      {Boolean(customFieldsPersonsMedical.find((e) => e.name === 'healthInsurances')) && (
+      {Boolean(flattenedCustomFieldsPersons.find((e) => e.name === 'healthInsurances')) && (
         <HealthInsuranceMultiCheckBox
           values={person.healthInsurances}
           onChange={(healthInsurances) => onChange({ healthInsurances })}
           editable={editable}
         />
       )}
-      {Boolean(customFieldsPersonsMedical.find((e) => e.name === 'structureMedical')) && (
+      {Boolean(flattenedCustomFieldsPersons.find((e) => e.name === 'structureMedical')) && (
         <InputLabelled
           label="Structure de suivi médical"
           onChangeText={(structureMedical) => onChange({ structureMedical })}

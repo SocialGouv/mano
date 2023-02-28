@@ -90,7 +90,7 @@ const DragAndDropSettings = ({
   return (
     <>
       <div className={['tw-my-10 tw-flex tw-items-center tw-gap-2', isDisabled ? 'disable-everything' : ''].join(' ')}>
-        <h3 className="tw-mb-0 tw-text-xl tw-font-extrabold">{title}</h3>
+        {title}
         {!!addButtonCaption && <ButtonCustom title={addButtonCaption} className="tw-ml-auto" onClick={() => setAddGroupModalVisible(true)} />}
       </div>
       <hr />
@@ -99,10 +99,11 @@ const DragAndDropSettings = ({
           id="groups-grid"
           className={['tw--m-1 tw-inline-flex tw-w-full tw-flex-wrap', isDisabled ? 'disable-everything' : ''].join(' ')}
           ref={gridRef}>
-          {data.map(({ groupTitle, items }) => (
+          {data.map(({ groupTitle, items, editable }) => (
             <Group
               key={groupTitle}
               groupTitle={groupTitle}
+              editable={editable}
               items={items}
               onDragAndDrop={onDragAndDropRequest}
               groupTitles={groupTitles}
@@ -144,6 +145,7 @@ const DragAndDropSettings = ({
 const Group = ({
   groupTitle,
   items,
+  editable = true,
   onDragAndDrop,
   groupTitles,
   onGroupTitleChange,
@@ -205,7 +207,7 @@ const Group = ({
               <span className="group-title tw-pl-2">
                 {groupTitle} ({items.length})
               </span>
-              {!!onGroupTitleChange && (
+              {!!onGroupTitleChange && !!editable && (
                 <button
                   type="button"
                   aria-label={`Modifier le groupe ${groupTitle}`}
