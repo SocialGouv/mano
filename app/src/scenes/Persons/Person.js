@@ -11,11 +11,10 @@ import Tabs from '../../components/Tabs';
 import colors from '../../utils/colors';
 import { useFocusEffect } from '@react-navigation/native';
 import {
-  customFieldsPersonsMedicalSelector,
-  customFieldsPersonsSocialSelector,
   allowedFieldsInHistorySelector,
   personsState,
   usePreparePersonForEncryption,
+  flattenedCustomFieldsPersonsSelector,
 } from '../../recoil/persons';
 import { actionsState } from '../../recoil/actions';
 import { commentsState } from '../../recoil/comments';
@@ -36,8 +35,7 @@ const cleanValue = (value) => {
 };
 
 const Person = ({ route, navigation }) => {
-  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
-  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
+  const flattenedCustomFieldsPersons = useRecoilValue(flattenedCustomFieldsPersonsSelector);
   const allowedFieldsInHistory = useRecoilValue(allowedFieldsInHistorySelector);
   const preparePersonForEncryption = usePreparePersonForEncryption();
 
@@ -57,10 +55,7 @@ const Person = ({ route, navigation }) => {
   const castToPerson = useCallback(
     (person = {}) => {
       const toReturn = {};
-      for (const field of customFieldsPersonsMedical || []) {
-        toReturn[field.name] = cleanValue(person[field.name]);
-      }
-      for (const field of customFieldsPersonsSocial || []) {
+      for (const field of flattenedCustomFieldsPersons || []) {
         toReturn[field.name] = cleanValue(person[field.name]);
       }
       return {

@@ -42,8 +42,7 @@ function serializeOrganisation(organisation) {
     /* custom fields persons: fields with customizavble options only */
     fieldsPersonsCustomizableOptions: organisation.fieldsPersonsCustomizableOptions || fieldsPersonsCustomizableOptions,
     /* custom fields persons */
-    customFieldsPersonsSocial: organisation.customFieldsPersonsSocial || [],
-    customFieldsPersonsMedical: organisation.customFieldsPersonsMedical || [],
+    customFieldsPersons: organisation.customFieldsPersons || [],
     customFieldsMedicalFile: organisation.customFieldsMedicalFile || defaultMedicalFileCustomFields,
   };
 }

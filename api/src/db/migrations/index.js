@@ -30,5 +30,5 @@
   await require("./2023-01-16_add-index-everywhere")();
   await require("./2023-01-18-gave-feedback-2023")();
   await require("./2023-01-19_custom-fields-person")();
-  await require("./2023-02-16_remove-deleted-and-not-recrypted-data")();
+  await require("./2023-02-28_refacto-custom-fields-person")();
 })();

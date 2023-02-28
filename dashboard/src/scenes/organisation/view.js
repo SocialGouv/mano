@@ -8,8 +8,6 @@ import ButtonCustom from '../../components/ButtonCustom';
 import EncryptionKey from '../../components/EncryptionKey';
 import SelectCustom from '../../components/SelectCustom';
 import {
-  customFieldsPersonsMedicalSelector,
-  customFieldsPersonsSocialSelector,
   fieldsPersonsCustomizableOptionsSelector,
   personFieldsIncludingCustomFieldsSelector,
   personsState,
@@ -51,8 +49,6 @@ const View = () => {
   const user = useRecoilValue(userState);
   const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
-  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
-  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
 
   const medicalFiles = useRecoilValue(medicalFileState);
@@ -404,23 +400,7 @@ const View = () => {
                             onEditChoice={onEditPersonsCustomInputChoice('fieldsPersonsCustomizableOptions')}
                           />
                           <hr />
-                          <h4 className="tw-my-8">Champs personnalisés - informations sociales</h4>
-                          <TableCustomFields
-                            customFields="customFieldsPersonsSocial"
-                            key={refreshErrorKey + 'customFieldsPersonsSocial'}
-                            data={persons}
-                            fields={customFieldsPersonsSocial}
-                            onEditChoice={onEditPersonsCustomInputChoice('customFieldsPersonsSocial')}
-                          />
-                          <hr />
-                          <h4 className="tw-my-8">Champs personnalisés - informations médicales</h4>
-                          <TableCustomFields
-                            customFields="customFieldsPersonsMedical"
-                            key={refreshErrorKey + 'customFieldsPersonsMedical'}
-                            data={persons}
-                            fields={customFieldsPersonsMedical}
-                            onEditChoice={onEditPersonsCustomInputChoice('customFieldsPersonsMedical')}
-                          />
+                          <h4 className="tw-my-8">Champs personnalisés</h4>
                         </>
                       ) : (
                         <>

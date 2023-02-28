@@ -3,18 +3,26 @@ import { useRecoilValue } from 'recoil';
 import { View } from 'react-native';
 import ScrollContainer from '../../components/ScrollContainer';
 import SubHeader from '../../components/SubHeader';
-import HealthInsuranceMultiCheckBox from '../../components/Selects/HealthInsuranceMultiCheckBox';
 import Spacer from '../../components/Spacer';
 import ButtonsContainer from '../../components/ButtonsContainer';
 import Button from '../../components/Button';
-import InputLabelled from '../../components/InputLabelled';
 import colors from '../../utils/colors';
 import CustomFieldInput from '../../components/CustomFieldInput';
-import { customFieldsPersonsMedicalSelector } from '../../recoil/persons';
 import { currentTeamState, userState } from '../../recoil/auth';
 
-const InformationsMedical = ({ navigation, editable, onChange, onUpdatePerson, onEdit, isUpdateDisabled, updating, backgroundColor, person }) => {
-  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
+const PersonSection = ({
+  navigation,
+  editable,
+  onChange,
+  onUpdatePerson,
+  onEdit,
+  isUpdateDisabled,
+  updating,
+  backgroundColor,
+  person,
+  fields,
+  name: sectionName,
+}) => {
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
   const scrollViewRef = useRef(null);
@@ -35,11 +43,11 @@ const InformationsMedical = ({ navigation, editable, onChange, onUpdatePerson, o
 
   return (
     <>
-      <SubHeader center backgroundColor={backgroundColor || colors.app.color} onBack={navigation.goBack} caption="Informations médicales" />
+      <SubHeader center backgroundColor={backgroundColor || colors.app.color} onBack={navigation.goBack} caption={sectionName} />
       <ScrollContainer ref={scrollViewRef} backgroundColor={backgroundColor || colors.app.color}>
         <View>
           {!editable && <Spacer />}
-          {(customFieldsPersonsMedical || [])
+          {(fields || [])
             .filter((f) => f)
             .filter((f) => f.enabled || f.enabledTeams?.includes(currentTeam._id))
             .filter((f) => !f.onlyHealthcareProfessional || user?.healthcareProfessional)
@@ -72,4 +80,4 @@ const InformationsMedical = ({ navigation, editable, onChange, onUpdatePerson, o
   );
 };
 
-export default InformationsMedical;
+export default PersonSection;
