@@ -21,7 +21,9 @@ export default function ActionsWeekly({ actions, onCreateAction }) {
     return actions.filter((action) =>
       dayjsInstance([DONE, CANCEL].includes(action.status) ? action.completedAt : action.dueAt).isBetween(
         dayjsInstance(startOfWeek),
-        dayjsInstance(startOfWeek).add(7, 'day').endOf('day')
+        dayjsInstance(startOfWeek).add(7, 'day').endOf('day'),
+        null,
+        '[)'
       )
     );
   }, [actions, startOfWeek]);
