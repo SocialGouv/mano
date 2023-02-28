@@ -21,6 +21,7 @@ import { currentTeamState, organisationState, teamsState, usersState, userState 
 import { clearCache, appCurrentCacheKey } from '../../services/dataManagement';
 import { refreshTriggerState } from '../../components/Loader';
 import { useIsFocused } from '@react-navigation/native';
+import useResetAllCachedDataRecoilStates from '../../recoil/reset';
 
 const Login = ({ navigation }) => {
   const [authViaCookie, setAuthViaCookie] = useState(false);
@@ -42,6 +43,7 @@ const Login = ({ navigation }) => {
   const setCurrentTeam = useSetRecoilState(currentTeamState);
   const [storageOrganisationId, setStorageOrganisationId] = useMMKVString('organisationId');
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
+  const resetAllRecoilStates = useResetAllCachedDataRecoilStates();
 
   const isFocused = useIsFocused();
 
@@ -76,7 +78,8 @@ const Login = ({ navigation }) => {
         API.onLogIn();
         const { organisation } = user;
         if (!!storageOrganisationId && organisation._id !== storageOrganisationId) {
-          clearCache('not same org');
+          await clearCache('not same org');
+          resetAllRecoilStates();
           setLastRefresh(0);
         }
         setStorageOrganisationId(organisation._id);
@@ -180,7 +183,8 @@ const Login = ({ navigation }) => {
       setOrganisation(response.user.organisation);
       // We need to reset cache if organisation has changed.
       if (!!storageOrganisationId && response.user.organisation._id !== storageOrganisationId) {
-        clearCache('again not same org');
+        await clearCache('again not same org');
+        resetAllRecoilStates();
         setLastRefresh(0);
       }
       setStorageOrganisationId(response.user.organisation._id);

@@ -58,6 +58,7 @@ import Consultation from './scenes/Persons/Consultation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { currentTeamState, organisationState, teamsState, userState } from './recoil/auth';
 import { appCurrentCacheKey, clearCache } from './services/dataManagement';
+import useResetAllCachedDataRecoilStates from './recoil/reset';
 
 const ActionsStack = createStackNavigator();
 const ActionsNavigator = () => {
@@ -280,6 +281,7 @@ const App = () => {
   const appStateListener = useRef(null);
   const navigationRef = useNavigationContainerRef();
 
+  const resetAllRecoilStates = useResetAllCachedDataRecoilStates();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const resetOrganisation = useResetRecoilState(organisationState);
   const resetUser = useResetRecoilState(userState);
@@ -325,6 +327,7 @@ const App = () => {
     API.organisation = null;
     if (clearAllRef.current) {
       await clearCache();
+      resetAllRecoilStates();
       setLastRefresh(0);
     }
     InteractionManager.runAfterInteractions(async () => {
