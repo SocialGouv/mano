@@ -310,7 +310,7 @@ export function MedicalFile({ person }) {
       )}
       <hr className="tw-my-8" />
       <div className="tw-mx-0 tw-mt-16 tw-mb-5 tw-flex tw-items-center">
-        <h2 className="tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Traitement en cours</h2>
+        <h2 className="tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Historique des traitements</h2>
         <div className="tw-flex tw-flex-1 tw-justify-end">
           <ButtonCustom
             icon={false}
