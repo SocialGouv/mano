@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FormGroup, Input, Label, Row, Col } from 'reactstrap';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
@@ -6,7 +6,6 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 
 import ButtonCustom from '../../components/ButtonCustom';
 import EncryptionKey from '../../components/EncryptionKey';
-import SelectCustom from '../../components/SelectCustom';
 import {
   customFieldsPersonsMedicalSelector,
   customFieldsPersonsSocialSelector,
@@ -21,9 +20,7 @@ import API, { encryptItem } from '../../services/api';
 import ExportData from '../data-import-export/ExportData';
 import ImportData from '../data-import-export/ImportData';
 import DownloadExample from '../data-import-export/DownloadExample';
-import SortableGrid from '../../components/SortableGrid';
 import useTitle from '../../services/useTitle';
-import { consultationsState, consultationTypes, prepareConsultationForEncryption } from '../../recoil/consultations';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
 import { capture } from '../../services/sentry';
 import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../recoil/medicalFiles';
@@ -31,6 +28,7 @@ import { useDataLoader } from '../../components/DataLoader';
 import ActionCategoriesSettings from './ActionCategoriesSettings';
 import ServicesSettings from './ServicesSettings';
 import ObservationsSettings from './ObservationsSettings';
+import ConsultationsSettings from './ConsultationsSettings';
 
 const getSettingTitle = (tabId) => {
   if (tabId === 'infos') return 'Infos';
@@ -232,7 +230,7 @@ const View = () => {
                     </>
                   );
                 case 'consultations':
-                  return <Consultations organisation={values} handleChange={handleChange} handleSubmit={handleSubmit} isSubmitting={isSubmitting} />;
+                  return <ConsultationsSettings />;
                 case 'medicalFile':
                   return (
                     <>
@@ -511,177 +509,6 @@ const View = () => {
     </div>
   );
 };
-
-function Consultations({ handleChange, isSubmitting, handleSubmit }) {
-  const [organisation, setOrganisation] = useRecoilState(organisationState);
-  const [orgConsultations, setOrgConsultations] = useState([]);
-  const allConsultations = useRecoilValue(consultationsState);
-  const [refreshErrorKey, setRefreshErrorKey] = useState(0);
-
-  const { refresh } = useDataLoader();
-
-  const consultationsSortable = useMemo(() => orgConsultations.map((e) => e.name), [orgConsultations]);
-  useEffect(() => {
-    setOrgConsultations(organisation.consultations);
-  }, [organisation, setOrgConsultations]);
-  const consultations = useRecoilValue(consultationsState);
-
-  return (
-    <>
-      <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Consultations</h3>
-      <p>
-        Disponible pour le personnel de santé 🧑‍⚕️ seulement dans l'onglet <b>Dossier médical</b> d'une personne suivie
-      </p>
-      <hr />
-
-      <h4 className="tw-my-8">Configuration du type de consultation</h4>
-
-      <FormGroup>
-        <Label htmlFor="consultations">Types de consultations</Label>
-
-        <SortableGrid
-          list={consultationsSortable}
-          key={JSON.stringify(orgConsultations)}
-          editItemTitle="Changer le nom du type de consultation"
-          onUpdateList={(list) => {
-            const newConsultations = [];
-            for (const item of list) {
-              const consultation = orgConsultations.find((e) => e.name === item);
-              if (consultation) newConsultations.push(consultation);
-              else newConsultations.push({ name: item, fields: [] });
-            }
-            setOrgConsultations(newConsultations);
-          }}
-          onRemoveItem={(content) => {
-            setOrgConsultations(orgConsultations.filter((e) => e.name !== content));
-          }}
-          onEditItem={async ({ content, newContent }) => {
-            if (!newContent) {
-              toast.error('Vous devez saisir un nom pour le type de consultation');
-              return;
-            }
-            const newConsultations = orgConsultations.map((e) => (e.name === content ? { ...e, name: newContent } : e));
-            setOrgConsultations(newConsultations);
-            const encryptedConsultations = await Promise.all(
-              allConsultations
-                .filter((consultation) => consultation.type === content)
-                .map((consultation) => ({ ...consultation, type: newContent }))
-                .map(prepareConsultationForEncryption(newConsultations))
-                .map(encryptItem)
-            );
-            const response = await API.put({
-              path: '/consultation/model',
-              body: {
-                organisationsConsultations: newConsultations,
-                consultations: encryptedConsultations,
-              },
-            });
-            if (response.ok) {
-              refresh();
-              handleChange({ target: { value: orgConsultations, name: 'consultations' } });
-              setOrganisation({ ...organisation, consultations: newConsultations });
-              toast.success("Consultation mise à jour. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
-            } else {
-              toast.error("Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !");
-            }
-          }}
-        />
-      </FormGroup>
-      <FormGroup>
-        <Label htmlFor="select-consultations">Ajouter un type de consultation</Label>
-        <SelectCustom
-          key={JSON.stringify(consultationsSortable || [])}
-          creatable
-          inputId="select-consultations"
-          classNamePrefix="select-consultations"
-          options={consultationTypes
-            .filter((cat) => !consultationsSortable.includes(cat))
-            .sort((c1, c2) => c1.localeCompare(c2))
-            .map((cat) => ({ value: cat, label: cat }))}
-          value={null}
-          onChange={(cat) => {
-            if (cat && cat.value) {
-              setOrgConsultations([...orgConsultations, { name: cat.value, fields: [] }]);
-            }
-          }}
-          onCreateOption={async (name) => {
-            setOrgConsultations([...orgConsultations, { name, fields: [] }]);
-          }}
-          isClearable
-        />
-      </FormGroup>
-      <div className="tw-mb-8 tw-mt-4 tw-flex tw-justify-end tw-gap-4">
-        <ButtonCustom
-          title="Mettre à jour"
-          loading={isSubmitting}
-          disabled={JSON.stringify(organisation.consultations) === JSON.stringify(orgConsultations)}
-          onClick={() => {
-            handleChange({ target: { value: orgConsultations, name: 'consultations' } });
-            handleSubmit();
-          }}
-        />
-      </div>
-      <hr />
-      <h4 className="tw-my-8">Champs personnalisés des consultations</h4>
-      {organisation.consultations.map((consultationType) => {
-        return (
-          <div key={consultationType.name}>
-            <h5 className="tw-mt-8">{consultationType.name}</h5>
-
-            <small>
-              Vous pouvez personnaliser les champs disponibles pour les consultations de type <strong>{consultationType.name}</strong>.
-            </small>
-            <TableCustomFields
-              customFields="consultations"
-              data={consultations}
-              key={refreshErrorKey + consultationType.name}
-              keyPrefix={consultationType.name}
-              mergeData={(newData) => {
-                return organisation.consultations.map((e) => (e.name === consultationType.name ? { ...e, fields: newData } : e));
-              }}
-              extractData={(data) => {
-                return data.find((e) => e.name === consultationType.name).fields || [];
-              }}
-              fields={(() => {
-                return Array.isArray(consultationType.fields) ? consultationType.fields : [];
-              })()}
-              onEditChoice={async ({ oldChoice, newChoice, field, fields }) => {
-                const updatedConsultations = replaceOldChoiceByNewChoice(consultations, oldChoice, newChoice, field);
-                const newConsultationsField = organisation.consultations.map((_consultationType) => {
-                  if (_consultationType.name === field.name) {
-                    return {
-                      ..._consultationType,
-                      fields,
-                    };
-                  }
-                  return _consultationType;
-                });
-                const response = await API.post({
-                  path: '/custom-field',
-                  body: {
-                    customFields: {
-                      consultations: newConsultationsField,
-                    },
-                    consultations: await Promise.all(
-                      updatedConsultations.map(prepareConsultationForEncryption(newConsultationsField)).map(encryptItem)
-                    ),
-                  },
-                });
-                if (response.ok) {
-                  toast.success('Choix mis à jour !');
-                  setOrganisation(response.data);
-                } else {
-                  setRefreshErrorKey((k) => k + 1); // to reset the table to its original values
-                }
-                refresh();
-              }}
-            />
-          </div>
-        );
-      })}
-    </>
-  );
-}
 
 const ImportFieldDetails = ({ field }) => {
   if (field.options?.length) {

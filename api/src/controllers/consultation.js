@@ -11,6 +11,7 @@ const { capture } = require("../sentry");
 const validateUser = require("../middleware/validateUser");
 const Consultation = require("../models/consultation");
 const { looseUuidRegex, customFieldSchema, positiveIntegerRegex } = require("../utils");
+const { serializeOrganisation } = require("../utils/data-serializer");
 
 const TODO = "A FAIRE";
 const DONE = "FAIT";
@@ -209,7 +210,7 @@ router.put(
       capture("error updating consultation", e);
       throw e;
     }
-    return res.status(200).send({ ok: true });
+    return res.status(200).send({ ok: true, data: serializeOrganisation(organisation) });
   })
 );
 
