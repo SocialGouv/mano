@@ -1621,9 +1621,18 @@ const TerritoryObservationsCreatedAt = ({ date, observations }) => {
   if (!data) return <div />;
   const moreThanOne = data.length > 1;
 
+  const handleOpenObservationModal = () => {
+    setObservation({
+      date: dayjs(date),
+      observations: [],
+    });
+    setOpenObservationModale(true);
+  };
+
   return (
     <>
       <StyledBox>
+        <ButtonCustom title="Ajouter une observation" className="tw-ml-auto tw-mb-10" onClick={handleOpenObservationModal} />
         <Table
           className="Table"
           title={`Observation${moreThanOne ? 's' : ''} de territoire${moreThanOne ? 's' : ''} faite${
