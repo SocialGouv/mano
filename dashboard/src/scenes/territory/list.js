@@ -91,7 +91,7 @@ const List = () => {
             render: (territory) => {
               return (
                 <div className="[overflow-wrap:anywhere]">
-                  <b>{territory.name}</b>,
+                  <b>{territory.name}</b>
                 </div>
               );
             },
@@ -138,7 +138,7 @@ const CreateTerritory = () => {
   const setTerritories = useSetRecoilState(territoriesState);
 
   return (
-    <div className="tw-w-full tw-flex tw-justify-end">
+    <div className="tw-flex tw-w-full tw-justify-end">
       <ButtonCustom
         disabled={!currentTeam?._id}
         onClick={() => setOpen(true)}
