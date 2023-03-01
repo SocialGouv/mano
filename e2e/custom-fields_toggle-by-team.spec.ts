@@ -176,12 +176,16 @@ test("Create custom fields filtered by team", async ({ page }) => {
 
   await page.getByRole("button", { name: "Consultations 🧑‍⚕️" }).click();
 
-  await page.locator(`data-test-id=${testConsultationField}`).getByLabel("Toute l'organisation").uncheck();
-
-  await page.locator(`data-test-id=${testConsultationField}`).getByLabel(teamExcludeCustomFieldName).uncheck();
-
-  await page.getByRole("button", { name: "Mettre à jour" }).nth(1).click();
-  await page.locator(".Toastify__close-button").last().click();
+  await page.hover(`[data-test-id="${testConsultationField}"]`);
+  await page
+    .getByRole("button", {
+      name: `Modifier le champ ${testConsultationField}`,
+    })
+    .click();
+  await page.getByLabel("Activé pour toute l'organisation").uncheck();
+  await changeReactSelectValue(page, "enabledTeams", "Team Test - 4");
+  await page.getByRole("button", { name: "Enregistrer" }).click();
+  await page.getByText("Mise à jour !").click();
 
   await page.getByRole("button", { name: "Territoires" }).click();
 
