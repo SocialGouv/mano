@@ -1,3 +1,10 @@
+## [1.249.5](https://github.com/SocialGouv/mano/compare/v1.249.4...v1.249.5) (2023-03-01)
+
+
+### Bug Fixes
+
+* **dashboard:** mauvaise date de derniere interaction pas lors d'un changement de clé ([#1348](https://github.com/SocialGouv/mano/issues/1348)) ([b4d9615](https://github.com/SocialGouv/mano/commit/b4d961533137fc4413b5ef1d574a33547accb01b))
+
 ## [1.249.4](https://github.com/SocialGouv/mano/compare/v1.249.3...v1.249.4) (2023-03-01)
 
 
