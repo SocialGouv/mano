@@ -39,9 +39,8 @@ test("test", async ({ page }) => {
     await page.getByRole("button", { name: "Consultations 🧑‍⚕️" }).click();
     await page.getByRole("button", { name: "Ajouter un type de consultations" }).click();
     await page.getByPlaceholder("Titre du groupe").fill("Infirmier");
-    await page.getByRole("button", { name: "Ajouter" }).click();
+    await page.getByRole("dialog", { name: "Ajouter un groupe" }).getByRole("button", { name: "Ajouter" }).click();
     await page.getByText("Type de consultation ajouté").click();
-
     await page.getByRole("button", { name: "Ajouter un champ" }).first().click();
     await addCustomField(page, "Poils au nez", "Choix dans une liste", ["un peu", "Beaucoup", "Passionnément"]);
 

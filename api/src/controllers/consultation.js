@@ -160,61 +160,6 @@ router.get(
 );
 
 router.put(
-  "/model",
-  passport.authenticate("user", { session: false }),
-  validateUser("admin"),
-  validateEncryptionAndMigrations,
-  catchErrors(async (req, res, next) => {
-    try {
-      z.object({
-        consultations: z.array(
-          z.object({
-            _id: z.string().regex(looseUuidRegex),
-            encrypted: z.string(),
-            encryptedEntityKey: z.string(),
-          })
-        ),
-        organisationsConsultations: z.optional(
-          z.array(
-            z.object({
-              name: z.string().min(1),
-              fields: z.array(customFieldSchema),
-            })
-          )
-        ),
-      }).parse(req.body);
-    } catch (e) {
-      const error = new Error(`Invalid request in consultation update: ${e}`);
-      error.status = 400;
-      return next(error);
-    }
-
-    const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
-    if (!organisation) return res.status(404).send({ ok: false, error: "Not Found" });
-
-    const { consultations = [], organisationsConsultations = [] } = req.body;
-
-    try {
-      await sequelize.transaction(async (tx) => {
-        for (const { encrypted, encryptedEntityKey, _id } of consultations) {
-          await Consultation.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
-        }
-
-        // Note by Rap2h: I don't understand why `organisation.set({ consultations: organisationsConsultations })`
-        // doesn't work here. Maybe JSONB is not handled correctly by Sequelize?
-        organisation.consultations = organisationsConsultations;
-        organisation.changed("consulations", true);
-        await organisation.save({ transaction: tx });
-      });
-    } catch (e) {
-      capture("error updating consultation", e);
-      throw e;
-    }
-    return res.status(200).send({ ok: true, data: serializeOrganisation(organisation) });
-  })
-);
-
-router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal"], { healthcareProfessional: true }),

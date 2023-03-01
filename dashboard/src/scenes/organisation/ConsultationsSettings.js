@@ -64,10 +64,12 @@ const ConsultationsSettings = () => {
         .map(prepareConsultationForEncryption(newConsultationFields))
         .map(encryptItem)
     );
-    const response = await API.put({
-      path: '/consultation/model',
+    const response = await API.post({
+      path: '/custom-field',
       body: {
-        organisationsConsultations: newConsultationFields,
+        customFields: {
+          consultations: newConsultationFields,
+        },
         consultations: encryptedConsultations,
       },
     });
@@ -107,7 +109,6 @@ const ConsultationsSettings = () => {
         name: group.groupTitle,
         fields: group.items.map((customFieldName) => flattenFields.find((f) => f.name === customFieldName)),
       }));
-      console.log({ newConsultationFields, flattenFields });
       const res = await API.put({
         path: `/organisation/${organisation._id}`,
         body: { consultations: newConsultationFields },
