@@ -3,6 +3,10 @@ const sequelize = require("../sequelize");
 
 module.exports = async () => {
   try {
+    // This migration has been done when there was a problem in encryption.
+    // These problems have been fixed, so this migration is not needed anymore.
+    // If there is a new issue, it should be fixed in the code, not in the migration.
+    /*
     await sequelize.query(`
       delete from "mano"."Person" r where exists(
       select * from "mano"."Organisation" o
@@ -69,6 +73,7 @@ module.exports = async () => {
       select * from "mano"."Organisation" o
       where r.organisation = o._id 
       and  r."updatedAt" < (o."encryptionLastUpdateAt" - interval '1 hour') and "deletedAt" is not null);`);
+      */
   } catch (e) {
     capture(e);
   }
