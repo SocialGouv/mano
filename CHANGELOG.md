@@ -1,3 +1,10 @@
+## [1.249.4](https://github.com/SocialGouv/mano/compare/v1.249.3...v1.249.4) (2023-03-01)
+
+
+### Bug Fixes
+
+* **app, dashboard:** mise-à-jour du  ou  au plus près de la requête du nombre d'lémémnents à mettre à jour ([#1362](https://github.com/SocialGouv/mano/issues/1362)) ([3e7c9d0](https://github.com/SocialGouv/mano/commit/3e7c9d0ee054659cf66682945b1ae5542febdf1e))
+
 ## [1.249.3](https://github.com/SocialGouv/mano/compare/v1.249.2...v1.249.3) (2023-02-28)
 
 
