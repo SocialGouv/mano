@@ -43,8 +43,10 @@ function serializeOrganisation(organisation) {
     fieldsPersonsCustomizableOptions: organisation.fieldsPersonsCustomizableOptions || fieldsPersonsCustomizableOptions,
     /* custom fields persons */
     customFieldsPersons: organisation.customFieldsPersons || [],
+    /* kept for retro-compatibility */
     customFieldsPersonsSocial: organisation.customFieldsPersons.find(({ name }) => name === "Informations sociales") || [],
     customFieldsPersonsMedical: organisation.customFieldsPersons.find(({ name }) => name === "Informations médicales") || [],
+
     customFieldsMedicalFile: organisation.customFieldsMedicalFile || defaultMedicalFileCustomFields,
   };
 }

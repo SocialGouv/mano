@@ -151,19 +151,31 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("link", { name: "Organisation" }).click();
   await page.getByRole("button", { name: "Personnes suivies" }).click();
 
-  await page.locator(`data-test-id=${testPersonSocialField}`).getByText("Toute l'organisation").click();
+  await expect(page.locator(`[data-test-id=${testPersonSocialField}]`)).toBeVisible();
+  await page.hover(`[data-test-id=${testPersonSocialField}]`);
+  await page
+    .getByRole("button", {
+      name: `Modifier le champ ${testPersonSocialField}`,
+    })
+    .click();
 
-  await page.locator(`data-test-id=${testPersonSocialField}`).getByLabel(teamExcludeCustomFieldName).uncheck();
+  await page.getByLabel("Activé pour toute l'organisation").uncheck();
+  await changeReactSelectValue(page, "enabledTeams", "Team Test - 4");
+  await page.getByRole("button", { name: "Enregistrer" }).click();
+  await page.getByText("Mise à jour !").click();
 
-  await page.getByRole("button", { name: "Mettre à jour" }).nth(2).click();
-  await page.locator(".Toastify__close-button").last().click();
+  await expect(page.locator(`[data-test-id=${testPersonMedicalField}]`)).toBeVisible();
+  await page.hover(`[data-test-id=${testPersonMedicalField}]`);
+  await page
+    .getByRole("button", {
+      name: `Modifier le champ ${testPersonMedicalField}`,
+    })
+    .click();
 
-  await page.locator(`data-test-id=${testPersonMedicalField}`).getByText("Toute l'organisation").click();
-
-  await page.locator(`data-test-id=${testPersonMedicalField}`).getByLabel(teamExcludeCustomFieldName).uncheck();
-
-  await page.getByRole("button", { name: "Mettre à jour" }).nth(3).click();
-  await page.locator(".Toastify__close-button").last().click();
+  await page.getByLabel("Activé pour toute l'organisation").uncheck();
+  await changeReactSelectValue(page, "enabledTeams", "Team Test - 4");
+  await page.getByRole("button", { name: "Enregistrer" }).click();
+  await page.getByText("Mise à jour !").click();
 
   await page.getByRole("button", { name: "Dossier Médical 🧑‍⚕️" }).click();
   await page.hover(`[data-test-id=${testMedicalFileField}]`);
