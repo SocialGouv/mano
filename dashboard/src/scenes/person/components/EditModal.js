@@ -206,9 +206,9 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                     )}
                   </div>
                   {!['restricted-access'].includes(user.role) &&
-                    customFieldsPersons.map(({ name, fields }) => {
+                    customFieldsPersons.map(({ name, fields }, index) => {
                       return (
-                        <div>
+                        <div key={name + index}>
                           <div
                             className="tw-mb-4 tw-flex tw-cursor-pointer tw-border-b tw-pb-2 tw-text-lg tw-font-semibold"
                             onClick={() => {
