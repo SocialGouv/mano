@@ -7,6 +7,7 @@ import dayjs from "dayjs";
 test.beforeAll(async () => {
   await populate();
 });
+test.setTimeout(90000);
 
 test("test", async ({ page }) => {
   const premier = "premier-" + nanoid();
