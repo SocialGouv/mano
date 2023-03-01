@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { atom, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { toast } from 'react-toastify';
@@ -88,6 +88,8 @@ export default function DataLoader() {
 
   const organisationId = organisation?._id;
 
+  const justChecked = useRef(null);
+
   // Loader initialization: get data from cache, check stats, init recoils states, and start loader.
   function initLoader() {
     if (loadList.list.length > 0) return;
@@ -121,6 +123,7 @@ export default function DataLoader() {
               withAllMedicalData: initialLoad,
             },
           }).then(({ data: stats }) => {
+            justChecked.current = Date.now();
             if (!stats) return;
             const newList = [];
             let itemsCount =
@@ -371,7 +374,7 @@ export default function DataLoader() {
 
   function stopLoader() {
     setIsLoading(false);
-    setLastLoad(Date.now());
+    setLastLoad(justChecked.current);
     setProgressBuffer(null);
     setProgress(null);
     setTotal(null);
