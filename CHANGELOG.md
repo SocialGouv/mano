@@ -1,3 +1,10 @@
+## [1.249.9](https://github.com/SocialGouv/mano/compare/v1.249.8...v1.249.9) (2023-03-02)
+
+
+### Bug Fixes
+
+* **dashboard:** possibilité de changer l'option Voir dans les statistiques ([#1377](https://github.com/SocialGouv/mano/issues/1377)) ([e48e79f](https://github.com/SocialGouv/mano/commit/e48e79f6f22a6496ceca8f59159499eadafecd5e))
+
 ## [1.249.8](https://github.com/SocialGouv/mano/compare/v1.249.7...v1.249.8) (2023-03-02)
 
 
