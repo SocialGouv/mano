@@ -23,12 +23,13 @@ import DownloadExample from '../data-import-export/DownloadExample';
 import useTitle from '../../services/useTitle';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
 import { capture } from '../../services/sentry';
-import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../recoil/medicalFiles';
+
 import { useDataLoader } from '../../components/DataLoader';
 import ActionCategoriesSettings from './ActionCategoriesSettings';
 import ServicesSettings from './ServicesSettings';
 import ObservationsSettings from './ObservationsSettings';
 import ConsultationsSettings from './ConsultationsSettings';
+import MedicalFileSettings from './MedicalFileSettings';
 
 const getSettingTitle = (tabId) => {
   if (tabId === 'infos') return 'Infos';
@@ -51,9 +52,7 @@ const View = () => {
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
-  const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
 
-  const medicalFiles = useRecoilValue(medicalFileState);
   const persons = useRecoilValue(personsState);
   const preparePersonForEncryption = usePreparePersonForEncryption();
   const [refreshErrorKey, setRefreshErrorKey] = useState(0);
@@ -232,64 +231,7 @@ const View = () => {
                 case 'consultations':
                   return <ConsultationsSettings />;
                 case 'medicalFile':
-                  return (
-                    <>
-                      <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Dossier Médical</h3>
-                      {organisation.encryptionEnabled ? (
-                        <>
-                          <p>
-                            Disponible pour les professionnel·le·s de santé 🧑‍⚕️ seulement dans l'onglet <b>Dossier médical</b> d'une personne suivie
-                          </p>
-                          <hr />
-                          <Row>
-                            <Label>Champs personnalisés</Label>
-                            <TableCustomFields
-                              data={medicalFiles}
-                              customFields="customFieldsMedicalFile"
-                              key={refreshErrorKey + 'customFieldsMedicalFile'}
-                              fields={customFieldsMedicalFile}
-                              onEditChoice={async ({ oldChoice, newChoice, field, fields }) => {
-                                const updatedMedicalFiles = replaceOldChoiceByNewChoice(medicalFiles, oldChoice, newChoice, field);
-
-                                const response = await API.post({
-                                  path: '/custom-field',
-                                  body: {
-                                    customFields: {
-                                      customFieldsMedicalFile: fields,
-                                    },
-                                    medicalFiles: await Promise.all(
-                                      updatedMedicalFiles.map(prepareMedicalFileForEncryption(fields)).map(encryptItem)
-                                    ),
-                                  },
-                                });
-                                if (response.ok) {
-                                  toast.success('Choix mis à jour !');
-                                  setOrganisation(response.data);
-                                } else {
-                                  setRefreshErrorKey((k) => k + 1); // to reset the table to its original values
-                                }
-                                refresh();
-                              }}
-                            />
-                          </Row>
-                        </>
-                      ) : (
-                        <>
-                          <Row>
-                            <Col md={10}>
-                              <p>
-                                Désolé, cette fonctionnalité qui consiste à personnaliser les champs disponibles pour le dossier médical des personnes
-                                suivies n'existe que pour les organisations chiffrées.
-                              </p>
-                            </Col>
-                          </Row>
-                          <div className="tw-mb-10 tw-flex tw-justify-end">
-                            <EncryptionKey />
-                          </div>
-                        </>
-                      )}
-                    </>
-                  );
+                  return <MedicalFileSettings />;
                 case 'actions':
                   return <ActionCategoriesSettings />;
                 case 'reception':

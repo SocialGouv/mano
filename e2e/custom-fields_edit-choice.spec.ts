@@ -180,7 +180,12 @@ test("test", async ({ page }) => {
     await page.getByText("Choix mis à jour !").click();
 
     await page.getByRole("button", { name: "Dossier Médical 🧑‍⚕️" }).click();
-    await page.locator('[data-test-id="Douleur"]').getByRole("button", { name: "Modifier le champ" }).click();
+    await page.hover('[data-test-id="Douleur"]');
+    await page
+      .getByRole("button", {
+        name: "Modifier le champ Douleur",
+      })
+      .click();
     await page.getByRole("button", { name: "Modifier le choix Colonne vertébrale merde je me suis trompé" }).click();
     await page.getByPlaceholder("Colonne vertébrale merde je me suis trompé").fill("Colonne vertébrale seulement");
     page.once("dialog", (dialog) => {
