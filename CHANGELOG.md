@@ -1,3 +1,10 @@
+## [1.249.7](https://github.com/SocialGouv/mano/compare/v1.249.6...v1.249.7) (2023-03-02)
+
+
+### Bug Fixes
+
+* update app version ([90fd315](https://github.com/SocialGouv/mano/commit/90fd31568148a818e8e9cb24aa10d0a5f150d501))
+
 ## [1.249.6](https://github.com/SocialGouv/mano/compare/v1.249.5...v1.249.6) (2023-03-02)
 
 

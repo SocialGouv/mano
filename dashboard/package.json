@@ -1,6 +1,6 @@
 {
   "name": "dashboard",
-  "version": "1.249.6",
+  "version": "1.249.7",
   "private": true,
   "dependencies": {
     "@babel/runtime": "^7.14.5",
