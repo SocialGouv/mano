@@ -1,3 +1,10 @@
+## [1.249.8](https://github.com/SocialGouv/mano/compare/v1.249.7...v1.249.8) (2023-03-02)
+
+
+### Bug Fixes
+
+* **app:** reset du cache quand on change d'organisation ([#1365](https://github.com/SocialGouv/mano/issues/1365)) ([3f98b1d](https://github.com/SocialGouv/mano/commit/3f98b1da4e38522daafe114bd510f34a34f31ff7))
+
 ## [1.249.7](https://github.com/SocialGouv/mano/compare/v1.249.6...v1.249.7) (2023-03-02)
 
 
