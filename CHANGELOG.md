@@ -1,3 +1,10 @@
+## [1.249.6](https://github.com/SocialGouv/mano/compare/v1.249.5...v1.249.6) (2023-03-02)
+
+
+### Bug Fixes
+
+* **deps:** update flipper_version ([#1376](https://github.com/SocialGouv/mano/issues/1376)) ([b2b2f3c](https://github.com/SocialGouv/mano/commit/b2b2f3c9026868d9239b702d70717ec64950454c))
+
 ## [1.249.5](https://github.com/SocialGouv/mano/compare/v1.249.4...v1.249.5) (2023-03-01)
 
 
