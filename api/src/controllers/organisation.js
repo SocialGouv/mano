@@ -264,7 +264,7 @@ router.put(
       const bodyToParse = {
         name: z.optional(z.string().min(1)),
         categories: z.optional(z.array(z.string().min(1))),
-        actionsGroupedCategories: z.optional(z.array(z.object({ actionsGroupedCategories: z.string(), categories: z.array(z.string().min(1)) }))),
+        actionsGroupedCategories: z.optional(z.array(z.object({ groupTitle: z.string(), categories: z.array(z.string().min(1)) }))),
         groupedServices: z.optional(z.array(z.object({ groupedServices: z.string(), services: z.array(z.string().min(1)) }))),
         collaborations: z.optional(z.array(z.string().min(1))),
         customFieldsObs: z.optional(z.array(customFieldSchema)),
