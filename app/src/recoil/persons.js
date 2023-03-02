@@ -106,19 +106,18 @@ export const usePreparePersonForEncryption = () => {
   const flattenedCustomFieldsPersons = useRecoilValue(flattenedCustomFieldsPersonsSelector);
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
   const personFields = useRecoilValue(personFieldsSelector);
-  const preparePersonForEncryption = (person, { checkRequiredFields = true } = {}) => {
-    if (!!checkRequiredFields) {
-      try {
-        if (!person.name) {
-          throw new Error('Person is missing name');
-        }
-      } catch (error) {
-        toast.error(
-          "La personne n'a pas été sauvegardée car son format était incorrect. Vous pouvez vérifier son contenu et tenter de la sauvegarder à nouveau. L'équipe technique a été prévenue et va travailler sur un correctif."
-        );
-        capture(error, { extra: { person } });
-        throw error;
+  const preparePersonForEncryption = (person) => {
+    try {
+      if (!person.name) {
+        throw new Error('Person is missing name');
       }
+    } catch (error) {
+      Alert.alert(
+        "La personne n'a pas été sauvegardée car son format était incorrect.",
+        "Vous pouvez vérifier son contenu et tenter de la sauvegarder à nouveau. L'équipe technique a été prévenue et va travailler sur un correctif."
+      );
+      capture(error, { extra: { person } });
+      throw error;
     }
     const encryptedFields = personFields.filter((f) => f.encrypted).map((f) => f.name);
     const encryptedFieldsIncludingCustom = [
