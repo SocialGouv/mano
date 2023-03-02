@@ -264,6 +264,7 @@ export const EditCustomField = ({ open, onDelete, data, editingField, onClose, o
       name: formData.get('name'),
       label: formData.get('label'),
       type: formData.get('type'),
+      showInStats: formData.get('showInStats'),
       options: formData.getAll('options'),
     };
     onSaveField(editedField);
@@ -411,6 +412,19 @@ export const EditCustomField = ({ open, onDelete, data, editingField, onClose, o
                 />
                 <span>Activé pour toute l'organisation</span>
               </label>
+            </div>
+          </div>
+          <div className="tw-basis-full tw-p-4">
+            <div>
+              <input
+                type="checkbox"
+                id="withTime"
+                name="withTime"
+                className="tw-mr-2"
+                checked={field.showInStats}
+                onChange={(e) => setField({ ...field, showInStats: e.target.checked })}
+              />
+              <label htmlFor="withTime">Voir dans les statistiques</label>
             </div>
           </div>
         </form>
