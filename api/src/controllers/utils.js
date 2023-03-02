@@ -23,7 +23,12 @@ router.get("/version", async (req, res) => {
     inAppMessage: [
       `La nouvelle version ${MOBILE_APP_VERSION} de Mano est disponible !`,
       `Vous avez la version ${req.headers.version} actuellement sur votre téléphone.
-Cette nouvelle version corrige un bug dans l'accès au dossier médical d'une personne suivie.`,
+Cette nouvelle version :
+- Améliore la gestion du cache, et rend l'application plus rapide
+- Rend possible la modification d'un commentaire par un autre utilisateur que son auteur
+- Rend possible la modification de la date d'un commentaire et d'une observation
+- Rend possible la modification d'une rencontre
+`,
       [
         { text: "Télécharger", link: "https://mano-app.fabrique.social.gouv.fr/download" },
         { text: "Plus tard", style: "cancel" },
