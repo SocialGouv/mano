@@ -1,4 +1,4 @@
-import { atom, selector } from 'recoil';
+import { selector } from 'recoil';
 import { organisationState } from './auth';
 
 export const structuresCategoriesSelector = selector({
@@ -15,9 +15,4 @@ export const flattenedStructuresCategoriesSelector = selector({
     const structuresGroupedCategories = get(structuresCategoriesSelector);
     return structuresGroupedCategories.reduce((allCategories, { categories }) => [...allCategories, ...categories], []);
   },
-});
-
-export const structuresState = atom({
-  key: 'structuresState',
-  default: [],
 });

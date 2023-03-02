@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { organisationState, userState } from '../../../recoil/auth';
-import { CANCEL, DONE, flattenedCategoriesSelector, mappedIdsToLabels } from '../../../recoil/actions';
+import { CANCEL, DONE, flattenedActionsCategoriesSelector, mappedIdsToLabels } from '../../../recoil/actions';
 import { filteredPersonActionsSelector } from '../selectors/selectors';
 import { useHistory } from 'react-router-dom';
 import CreateActionModal from '../../../components/CreateActionModal';
@@ -87,7 +87,7 @@ export const Actions = ({ person }) => {
 };
 
 const ActionsFilters = ({ data, filteredData, setFilterCategories, setFilterStatus, filterStatus, filterCategories }) => {
-  const categories = useRecoilValue(flattenedCategoriesSelector);
+  const categories = useRecoilValue(flattenedActionsCategoriesSelector);
 
   const catsSelect = ['-- Aucune --', ...(categories || [])];
 

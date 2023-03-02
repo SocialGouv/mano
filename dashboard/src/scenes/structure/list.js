@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SmallHeader } from '../../components/header';
 import Loading from '../../components/loading';
 import Table from '../../components/table';
@@ -12,6 +12,7 @@ import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../compo
 import SelectCustom from '../../components/SelectCustom';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../../recoil/auth';
+import { flattenedStructuresCategoriesSelector } from '../../recoil/structures';
 
 const List = () => {
   const [structures, setStructures] = useState([]);
@@ -36,11 +37,6 @@ const List = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
 
-  const existingCategories = useMemo(
-    () => [...new Set(structures.reduce((acc, structure) => [...acc, ...(structure.categories || [])], []))].sort((c1, c2) => c1?.localeCompare(c2)),
-    [structures]
-  );
-
   if (isLoading) return <Loading />;
 
   return (
@@ -55,7 +51,6 @@ const List = () => {
               getStructures();
             }}
             structure={currentStructure}
-            existingCategories={existingCategories}
             open={currentStructureOpen}
             onOpen={() => setCurrentStructureOpen(true)}
             onClose={() => {
@@ -128,9 +123,11 @@ const List = () => {
   );
 };
 
-const Structure = ({ structure: initStructure, onSuccess, existingCategories, open, onClose, onOpen }) => {
+const Structure = ({ structure: initStructure, onSuccess, open, onClose, onOpen }) => {
   const structureRef = React.useRef(initStructure);
   const user = useRecoilValue(userState);
+  const categories = useRecoilValue(flattenedStructuresCategoriesSelector);
+
   const [structure, setStructure] = useState(initStructure);
   const [disabled, setDisabled] = useState(false);
   const onResetAndClose = () => {
@@ -221,9 +218,8 @@ const Structure = ({ structure: initStructure, onSuccess, existingCategories, op
                 inputId="categories"
                 name="categories"
                 classNamePrefix="categories"
-                creatable
                 isMulti
-                options={existingCategories.map((opt) => ({ value: opt, label: opt }))}
+                options={categories.map((opt) => ({ value: opt, label: opt }))}
                 value={(structure?.categories || []).map((opt) => ({ value: opt, label: opt }))}
                 onChange={(v) => {
                   onChange({ target: { name: 'categories', value: v.map((v) => v.value) } });

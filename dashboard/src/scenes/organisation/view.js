@@ -29,6 +29,7 @@ import ObservationsSettings from './ObservationsSettings';
 import ConsultationsSettings from './ConsultationsSettings';
 import MedicalFileSettings from './MedicalFileSettings';
 import PersonCustomFieldsSettings from './PersonCustomFieldsSettings';
+import StructuresCategoriesSettings from './StructuresCategoriesSettings';
 
 const getSettingTitle = (tabId) => {
   if (tabId === 'infos') return 'Infos';
@@ -38,6 +39,7 @@ const getSettingTitle = (tabId) => {
   if (tabId === 'consultations') return 'Consultations 🧑‍⚕️ ';
   if (tabId === 'medicalFile') return 'Dossier Médical 🧑‍⚕️';
   if (tabId === 'actions') return 'Actions';
+  if (tabId === 'structures') return 'Structures';
   if (tabId === 'territories') return 'Territoires';
   if (tabId === 'export') return 'Export';
   if (tabId === 'import') return 'Import';
@@ -136,6 +138,11 @@ const View = () => {
             Actions
           </button>
           <button
+            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'structures' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
+            onClick={() => setTab('structures')}>
+            Structures
+          </button>
+          <button
             className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'territories' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
             onClick={() => setTab('territories')}
             disabled={!organisation.encryptionEnabled}>
@@ -231,6 +238,8 @@ const View = () => {
                   return <MedicalFileSettings />;
                 case 'actions':
                   return <ActionCategoriesSettings />;
+                case 'structures':
+                  return <StructuresCategoriesSettings />;
                 case 'reception':
                   return (
                     <>

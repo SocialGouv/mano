@@ -8,6 +8,10 @@ module.exports = (sequelize, DataTypes) => {
     actionsGroupedCategories: {
       type: DataTypes.JSONB, // example: [{"groupTitle": "médical", categories: ["seringue", "pansement"]}, { "groupTitle": "local", "categories": ["entretien", "lavage"]}]
     },
+    structuresGroupedCategories: {
+      type: DataTypes.JSONB,
+      // example: [{"groupTitle": "lala", categories: ["carud", "mairie"]}, { "groupTitle": "lolo", "categories": ["entretien", "lavage"]}]
+    },
     collaborations: { type: [DataTypes.ARRAY(DataTypes.TEXT)], defaultValue: [] },
     consultations: DataTypes.JSONB,
     encryptionEnabled: { type: DataTypes.BOOLEAN },
