@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, Keyboard, View } from 'react-native';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilValue, useRecoilState } from 'recoil';
 import ScrollContainer from '../../components/ScrollContainer';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
@@ -24,6 +24,7 @@ import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIf
 import { dayjsInstance } from '../../services/dateDayjs';
 import InputFromSearchList from '../../components/InputFromSearchList';
 import { useFocusEffect } from '@react-navigation/native';
+import { MyText } from '../../components/MyText';
 
 const cleanValue = (value) => {
   if (typeof value === 'string') return (value || '').trim();
@@ -31,12 +32,16 @@ const cleanValue = (value) => {
 };
 
 const Consultation = ({ navigation, route }) => {
-  const setAllConsultations = useSetRecoilState(consultationsState);
+  const [allConsultations, setAllConsultations] = useRecoilState(consultationsState);
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
   const person = route?.params?.personDB || route?.params?.person;
-  const consultationDB = route?.params?.consultationDB;
+  const consultationDB = useMemo(
+    () => allConsultations.find((c) => c._id === route?.params?.consultationDB?._id),
+    [allConsultations, route?.params?.consultationDB?._id]
+  );
+
   const isNew = !consultationDB?._id;
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
@@ -67,6 +72,7 @@ const Consultation = ({ navigation, route }) => {
   );
 
   const [posting, setPosting] = useState(false);
+  const [editable, setEditable] = useState(!!isNew);
   const [deleting, setDeleting] = useState(false);
 
   const [consultation, setConsultation] = useState(() => castToConsultation(consultationDB));
@@ -95,8 +101,17 @@ const Consultation = ({ navigation, route }) => {
       }
     }, [route?.params?.person])
   );
+  useEffect(() => {
+    if (!editable) {
+      if (consultation.status !== consultationDB.status) onSaveConsultationRequest();
+      if (JSON.stringify(consultation.onlyVisibleBy) !== JSON.stringify(consultationDB.onlyVisibleBy)) {
+        onSaveConsultationRequest({ goBackOnSave: false });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editable, consultation.status, consultation.onlyVisibleBy]);
 
-  const onSaveConsultationRequest = async () => {
+  const onSaveConsultationRequest = async ({ goBackOnSave = true } = {}) => {
     if (!consultation.status) return Alert.alert('Veuillez indiquer un status');
     if (!consultation.dueAt) return Alert.alert('Veuillez indiquer une date');
     if (!consultation.type) return Alert.alert('Veuillez indiquer un type');
@@ -132,7 +147,12 @@ const Consultation = ({ navigation, route }) => {
         await createReportAtDateIfNotExist(completedAt);
       }
     }
-    onBack();
+    if (goBackOnSave) {
+      onBack();
+    } else {
+      setPosting(false);
+      setConsultation(castToConsultation(consultationResponse.decryptedData));
+    }
   };
 
   const onDeleteRequest = () => {
@@ -203,6 +223,9 @@ const Consultation = ({ navigation, route }) => {
           person?.name || ''
         }`}
         onBack={onGoBackRequested}
+        onEdit={!editable ? () => setEditable(true) : null}
+        onSave={!editable || isDisabled ? null : () => onSaveConsultationRequest()}
+        saving={posting}
         testID="consultation"
       />
       <ScrollContainer keyboardShouldPersistTaps="handled">
@@ -216,8 +239,9 @@ const Consultation = ({ navigation, route }) => {
             onChangeText={(name) => onChange({ name })}
             placeholder="Nom de la consultation (facultatif)"
             testID="consultation-name"
+            editable={editable}
           />
-          <ConsultationTypeSelect editable value={consultation.type} onSelect={(type) => onChange({ type })} />
+          <ConsultationTypeSelect editable={editable} value={consultation.type} onSelect={(type) => onChange({ type })} />
           {organisation.consultations
             .find((e) => e.name === consultation.type)
             ?.fields.filter((f) => f)
@@ -231,9 +255,7 @@ const Consultation = ({ navigation, route }) => {
                   field={field}
                   value={consultation[name]}
                   handleChange={(newValue) => onChange({ [name]: newValue })}
-                  editable
-                  // ref={(r) => (refs.current[`${name}-ref`] = r)}
-                  // onFocus={() => _scrollToInput(refs.current[`${name}-ref`])}
+                  editable={editable}
                 />
               );
             })}
@@ -245,20 +267,38 @@ const Consultation = ({ navigation, route }) => {
             documents={consultation.documents}
           />
           <Spacer />
-          <ActionStatusSelect value={consultation.status} onSelect={(status) => onChange({ status })} editable testID="consultation-status" />
-          <DateAndTimeInput label="Date" date={consultation.dueAt} setDate={(dueAt) => onChange({ dueAt })} editable showYear showTime withTime />
-          <CheckboxLabelled
-            label="Seulement visible par moi"
-            alone
-            onPress={() => onChange({ onlyVisibleBy: consultation.onlyVisibleBy?.includes(user._id) ? [] : [user._id] })}
-            value={consultation.onlyVisibleBy?.includes(user._id)}
+          <ActionStatusSelect
+            value={consultation.status}
+            onSelect={(status) => onChange({ status })}
+            onSelectAndSave={(status) => onChange({ status })}
+            editable={editable}
+            testID="consultation-status"
           />
+          <DateAndTimeInput
+            label="Date"
+            date={consultation.dueAt}
+            setDate={(dueAt) => onChange({ dueAt })}
+            editable={editable}
+            showYear
+            showTime
+            withTime
+          />
+          {consultationDB.user === user._id ? (
+            <CheckboxLabelled
+              label="Seulement visible par moi"
+              alone
+              onPress={() => {
+                onChange({ onlyVisibleBy: consultation.onlyVisibleBy?.includes(user._id) ? [] : [user._id] });
+              }}
+              value={consultation.onlyVisibleBy?.includes(user._id)}
+            />
+          ) : null}
           <ButtonsContainer>
             {!isNew && <ButtonDelete onPress={onDeleteRequest} deleting={deleting} />}
             <Button
-              caption={isNew ? 'Créer' : 'Modifier'}
-              disabled={!!isDisabled}
-              onPress={onSaveConsultationRequest}
+              caption={isNew ? 'Créer' : editable ? 'Mettre à jour' : 'Modifier'}
+              disabled={editable ? isDisabled : false}
+              onPress={editable ? () => onSaveConsultationRequest() : () => setEditable(true)}
               loading={posting}
               testID="consultation-create"
             />
