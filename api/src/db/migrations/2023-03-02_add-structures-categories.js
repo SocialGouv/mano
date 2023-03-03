@@ -39,8 +39,8 @@ module.exports = async () => {
         `UPDATE "mano"."Organisation" SET "structuresGroupedCategories"=:structuresGroupedCategories, "migrations"=:migrations WHERE "_id"=:_id`,
         {
           replacements: {
-            structuresGroupedCategories: groupedCategories,
-            migrations: [...(organisation.migrations || []), "structures-categories-init"],
+            structuresGroupedCategories: JSON.stringify(groupedCategories),
+            migrations: `{"${[...(organisation.migrations || []), "structures-categories-init"].join(`","`)}"}`,
             _id: organisation._id,
           },
           type: sequelize.QueryTypes.UPDATE,

@@ -21,13 +21,15 @@ module.exports = async () => {
         `UPDATE "mano"."Organisation" SET "customFieldsPersonsSocial"=:customFieldsPersonsSocial, "customFieldsPersonsMedical"=:customFieldsPersonsMedical, "migrationLastUpdateAt"=:migrationLastUpdateAt, "migrations"=:migrations WHERE "_id"=:_id`,
         {
           replacements: {
-            customFieldsPersonsSocial: (organisation.customFieldsPersonsSocial || []).concat(defaultSocialCustomFields),
-            customFieldsPersonsMedical: (
-              organisation.customFieldsPersonsMedical ||
-              defaultMedicalCustomFields.filter((e) => defaultMedicalFieldNameBeforeMigration.includes(e.name))
-            ).concat(defaultMedicalCustomFields.filter((e) => !defaultMedicalFieldNameBeforeMigration.includes(e.name))),
+            customFieldsPersonsSocial: JSON.stringify((organisation.customFieldsPersonsSocial || []).concat(defaultSocialCustomFields)),
+            customFieldsPersonsMedical: JSON.stringify(
+              (
+                organisation.customFieldsPersonsMedical ||
+                defaultMedicalCustomFields.filter((e) => defaultMedicalFieldNameBeforeMigration.includes(e.name))
+              ).concat(defaultMedicalCustomFields.filter((e) => !defaultMedicalFieldNameBeforeMigration.includes(e.name)))
+            ),
             migrationLastUpdateAt: new Date(),
-            migrations: [...(organisation.migrations || []), "custom-fields-persons-setup"],
+            migrations: `{"${[...(organisation.migrations || []), "custom-fields-persons-setup"].join(`","`)}"}`,
             _id: organisation._id,
           },
           type: sequelize.QueryTypes.UPDATE,

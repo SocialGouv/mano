@@ -24,7 +24,12 @@ function serializeOrganisation(organisation) {
       : organisation.categories,
 
     actionsGroupedCategories: organisation.actionsGroupedCategories,
-    structuresGroupedCategories: organisation.structuresGroupedCategories,
+    structuresGroupedCategories: organisation.structuresGroupedCategories || [
+      {
+        groupTitle: "Toutes mes catégories",
+        categories: [],
+      },
+    ],
 
     /* services settings */
     groupedServices: organisation.groupedServices,
