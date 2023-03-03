@@ -1,3 +1,10 @@
+## [1.249.10](https://github.com/SocialGouv/mano/compare/v1.249.9...v1.249.10) (2023-03-03)
+
+
+### Bug Fixes
+
+* **dashboard:** afficher la liste des filtres des consultations même quand le filtre ne retourne aucune consultation ([#1381](https://github.com/SocialGouv/mano/issues/1381)) ([b96abe7](https://github.com/SocialGouv/mano/commit/b96abe740dfbdbc853ce359c7e870efaa8e4a135))
+
 ## [1.249.9](https://github.com/SocialGouv/mano/compare/v1.249.8...v1.249.9) (2023-03-02)
 
 
