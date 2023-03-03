@@ -1,3 +1,10 @@
+# [1.250.0](https://github.com/SocialGouv/mano/compare/v1.249.10...v1.250.0) (2023-03-03)
+
+
+### Features
+
+* **app:** affichage de la consultation en mode lecture par défaut, au lieu du mode modification par défaut ([#1378](https://github.com/SocialGouv/mano/issues/1378)) ([82642e1](https://github.com/SocialGouv/mano/commit/82642e122ecca1f233070081ed2c4c04c90cc6a9))
+
 ## [1.249.10](https://github.com/SocialGouv/mano/compare/v1.249.9...v1.249.10) (2023-03-03)
 
 
