@@ -70,14 +70,14 @@ export function MedicalFile({ person }) {
     setShowAddTreatment(false);
   };
 
-  const consultations = useMemo(
+  const personConsultations = useMemo(() => (allConsultations || []).filter((c) => c.person === person._id), [allConsultations, person._id]);
+  const personConsultationsFiltered = useMemo(
     () =>
-      (allConsultations || [])
-        .filter((c) => c.person === person._id)
+      personConsultations
         .filter((c) => !consultationStatuses.length || consultationStatuses.includes(c.status))
         .filter((c) => !consultationTypes.length || consultationTypes.includes(c.type))
         .sort(sortActionsOrConsultations(consultationsSortBy, consultationsSortOrder)),
-    [allConsultations, consultationStatuses, consultationTypes, person._id, consultationsSortBy, consultationsSortOrder]
+    [personConsultations, consultationsSortBy, consultationsSortOrder, consultationStatuses, consultationTypes]
   );
 
   const treatments = useMemo(() => (allTreatments || []).filter((t) => t.person === person._id), [allTreatments, person._id]);
@@ -105,20 +105,20 @@ export function MedicalFile({ person }) {
         .filter(Boolean)
         .flat() || [];
     const consultationsDocs =
-      consultations
+      personConsultationsFiltered
         ?.map((consultation) => consultation.documents?.map((doc) => ({ ...doc, type: 'consultation', consultation })))
         .filter(Boolean)
         .flat() || [];
     const otherDocs = medicalFile?.documents || [];
     return [...ordonnances, ...consultationsDocs, ...otherDocs].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  }, [consultations, medicalFile?.documents, treatments]);
+  }, [personConsultationsFiltered, medicalFile?.documents, treatments]);
 
   return (
     <>
       <h1 className="printonly">Dossier médical de {person?.name}</h1>
       <small className="printonly">extrait le {dayjsInstance().format('ddd DD MM YYYY')}</small>
       <div className="tw-mx-0 tw-mt-8 tw-mb-5 tw-flex tw-items-center">
-        <h2 className="tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Informations générales</h2>
+        <h2 className="tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Informations jjj générales</h2>
         <div className="tw-flex tw-flex-1 tw-justify-end">
           <ButtonCustom
             icon={false}
@@ -471,7 +471,7 @@ export function MedicalFile({ person }) {
           />
         </div>
       </div>
-      {!!consultations.length && (
+      {!!personConsultations.length && (
         <Row className="noprint -tw-mx-4 tw-mb-10 tw-flex tw-flex-wrap tw-border-b tw-border-zinc-300">
           <Col md={12} lg={6} className="tw-mb-5 tw-flex tw-items-center">
             <Label className="tw-mr-2.5 tw-w-40 tw-shrink-0" htmlFor="action-select-categories-filter">
@@ -512,7 +512,7 @@ export function MedicalFile({ person }) {
         </Row>
       )}
       <div className="printonly">
-        {consultations.map((c) => {
+        {personConsultationsFiltered.map((c) => {
           const hiddenKeys = [
             '_id',
             'name',
@@ -565,7 +565,7 @@ export function MedicalFile({ person }) {
       </div>
       <Table
         className="noprint"
-        data={consultations}
+        data={personConsultationsFiltered}
         rowKey={'_id'}
         rowDisabled={(actionOrConsultation) => disableConsultationRow(actionOrConsultation, user)}
         onRowClick={(item) => {
