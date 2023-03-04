@@ -1,3 +1,10 @@
+# [1.251.0](https://github.com/SocialGouv/mano/compare/v1.250.0...v1.251.0) (2023-03-04)
+
+
+### Features
+
+* **dashboard:** paramètres des consultations modernisés ([#1367](https://github.com/SocialGouv/mano/issues/1367)) ([46091ab](https://github.com/SocialGouv/mano/commit/46091ab9480c28ae73d593c0b4436771b93fabc7))
+
 # [1.250.0](https://github.com/SocialGouv/mano/compare/v1.249.10...v1.250.0) (2023-03-03)
 
 
