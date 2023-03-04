@@ -1,7 +1,6 @@
 import { test, expect, Page } from "@playwright/test";
-import { nanoid } from "nanoid";
 import { populate } from "./scripts/populate-db";
-import { changeReactSelectValue, clickOnEmptyReactSelect, loginWith } from "./utils";
+import { clickOnEmptyReactSelect, loginWith } from "./utils";
 
 test.beforeAll(async () => {
   await populate();
@@ -20,17 +19,6 @@ const addCustomField = async (page: Page, name: string, type: string, options: s
 };
 
 test("test", async ({ page }) => {
-  const person1Name = nanoid();
-  const person2Name = nanoid();
-  const person3Name = nanoid();
-  const territory1Name = nanoid();
-  const observation1Name = nanoid();
-  const observation2Name = nanoid();
-  const observation3Name = nanoid();
-  const consultation1Name = nanoid();
-  const consultation2Name = nanoid();
-  const consultation3Name = nanoid();
-
   await loginWith(page, "admin1@example.org");
 
   await test.step("create fields", async () => {
@@ -49,10 +37,10 @@ test("test", async ({ page }) => {
     await addCustomField(page, "Douleur", "Choix multiple dans une liste", ["Colonne vertébrale merde je me suis trompé", "Bras", "Jambe"]);
 
     await page.getByRole("button", { name: "Consultations 🧑‍⚕️" }).click();
-    await clickOnEmptyReactSelect(page, "select-consultations", "Infirmier");
-    await page.getByRole("button", { name: "Mettre à jour" }).first().click();
-    await page.getByText("Mise à jour !").click();
-
+    await page.getByRole("button", { name: "Ajouter un type de consultations" }).click();
+    await page.getByPlaceholder("Titre du groupe").fill("Infirmier");
+    await page.getByRole("dialog", { name: "Ajouter un groupe" }).getByRole("button", { name: "Ajouter" }).click();
+    await page.getByText("Type de consultation ajouté").click();
     await page.getByRole("button", { name: "Ajouter un champ" }).first().click();
     await addCustomField(page, "Poils au nez", "Choix dans une liste", ["un peu", "Beaucoup", "Passionnément"]);
 
@@ -208,7 +196,12 @@ test("test", async ({ page }) => {
     await page.getByText("Choix mis à jour !").click();
 
     await page.getByRole("button", { name: "Consultations 🧑‍⚕️" }).click();
-    await page.locator('[data-test-id="Poils au nez"]').getByRole("button", { name: "Modifier le champ" }).click();
+    await page.hover('[data-test-id="Poils au nez"]');
+    await page
+      .getByRole("button", {
+        name: "Modifier le champ Poils au nez",
+      })
+      .click();
     await page.getByRole("button", { name: "Modifier le choix un peu" }).click();
     await page.getByPlaceholder("un peu").fill("Un peu");
     page.once("dialog", (dialog) => {
@@ -220,7 +213,12 @@ test("test", async ({ page }) => {
     await page.getByRole("dialog", { name: "Éditer le choix: un peu" }).getByRole("button", { name: "Enregistrer" }).click();
     await page.getByText("Choix mis à jour !").click();
 
-    await page.locator('[data-test-id="Pansements"]').getByRole("button", { name: "Modifier le champ" }).click();
+    await page.hover('[data-test-id="Pansements"]');
+    await page
+      .getByRole("button", {
+        name: "Modifier le champ Pansements",
+      })
+      .click();
     await page.getByRole("button", { name: "Modifier le choix Gros" }).click();
     await page.getByPlaceholder("Gros").fill("Petit");
     page.once("dialog", (dialog) => {
