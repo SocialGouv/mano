@@ -276,9 +276,7 @@ CREATE TABLE IF NOT EXISTS mano."Report" (
     "team" uuid,
     "date" text,
     "debug" jsonb,
-    "deletedAt" timestamp with time zone,
-    CONSTRAINT "Report_team_fkey" FOREIGN KEY ("team") REFERENCES "mano"."Team"("_id") ON DELETE CASCADE ON UPDATE CASCADE,
-    constraint "Report_organisation_team_date_key" unique (organisation, team, "date")
+    "deletedAt" timestamp with time zone
 );
 
 CREATE TABLE IF NOT EXISTS "mano"."Rencontre" (
@@ -289,8 +287,7 @@ CREATE TABLE IF NOT EXISTS "mano"."Rencontre" (
     "encrypted" text,
     "encryptedEntityKey" text,
     "deletedAt" timestamp with time zone,
-    PRIMARY KEY ("_id"),
-    CONSTRAINT "Rencontre_organisation_fkey" FOREIGN KEY ("organisation") REFERENCES "mano"."Organisation"("_id") ON DELETE CASCADE ON UPDATE CASCADE
+    PRIMARY KEY ("_id")
 );
 
 CREATE TABLE IF NOT EXISTS "mano"."Group" (
@@ -301,8 +298,7 @@ CREATE TABLE IF NOT EXISTS "mano"."Group" (
     "encrypted" text,
     "encryptedEntityKey" text,
     "deletedAt" timestamp with time zone,
-    PRIMARY KEY ("_id"),
-    CONSTRAINT "Group_organisation_fkey" FOREIGN KEY ("organisation") REFERENCES "mano"."Organisation"("_id") ON DELETE CASCADE ON UPDATE CASCADE
+    PRIMARY KEY ("_id")
 );
 
 create table if not exists mano."Service" (
@@ -315,11 +311,8 @@ create table if not exists mano."Service" (
     "createdAt" timestamp with time zone not null,
     "updatedAt" timestamp with time zone not null,
     "deletedAt" timestamp with time zone,
-    unique (organisation, service, "date", team),
-    foreign key ("team") references "mano"."Team"("_id") on delete cascade on update cascade,
-    foreign key ("organisation") references "mano"."Organisation"("_id") on delete cascade on update cascade
+    unique (organisation, service, "date", team)
 );
-create index if not exists idx_service_date_team on mano."Service" ("date", team);
 
 --
 -- Data for Name: Action; Type: TABLE DATA; Schema: mano; Owner: user_feat-pen-test-18fpoe
@@ -916,6 +909,20 @@ ALTER TABLE ONLY mano."Treatment"
 ALTER TABLE ONLY mano."User"
     ADD CONSTRAINT "User_organisation_fkey" FOREIGN KEY (organisation) REFERENCES mano."Organisation"(_id) ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE;
 
+alter table only mano."Report"
+    add CONSTRAINT "Report_team_fkey" FOREIGN KEY ("team") REFERENCES "mano"."Team"("_id") ON DELETE CASCADE ON UPDATE CASCADE,
+    add constraint "Report_organisation_team_date_key" unique (organisation, team, "date");
+
+alter table only mano."Rencontre"
+    add CONSTRAINT "Rencontre_organisation_fkey" FOREIGN KEY ("organisation") REFERENCES "mano"."Organisation"("_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+alter table  only mano."Group"
+    add CONSTRAINT "Group_organisation_fkey" FOREIGN KEY ("organisation") REFERENCES "mano"."Organisation"("_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+alter table  only mano."Service"
+    ADD CONSTRAINT "Service_team_fkey" foreign key ("team") references "mano"."Team"("_id") on delete cascade on update cascade,
+    ADD CONSTRAINT "Service_organisation_fkey" foreign key ("organisation") references "mano"."Organisation"("_id") on delete cascade on update cascade;
+
 
 
 create index if not exists action_deletedat_idx on mano."Action" ("deletedAt");
@@ -967,6 +974,7 @@ create index if not exists treatment_updatedat_idx on mano."Treatment" ("updated
 create index if not exists treatment_organisation_idx on mano."Treatment" (organisation);
 create index if not exists user_updatedat_idx on mano."User" ("updatedAt");
 create index if not exists user_organisation_idx on mano."User" (organisation);
+create index if not exists idx_service_date_team on mano."Service" ("date", team);
 
 --
 -- PostgreSQL database dump complete
