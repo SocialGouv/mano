@@ -1,11 +1,13 @@
 import 'dayjs/locale/fr';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import isBetween from 'dayjs/plugin/isBetween';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import dayjs from 'dayjs';
 
 dayjs.locale('fr');
 dayjs.extend(relativeTime);
 dayjs.extend(isBetween);
+dayjs.extend(customParseFormat);
 
 /** FORMAT DATES **/
 
@@ -132,5 +134,9 @@ export const getIsDayWithinHoursOffsetOfPeriod = (dayToTest, { referenceStartDay
   // -> the date of anonymous passages is at the start of the day
   return dayjs(dayToTest).isBetween(startDate, endDate, null, '[)');
 };
+
+export function fromDateString(dateString) {
+  return dayjs(dateString, ['YYYY-MM-DD', 'DD/MM/YYYY', 'DD/MM/YY', 'D/M/YYYY', 'D/M/YY', 'D/MM/YYYY', 'D/MM/YY'], 'fr', true);
+}
 
 export const dayjsInstance = dayjs;
