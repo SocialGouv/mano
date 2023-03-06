@@ -16,7 +16,7 @@ module.exports = async () => {
     //
     await sequelize.query(`
       ALTER TABLE "mano"."Organisation"
-      ADD COLUMN IF NOT EXISTS "migrations" text[] default array['custom-fields-persons-setup', 'custom-fields-persons-refacto-regroup'];
+      ADD COLUMN IF NOT EXISTS "migrations" text[] default array['custom-fields-persons-setup', 'custom-fields-persons-refacto-regroup', 'custom-fields-persons-fix'];
     `);
   } catch (e) {
     capture(e);
