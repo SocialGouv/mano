@@ -1,3 +1,10 @@
+## [1.253.1](https://github.com/SocialGouv/mano/compare/v1.253.0...v1.253.1) (2023-03-06)
+
+
+### Bug Fixes
+
+* force dashboard version ([e1f9a52](https://github.com/SocialGouv/mano/commit/e1f9a528a38bfd2ff313f916e7fa79138ed11525))
+
 # [1.253.0](https://github.com/SocialGouv/mano/compare/v1.252.0...v1.253.0) (2023-03-06)
 
 
