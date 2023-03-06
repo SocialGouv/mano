@@ -1,3 +1,10 @@
+## [1.253.4](https://github.com/SocialGouv/mano/compare/v1.253.3...v1.253.4) (2023-03-06)
+
+
+### Bug Fixes
+
+* **api:** migration custom fields ([#1384](https://github.com/SocialGouv/mano/issues/1384)) ([737a838](https://github.com/SocialGouv/mano/commit/737a8387b44cb5abcd4d886bd54b152fd2ff5a33))
+
 ## [1.253.3](https://github.com/SocialGouv/mano/compare/v1.253.2...v1.253.3) (2023-03-06)
 
 
