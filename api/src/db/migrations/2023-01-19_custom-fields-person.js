@@ -17,7 +17,7 @@ module.exports = async () => {
     const defaultMedicalFieldNameBeforeMigration = ["consumptions", "vulnerabilities", "caseHistoryTypes", "caseHistoryDescription"];
 
     for (const organisation of organisations) {
-      if (organisation.migrations?.includes("custom-fields-persons-refacto-regroup")) continue;
+      if (organisation.migrations?.includes("custom-fields-persons-fix")) continue;
       const customFieldsPersonsSocial = [...(organisation.customFieldsPersonsSocial || []), ...defaultSocialCustomFields];
 
       const customFieldsPersonsMedical = [
@@ -38,7 +38,7 @@ module.exports = async () => {
           },
         ],
         migrationLastUpdateAt: new Date(),
-        migrations: [...(organisation.migrations || []), "custom-fields-persons-refacto-regroup"],
+        migrations: [...(organisation.migrations || []), "custom-fields-persons-fix"],
       });
       await organisation.save();
     }
