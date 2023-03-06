@@ -1,3 +1,10 @@
+## [1.253.5](https://github.com/SocialGouv/mano/compare/v1.253.4...v1.253.5) (2023-03-06)
+
+
+### Bug Fixes
+
+* **dashboard:** remise en place du bouton afficher dans les statistiques ([b1455a6](https://github.com/SocialGouv/mano/commit/b1455a6f6350d4f1d200f5aaf81bb0ff338e9811))
+
 ## [1.253.4](https://github.com/SocialGouv/mano/compare/v1.253.3...v1.253.4) (2023-03-06)
 
 
