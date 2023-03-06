@@ -141,25 +141,6 @@ CREATE TABLE IF NOT EXISTS mano."RelUserTeam" (
     "updatedAt" timestamp with time zone NOT NULL
 );
 
-
-
-CREATE TABLE IF NOT EXISTS mano."Report" (
-    _id uuid NOT NULL,
-    "createdAt" timestamp with time zone NOT NULL,
-    "updatedAt" timestamp with time zone NOT NULL,
-    encrypted text,
-    "encryptedEntityKey" text,
-    organisation uuid,
-    "team" uuid,
-    "date" text,
-    "debug" jsonb,
-    "deletedAt" timestamp with time zone,
-    CONSTRAINT "Report_team_fkey" FOREIGN KEY ("team") REFERENCES "mano"."Team"("_id") ON DELETE CASCADE ON UPDATE CASCADE,
-    constraint "Report_organisation_team_date_key" unique (organisation, team, "date")
-);
-
-
-
 CREATE TABLE IF NOT EXISTS mano."Structure" (
     _id uuid NOT NULL,
     name text,
@@ -243,6 +224,24 @@ CREATE TABLE IF NOT EXISTS mano."User" (
     "debugDashboard" jsonb,
     "gaveFeedbackEarly2023" boolean
 );
+
+
+
+CREATE TABLE IF NOT EXISTS mano."Report" (
+    _id uuid NOT NULL,
+    "createdAt" timestamp with time zone NOT NULL,
+    "updatedAt" timestamp with time zone NOT NULL,
+    encrypted text,
+    "encryptedEntityKey" text,
+    organisation uuid,
+    "team" uuid,
+    "date" text,
+    "debug" jsonb,
+    "deletedAt" timestamp with time zone,
+    CONSTRAINT "Report_team_fkey" FOREIGN KEY ("team") REFERENCES "mano"."Team"("_id") ON DELETE CASCADE ON UPDATE CASCADE,
+    constraint "Report_organisation_team_date_key" unique (organisation, team, "date")
+);
+
 
 CREATE TABLE IF NOT EXISTS "mano"."Rencontre" (
     "_id" uuid,
