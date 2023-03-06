@@ -50,15 +50,25 @@ test("test", async ({ page }) => {
 
   await page.getByRole("button", { name: "Personnes suivies" }).click();
 
-  await page.locator('[data-test-id="Champ utilisé"]').getByRole("button", { name: "Modifier le champ" }).click();
+  await page.hover('[data-test-id="Champ utilisé"]');
+  await page
+    .getByRole("button", {
+      name: "Modifier le champ Champ utilisé",
+    })
+    .click();
   await expect(page.locator(".type--is-disabled")).toBeVisible();
   await page.getByLabel("Nom").fill("Champ utilisé et modifié");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Mise à jour !").click();
   await expect(page.getByText("choix 1, choix 2, choix 3")).toBeVisible();
-  await expect(page.getByRole("cell", { name: "Champ utilisé et modifié" })).toBeVisible();
+  await expect(page.getByText("Champ utilisé et modifié")).toBeVisible();
 
-  await page.locator('[data-test-id="Champ non utilisé"]').getByRole("button", { name: "Modifier le champ" }).click();
+  await page.hover('[data-test-id="Champ non utilisé"]');
+  await page
+    .getByRole("button", {
+      name: "Modifier le champ Champ non utilisé",
+    })
+    .click();
   await expect(page.locator(".type--is-disabled")).not.toBeVisible();
 
   await changeReactSelectValue(page, "type", "Zone de texte multi-lignes");

@@ -98,7 +98,7 @@ const ServicesSettings = () => {
 
   return (
     <DragAndDropSettings
-      title="Services"
+      title={<h3 className="tw-mb-0 tw-text-xl tw-font-extrabold">Services</h3>}
       data={dataFormatted}
       addButtonCaption="Ajouter un groupe"
       onAddGroup={onAddGroup}

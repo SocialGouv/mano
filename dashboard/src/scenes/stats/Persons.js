@@ -26,8 +26,7 @@ const PersonStats = ({
   personsForStats,
   groupsForPersons,
   personFields,
-  customFieldsPersonsMedical,
-  customFieldsPersonsSocial,
+  flattenedCustomFieldsPersons,
 }) => {
   const [personsModalOpened, setPersonsModalOpened] = useState(false);
   const [sliceField, setSliceField] = useState(null);
@@ -129,15 +128,7 @@ const PersonStats = ({
       />
       <CustomFieldsStats
         data={personsForStats}
-        customFields={customFieldsPersonsMedical}
-        onSliceClick={onSliceClick}
-        help={(label) =>
-          `${label.capitalize()} des ${title} dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`
-        }
-      />
-      <CustomFieldsStats
-        data={personsForStats}
-        customFields={customFieldsPersonsSocial}
+        customFields={flattenedCustomFieldsPersons}
         onSliceClick={onSliceClick}
         help={(label) =>
           `${label.capitalize()} des ${title} dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`

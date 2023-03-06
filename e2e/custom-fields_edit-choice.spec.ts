@@ -155,7 +155,12 @@ test("test", async ({ page }) => {
     await page.getByRole("dialog", { name: "Éditer le choix: Relai vers autre structure" }).getByRole("button", { name: "Enregistrer" }).click();
     await page.getByText("Choix mis à jour !").click();
 
-    await page.locator('[data-test-id="Contrat de travail"]').getByRole("button", { name: "Modifier le champ" }).click();
+    await page.hover('[data-test-id="Contrat de travail"]');
+    await page
+      .getByRole("button", {
+        name: "Modifier le champ Contrat de travail",
+      })
+      .click();
     await page.getByRole("button", { name: "Modifier le choix CDI merde je me suis trompé" }).click();
     await page.getByPlaceholder("CDI merde je me suis trompé").fill("CDI seulement");
     page.once("dialog", (dialog) => {
@@ -167,7 +172,12 @@ test("test", async ({ page }) => {
     await page.getByRole("dialog", { name: "Éditer le choix: CDI merde je me suis trompé" }).getByRole("button", { name: "Enregistrer" }).click();
     await page.getByText("Choix mis à jour !").click();
 
-    await page.locator('[data-test-id="Drogues à fumer"]').getByRole("button", { name: "Modifier le champ" }).click();
+    await page.hover('[data-test-id="Drogues à fumer"]');
+    await page
+      .getByRole("button", {
+        name: "Modifier le champ Drogues à fumer",
+      })
+      .click();
     await page.getByRole("button", { name: "Modifier le choix Pétard merde je me suis trompé" }).click();
     await page.getByPlaceholder("Pétard merde je me suis trompé").fill("Pétard seulement");
     page.once("dialog", (dialog) => {

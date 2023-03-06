@@ -15,8 +15,7 @@ export const personsState = atom({
 All fields for person are
 - personFieldsSelector: fields chosen by Mano, they afre fixed and cannot be changed (yet) by the user
 - fieldsPersonsCustomizableOptionsSelector: fields chosen by Mano but that can have options chosen by the user
-- customFieldsPersonsMedicalSelector: fields chosen by the user for medical
-- customFieldsPersonsSocialSelector: fields chosen by the user for social
+- customFieldsPersonsSelector: fields chosen by the user
 
 */
 export const personFieldsSelector = selector({
@@ -35,19 +34,25 @@ export const fieldsPersonsCustomizableOptionsSelector = selector({
   },
 });
 
-export const customFieldsPersonsMedicalSelector = selector({
-  key: 'customFieldsPersonsMedicalSelector',
+export const customFieldsPersonsSelector = selector({
+  key: 'customFieldsPersonsSelector',
   get: ({ get }) => {
     const organisation = get(organisationState);
-    return organisation.customFieldsPersonsMedical;
+    return organisation.customFieldsPersons || [];
   },
 });
 
-export const customFieldsPersonsSocialSelector = selector({
-  key: 'customFieldsPersonsSocialSelector',
+export const flattenedCustomFieldsPersonsSelector = selector({
+  key: 'flattenedCustomFieldsPersonsSelector',
   get: ({ get }) => {
-    const organisation = get(organisationState);
-    return organisation.customFieldsPersonsSocial;
+    const customFieldsPersonsSections = get(customFieldsPersonsSelector);
+    const customFieldsPersons = [];
+    for (const section of customFieldsPersonsSections) {
+      for (const field of section.fields) {
+        customFieldsPersons.push(field);
+      }
+    }
+    return customFieldsPersons;
   },
 });
 
@@ -58,11 +63,10 @@ export const personFieldsIncludingCustomFieldsSelector = selector({
   get: ({ get }) => {
     const personFields = get(personFieldsSelector);
     const fieldsPersonsCustomizableOptions = get(fieldsPersonsCustomizableOptionsSelector);
-    const customFieldsPersonsSocial = get(customFieldsPersonsSocialSelector);
-    const customFieldsPersonsMedical = get(customFieldsPersonsMedicalSelector);
+    const flattenedCustomFieldsPersons = get(flattenedCustomFieldsPersonsSelector);
     return [
       ...personFields,
-      ...[...fieldsPersonsCustomizableOptions, ...customFieldsPersonsMedical, ...customFieldsPersonsSocial].map((f) => {
+      ...[...fieldsPersonsCustomizableOptions, ...flattenedCustomFieldsPersons].map((f) => {
         return {
           name: f.name,
           type: f.type,
@@ -99,8 +103,7 @@ Prepare for encryption hook
 */
 
 export const usePreparePersonForEncryption = () => {
-  const customFieldsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
-  const customFieldsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
+  const flattenedCustomFieldsPersons = useRecoilValue(flattenedCustomFieldsPersonsSelector);
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
   const personFields = useRecoilValue(personFieldsSelector);
   const preparePersonForEncryption = (person) => {
@@ -118,8 +121,7 @@ export const usePreparePersonForEncryption = () => {
     }
     const encryptedFields = personFields.filter((f) => f.encrypted).map((f) => f.name);
     const encryptedFieldsIncludingCustom = [
-      ...customFieldsSocial.map((f) => f.name),
-      ...customFieldsMedical.map((f) => f.name),
+      ...flattenedCustomFieldsPersons.map((f) => f.name),
       ...fieldsPersonsCustomizableOptions.map((f) => f.name),
       ...encryptedFields,
     ];

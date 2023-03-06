@@ -15,15 +15,30 @@ module.exports = async () => {
     // The downside of this approach is that if the user has deleted all the default medical custom fields,
     // they will be re-added. But this is a rare case and it's not worth the effort to handle it.
     const defaultMedicalFieldNameBeforeMigration = ["consumptions", "vulnerabilities", "caseHistoryTypes", "caseHistoryDescription"];
+
     for (const organisation of organisations) {
-      if (organisation.migrations?.includes("custom-fields-persons-setup")) continue;
+      if (organisation.migrations?.includes("custom-fields-persons-refacto-regroup")) continue;
+      const customFieldsPersonsSocial = [...(organisation.customFieldsPersonsSocial || []), ...defaultSocialCustomFields];
+
+      const customFieldsPersonsMedical = [
+        ...(organisation.customFieldsPersonsMedical ||
+          defaultMedicalCustomFields.filter((e) => defaultMedicalFieldNameBeforeMigration.includes(e.name))),
+        ...defaultMedicalCustomFields.filter((e) => !defaultMedicalFieldNameBeforeMigration.includes(e.name)),
+      ];
+
       organisation.set({
-        customFieldsPersonsSocial: (organisation.customFieldsPersonsSocial || []).concat(defaultSocialCustomFields),
-        customFieldsPersonsMedical: (
-          organisation.customFieldsPersonsMedical || defaultMedicalCustomFields.filter((e) => defaultMedicalFieldNameBeforeMigration.includes(e.name))
-        ).concat(defaultMedicalCustomFields.filter((e) => !defaultMedicalFieldNameBeforeMigration.includes(e.name))),
+        customFieldsPersons: [
+          {
+            name: "Informations sociales",
+            fields: customFieldsPersonsSocial,
+          },
+          {
+            name: "Informations médicales",
+            fields: customFieldsPersonsMedical,
+          },
+        ],
         migrationLastUpdateAt: new Date(),
-        migrations: [...(organisation.migrations || []), "custom-fields-persons-setup"],
+        migrations: [...(organisation.migrations || []), "custom-fields-persons-refacto-regroup"],
       });
       await organisation.save();
     }

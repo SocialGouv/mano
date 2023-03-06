@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { useRecoilValue, useSetRecoilState, useRecoilState } from 'recoil';
 import { v4 as uuidv4 } from 'uuid';
 import ButtonCustom from '../../components/ButtonCustom';
-import { personsState, usePreparePersonForEncryption, personFieldsSelector, customFieldsPersonsMedicalSelector } from '../../recoil/persons';
+import { personsState, usePreparePersonForEncryption, personFieldsSelector, flattenedCustomFieldsPersonsSelector } from '../../recoil/persons';
 import { currentTeamState, organisationState, usersState, userState } from '../../recoil/auth';
 import { dayjsInstance, formatDateWithFullMonth, formatTime, outOfBoundariesDate } from '../../services/date';
 import API from '../../services/api';
@@ -54,7 +54,7 @@ export function MedicalFile({ person }) {
 
   const personFields = useRecoilValue(personFieldsSelector);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
-  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
+  const flattenedCustomFieldsPersons = useRecoilValue(flattenedCustomFieldsPersonsSelector);
   const preparePersonForEncryption = usePreparePersonForEncryption();
 
   const user = useRecoilValue(userState);
@@ -146,7 +146,7 @@ export function MedicalFile({ person }) {
           </b>
         </div>
         {/* These custom fields are displayed by default, because they where displayed before they became custom fields */}
-        {Boolean(customFieldsPersonsMedical.find((e) => e.name === 'structureMedical')) && (
+        {Boolean(flattenedCustomFieldsPersons.find((e) => e.name === 'structureMedical')) && (
           <div>
             Structure de suivi médical&nbsp;:{' '}
             <b>
@@ -154,7 +154,7 @@ export function MedicalFile({ person }) {
             </b>
           </div>
         )}
-        {Boolean(customFieldsPersonsMedical.find((e) => e.name === 'healthInsurances')) && (
+        {Boolean(flattenedCustomFieldsPersons.find((e) => e.name === 'healthInsurances')) && (
           <div>
             Couverture(s) médicale(s)&nbsp;:{' '}
             <b>
@@ -206,7 +206,7 @@ export function MedicalFile({ person }) {
                       classNamePrefix="person-select-gender"
                     />
                   </Col>
-                  {Boolean(customFieldsPersonsMedical.find((e) => e.name === 'structureMedical')) && (
+                  {Boolean(flattenedCustomFieldsPersons.find((e) => e.name === 'structureMedical')) && (
                     <Col md={4}>
                       <FormGroup>
                         <Label htmlFor="structureMedical">Structure de suivi médical</Label>
@@ -214,11 +214,11 @@ export function MedicalFile({ person }) {
                       </FormGroup>
                     </Col>
                   )}
-                  {Boolean(customFieldsPersonsMedical.find((e) => e.name === 'healthInsurances')) && (
+                  {Boolean(flattenedCustomFieldsPersons.find((e) => e.name === 'healthInsurances')) && (
                     <Col md={4}>
                       <Label htmlFor="person-select-healthInsurances">Couverture(s) médicale(s)</Label>
                       <SelectCustom
-                        options={customFieldsPersonsMedical
+                        options={flattenedCustomFieldsPersons
                           .find((f) => f.name === 'healthInsurances')
                           .options.map((_option) => ({ value: _option, label: _option }))}
                         value={values.healthInsurances?.map((_option) => ({ value: _option, label: _option })) || []}

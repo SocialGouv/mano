@@ -41,9 +41,15 @@ router.post(
       z.object({
         customFieldsObs: z.optional(z.array(customFieldSchema)),
         fieldsPersonsCustomizableOptions: z.optional(z.array(customFieldSchema)),
-        customFieldsPersonsSocial: z.optional(z.array(customFieldSchema)),
-        customFieldsPersonsMedical: z.optional(z.array(customFieldSchema)),
         customFieldsMedicalFile: z.optional(z.array(customFieldSchema)),
+        customFieldsPersons: z.optional(
+          z.array(
+            z.object({
+              name: z.string().min(1),
+              fields: z.array(customFieldSchema),
+            })
+          )
+        ),
         consultations: z.optional(
           z.array(
             z.object({
@@ -91,21 +97,14 @@ router.post(
             typeof customFields.fieldsPersonsCustomizableOptions === "string"
               ? JSON.parse(customFields.fieldsPersonsCustomizableOptions)
               : customFields.fieldsPersonsCustomizableOptions;
-        if (customFields.hasOwnProperty("customFieldsPersonsSocial"))
-          updateOrg.customFieldsPersonsSocial =
-            typeof customFields.customFieldsPersonsSocial === "string"
-              ? JSON.parse(customFields.customFieldsPersonsSocial)
-              : customFields.customFieldsPersonsSocial;
-        if (customFields.hasOwnProperty("customFieldsPersonsMedical"))
-          updateOrg.customFieldsPersonsMedical =
-            typeof customFields.customFieldsPersonsMedical === "string"
-              ? JSON.parse(customFields.customFieldsPersonsMedical)
-              : customFields.customFieldsPersonsMedical;
         if (customFields.hasOwnProperty("customFieldsMedicalFile"))
           updateOrg.customFieldsMedicalFile =
             typeof customFields.customFieldsMedicalFile === "string"
               ? JSON.parse(customFields.customFieldsMedicalFile)
               : customFields.customFieldsMedicalFile;
+        if (customFields.hasOwnProperty("customFieldsPersons"))
+          updateOrg.customFieldsPersons =
+            typeof customFields.customFieldsPersons === "string" ? JSON.parse(customFields.customFieldsPersons) : customFields.customFieldsPersons;
         if (customFields.hasOwnProperty("consultations"))
           updateOrg.consultations =
             typeof customFields.consultations === "string" ? JSON.parse(customFields.consultations) : customFields.consultations;

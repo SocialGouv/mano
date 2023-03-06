@@ -57,7 +57,7 @@ const MedicalFileSettings = () => {
 
   return (
     <DragAndDropSettings
-      title="Dossier médical"
+      title={<h3 className="tw-mb-0 tw-text-xl tw-font-extrabold">Dossier médical</h3>}
       data={dataFormatted}
       dataItemKey={(cat) => cat.name}
       ItemComponent={MedicalFileCustomField}

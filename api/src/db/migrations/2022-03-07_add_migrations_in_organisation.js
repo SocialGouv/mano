@@ -3,7 +3,8 @@ const sequelize = require("../sequelize");
 
 module.exports = async () => {
   try {
-    // The 'custom-fields-persons-setup' is set by default to avoid running the same code twice in 2023-01-19_custom-fields-person.js
+    // These migrations are set by default to avoid running the same code twice
+    // in 2023-01-19_custom-fields-person.js and in 2023-02-28_refacto-custom-fields-person.js
     //
     // 1. If the organisation already exists, it won't have the 'custom-fields-persons-setup' migration by default
     //    so the script can execut to migrate existing custom fields to the customFieldsPersons.
@@ -15,7 +16,7 @@ module.exports = async () => {
     //
     await sequelize.query(`
       ALTER TABLE "mano"."Organisation"
-      ADD COLUMN IF NOT EXISTS "migrations" text[] default array['custom-fields-persons-setup'];
+      ADD COLUMN IF NOT EXISTS "migrations" text[] default array['custom-fields-persons-setup', 'custom-fields-persons-refacto-regroup'];
     `);
   } catch (e) {
     capture(e);

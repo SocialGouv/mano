@@ -55,7 +55,7 @@ const ObservationsSettings = () => {
 
   return (
     <DragAndDropSettings
-      title="Observations de territoire"
+      title={<h3 className="tw-mb-0 tw-text-xl tw-font-extrabold">Observations de territoire</h3>}
       data={dataFormatted}
       dataItemKey={(cat) => cat.name}
       ItemComponent={ObservationCustomField}

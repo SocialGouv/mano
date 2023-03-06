@@ -5,9 +5,9 @@ import { organisationState } from '../../recoil/auth';
 import API, { encryptItem } from '../../services/api';
 import { toast } from 'react-toastify';
 import DragAndDropSettings from './DragAndDropSettings';
-import { consultationsState, prepareConsultationForEncryption } from '../../recoil/consultations';
 import { EditCustomField } from '../../components/TableCustomFields';
 import CustomFieldSetting from '../../components/CustomFieldSetting';
+import { customFieldsPersonsSelector, flattenedCustomFieldsPersonsSelector, personsState, usePreparePersonForEncryption } from '../../recoil/persons';
 
 const sanitizeFields = (field) => {
   const sanitizedField = {};
@@ -17,37 +17,38 @@ const sanitizeFields = (field) => {
   return sanitizedField;
 };
 
-const ConsultationsSettings = () => {
-  const allConsultations = useRecoilValue(consultationsState);
+const PersonCustomFieldsSettings = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
-  const consultationFields = organisation.consultations;
+  const customFieldsPersons = useRecoilValue(customFieldsPersonsSelector);
+  const flattenedCustomFieldsPersons = useRecoilValue(flattenedCustomFieldsPersonsSelector);
   const dataFormatted = useMemo(() => {
-    return consultationFields.map(({ name, fields }) => ({
+    return customFieldsPersons.map(({ name, fields }) => ({
       groupTitle: name,
       items: fields,
+      editable: !['Informations sociales', 'Informations médicales'].includes(name),
     }));
-  }, [consultationFields]);
+  }, [customFieldsPersons]);
 
   const { refresh } = useDataLoader();
 
-  const onAddConsultationType = async (name) => {
+  const onAddGroup = async (name) => {
     const res = await API.put({
       path: `/organisation/${organisation._id}`,
-      body: { consultations: [...consultationFields, { name, fields: [] }] },
+      body: { customFieldsPersons: [...customFieldsPersons, { name, fields: [] }] },
     });
     if (res.ok) {
-      toast.success('Type de consultation ajouté', { autoclose: 2000 });
+      toast.success('Groupe ajouté', { autoclose: 2000 });
       setOrganisation(res.data);
     }
     refresh();
   };
 
-  const onConsultationTypeChange = async (oldName, newName) => {
+  const onGroupTitleChange = async (oldName, newName) => {
     if (!newName) {
-      toast.error('Vous devez saisir un nom pour le type de consultation');
+      toast.error('Vous devez saisir un nom pour le groupe de champs personnalisés');
       return;
     }
-    const newConsultationFields = consultationFields.map((type) => {
+    const newCustomFieldsPersons = customFieldsPersons.map((type) => {
       if (type.name !== oldName) return type;
       return {
         ...type,
@@ -56,42 +57,30 @@ const ConsultationsSettings = () => {
     });
 
     const oldOrganisation = organisation;
-    setOrganisation({ ...organisation, consultations: newConsultationFields }); // optimistic UI
-    const encryptedConsultations = await Promise.all(
-      allConsultations
-        .filter((consultation) => consultation.type === oldName)
-        .map((consultation) => ({ ...consultation, type: newName }))
-        .map(prepareConsultationForEncryption(newConsultationFields))
-        .map(encryptItem)
-    );
-    const response = await API.post({
-      path: '/custom-field',
-      body: {
-        customFields: {
-          consultations: newConsultationFields,
-        },
-        consultations: encryptedConsultations,
-      },
+    setOrganisation({ ...organisation, customFieldsPersons: newCustomFieldsPersons }); // optimistic UI
+    const response = await API.put({
+      path: `/organisation/${organisation._id}`,
+      body: { customFieldsPersons: newCustomFieldsPersons },
     });
     if (response.ok) {
       refresh();
       setOrganisation(response.data);
-      toast.success("Consultation mise à jour. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
+      toast.success("Groupe mise à jour. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
     } else {
       setOrganisation(oldOrganisation);
       toast.error("Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !");
     }
   };
 
-  const onDeleteType = async (name) => {
-    const newConsultationFields = consultationFields.filter((type) => type.name !== name);
+  const onDeleteGroup = async (name) => {
+    const newCustomFieldsPersons = customFieldsPersons.filter((type) => type.name !== name);
 
     const oldOrganisation = organisation;
-    setOrganisation({ ...organisation, consultations: newConsultationFields }); // optimistic UI
+    setOrganisation({ ...organisation, customFieldsPersons: newCustomFieldsPersons }); // optimistic UI
 
     const response = await API.put({
       path: `/organisation/${organisation._id}`,
-      body: { consultations: newConsultationFields },
+      body: { customFieldsPersons: newCustomFieldsPersons },
     });
     if (response.ok) {
       toast.success('Type de consultation supprimé', { autoclose: 2000 });
@@ -103,35 +92,34 @@ const ConsultationsSettings = () => {
   };
 
   const onDragAndDrop = useCallback(
-    async (newConsultationFields) => {
-      const flattenFields = consultationFields.reduce((allFields, type) => [...allFields, ...type.fields], []);
-      newConsultationFields = newConsultationFields.map((group) => ({
+    async (newCustomFieldsPersons) => {
+      newCustomFieldsPersons = newCustomFieldsPersons.map((group) => ({
         name: group.groupTitle,
-        fields: group.items.map((customFieldName) => flattenFields.find((f) => f.name === customFieldName)),
+        fields: group.items.map((customFieldName) => flattenedCustomFieldsPersons.find((f) => f.name === customFieldName)),
       }));
       const res = await API.put({
         path: `/organisation/${organisation._id}`,
-        body: { consultations: newConsultationFields },
+        body: { customFieldsPersons: newCustomFieldsPersons },
       });
       if (res.ok) {
         setOrganisation(res.data);
         refresh();
       }
     },
-    [consultationFields, organisation._id, refresh, setOrganisation]
+    [flattenedCustomFieldsPersons, organisation._id, refresh, setOrganisation]
   );
 
   return (
     <DragAndDropSettings
-      title={<h3 className="tw-mb-0 tw-text-xl tw-font-extrabold">Consultations</h3>}
+      title={<h4>Champs personnalisés</h4>}
       data={dataFormatted}
-      addButtonCaption="Ajouter un type de consultations"
-      onAddGroup={onAddConsultationType}
-      onGroupTitleChange={onConsultationTypeChange}
+      addButtonCaption="Ajouter un groupe de champs personnalisés"
+      onAddGroup={onAddGroup}
+      onGroupTitleChange={onGroupTitleChange}
       dataItemKey={(cat) => cat.name}
       ItemComponent={ConsultationCustomField}
       NewItemComponent={AddField}
-      onDeleteGroup={onDeleteType}
+      onDeleteGroup={onDeleteGroup}
       onDragAndDrop={onDragAndDrop}
     />
   );
@@ -139,13 +127,13 @@ const ConsultationsSettings = () => {
 
 const AddField = ({ groupTitle: typeName }) => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
-  const consultationFields = organisation.consultations;
+  const customFieldsPersons = useRecoilValue(customFieldsPersonsSelector);
   const [isAddingField, setIsAddingField] = useState(false);
   const { refresh } = useDataLoader();
 
   const onAddField = async (newField) => {
     try {
-      const newConsultationFields = consultationFields.map((type) => {
+      const newCustomFieldsPersons = customFieldsPersons.map((type) => {
         if (type.name !== typeName) return type;
         return {
           ...type,
@@ -154,7 +142,7 @@ const AddField = ({ groupTitle: typeName }) => {
       });
       const response = await API.put({
         path: `/organisation/${organisation._id}`,
-        body: { consultations: newConsultationFields },
+        body: { customFieldsPersons: newCustomFieldsPersons },
       });
       if (response.ok) {
         toast.success('Mise à jour !');
@@ -215,14 +203,15 @@ const ConsultationCustomField = ({ item: customField, groupTitle: typeName }) =>
   const [isSelected, setIsSelected] = useState(false);
   const [isEditingField, setIsEditingField] = useState(false);
   const [organisation, setOrganisation] = useRecoilState(organisationState);
-  const allConsultations = useRecoilValue(consultationsState);
-  const consultationFields = organisation.consultations;
+  const allPersons = useRecoilValue(personsState);
+  const customFieldsPersons = useRecoilValue(customFieldsPersonsSelector);
+  const preparePersonForEncryption = usePreparePersonForEncryption();
 
   const { refresh } = useDataLoader();
 
   const onSaveField = async (editedField) => {
     try {
-      const newConsultationFields = consultationFields.map((type) => {
+      const newCustomFieldsPersons = customFieldsPersons.map((type) => {
         if (type.name !== typeName) return type;
         return {
           ...type,
@@ -231,7 +220,7 @@ const ConsultationCustomField = ({ item: customField, groupTitle: typeName }) =>
       });
       const response = await API.put({
         path: `/organisation/${organisation._id}`,
-        body: { consultations: newConsultationFields },
+        body: { customFieldsPersons: newCustomFieldsPersons },
       });
       if (response.ok) {
         toast.success('Mise à jour !');
@@ -246,7 +235,7 @@ const ConsultationCustomField = ({ item: customField, groupTitle: typeName }) =>
   };
 
   const onEditChoice = async ({ oldChoice, newChoice, field }) => {
-    const newConsultationFields = consultationFields.map((type) => {
+    const newCustomFieldsPersons = customFieldsPersons.map((type) => {
       if (type.name !== typeName) return type;
       return {
         ...type,
@@ -261,15 +250,15 @@ const ConsultationCustomField = ({ item: customField, groupTitle: typeName }) =>
       };
     });
     setIsEditingField(false);
-    const updatedConsultations = replaceOldChoiceByNewChoice(allConsultations, oldChoice, newChoice, field);
+    const updatedPersons = replaceOldChoiceByNewChoice(allPersons, oldChoice, newChoice, field);
 
     const response = await API.post({
       path: '/custom-field',
       body: {
         customFields: {
-          consultations: newConsultationFields,
+          customFieldsPersons: newCustomFieldsPersons,
         },
-        consultations: await Promise.all(updatedConsultations.map(prepareConsultationForEncryption(newConsultationFields)).map(encryptItem)),
+        persons: await Promise.all(updatedPersons.map(preparePersonForEncryption).map(encryptItem)),
       },
     });
     if (response.ok) {
@@ -281,7 +270,7 @@ const ConsultationCustomField = ({ item: customField, groupTitle: typeName }) =>
 
   const onDeleteField = async () => {
     try {
-      const newConsultationFields = consultationFields.map((type) => {
+      const newCustomFieldsPersons = customFieldsPersons.map((type) => {
         if (type.name !== typeName) return type;
         return {
           ...type,
@@ -290,7 +279,7 @@ const ConsultationCustomField = ({ item: customField, groupTitle: typeName }) =>
       });
       const response = await API.put({
         path: `/organisation/${organisation._id}`,
-        body: { consultations: newConsultationFields },
+        body: { customFieldsPersons: newCustomFieldsPersons },
       });
       if (response.ok) {
         toast.success('Mise à jour !');
@@ -326,7 +315,7 @@ const ConsultationCustomField = ({ item: customField, groupTitle: typeName }) =>
       <EditCustomField
         open={isEditingField}
         editingField={customField}
-        data={allConsultations}
+        data={allPersons}
         onClose={() => {
           setIsEditingField(false);
         }}
@@ -338,4 +327,4 @@ const ConsultationCustomField = ({ item: customField, groupTitle: typeName }) =>
   );
 };
 
-export default ConsultationsSettings;
+export default PersonCustomFieldsSettings;
