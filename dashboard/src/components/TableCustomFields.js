@@ -264,7 +264,7 @@ export const EditCustomField = ({ open, onDelete, data, editingField, onClose, o
       name: formData.get('name'),
       label: formData.get('label'),
       type: formData.get('type'),
-      showInStats: formData.get('showInStats'),
+      showInStats: formData.get('showInStats') === 'on',
       options: formData.getAll('options'),
     };
     onSaveField(editedField);
@@ -418,13 +418,13 @@ export const EditCustomField = ({ open, onDelete, data, editingField, onClose, o
             <div>
               <input
                 type="checkbox"
-                id="withTime"
-                name="withTime"
+                id="showInStats"
+                name="showInStats"
                 className="tw-mr-2"
                 checked={field.showInStats}
                 onChange={(e) => setField({ ...field, showInStats: e.target.checked })}
               />
-              <label htmlFor="withTime">Voir dans les statistiques</label>
+              <label htmlFor="showInStats">Voir dans les statistiques</label>
             </div>
           </div>
         </form>
