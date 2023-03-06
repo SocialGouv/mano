@@ -1,3 +1,10 @@
+## [1.253.2](https://github.com/SocialGouv/mano/compare/v1.253.1...v1.253.2) (2023-03-06)
+
+
+### Bug Fixes
+
+* retrocompatibility ([51bad50](https://github.com/SocialGouv/mano/commit/51bad50684c03b2c72224a097e664ecb909a25a2))
+
 ## [1.253.1](https://github.com/SocialGouv/mano/compare/v1.253.0...v1.253.1) (2023-03-06)
 
 
