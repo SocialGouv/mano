@@ -123,7 +123,7 @@ const ConsultationsSettings = () => {
 
   return (
     <DragAndDropSettings
-      title="Consultations"
+      title={<h3 className="tw-mb-0 tw-text-xl tw-font-extrabold">Consultations</h3>}
       data={dataFormatted}
       addButtonCaption="Ajouter un type de consultations"
       onAddGroup={onAddConsultationType}
