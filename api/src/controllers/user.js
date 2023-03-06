@@ -10,9 +10,7 @@ const { validatePassword, looseUuidRegex, jwtRegex, sanitizeAll, headerJwtRegex 
 const mailservice = require("../utils/mailservice");
 const config = require("../config");
 const { comparePassword } = require("../utils");
-const User = require("../models/user");
-const RelUserTeam = require("../models/relUserTeam");
-const Team = require("../models/team");
+const { User, RelUserTeam, Team } = require("../db/sequelize");
 const validateUser = require("../middleware/validateUser");
 const { capture } = require("../sentry");
 const { ExtractJwt } = require("passport-jwt");

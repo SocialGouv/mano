@@ -1,11 +1,8 @@
-const { DataTypes, Model, Sequelize, Deferrable } = require("sequelize");
-const sequelize = require("../db/sequelize");
+const { Model, Deferrable } = require("sequelize");
 
-class Structure extends Model {}
-
-Structure.init(
-  {
-    _id: { type: DataTypes.UUID, allowNull: false, defaultValue: Sequelize.UUIDV4, primaryKey: true },
+module.exports = (sequelize, DataTypes) => {
+  const schema = {
+    _id: { type: DataTypes.UUID, allowNull: false, defaultValue: DataTypes.UUIDV4, primaryKey: true },
     organisation: { type: DataTypes.UUID, references: { model: "Organisation", key: "_id", deferrable: Deferrable.INITIALLY_IMMEDIATE } },
     name: DataTypes.TEXT,
     phone: DataTypes.TEXT,
@@ -14,8 +11,15 @@ Structure.init(
     postcode: DataTypes.TEXT,
     description: DataTypes.TEXT,
     categories: DataTypes.ARRAY(DataTypes.TEXT),
-  },
-  { sequelize, modelName: "Structure", freezeTableName: true }
-);
+  };
 
-module.exports = Structure;
+  class Structure extends Model {
+    static associate({ Organisation, Structure }) {
+      Structure.belongsTo(Organisation, { foreignKey: { type: DataTypes.UUID, name: "organisation", field: "organisation" } });
+      Organisation.hasMany(Structure, { foreignKey: { type: DataTypes.UUID, name: "organisation", field: "organisation" } });
+    }
+  }
+
+  Structure.init(schema, { sequelize, modelName: "Structure", freezeTableName: true });
+  return Structure;
+};

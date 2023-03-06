@@ -1,20 +1,20 @@
-const { DataTypes, Model, Sequelize, Deferrable } = require("sequelize");
-const sequelize = require("../db/sequelize");
+const { Model, Deferrable } = require("sequelize");
 
-/*
-A group is a group of persons
-Initially a family, but could be extended to something else
+module.exports = (sequelize, DataTypes) => {
+  const schema = {
+    _id: { type: DataTypes.UUID, allowNull: false, defaultValue: DataTypes.UUIDV4, primaryKey: true },
+    organisation: { type: DataTypes.UUID, references: { model: "Organisation", key: "_id", deferrable: Deferrable.INITIALLY_IMMEDIATE } },
+    encrypted: { type: DataTypes.TEXT },
+    encryptedEntityKey: { type: DataTypes.TEXT },
+  };
 
-*/
-class Group extends Model {}
+  class Group extends Model {
+    static associate({ Organisation, Group }) {
+      Group.belongsTo(Organisation, { foreignKey: { type: DataTypes.UUID, name: "organisation", field: "organisation" } });
+      Organisation.hasMany(Group, { foreignKey: { type: DataTypes.UUID, name: "organisation", field: "organisation" } });
+    }
+  }
 
-const schema = {
-  _id: { type: DataTypes.UUID, allowNull: false, defaultValue: Sequelize.UUIDV4, primaryKey: true },
-  organisation: { type: DataTypes.UUID, references: { model: "Organisation", key: "_id", deferrable: Deferrable.INITIALLY_IMMEDIATE } },
-  encrypted: { type: DataTypes.TEXT },
-  encryptedEntityKey: { type: DataTypes.TEXT },
+  Group.init(schema, { sequelize, modelName: "Group", freezeTableName: true, timestamps: true, paranoid: true });
+  return Group;
 };
-
-Group.init(schema, { sequelize, modelName: "Group", freezeTableName: true, timestamps: true, paranoid: true });
-
-module.exports = Group;

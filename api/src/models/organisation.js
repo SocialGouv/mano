@@ -1,17 +1,12 @@
-const { DataTypes, Model, Sequelize } = require("sequelize");
-const sequelize = require("../db/sequelize");
+const { Model } = require("sequelize");
 
-class Organisation extends Model {}
-
-Organisation.init(
-  {
-    _id: { type: DataTypes.UUID, allowNull: false, defaultValue: Sequelize.UUIDV4, primaryKey: true },
+module.exports = (sequelize, DataTypes) => {
+  const schema = {
+    _id: { type: DataTypes.UUID, allowNull: false, defaultValue: DataTypes.UUIDV4, primaryKey: true },
     name: DataTypes.TEXT,
-
     categories: DataTypes.ARRAY(DataTypes.TEXT),
     actionsGroupedCategories: {
-      type: DataTypes.JSONB,
-      // example: [{"groupTitle": "médical", categories: ["seringue", "pansement"]}, { "groupTitle": "local", "categories": ["entretien", "lavage"]}]
+      type: DataTypes.JSONB, // example: [{"groupTitle": "médical", categories: ["seringue", "pansement"]}, { "groupTitle": "local", "categories": ["entretien", "lavage"]}]
     },
     collaborations: { type: [DataTypes.ARRAY(DataTypes.TEXT)], defaultValue: [] },
     consultations: DataTypes.JSONB,
@@ -23,8 +18,7 @@ Organisation.init(
     territoriesEnabled: { type: DataTypes.BOOLEAN },
     groupsEnabled: { type: DataTypes.BOOLEAN },
     groupedServices: {
-      type: DataTypes.JSONB,
-      // example: [{"groupTitle": "injection", categories: ["Garrot", "1cc"]}, { "groupTitle": "inhalation", "categories": ["Kit base", "Grille"]}]
+      type: DataTypes.JSONB, // example: [{"groupTitle": "injection", categories: ["Garrot", "1cc"]}, { "groupTitle": "inhalation", "categories": ["Kit base", "Grille"]}]
     },
     services: DataTypes.ARRAY(DataTypes.TEXT),
     customFieldsObs: DataTypes.JSONB,
@@ -34,8 +28,14 @@ Organisation.init(
     migrating: { type: DataTypes.BOOLEAN, default: false },
     migrations: DataTypes.ARRAY(DataTypes.TEXT),
     migrationLastUpdateAt: DataTypes.DATE,
-  },
-  { sequelize, modelName: "Organisation", freezeTableName: true }
-);
+  };
 
-module.exports = Organisation;
+  class Organisation extends Model {
+    static associate(models) {
+      // See other models
+    }
+  }
+
+  Organisation.init(schema, { sequelize, modelName: "Organisation", freezeTableName: true });
+  return Organisation;
+};

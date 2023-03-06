@@ -5,26 +5,27 @@ const { Op, fn } = require("sequelize");
 const crypto = require("crypto");
 const { z } = require("zod");
 const { catchErrors } = require("../errors");
-const Organisation = require("../models/organisation");
-const User = require("../models/user");
-const Action = require("../models/action");
-const Consultation = require("../models/consultation");
-const Treatment = require("../models/treatment");
-const MedicalFile = require("../models/medicalFile");
-const Person = require("../models/person");
-const Group = require("../models/group");
-const Territory = require("../models/territory");
-const Report = require("../models/report");
-const Comment = require("../models/comment");
-const Passage = require("../models/passage");
-const Rencontre = require("../models/rencontre");
+const {
+  Organisation,
+  Person,
+  Group,
+  Place,
+  RelPersonPlace,
+  Action,
+  Consultation,
+  Treatment,
+  MedicalFile,
+  Comment,
+  Passage,
+  Rencontre,
+  Territory,
+  Report,
+  TerritoryObservation,
+} = require("../db/sequelize");
 const mailservice = require("../utils/mailservice");
 const validateUser = require("../middleware/validateUser");
 const { looseUuidRegex, customFieldSchema, positiveIntegerRegex } = require("../utils");
 const { capture } = require("../sentry");
-const Place = require("../models/place");
-const RelPersonPlace = require("../models/relPersonPlace");
-const TerritoryObservation = require("../models/territoryObservation");
 const { serializeOrganisation } = require("../utils/data-serializer");
 const { defaultSocialCustomFields, defaultMedicalCustomFields } = require("../utils/custom-fields/person");
 

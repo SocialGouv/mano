@@ -1,10 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { catchErrors } = require("../errors");
-const Action = require("../models/action");
-const Comment = require("../models/comment");
-const Person = require("../models/person");
-const User = require("../models/user");
+const { Action, Comment, Person, User } = require("../db/sequelize");
 const { Op } = require("sequelize");
 
 router.get(

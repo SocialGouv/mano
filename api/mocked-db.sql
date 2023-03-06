@@ -979,4 +979,3 @@ create index if not exists idx_service_date_team on mano."Service" ("date", team
 --
 -- PostgreSQL database dump complete
 --
-

@@ -1,13 +1,8 @@
-const { DataTypes, Model, Sequelize, Deferrable } = require("sequelize");
+const { Model, Deferrable } = require("sequelize");
 
-const sequelize = require("../db/sequelize");
-const { hashPassword } = require("../utils");
-
-class User extends Model {}
-
-User.init(
-  {
-    _id: { type: DataTypes.UUID, allowNull: false, defaultValue: Sequelize.UUIDV4, primaryKey: true },
+module.exports = (sequelize, DataTypes) => {
+  const schema = {
+    _id: { type: DataTypes.UUID, allowNull: false, defaultValue: DataTypes.UUIDV4, primaryKey: true },
     name: DataTypes.TEXT,
     email: { type: DataTypes.TEXT, allowNull: false },
     password: { type: DataTypes.TEXT, allowNull: false },
@@ -22,8 +17,18 @@ User.init(
     debugApp: DataTypes.JSONB,
     debugDashboard: DataTypes.JSONB,
     gaveFeedbackEarly2023: DataTypes.BOOLEAN,
-  },
-  {
+  };
+
+  class User extends Model {
+    static associate({ Organisation, User, Team, RelUserTeam }) {
+      User.belongsTo(Organisation, { foreignKey: { type: DataTypes.UUID, name: "organisation", field: "organisation" } });
+      Organisation.hasMany(User, { foreignKey: { type: DataTypes.UUID, name: "organisation", field: "organisation" } });
+      User.belongsToMany(Team, { foreignKey: { type: DataTypes.UUID, name: "user", field: "user" }, through: RelUserTeam });
+      Team.belongsToMany(User, { foreignKey: { type: DataTypes.UUID, name: "team", field: "team" }, through: RelUserTeam });
+    }
+  }
+
+  User.init(schema, {
     sequelize,
     modelName: "User",
     freezeTableName: true,
@@ -35,15 +40,15 @@ User.init(
         attributes: {},
       },
     },
-  }
-);
+  });
 
-User.beforeCreate(async (user) => {
-  user.password = await hashPassword(user.password);
-});
+  User.beforeCreate(async (user) => {
+    user.password = await hashPassword(user.password);
+  });
 
-User.beforeUpdate(async (user) => {
-  if (user.changed("password")) user.password = await hashPassword(user.password);
-});
+  User.beforeUpdate(async (user) => {
+    if (user.changed("password")) user.password = await hashPassword(user.password);
+  });
 
-module.exports = User;
+  return User;
+};

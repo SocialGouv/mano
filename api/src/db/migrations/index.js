@@ -1,3 +1,0 @@
-(async () => {
-  // Do not use! Will be removed soon...
-})();

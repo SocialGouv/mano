@@ -4,8 +4,7 @@ const passport = require("passport");
 const { z } = require("zod");
 const { looseUuidRegex } = require("../utils");
 const { catchErrors } = require("../errors");
-const Team = require("../models/team");
-const RelUserTeam = require("../models/relUserTeam");
+const { Team, RelUserTeam } = require("../db/sequelize");
 const validateUser = require("../middleware/validateUser");
 
 router.post(
