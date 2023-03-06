@@ -1,3 +1,10 @@
+# [1.252.0](https://github.com/SocialGouv/mano/compare/v1.251.0...v1.252.0) (2023-03-06)
+
+
+### Features
+
+* **dashboard:** paramètres du dossier médical modernisés ([#1379](https://github.com/SocialGouv/mano/issues/1379)) ([cd58acb](https://github.com/SocialGouv/mano/commit/cd58acb1209116d7aef172c2e3db0509c2937a20))
+
 # [1.251.0](https://github.com/SocialGouv/mano/compare/v1.250.0...v1.251.0) (2023-03-04)
 
 
