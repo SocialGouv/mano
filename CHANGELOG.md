@@ -1,3 +1,10 @@
+# [1.253.0](https://github.com/SocialGouv/mano/compare/v1.252.0...v1.253.0) (2023-03-06)
+
+
+### Features
+
+* possibilité d'ajouter des groupes de champs personnalisés pour les personnes ([#1372](https://github.com/SocialGouv/mano/issues/1372)) ([e52916a](https://github.com/SocialGouv/mano/commit/e52916ad3d45af7041bdb2816abcb4e7a75ed292))
+
 # [1.252.0](https://github.com/SocialGouv/mano/compare/v1.251.0...v1.252.0) (2023-03-06)
 
 
