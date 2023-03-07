@@ -9,7 +9,7 @@ const { looseUuidRegex, dateRegex } = require("../utils");
 const { capture } = require("../sentry");
 const validateUser = require("../middleware/validateUser");
 const { serializeOrganisation } = require("../utils/data-serializer");
-const { Organisation, Person, Action, Comment, Report } = require("../db/sequelize");
+const { Organisation, Person, Action, Comment, Report, Team, Service } = require("../db/sequelize");
 
 router.put(
   "/:migrationName",
