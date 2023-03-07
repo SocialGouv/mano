@@ -129,7 +129,7 @@ const config: PlaywrightTestConfig = {
       },
     },
     {
-      command: "node ./api/src/index.js",
+      command: "yarn --cwd ./api start:test",
       port: 8091,
       timeout: 120 * 1000,
       reuseExistingServer: !process.env.CI,
