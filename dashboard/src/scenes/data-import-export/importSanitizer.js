@@ -1,4 +1,4 @@
-import { dayjsInstance } from '../../services/date';
+import { dayjsInstance, fromDateString } from '../../services/date';
 
 const sanitizeString = (value) => {
   if (!value) return null;
@@ -16,7 +16,8 @@ const sanitizeNumber = (value) => {
 const sanitizeDate = (value) => {
   // https://stackoverflow.com/a/643827/5225096
   if (typeof value?.getMonth === 'function' || value instanceof dayjsInstance) return value;
-  if (!isNaN(new Date(value).getMonth())) return new Date(value);
+  const date = fromDateString(value);
+  if (date.isValid()) return date.toDate();
   return null;
 };
 
