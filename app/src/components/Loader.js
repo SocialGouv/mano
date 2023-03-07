@@ -104,10 +104,12 @@ export const DataLoader = () => {
     setOrganisation(userResponse.user.organisation);
     setUser(userResponse.user);
 
+    const serverDateResponse = await API.get({ path: '/now' });
+    const serverDate = serverDateResponse.data;
+
     /*
     Get number of data to download to show the appropriate loading progress bar
     */
-    const justChecked = Date.now();
     const response = await API.get({
       path: '/organisation/stats',
       query: { organisation: organisationId, after: lastRefresh, withDeleted: true },
@@ -381,7 +383,7 @@ export const DataLoader = () => {
     */
     initialLoadDone.current = true;
     await new Promise((res) => setTimeout(res, 150));
-    setLastRefresh(justChecked);
+    setLastRefresh(serverDate);
     setLoading('');
     setProgress(0);
     setFullScreen(false);
