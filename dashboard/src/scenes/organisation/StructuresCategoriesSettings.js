@@ -79,7 +79,7 @@ const AddCategory = ({ groupTitle }) => {
     });
     if (response.ok) {
       setOrganisation(response.data);
-      toast.success("Catégorie ajoutée. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard", { autoClose: 2000 });
+      toast.success("Catégorie ajoutée. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
     } else {
       setOrganisation(oldOrganisation);
     }
