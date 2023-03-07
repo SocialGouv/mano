@@ -7,7 +7,7 @@ module.exports = async () => {
       ALTER TABLE "mano"."Organisation"
       ADD COLUMN IF NOT EXISTS "structuresGroupedCategories" jsonb;
     `);
-    const [organisations, _] = await sequelize.query(`
+    const [organisations] = await sequelize.query(`
       SELECT * FROM "mano"."Organisation"
     `);
     for (const organisation of organisations) {

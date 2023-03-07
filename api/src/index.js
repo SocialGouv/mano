@@ -14,6 +14,7 @@ const { SentryInit } = require("./sentry");
 const Sentry = require("@sentry/node");
 
 require("./db/sequelize");
+require("./db/relation");
 
 // Put together a schema
 const app = express();
