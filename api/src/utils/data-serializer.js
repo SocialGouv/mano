@@ -44,8 +44,8 @@ function serializeOrganisation(organisation) {
     /* custom fields persons */
     customFieldsPersons: organisation.customFieldsPersons || [],
     /* kept for retro-compatibility */
-    customFieldsPersonsSocial: organisation.customFieldsPersons.find(({ name }) => name === "Informations sociales")?.fields || [],
-    customFieldsPersonsMedical: organisation.customFieldsPersons.find(({ name }) => name === "Informations médicales")?.fields || [],
+    customFieldsPersonsSocial: (organisation.customFieldsPersons || []).find(({ name }) => name === "Informations sociales")?.fields || [],
+    customFieldsPersonsMedical: (organisation.customFieldsPersons || []).find(({ name }) => name === "Informations médicales")?.fields || [],
 
     customFieldsMedicalFile: organisation.customFieldsMedicalFile || defaultMedicalFileCustomFields,
   };
