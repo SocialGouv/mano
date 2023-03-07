@@ -1,3 +1,10 @@
+## [1.253.7](https://github.com/SocialGouv/mano/compare/v1.253.6...v1.253.7) (2023-03-07)
+
+
+### Bug Fixes
+
+* **api:** correction du dataserializer quand il n'y a aucune pas de champs persos ([b90cb5d](https://github.com/SocialGouv/mano/commit/b90cb5d5551b2b9d3308fa3b78501a3bc0adacda))
+
 ## [1.253.6](https://github.com/SocialGouv/mano/compare/v1.253.5...v1.253.6) (2023-03-07)
 
 
