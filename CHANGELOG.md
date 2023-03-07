@@ -1,3 +1,10 @@
+## [1.253.6](https://github.com/SocialGouv/mano/compare/v1.253.5...v1.253.6) (2023-03-07)
+
+
+### Bug Fixes
+
+* **dashboard:** support de plus de format de date à l'import, pour accepter les notations française en plus de 2010-12-22 ([#1386](https://github.com/SocialGouv/mano/issues/1386)) ([9563c8f](https://github.com/SocialGouv/mano/commit/9563c8fa04561336c9efea73f716766c992757f3))
+
 ## [1.253.5](https://github.com/SocialGouv/mano/compare/v1.253.4...v1.253.5) (2023-03-06)
 
 
