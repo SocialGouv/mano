@@ -3,13 +3,10 @@ const router = express.Router();
 const passport = require("passport");
 const { z } = require("zod");
 const { Op } = require("sequelize");
-const { sequelize } = require("../db/sequelize");
 const { catchErrors } = require("../errors");
 const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
-const { capture } = require("../sentry");
 const validateUser = require("../middleware/validateUser");
 const { looseUuidRegex, positiveIntegerRegex } = require("../utils");
-const { serializeOrganisation } = require("../utils/data-serializer");
 const { Consultation } = require("../db/sequelize");
 
 const TODO = "A FAIRE";

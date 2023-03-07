@@ -2,14 +2,13 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const { z } = require("zod");
-const { sequelize } = require("../db/sequelize");
 const { catchErrors } = require("../errors");
 const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
 const { looseUuidRegex, dateRegex } = require("../utils");
 const { capture } = require("../sentry");
 const validateUser = require("../middleware/validateUser");
 const { serializeOrganisation } = require("../utils/data-serializer");
-const { Organisation, Person, Action, Comment, Report, Team, Service } = require("../db/sequelize");
+const { Organisation, Person, Action, Comment, Report, Team, Service, sequelize } = require("../db/sequelize");
 
 router.put(
   "/:migrationName",

@@ -19,9 +19,9 @@ const {
   Territory,
   Report,
   TerritoryObservation,
+  sequelize,
 } = require("../db/sequelize");
 
-const { sequelize } = require("../db/sequelize");
 const { capture } = require("../sentry");
 const validateUser = require("../middleware/validateUser");
 const { looseUuidRegex } = require("../utils");

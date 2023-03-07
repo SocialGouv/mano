@@ -3,13 +3,12 @@ const router = express.Router();
 const passport = require("passport");
 const { z } = require("zod");
 const { looseUuidRegex, dateRegex } = require("../utils");
-const { sequelize } = require("../db/sequelize");
 const { catchErrors } = require("../errors");
 const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
 const { capture } = require("../sentry");
 const validateUser = require("../middleware/validateUser");
 const { serializeOrganisation } = require("../utils/data-serializer");
-const { Report, Organisation, Service } = require("../db/sequelize");
+const { Report, Organisation, Service, sequelize } = require("../db/sequelize");
 
 router.post(
   "/team/:team/date/:date",
