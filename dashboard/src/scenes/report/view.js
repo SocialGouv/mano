@@ -57,6 +57,7 @@ import ReceptionService from '../../components/ReceptionService';
 import { useLocalStorage } from 'react-use';
 import useSearchParamState from '../../services/useSearchParamState';
 import { arrayOfitemsGroupedByActionSelector, arrayOfitemsGroupedByConsultationSelector } from '../../recoil/selectors';
+import ConsultationModal from '../../components/ConsultationModal';
 
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithFullMonth(date)}`;
@@ -1204,6 +1205,7 @@ const Consultations = ({ date, status, consultations, setSortOrder, setSortBy, s
   const data = consultations;
   const user = useRecoilValue(userState);
   const history = useHistory();
+  const [showModal, setShowModal] = useState(false);
 
   if (!data) return <div />;
   const moreThanOne = data.length > 1;
@@ -1211,6 +1213,7 @@ const Consultations = ({ date, status, consultations, setSortOrder, setSortBy, s
   return (
     <>
       <StyledBox>
+        <ButtonCustom title="Ajouter une consultation" className="tw-ml-auto tw-mb-10" onClick={() => setShowModal(true)} />
         <Table
           className="Table"
           title={`Consultation${moreThanOne ? 's' : ''} ${status === DONE ? 'faite' : 'annulée'}${
@@ -1275,6 +1278,7 @@ const Consultations = ({ date, status, consultations, setSortOrder, setSortBy, s
             },
           ]}
         />
+        {showModal && <ConsultationModal onClose={() => setShowModal(false)} />}
       </StyledBox>
       <hr />
     </>
