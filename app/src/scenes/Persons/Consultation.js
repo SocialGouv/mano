@@ -37,10 +37,15 @@ const Consultation = ({ navigation, route }) => {
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
   const person = route?.params?.personDB || route?.params?.person;
-  const consultationDB = useMemo(
-    () => allConsultations.find((c) => c._id === route?.params?.consultationDB?._id),
-    [allConsultations, route?.params?.consultationDB?._id]
-  );
+  const consultationDB = useMemo(() => {
+    if (route?.params?.consultationDB?._id) {
+      return allConsultations.find((c) => c._id === route?.params?.consultationDB?._id);
+    } else {
+      return {
+        user: user._id,
+      };
+    }
+  }, [allConsultations, route?.params?.consultationDB?._id]);
 
   const isNew = !consultationDB?._id;
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
