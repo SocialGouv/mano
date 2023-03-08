@@ -1,3 +1,10 @@
+## [1.255.1](https://github.com/SocialGouv/mano/compare/v1.255.0...v1.255.1) (2023-03-08)
+
+
+### Bug Fixes
+
+* correctif sur les exports des champs Oui/Non en tableau Excel ([#1393](https://github.com/SocialGouv/mano/issues/1393)) ([f01db4e](https://github.com/SocialGouv/mano/commit/f01db4e86145bd36d97eed663ad9b5eb7c7ce1a3))
+
 # [1.255.0](https://github.com/SocialGouv/mano/compare/v1.254.0...v1.255.0) (2023-03-08)
 
 
