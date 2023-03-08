@@ -23,7 +23,8 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
             fields[field.label] = (person[field.name] || []).map((t) => teams.find((person) => person._id === t)?.name)?.join(', ');
           } else if (['date', 'date-with-time'].includes(field.type))
             fields[field.label || field.name] = person[field.name] ? dayjsInstance(person[field.name]).format('YYYY-MM-DD') : '';
-          else if (['boolean', 'yes-no'].includes(field.type)) fields[field.label || field.name] = person[field.name] ? 'Oui' : 'Non';
+          else if (['boolean'].includes(field.type)) fields[field.label || field.name] = person[field.name] ? 'Oui' : 'Non';
+          else if (['yes-no'].includes(field.type)) fields[field.label || field.name] = person[field.name];
           else if (Array.isArray(person[field.name])) fields[field.label || field.name] = person[field.name].join(', ');
           else fields[field.label || field.name] = person[field.name];
           return fields;
@@ -70,7 +71,7 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
               ⌄
             </div>
           </Menu.Button>
-      )}
+        )}
       </div>
       <Transition
         as={Fragment}
