@@ -1,3 +1,10 @@
+## [1.253.8](https://github.com/SocialGouv/mano/compare/v1.253.7...v1.253.8) (2023-03-08)
+
+
+### Bug Fixes
+
+* **dashboard:** coquille dans titre Informations generales du dossier medical ([#1391](https://github.com/SocialGouv/mano/issues/1391)) ([3a4d344](https://github.com/SocialGouv/mano/commit/3a4d3440f17816c05348857070a9bdcd3cc5ff8a))
+
 ## [1.253.7](https://github.com/SocialGouv/mano/compare/v1.253.6...v1.253.7) (2023-03-07)
 
 
