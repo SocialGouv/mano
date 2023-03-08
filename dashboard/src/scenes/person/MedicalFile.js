@@ -118,7 +118,7 @@ export function MedicalFile({ person }) {
       <h1 className="printonly">Dossier médical de {person?.name}</h1>
       <small className="printonly">extrait le {dayjsInstance().format('ddd DD MM YYYY')}</small>
       <div className="tw-mx-0 tw-mt-8 tw-mb-5 tw-flex tw-items-center">
-        <h2 className="tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Informations jjj générales</h2>
+        <h2 className="tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Informations générales</h2>
         <div className="tw-flex tw-flex-1 tw-justify-end">
           <ButtonCustom
             icon={false}
