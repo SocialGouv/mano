@@ -1,3 +1,10 @@
+# [1.254.0](https://github.com/SocialGouv/mano/compare/v1.253.8...v1.254.0) (2023-03-08)
+
+
+### Features
+
+* **dashboard:** bouton pour ajouter une consultation dans les comptes rendus ([#1390](https://github.com/SocialGouv/mano/issues/1390)) ([abb33c9](https://github.com/SocialGouv/mano/commit/abb33c9f1de6dd3b1c2850fa8284f8762917755b))
+
 ## [1.253.8](https://github.com/SocialGouv/mano/compare/v1.253.7...v1.253.8) (2023-03-08)
 
 
