@@ -213,7 +213,7 @@ export const itemsGroupedByPersonSelector = selector({
         if (consultation.createdAt > personsObject[consultation.person].lastUpdateCheckForGDPR) {
           personsObject[consultation.person].lastUpdateCheckForGDPR = consultation.createdAt;
         }
-        if (consultation.duedAt > personsObject[consultation.person].lastUpdateCheckForGDPR) {
+        if (consultation.dueAt > personsObject[consultation.person].lastUpdateCheckForGDPR) {
           personsObject[consultation.person].lastUpdateCheckForGDPR = consultation.dueAt;
         }
       }
