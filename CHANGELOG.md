@@ -1,3 +1,10 @@
+# [1.255.0](https://github.com/SocialGouv/mano/compare/v1.254.0...v1.255.0) (2023-03-08)
+
+
+### Features
+
+* **dashboard:** nouveau bouton pour ajouter une observation dans les comptes rendus ([#1370](https://github.com/SocialGouv/mano/issues/1370)) ([6cc8b7f](https://github.com/SocialGouv/mano/commit/6cc8b7f1311f55cf131b6ecd6c7af4894e278635))
+
 # [1.254.0](https://github.com/SocialGouv/mano/compare/v1.253.8...v1.254.0) (2023-03-08)
 
 
