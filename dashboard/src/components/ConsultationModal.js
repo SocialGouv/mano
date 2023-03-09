@@ -191,24 +191,28 @@ export default function ConsultationModal({ onClose, personId, consultation }) {
                 );
               })}
           </div>
-          <hr />
-          <div>
-            <div>
-              <label htmlFor="create-consultation-onlyme">
-                <input
-                  type="checkbox"
-                  id="create-consultation-onlyme"
-                  style={{ marginRight: '0.5rem' }}
-                  name="onlyVisibleByCreator"
-                  checked={data.onlyVisibleBy?.includes(user._id)}
-                  onChange={() => {
-                    setData({ ...data, onlyVisibleBy: data.onlyVisibleBy?.includes(user._id) ? [] : [user._id] });
-                  }}
-                />
-                Seulement visible par moi
-              </label>
-            </div>
-          </div>
+          {data.user === user._id && (
+            <>
+              <hr />
+              <div>
+                <div>
+                  <label htmlFor="create-consultation-onlyme">
+                    <input
+                      type="checkbox"
+                      id="create-consultation-onlyme"
+                      style={{ marginRight: '0.5rem' }}
+                      name="onlyVisibleByCreator"
+                      checked={data.onlyVisibleBy?.includes(user._id)}
+                      onChange={() => {
+                        setData({ ...data, onlyVisibleBy: data.onlyVisibleBy?.includes(user._id) ? [] : [user._id] });
+                      }}
+                    />
+                    Seulement visible par moi
+                  </label>
+                </div>
+              </div>
+            </>
+          )}
           <hr />
           <div className="-tw-mx-4 tw-flex tw-flex-wrap">
             <div className="tw-basis-1/2 tw-p-4">
