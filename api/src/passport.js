@@ -2,7 +2,7 @@ const passport = require("passport");
 const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
 const { SECRET } = require("./config");
-const User = require("./models/user"); // load up the user model
+const { User } = require("./db/sequelize");
 
 module.exports = (app) => {
   const jwtStrategyOptions = {

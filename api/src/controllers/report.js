@@ -7,7 +7,7 @@ const { looseUuidRegex, positiveIntegerRegex } = require("../utils");
 const { catchErrors } = require("../errors");
 const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
 const validateUser = require("../middleware/validateUser");
-const Report = require("../models/report");
+const { Report } = require("../db/sequelize");
 
 router.get(
   "/",

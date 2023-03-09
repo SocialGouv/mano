@@ -6,7 +6,7 @@ const { Op } = require("sequelize");
 const { catchErrors } = require("../errors");
 const validateUser = require("../middleware/validateUser");
 const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
-const Action = require("../models/action");
+const { Action } = require("../db/sequelize");
 const { looseUuidRegex, positiveIntegerRegex } = require("../utils");
 
 const TODO = "A FAIRE";

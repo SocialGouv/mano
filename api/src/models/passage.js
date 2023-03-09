@@ -1,16 +1,20 @@
-const { DataTypes, Model, Sequelize, Deferrable } = require("sequelize");
-const sequelize = require("../db/sequelize");
+const { Model, Deferrable } = require("sequelize");
 
-class Passage extends Model {}
+module.exports = (sequelize, DataTypes) => {
+  const schema = {
+    _id: { type: DataTypes.UUID, allowNull: false, defaultValue: DataTypes.UUIDV4, primaryKey: true },
+    organisation: { type: DataTypes.UUID, references: { model: "Organisation", key: "_id", deferrable: Deferrable.INITIALLY_IMMEDIATE } },
+    encrypted: { type: DataTypes.TEXT },
+    encryptedEntityKey: { type: DataTypes.TEXT },
+  };
 
-const schema = {
-  _id: { type: DataTypes.UUID, allowNull: false, defaultValue: Sequelize.UUIDV4, primaryKey: true },
-  organisation: { type: DataTypes.UUID, references: { model: "Organisation", key: "_id", deferrable: Deferrable.INITIALLY_IMMEDIATE } },
+  class Passage extends Model {
+    static associate({ Organisation, Passage }) {
+      Passage.belongsTo(Organisation, { foreignKey: { type: DataTypes.UUID, name: "organisation", field: "organisation" } });
+      Organisation.hasMany(Passage, { foreignKey: { type: DataTypes.UUID, name: "organisation", field: "organisation" } });
+    }
+  }
 
-  encrypted: { type: DataTypes.TEXT },
-  encryptedEntityKey: { type: DataTypes.TEXT },
+  Passage.init(schema, { sequelize, modelName: "Passage", freezeTableName: true, timestamps: true, paranoid: true });
+  return Passage;
 };
-
-Passage.init(schema, { sequelize, modelName: "Passage", freezeTableName: true, timestamps: true, paranoid: true });
-
-module.exports = Passage;

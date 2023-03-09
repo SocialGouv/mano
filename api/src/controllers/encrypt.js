@@ -3,22 +3,25 @@ const router = express.Router();
 const passport = require("passport");
 const { z } = require("zod");
 const { catchErrors } = require("../errors");
-const Organisation = require("../models/organisation");
-const Person = require("../models/person");
-const Group = require("../models/group");
-const Place = require("../models/place");
-const RelPersonPlace = require("../models/relPersonPlace");
-const Action = require("../models/action");
-const Consultation = require("../models/consultation");
-const Treatment = require("../models/treatment");
-const MedicalFile = require("../models/medicalFile");
-const Comment = require("../models/comment");
-const Passage = require("../models/passage");
-const Rencontre = require("../models/rencontre");
-const Territory = require("../models/territory");
-const Report = require("../models/report");
-const TerritoryObservation = require("../models/territoryObservation");
-const sequelize = require("../db/sequelize");
+const {
+  Organisation,
+  Person,
+  Group,
+  Place,
+  RelPersonPlace,
+  Action,
+  Consultation,
+  Treatment,
+  MedicalFile,
+  Comment,
+  Passage,
+  Rencontre,
+  Territory,
+  Report,
+  TerritoryObservation,
+  sequelize,
+} = require("../db/sequelize");
+
 const { capture } = require("../sentry");
 const validateUser = require("../middleware/validateUser");
 const { looseUuidRegex } = require("../utils");

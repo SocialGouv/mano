@@ -13,7 +13,7 @@
   },
   "scripts": {
     "test:start-dashboard-for-record": "REACT_APP_HOST=127.0.0.1:8091 REACT_APP_SCHEME=http REACT_APP_TEST=true REACT_APP_TEST_PLAYWRIGHT=true PORT=8090 yarn --cwd ./dashboard dev",
-    "test:start-api-for-record": "PORT=8091 NODE_ENV=test PGDATABASE=manotest node ./api/src/index.js dev",
+    "test:start-api-for-record": "PORT=8091 NODE_ENV=test PGDATABASE=manotest yarn --cwd ./api start:test",
     "test:init-db": "PGDATABASE=manotest node ./e2e/scripts/init-db.js",
     "postinstall": "is-ci || husky install"
   },

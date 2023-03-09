@@ -1,17 +1,20 @@
-const { DataTypes, Model, Sequelize, Deferrable } = require("sequelize");
-const sequelize = require("../db/sequelize");
+const { Model, Deferrable } = require("sequelize");
 
-// Lieux frequentés
+module.exports = (sequelize, DataTypes) => {
+  const schema = {
+    _id: { type: DataTypes.UUID, allowNull: false, defaultValue: DataTypes.UUIDV4, primaryKey: true },
+    organisation: { type: DataTypes.UUID, references: { model: "Organisation", key: "_id", deferrable: Deferrable.INITIALLY_IMMEDIATE } },
+    encrypted: { type: DataTypes.TEXT },
+    encryptedEntityKey: { type: DataTypes.TEXT },
+  };
 
-const schema = {
-  _id: { type: DataTypes.UUID, allowNull: false, defaultValue: Sequelize.UUIDV4, primaryKey: true },
-  organisation: { type: DataTypes.UUID, references: { model: "Organisation", key: "_id", deferrable: Deferrable.INITIALLY_IMMEDIATE } },
-  encrypted: { type: DataTypes.TEXT },
-  encryptedEntityKey: { type: DataTypes.TEXT },
+  class Place extends Model {
+    static associate({ Organisation, Place }) {
+      Place.belongsTo(Organisation, { foreignKey: { type: DataTypes.UUID, name: "organisation", field: "organisation" } });
+      Organisation.hasMany(Place, { foreignKey: { type: DataTypes.UUID, name: "organisation", field: "organisation" } });
+    }
+  }
+
+  Place.init(schema, { sequelize, modelName: "Place", freezeTableName: true, timestamps: true, paranoid: true });
+  return Place;
 };
-
-class Place extends Model {}
-
-Place.init(schema, { sequelize, modelName: "Place", freezeTableName: true, timestamps: true, paranoid: true });
-
-module.exports = Place;

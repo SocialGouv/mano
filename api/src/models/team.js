@@ -1,16 +1,20 @@
-const { DataTypes, Model, Sequelize, Deferrable } = require("sequelize");
-const sequelize = require("../db/sequelize");
+const { Model, Deferrable } = require("sequelize");
 
-class Team extends Model {}
-
-Team.init(
-  {
-    _id: { type: DataTypes.UUID, allowNull: false, defaultValue: Sequelize.UUIDV4, primaryKey: true },
+module.exports = (sequelize, DataTypes) => {
+  const schema = {
+    _id: { type: DataTypes.UUID, allowNull: false, defaultValue: DataTypes.UUIDV4, primaryKey: true },
     name: DataTypes.TEXT,
     nightSession: DataTypes.BOOLEAN,
     organisation: { type: DataTypes.UUID, references: { model: "Organisation", key: "_id", deferrable: Deferrable.INITIALLY_IMMEDIATE } },
-  },
-  { sequelize, modelName: "Team", freezeTableName: true }
-);
+  };
 
-module.exports = Team;
+  class Team extends Model {
+    static associate({ Organisation, Team }) {
+      Team.belongsTo(Organisation, { foreignKey: { type: DataTypes.UUID, name: "organisation", field: "organisation" } });
+      Organisation.hasMany(Team, { foreignKey: { type: DataTypes.UUID, name: "organisation", field: "organisation" } });
+    }
+  }
+
+  Team.init(schema, { sequelize, modelName: "Team", freezeTableName: true });
+  return Team;
+};

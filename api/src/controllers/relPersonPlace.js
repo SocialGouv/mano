@@ -6,7 +6,7 @@ const { z } = require("zod");
 const { catchErrors } = require("../errors");
 const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
 const validateUser = require("../middleware/validateUser");
-const RelPersonPlace = require("../models/relPersonPlace");
+const { RelPersonPlace } = require("../db/sequelize");
 const { looseUuidRegex, positiveIntegerRegex } = require("../utils");
 
 router.post(

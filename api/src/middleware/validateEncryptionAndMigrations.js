@@ -1,4 +1,4 @@
-const Organisation = require("../models/organisation");
+const { Organisation } = require("../db/sequelize");
 
 function dateForCompare(date) {
   return Date.parse(new Date(date));
