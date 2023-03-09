@@ -10,7 +10,7 @@ import {
   formatDateWithNameOfDay,
   formatTime,
   getIsDayWithinHoursOffsetOfPeriod,
-  startOfToday,
+  //startOfToday,
 } from '../../services/date';
 import DateBloc from '../../components/DateBloc';
 import { HeaderStyled, Title as HeaderTitle } from '../../components/header';
@@ -987,20 +987,18 @@ const ActionCompletedAt = ({ date, status, actions, setSortOrder, setSortBy, sor
 
   const moreThanOne = data.length > 1;
 
-  const completedAt = startOfToday().add(12, 'hours');
-
   return (
     <>
       <StyledBox>
         {status === DONE && (
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <CreateActionModal open={modalOpen} setOpen={(value) => setModalOpen(value)} completedAt={completedAt} isMulti />
+            <CreateActionModal open={modalOpen} setOpen={(value) => setModalOpen(value)} completedAt={date} isMulti />
             <div className="noprint" style={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
               <ButtonCustom
                 icon={agendaIcon}
                 onClick={() => setModalOpen(true)}
                 color="primary"
-                title={`Créer une nouvelle action faite le ${formatDateWithFullMonth(completedAt)}`}
+                title={`Créer une nouvelle action faite le ${formatDateWithFullMonth(date)}`}
                 padding={'12px 24px'}
               />
             </div>
