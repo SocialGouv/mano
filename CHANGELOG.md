@@ -1,3 +1,10 @@
+## [1.255.2](https://github.com/SocialGouv/mano/compare/v1.255.1...v1.255.2) (2023-03-09)
+
+
+### Bug Fixes
+
+* prendre la date du serveur pour le loader ([#1392](https://github.com/SocialGouv/mano/issues/1392)) ([c2284fd](https://github.com/SocialGouv/mano/commit/c2284fd0fb019304964fc794d8b4308d48d10673))
+
 ## [1.255.1](https://github.com/SocialGouv/mano/compare/v1.255.0...v1.255.1) (2023-03-08)
 
 
