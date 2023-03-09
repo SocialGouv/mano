@@ -1,3 +1,10 @@
+## [1.255.3](https://github.com/SocialGouv/mano/compare/v1.255.2...v1.255.3) (2023-03-09)
+
+
+### Bug Fixes
+
+* **dashboard:** seul le user créateur d'une consultation peut cocher 'seulement visible par moi' + click sur consultation désactivée en mode hebdomadaire lorsque non visible par moi ([#1395](https://github.com/SocialGouv/mano/issues/1395)) ([e342f05](https://github.com/SocialGouv/mano/commit/e342f05280d1e30529416db70cea1a1b980485a2))
+
 ## [1.255.2](https://github.com/SocialGouv/mano/compare/v1.255.1...v1.255.2) (2023-03-09)
 
 
