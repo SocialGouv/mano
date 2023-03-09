@@ -9,6 +9,11 @@ router.get("/check-auth", passport.authenticate("user", { session: false }), asy
   res.status(200).send({ ok: true });
 });
 
+router.get("/now", passport.authenticate("user", { session: false }), async (req, res) => {
+  const data = Date.now();
+  res.status(200).send({ ok: true, data });
+});
+
 // Get mobile app version suggested by the server.
 // When a new version of the mobile app is released, the server will send the version number
 // so the mobile app can send a notification to the user.

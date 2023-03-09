@@ -88,7 +88,7 @@ export default function DataLoader() {
 
   const organisationId = organisation?._id;
 
-  const justChecked = useRef(null);
+  const serverDate = useRef(null);
 
   // Loader initialization: get data from cache, check stats, init recoils states, and start loader.
   function initLoader() {
@@ -108,6 +108,9 @@ export default function DataLoader() {
           if (!userResponse.ok) return resetLoaderOnError();
           setOrganisation(userResponse.user.organisation);
           setUser(userResponse.user);
+          // Get date from server at the very beginning of the loader.
+          const serverDateResponse = await API.get({ path: '/now' });
+          serverDate.current = serverDateResponse.data;
         })
         .then(() => (initialLoad ? migrateData() : Promise.resolve()))
         .then(() => getCacheItem(dashboardCurrentCacheKey))
@@ -123,7 +126,6 @@ export default function DataLoader() {
               withAllMedicalData: initialLoad,
             },
           }).then(({ data: stats }) => {
-            justChecked.current = Date.now();
             if (!stats) return;
             const newList = [];
             let itemsCount =
@@ -374,7 +376,7 @@ export default function DataLoader() {
 
   function stopLoader() {
     setIsLoading(false);
-    setLastLoad(justChecked.current);
+    setLastLoad(serverDate.current);
     setProgressBuffer(null);
     setProgress(null);
     setTotal(null);
