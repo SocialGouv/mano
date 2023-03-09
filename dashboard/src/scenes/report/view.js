@@ -10,7 +10,6 @@ import {
   formatDateWithNameOfDay,
   formatTime,
   getIsDayWithinHoursOffsetOfPeriod,
-  //startOfToday,
 } from '../../services/date';
 import DateBloc from '../../components/DateBloc';
 import { HeaderStyled, Title as HeaderTitle } from '../../components/header';
