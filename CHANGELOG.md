@@ -1,3 +1,10 @@
+## [1.255.5](https://github.com/SocialGouv/mano/compare/v1.255.4...v1.255.5) (2023-03-10)
+
+
+### Bug Fixes
+
+* User model ([57daf25](https://github.com/SocialGouv/mano/commit/57daf25cccc746a0edc2de6c8038abcf84e21a05))
+
 ## [1.255.4](https://github.com/SocialGouv/mano/compare/v1.255.3...v1.255.4) (2023-03-10)
 
 
