@@ -1385,7 +1385,7 @@ const CommentCreatedAt = ({ date, comments }) => {
             {
               title: 'Heure',
               dataKey: 'date',
-              render: (comment) => <span>{dayjs(comment.date || comment.createdAt).format('HH:mm')}</span>,
+              render: (comment) => <span>{dayjs(comment.date || comment.createdAt).format('D MMM HH:mm')}</span>,
             },
             {
               title: 'Utilisateur',
@@ -1503,7 +1503,7 @@ const PassagesCreatedAt = ({ date, passages }) => {
                 title: 'Heure',
                 dataKey: 'date',
                 render: (passage) => {
-                  const time = dayjs(passage.date).format('HH:mm');
+                  const time = dayjs(passage.date).format('D MMM HH:mm');
                   // anonymous comment migrated from `report.passages`
                   // have no time
                   // have no user assigned either
@@ -1583,7 +1583,7 @@ const RencontresCreatedAt = ({ date, rencontres }) => {
                 title: 'Heure',
                 dataKey: 'date',
                 render: (rencontre) => {
-                  const time = dayjs(rencontre.date).format('HH:mm');
+                  const time = dayjs(rencontre.date).format('D MMM HH:mm');
                   // anonymous comment migrated from `report.rencontres`
                   // have no time
                   // have no user assigned either
@@ -1653,7 +1653,7 @@ const TerritoryObservationsCreatedAt = ({ date, observations }) => {
             {
               title: 'Heure',
               dataKey: 'observedAt',
-              render: (obs) => <span>{dayjs(obs.observedAt || obs.createdAt).format('HH:mm')}</span>,
+              render: (obs) => <span>{dayjs(obs.observedAt || obs.createdAt).format('D MMM HH:mm')}</span>,
             },
             {
               title: 'Utilisateur',
@@ -1704,7 +1704,7 @@ const PersonCreatedAt = ({ date, persons, setSortBy, setSortOrder, sortBy, sortO
               onSortBy: setSortBy,
               sortOrder,
               sortBy,
-              render: (p) => <span>{dayjs(p.createdAt).format('HH:mm')}</span>,
+              render: (p) => <span>{dayjs(p.createdAt).format('D MMM HH:mm')}</span>,
             },
             {
               title: 'Personne (nom)',
