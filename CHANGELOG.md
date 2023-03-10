@@ -1,3 +1,10 @@
+# [1.256.0](https://github.com/SocialGouv/mano/compare/v1.255.5...v1.256.0) (2023-03-10)
+
+
+### Features
+
+* **dashboard:** possibilité d'importer des personnes sorties de file active ([#1399](https://github.com/SocialGouv/mano/issues/1399)) ([88e01ef](https://github.com/SocialGouv/mano/commit/88e01ef3aa14cf0f0e6ba2ba3eafd8f495679de8))
+
 ## [1.255.5](https://github.com/SocialGouv/mano/compare/v1.255.4...v1.255.5) (2023-03-10)
 
 
