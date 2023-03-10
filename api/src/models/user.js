@@ -1,4 +1,5 @@
 const { Model, Deferrable } = require("sequelize");
+const { hashPassword } = require("../utils");
 
 module.exports = (sequelize, DataTypes) => {
   const schema = {
