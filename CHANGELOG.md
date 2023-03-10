@@ -1,3 +1,10 @@
+## [1.255.4](https://github.com/SocialGouv/mano/compare/v1.255.3...v1.255.4) (2023-03-10)
+
+
+### Bug Fixes
+
+* **api:** import hashpassword ([862b396](https://github.com/SocialGouv/mano/commit/862b396ec22b061f025d36f520009cc0854abd54))
+
 ## [1.255.3](https://github.com/SocialGouv/mano/compare/v1.255.2...v1.255.3) (2023-03-09)
 
 
