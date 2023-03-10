@@ -20,6 +20,7 @@ const {
   Rencontre,
   Territory,
   Report,
+  User,
   TerritoryObservation,
 } = require("../db/sequelize");
 const mailservice = require("../utils/mailservice");
@@ -191,7 +192,6 @@ router.get(
   passport.authenticate("user", { session: false }),
   validateUser("superadmin"),
   catchErrors(async (req, res, next) => {
-    const startLoadingDate = Date.now();
     try {
       z.object({
         withCounters: z.optional(z.enum(["true", "false"])),
@@ -209,8 +209,7 @@ router.get(
       group: ["organisation"],
       attributes: ["organisation", [fn("COUNT", "TagName"), "countByOrg"]],
     };
-    const now = Date.now();
-    console.log("now");
+
     const actions = (await Action.findAll(countQuery)).map((item) => item.toJSON());
     const persons = (await Person.findAll(countQuery)).map((item) => item.toJSON());
     const groups = (await Group.findAll(countQuery)).map((item) => item.toJSON());
@@ -223,8 +222,6 @@ router.get(
     const observations = (await TerritoryObservation.findAll(countQuery)).map((item) => item.toJSON());
     const treatments = (await Treatment.findAll(countQuery)).map((item) => item.toJSON());
     const users = (await User.findAll(countQuery)).map((item) => item.toJSON());
-
-    console.log("counters", Date.now() - now);
 
     const data = organisations
       .map((org) => org.toJSON())
@@ -255,8 +252,6 @@ router.get(
           countersTotal: Object.keys(counters).reduce((total, key) => total + (counters[key] || 0), 0),
         };
       });
-
-    console.log("end", Date.now() - now);
 
     return res.status(200).send({
       ok: true,
