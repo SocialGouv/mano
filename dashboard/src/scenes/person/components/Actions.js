@@ -95,7 +95,7 @@ const ActionsFilters = ({ data, filteredData, setFilterCategories, setFilterStat
     <>
       {data.length ? (
         <div className="tw-mb-4 tw-flex tw-basis-full tw-justify-between tw-gap-2 tw-px-3">
-          <div className="tw-shrink-0 tw-flex-grow">
+          <div className="-tw-z-10 tw-shrink-0 tw-flex-grow">
             <label htmlFor="action-select-categories-filter">Filtrer par catégorie</label>
             <SelectCustom
               options={catsSelect.map((_option) => ({ value: _option, label: _option }))}
@@ -109,7 +109,7 @@ const ActionsFilters = ({ data, filteredData, setFilterCategories, setFilterStat
               isMulti
             />
           </div>
-          <div className="tw-shrink-0 tw-flex-grow">
+          <div className="-tw-z-10 tw-shrink-0 tw-flex-grow">
             <label htmlFor="action-select-status-filter">Filtrer par statut</label>
             <SelectCustom
               inputId="action-select-status-filter"
