@@ -1,3 +1,10 @@
+## [1.256.1](https://github.com/SocialGouv/mano/compare/v1.256.0...v1.256.1) (2023-03-13)
+
+
+### Bug Fixes
+
+* tests ([#1398](https://github.com/SocialGouv/mano/issues/1398)) ([f6b65d0](https://github.com/SocialGouv/mano/commit/f6b65d0658eaa796eb18368956a81998e5240e75))
+
 # [1.256.0](https://github.com/SocialGouv/mano/compare/v1.255.5...v1.256.0) (2023-03-10)
 
 
