@@ -1,3 +1,10 @@
+## [1.256.2](https://github.com/SocialGouv/mano/compare/v1.256.1...v1.256.2) (2023-03-13)
+
+
+### Bug Fixes
+
+* montre la date dans les comptes-rendus, pour que ce soit plus clair avec les maraudes de nuit ([#1400](https://github.com/SocialGouv/mano/issues/1400)) ([be4897d](https://github.com/SocialGouv/mano/commit/be4897d3a501453153e251dba77cc20b3d4e64a9))
+
 ## [1.256.1](https://github.com/SocialGouv/mano/compare/v1.256.0...v1.256.1) (2023-03-13)
 
 
