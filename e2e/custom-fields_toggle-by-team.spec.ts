@@ -151,7 +151,6 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("link", { name: "Organisation" }).click();
   await page.getByRole("button", { name: "Personnes suivies" }).click();
 
-  await expect(page.locator(`[data-test-id=${testPersonSocialField}]`)).toBeVisible();
   await page.hover(`[data-test-id=${testPersonSocialField}]`);
   await page
     .getByRole("button", {
@@ -164,7 +163,6 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Mise à jour !").click();
 
-  await expect(page.locator(`[data-test-id=${testPersonMedicalField}]`)).toBeVisible();
   await page.hover(`[data-test-id=${testPersonMedicalField}]`);
   await page
     .getByRole("button", {
@@ -204,7 +202,6 @@ test("Create custom fields filtered by team", async ({ page }) => {
 
   await page.getByRole("button", { name: "Territoires" }).click();
 
-  await expect(page.locator(`[data-test-id=${testObsTerritoryField}]`)).toBeVisible();
   await page.hover(`[data-test-id=${testObsTerritoryField}]`);
   await page
     .getByRole("button", {
