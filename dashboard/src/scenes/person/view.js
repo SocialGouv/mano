@@ -6,7 +6,7 @@ import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
 import API from '../../services/api';
 import { formatDateWithFullMonth } from '../../services/date';
 import History from './components/History';
-import { MedicalFile } from './MedicalFile';
+import MedicalFile from './components/MedicalFile';
 import Summary from './components/Summary';
 import BackButton from '../../components/backButton';
 import UserName from '../../components/UserName';

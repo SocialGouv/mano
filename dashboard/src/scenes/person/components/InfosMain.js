@@ -6,12 +6,12 @@ import EditModal from './EditModal';
 import TagTeam from '../../../components/TagTeam';
 import ExclamationMarkButton from '../../../components/tailwind/ExclamationMarkButton';
 
-export function InfosMain({ person }) {
+export function InfosMain({ person, isMedicalFile }) {
   const [editModal, setEditModal] = useState(false);
   return (
     <Container>
       {Boolean(editModal) && <EditModal person={person} selectedPanel={'main'} onClose={() => setEditModal(false)} />}
-      <div className="card !tw-rounded-lg !tw-bg-main" data-test-id={person._id}>
+      <div className={isMedicalFile ? 'card !tw-rounded-lg !tw-bg-blue-900' : 'card !tw-rounded-lg !tw-bg-main'} data-test-id={person._id}>
         <div className="card-body">
           <div className="person-name [overflow-wrap:anywhere]">
             {person.alertness && <ExclamationMarkButton className="tw-mr-2" />}
