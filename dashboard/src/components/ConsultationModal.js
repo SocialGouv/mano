@@ -17,7 +17,7 @@ import { toast } from 'react-toastify';
 import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from './tailwind/Modal';
 import SelectPerson from './SelectPerson';
 
-export default function ConsultationModal({ onClose, personId, consultation }) {
+export default function ConsultationModal({ onClose, personId, consultation, date }) {
   const organisation = useRecoilValue(organisationState);
   const team = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
@@ -30,7 +30,7 @@ export default function ConsultationModal({ onClose, personId, consultation }) {
     () =>
       consultation || {
         _id: uuidv4(),
-        dueAt: new Date(),
+        dueAt: date ? new Date(date) : new Date(),
         completedAt: new Date(),
         name: '',
         type: '',
@@ -41,7 +41,7 @@ export default function ConsultationModal({ onClose, personId, consultation }) {
         onlyVisibleBy: [],
         createdAt: new Date(),
       },
-    [organisation._id, personId, user._id, consultation]
+    [organisation._id, personId, user._id, consultation, date]
   );
   const [data, setData] = useState(initialState);
 
