@@ -169,7 +169,7 @@ const ActionsTable = ({ filteredData }) => {
                 <div
                   className={['restricted-access'].includes(user.role) ? 'tw-cursor-not-allowed tw-py-2' : 'tw-cursor-pointer tw-py-2'}
                   onClick={() => {
-                    if (['restricted-access'].includes(user.role)) return;
+                    //if (['restricted-access'].includes(user.role)) return;
                     history.push(`/action/${action._id}`);
                   }}>
                   <div className="tw-flex">

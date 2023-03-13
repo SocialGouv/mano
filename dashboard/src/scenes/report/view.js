@@ -58,6 +58,7 @@ import { useLocalStorage } from 'react-use';
 import useSearchParamState from '../../services/useSearchParamState';
 import { arrayOfitemsGroupedByActionSelector, arrayOfitemsGroupedByConsultationSelector } from '../../recoil/selectors';
 import ConsultationModal from '../../components/ConsultationModal';
+import CommentModal from '../person/components/CommentModal';
 
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithFullMonth(date)}`;
@@ -557,27 +558,28 @@ const View = () => {
                 <hr />
               </>
             )}
+
+            <DrawerLink
+              id="report-button-action-completed"
+              className={activeTab === 'action-completed' ? 'active' : ''}
+              onClick={() => setActiveTab('action-completed')}>
+              Actions complétées ({actionsDone.length})
+            </DrawerLink>
+            <DrawerLink
+              id="report-button-action-created"
+              className={activeTab === 'action-created' ? 'active' : ''}
+              onClick={() => setActiveTab('action-created')}>
+              Actions créées ({actionsCreatedAt.length})
+            </DrawerLink>
+            <DrawerLink
+              id="report-button-action-cancelled"
+              className={activeTab === 'action-cancelled' ? 'active' : ''}
+              onClick={() => setActiveTab('action-cancelled')}>
+              Actions annulées ({actionsCancel.length})
+            </DrawerLink>
+            <hr />
             {!['restricted-access'].includes(user.role) && (
               <>
-                <DrawerLink
-                  id="report-button-action-completed"
-                  className={activeTab === 'action-completed' ? 'active' : ''}
-                  onClick={() => setActiveTab('action-completed')}>
-                  Actions complétées ({actionsDone.length})
-                </DrawerLink>
-                <DrawerLink
-                  id="report-button-action-created"
-                  className={activeTab === 'action-created' ? 'active' : ''}
-                  onClick={() => setActiveTab('action-created')}>
-                  Actions créées ({actionsCreatedAt.length})
-                </DrawerLink>
-                <DrawerLink
-                  id="report-button-action-cancelled"
-                  className={activeTab === 'action-cancelled' ? 'active' : ''}
-                  onClick={() => setActiveTab('action-cancelled')}>
-                  Actions annulées ({actionsCancel.length})
-                </DrawerLink>
-                <hr />
                 <DrawerLink
                   id="report-button-comment-created"
                   className={activeTab === 'comment-created' ? 'active' : ''}
@@ -596,17 +598,13 @@ const View = () => {
               onClick={() => setActiveTab('rencontres')}>
               Rencontres ({rencontres.length})
             </DrawerLink>
-            {!['restricted-access'].includes(user.role) && !!organisation.territoriesEnabled && (
-              <>
-                <hr />
-                <DrawerLink
-                  id="report-button-territory-observations"
-                  className={activeTab === 'territory-observations' ? 'active' : ''}
-                  onClick={() => setActiveTab('territory-observations')}>
-                  Observations ({observations.length})
-                </DrawerLink>
-              </>
-            )}
+            <hr />
+            <DrawerLink
+              id="report-button-territory-observations"
+              className={activeTab === 'territory-observations' ? 'active' : ''}
+              onClick={() => setActiveTab('territory-observations')}>
+              Observations ({observations.length})
+            </DrawerLink>
             {!['restricted-access'].includes(user.role) && (
               <>
                 <hr />
@@ -1344,12 +1342,17 @@ const CommentCreatedAt = ({ date, comments }) => {
   const history = useHistory();
   const data = comments;
   const organisation = useRecoilValue(organisationState);
+  const [showModal, setShowModal] = useState(false);
+  const person = useRecoilValue(userState);
 
+  console.log('comments', comments);
+  //console.log('person', person);
   if (!data) return <div />;
 
   return (
     <>
       <StyledBox>
+        <ButtonCustom title="Ajouter un commentaire" className="tw-ml-auto tw-mb-10" onClick={() => setShowModal(true)} />
         <Table
           className="Table"
           title={`Commentaires ajoutés le ${formatDateWithFullMonth(date)}`}
@@ -1441,6 +1444,7 @@ const CommentCreatedAt = ({ date, comments }) => {
             },
           ]}
         />
+        {showModal && <CommentModal isNewComment={true} person={person} onClose={() => setShowModal(false)} />}
       </StyledBox>
       <hr />
     </>

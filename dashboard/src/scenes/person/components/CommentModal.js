@@ -20,6 +20,8 @@ const CommentModal = ({ comment = {}, isNewComment, onClose, person }) => {
   const currentTeam = useRecoilValue(currentTeamState);
   const setComments = useSetRecoilState(commentsState);
 
+  console.log("c'est qui la personne ? : ", person);
+
   const canToggleGroupCheck = useMemo(
     () => !!organisation.groupsEnabled && !!person._id && groups.find((group) => group.persons.includes(person._id)),
     [groups, person._id, organisation.groupsEnabled]
@@ -42,7 +44,7 @@ const CommentModal = ({ comment = {}, isNewComment, onClose, person }) => {
             if (!body.date && !isNewComment) return toast.error('La date est obligatoire');
             if (!body.comment) return toast.error('Le commentaire est obligatoire');
             if (!isNewComment && (!body.date || outOfBoundariesDate(body.date)))
-                return toast.error('La date de création est hors limites (entre 1900 et 2100)');
+              return toast.error('La date de création est hors limites (entre 1900 et 2100)');
 
             const commentBody = {
               comment: body.comment,

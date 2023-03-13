@@ -113,7 +113,7 @@ const ActionView = () => {
 
   return (
     <>
-      <SmallHeaderWithBackButton/>
+      <SmallHeaderWithBackButton />
       <h2 className="tw-mb-5 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">
         {`${action?.name}`}
         <UserName className="tw-block tw-text-base tw-font-normal tw-italic" id={action.user} wrapper={(name) => ` (créée par ${name})`} />
@@ -206,16 +206,18 @@ const ActionView = () => {
                       withMostUsed
                     />
                   </div>
-                  <div className="tw-mb-4">
-                    <label htmlFor="description">Description</label>
-                    <textarea
-                      className="tw-block tw-w-full tw-rounded tw-border tw-border-gray-300 tw-py-1.5 tw-px-3 tw-text-base tw-transition-all"
-                      name="description"
-                      id="description"
-                      value={values.description}
-                      onChange={handleChange}
-                    />
-                  </div>
+                  {!['restricted-access'].includes(user.role) && (
+                    <div className="tw-mb-4">
+                      <label htmlFor="description">Description</label>
+                      <textarea
+                        className="tw-block tw-w-full tw-rounded tw-border tw-border-gray-300 tw-py-1.5 tw-px-3 tw-text-base tw-transition-all"
+                        name="description"
+                        id="description"
+                        value={values.description}
+                        onChange={handleChange}
+                      />
+                    </div>
+                  )}
                   {!!canToggleGroupCheck && (
                     <div className="tw-mb-4">
                       <label htmlFor="create-action-for-group">
@@ -316,7 +318,7 @@ const ActionView = () => {
           );
         }}
       </Formik>
-      <Comments />
+      {!['restricted-access'].includes(user.role) && <Comments />}
     </>
   );
 };
