@@ -1213,7 +1213,7 @@ const Consultations = ({ date, status, consultations, setSortOrder, setSortBy, s
   return (
     <>
       <StyledBox>
-        <ButtonCustom title="Ajouter une consultation" className="tw-ml-auto tw-mb-10" onClick={() => setShowModal(true)} />
+        <ButtonCustom title={`Ajouter une consultation faite le ${formatDateWithFullMonth(date)}`} className="tw-ml-auto tw-mb-10" onClick={() => setShowModal(true)} />
         <Table
           className="Table"
           title={`Consultation${moreThanOne ? 's' : ''} ${status === DONE ? 'faite' : 'annulée'}${
@@ -1278,7 +1278,7 @@ const Consultations = ({ date, status, consultations, setSortOrder, setSortBy, s
             },
           ]}
         />
-        {showModal && <ConsultationModal onClose={() => setShowModal(false)} />}
+        {showModal && <ConsultationModal date={date} onClose={() => setShowModal(false)} />}
       </StyledBox>
       <hr />
     </>
