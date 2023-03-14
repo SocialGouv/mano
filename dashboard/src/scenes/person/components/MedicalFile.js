@@ -50,9 +50,10 @@ export default function MedicalFile({ person }) {
           <div className="tw-grid tw-grid-cols-12 tw-gap-4 tw-pt-4">
             <div className="tw-col-span-6 tw-flex tw-min-h-[200px] tw-flex-col tw-gap-4">
               <PersonCustomFields
-                key={'Dossier médical'}
+                isMedicalFile
+                key={'Dossier Médical'}
                 person={person}
-                sectionName={'Dossier médical'}
+                sectionName={'Dossier Médical'}
                 fields={customFieldsMedicalFileWithLegacyFields}
                 colspan={6}
               />

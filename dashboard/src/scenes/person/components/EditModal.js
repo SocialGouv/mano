@@ -10,24 +10,30 @@ import {
 import { outOfBoundariesDate } from '../../../services/date';
 import SelectTeamMultiple from '../../../components/SelectTeamMultiple';
 import { currentTeamState, userState } from '../../../recoil/auth';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import CustomFieldInput from '../../../components/CustomFieldInput';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import ButtonCustom from '../../../components/ButtonCustom';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
 import API from '../../../services/api';
 import { cleanHistory } from './History';
 import DatePicker from '../../../components/DatePicker';
+import { customFieldsMedicalFileSelector, medicalFileState } from '../../../recoil/medicalFiles';
+import CustomFieldDisplay from '../../../components/CustomFieldDisplay';
 
-export default function EditModal({ person, selectedPanel, onClose }) {
+export default function EditModal({ person, selectedPanel, onClose, isMedicalFile = false }) {
   const [openPanels, setOpenPanels] = useState([selectedPanel]);
   const user = useRecoilValue(userState);
   const customFieldsPersons = useRecoilValue(customFieldsPersonsSelector);
   const allowedFieldsInHistory = useRecoilValue(allowedFieldsInHistorySelector);
   const team = useRecoilValue(currentTeamState);
   const setPersons = useSetRecoilState(personsState);
+  const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
+  const [allMedicalFiles, setAllMedicalFiles] = useRecoilState(medicalFileState);
+  const medicalFile = useMemo(() => (allMedicalFiles || []).find((m) => m.person === person._id), [allMedicalFiles, person._id]);
 
+  console.log(person);
   const preparePersonForEncryption = usePreparePersonForEncryption();
   const personFields = useRecoilValue(personFieldsSelector);
 
@@ -205,7 +211,8 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                       </Row>
                     )}
                   </div>
-                  {!['restricted-access'].includes(user.role) &&
+                  {!isMedicalFile &&
+                    !['restricted-access'].includes(user.role) &&
                     customFieldsPersons.map(({ name, fields }, index) => {
                       return (
                         <div key={name + index}>
@@ -236,6 +243,34 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                         </div>
                       );
                     })}
+                  {isMedicalFile && (
+                    <div key={'Dossier Médical'}>
+                      <div
+                        className="tw-mb-4 tw-flex tw-cursor-pointer tw-border-b tw-pb-2 tw-text-lg tw-font-semibold"
+                        onClick={() => {
+                          if (openPanels.includes('Dossier Médical')) {
+                            setOpenPanels(openPanels.filter((p) => p !== 'Dossier Médical'));
+                          } else {
+                            setOpenPanels([...openPanels, 'Dossier Médical']);
+                          }
+                        }}>
+                        <div className="tw-flex-1">Dossier Médical</div>
+                        <div>{!openPanels.includes('Dossier Médical') ? '+' : '-'}</div>
+                      </div>
+
+                      <div className="[overflow-wrap:anywhere]">
+                        {openPanels.includes('Dossier Médical') && (
+                          <Row>
+                            {customFieldsMedicalFile
+                              .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
+                              .map((field) => (
+                                <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
+                              ))}
+                          </Row>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div className="tw-flex tw-items-end tw-justify-end tw-gap-2">
                   <ButtonCustom disabled={isSubmitting} color="secondary" onClick={onClose} title="Annuler" />

@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react';
 import EditModal from './EditModal';
 import CustomFieldDisplay from '../../../components/CustomFieldDisplay';
 
-export default function PersonCustomFields({ person, sectionName, fields, colspan = 4 }) {
+export default function PersonCustomFields({ person, sectionName, fields, colspan = 4, isMedicalFile = false }) {
   const [editModal, setEditModal] = useState(false);
   const team = useRecoilValue(currentTeamState);
   const enabledFields = useMemo(() => {
@@ -13,7 +13,7 @@ export default function PersonCustomFields({ person, sectionName, fields, colspa
   }, [fields, team]);
   return (
     <div className="pt-4 p-3 border tw-min-h-[200px] tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
-      {Boolean(editModal) && <EditModal person={person} selectedPanel={editModal} onClose={() => setEditModal(false)} />}
+      {Boolean(editModal) && <EditModal isMedicalFile person={person} selectedPanel={editModal} onClose={() => setEditModal(false)} />}
       <div className="tw-flex">
         <h4 className="tw-flex-1">{sectionName}</h4>
         <div>

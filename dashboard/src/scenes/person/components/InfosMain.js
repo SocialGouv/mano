@@ -10,7 +10,7 @@ export function InfosMain({ person, isMedicalFile }) {
   const [editModal, setEditModal] = useState(false);
   return (
     <Container>
-      {Boolean(editModal) && <EditModal person={person} selectedPanel={'main'} onClose={() => setEditModal(false)} />}
+      {Boolean(editModal) && <EditModal isMedicalFile={isMedicalFile} person={person} selectedPanel={'main'} onClose={() => setEditModal(false)} />}
       <div className={isMedicalFile ? 'card !tw-rounded-lg !tw-bg-blue-900' : 'card !tw-rounded-lg !tw-bg-main'} data-test-id={person._id}>
         <div className="card-body">
           <div className="person-name [overflow-wrap:anywhere]">
