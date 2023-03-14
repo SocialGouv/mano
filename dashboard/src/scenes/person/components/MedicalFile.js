@@ -9,15 +9,28 @@ import DeletePersonButton from './DeletePersonButton';
 import PassagesRencontres from './PassagesRencontres';
 import OutOfActiveList from '../OutOfActiveList';
 import MergeTwoPersons from '../MergeTwoPersons';
-import { customFieldsPersonsSelector } from '../../../recoil/persons';
+import { customFieldsPersonsSelector, flattenedCustomFieldsPersonsSelector } from '../../../recoil/persons';
 import { customFieldsMedicalFileSelector } from '../../../recoil/medicalFiles';
 import { Treatments } from './Treatments';
-import PersonMedicalDocuments from './PersonMedicalDocuments';
+import CustomFieldDisplay from '../../../components/CustomFieldDisplay';
+import { useMemo } from 'react';
+import PersonDocumentsMedical from './PersonDocumentsMedical';
 
 export default function MedicalFile({ person }) {
   const user = useRecoilValue(userState);
   const customFieldsPersons = useRecoilValue(customFieldsPersonsSelector);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
+  const flattenedCustomFieldsPersons = useRecoilValue(flattenedCustomFieldsPersonsSelector);
+  // These custom fields are displayed by default, because they where displayed before they became custom fields
+  const customFieldsMedicalFileWithLegacyFields = useMemo(() => {
+    console.log(customFieldsMedicalFile, 'customFieldsMedicalFile');
+    const c = [...customFieldsMedicalFile];
+    if (flattenedCustomFieldsPersons.find((e) => e.name === 'structureMedical'))
+      c.unshift({ name: 'structureMedical', label: 'Structure de suivi médical', type: 'text', enabled: true });
+    if (flattenedCustomFieldsPersons.find((e) => e.name === 'healthInsurances'))
+      c.unshift({ name: 'healthInsurances', label: 'Couverture(s) médicale(s)', type: 'multi-choice', enabled: true });
+    return c;
+  }, [customFieldsMedicalFile, flattenedCustomFieldsPersons]);
 
   return (
     <>
@@ -29,7 +42,7 @@ export default function MedicalFile({ person }) {
           <Consultations person={person} />
         </div>
         <div className="tw-col-span-4 tw-h-0 tw-min-h-full tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
-          <PersonMedicalDocuments person={person} />
+          <PersonDocumentsMedical person={person} />
         </div>
       </div>
       {!['restricted-access'].includes(user.role) && (
@@ -40,7 +53,7 @@ export default function MedicalFile({ person }) {
                 key={'Dossier médical'}
                 person={person}
                 sectionName={'Dossier médical'}
-                fields={customFieldsMedicalFile}
+                fields={customFieldsMedicalFileWithLegacyFields}
                 colspan={6}
               />
             </div>

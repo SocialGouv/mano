@@ -19,8 +19,6 @@ import ConsultationModal from '../../../components/ConsultationModal';
 export const Consultations = ({ person }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [fullScreen, setFullScreen] = useState(false);
-  const [filterCategories, setFilterCategories] = useState([]);
-  const [filterStatus, setFilterStatus] = useState([]);
 
   const allConsultations = useRecoilValue(arrayOfitemsGroupedByConsultationSelector);
   const [consultationTypes, setConsultationTypes] = useLocalStorage('consultation-types', []);
@@ -67,10 +65,10 @@ export const Consultations = ({ person }) => {
         <ConsultationsFilters
           data={data}
           filteredData={filteredData}
-          filterCategories={filterCategories}
-          setFilterCategories={setFilterCategories}
-          setFilterStatus={setFilterStatus}
-          filterStatus={filterStatus}
+          consultationTypes={consultationTypes}
+          setConsultationTypes={setConsultationTypes}
+          setConsultationStatuses={setConsultationStatuses}
+          consultationStatuses={consultationStatuses}
         />
         <ModalContainer open={!!fullScreen} className="" size="full" onClose={() => setFullScreen(false)}>
           <ModalHeader title={`Actions de  ${person?.name} (${filteredData.length})`}>
@@ -78,10 +76,10 @@ export const Consultations = ({ person }) => {
               <ConsultationsFilters
                 data={data}
                 filteredData={filteredData}
-                filterCategories={filterCategories}
-                setFilterCategories={setFilterCategories}
-                setFilterStatus={setFilterStatus}
-                filterStatus={filterStatus}
+                consultationTypes={consultationTypes}
+                setConsultationTypes={setConsultationTypes}
+                setConsultationStatuses={setConsultationStatuses}
+                consultationStatuses={consultationStatuses}
               />
             </div>
           </ModalHeader>
@@ -111,25 +109,23 @@ export const Consultations = ({ person }) => {
   );
 };
 
-const ConsultationsFilters = ({ data, filteredData, setFilterCategories, setFilterStatus, filterStatus, filterCategories }) => {
-  const categories = useRecoilValue(flattenedCategoriesSelector);
-
-  const catsSelect = ['-- Aucune --', ...(categories || [])];
+const ConsultationsFilters = ({ data, filteredData, setConsultationTypes, setConsultationStatuses, consultationStatuses, consultationTypes }) => {
+  const organisation = useRecoilValue(organisationState);
 
   return (
     <>
       {data.length ? (
         <div className="tw-mb-4 tw-flex tw-basis-full tw-justify-between tw-gap-2 tw-px-3">
           <div className="tw-shrink-0 tw-flex-grow">
-            <label htmlFor="action-select-categories-filter">Filtrer par catégorie</label>
+            <label htmlFor="consultations-select-types-filter">Filtrer par type</label>
             <SelectCustom
-              options={catsSelect.map((_option) => ({ value: _option, label: _option }))}
-              value={filterCategories?.map((_option) => ({ value: _option, label: _option })) || []}
-              getOptionValue={(i) => i.value}
-              getOptionLabel={(i) => i.label}
-              onChange={(values) => setFilterCategories(values.map((v) => v.value))}
-              inputId="action-select-categories-filter"
-              name="categories"
+              options={organisation.consultations.map((e) => ({ _id: e.name, name: e.name }))}
+              value={organisation.consultations.map((e) => ({ _id: e.name, name: e.name })).filter((s) => consultationTypes.includes(s._id))}
+              getOptionValue={(s) => s._id}
+              getOptionLabel={(s) => s.name}
+              onChange={(selectedTypes) => setConsultationTypes(selectedTypes.map((t) => t._id))}
+              inputId="consultations-select-types-filter"
+              name="types"
               isClearable
               isMulti
             />
@@ -142,10 +138,10 @@ const ConsultationsFilters = ({ data, filteredData, setFilterCategories, setFilt
               getOptionValue={(s) => s._id}
               getOptionLabel={(s) => s.name}
               name="status"
-              onChange={(s) => setFilterStatus(s.map((s) => s._id))}
+              onChange={(s) => setConsultationStatuses(s.map((s) => s._id))}
               isClearable
               isMulti
-              value={mappedIdsToLabels.filter((s) => filterStatus.includes(s._id))}
+              value={mappedIdsToLabels.filter((s) => consultationStatuses.includes(s._id))}
             />
           </div>
         </div>

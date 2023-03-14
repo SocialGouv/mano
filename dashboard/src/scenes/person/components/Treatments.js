@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { useRecoilValue } from 'recoil';
-import { organisationState, userState } from '../../../recoil/auth';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { organisationState, usersState, userState } from '../../../recoil/auth';
 import { CANCEL, DONE, flattenedCategoriesSelector, mappedIdsToLabels, sortActionsOrConsultations } from '../../../recoil/actions';
 import { filteredPersonActionsSelector } from '../selectors/selectors';
 import { useHistory } from 'react-router-dom';
@@ -10,10 +10,12 @@ import ExclamationMarkButton from '../../../components/tailwind/ExclamationMarkB
 import ActionStatus from '../../../components/ActionStatus';
 import TagTeam from '../../../components/TagTeam';
 import ActionOrConsultationName from '../../../components/ActionOrConsultationName';
-import { formatDateWithNameOfDay, formatTime } from '../../../services/date';
+import { formatDateWithFullMonth, formatDateWithNameOfDay, formatTime } from '../../../services/date';
 import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from '../../../components/tailwind/Modal';
 import { arrayOfitemsGroupedByConsultationSelector } from '../../../recoil/selectors';
 import { useLocalStorage } from 'react-use';
+import TreatmentModal from './TreatmentModal';
+import { treatmentsState } from '../../../recoil/treatments';
 
 export const Treatments = ({ person }) => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -21,30 +23,19 @@ export const Treatments = ({ person }) => {
   const [filterCategories, setFilterCategories] = useState([]);
   const [filterStatus, setFilterStatus] = useState([]);
 
-  const allConsultations = useRecoilValue(arrayOfitemsGroupedByConsultationSelector);
-  const [consultationTypes, setConsultationTypes] = useLocalStorage('consultation-types', []);
-  const [consultationStatuses, setConsultationStatuses] = useLocalStorage('consultation-statuses', []);
-
-  const personConsultations = useMemo(() => [].filter((c) => c.person === person._id), [allConsultations, person._id]);
-  const personConsultationsFiltered = useMemo(
-    () =>
-      personConsultations
-        .filter((c) => !consultationStatuses.length || consultationStatuses.includes(c.status))
-        .filter((c) => !consultationTypes.length || consultationTypes.includes(c.type))
-        .sort((p1, p2) => ((p1.completedAt || p1.dueAt) > (p2.completedAt || p2.dueAt) ? -1 : 1)),
-    [personConsultations, consultationStatuses, consultationTypes]
-  );
-  const data = personConsultations;
-  const filteredData = personConsultationsFiltered;
+  const [allTreatments, setAllTreatments] = useRecoilState(treatmentsState);
+  const treatments = useMemo(() => (allTreatments || []).filter((t) => t.person === person._id), [allTreatments, person._id]);
+  const filteredData = treatments;
 
   return (
     <>
+      {modalOpen && <TreatmentModal isNewTreatment person={person} onClose={() => setModalOpen(false)} />}
       <div className="tw-relative">
         <div className="tw-sticky tw-top-0 tw-z-10 tw-flex tw-bg-white tw-p-3">
           <h4 className="tw-flex-1">Traitements {filteredData.length ? `(${filteredData.length})` : ''}</h4>
           <div className="flex-col tw-flex tw-items-center tw-gap-2">
             <button
-              aria-label="Ajouter une action"
+              aria-label="Ajouter un traitement"
               className="tw-text-md tw-h-8 tw-w-8 tw-rounded-full tw-bg-blue-900 tw-font-bold tw-text-white tw-transition hover:tw-scale-125"
               onClick={() => setModalOpen(true)}>
               ＋
@@ -65,7 +56,7 @@ export const Treatments = ({ person }) => {
         <ModalContainer open={!!fullScreen} className="" size="full" onClose={() => setFullScreen(false)}>
           <ModalHeader title={`Actions de  ${person?.name} (${filteredData.length})`}></ModalHeader>
           <ModalBody>
-            <ConsltationsTable filteredData={filteredData} />
+            <TreatmentsTable filteredData={filteredData} person={person} />
           </ModalBody>
           <ModalFooter>
             <button type="button" name="cancel" className="button-cancel" onClick={() => setFullScreen(false)}>
@@ -76,60 +67,70 @@ export const Treatments = ({ person }) => {
             </button>
           </ModalFooter>
         </ModalContainer>
-        <ConsltationsTable filteredData={filteredData} />
+        <TreatmentsTable filteredData={filteredData} person={person} />
       </div>
-      <CreateActionModal person={person._id} open={modalOpen} setOpen={(value) => setModalOpen(value)} />
     </>
   );
 };
 
-const ConsltationsTable = ({ filteredData }) => {
+const TreatmentsTable = ({ filteredData, person }) => {
   const history = useHistory();
   const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
+  const [treatmentEditOpen, setTreatmentEditOpen] = useState(false);
+  const users = useRecoilValue(usersState);
 
   return (
-    <table className="table">
-      <tbody className="small">
-        {filteredData.map((action, i) => {
-          const date = formatDateWithNameOfDay([DONE, CANCEL].includes(action.status) ? action.completedAt : action.dueAt);
-          const time = action.withTime && action.dueAt ? ` ${formatTime(action.dueAt)}` : '';
-          return (
-            <tr key={action._id} className={i % 2 ? 'tw-bg-sky-800/80 tw-text-white' : 'tw-bg-sky-100/80'}>
-              <td>
-                <div
-                  className={['restricted-access'].includes(user.role) ? 'tw-cursor-not-allowed tw-py-2' : 'tw-cursor-pointer tw-py-2'}
-                  onClick={() => {
-                    if (['restricted-access'].includes(user.role)) return;
-                    history.push(`/action/${action._id}`);
-                  }}>
-                  <div className="tw-flex">
-                    <div className="tw-flex-1">{`${date}${time}`}</div>
-                    <div>
-                      <ActionStatus status={action.status} />
+    <>
+      <table className="table">
+        <tbody className="small">
+          {filteredData.map((treatment, i) => {
+            const date = formatDateWithNameOfDay([DONE, CANCEL].includes(treatment.status) ? treatment.completedAt : treatment.dueAt);
+            const time = treatment.withTime && treatment.dueAt ? ` ${formatTime(treatment.dueAt)}` : '';
+            return (
+              <tr key={treatment._id} className={i % 2 ? 'tw-bg-slate-50/80' : 'tw-bg-slate-100/80'}>
+                <td>
+                  <div
+                    className={['restricted-access'].includes(user.role) ? 'tw-cursor-not-allowed tw-py-2' : 'tw-cursor-pointer tw-py-2'}
+                    onClick={() => {
+                      setTreatmentEditOpen(treatment);
+                    }}>
+                    <div className="tw-flex">
+                      <div className="tw-flex tw-flex-1 tw-items-center">
+                        <TreatmentDate treatment={treatment} />
+                        {Boolean(treatment.documents?.length) && <div className="tw-ml-2 tw-text-xs">{treatment.documents?.length} document(s)</div>}
+                      </div>
+                      <div>Créé par {treatment.user ? users.find((u) => u._id === treatment.user)?.name : ''}</div>
+                    </div>
+                    <div className="tw-mt-2 tw-grid tw-grid-cols-2">
+                      <div>
+                        <div>{treatment.name}</div>
+                        <small className="text-muted">{treatment.indication}</small>
+                      </div>
+                      <div>
+                        <div>{treatment.dosage}</div>
+                        <small className="text-muted">{treatment.frequency}</small>
+                      </div>
                     </div>
                   </div>
-                  <div className="tw-mt-2 tw-flex">
-                    <div className="tw-flex tw-flex-1 tw-flex-row tw-items-center">
-                      {!['restricted-access'].includes(user.role) && (
-                        <>
-                          <ActionOrConsultationName item={action} hideType />
-                          {Boolean(action.name) && ![action.type, `Consultation ${action.type}`].includes(action.name) && (
-                            <span className="tw-ml-2">- {action.type}</span>
-                          )}
-                        </>
-                      )}
-                    </div>
-                    <div className="tw-flex tw-flex-col tw-gap-px">
-                      {Array.isArray(action?.teams) ? action.teams.map((e) => <TagTeam key={e} teamId={e} />) : <TagTeam teamId={action?.team} />}
-                    </div>
-                  </div>
-                </div>
-              </td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      {treatmentEditOpen && <TreatmentModal treatment={treatmentEditOpen} person={person} onClose={() => setTreatmentEditOpen(false)} />}
+    </>
   );
 };
+
+function TreatmentDate({ treatment }) {
+  if (!!treatment.endDate) {
+    return (
+      <p className="tw-m-0">
+        Du {formatDateWithFullMonth(treatment.startDate)} au {formatDateWithFullMonth(treatment.endDate)}
+      </p>
+    );
+  }
+  return <p className="tw-m-0">À partir du {formatDateWithFullMonth(treatment.startDate)}</p>;
+}

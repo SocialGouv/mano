@@ -1,17 +1,26 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useLocalStorage } from 'react-use';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { modalConfirmState } from '../../../components/ModalConfirm';
 import PersonName from '../../../components/PersonName';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../../components/tailwind/Modal';
-import { organisationState, usersState, userState } from '../../../recoil/auth';
+import { sortActionsOrConsultations } from '../../../recoil/actions';
+import { currentTeamState, organisationState, usersState, userState } from '../../../recoil/auth';
+import { consultationsState } from '../../../recoil/consultations';
 import { groupsState } from '../../../recoil/groups';
-import { personsState, usePreparePersonForEncryption } from '../../../recoil/persons';
+import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../../recoil/medicalFiles';
+import { flattenedCustomFieldsPersonsSelector, personFieldsSelector, personsState, usePreparePersonForEncryption } from '../../../recoil/persons';
+import { arrayOfitemsGroupedByConsultationSelector } from '../../../recoil/selectors';
+import { treatmentsState } from '../../../recoil/treatments';
 import API from '../../../services/api';
 import { formatDateTimeWithNameOfDay } from '../../../services/date';
 import { capture } from '../../../services/sentry';
+import useSearchParamState from '../../../services/useSearchParamState';
 import { download } from '../../../utils';
+import DocumentModal from './PersonDocumentModal';
 
-const PersonMedicalDocuments = ({ person }) => {
+const PersonDocumentsMedical = ({ person }) => {
   const [documentToEdit, setDocumentToEdit] = useState(null);
 
   const user = useRecoilValue(userState);
@@ -21,7 +30,48 @@ const PersonMedicalDocuments = ({ person }) => {
   const organisation = useRecoilValue(organisationState);
   const preparePersonForEncryption = usePreparePersonForEncryption();
 
-  const documents = [...(person.documents || []), ...(person.groupDocuments || [])].sort((a, b) => a.createdAt > b.createdAt);
+  const allConsultations = useRecoilValue(arrayOfitemsGroupedByConsultationSelector);
+  const [allTreatments] = useRecoilState(treatmentsState);
+  const [allMedicalFiles, setAllMedicalFiles] = useRecoilState(medicalFileState);
+
+  const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
+
+  const personConsultations = useMemo(() => (allConsultations || []).filter((c) => c.person === person._id), [allConsultations, person._id]);
+
+  const treatments = useMemo(() => (allTreatments || []).filter((t) => t.person === person._id), [allTreatments, person._id]);
+
+  const medicalFile = useMemo(() => (allMedicalFiles || []).find((m) => m.person === person._id), [allMedicalFiles, person._id]);
+
+  useEffect(() => {
+    if (!medicalFile) {
+      (async () => {
+        const response = await API.post({
+          path: '/medical-file',
+          body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({ person: person._id, documents: [], organisation: organisation._id }),
+        });
+        if (!response.ok) return;
+        setAllMedicalFiles((medicalFiles) => [...medicalFiles, response.decryptedData]);
+      })();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [medicalFile]);
+
+  const allMedicalDocuments = useMemo(() => {
+    const ordonnances =
+      treatments
+        ?.map((treatment) => treatment.documents?.map((doc) => ({ ...doc, type: 'treatment', treatment })))
+        .filter(Boolean)
+        .flat() || [];
+    const consultationsDocs =
+      personConsultations
+        ?.map((consultation) => consultation.documents?.map((doc) => ({ ...doc, type: 'consultation', consultation })))
+        .filter(Boolean)
+        .flat() || [];
+    const otherDocs = medicalFile?.documents || [];
+    return [...ordonnances, ...consultationsDocs, ...otherDocs].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  }, [personConsultations, medicalFile?.documents, treatments]);
+
+  const documents = allMedicalDocuments;
 
   // below there is `Note: Ce document est lié à <PersonName item={document} />`
   // if the user clicks on the person name, we need to hide the DocumentModal
@@ -33,10 +83,10 @@ const PersonMedicalDocuments = ({ person }) => {
     <div className="tw-relative">
       {documentToEdit && <DocumentModal document={documentToEdit} person={person} onClose={() => setDocumentToEdit(null)} key={documentToEdit._id} />}
       <div className="tw-sticky tw-top-0 tw-z-50 tw-flex tw-bg-white tw-p-3">
-        <h4 className="tw-flex-1 tw-text-xl">Documents médicaux {person?.documents?.length ? `(${person?.documents?.length})` : ''}</h4>
+        <h4 className="tw-flex-1 tw-text-xl">Documents {documents?.length ? `(${documents?.length})` : ''}</h4>
         <label
           aria-label="Ajouter un document"
-          className="tw-text-md tw-h-8 tw-w-8 tw-cursor-pointer tw-rounded-full tw-bg-blue-900 tw-text-center tw-font-bold tw-leading-8 tw-text-white tw-transition hover:tw-scale-125">
+          className="tw-text-md tw-h-8 tw-w-8 tw-cursor-pointer tw-rounded-full tw-bg-main tw-text-center tw-font-bold tw-leading-8 tw-text-white tw-transition hover:tw-scale-125">
           ＋
           <input
             type="file"
@@ -144,122 +194,4 @@ const PersonMedicalDocuments = ({ person }) => {
   );
 };
 
-function DocumentModal({ document, onClose, person }) {
-  const users = useRecoilValue(usersState);
-  const preparePersonForEncryption = usePreparePersonForEncryption();
-  const setPersons = useSetRecoilState(personsState);
-
-  const groups = useRecoilValue(groupsState);
-  const organisation = useRecoilValue(organisationState);
-
-  const canToggleGroupCheck = useMemo(
-    () => !!organisation.groupsEnabled && groups.find((group) => group.persons.includes(person._id)),
-    [groups, person._id, organisation.groupsEnabled]
-  );
-
-  return (
-    <ModalContainer open className="[overflow-wrap:anywhere]">
-      <ModalHeader title={document.name} />
-      <ModalBody>
-        <div className="tw-flex tw-w-full tw-flex-col tw-justify-between tw-gap-4 tw-px-8">
-          <small className="tw-opacity-60">
-            Créé par {users.find((e) => e._id === document.createdBy)?.name} le {formatDateTimeWithNameOfDay(document.createdAt)}
-          </small>
-          {!!canToggleGroupCheck && (
-            <div>
-              <label htmlFor="document-for-group">
-                <input
-                  type="checkbox"
-                  className="tw-mr-2"
-                  id="document-for-group"
-                  name="group"
-                  defaultChecked={document.group}
-                  value={document.group}
-                  onChange={async () => {
-                    const _person = !document.person ? person : document.personPopulated;
-                    const isAttachedToAnotherPerson = _person._id !== person._id;
-                    const personResponse = await API.put({
-                      path: `/person/${_person._id}`,
-                      body: preparePersonForEncryption({
-                        ..._person,
-                        documents: _person.documents.map((_document) =>
-                          document._id === _document._id ? { ..._document, group: !_document.group } : _document
-                        ),
-                      }),
-                    });
-                    if (personResponse.ok) {
-                      toast.success('Document mis à jour !');
-                      const newPerson = personResponse.decryptedData;
-                      setPersons((persons) =>
-                        persons.map((p) => {
-                          if (p._id === _person._id) return newPerson;
-                          return p;
-                        })
-                      );
-                      if (isAttachedToAnotherPerson) onClose();
-                    }
-                  }}
-                />
-                Document familial
-                <br />
-                <small className="tw-block tw-text-gray-500">Ce document sera visible pour toute la famille</small>
-              </label>
-              {!!document.personPopulated && (
-                <small className="tw-block tw-text-gray-500">
-                  Note: Ce document est lié à <PersonName item={document} />
-                </small>
-              )}
-            </div>
-          )}
-        </div>
-      </ModalBody>
-      <ModalFooter>
-        <button type="button" name="cancel" className="button-cancel" onClick={() => onClose()}>
-          Fermer
-        </button>
-        <button
-          type="button"
-          className="button-destructive"
-          onClick={async () => {
-            if (!window.confirm('Voulez-vous vraiment supprimer ce document ?')) return;
-            const _person = !document.person ? person : document.personPopulated;
-            await API.delete({ path: document.downloadPath ?? `/person/${document.person ?? person._id}/document/${document.file.filename}` });
-            const personResponse = await API.put({
-              path: `/person/${_person._id}`,
-              body: preparePersonForEncryption({
-                ..._person,
-                documents: _person.documents.filter((d) => d._id !== document._id),
-              }),
-            });
-            if (personResponse.ok) {
-              const newPerson = personResponse.decryptedData;
-              setPersons((persons) =>
-                persons.map((p) => {
-                  if (p._id === _person._id) return newPerson;
-                  return p;
-                })
-              );
-            }
-            onClose();
-          }}>
-          Supprimer
-        </button>
-        <button
-          type="button"
-          className="button-submit"
-          onClick={async () => {
-            const file = await API.download({
-              path: document.downloadPath ?? `/person/${document.person ?? person._id}/document/${document.file.filename}`,
-              encryptedEntityKey: document.encryptedEntityKey,
-            });
-            download(file, document.name);
-            onClose();
-          }}>
-          Télécharger
-        </button>
-      </ModalFooter>
-    </ModalContainer>
-  );
-}
-
-export default PersonMedicalDocuments;
+export default PersonDocumentsMedical;
