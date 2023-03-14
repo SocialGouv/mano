@@ -1,3 +1,10 @@
+# [1.257.0](https://github.com/SocialGouv/mano/compare/v1.256.2...v1.257.0) (2023-03-14)
+
+
+### Features
+
+* **dashboard:** bouton d'ajout de consultations dans les cpte rendu + selecteur dans la modale a la date du compte rendu en cours et non a la date du jour ([#1404](https://github.com/SocialGouv/mano/issues/1404)) ([72e1fa7](https://github.com/SocialGouv/mano/commit/72e1fa782be0282ce1df9de224d4cb8917899359))
+
 ## [1.256.2](https://github.com/SocialGouv/mano/compare/v1.256.1...v1.256.2) (2023-03-13)
 
 
