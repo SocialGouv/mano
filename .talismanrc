@@ -10,6 +10,6 @@ fileignoreconfig:
 - filename: dashboard/yarn.lock
   checksum: 322b61343eb3804fad4090ba0c31f95b0f1e396cbc26f46246e0cffb41530c2e
 - filename: yarn.lock
-  checksum: de5b3642462919a44188de7d368f7a54e71a995d237bffd180b90f75f6291b64
+  checksum: 6696a547ef8acbe0cd1631f18b716f64ab69336ce28db9d3ec2d336b527c3c3f
 threshold: high
 version: "1.0"

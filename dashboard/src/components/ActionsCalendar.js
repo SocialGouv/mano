@@ -83,8 +83,7 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
           history.push(`/action/${actionOrConsultation._id}`);
         }
       }}
-      //rowDisabled={(actionOrConsultation) => ['restricted-access'].includes(user.role) || disableConsultationRow(actionOrConsultation, user)}
-      //rowDisabled={(actionOrConsultation) => disableConsultationRow(actionOrConsultation, user)}
+      rowDisabled={(actionOrConsultation) => disableConsultationRow(actionOrConsultation, user)}
       rowKey="_id"
       dataTestId="name"
       columns={[

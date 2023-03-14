@@ -134,5 +134,3 @@ const View = () => {
 };
 
 export default View;
-
-//   editable= {['restricted-access'].includes(user.role) ?  : editable}
