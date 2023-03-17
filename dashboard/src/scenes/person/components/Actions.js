@@ -169,7 +169,6 @@ const ActionsTable = ({ filteredData }) => {
                 <div
                   className={['restricted-access'].includes(user.role) ? 'tw-cursor-not-allowed tw-py-2' : 'tw-cursor-pointer tw-py-2'}
                   onClick={() => {
-                    //if (['restricted-access'].includes(user.role)) return;
                     history.push(`/action/${action._id}`);
                   }}>
                   <div className="tw-flex">
@@ -182,16 +181,12 @@ const ActionsTable = ({ filteredData }) => {
                   </div>
                   <div className="tw-mt-2 tw-flex">
                     <div className="tw-flex tw-flex-1 tw-flex-row tw-items-center">
-                      {!['restricted-access'].includes(user.role) && (
-                        <>
-                          {!!organisation.groupsEnabled && !!action.group && (
-                            <span className="tw-mr-2 tw-text-xl" aria-label="Action familiale" title="Action familiale">
-                              👪
-                            </span>
-                          )}
-                          <ActionOrConsultationName item={action} />
-                        </>
+                      {!!organisation.groupsEnabled && !!action.group && (
+                        <span className="tw-mr-2 tw-text-xl" aria-label="Action familiale" title="Action familiale">
+                          👪
+                        </span>
                       )}
+                      <ActionOrConsultationName item={action} />
                     </div>
                     <div className="tw-flex tw-flex-col tw-gap-px">
                       {Array.isArray(action?.teams) ? action.teams.map((e) => <TagTeam key={e} teamId={e} />) : <TagTeam teamId={action?.team} />}
