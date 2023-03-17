@@ -306,7 +306,9 @@ const ActionView = () => {
                 </div>
               </div>
               <div className="tw-mt-4 tw-flex tw-justify-end">
-                <ButtonCustom title={'Supprimer'} type="button" style={{ marginRight: 10 }} color="danger" onClick={deleteData} />
+                {!['restricted-access'].includes(user.role) && (
+                  <ButtonCustom title={'Supprimer'} type="button" style={{ marginRight: 10 }} color="danger" onClick={deleteData} />
+                )}
                 <ButtonCustom
                   title={'Mettre à jour'}
                   loading={isSubmitting}
