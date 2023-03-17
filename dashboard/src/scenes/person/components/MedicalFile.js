@@ -18,12 +18,10 @@ import PersonDocumentsMedical from './PersonDocumentsMedical';
 
 export default function MedicalFile({ person }) {
   const user = useRecoilValue(userState);
-  const customFieldsPersons = useRecoilValue(customFieldsPersonsSelector);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
   const flattenedCustomFieldsPersons = useRecoilValue(flattenedCustomFieldsPersonsSelector);
   // These custom fields are displayed by default, because they where displayed before they became custom fields
   const customFieldsMedicalFileWithLegacyFields = useMemo(() => {
-    console.log(customFieldsMedicalFile, 'customFieldsMedicalFile');
     const c = [...customFieldsMedicalFile];
     if (flattenedCustomFieldsPersons.find((e) => e.name === 'structureMedical'))
       c.unshift({ name: 'structureMedical', label: 'Structure de suivi médical', type: 'text', enabled: true });

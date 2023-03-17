@@ -13,7 +13,9 @@ export default function PersonCustomFields({ person, sectionName, fields, colspa
   }, [fields, team]);
   return (
     <div className="pt-4 p-3 border tw-min-h-[200px] tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
-      {Boolean(editModal) && <EditModal isMedicalFile person={person} selectedPanel={editModal} onClose={() => setEditModal(false)} />}
+      {Boolean(editModal) && (
+        <EditModal isMedicalFile={isMedicalFile} person={person} selectedPanel={editModal} onClose={() => setEditModal(false)} />
+      )}
       <div className="tw-flex">
         <h4 className="tw-flex-1">{sectionName}</h4>
         <div>
@@ -33,7 +35,10 @@ export default function PersonCustomFields({ person, sectionName, fields, colspa
             <div className="my-2 [overflow-wrap:anywhere]">
               <div className="tw-text-sm tw-font-semibold tw-text-gray-600">{field.label}</div>
               <div>
-                <CustomFieldDisplay type={field.type} value={person[field.name]} />
+                <CustomFieldDisplay
+                  type={field.type}
+                  value={isMedicalFile ? person[field.name] || person.medicalFile?.[field.name] : person[field.name]}
+                />
               </div>
             </div>
           </Col>

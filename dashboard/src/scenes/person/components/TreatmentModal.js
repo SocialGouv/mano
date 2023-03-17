@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { FormGroup, Input, Label, Row, Col, Modal, ModalHeader, ModalBody } from 'reactstrap';
+import { FormGroup, Input, Label, Row, Col } from 'reactstrap';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
 import { useRecoilValue, useSetRecoilState, useRecoilState } from 'recoil';
@@ -28,6 +28,7 @@ import { useLocalStorage } from 'react-use';
 import ConsultationModal from '../../../components/ConsultationModal';
 import { consultationsState, disableConsultationRow } from '../../../recoil/consultations';
 import DatePicker from '../../../components/DatePicker';
+import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from '../../../components/tailwind/Modal';
 
 /**
  * @param {Object} props
@@ -61,7 +62,7 @@ export default function TreatmentModal({ onClose, isNewTreatment, treatment, per
   }, [isNewTreatment, treatment, user, person, organisation]);
 
   return (
-    <Modal isOpen={true} toggle={onClose} size="lg" backdrop="static">
+    <ModalContainer open={true} onClose={onClose} size="3xl">
       <Formik
         enableReinitialize
         initialValues={currentTreatment}
@@ -111,82 +112,44 @@ export default function TreatmentModal({ onClose, isNewTreatment, treatment, per
         }}>
         {({ values, handleChange, handleSubmit, isSubmitting, errors, touched }) => (
           <React.Fragment>
-            <ModalHeader
-              toggle={async () => {
-                if (JSON.stringify(values) === JSON.stringify(currentTreatment)) return onClose();
-                setModalConfirmState({
-                  open: true,
-                  options: {
-                    title: 'Voulez-vous enregistrer vos modifications ?',
-                    buttons: [
-                      {
-                        text: 'Annuler',
-                        style: 'cancel',
-                      },
-                      {
-                        text: 'Non',
-                        style: 'danger',
-                        onClick: onClose,
-                      },
-                      {
-                        text: 'Oui',
-                        onClick: handleSubmit,
-                      },
-                    ],
-                  },
-                });
-              }}>
-              {isNewTreatment ? 'Ajouter un traitement' : currentTreatment?.name}
-            </ModalHeader>
+            <ModalHeader title={isNewTreatment ? 'Ajouter un traitement' : currentTreatment?.name}></ModalHeader>
             <ModalBody>
-              <Row>
-                <Col md={6}>
-                  <FormGroup>
-                    <Label htmlFor="medicine-name">Nom</Label>
-                    <Input placeholder="Amoxicilline" name="name" id="medicine-name" value={values.name} onChange={handleChange} />
-                    {touched.name && errors.name && <span className="tw-text-xs tw-text-red-500">{errors.name}</span>}
-                  </FormGroup>
-                </Col>
-                <Col md={6}>
-                  <FormGroup>
-                    <Label htmlFor="dosage">Dosage</Label>
-                    <Input placeholder="1mg" name="dosage" id="dosage" value={values.dosage} onChange={handleChange} />
-                    {touched.dosage && errors.dosage && <span className="tw-text-xs tw-text-red-500">{errors.dosage}</span>}
-                  </FormGroup>
-                </Col>
-                <Col md={6}>
-                  <FormGroup>
-                    <Label htmlFor="frequency">Fréquence</Label>
-                    <Input placeholder="1 fois par jour" name="frequency" id="frequency" value={values.frequency} onChange={handleChange} />
-                    {touched.frequency && errors.frequency && <span className="tw-text-xs tw-text-red-500">{errors.frequency}</span>}
-                  </FormGroup>
-                </Col>
-                <Col md={6}>
-                  <FormGroup>
-                    <Label htmlFor="indication">Indication</Label>
-                    <Input placeholder="Angine" name="indication" id="indication" value={values.indication} onChange={handleChange} />
-                    {touched.indication && errors.indication && <span className="tw-text-xs tw-text-red-500">{errors.indication}</span>}
-                  </FormGroup>
-                </Col>
-                <Col md={6}>
-                  <FormGroup>
-                    <Label htmlFor="startDate">Date de début</Label>
-                    <div>
-                      <DatePicker id="startDate" defaultValue={values.startDate} onChange={handleChange} />
-                    </div>
-                    {touched.startDate && errors.startDate && <span className="tw-text-xs tw-text-red-500">{errors.startDate}</span>}
-                  </FormGroup>
-                </Col>
-                <Col md={6}>
-                  <FormGroup>
-                    <Label htmlFor="endDate">Date de fin</Label>
-                    <div>
-                      <DatePicker id="endDate" defaultValue={values.endDate} onChange={handleChange} />
-                    </div>
-                    {touched.endDate && errors.endDate && <span className="tw-text-xs tw-text-red-500">{errors.endDate}</span>}
-                  </FormGroup>
-                </Col>
-                <Col md={12}>
+              <div className="tw-mt-4 tw-grid tw-grid-cols-2 tw-gap-4 tw-px-8">
+                <div>
+                  <Label htmlFor="medicine-name">Nom</Label>
+                  <Input placeholder="Amoxicilline" name="name" id="medicine-name" value={values.name} onChange={handleChange} />
+                  {touched.name && errors.name && <span className="tw-text-xs tw-text-red-500">{errors.name}</span>}
+                </div>
+                <div>
+                  <Label htmlFor="dosage">Dosage</Label>
+                  <Input placeholder="1mg" name="dosage" id="dosage" value={values.dosage} onChange={handleChange} />
+                  {touched.dosage && errors.dosage && <span className="tw-text-xs tw-text-red-500">{errors.dosage}</span>}
+                </div>
+                <div>
+                  <Label htmlFor="frequency">Fréquence</Label>
+                  <Input placeholder="1 fois par jour" name="frequency" id="frequency" value={values.frequency} onChange={handleChange} />
+                  {touched.frequency && errors.frequency && <span className="tw-text-xs tw-text-red-500">{errors.frequency}</span>}
+                </div>
+                <div>
+                  <Label htmlFor="indication">Indication</Label>
+                  <Input placeholder="Angine" name="indication" id="indication" value={values.indication} onChange={handleChange} />
+                  {touched.indication && errors.indication && <span className="tw-text-xs tw-text-red-500">{errors.indication}</span>}
+                </div>
+                <div>
+                  <Label htmlFor="startDate">Date de début</Label>
+                  <div>
+                    <DatePicker id="startDate" defaultValue={values.startDate} onChange={handleChange} />
+                  </div>
+                  {touched.startDate && errors.startDate && <span className="tw-text-xs tw-text-red-500">{errors.startDate}</span>}
+                </div>
+                <div>
+                  <Label htmlFor="endDate">Date de fin</Label>
+                  <div>
+                    <DatePicker id="endDate" defaultValue={values.endDate} onChange={handleChange} />
+                  </div>
+                  {touched.endDate && errors.endDate && <span className="tw-text-xs tw-text-red-500">{errors.endDate}</span>}
+                </div>
+                <div className="tw-col-span-2">
                   <Documents
                     title="Documents"
                     personId={person._id}
@@ -220,21 +183,41 @@ export default function TreatmentModal({ onClose, isNewTreatment, treatment, per
                       });
                     }}
                   />
-                </Col>
-              </Row>
-              <br />
-              <div className="tw-mt-4 tw-flex tw-justify-end">
-                <ButtonCustom
-                  type="submit"
-                  disabled={isSubmitting || JSON.stringify(values) === JSON.stringify(currentTreatment)}
-                  onClick={() => !isSubmitting && handleSubmit()}
-                  title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}
-                />
+                </div>
               </div>
             </ModalBody>
+            <ModalFooter>
+              <button name="Annuler" type="button" className="button-cancel" onClick={() => onClose()}>
+                Annuler
+              </button>
+              {!isNewTreatment && (
+                <button
+                  type="button"
+                  name="cancel"
+                  className="button-destructive"
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    if (!window.confirm('Voulez-vous supprimer ce traitement ?')) return;
+                    const response = await API.delete({ path: `/treatment/${treatment._id}` });
+                    if (!response.ok) return;
+                    setAllTreatments((all) => all.filter((t) => t._id !== treatment._id));
+                    toast.success('Traitement supprimé !');
+                    onClose();
+                  }}>
+                  Supprimer
+                </button>
+              )}
+              <button
+                className="button-submit"
+                type="button"
+                disabled={isSubmitting || JSON.stringify(values) === JSON.stringify(currentTreatment)}
+                onClick={() => !isSubmitting && handleSubmit()}>
+                {isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}
+              </button>
+            </ModalFooter>
           </React.Fragment>
         )}
       </Formik>
-    </Modal>
+    </ModalContainer>
   );
 }

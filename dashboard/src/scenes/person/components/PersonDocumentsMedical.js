@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useLocalStorage } from 'react-use';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import ConsultationModal from '../../../components/ConsultationModal';
 import { modalConfirmState } from '../../../components/ModalConfirm';
 import PersonName from '../../../components/PersonName';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../../components/tailwind/Modal';
@@ -19,6 +20,7 @@ import { capture } from '../../../services/sentry';
 import useSearchParamState from '../../../services/useSearchParamState';
 import { download } from '../../../utils';
 import DocumentModal from './PersonDocumentModal';
+import TreatmentModal from './TreatmentModal';
 
 const PersonDocumentsMedical = ({ person }) => {
   const [documentToEdit, setDocumentToEdit] = useState(null);
@@ -33,6 +35,8 @@ const PersonDocumentsMedical = ({ person }) => {
   const allConsultations = useRecoilValue(arrayOfitemsGroupedByConsultationSelector);
   const [allTreatments] = useRecoilState(treatmentsState);
   const [allMedicalFiles, setAllMedicalFiles] = useRecoilState(medicalFileState);
+  const [consultation, setConsultation] = useState(false);
+  const [treatment, setTreatment] = useState(false);
 
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
 
@@ -81,12 +85,52 @@ const PersonDocumentsMedical = ({ person }) => {
 
   return (
     <div className="tw-relative">
-      {documentToEdit && <DocumentModal document={documentToEdit} person={person} onClose={() => setDocumentToEdit(null)} key={documentToEdit._id} />}
+      {documentToEdit && (
+        <DocumentModal document={documentToEdit} person={person} onClose={() => setDocumentToEdit(null)} key={documentToEdit._id}>
+          {documentToEdit.type === 'treatment' ? (
+            <button
+              onClick={() => {
+                setTreatment(documentToEdit.treatment);
+                setDocumentToEdit(null);
+              }}
+              className="button-classic">
+              Voir le traitement associé
+            </button>
+          ) : documentToEdit.type === 'consultation' ? (
+            <button
+              onClick={() => {
+                setConsultation(documentToEdit.consultation);
+                setDocumentToEdit(null);
+              }}
+              className="button-classic">
+              Voir la consultation associé
+            </button>
+          ) : null}
+        </DocumentModal>
+      )}
+      {consultation && (
+        <ConsultationModal
+          consultation={consultation}
+          onClose={() => {
+            setConsultation(false);
+          }}
+          personId={person._id}
+        />
+      )}
+      {treatment && (
+        <TreatmentModal
+          treatment={treatment}
+          onClose={() => {
+            setTreatment(false);
+          }}
+          person={person}
+        />
+      )}
       <div className="tw-sticky tw-top-0 tw-z-50 tw-flex tw-bg-white tw-p-3">
         <h4 className="tw-flex-1 tw-text-xl">Documents {documents?.length ? `(${documents?.length})` : ''}</h4>
         <label
           aria-label="Ajouter un document"
-          className="tw-text-md tw-h-8 tw-w-8 tw-cursor-pointer tw-rounded-full tw-bg-main tw-text-center tw-font-bold tw-leading-8 tw-text-white tw-transition hover:tw-scale-125">
+          className="tw-text-md tw-h-8 tw-w-8 tw-cursor-pointer tw-rounded-full tw-bg-blue-900 tw-text-center tw-font-bold tw-leading-8 tw-text-white tw-transition hover:tw-scale-125">
           ＋
           <input
             type="file"
@@ -106,12 +150,12 @@ const PersonDocumentsMedical = ({ person }) => {
               }
               setResetFileInputKey((k) => k + 1);
               const { data: file, encryptedEntityKey } = docResponse;
-              const personResponse = await API.put({
-                path: `/person/${person._id}`,
-                body: preparePersonForEncryption({
-                  ...person,
+              const medicalFileResponse = await API.put({
+                path: `/medical-file/${medicalFile._id}`,
+                body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({
+                  ...medicalFile,
                   documents: [
-                    ...(person.documents || []),
+                    ...(medicalFile.documents || []),
                     {
                       _id: file.filename,
                       name: file.originalname,
@@ -124,12 +168,12 @@ const PersonDocumentsMedical = ({ person }) => {
                   ],
                 }),
               });
-              if (personResponse.ok) {
-                const newPerson = personResponse.decryptedData;
-                setPersons((persons) =>
-                  persons.map((p) => {
-                    if (p._id === person._id) return newPerson;
-                    return p;
+              if (medicalFileResponse.ok) {
+                const newMedicalFile = medicalFileResponse.decryptedData;
+                setAllMedicalFiles((allMedicalFiles) =>
+                  allMedicalFiles.map((m) => {
+                    if (m._id === medicalFile._id) return newMedicalFile;
+                    return m;
                   })
                 );
                 toast.success('Document ajouté !');
@@ -150,21 +194,20 @@ const PersonDocumentsMedical = ({ person }) => {
                 setDocumentToEdit(doc);
               }}>
               <td className="tw-p-3">
-                <p className="tw-m-0 tw-flex tw-items-center tw-overflow-hidden tw-font-bold">
-                  {!!organisation.groupsEnabled && !!doc.group && (
-                    <span className="tw-mr-2 tw-text-xl" aria-label="Commentaire familial" title="Commentaire familial">
-                      👪
-                    </span>
+                <p className="tw-m-0 tw-flex tw-items-center tw-overflow-hidden tw-font-bold">{doc.name}</p>
+                <div className="tw-flex tw-text-xs">
+                  <div className="tw-flex-1 tw-grow">
+                    <p className="tw-m-0 tw-mt-1">{formatDateTimeWithNameOfDay(doc.createdAt)}</p>
+                    <p className="tw-m-0">Créé par {users.find((e) => e._id === doc.createdBy)?.name}</p>
+                  </div>
+                  {doc.type && (
+                    <div>
+                      <div className="tw-rounded tw-border tw-border-blue-900 tw-bg-blue-900/10 tw-px-1">
+                        {doc.type === 'treatment' ? 'Traitement' : doc.type === 'consultation' ? 'Consultation' : ''}
+                      </div>
+                    </div>
                   )}
-                  {doc.name}
-                </p>
-                {!!organisation.groupsEnabled && !!doc.group && !!doc.personPopulated && (
-                  <p className="tw--xs tw-m-0 tw-mt-1">
-                    Ce document est lié à <PersonName item={doc} />
-                  </p>
-                )}
-                <p className="tw-m-0 tw-mt-1 tw-text-xs">{formatDateTimeWithNameOfDay(doc.createdAt)}</p>
-                <p className="tw-m-0 tw-text-xs">Créé par {users.find((e) => e._id === doc.createdBy)?.name}</p>
+                </div>
               </td>
             </tr>
           ))}

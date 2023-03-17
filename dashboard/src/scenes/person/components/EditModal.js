@@ -3,6 +3,7 @@ import SelectAsInput from '../../../components/SelectAsInput';
 import {
   allowedFieldsInHistorySelector,
   customFieldsPersonsSelector,
+  flattenedCustomFieldsPersonsSelector,
   personFieldsSelector,
   personsState,
   usePreparePersonForEncryption,
@@ -19,13 +20,14 @@ import { toast } from 'react-toastify';
 import API from '../../../services/api';
 import { cleanHistory } from './History';
 import DatePicker from '../../../components/DatePicker';
-import { customFieldsMedicalFileSelector, medicalFileState } from '../../../recoil/medicalFiles';
+import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../../recoil/medicalFiles';
 import CustomFieldDisplay from '../../../components/CustomFieldDisplay';
 
 export default function EditModal({ person, selectedPanel, onClose, isMedicalFile = false }) {
   const [openPanels, setOpenPanels] = useState([selectedPanel]);
   const user = useRecoilValue(userState);
   const customFieldsPersons = useRecoilValue(customFieldsPersonsSelector);
+  const flattenedCustomFieldsPersons = useRecoilValue(flattenedCustomFieldsPersonsSelector);
   const allowedFieldsInHistory = useRecoilValue(allowedFieldsInHistorySelector);
   const team = useRecoilValue(currentTeamState);
   const setPersons = useSetRecoilState(personsState);
@@ -33,7 +35,15 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
   const [allMedicalFiles, setAllMedicalFiles] = useRecoilState(medicalFileState);
   const medicalFile = useMemo(() => (allMedicalFiles || []).find((m) => m.person === person._id), [allMedicalFiles, person._id]);
 
-  console.log(person);
+  const customFieldsMedicalFileWithLegacyFields = useMemo(() => {
+    const c = [...customFieldsMedicalFile];
+    if (flattenedCustomFieldsPersons.find((e) => e.name === 'structureMedical'))
+      c.unshift({ name: 'structureMedical', label: 'Structure de suivi médical', type: 'text', enabled: true });
+    if (flattenedCustomFieldsPersons.find((e) => e.name === 'healthInsurances'))
+      c.unshift({ name: 'healthInsurances', label: 'Couverture(s) médicale(s)', type: 'multi-choice', enabled: true });
+    return c;
+  }, [customFieldsMedicalFile, flattenedCustomFieldsPersons]);
+
   const preparePersonForEncryption = usePreparePersonForEncryption();
   const personFields = useRecoilValue(personFieldsSelector);
 
@@ -43,7 +53,7 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
       <ModalBody>
         <Formik
           enableReinitialize
-          initialValues={person}
+          initialValues={{ ...person, ...medicalFile }}
           onSubmit={async (body) => {
             if (!body.name?.trim()?.length) return toast.error('Une personne doit avoir un nom');
             if (!body.followedSince) body.followedSince = person.createdAt;
@@ -65,7 +75,6 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
               if (body[key] !== person[key]) historyEntry.data[key] = { oldValue: person[key], newValue: body[key] };
             }
             if (!!Object.keys(historyEntry.data).length) body.history = [...cleanHistory(person.history || []), historyEntry];
-
             const response = await API.put({
               path: `/person/${person._id}`,
               body: preparePersonForEncryption(body),
@@ -78,6 +87,26 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                   return p;
                 })
               );
+
+              // Medical file
+              if (isMedicalFile) {
+                const bodyMedicalFile = body;
+
+                const mfResponse = await API.put({
+                  path: `/medical-file/${medicalFile._id}`,
+                  body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({ ...medicalFile, ...bodyMedicalFile }),
+                });
+                if (mfResponse.ok) {
+                  setAllMedicalFiles((medicalFiles) =>
+                    medicalFiles.map((m) => {
+                      if (m._id === medicalFile._id) return mfResponse.decryptedData;
+                      return m;
+                    })
+                  );
+                } else {
+                  toast.error("Les données médicales n'ont pas été enregistrées");
+                }
+              }
               toast.success('Mis à jour !');
               onClose();
             } else {
@@ -261,10 +290,16 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                       <div className="[overflow-wrap:anywhere]">
                         {openPanels.includes('Dossier Médical') && (
                           <Row>
-                            {customFieldsMedicalFile
+                            {customFieldsMedicalFileWithLegacyFields
                               .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
                               .map((field) => (
-                                <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
+                                <CustomFieldInput
+                                  model="person"
+                                  values={values}
+                                  handleChange={handleChange}
+                                  field={{ ...field, name: field.name }}
+                                  key={'medicalFile.' + field.name}
+                                />
                               ))}
                           </Row>
                         )}

@@ -11,7 +11,7 @@ import { formatDateTimeWithNameOfDay } from '../../../services/date';
 import { capture } from '../../../services/sentry';
 import { download } from '../../../utils';
 
-export default function DocumentModal({ document, onClose, person }) {
+export default function DocumentModal({ document, onClose, person, children }) {
   const users = useRecoilValue(usersState);
   const preparePersonForEncryption = usePreparePersonForEncryption();
   const setPersons = useSetRecoilState(personsState);
@@ -29,9 +29,10 @@ export default function DocumentModal({ document, onClose, person }) {
       <ModalHeader title={document.name} />
       <ModalBody>
         <div className="tw-flex tw-w-full tw-flex-col tw-justify-between tw-gap-4 tw-px-8">
-          <small className="tw-opacity-60">
+          <small className="tw-pt-4 tw-opacity-60">
             Créé par {users.find((e) => e._id === document.createdBy)?.name} le {formatDateTimeWithNameOfDay(document.createdAt)}
           </small>
+          {children}
           {!!canToggleGroupCheck && (
             <div>
               <label htmlFor="document-for-group">
@@ -81,7 +82,13 @@ export default function DocumentModal({ document, onClose, person }) {
         </div>
       </ModalBody>
       <ModalFooter>
-        <button type="button" name="cancel" className="button-cancel" onClick={() => onClose()}>
+        <button
+          type="button"
+          name="cancel"
+          className="button-cancel"
+          onClick={() => {
+            onClose();
+          }}>
           Fermer
         </button>
         <button

@@ -16,6 +16,7 @@ import { arrayOfitemsGroupedByConsultationSelector } from '../../../recoil/selec
 import { useLocalStorage } from 'react-use';
 import TreatmentModal from './TreatmentModal';
 import { treatmentsState } from '../../../recoil/treatments';
+import { AgendaMutedIcon } from './AgendaMutedIcon';
 
 export const Treatments = ({ person }) => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -67,7 +68,14 @@ export const Treatments = ({ person }) => {
             </button>
           </ModalFooter>
         </ModalContainer>
-        <TreatmentsTable filteredData={filteredData} person={person} />
+        {filteredData.length ? (
+          <TreatmentsTable filteredData={filteredData} person={person} />
+        ) : (
+          <div className="tw-p-4 tw-text-center tw-text-gray-300">
+            <AgendaMutedIcon />
+            Aucun traitement
+          </div>
+        )}
       </div>
     </>
   );
