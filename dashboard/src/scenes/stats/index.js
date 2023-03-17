@@ -198,7 +198,7 @@ const Stats = () => {
           const res = data.filter((item) => {
             const params = [
               { referenceStartDay: period.startDate, referenceEndDay: period.endDate },
-              item.assignedTeams.every((teamId) => teamsOffsetHours[teamId] === 12),
+              (item.assignedTeams || []).every((teamId) => teamsOffsetHours[teamId] === 12),
             ];
             if (!item) return false;
             return (
