@@ -12,7 +12,7 @@ export default function ActionOrConsultationName({ item, hideType = false }) {
     return (
       <div className="tw-italic tw-opacity-30">
         Seulement visible par
-        <br />
+        {hideType ? ' ' : <br />}
         <UserName id={item.user} />
       </div>
     );
