@@ -2,7 +2,6 @@ import React, { useMemo, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { organisationState, userState } from '../../../recoil/auth';
 import { CANCEL, DONE, mappedIdsToLabels } from '../../../recoil/actions';
-import { useHistory } from 'react-router-dom';
 import SelectCustom from '../../../components/SelectCustom';
 import ActionStatus from '../../../components/ActionStatus';
 import TagTeam from '../../../components/TagTeam';
@@ -111,23 +110,23 @@ const ConsultationsFilters = ({ data, filteredData, setConsultationTypes, setCon
       {data.length ? (
         <div className="tw-mb-4 tw-flex tw-basis-full tw-justify-between tw-gap-2 tw-px-3">
           <div className="tw-shrink-0 tw-flex-grow">
-            <label htmlFor="consultations-select-types-filter">Filtrer par type</label>
+            <label htmlFor="consultation-select-types-filter">Filtrer par type</label>
             <SelectCustom
               options={organisation.consultations.map((e) => ({ _id: e.name, name: e.name }))}
               value={organisation.consultations.map((e) => ({ _id: e.name, name: e.name })).filter((s) => consultationTypes.includes(s._id))}
               getOptionValue={(s) => s._id}
               getOptionLabel={(s) => s.name}
               onChange={(selectedTypes) => setConsultationTypes(selectedTypes.map((t) => t._id))}
-              inputId="consultations-select-types-filter"
+              inputId="consultation-select-types-filter"
               name="types"
               isClearable
               isMulti
             />
           </div>
           <div className="tw-shrink-0 tw-flex-grow">
-            <label htmlFor="action-select-status-filter">Filtrer par statut</label>
+            <label htmlFor="consultation-select-status-filter">Filtrer par statut</label>
             <SelectCustom
-              inputId="action-select-status-filter"
+              inputId="consultation-select-status-filter"
               options={mappedIdsToLabels}
               getOptionValue={(s) => s._id}
               getOptionLabel={(s) => s.name}
@@ -157,41 +156,45 @@ const ConsultationsTable = ({ filteredData, person }) => {
     <>
       <table className="table">
         <tbody className="small">
-          {filteredData.map((action, i) => {
-            const date = formatDateWithNameOfDay([DONE, CANCEL].includes(action.status) ? action.completedAt : action.dueAt);
-            const time = action.withTime && action.dueAt ? ` ${formatTime(action.dueAt)}` : '';
+          {filteredData.map((consultation, i) => {
+            const date = formatDateWithNameOfDay([DONE, CANCEL].includes(consultation.status) ? consultation.completedAt : consultation.dueAt);
+            const time = consultation.withTime && consultation.dueAt ? ` ${formatTime(consultation.dueAt)}` : '';
             return (
-              <tr key={action._id} className={i % 2 ? 'tw-bg-sky-800/80 tw-text-white' : 'tw-bg-sky-100/80'}>
+              <tr key={consultation._id} className={i % 2 ? 'tw-bg-sky-800/80 tw-text-white' : 'tw-bg-sky-100/80'}>
                 <td>
                   <div
                     className={
-                      ['restricted-access'].includes(user.role) || disableConsultationRow(action, user)
+                      ['restricted-access'].includes(user.role) || disableConsultationRow(consultation, user)
                         ? 'tw-cursor-not-allowed tw-py-2'
                         : 'tw-cursor-pointer tw-py-2'
                     }
                     onClick={() => {
-                      if (disableConsultationRow(action, user)) return;
-                      setConsultationEditOpen(action);
+                      if (disableConsultationRow(consultation, user)) return;
+                      setConsultationEditOpen(consultation);
                     }}>
                     <div className="tw-flex">
                       <div className="tw-flex-1">{`${date}${time}`}</div>
                       <div>
-                        <ActionStatus status={action.status} />
+                        <ActionStatus status={consultation.status} />
                       </div>
                     </div>
                     <div className="tw-mt-2 tw-flex">
                       <div className="tw-flex tw-flex-1 tw-flex-row tw-items-center">
                         {!['restricted-access'].includes(user.role) && (
                           <>
-                            <ActionOrConsultationName item={action} hideType />
-                            {Boolean(action.name) && ![action.type, `Consultation ${action.type}`].includes(action.name) && (
-                              <span className="tw-ml-2">- {action.type}</span>
+                            <ActionOrConsultationName item={consultation} hideType />
+                            {Boolean(consultation.name) && ![consultation.type, `Consultation ${consultation.type}`].includes(consultation.name) && (
+                              <span className="tw-ml-2">- {consultation.type}</span>
                             )}
                           </>
                         )}
                       </div>
                       <div className="tw-flex tw-flex-col tw-gap-px">
-                        {Array.isArray(action?.teams) ? action.teams.map((e) => <TagTeam key={e} teamId={e} />) : <TagTeam teamId={action?.team} />}
+                        {Array.isArray(consultation?.teams) ? (
+                          consultation.teams.map((e) => <TagTeam key={e} teamId={e} />)
+                        ) : (
+                          <TagTeam teamId={consultation?.team} />
+                        )}
                       </div>
                     </div>
                   </div>
