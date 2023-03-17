@@ -599,12 +599,14 @@ const View = () => {
               Rencontres ({rencontres.length})
             </DrawerLink>
             <hr />
-            <DrawerLink
-              id="report-button-territory-observations"
-              className={activeTab === 'territory-observations' ? 'active' : ''}
-              onClick={() => setActiveTab('territory-observations')}>
-              Observations ({observations.length})
-            </DrawerLink>
+            {!!organisation.territoriesEnabled && (
+              <DrawerLink
+                id="report-button-territory-observations"
+                className={activeTab === 'territory-observations' ? 'active' : ''}
+                onClick={() => setActiveTab('territory-observations')}>
+                Observations ({observations.length})
+              </DrawerLink>
+            )}
             {!['restricted-access'].includes(user.role) && (
               <>
                 <hr />
