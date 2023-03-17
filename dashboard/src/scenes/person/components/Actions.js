@@ -27,7 +27,7 @@ export const Actions = ({ person }) => {
     <>
       <div className="tw-relative">
         <div className="tw-sticky tw-top-0 tw-flex tw-bg-white tw-p-3">
-          <h4 className="tw-flex-1">Actions {filteredData.length ? `(${filteredData.length})` : ''}</h4>
+          <h4 className="tw-flex-1 tw-text-xl">Actions {filteredData.length ? `(${filteredData.length})` : ''}</h4>
           <div className="flex-col tw-flex tw-items-center tw-gap-2">
             <button
               aria-label="Ajouter une action"

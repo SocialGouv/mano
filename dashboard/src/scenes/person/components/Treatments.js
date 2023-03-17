@@ -22,7 +22,7 @@ export const Treatments = ({ person }) => {
       {modalOpen && <TreatmentModal isNewTreatment person={person} onClose={() => setModalOpen(false)} />}
       <div className="tw-relative">
         <div className="tw-sticky tw-top-0 tw-z-10 tw-flex tw-bg-white tw-p-3">
-          <h4 className="tw-flex-1">Traitements {filteredData.length ? `(${filteredData.length})` : ''}</h4>
+          <h4 className="tw-flex-1 tw-text-xl">Traitements {filteredData.length ? `(${filteredData.length})` : ''}</h4>
           <div className="flex-col tw-flex tw-items-center tw-gap-2">
             <button
               aria-label="Ajouter un traitement"
@@ -76,8 +76,6 @@ const TreatmentsTable = ({ filteredData, person }) => {
       <table className="table">
         <tbody className="small">
           {filteredData.map((treatment, i) => {
-            const date = formatDateWithNameOfDay([DONE, CANCEL].includes(treatment.status) ? treatment.completedAt : treatment.dueAt);
-            const time = treatment.withTime && treatment.dueAt ? ` ${formatTime(treatment.dueAt)}` : '';
             return (
               <tr key={treatment._id} className={i % 2 ? 'tw-bg-slate-50/80' : 'tw-bg-slate-100/80'}>
                 <td>
@@ -93,15 +91,11 @@ const TreatmentsTable = ({ filteredData, person }) => {
                       </div>
                       <div>Créé par {treatment.user ? users.find((u) => u._id === treatment.user)?.name : ''}</div>
                     </div>
-                    <div className="tw-mt-2 tw-grid tw-grid-cols-2">
-                      <div>
-                        <div>{treatment.name}</div>
-                        <small className="text-muted">{treatment.indication}</small>
-                      </div>
-                      <div>
-                        <div>{treatment.dosage}</div>
-                        <small className="text-muted">{treatment.frequency}</small>
-                      </div>
+                    <div className="tw-mt-2">
+                      {treatment.name} - {treatment.indication}{' '}
+                      <span className="text-muted">
+                        ({treatment.dosage} - {treatment.frequency})
+                      </span>
                     </div>
                   </div>
                 </td>

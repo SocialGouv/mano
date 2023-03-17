@@ -12,12 +12,12 @@ export default function PersonCustomFields({ person, sectionName, fields, colspa
     return fields.filter((f) => f.enabled || f.enabledTeams?.includes(team._id));
   }, [fields, team]);
   return (
-    <div className="pt-4 p-3 border tw-min-h-[200px] tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+    <div className="p-3 border tw-min-h-[200px] tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
       {Boolean(editModal) && (
         <EditModal isMedicalFile={isMedicalFile} person={person} selectedPanel={editModal} onClose={() => setEditModal(false)} />
       )}
       <div className="tw-flex">
-        <h4 className="tw-flex-1">{sectionName}</h4>
+        <h4 className="tw-flex-1 tw-text-xl">{sectionName}</h4>
         <div>
           <button
             className="tw-transition hover:tw-scale-125"
