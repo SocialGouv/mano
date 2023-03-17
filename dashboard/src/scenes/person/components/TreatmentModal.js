@@ -1,32 +1,14 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { FormGroup, Input, Label, Row, Col } from 'reactstrap';
+import React, { useMemo } from 'react';
+import { Input, Label } from 'reactstrap';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
-import { useRecoilValue, useSetRecoilState, useRecoilState } from 'recoil';
+import { useRecoilValue, useRecoilState } from 'recoil';
 import { v4 as uuidv4 } from 'uuid';
-import ButtonCustom from '../../../components/ButtonCustom';
-import { personsState, usePreparePersonForEncryption, personFieldsSelector, flattenedCustomFieldsPersonsSelector } from '../../../recoil/persons';
-import { currentTeamState, organisationState, usersState, userState } from '../../../recoil/auth';
-import { dayjsInstance, formatDateWithFullMonth, formatTime, outOfBoundariesDate } from '../../../services/date';
+import { organisationState, userState } from '../../../recoil/auth';
+import { outOfBoundariesDate } from '../../../services/date';
 import API from '../../../services/api';
-import useSearchParamState from '../../../services/useSearchParamState';
-import SelectAsInput from '../../../components/SelectAsInput';
-import CustomFieldInput from '../../../components/CustomFieldInput';
-import Table from '../../../components/table';
-import ActionStatus from '../../../components/ActionStatus';
-import SelectCustom from '../../../components/SelectCustom';
-import CustomFieldDisplay from '../../../components/CustomFieldDisplay';
-import DateBloc from '../../../components/DateBloc';
-import { mappedIdsToLabels, DONE, CANCEL, sortActionsOrConsultations } from '../../../recoil/actions';
 import Documents from '../../../components/Documents';
-import { arrayOfitemsGroupedByConsultationSelector } from '../../../recoil/selectors';
 import { prepareTreatmentForEncryption, treatmentsState } from '../../../recoil/treatments';
-import { medicalFileState, prepareMedicalFileForEncryption, customFieldsMedicalFileSelector } from '../../../recoil/medicalFiles';
-import { modalConfirmState } from '../../../components/ModalConfirm';
-import ActionOrConsultationName from '../../../components/ActionOrConsultationName';
-import { useLocalStorage } from 'react-use';
-import ConsultationModal from '../../../components/ConsultationModal';
-import { consultationsState, disableConsultationRow } from '../../../recoil/consultations';
 import DatePicker from '../../../components/DatePicker';
 import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from '../../../components/tailwind/Modal';
 
@@ -38,7 +20,6 @@ import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from '../../../co
  * @param {Object} props.person
  */
 export default function TreatmentModal({ onClose, isNewTreatment, treatment, person }) {
-  const setModalConfirmState = useSetRecoilState(modalConfirmState);
   const [allTreatments, setAllTreatments] = useRecoilState(treatmentsState);
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);

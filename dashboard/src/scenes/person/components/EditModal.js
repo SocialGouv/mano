@@ -21,7 +21,6 @@ import API from '../../../services/api';
 import { cleanHistory } from './History';
 import DatePicker from '../../../components/DatePicker';
 import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../../recoil/medicalFiles';
-import CustomFieldDisplay from '../../../components/CustomFieldDisplay';
 
 export default function EditModal({ person, selectedPanel, onClose, isMedicalFile = false }) {
   const [openPanels, setOpenPanels] = useState([selectedPanel]);

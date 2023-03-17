@@ -1,14 +1,13 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { toast } from 'react-toastify';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import PersonName from '../../../components/PersonName';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../../components/tailwind/Modal';
-import { organisationState, usersState, userState } from '../../../recoil/auth';
+import { organisationState, usersState } from '../../../recoil/auth';
 import { groupsState } from '../../../recoil/groups';
 import { personsState, usePreparePersonForEncryption } from '../../../recoil/persons';
 import API from '../../../services/api';
 import { formatDateTimeWithNameOfDay } from '../../../services/date';
-import { capture } from '../../../services/sentry';
 import { download } from '../../../utils';
 
 export default function DocumentModal({ document, onClose, person, children }) {

@@ -1,24 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
-import { useLocalStorage } from 'react-use';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import ConsultationModal from '../../../components/ConsultationModal';
-import { modalConfirmState } from '../../../components/ModalConfirm';
-import PersonName from '../../../components/PersonName';
-import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../../components/tailwind/Modal';
-import { sortActionsOrConsultations } from '../../../recoil/actions';
-import { currentTeamState, organisationState, usersState, userState } from '../../../recoil/auth';
-import { consultationsState } from '../../../recoil/consultations';
-import { groupsState } from '../../../recoil/groups';
+import { organisationState, usersState, userState } from '../../../recoil/auth';
 import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../../recoil/medicalFiles';
-import { flattenedCustomFieldsPersonsSelector, personFieldsSelector, personsState, usePreparePersonForEncryption } from '../../../recoil/persons';
 import { arrayOfitemsGroupedByConsultationSelector } from '../../../recoil/selectors';
 import { treatmentsState } from '../../../recoil/treatments';
 import API from '../../../services/api';
 import { formatDateTimeWithNameOfDay } from '../../../services/date';
 import { capture } from '../../../services/sentry';
-import useSearchParamState from '../../../services/useSearchParamState';
-import { download } from '../../../utils';
 import DocumentModal from './PersonDocumentModal';
 import TreatmentModal from './TreatmentModal';
 
@@ -26,11 +16,9 @@ const PersonDocumentsMedical = ({ person }) => {
   const [documentToEdit, setDocumentToEdit] = useState(null);
 
   const user = useRecoilValue(userState);
-  const setPersons = useSetRecoilState(personsState);
   const [resetFileInputKey, setResetFileInputKey] = useState(0); // to be able to use file input multiple times
   const users = useRecoilValue(usersState);
   const organisation = useRecoilValue(organisationState);
-  const preparePersonForEncryption = usePreparePersonForEncryption();
 
   const allConsultations = useRecoilValue(arrayOfitemsGroupedByConsultationSelector);
   const [allTreatments] = useRecoilState(treatmentsState);

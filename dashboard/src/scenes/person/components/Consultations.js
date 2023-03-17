@@ -1,12 +1,9 @@
 import React, { useMemo, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { organisationState, userState } from '../../../recoil/auth';
-import { CANCEL, DONE, flattenedCategoriesSelector, mappedIdsToLabels, sortActionsOrConsultations } from '../../../recoil/actions';
-import { filteredPersonActionsSelector } from '../selectors/selectors';
+import { CANCEL, DONE, mappedIdsToLabels } from '../../../recoil/actions';
 import { useHistory } from 'react-router-dom';
-import CreateActionModal from '../../../components/CreateActionModal';
 import SelectCustom from '../../../components/SelectCustom';
-import ExclamationMarkButton from '../../../components/tailwind/ExclamationMarkButton';
 import ActionStatus from '../../../components/ActionStatus';
 import TagTeam from '../../../components/TagTeam';
 import ActionOrConsultationName from '../../../components/ActionOrConsultationName';
@@ -72,7 +69,7 @@ export const Consultations = ({ person }) => {
           consultationStatuses={consultationStatuses}
         />
         <ModalContainer open={!!fullScreen} className="" size="full" onClose={() => setFullScreen(false)}>
-          <ModalHeader title={`Actions de  ${person?.name} (${filteredData.length})`}>
+          <ModalHeader title={`Consultations de  ${person?.name} (${filteredData.length})`}>
             <div className="tw-mt-2 tw-w-full tw-max-w-2xl">
               <ConsultationsFilters
                 data={data}
@@ -157,9 +154,7 @@ const ConsultationsFilters = ({ data, filteredData, setConsultationTypes, setCon
 };
 
 const ConsultationsTable = ({ filteredData, person }) => {
-  const history = useHistory();
   const user = useRecoilValue(userState);
-  const organisation = useRecoilValue(organisationState);
   const [consultationEditOpen, setConsultationEditOpen] = useState(false);
 
   return (

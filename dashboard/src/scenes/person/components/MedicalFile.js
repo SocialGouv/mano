@@ -2,17 +2,13 @@ import { useRecoilValue } from 'recoil';
 import { userState } from '../../../recoil/auth';
 import { Consultations } from './Consultations';
 import { InfosMain } from './InfosMain';
-import PersonDocuments from './PersonDocuments';
 import PersonCustomFields from './PersonCustomFields';
-import Comments from './Comments';
 import DeletePersonButton from './DeletePersonButton';
-import PassagesRencontres from './PassagesRencontres';
 import OutOfActiveList from '../OutOfActiveList';
 import MergeTwoPersons from '../MergeTwoPersons';
-import { customFieldsPersonsSelector, flattenedCustomFieldsPersonsSelector } from '../../../recoil/persons';
+import { flattenedCustomFieldsPersonsSelector } from '../../../recoil/persons';
 import { customFieldsMedicalFileSelector } from '../../../recoil/medicalFiles';
 import { Treatments } from './Treatments';
-import CustomFieldDisplay from '../../../components/CustomFieldDisplay';
 import { useMemo } from 'react';
 import PersonDocumentsMedical from './PersonDocumentsMedical';
 

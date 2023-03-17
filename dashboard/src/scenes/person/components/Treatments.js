@@ -1,19 +1,10 @@
 import React, { useMemo, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { organisationState, usersState, userState } from '../../../recoil/auth';
-import { CANCEL, DONE, flattenedCategoriesSelector, mappedIdsToLabels, sortActionsOrConsultations } from '../../../recoil/actions';
-import { filteredPersonActionsSelector } from '../selectors/selectors';
+import { CANCEL, DONE } from '../../../recoil/actions';
 import { useHistory } from 'react-router-dom';
-import CreateActionModal from '../../../components/CreateActionModal';
-import SelectCustom from '../../../components/SelectCustom';
-import ExclamationMarkButton from '../../../components/tailwind/ExclamationMarkButton';
-import ActionStatus from '../../../components/ActionStatus';
-import TagTeam from '../../../components/TagTeam';
-import ActionOrConsultationName from '../../../components/ActionOrConsultationName';
 import { formatDateWithFullMonth, formatDateWithNameOfDay, formatTime } from '../../../services/date';
 import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from '../../../components/tailwind/Modal';
-import { arrayOfitemsGroupedByConsultationSelector } from '../../../recoil/selectors';
-import { useLocalStorage } from 'react-use';
 import TreatmentModal from './TreatmentModal';
 import { treatmentsState } from '../../../recoil/treatments';
 import { AgendaMutedIcon } from './AgendaMutedIcon';
@@ -21,9 +12,6 @@ import { AgendaMutedIcon } from './AgendaMutedIcon';
 export const Treatments = ({ person }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [fullScreen, setFullScreen] = useState(false);
-  const [filterCategories, setFilterCategories] = useState([]);
-  const [filterStatus, setFilterStatus] = useState([]);
-
   const [allTreatments, setAllTreatments] = useRecoilState(treatmentsState);
   const treatments = useMemo(() => (allTreatments || []).filter((t) => t.person === person._id), [allTreatments, person._id]);
   const filteredData = treatments;
@@ -55,7 +43,7 @@ export const Treatments = ({ person }) => {
           </div>
         </div>
         <ModalContainer open={!!fullScreen} className="" size="full" onClose={() => setFullScreen(false)}>
-          <ModalHeader title={`Actions de  ${person?.name} (${filteredData.length})`}></ModalHeader>
+          <ModalHeader title={`Traitements de  ${person?.name} (${filteredData.length})`}></ModalHeader>
           <ModalBody>
             <TreatmentsTable filteredData={filteredData} person={person} />
           </ModalBody>
@@ -64,7 +52,7 @@ export const Treatments = ({ person }) => {
               Fermer
             </button>
             <button type="button" className="button-submit" onClick={() => setModalOpen(true)}>
-              ＋ Ajouter une consultation
+              ＋ Ajouter un traitement
             </button>
           </ModalFooter>
         </ModalContainer>
