@@ -49,18 +49,18 @@ test("test restricted accesses", async ({ page }) => {
 
     await page.getByRole("button", { name: "Dossier Médical" }).click();
 
-    await page.getByRole("button", { name: "🩺 Ajouter une consultation" }).click();
+    await page.getByRole("button", { name: "Ajouter une consultation" }).click();
     await page.getByLabel("Nom").fill(consult1);
     await clickOnEmptyReactSelect(page, "consultation-modal-type", "Médicale");
     await page.getByRole("button", { name: "Sauvegarder" }).click();
 
-    await page.getByRole("button", { name: "🩺 Ajouter une consultation" }).click();
+    await page.getByRole("button", { name: "Ajouter une consultation" }).click();
     await clickOnEmptyReactSelect(page, "consultation-modal-type", "Médicale");
     await page.getByLabel("Nom").fill(consult1visibleByMe);
     await page.getByLabel("Seulement visible par moi").check();
     await page.getByRole("button", { name: "Sauvegarder" }).click();
 
-    await page.getByRole("button", { name: "💊 Ajouter un traitement" }).click();
+    await page.getByRole("button", { name: "Ajouter un traitement" }).click();
     await page.getByPlaceholder("Amoxicilline").fill(treatment1);
     await page.getByPlaceholder("1mg").fill("1");
     await page.getByPlaceholder("1 fois par jour").fill("1");

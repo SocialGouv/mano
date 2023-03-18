@@ -144,7 +144,7 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Mettre à jour" }).nth(1).click();
   await page.getByText("Mise à jour effectuée !").click();
 
-  await page.getByRole("button", { name: "💊 Ajouter un traitement" }).click();
+  await page.getByRole("button", { name: "Ajouter un traitement" }).click();
   await page.getByPlaceholder("Amoxicilline").click();
   await page.getByPlaceholder("Amoxicilline").fill("hdeyygdeygde");
   await page.getByRole("dialog").getByRole("document").locator('div:has-text("Fréquence")').nth(4).click();
@@ -167,7 +167,7 @@ test("test", async ({ page }) => {
   await page.getByText("Traitement créé !").click();
 
   await expect(page.locator('small:has-text("dedededed")')).toBeVisible();
-  await page.getByRole("button", { name: "🩺 Ajouter une consultation" }).click();
+  await page.getByRole("button", { name: "Ajouter une consultation" }).click();
   await page.getByLabel("Nom").click();
   await page.getByLabel("Nom").fill("AZAZAZAZAZAZAZAZA");
   await page.getByRole("button", { name: "Sauvegarder" }).click();

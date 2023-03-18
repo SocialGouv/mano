@@ -14,9 +14,11 @@ import ConsultationModal from '../../../components/ConsultationModal';
 import { AgendaMutedIcon } from './AgendaMutedIcon';
 import { disableConsultationRow } from '../../../recoil/consultations';
 import { FullScreenIcon } from './FullScreenIcon';
+import useSearchParamState from '../../../services/useSearchParamState';
 
 export const Consultations = ({ person }) => {
-  const [modalOpen, setModalOpen] = useState(false);
+  const [currentConsultationId, setCurrentConsultationId] = useSearchParamState('consultationId', null);
+  const [modalOpen, setModalOpen] = useState(!!currentConsultationId);
   const [fullScreen, setFullScreen] = useState(false);
 
   const allConsultations = useRecoilValue(arrayOfitemsGroupedByConsultationSelector);
@@ -88,11 +90,12 @@ export const Consultations = ({ person }) => {
             </button>
           </ModalFooter>
         </ModalContainer>
-        <ConsultationsTable filteredData={filteredData} person={person} />
+        <ConsultationsTable filteredData={filteredData} person={person} setCurrentConsultationId={setCurrentConsultationId} />
       </div>
       {modalOpen && (
         <ConsultationModal
           onClose={() => {
+            setCurrentConsultationId(null);
             setModalOpen(false);
           }}
           personId={person._id}
@@ -148,7 +151,7 @@ const ConsultationsFilters = ({ data, filteredData, setConsultationTypes, setCon
   );
 };
 
-const ConsultationsTable = ({ filteredData, person }) => {
+const ConsultationsTable = ({ filteredData, person, setCurrentConsultationId }) => {
   const user = useRecoilValue(userState);
   const [consultationEditOpen, setConsultationEditOpen] = useState(false);
 
@@ -170,6 +173,7 @@ const ConsultationsTable = ({ filteredData, person }) => {
                     }
                     onClick={() => {
                       if (disableConsultationRow(consultation, user)) return;
+                      setCurrentConsultationId(consultation._id);
                       setConsultationEditOpen(consultation);
                     }}>
                     <div className="tw-flex">
@@ -208,6 +212,7 @@ const ConsultationsTable = ({ filteredData, person }) => {
         <ConsultationModal
           consultation={consultationEditOpen}
           onClose={() => {
+            setCurrentConsultationId(null);
             setConsultationEditOpen(false);
           }}
           personId={person._id}

@@ -76,7 +76,7 @@ test("Create and modify a person", async ({ page }) => {
   await page.locator(".Toastify__close-button").last().click();
 
   await page.getByRole("button", { name: "Dossier Médical" }).click();
-  await page.getByRole("button", { name: "💊 Ajouter un traitement" }).click();
+  await page.getByRole("button", { name: "Ajouter un traitement" }).click();
   await page.getByPlaceholder("Amoxicilline").click();
   await page.getByPlaceholder("Amoxicilline").fill("dsqdsqdsq");
   await page.getByPlaceholder("1mg").click();

@@ -70,12 +70,12 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Rencontre enregistrée").click();
   await page.getByRole("button", { name: "Dossier Médical" }).click();
-  await page.getByRole("button", { name: "🩺 Ajouter une consultation" }).click();
+  await page.getByRole("button", { name: "Ajouter une consultation" }).click();
   await page.getByLabel("Nom (facultatif)").fill("La consultation");
   await page.locator(".consultation-modal-type__input-container").click();
   await page.locator("#react-select-type-option-0").click();
   await page.getByRole("button", { name: "Sauvegarder" }).click();
-  await page.getByRole("button", { name: "💊 Ajouter un traitement" }).click();
+  await page.getByRole("button", { name: "Ajouter un traitement" }).click();
   await page.getByPlaceholder("Amoxicilline").click();
   await page.getByPlaceholder("Amoxicilline").fill("le traitement");
   await page.getByPlaceholder("1mg").click();
