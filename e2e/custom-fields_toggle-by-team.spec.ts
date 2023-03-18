@@ -275,8 +275,8 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("button", { name: "Annuler" }).click();
 
   await page.getByRole("button", { name: "Dossier Médical" }).click();
-  await expect(page.locator(`data-test-id=${testMedicalFileField}`)).toBeHidden();
-  await page.locator("tbody > tr > td:nth-child(5)").click();
+  await expect(page.getByText(testMedicalFileField)).toBeHidden();
+  await page.getByText("- Médicale").click();
   await expect(page.locator(`data-test-id=${testConsultationField}`)).toBeHidden();
   await page.getByRole("button", { name: "Annuler" }).click();
 

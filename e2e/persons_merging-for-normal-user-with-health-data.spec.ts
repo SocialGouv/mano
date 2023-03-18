@@ -66,17 +66,19 @@ test("merging normal user with health data", async ({ page }) => {
     await expect(page).toHaveURL("http://localhost:8090/person");
     await page.getByRole("cell", { name: "1", exact: true }).click();
     await page.getByRole("button", { name: "Dossier Médical" }).click();
+    await page.getByRole("button", { name: "Éditer les dossier médical" }).click();
     await page.getByLabel("Numéro de sécurité sociale").fill("123");
-    await page.getByRole("button", { name: "Mettre à jour" }).nth(1).click();
-    await page.getByText("Mise à jour effectuée !").click();
+    await page.getByRole("button", { name: "Enregistrer" }).click();
+    await page.getByText("Mis à jour !").click();
 
     await page.getByRole("link", { name: "Personnes suivies" }).click();
     await expect(page).toHaveURL("http://localhost:8090/person");
     await page.getByRole("cell", { name: "2", exact: true }).click();
     await page.getByRole("button", { name: "Dossier Médical" }).click();
+    await page.getByRole("button", { name: "Éditer les dossier médical" }).click();
     await page.getByLabel("Numéro de sécurité sociale").fill("456");
-    await page.getByRole("button", { name: "Mettre à jour" }).nth(1).click();
-    await page.getByText("Mise à jour effectuée !").click();
+    await page.getByRole("button", { name: "Enregistrer" }).click();
+    await page.getByText("Mis à jour !").click();
   });
 
   await test.step("setup array medical field for one person", async () => {
@@ -84,10 +86,11 @@ test("merging normal user with health data", async ({ page }) => {
     await expect(page).toHaveURL("http://localhost:8090/person");
     await page.getByRole("cell", { name: "3", exact: true }).click();
     await page.getByRole("button", { name: "Dossier Médical" }).click();
+    await page.getByRole("button", { name: "Éditer les dossier médical" }).click();
     await clickOnEmptyReactSelect(page, "person-custom-select-multi-champ", "choix 1");
     await changeReactSelectValue(page, "person-custom-select-multi-champ", "choix 2");
-    await page.getByRole("button", { name: "Mettre à jour" }).nth(1).click();
-    await page.getByText("Mise à jour effectuée !").click();
+    await page.getByRole("button", { name: "Enregistrer" }).click();
+    await page.getByText("Mis à jour !").click();
   });
 
   await test.step("try to merge as health professional", async () => {
@@ -163,8 +166,9 @@ test("merging normal user with health data", async ({ page }) => {
     await expect(page).toHaveURL("http://localhost:8090/person");
     await page.getByRole("cell", { name: "1", exact: true }).click();
     await page.getByRole("button", { name: "Dossier Médical" }).click();
-    await expect(page.getByLabel("Numéro de sécurité sociale")).toHaveValue("123");
-    await expect(page.locator("div.person-custom-select-multi-champ__value-container")).toHaveText("choix 1choix 2");
+    await page.getByText("123").click();
+    await page.getByText("choix 1").click();
+    await page.getByText("choix 2").click();
     await page.getByRole("button", { name: "Résumé" }).click();
     await page.getByRole("button", { name: "Fusionner avec un autre dossier" }).click();
     page.on("dialog", async (dialog) => {
@@ -177,7 +181,8 @@ test("merging normal user with health data", async ({ page }) => {
     await page.getByRole("button", { name: "Fusionner", exact: true }).click();
     await page.getByText("Fusion réussie !").click();
     await page.getByRole("button", { name: "Dossier Médical" }).click();
-    await expect(page.getByLabel("Numéro de sécurité sociale")).toHaveValue("456");
-    await expect(page.locator("div.person-custom-select-multi-champ__value-container")).toHaveText("choix 1choix 2");
+    await page.getByText("456").click();
+    await page.getByText("choix 1").click();
+    await page.getByText("choix 2").click();
   });
 });
