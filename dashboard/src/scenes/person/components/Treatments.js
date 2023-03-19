@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { organisationState, usersState, userState } from '../../../recoil/auth';
-import { useHistory } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
+import { usersState, userState } from '../../../recoil/auth';
 import { formatDateWithFullMonth } from '../../../services/date';
 import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from '../../../components/tailwind/Modal';
 import TreatmentModal from './TreatmentModal';
@@ -64,9 +63,7 @@ export const Treatments = ({ person }) => {
 };
 
 const TreatmentsTable = ({ filteredData, person }) => {
-  const history = useHistory();
   const user = useRecoilValue(userState);
-  const organisation = useRecoilValue(organisationState);
   const [treatmentEditOpen, setTreatmentEditOpen] = useState(false);
   const users = useRecoilValue(usersState);
 
