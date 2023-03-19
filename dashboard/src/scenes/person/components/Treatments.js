@@ -1,9 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { organisationState, usersState, userState } from '../../../recoil/auth';
-import { CANCEL, DONE } from '../../../recoil/actions';
 import { useHistory } from 'react-router-dom';
-import { formatDateWithFullMonth, formatDateWithNameOfDay, formatTime } from '../../../services/date';
+import { formatDateWithFullMonth } from '../../../services/date';
 import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from '../../../components/tailwind/Modal';
 import TreatmentModal from './TreatmentModal';
 import { treatmentsState } from '../../../recoil/treatments';
@@ -13,7 +12,7 @@ import { FullScreenIcon } from './FullScreenIcon';
 export const Treatments = ({ person }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [fullScreen, setFullScreen] = useState(false);
-  const [allTreatments, setAllTreatments] = useRecoilState(treatmentsState);
+  const allTreatments = useRecoilValue(treatmentsState);
   const treatments = useMemo(() => (allTreatments || []).filter((t) => t.person === person._id), [allTreatments, person._id]);
   const filteredData = treatments;
 

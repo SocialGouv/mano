@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { Input, Label } from 'reactstrap';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
-import { useRecoilValue, useRecoilState } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { v4 as uuidv4 } from 'uuid';
 import { organisationState, userState } from '../../../recoil/auth';
 import { outOfBoundariesDate } from '../../../services/date';
@@ -20,7 +20,7 @@ import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from '../../../co
  * @param {Object} props.person
  */
 export default function TreatmentModal({ onClose, isNewTreatment, treatment, person }) {
-  const [allTreatments, setAllTreatments] = useRecoilState(treatmentsState);
+  const setAllTreatments = useSetRecoilState(treatmentsState);
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
 
