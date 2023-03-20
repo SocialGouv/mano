@@ -118,9 +118,14 @@ const Stats = () => {
   const [period, setPeriod] = useLocalStorage('period', { startDate: null, endDate: null });
   const [preset, setPreset] = useLocalStorage('stats-date-preset', null);
   const [actionsStatuses, setActionsStatuses] = useLocalStorage('stats-actionsStatuses', DONE);
-  const [selectedTeams, setSelectedTeams] = useLocalStorage('stats-teams', [currentTeam]);
+  const [manuallySelectedTeams, setSelectedTeams] = useLocalStorage('stats-teams', [currentTeam]);
   const [actionsCategoriesGroups, setActionsCategoriesGroups] = useLocalStorage('stats-catGroups', []);
   const [actionsCategories, setActionsCategories] = useLocalStorage('stats-categories', []);
+
+  const selectedTeams = useMemo(() => {
+    if (viewAllOrganisationData) return teams;
+    return manuallySelectedTeams;
+  }, [manuallySelectedTeams, viewAllOrganisationData, teams]);
 
   const selectedTeamsIdsObject = useMemo(() => {
     const teamsIdsObject = {};
@@ -129,6 +134,14 @@ const Stats = () => {
     }
     return teamsIdsObject;
   }, [selectedTeams]);
+
+  const teamsOffsetHours = useMemo(() => {
+    const teamsIdsObject = {};
+    for (const team of teams) {
+      teamsIdsObject[team._id] = team.nightSession ? 12 : 0;
+    }
+    return teamsIdsObject;
+  }, [teams]);
 
   useTitle(`${activeTab} - Statistiques`);
 
@@ -163,26 +176,30 @@ const Stats = () => {
 
   const persons = useMemo(
     () =>
-      getDataForPeriod(filterByTeam(allPersons, 'assignedTeams'), period, selectedTeams, viewAllOrganisationData, {
+      getDataForPeriod(filterByTeam(allPersons, 'assignedTeams'), period, teamsOffsetHours, {
         filters: filterPersons.filter((f) => f.field !== 'outOfActiveList'),
         field: 'followedSince',
+        teamField: 'assignedTeams',
       }),
-    [allPersons, filterByTeam, filterPersons, period, selectedTeams, viewAllOrganisationData]
+    [allPersons, filterByTeam, filterPersons, period, teamsOffsetHours]
   );
   const personsUpdated = useMemo(
     () =>
       getDataForPeriod(
         filterByTeam(allPersons, 'assignedTeams'),
         period,
-        selectedTeams,
-        viewAllOrganisationData,
+        teamsOffsetHours,
         {
           filters: filterPersons.filter((f) => f.field !== 'outOfActiveList'),
           field: 'followedSince',
+          teamField: 'assignedTeams',
         },
-        (data, offsetHours) => {
+        (data) => {
           const res = data.filter((item) => {
-            const params = [{ referenceStartDay: period.startDate, referenceEndDay: period.endDate }, offsetHours];
+            const params = [
+              { referenceStartDay: period.startDate, referenceEndDay: period.endDate },
+              (item.assignedTeams || []).every((teamId) => teamsOffsetHours[teamId] === 12),
+            ];
             if (!item) return false;
             return (
               getIsDayWithinHoursOffsetOfPeriod(item.followedSince, ...params) ||
@@ -206,7 +223,7 @@ const Stats = () => {
           return res;
         }
       ),
-    [filterByTeam, allPersons, period, selectedTeams, viewAllOrganisationData, filterPersons]
+    [filterByTeam, allPersons, period, teamsOffsetHours, filterPersons]
   );
   const personsForStats = useMemo(() => {
     const outOfActiveListFilter = filterPersons.find((f) => f.field === 'outOfActiveList')?.value;
@@ -232,11 +249,12 @@ const Stats = () => {
   }, [period.endDate, period.startDate, personsUpdatedForStats, selectedTeams, viewAllOrganisationData]);
   const actions = useMemo(
     () =>
-      getDataForPeriod(filterByTeam(allActions, 'teams'), period, selectedTeams, viewAllOrganisationData, {
+      getDataForPeriod(filterByTeam(allActions, 'teams'), period, teamsOffsetHours, {
         field: 'completedAt',
         backupField: 'dueAt',
+        teamField: 'teams',
       }),
-    [allActions, filterByTeam, period, selectedTeams, viewAllOrganisationData]
+    [allActions, filterByTeam, period, teamsOffsetHours]
   );
   const actionsFilteredByStatus = useMemo(
     () => actions.filter((a) => !actionsStatuses.length || actionsStatuses.includes(a.status)),
@@ -291,22 +309,22 @@ const Stats = () => {
   }, [actions.length, personsWithActions.length]);
   const consultations = useMemo(
     () =>
-      getDataForPeriod(allConsultations, period, selectedTeams, true, {
+      getDataForPeriod(allConsultations, period, teamsOffsetHours, {
         field: 'completedAt',
         backupField: 'dueAt',
+        teamField: null,
       }),
-    [allConsultations, period, selectedTeams]
+    [allConsultations, period, teamsOffsetHours]
   );
   const observations = useMemo(
     () =>
       getDataForPeriod(
         filterByTeam(allObservations, 'team').filter((e) => !selectedTerritories.length || selectedTerritories.some((t) => e.territory === t._id)),
         period,
-        selectedTeams,
-        viewAllOrganisationData,
+        teamsOffsetHours,
         { field: 'observedAt' }
       ),
-    [allObservations, filterByTeam, period, selectedTeams, viewAllOrganisationData, selectedTerritories]
+    [allObservations, filterByTeam, period, teamsOffsetHours, selectedTerritories]
   );
   const passages = useMemo(() => {
     const teamsPassages = filterByTeam(allPassages, 'team');
@@ -315,8 +333,8 @@ const Stats = () => {
       type: !!passage.person ? 'Non-anonyme' : 'Anonyme',
       gender: !passage.person ? null : allPersonsAsObject[passage.person]?.gender || 'Non renseigné',
     }));
-    return getDataForPeriod(populatedPassages, period, selectedTeams, viewAllOrganisationData, { field: 'date' });
-  }, [allPassages, filterByTeam, period, selectedTeams, viewAllOrganisationData, allPersonsAsObject]);
+    return getDataForPeriod(populatedPassages, period, teamsOffsetHours, { field: 'date', teamField: 'team' });
+  }, [allPassages, filterByTeam, period, teamsOffsetHours, allPersonsAsObject]);
   const personsInPassagesBeforePeriod = useMemo(() => {
     if (!period?.startDate) return [];
     const passagesIds = {};
@@ -354,8 +372,8 @@ const Stats = () => {
       type: 'Rencontres',
       gender: !rencontre.person ? null : allPersonsAsObject[rencontre.person]?.gender || 'Non renseigné',
     }));
-    return getDataForPeriod(populatedRencontres, period, selectedTeams, viewAllOrganisationData, { field: 'date' });
-  }, [allRencontres, filterByTeam, period, selectedTeams, viewAllOrganisationData, allPersonsAsObject]);
+    return getDataForPeriod(populatedRencontres, period, teamsOffsetHours, { field: 'date', teamField: 'team' });
+  }, [allRencontres, filterByTeam, period, teamsOffsetHours, allPersonsAsObject]);
 
   const personsInRencontresBeforePeriod = useMemo(() => {
     if (!period?.startDate) return [];
@@ -383,8 +401,8 @@ const Stats = () => {
     return arrayOfPersonsOfRencontres;
   }, [rencontres, allPersonsAsObject]);
   const reports = useMemo(
-    () => getDataForPeriod(filterByTeam(allreports, 'team'), period, selectedTeams, viewAllOrganisationData, { field: 'date' }),
-    [allreports, filterByTeam, period, selectedTeams, viewAllOrganisationData]
+    () => getDataForPeriod(filterByTeam(allreports, 'team'), period, teamsOffsetHours, { field: 'date', teamField: 'team' }),
+    [allreports, filterByTeam, period, teamsOffsetHours]
   );
   const reportsServices = useMemo(() => reports.map((rep) => (rep.services ? JSON.parse(rep.services) : null)).filter(Boolean), [reports]);
   const filterPersonsBase = useRecoilValue(filterPersonsBaseSelector);

@@ -4,27 +4,30 @@ import { getIsDayWithinHoursOffsetOfPeriod } from '../../services/date';
 export const getDataForPeriod = (
   data,
   { startDate, endDate },
-  selectedTeams,
-  viewAllOrganisationData,
-  { filters = [], field = 'createdAt', backupField = 'createdAt' } = {},
+  teamsOffsetHours,
+  { filters = [], field = 'createdAt', backupField = 'createdAt', teamField = null } = {},
   callback = null
 ) => {
   if (!!filters?.filter((f) => Boolean(f?.value)).length) data = filterData(data, filters);
   if (!startDate || !endDate) {
     return data;
   }
-  const offsetHours = Boolean(viewAllOrganisationData) || selectedTeams.every((e) => !e.nightSession) ? 0 : 12;
 
   if (callback) {
-    return callback(data, offsetHours);
+    return callback(data);
   }
-  return data.filter((item) =>
-    getIsDayWithinHoursOffsetOfPeriod(
+  return data.filter((item) => {
+    const offsetHours = !teamField
+      ? 0
+      : Array.isArray(item[teamField])
+      ? item[teamField].every((teamId) => teamsOffsetHours[teamId] === 12)
+      : teamsOffsetHours[item[teamField]];
+    return getIsDayWithinHoursOffsetOfPeriod(
       item[field] || item[backupField] || item.createdAt,
       { referenceStartDay: startDate, referenceEndDay: endDate },
       offsetHours
-    )
-  );
+    );
+  });
 };
 
 export const getDuration = (timestampFromNow) => {
