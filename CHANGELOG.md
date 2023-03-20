@@ -1,3 +1,10 @@
+## [1.257.1](https://github.com/SocialGouv/mano/compare/v1.257.0...v1.257.1) (2023-03-20)
+
+
+### Bug Fixes
+
+* **dashboard:** statistiques des maraudes de nuit seules dans leur organisation ([#1401](https://github.com/SocialGouv/mano/issues/1401)) ([9802801](https://github.com/SocialGouv/mano/commit/980280170b29506cce5185b723622bff18946aa4))
+
 # [1.257.0](https://github.com/SocialGouv/mano/compare/v1.256.2...v1.257.0) (2023-03-14)
 
 
