@@ -1,3 +1,10 @@
+# [1.258.0](https://github.com/SocialGouv/mano/compare/v1.257.1...v1.258.0) (2023-03-20)
+
+
+### Features
+
+* **dashboard:** gestion des catégories de structures depuis les paramètres de l'organisation ([#1382](https://github.com/SocialGouv/mano/issues/1382)) ([b4bda00](https://github.com/SocialGouv/mano/commit/b4bda0080b7845a495814c9e759cd7ee1b970fc8))
+
 ## [1.257.1](https://github.com/SocialGouv/mano/compare/v1.257.0...v1.257.1) (2023-03-20)
 
 
