@@ -208,7 +208,7 @@ test("test", async ({ page }) => {
 
   await page.getByRole("link", { name: "Territoires" }).click();
   await page.getByRole("link", { name: "Comptes rendus" }).click();
-  await page.getByRole("button", { name: "2023-03-06" }).click();
+  await page.getByRole("button", { name: anotherDay }).click();
 
   // test sur les territoires
   await page.getByRole("link", { name: "Territoires" }).click();
