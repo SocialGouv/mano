@@ -4,13 +4,7 @@ import styled from 'styled-components';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Formik } from 'formik';
-import {
-  addOneDay,
-  formatDateWithFullMonth,
-  formatDateWithNameOfDay,
-  formatTime,
-  getIsDayWithinHoursOffsetOfPeriod,
-} from '../../services/date';
+import { addOneDay, formatDateWithFullMonth, formatDateWithNameOfDay, formatTime, getIsDayWithinHoursOffsetOfPeriod } from '../../services/date';
 import DateBloc from '../../components/DateBloc';
 import { HeaderStyled, Title as HeaderTitle } from '../../components/header';
 import BackButton, { BackButtonWrapper } from '../../components/backButton';
@@ -57,6 +51,7 @@ import { useLocalStorage } from 'react-use';
 import useSearchParamState from '../../services/useSearchParamState';
 import { arrayOfitemsGroupedByActionSelector, arrayOfitemsGroupedByConsultationSelector } from '../../recoil/selectors';
 import ConsultationModal from '../../components/ConsultationModal';
+import { addHoursToDate } from '/Users/marionbelorgey/Desktop/MANO/mano/dashboard/src/services/date.js';
 
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithFullMonth(date)}`;
@@ -984,14 +979,15 @@ const ActionCompletedAt = ({ date, status, actions, setSortOrder, setSortBy, sor
 
   if (!data) return <div />;
 
+  console.log(date);
   const moreThanOne = data.length > 1;
-
+  const dateForSelector = addHoursToDate(date, '12');
   return (
     <>
       <StyledBox>
         {status === DONE && (
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <CreateActionModal open={modalOpen} setOpen={(value) => setModalOpen(value)} completedAt={date} isMulti />
+            <CreateActionModal open={modalOpen} setOpen={(value) => setModalOpen(value)} completedAt={dateForSelector} isMulti />
             <div className="noprint" style={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
               <ButtonCustom
                 icon={agendaIcon}
