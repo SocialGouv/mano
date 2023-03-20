@@ -3,6 +3,7 @@ import SelectAsInput from '../../../components/SelectAsInput';
 import {
   allowedFieldsInHistorySelector,
   customFieldsPersonsSelector,
+  flattenedCustomFieldsPersonsSelector,
   personFieldsSelector,
   personsState,
   usePreparePersonForEncryption,
@@ -10,23 +11,37 @@ import {
 import { outOfBoundariesDate } from '../../../services/date';
 import SelectTeamMultiple from '../../../components/SelectTeamMultiple';
 import { currentTeamState, userState } from '../../../recoil/auth';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import CustomFieldInput from '../../../components/CustomFieldInput';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import ButtonCustom from '../../../components/ButtonCustom';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
 import API from '../../../services/api';
 import { cleanHistory } from './History';
 import DatePicker from '../../../components/DatePicker';
+import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../../recoil/medicalFiles';
 
-export default function EditModal({ person, selectedPanel, onClose }) {
+export default function EditModal({ person, selectedPanel, onClose, isMedicalFile = false }) {
   const [openPanels, setOpenPanels] = useState([selectedPanel]);
   const user = useRecoilValue(userState);
   const customFieldsPersons = useRecoilValue(customFieldsPersonsSelector);
+  const flattenedCustomFieldsPersons = useRecoilValue(flattenedCustomFieldsPersonsSelector);
   const allowedFieldsInHistory = useRecoilValue(allowedFieldsInHistorySelector);
   const team = useRecoilValue(currentTeamState);
   const setPersons = useSetRecoilState(personsState);
+  const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
+  const [allMedicalFiles, setAllMedicalFiles] = useRecoilState(medicalFileState);
+  const medicalFile = useMemo(() => (allMedicalFiles || []).find((m) => m.person === person._id), [allMedicalFiles, person._id]);
+
+  const customFieldsMedicalFileWithLegacyFields = useMemo(() => {
+    const c = [...customFieldsMedicalFile];
+    const structureMedical = flattenedCustomFieldsPersons.find((e) => e.name === 'structureMedical');
+    if (structureMedical) c.unshift(structureMedical);
+    const healthInsurances = flattenedCustomFieldsPersons.find((e) => e.name === 'healthInsurances');
+    if (healthInsurances) c.unshift(healthInsurances);
+    return c;
+  }, [customFieldsMedicalFile, flattenedCustomFieldsPersons]);
 
   const preparePersonForEncryption = usePreparePersonForEncryption();
   const personFields = useRecoilValue(personFieldsSelector);
@@ -37,7 +52,7 @@ export default function EditModal({ person, selectedPanel, onClose }) {
       <ModalBody>
         <Formik
           enableReinitialize
-          initialValues={person}
+          initialValues={{ ...person, ...medicalFile }}
           onSubmit={async (body) => {
             if (!body.name?.trim()?.length) return toast.error('Une personne doit avoir un nom');
             if (!body.followedSince) body.followedSince = person.createdAt;
@@ -59,7 +74,6 @@ export default function EditModal({ person, selectedPanel, onClose }) {
               if (body[key] !== person[key]) historyEntry.data[key] = { oldValue: person[key], newValue: body[key] };
             }
             if (!!Object.keys(historyEntry.data).length) body.history = [...cleanHistory(person.history || []), historyEntry];
-
             const response = await API.put({
               path: `/person/${person._id}`,
               body: preparePersonForEncryption(body),
@@ -72,6 +86,26 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                   return p;
                 })
               );
+
+              // Medical file
+              if (isMedicalFile) {
+                const bodyMedicalFile = body;
+
+                const mfResponse = await API.put({
+                  path: `/medical-file/${medicalFile._id}`,
+                  body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({ ...medicalFile, ...bodyMedicalFile }),
+                });
+                if (mfResponse.ok) {
+                  setAllMedicalFiles((medicalFiles) =>
+                    medicalFiles.map((m) => {
+                      if (m._id === medicalFile._id) return mfResponse.decryptedData;
+                      return m;
+                    })
+                  );
+                } else {
+                  toast.error("Les données médicales n'ont pas été enregistrées");
+                }
+              }
               toast.success('Mis à jour !');
               onClose();
             } else {
@@ -205,7 +239,8 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                       </Row>
                     )}
                   </div>
-                  {!['restricted-access'].includes(user.role) &&
+                  {!isMedicalFile &&
+                    !['restricted-access'].includes(user.role) &&
                     customFieldsPersons.map(({ name, fields }, index) => {
                       return (
                         <div key={name + index}>
@@ -236,6 +271,34 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                         </div>
                       );
                     })}
+                  {isMedicalFile && (
+                    <div key={'Dossier Médical'}>
+                      <div
+                        className="tw-mb-4 tw-flex tw-cursor-pointer tw-border-b tw-pb-2 tw-text-lg tw-font-semibold"
+                        onClick={() => {
+                          if (openPanels.includes('Dossier Médical')) {
+                            setOpenPanels(openPanels.filter((p) => p !== 'Dossier Médical'));
+                          } else {
+                            setOpenPanels([...openPanels, 'Dossier Médical']);
+                          }
+                        }}>
+                        <div className="tw-flex-1">Dossier Médical</div>
+                        <div>{!openPanels.includes('Dossier Médical') ? '+' : '-'}</div>
+                      </div>
+
+                      <div className="[overflow-wrap:anywhere]">
+                        {openPanels.includes('Dossier Médical') && (
+                          <Row>
+                            {customFieldsMedicalFileWithLegacyFields
+                              .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
+                              .map((field) => (
+                                <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
+                              ))}
+                          </Row>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div className="tw-flex tw-items-end tw-justify-end tw-gap-2">
                   <ButtonCustom disabled={isSubmitting} color="secondary" onClick={onClose} title="Annuler" />

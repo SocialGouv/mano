@@ -121,8 +121,8 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("button", { name: "Annuler" }).click();
 
   await page.getByRole("button", { name: "Dossier Médical" }).click();
-  await page.getByLabel(testMedicalFileField).click();
-  await page.getByRole("button", { name: "🩺 Ajouter une consultation" }).click();
+  await page.getByText(testMedicalFileField).click();
+  await page.getByRole("button", { name: "Ajouter une consultation" }).click();
   await page.getByRole("textbox", { name: "Nom (facultatif)" }).fill("Consult");
   await clickOnEmptyReactSelect(page, "consultation-modal-type", "Médicale");
   await page.getByLabel(testConsultationField).click();
@@ -234,8 +234,8 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("button", { name: "Annuler" }).click();
 
   await page.getByRole("button", { name: "Dossier Médical" }).click();
-  await page.locator(`data-test-id=${testMedicalFileField}`).click();
-  await page.locator("tbody > tr > td:nth-child(5)").click();
+  await page.getByText(testMedicalFileField).click();
+  await page.getByText("- Médicale").click();
   await page.locator(`data-test-id=${testConsultationField}`).click();
 
   await page.getByRole("button", { name: "Annuler" }).click();
@@ -272,8 +272,8 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("button", { name: "Annuler" }).click();
 
   await page.getByRole("button", { name: "Dossier Médical" }).click();
-  await expect(page.locator(`data-test-id=${testMedicalFileField}`)).toBeHidden();
-  await page.locator("tbody > tr > td:nth-child(5)").click();
+  await expect(page.getByText(testMedicalFileField)).toBeHidden();
+  await page.getByText("- Médicale").click();
   await expect(page.locator(`data-test-id=${testConsultationField}`)).toBeHidden();
   await page.getByRole("button", { name: "Annuler" }).click();
 

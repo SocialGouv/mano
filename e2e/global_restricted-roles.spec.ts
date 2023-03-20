@@ -49,18 +49,18 @@ test("test restricted accesses", async ({ page }) => {
 
     await page.getByRole("button", { name: "Dossier Médical" }).click();
 
-    await page.getByRole("button", { name: "🩺 Ajouter une consultation" }).click();
+    await page.getByRole("button", { name: "Ajouter une consultation" }).click();
     await page.getByLabel("Nom").fill(consult1);
     await clickOnEmptyReactSelect(page, "consultation-modal-type", "Médicale");
     await page.getByRole("button", { name: "Sauvegarder" }).click();
 
-    await page.getByRole("button", { name: "🩺 Ajouter une consultation" }).click();
+    await page.getByRole("button", { name: "Ajouter une consultation" }).click();
     await clickOnEmptyReactSelect(page, "consultation-modal-type", "Médicale");
     await page.getByLabel("Nom").fill(consult1visibleByMe);
     await page.getByLabel("Seulement visible par moi").check();
     await page.getByRole("button", { name: "Sauvegarder" }).click();
 
-    await page.getByRole("button", { name: "💊 Ajouter un traitement" }).click();
+    await page.getByRole("button", { name: "Ajouter un traitement" }).click();
     await page.getByPlaceholder("Amoxicilline").fill(treatment1);
     await page.getByPlaceholder("1mg").fill("1");
     await page.getByPlaceholder("1 fois par jour").fill("1");
@@ -102,12 +102,10 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.getByRole("button", { name: "Lieux fréquentés (0)" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Historique" })).toBeVisible();
     await page.getByRole("button", { name: "Dossier Médical" }).click();
-    await expect(page.getByText("Régime Général").nth(1)).toBeVisible();
-    await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${treatment1} 1` }) })).toBeVisible();
-    await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1} Médicale` }) })).toBeVisible();
-    await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1visibleByMe} Médicale` }) })).toBeVisible();
-    await page.locator("tr", { has: page.getByRole("cell", { name: `${consult1visibleByMe} Médicale` }) }).click();
-    await page.getByRole("button", { name: "Annuler" }).click();
+    await expect(page.getByText("Régime Général")).toBeVisible();
+    await expect(page.getByText(`${treatment1} - 1`)).toBeVisible();
+    await expect(page.getByText(consult1)).toBeVisible();
+    await expect(page.getByText(consult1visibleByMe)).toBeVisible();
 
     await expect(page.getByRole("link", { name: "Territoires" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Comptes rendus" })).toBeVisible();
@@ -171,11 +169,11 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.getByRole("button", { name: "Lieux fréquentés (0)" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Historique" })).toBeVisible();
     await page.getByRole("button", { name: "Dossier Médical" }).click();
-    await expect(page.getByText("Régime Général").nth(1)).toBeVisible();
-    await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${treatment1} 1` }) })).toBeVisible();
-    await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1} Médicale` }) })).toBeVisible();
-    await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1visibleByMe} Médicale` }) })).not.toBeVisible();
-    await expect(page.locator("tr.tw-cursor-not-allowed", { has: page.getByText("Seulement visible parUser Admin Test - 1") })).toBeVisible();
+    await expect(page.getByText("Régime Général")).toBeVisible();
+    await expect(page.getByText(`${treatment1} - 1`)).toBeVisible();
+    await expect(page.getByText(consult1)).toBeVisible();
+    await expect(page.getByText(consult1visibleByMe)).not.toBeVisible();
+    await expect(page.getByText("Seulement visible par User Admin Test - 1")).toBeVisible();
     await expect(page.getByRole("link", { name: "Territoires" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Comptes rendus" })).toBeVisible();
 
@@ -357,13 +355,11 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.getByText(`Suivi·e depuis le : ${dayjs().format("DD/MM/YYYY")}`)).toBeVisible();
 
     await page.getByRole("button", { name: "Dossier Médical" }).click();
-    await expect(page.getByText("Régime Général").nth(1)).toBeVisible();
-    await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${treatment1} 1` }) })).toBeVisible();
-    await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1} Médicale` }) })).toBeVisible();
-    await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1visibleByMe} Médicale` }) })).toBeVisible();
-    await expect(page.locator("tr.tw-cursor-not-allowed", { has: page.getByText("Seulement visible parUser Admin Test - 1") })).not.toBeVisible();
-    await page.locator("tr", { has: page.getByRole("cell", { name: `${consult1visibleByMe} Médicale` }) }).click();
-    await page.getByRole("button", { name: "Annuler" }).click();
+    await expect(page.getByText("Régime Général")).toBeVisible();
+    await expect(page.getByText(`${treatment1} - 1`)).toBeVisible();
+    await expect(page.getByText(consult1)).toBeVisible();
+    await expect(page.getByText(consult1visibleByMe)).toBeVisible();
+    await expect(page.getByText("Seulement visible par User Admin Test - 1")).not.toBeVisible();
 
     await page.getByRole("link", { name: "Agenda" }).click();
 
@@ -395,11 +391,11 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.getByText("En rue depuis le : 12/11/2001")).toBeVisible();
 
     await page.getByRole("button", { name: "Dossier Médical" }).click();
-    await expect(page.getByText("Régime Général").nth(1)).toBeVisible();
-    await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${treatment1} 1` }) })).toBeVisible();
-    await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1} Médicale` }) })).toBeVisible();
-    await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1visibleByMe} Médicale` }) })).not.toBeVisible();
-    await expect(page.locator("tr.tw-cursor-not-allowed", { has: page.getByText("Seulement visible parUser Admin Test - 1") })).toBeVisible();
+    await expect(page.getByText("Régime Général")).toBeVisible();
+    await expect(page.getByText(`${treatment1} - 1`)).toBeVisible();
+    await expect(page.getByText(consult1)).toBeVisible();
+    await expect(page.getByText(consult1visibleByMe)).not.toBeVisible();
+    await expect(page.getByText("Seulement visible par User Admin Test - 1")).toBeVisible();
 
     await page.getByRole("link", { name: "Agenda" }).click();
 

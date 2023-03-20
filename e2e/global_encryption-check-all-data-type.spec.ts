@@ -70,12 +70,12 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Rencontre enregistrée").click();
   await page.getByRole("button", { name: "Dossier Médical" }).click();
-  await page.getByRole("button", { name: "🩺 Ajouter une consultation" }).click();
+  await page.getByRole("button", { name: "Ajouter une consultation" }).click();
   await page.getByLabel("Nom (facultatif)").fill("La consultation");
   await page.locator(".consultation-modal-type__input-container").click();
   await page.locator("#react-select-type-option-0").click();
   await page.getByRole("button", { name: "Sauvegarder" }).click();
-  await page.getByRole("button", { name: "💊 Ajouter un traitement" }).click();
+  await page.getByRole("button", { name: "Ajouter un traitement" }).click();
   await page.getByPlaceholder("Amoxicilline").click();
   await page.getByPlaceholder("Amoxicilline").fill("le traitement");
   await page.getByPlaceholder("1mg").click();
@@ -86,14 +86,11 @@ test("test", async ({ page }) => {
   await page.getByPlaceholder("Angine").fill("Rhume");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Traitement créé !").click();
+  await page.getByRole("button", { name: "Éditer les dossier médical" }).click();
   await page.getByLabel("Numéro de sécurité sociale").click();
   await page.getByLabel("Numéro de sécurité sociale").fill("12345");
-  await page
-    .locator('[data-test-id="' + premier + 'Dossier Médical"] div')
-    .filter({ hasText: "Numéro de sécurité socialeLoading...Mettre à jour" })
-    .getByRole("button", { name: "Mettre à jour" })
-    .click();
-  await page.getByText("Mise à jour effectuée !").click();
+  await page.getByRole("button", { name: "Enregistrer" }).click();
+  await page.getByText("Mis à jour !").click();
   await page.getByRole("button", { name: "Lieux fréquentés (0)" }).click();
   await page.getByRole("button", { name: "Fermer" }).click();
   await page.getByRole("button", { name: "Ajouter un lieu" }).click();
@@ -157,12 +154,12 @@ test("test", async ({ page }) => {
   await page.getByRole("link", { name: "Agenda" }).click();
   await page.getByText("La consultation").click();
   await page.getByRole("button", { name: "Annuler" }).click();
-  await page.getByRole("cell", { name: "le traitement Rhume" }).click();
-  await page.getByRole("button", { name: "Close" }).click();
-  await page.getByRole("cell", { name: "La consultation Médicale" }).click();
+  await page.getByText("le traitement - Rhume (1mg - 12 fois)").click();
+  await page.getByRole("button", { name: "Fermer" }).click();
+  await page.getByText("La consultation").click();
   await page.getByRole("button", { name: "Annuler" }).click();
-  await page.getByLabel("Structure de suivi médical").click();
-  await page.getByLabel("Numéro de sécurité sociale").click();
+  await page.getByText("MDEIDAL").click();
+  await page.getByText("12345").click();
   await page.getByRole("button", { name: "Lieux fréquentés (1)" }).click();
   await page.getByRole("button", { name: "Fermer" }).click();
   await page.locator('[data-test-id="test lieu"]').click();

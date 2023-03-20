@@ -225,6 +225,7 @@ export const itemsGroupedByPersonSelector = selector({
       }
       for (const medicalFile of medicalFiles) {
         if (!personsObject[medicalFile.person]) continue;
+        if (personsObject[medicalFile.person].medicalFile) continue;
         personsObject[medicalFile.person].medicalFile = medicalFile;
         if (medicalFile.creatededAt > personsObject[medicalFile.person].lastUpdateCheckForGDPR) {
           personsObject[medicalFile.person].lastUpdateCheckForGDPR = medicalFile.createdAt;

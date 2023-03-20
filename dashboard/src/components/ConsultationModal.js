@@ -303,6 +303,23 @@ export default function ConsultationModal({ onClose, personId, consultation, dat
         <button name="Annuler" type="button" className="button-cancel" onClick={() => onClose()}>
           Annuler
         </button>
+        {!isNewConsultation && (
+          <button
+            type="button"
+            name="cancel"
+            className="button-destructive"
+            onClick={async (e) => {
+              e.stopPropagation();
+              if (!window.confirm('Voulez-vous supprimer cette consultation ?')) return;
+              const response = await API.delete({ path: `/consultation/${consultation._id}` });
+              if (!response.ok) return;
+              setAllConsultations((all) => all.filter((t) => t._id !== consultation._id));
+              toast.success('Consultation supprimée !');
+              onClose();
+            }}>
+            Supprimer
+          </button>
+        )}
         <button type="submit" className="button-submit" form="add-consultation-form">
           Sauvegarder
         </button>
