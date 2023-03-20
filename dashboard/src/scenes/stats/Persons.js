@@ -11,11 +11,12 @@ import { Block } from './Blocks';
 import CustomFieldsStats from './CustomFieldsStats';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../components/tailwind/Modal';
 import { organisationState, teamsState } from '../../recoil/auth';
-import { sortPersons } from '../../recoil/persons';
+import { personFieldsIncludingCustomFieldsSelector, sortPersons } from '../../recoil/persons';
 import TagTeam from '../../components/TagTeam';
 import Table from '../../components/table';
-import { formatDateWithFullMonth } from '../../services/date';
+import { dayjsInstance, formatDateWithFullMonth } from '../../services/date';
 import CustomFieldDisplay from '../../components/CustomFieldDisplay';
+import { utils, writeFile } from 'xlsx';
 
 const PersonStats = ({
   title,
@@ -37,13 +38,15 @@ const PersonStats = ({
     const newSlicefield = filterBase.find((f) => f.field === fieldName);
     setSliceField(newSlicefield);
     setSliceValue(newSlice);
-    setSlicedData(
-      filterData(
-        personConcerned,
-        [{ ...newSlicefield, value: newSlice, type: newSlicefield.field === 'outOfActiveList' ? 'boolean' : newSlicefield.field }],
-        true
-      )
-    );
+    const slicedData =
+      newSlicefield.type === 'boolean'
+        ? personConcerned.filter((p) => (newSlice === 'Non' ? !p[newSlicefield.field] : !!p[newSlicefield.field]))
+        : filterData(
+            personConcerned,
+            [{ ...newSlicefield, value: newSlice, type: newSlicefield.field === 'outOfActiveList' ? 'boolean' : newSlicefield.field }],
+            true
+          );
+    setSlicedData(slicedData);
     setPersonsModalOpened(true);
   };
   return (
@@ -424,6 +427,7 @@ const SelectedPersonsModal = ({ open, onClose, persons, title, onAfterLeave, sli
   const history = useHistory();
   const teams = useRecoilValue(teamsState);
   const organisation = useRecoilValue(organisationState);
+  const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
 
   const [sortBy, setSortBy] = useLocalStorage('person-sortBy', 'name');
   const [sortOrder, setSortOrder] = useLocalStorage('person-sortOrder', 'ASC');
@@ -433,9 +437,44 @@ const SelectedPersonsModal = ({ open, onClose, persons, title, onAfterLeave, sli
 
   if (!sliceField) return null;
 
+  const exportXlsx = () => {
+    const wb = utils.book_new();
+    const ws = utils.json_to_sheet(
+      persons.map((person) => {
+        return {
+          id: person._id,
+          ...personFieldsIncludingCustomFields
+            .filter((person) => !['_id', 'organisation', 'user', 'createdAt', 'updatedAt', 'documents', 'history'].includes(person.name))
+            .reduce((fields, field) => {
+              if (field.name === 'assignedTeams') {
+                fields[field.label] = (person[field.name] || []).map((t) => teams.find((person) => person._id === t)?.name)?.join(', ');
+              } else if (['date', 'date-with-time'].includes(field.type))
+                fields[field.label || field.name] = person[field.name] ? dayjsInstance(person[field.name]).format('YYYY-MM-DD') : '';
+              else if (['boolean'].includes(field.type)) fields[field.label || field.name] = person[field.name] ? 'Oui' : 'Non';
+              else if (['yes-no'].includes(field.type)) fields[field.label || field.name] = person[field.name];
+              else if (Array.isArray(person[field.name])) fields[field.label || field.name] = person[field.name].join(', ');
+              else fields[field.label || field.name] = person[field.name];
+              return fields;
+            }, {}),
+          'Créé le': dayjsInstance(person.createdAt).format('YYYY-MM-DD'),
+          'Mis à jour le': dayjsInstance(person.updatedAt).format('YYYY-MM-DD'),
+        };
+      })
+    );
+    utils.book_append_sheet(wb, ws, 'Personnes suivies');
+    writeFile(wb, `${title}.xlsx`);
+  };
   return (
     <ModalContainer open={open} size="full" onClose={onClose} onAfterLeave={onAfterLeave}>
-      <ModalHeader title={title} />
+      <ModalHeader
+        title={
+          <div className="tw-flex tw-w-full tw-items-center tw-justify-between">
+            {title}{' '}
+            <button onClick={exportXlsx} className="button-submit tw-ml-auto tw-mr-20">
+              Télécharger un export
+            </button>
+          </div>
+        }></ModalHeader>
       <ModalBody>
         <div className="tw-p-4">
           <Table
