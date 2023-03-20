@@ -36,10 +36,10 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
 
   const customFieldsMedicalFileWithLegacyFields = useMemo(() => {
     const c = [...customFieldsMedicalFile];
-    if (flattenedCustomFieldsPersons.find((e) => e.name === 'structureMedical'))
-      c.unshift({ name: 'structureMedical', label: 'Structure de suivi médical', type: 'text', enabled: true });
-    if (flattenedCustomFieldsPersons.find((e) => e.name === 'healthInsurances'))
-      c.unshift({ name: 'healthInsurances', label: 'Couverture(s) médicale(s)', type: 'multi-choice', enabled: true });
+    const structureMedical = flattenedCustomFieldsPersons.find((e) => e.name === 'structureMedical');
+    if (structureMedical) c.unshift(structureMedical);
+    const healthInsurances = flattenedCustomFieldsPersons.find((e) => e.name === 'healthInsurances');
+    if (healthInsurances) c.unshift(healthInsurances);
     return c;
   }, [customFieldsMedicalFile, flattenedCustomFieldsPersons]);
 
@@ -292,13 +292,7 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                             {customFieldsMedicalFileWithLegacyFields
                               .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
                               .map((field) => (
-                                <CustomFieldInput
-                                  model="person"
-                                  values={values}
-                                  handleChange={handleChange}
-                                  field={{ ...field, name: field.name }}
-                                  key={'medicalFile.' + field.name}
-                                />
+                                <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
                               ))}
                           </Row>
                         )}
