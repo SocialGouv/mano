@@ -32,7 +32,7 @@ const View = () => {
 
   return (
     <>
-      <SmallHeaderWithBackButton/>
+      <SmallHeaderWithBackButton />
       <Formik
         initialValues={territory}
         enableReinitialize
@@ -58,7 +58,7 @@ const View = () => {
                 <Col md={6}>
                   <FormGroup>
                     <Label htmlFor="name">Nom</Label>
-                    <Input name="name" id="name" value={values.name} onChange={handleChange} />
+                    <Input name="name" id="name" value={values.name} onChange={handleChange} readOnly={user.role === 'restricted-access'} />
                   </FormGroup>
                 </Col>
 
@@ -76,6 +76,7 @@ const View = () => {
                       getOptionLabel={(i) => i.label}
                       inputId="territory-select-types"
                       classNamePrefix="territory-select-types"
+                      isDisabled={user.role === 'restricted-access'}
                     />
                   </FormGroup>
                 </Col>
@@ -83,35 +84,45 @@ const View = () => {
                 <Col md={6}>
                   <FormGroup>
                     <Label htmlFor="perimeter">Périmètre</Label>
-                    <Input name="perimeter" id="perimeter" value={values.perimeter} onChange={handleChange} />
+                    <Input
+                      name="perimeter"
+                      id="perimeter"
+                      value={values.perimeter}
+                      onChange={handleChange}
+                      readOnly={user.role === 'restricted-access'}
+                    />
                   </FormGroup>
                 </Col>
               </Row>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
-                <DeleteButtonAndConfirmModal
-                  title={`Voulez-vous vraiment supprimer le territoire ${territory.name}`}
-                  textToConfirm={territory.name}
-                  onConfirm={async () => {
-                    const res = await API.delete({ path: `/territory/${id}` });
-                    if (res.ok) {
-                      setTerritories((territories) => territories.filter((t) => t._id !== id));
-                      for (let obs of territoryObservations.filter((o) => o.territory === id)) {
-                        const res = await API.delete({ path: `/territory-observation/${obs._id}` });
+                {!['restricted-access'].includes(user.role) && (
+                  <>
+                    <DeleteButtonAndConfirmModal
+                      title={`Voulez-vous vraiment supprimer le territoire ${territory.name}`}
+                      textToConfirm={territory.name}
+                      onConfirm={async () => {
+                        const res = await API.delete({ path: `/territory/${id}` });
                         if (res.ok) {
-                          setTerritoryObservations((territoryObservations) => territoryObservations.filter((p) => p._id !== obs._id));
+                          setTerritories((territories) => territories.filter((t) => t._id !== id));
+                          for (let obs of territoryObservations.filter((o) => o.territory === id)) {
+                            const res = await API.delete({ path: `/territory-observation/${obs._id}` });
+                            if (res.ok) {
+                              setTerritoryObservations((territoryObservations) => territoryObservations.filter((p) => p._id !== obs._id));
+                            }
+                          }
+                          toast.success('Suppression réussie');
+                          history.goBack();
                         }
-                      }
-                      toast.success('Suppression réussie');
-                      history.goBack();
-                    }
-                  }}>
-                  <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
-                    Cette opération est irréversible
-                    <br />
-                    et entrainera la suppression définitive de toutes les observations liées au territoire.
-                  </span>
-                </DeleteButtonAndConfirmModal>
-                <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} />
+                      }}>
+                      <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
+                        Cette opération est irréversible
+                        <br />
+                        et entrainera la suppression définitive de toutes les observations liées au territoire.
+                      </span>
+                    </DeleteButtonAndConfirmModal>
+                    <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} />
+                  </>
+                )}
               </div>
             </React.Fragment>
           );

@@ -139,13 +139,15 @@ const CreateTerritory = () => {
 
   return (
     <div className="tw-flex tw-w-full tw-justify-end">
-      <ButtonCustom
-        disabled={!currentTeam?._id}
-        onClick={() => setOpen(true)}
-        color="primary"
-        title="Créer un nouveau territoire"
-        padding="12px 24px"
-      />
+      {!['restricted-access'].includes(user.role) && (
+        <ButtonCustom
+          disabled={!currentTeam?._id}
+          onClick={() => setOpen(true)}
+          color="primary"
+          title="Créer un nouveau territoire"
+          padding="12px 24px"
+        />
+      )}
       <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
         <ModalHeader toggle={() => setOpen(false)}>Créer un nouveau territoire</ModalHeader>
         <ModalBody>

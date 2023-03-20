@@ -45,7 +45,7 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
     return response;
   };
 
-  if (['restricted-access'].includes(user.role)) return null;
+  //if (['restricted-access'].includes(user.role)) return null;
 
   return (
     <ModalContainer open={open} onClose={() => setOpen(false)} size="3xl">
@@ -167,10 +167,12 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
                         withMostUsed
                       />
                     </FormGroup>
-                    <FormGroup>
-                      <Label htmlFor="description">Description</Label>
-                      <Input type="textarea" name="description" id="description" value={values.description} onChange={handleChange} />
-                    </FormGroup>
+                    {!['restricted-access'].includes(user.role) && (
+                      <FormGroup>
+                        <Label htmlFor="description">Description</Label>
+                        <Input type="textarea" name="description" id="description" value={values.description} onChange={handleChange} />
+                      </FormGroup>
+                    )}
                     {!!canToggleGroupCheck && (
                       <FormGroup>
                         <Label htmlFor="create-action-for-group">
@@ -259,24 +261,28 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
                   </div>
                 </div>
                 <div>
-                  <FormGroup>
-                    <Label htmlFor="create-comment-description">Commentaire (optionnel)</Label>
-                    <Input id="create-comment-description" type="textarea" name="comment" value={values.comment} onChange={handleChange} />
-                  </FormGroup>
-                  <FormGroup>
-                    <Label htmlFor="create-comment-urgent">
-                      <input
-                        type="checkbox"
-                        id="create-comment-urgent"
-                        style={{ marginRight: '0.5rem' }}
-                        name="commentUrgent"
-                        checked={values.commentUrgent}
-                        onChange={handleChange}
-                      />
-                      Commentaire prioritaire <br />
-                      <small className="text-muted">Ce commentaire sera mise en avant par rapport aux autres</small>
-                    </Label>
-                  </FormGroup>
+                  {!['restricted-access'].includes(user.role) && (
+                    <>
+                      <FormGroup>
+                        <Label htmlFor="create-comment-description">Commentaire (optionnel)</Label>
+                        <Input id="create-comment-description" type="textarea" name="comment" value={values.comment} onChange={handleChange} />
+                      </FormGroup>
+                      <FormGroup>
+                        <Label htmlFor="create-comment-urgent">
+                          <input
+                            type="checkbox"
+                            id="create-comment-urgent"
+                            style={{ marginRight: '0.5rem' }}
+                            name="commentUrgent"
+                            checked={values.commentUrgent}
+                            onChange={handleChange}
+                          />
+                          Commentaire prioritaire <br />
+                          <small className="text-muted">Ce commentaire sera mise en avant par rapport aux autres</small>
+                        </Label>
+                      </FormGroup>
+                    </>
+                  )}
                 </div>
                 <div className="tw-mt-4 tw-flex tw-justify-end">
                   <ButtonCustom

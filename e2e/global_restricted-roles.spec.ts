@@ -269,7 +269,7 @@ test("test restricted accesses", async ({ page }) => {
   await test.step("Restricted user can see not so many things", async () => {
     await expect(page.getByRole("link", { name: "Accueil" })).toBeVisible();
 
-    await expect(page.getByRole("link", { name: "Agenda" })).not.toBeVisible();
+    await expect(page.getByRole("link", { name: "Agenda" })).toBeVisible();
 
     await page.getByRole("link", { name: "Personnes suivies" }).click();
     await expect(page).toHaveURL("http://localhost:8090/person");
@@ -297,7 +297,7 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.getByRole("button", { name: "Lieux fréquentés (0)" })).not.toBeVisible();
     await expect(page.getByRole("button", { name: "Historique" })).not.toBeVisible();
 
-    await expect(page.getByRole("link", { name: "Territoires" })).not.toBeVisible();
+    await expect(page.getByRole("link", { name: "Territoires" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Comptes rendus" })).toBeVisible();
 
     await expect(page.getByRole("link", { name: "Structures" })).not.toBeVisible();
