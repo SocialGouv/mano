@@ -1,3 +1,11 @@
+# [1.259.0](https://github.com/SocialGouv/mano/compare/v1.258.0...v1.259.0) (2023-03-20)
+
+
+### Features
+
+* **dashboard:** nouvelle présentation du dossier médical ([#1407](https://github.com/SocialGouv/mano/issues/1407)) ([76cf6d2](https://github.com/SocialGouv/mano/commit/76cf6d26e18c2a110c92704b0b752b752aade228))
+* **dashboard:** revision des acces user en mode restreint en rapport avec l'atelier de vendredi ([#1406](https://github.com/SocialGouv/mano/issues/1406)) ([80809e4](https://github.com/SocialGouv/mano/commit/80809e478211d883b121b99205d4bb1970e0ece6)), closes [#1412](https://github.com/SocialGouv/mano/issues/1412)
+
 # [1.258.0](https://github.com/SocialGouv/mano/compare/v1.257.1...v1.258.0) (2023-03-20)
 
 
