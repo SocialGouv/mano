@@ -9,7 +9,7 @@ import {
 } from '../../recoil/persons';
 import { customFieldsObsSelector, territoryObservationsState } from '../../recoil/territoryObservations';
 import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
-import { actionsCategoriesSelector, actionsState, DONE, flattenedCategoriesSelector } from '../../recoil/actions';
+import { actionsCategoriesSelector, actionsState, DONE, flattenedActionsCategoriesSelector } from '../../recoil/actions';
 import { reportsState } from '../../recoil/reports';
 import { territoriesState } from '../../recoil/territory';
 import { passagesState } from '../../recoil/passages';
@@ -106,7 +106,7 @@ const Stats = () => {
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
   const personFields = useRecoilValue(personFieldsSelector);
   const territories = useRecoilValue(territoriesState);
-  const allCategories = useRecoilValue(flattenedCategoriesSelector);
+  const allCategories = useRecoilValue(flattenedActionsCategoriesSelector);
   const groupsCategories = useRecoilValue(actionsCategoriesSelector);
 
   const [selectedTerritories, setSelectedTerritories] = useLocalStorage('stats-territories', []);

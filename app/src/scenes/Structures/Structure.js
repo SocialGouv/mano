@@ -9,15 +9,13 @@ import Button from '../../components/Button';
 import API from '../../services/api';
 import ButtonsContainer from '../../components/ButtonsContainer';
 import colors from '../../utils/colors';
-import Label from '../../components/Label';
-import Tags from '../../components/Tags';
 import Spacer from '../../components/Spacer';
 import PinIcon from '../../icons/PinIcon';
 import PhoneIcon from '../../icons/PhoneIcon';
-import { MyText } from '../../components/MyText';
 import { useRecoilState } from 'recoil';
 import { structuresState } from '../../recoil/structures';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
+import StructuresCategoriesModalSelect from '../../components/StructuresCategoriesModalSelect';
 
 const isEven = (value) => {
   if (value % 2 === 0) return true;
@@ -257,15 +255,10 @@ const Structure = ({ navigation, route }) => {
           multiline
           editable={editable}
         />
-        <Label label="Catégories" big={!editable} />
-        <Tags
-          data={categories}
-          onChange={(categories) => {
-            setStructure((s) => ({ ...s, categories }));
-            setCagetoriesUpdated(true);
-          }}
+        <StructuresCategoriesModalSelect
+          onChange={(categories) => setStructure((a) => ({ ...a, categories }))}
+          values={categories}
           editable={editable}
-          renderTag={(name) => <MyText>{name}</MyText>}
         />
         <ButtonsContainer>
           <DeleteButtonAndConfirmModal

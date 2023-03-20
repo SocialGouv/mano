@@ -22,7 +22,14 @@ function serializeOrganisation(organisation) {
     categories: !!organisation.actionsGroupedCategories
       ? organisation.actionsGroupedCategories.reduce((flattenedCategories, group) => [...flattenedCategories, ...group.categories], [])
       : organisation.categories,
+
     actionsGroupedCategories: organisation.actionsGroupedCategories,
+    structuresGroupedCategories: organisation.structuresGroupedCategories || [
+      {
+        groupTitle: "Toutes mes catégories",
+        categories: [],
+      },
+    ],
 
     /* services settings */
     groupedServices: organisation.groupedServices,
