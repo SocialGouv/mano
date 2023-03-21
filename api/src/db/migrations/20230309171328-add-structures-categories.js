@@ -34,7 +34,7 @@ module.exports = {
       ];
 
       await queryInterface.sequelize.query(
-        `UPDATE "mano"."Organisation" SET "structuresGroupedCategories"=:structuresGroupedCategories, "migrations"=:migrations WHERE "_id"=:_id`,
+        `UPDATE "mano"."Organisation" SET "structuresGroupedCategories"=:structuresGroupedCategories WHERE "_id"=:_id`,
         {
           replacements: {
             structuresGroupedCategories: JSON.stringify(groupedCategories),
