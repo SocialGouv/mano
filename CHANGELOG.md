@@ -1,3 +1,10 @@
+# [1.260.0](https://github.com/SocialGouv/mano/compare/v1.259.1...v1.260.0) (2023-03-21)
+
+
+### Features
+
+* **dashboard:** possiblité de télécharger un export des personnes suivies en cliquant sur une part de camembert dans les stats ([#1413](https://github.com/SocialGouv/mano/issues/1413)) ([1772c52](https://github.com/SocialGouv/mano/commit/1772c52a60cb29df9bcb34631909e33fc2642281))
+
 ## [1.259.1](https://github.com/SocialGouv/mano/compare/v1.259.0...v1.259.1) (2023-03-21)
 
 
