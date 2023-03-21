@@ -10,7 +10,7 @@ const { PORT } = require("./config");
 const errors = require("./errors");
 
 const versionCheck = require("./middleware/versionCheck");
-const { SentryInit } = require("./sentry");
+const { SentryInit, capture } = require("./sentry");
 const Sentry = require("@sentry/node");
 
 require("./db/sequelize");
@@ -38,6 +38,11 @@ const now = new Date();
 // kube probe
 app.get("/healthz", async (req, res) => {
   res.send(`Hello World`);
+});
+
+app.get("/sentry-check", async (req, res) => {
+  capture("sentry-check");
+  res.send(`Sentry checked!`);
 });
 
 app.get("/", async (req, res) => {
