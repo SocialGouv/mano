@@ -1,3 +1,10 @@
+## [1.259.1](https://github.com/SocialGouv/mano/compare/v1.259.0...v1.259.1) (2023-03-21)
+
+
+### Bug Fixes
+
+* sentry check ([656a45a](https://github.com/SocialGouv/mano/commit/656a45ae4257da3faa371bb699e0f70d0f0ba289))
+
 # [1.259.0](https://github.com/SocialGouv/mano/compare/v1.258.0...v1.259.0) (2023-03-20)
 
 
