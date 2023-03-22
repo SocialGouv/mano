@@ -1,3 +1,10 @@
+# [1.261.0](https://github.com/SocialGouv/mano/compare/v1.260.1...v1.261.0) (2023-03-22)
+
+
+### Features
+
+* impression du nouveau dossier medical ([#1416](https://github.com/SocialGouv/mano/issues/1416)) ([20ad4cb](https://github.com/SocialGouv/mano/commit/20ad4cbc11592a0f8d78cee485f825dcbb821fee))
+
 ## [1.260.1](https://github.com/SocialGouv/mano/compare/v1.260.0...v1.260.1) (2023-03-21)
 
 
