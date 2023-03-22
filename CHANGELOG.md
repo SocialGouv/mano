@@ -1,3 +1,10 @@
+## [1.261.1](https://github.com/SocialGouv/mano/compare/v1.261.0...v1.261.1) (2023-03-22)
+
+
+### Bug Fixes
+
+* flex 1 design person ([97c7b75](https://github.com/SocialGouv/mano/commit/97c7b757e1ca0ee1c3316ddf777a0e7696069a33))
+
 # [1.261.0](https://github.com/SocialGouv/mano/compare/v1.260.1...v1.261.0) (2023-03-22)
 
 
