@@ -1,6 +1,4 @@
-import { theme } from '../../../config';
 import { dayjsInstance } from '../../../services/date';
-import styled from 'styled-components';
 import React, { useState } from 'react';
 import EditModal from './EditModal';
 import TagTeam from '../../../components/TagTeam';
@@ -9,17 +7,19 @@ import ExclamationMarkButton from '../../../components/tailwind/ExclamationMarkB
 export function InfosMain({ person, isMedicalFile }) {
   const [editModal, setEditModal] = useState(false);
   return (
-    <Container>
+    <div>
       {Boolean(editModal) && <EditModal isMedicalFile={isMedicalFile} person={person} selectedPanel={'main'} onClose={() => setEditModal(false)} />}
-      <div className={isMedicalFile ? 'card !tw-rounded-lg !tw-bg-blue-900' : 'card !tw-rounded-lg !tw-bg-main'} data-test-id={person._id}>
-        <div className="card-body">
-          <div className="person-name [overflow-wrap:anywhere]">
+      <div
+        className={['tw-flex tw-min-h-[350px] tw-items-center !tw-rounded-lg', isMedicalFile ? '!tw-bg-blue-900' : '!tw-bg-main'].join(' ')}
+        data-test-id={person._id}>
+        <div className="tw-p-5 tw-text-center tw-text-white">
+          <div className="tw-border-b tw-border-white tw-pb-2 [overflow-wrap:anywhere]">
             {person.alertness && <ExclamationMarkButton className="tw-mr-2" />}
             <b>{person.name}</b>
             {person.otherNames && <span> ({person.otherNames})</span>}
             <Teams person={person} />
           </div>
-          <div className="person-description">
+          <div className="tw-flex tw-flex-col tw-gap-4 tw-pt-4 tw-text-sm">
             {person.birthdate && (
               <div>
                 <div>
@@ -47,12 +47,23 @@ export function InfosMain({ person, isMedicalFile }) {
               {person.phone}
             </div>
           </div>
-          <button className="rounded px-2 py-1 tw-mt-4 tw-bg-white tw-text-sm tw-text-main" onClick={() => setEditModal(true)}>
-            Modifier
-          </button>
+          <div className="tw-mt-4 tw-flex tw-flex-row tw-items-center tw-justify-center tw-gap-2">
+            {!!isMedicalFile && (
+              <button className="tw-block tw-px-2 tw-py-1 tw-text-sm tw-text-white tw-underline tw-opacity-80" onClick={() => window.print()}>
+                Imprimer
+              </button>
+            )}
+            <button
+              className={['tw-block tw-rounded tw-bg-white tw-px-2 tw-py-1 tw-text-sm', isMedicalFile ? '!tw-text-blue-900' : '!tw-text-main'].join(
+                ' '
+              )}
+              onClick={() => setEditModal(true)}>
+              Modifier
+            </button>
+          </div>
         </div>
       </div>
-    </Container>
+    </div>
   );
 }
 
@@ -63,27 +74,3 @@ const Teams = ({ person: { _id, assignedTeams } }) => (
     ))}
   </div>
 );
-
-const Container = styled.div`
-  .card {
-    min-height: 350px;
-    display: flex;
-    align-items: center;
-    flex-direction: row;
-  }
-  .card-body {
-    color: ${theme.white};
-    text-align: center;
-  }
-  .person-name {
-    border-bottom: solid white 1px;
-    padding-bottom: 0.5rem;
-  }
-  .person-description {
-    padding-top: 1rem;
-    font-size: 14px;
-    row-gap: 1rem;
-    display: flex;
-    flex-direction: column;
-  }
-`;
