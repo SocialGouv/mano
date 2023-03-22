@@ -12,14 +12,14 @@ export function InfosMain({ person, isMedicalFile }) {
       <div
         className={['tw-flex tw-min-h-[350px] tw-items-center !tw-rounded-lg', isMedicalFile ? '!tw-bg-blue-900' : '!tw-bg-main'].join(' ')}
         data-test-id={person._id}>
-        <div className="tw-p-5 tw-text-center tw-text-white">
+        <div className="tw-flex-1 tw-p-5 tw-text-center tw-text-white">
           <div className="tw-border-b tw-border-white tw-pb-2 [overflow-wrap:anywhere]">
             {person.alertness && <ExclamationMarkButton className="tw-mr-2" />}
             <b>{person.name}</b>
             {person.otherNames && <span> ({person.otherNames})</span>}
             <Teams person={person} />
           </div>
-          <div className="tw-flex tw-flex-col tw-gap-4 tw-pt-4 tw-text-sm">
+          <div className="tw-flex tw-flex-col tw-gap-4 tw-pt-4 tw-text-sm ">
             {person.birthdate && (
               <div>
                 <div>
