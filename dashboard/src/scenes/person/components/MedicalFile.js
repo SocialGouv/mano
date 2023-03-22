@@ -11,6 +11,7 @@ import { customFieldsMedicalFileSelector } from '../../../recoil/medicalFiles';
 import { Treatments } from './Treatments';
 import { useMemo } from 'react';
 import PersonDocumentsMedical from './PersonDocumentsMedical';
+import { MedicalFilePrint } from './MedicalFilePrint';
 
 export default function MedicalFile({ person }) {
   const user = useRecoilValue(userState);
@@ -28,7 +29,8 @@ export default function MedicalFile({ person }) {
 
   return (
     <>
-      <div className="tw-grid tw-grid-cols-12 tw-gap-4 tw-pt-4">
+      {!process.env.REACT_APP_TEST_PLAYWRIGHT && <MedicalFilePrint person={person} />}
+      <div className="noprint tw-grid tw-grid-cols-12 tw-gap-4 tw-pt-4">
         <div className="tw-col-span-3">
           <InfosMain person={person} isMedicalFile />
         </div>
@@ -41,7 +43,7 @@ export default function MedicalFile({ person }) {
       </div>
       {!['restricted-access'].includes(user.role) && (
         <>
-          <div className="tw-grid tw-grid-cols-12 tw-gap-4 tw-pt-4">
+          <div className="noprint tw-grid tw-grid-cols-12 tw-gap-4 tw-pt-4">
             <div className="tw-col-span-6 tw-flex tw-min-h-[200px] tw-flex-col tw-gap-4">
               <PersonCustomFields
                 isMedicalFile
@@ -56,7 +58,7 @@ export default function MedicalFile({ person }) {
               <Treatments person={person} />
             </div>
           </div>
-          <div className="tw-mt-4 tw-flex tw-justify-end tw-gap-2">
+          <div className="noprint tw-mt-4 tw-flex tw-justify-end tw-gap-2">
             <MergeTwoPersons person={person} />
             <OutOfActiveList person={person} />
             <DeletePersonButton person={person} />
