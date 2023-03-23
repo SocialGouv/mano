@@ -240,7 +240,7 @@ const Create = ({ onChange }) => {
                       Professionnel·le de santé
                     </Label>
                     <div>
-                      <small className="text-muted">Un professionnel·le de santé à accès au dossier médical complet des personnes.</small>
+                      <small className="text-muted">Un professionnel·le de santé a accès au dossier médical complet des personnes.</small>
                     </div>
                   </Col>
                 )}
