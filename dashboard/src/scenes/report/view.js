@@ -51,7 +51,7 @@ import { useLocalStorage } from 'react-use';
 import useSearchParamState from '../../services/useSearchParamState';
 import { arrayOfitemsGroupedByActionSelector, arrayOfitemsGroupedByConsultationSelector } from '../../recoil/selectors';
 import ConsultationModal from '../../components/ConsultationModal';
-import { addHoursToDate } from '/Users/marionbelorgey/Desktop/MANO/mano/dashboard/src/services/date.js';
+import { addHoursToDate } from '../../services/date.js';
 
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithFullMonth(date)}`;
@@ -979,7 +979,6 @@ const ActionCompletedAt = ({ date, status, actions, setSortOrder, setSortBy, sor
 
   if (!data) return <div />;
 
-  console.log(date);
   const moreThanOne = data.length > 1;
   const dateForSelector = addHoursToDate(date, '12');
   return (
