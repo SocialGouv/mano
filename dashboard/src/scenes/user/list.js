@@ -168,6 +168,7 @@ const Create = ({ onChange }) => {
             initialValues={{ name: '', email: '', role: '', team: [], healthcareProfessional: false }}
             validate={(values) => {
               const errors = {};
+              if (values.role === 'restricted-access' && values.healthcareProfessional) values.healthcareProfessional = false;
               if (!values.name) errors.name = 'Le nom est obligatoire';
               if (!values.email) errors.email = "L'email est obligatoire";
               else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)) errors.email = "L'email est invalide";
@@ -226,25 +227,24 @@ const Create = ({ onChange }) => {
                       </div>
                     </FormGroup>
                   </Col>
-                  {(values.role !== "restricted-access") && (
-                  <Col md={12}>
-                    <Label htmlFor="healthcareProfessional" style={{ marginBottom: 0 }}>
-                      <input
-                        type="checkbox"
-                        style={{ marginRight: '0.5rem' }}
-                        name="healthcareProfessional"
-                        id="healthcareProfessional"
-                        checked={values.healthcareProfessional}
-                        onChange={handleChange}
-                      />
-                      Professionnel·le de santé
-                    </Label>
-                    <div>
-                      <small className="text-muted">Un professionnel·le de santé a accès au dossier médical complet des personnes.</small>
-                    </div>
-                  </Col>
-                )}
-                {(values.role === 'restricted-access' && values.healthcareProfessional ? values.healthcareProfessional = false : null)}
+                  {values.role !== 'restricted-access' && (
+                    <Col md={12}>
+                      <Label htmlFor="healthcareProfessional" style={{ marginBottom: 0 }}>
+                        <input
+                          type="checkbox"
+                          style={{ marginRight: '0.5rem' }}
+                          name="healthcareProfessional"
+                          id="healthcareProfessional"
+                          checked={values.healthcareProfessional}
+                          onChange={handleChange}
+                        />
+                        Professionnel·le de santé
+                      </Label>
+                      <div>
+                        <small className="text-muted">Un professionnel·le de santé a accès au dossier médical complet des personnes.</small>
+                      </div>
+                    </Col>
+                  )}
                 </Row>
                 <br />
                 <Row>
