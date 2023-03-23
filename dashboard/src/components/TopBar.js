@@ -55,7 +55,7 @@ const TopBar = () => {
           />
         </div>
         <div className="tw-flex tw-flex-1 tw-justify-end [&_.dropdown-menu.show]:tw-z-[10000]">
-          {!['restricted-access'].includes(user.role) && <Notification />}
+         <Notification />
           <ButtonDropdown direction="down" isOpen={dropdownOpen} toggle={() => setDropdownOpen(!dropdownOpen)}>
           <RefreshButton/>
             <DropdownToggleStyled>

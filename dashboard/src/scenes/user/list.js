@@ -226,6 +226,7 @@ const Create = ({ onChange }) => {
                       </div>
                     </FormGroup>
                   </Col>
+                  {(values.role !== "restricted-access") && (
                   <Col md={12}>
                     <Label htmlFor="healthcareProfessional" style={{ marginBottom: 0 }}>
                       <input
@@ -242,6 +243,7 @@ const Create = ({ onChange }) => {
                       <small className="text-muted">Un professionnel·le de santé à accès au dossier médical complet des personnes.</small>
                     </div>
                   </Col>
+                )}
                 </Row>
                 <br />
                 <Row>
