@@ -1,91 +1,31 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useDataLoader } from '../../components/DataLoader';
-import { actionsCategoriesSelector, flattenedActionsCategoriesSelector, actionsState, prepareActionForEncryption } from '../../recoil/actions';
-import { organisationState, userState } from '../../recoil/auth';
-import API, { encryptItem } from '../../services/api';
+import { organisationState } from '../../recoil/auth';
+import API from '../../services/api';
 import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from '../../components/tailwind/Modal';
 import { toast } from 'react-toastify';
 import DragAndDropSettings from './DragAndDropSettings';
+import { flattenedStructuresCategoriesSelector, structuresCategoriesSelector } from '../../recoil/structures';
 
-const ActionCategoriesSettings = () => {
+const StructuresCategoriesSettings = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
-  const actionsGroupedCategories = useRecoilValue(actionsCategoriesSelector);
+  const structuresGroupedCategories = useRecoilValue(structuresCategoriesSelector);
   const dataFormatted = useMemo(() => {
-    return actionsGroupedCategories.map(({ groupTitle, categories }) => ({
+    return structuresGroupedCategories.map(({ groupTitle, categories }) => ({
       groupTitle,
       items: categories,
     }));
-  }, [actionsGroupedCategories]);
+  }, [structuresGroupedCategories]);
 
   const { refresh } = useDataLoader();
-
-  const onAddGroup = async (groupTitle) => {
-    const res = await API.put({
-      path: `/organisation/${organisation._id}`,
-      body: { actionsGroupedCategories: [...actionsGroupedCategories, { groupTitle, categories: [] }] },
-    });
-    if (res.ok) {
-      toast.success('Groupe ajouté', { autoclose: 2000 });
-      setOrganisation(res.data);
-    }
-    refresh();
-  };
-
-  const onGroupTitleChange = async (oldGroupTitle, newGroupTitle) => {
-    const newActionsGroupedCategories = actionsGroupedCategories.map((group) => {
-      if (group.groupTitle !== oldGroupTitle) return group;
-      return {
-        ...group,
-        groupTitle: newGroupTitle,
-      };
-    });
-
-    const oldOrganisation = organisation;
-    setOrganisation({ ...organisation, actionsGroupedCategories: newActionsGroupedCategories }); // optimistic UI
-
-    const response = await API.put({
-      path: `/category`,
-      body: {
-        actionsGroupedCategories: newActionsGroupedCategories,
-      },
-    });
-    if (response.ok) {
-      refresh();
-      setOrganisation(response.data);
-      toast.success("Groupe mis à jour. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
-    } else {
-      setOrganisation(oldOrganisation);
-    }
-  };
-
-  const onDeleteGroup = async (groupTitle) => {
-    const newActionsGroupedCategories = actionsGroupedCategories.filter((group) => group.groupTitle !== groupTitle);
-
-    const oldOrganisation = organisation;
-    setOrganisation({ ...organisation, actionsGroupedCategories: newActionsGroupedCategories }); // optimistic UI
-
-    const response = await API.put({
-      path: `/category`,
-      body: {
-        actionsGroupedCategories: newActionsGroupedCategories,
-      },
-    });
-    if (response.ok) {
-      refresh();
-      setOrganisation(response.data);
-      toast.success("Catégorie supprimée. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
-    } else {
-      setOrganisation(oldOrganisation);
-    }
-  };
 
   const onDragAndDrop = useCallback(
     async (newGroups) => {
       newGroups = newGroups.map((group) => ({ groupTitle: group.groupTitle, categories: group.items }));
       const res = await API.put({
         path: `/organisation/${organisation._id}`,
-        body: { actionsGroupedCategories: newGroups },
+        body: { structuresGroupedCategories: newGroups },
       });
       if (res.ok) {
         setOrganisation(res.data);
@@ -97,23 +37,19 @@ const ActionCategoriesSettings = () => {
 
   return (
     <DragAndDropSettings
-      title={<h3 className="tw-mb-0 tw-text-xl tw-font-extrabold">Catégories d'action</h3>}
+      title="Catégories de structures"
       data={dataFormatted}
-      addButtonCaption="Ajouter un groupe"
-      onAddGroup={onAddGroup}
-      onGroupTitleChange={onGroupTitleChange}
       dataItemKey={(cat) => cat}
       ItemComponent={Category}
       NewItemComponent={AddCategory}
-      onDeleteGroup={onDeleteGroup}
       onDragAndDrop={onDragAndDrop}
     />
   );
 };
 
 const AddCategory = ({ groupTitle }) => {
-  const actionsGroupedCategories = useRecoilValue(actionsCategoriesSelector);
-  const flattenedCategories = useRecoilValue(flattenedActionsCategoriesSelector);
+  const structuresGroupedCategories = useRecoilValue(structuresCategoriesSelector);
+  const flattenedCategories = useRecoilValue(flattenedStructuresCategoriesSelector);
 
   const [organisation, setOrganisation] = useRecoilState(organisationState);
 
@@ -122,10 +58,10 @@ const AddCategory = ({ groupTitle }) => {
     const { newCategory } = Object.fromEntries(new FormData(e.target));
     if (!newCategory) return toast.error('Vous devez saisir un nom pour la catégorie');
     if (flattenedCategories.includes(newCategory)) {
-      const existingGroupTitle = actionsGroupedCategories.find(({ categories }) => categories.includes(newCategory)).groupTitle;
+      const existingGroupTitle = structuresGroupedCategories.find(({ categories }) => categories.includes(newCategory)).groupTitle;
       return toast.error(`Cette catégorie existe déjà: ${existingGroupTitle} > ${newCategory}`);
     }
-    const newActionsGroupedCategories = actionsGroupedCategories.map((group) => {
+    const newStructuresGroupedCategories = structuresGroupedCategories.map((group) => {
       if (group.groupTitle !== groupTitle) return group;
       return {
         ...group,
@@ -134,11 +70,11 @@ const AddCategory = ({ groupTitle }) => {
     });
 
     const oldOrganisation = organisation;
-    setOrganisation({ ...organisation, actionsGroupedCategories: newActionsGroupedCategories }); // optimistic UI
+    setOrganisation({ ...organisation, structuresGroupedCategories: newStructuresGroupedCategories }); // optimistic UI
     const response = await API.put({
-      path: `/category`,
+      path: `/organisation/${organisation._id}`,
       body: {
-        actionsGroupedCategories: newActionsGroupedCategories,
+        structuresGroupedCategories: newStructuresGroupedCategories,
       },
     });
     if (response.ok) {
@@ -167,13 +103,11 @@ const AddCategory = ({ groupTitle }) => {
 
 const Category = ({ item: category, groupTitle }) => {
   const [isSelected, setIsSelected] = useState(false);
-  const user = useRecoilValue(userState);
   const [isEditingCategory, setIsEditingCategory] = useState(false);
-  const actions = useRecoilValue(actionsState);
   const [organisation, setOrganisation] = useRecoilState(organisationState);
 
-  const actionsGroupedCategories = useRecoilValue(actionsCategoriesSelector);
-  const flattenedCategories = useRecoilValue(flattenedActionsCategoriesSelector);
+  const structuresGroupedCategories = useRecoilValue(structuresCategoriesSelector);
+  const flattenedCategories = useRecoilValue(flattenedStructuresCategoriesSelector);
   const { refresh } = useDataLoader();
 
   const onEditCategory = async (e) => {
@@ -183,20 +117,11 @@ const Category = ({ item: category, groupTitle }) => {
     if (!newCategory) return toast.error('Vous devez saisir un nom pour la catégorie');
     if (newCategory.trim() === oldCategory.trim()) return toast.error("Le nom de la catégorie n'a pas changé");
     if (flattenedCategories.includes(newCategory)) {
-      const existingGroupTitle = actionsGroupedCategories.find(({ categories }) => categories.includes(newCategory)).groupTitle;
+      const existingGroupTitle = structuresGroupedCategories.find(({ categories }) => categories.includes(newCategory)).groupTitle;
       return toast.error(`Cette catégorie existe déjà: ${existingGroupTitle} > ${newCategory}`);
     }
-    const encryptedActions = await Promise.all(
-      actions
-        .filter((a) => a.categories?.includes(oldCategory))
-        .map((action) => ({
-          ...action,
-          categories: [...new Set(action.categories.map((cat) => (cat === oldCategory ? newCategory.trim() : cat)))],
-        }))
-        .map((action) => prepareActionForEncryption({ ...action, user: action.user || user._id }))
-        .map(encryptItem)
-    );
-    const newActionsGroupedCategories = actionsGroupedCategories.map((group) => {
+
+    const newStructuresGroupedCategories = structuresGroupedCategories.map((group) => {
       if (group.groupTitle !== groupTitle) return group;
       return {
         ...group,
@@ -204,13 +129,14 @@ const Category = ({ item: category, groupTitle }) => {
       };
     });
     const oldOrganisation = organisation;
-    setOrganisation({ ...organisation, actionsGroupedCategories: newActionsGroupedCategories }); // optimistic UI
+    setOrganisation({ ...organisation, structuresGroupedCategories: newStructuresGroupedCategories }); // optimistic UI
 
     const response = await API.put({
-      path: `/category`,
+      path: `/structure/category`,
       body: {
-        actionsGroupedCategories: newActionsGroupedCategories,
-        actions: encryptedActions,
+        structuresGroupedCategories: newStructuresGroupedCategories,
+        newCategory,
+        oldCategory,
       },
     });
     if (response.ok) {
@@ -225,7 +151,7 @@ const Category = ({ item: category, groupTitle }) => {
 
   const onDeleteCategory = async () => {
     if (!window.confirm('Voulez-vous vraiment supprimer cette catégorie ? Cette opération est irréversible')) return;
-    const newActionsGroupedCategories = actionsGroupedCategories.map((group) => {
+    const newStructuresGroupedCategories = structuresGroupedCategories.map((group) => {
       if (group.groupTitle !== groupTitle) return group;
       return {
         ...group,
@@ -233,12 +159,12 @@ const Category = ({ item: category, groupTitle }) => {
       };
     });
     const oldOrganisation = organisation;
-    setOrganisation({ ...organisation, actionsGroupedCategories: newActionsGroupedCategories }); // optimistic UI
+    setOrganisation({ ...organisation, structuresGroupedCategories: newStructuresGroupedCategories }); // optimistic UI
 
     const response = await API.put({
-      path: `/category`,
+      path: `/organisation/${organisation._id}`,
       body: {
-        actionsGroupedCategories: newActionsGroupedCategories,
+        structuresGroupedCategories: newStructuresGroupedCategories,
       },
     });
     if (response.ok) {
@@ -301,4 +227,4 @@ const Category = ({ item: category, groupTitle }) => {
   );
 };
 
-export default ActionCategoriesSettings;
+export default StructuresCategoriesSettings;

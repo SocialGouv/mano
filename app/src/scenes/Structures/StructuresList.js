@@ -46,6 +46,7 @@ const Structures = ({ navigation }) => {
         refreshing={refreshing}
         onRefresh={getStructures}
         estimatedItemSize={80}
+        key={JSON.stringify(structures)}
         data={structures}
         renderItem={renderRow}
         keyExtractor={keyExtractor}

@@ -52,6 +52,8 @@ import useSearchParamState from '../../services/useSearchParamState';
 import { arrayOfitemsGroupedByActionSelector, arrayOfitemsGroupedByConsultationSelector } from '../../recoil/selectors';
 import ConsultationModal from '../../components/ConsultationModal';
 import { addHoursToDate } from '../../services/date.js';
+import CommentModal from '../person/components/CommentModal';
+
 
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithFullMonth(date)}`;
@@ -551,27 +553,28 @@ const View = () => {
                 <hr />
               </>
             )}
+
+            <DrawerLink
+              id="report-button-action-completed"
+              className={activeTab === 'action-completed' ? 'active' : ''}
+              onClick={() => setActiveTab('action-completed')}>
+              Actions complétées ({actionsDone.length})
+            </DrawerLink>
+            <DrawerLink
+              id="report-button-action-created"
+              className={activeTab === 'action-created' ? 'active' : ''}
+              onClick={() => setActiveTab('action-created')}>
+              Actions créées ({actionsCreatedAt.length})
+            </DrawerLink>
+            <DrawerLink
+              id="report-button-action-cancelled"
+              className={activeTab === 'action-cancelled' ? 'active' : ''}
+              onClick={() => setActiveTab('action-cancelled')}>
+              Actions annulées ({actionsCancel.length})
+            </DrawerLink>
+            <hr />
             {!['restricted-access'].includes(user.role) && (
               <>
-                <DrawerLink
-                  id="report-button-action-completed"
-                  className={activeTab === 'action-completed' ? 'active' : ''}
-                  onClick={() => setActiveTab('action-completed')}>
-                  Actions complétées ({actionsDone.length})
-                </DrawerLink>
-                <DrawerLink
-                  id="report-button-action-created"
-                  className={activeTab === 'action-created' ? 'active' : ''}
-                  onClick={() => setActiveTab('action-created')}>
-                  Actions créées ({actionsCreatedAt.length})
-                </DrawerLink>
-                <DrawerLink
-                  id="report-button-action-cancelled"
-                  className={activeTab === 'action-cancelled' ? 'active' : ''}
-                  onClick={() => setActiveTab('action-cancelled')}>
-                  Actions annulées ({actionsCancel.length})
-                </DrawerLink>
-                <hr />
                 <DrawerLink
                   id="report-button-comment-created"
                   className={activeTab === 'comment-created' ? 'active' : ''}
@@ -590,16 +593,14 @@ const View = () => {
               onClick={() => setActiveTab('rencontres')}>
               Rencontres ({rencontres.length})
             </DrawerLink>
-            {!['restricted-access'].includes(user.role) && !!organisation.territoriesEnabled && (
-              <>
-                <hr />
-                <DrawerLink
-                  id="report-button-territory-observations"
-                  className={activeTab === 'territory-observations' ? 'active' : ''}
-                  onClick={() => setActiveTab('territory-observations')}>
-                  Observations ({observations.length})
-                </DrawerLink>
-              </>
+            <hr />
+            {!!organisation.territoriesEnabled && (
+              <DrawerLink
+                id="report-button-territory-observations"
+                className={activeTab === 'territory-observations' ? 'active' : ''}
+                onClick={() => setActiveTab('territory-observations')}>
+                Observations ({observations.length})
+              </DrawerLink>
             )}
             {!['restricted-access'].includes(user.role) && (
               <>
@@ -1205,7 +1206,7 @@ const Consultations = ({ date, status, consultations, setSortOrder, setSortBy, s
   return (
     <>
       <StyledBox>
-        <ButtonCustom title="Ajouter une consultation" className="tw-ml-auto tw-mb-10" onClick={() => setShowModal(true)} />
+        <ButtonCustom title={`Ajouter une consultation faite le ${formatDateWithFullMonth(date)}`} className="tw-ml-auto tw-mb-10" onClick={() => setShowModal(true)} />
         <Table
           className="Table"
           title={`Consultation${moreThanOne ? 's' : ''} ${status === DONE ? 'faite' : 'annulée'}${
@@ -1270,7 +1271,7 @@ const Consultations = ({ date, status, consultations, setSortOrder, setSortBy, s
             },
           ]}
         />
-        {showModal && <ConsultationModal onClose={() => setShowModal(false)} />}
+        {showModal && <ConsultationModal date={date} onClose={() => setShowModal(false)} />}
       </StyledBox>
       <hr />
     </>
@@ -1336,12 +1337,17 @@ const CommentCreatedAt = ({ date, comments }) => {
   const history = useHistory();
   const data = comments;
   const organisation = useRecoilValue(organisationState);
+  const [showModal, setShowModal] = useState(false);
+  const person = useRecoilValue(userState);
 
+  console.log('comments', comments);
+  //console.log('person', person);
   if (!data) return <div />;
 
   return (
     <>
       <StyledBox>
+        <ButtonCustom title="Ajouter un commentaire" className="tw-ml-auto tw-mb-10" onClick={() => setShowModal(true)} />
         <Table
           className="Table"
           title={`Commentaires ajoutés le ${formatDateWithFullMonth(date)}`}
@@ -1377,7 +1383,7 @@ const CommentCreatedAt = ({ date, comments }) => {
             {
               title: 'Heure',
               dataKey: 'date',
-              render: (comment) => <span>{dayjs(comment.date || comment.createdAt).format('HH:mm')}</span>,
+              render: (comment) => <span>{dayjs(comment.date || comment.createdAt).format('D MMM HH:mm')}</span>,
             },
             {
               title: 'Utilisateur',
@@ -1433,6 +1439,7 @@ const CommentCreatedAt = ({ date, comments }) => {
             },
           ]}
         />
+        {showModal && <CommentModal isNewComment={true} person={person} onClose={() => setShowModal(false)} />}
       </StyledBox>
       <hr />
     </>
@@ -1495,7 +1502,7 @@ const PassagesCreatedAt = ({ date, passages }) => {
                 title: 'Heure',
                 dataKey: 'date',
                 render: (passage) => {
-                  const time = dayjs(passage.date).format('HH:mm');
+                  const time = dayjs(passage.date).format('D MMM HH:mm');
                   // anonymous comment migrated from `report.passages`
                   // have no time
                   // have no user assigned either
@@ -1575,7 +1582,7 @@ const RencontresCreatedAt = ({ date, rencontres }) => {
                 title: 'Heure',
                 dataKey: 'date',
                 render: (rencontre) => {
-                  const time = dayjs(rencontre.date).format('HH:mm');
+                  const time = dayjs(rencontre.date).format('D MMM HH:mm');
                   // anonymous comment migrated from `report.rencontres`
                   // have no time
                   // have no user assigned either
@@ -1645,7 +1652,7 @@ const TerritoryObservationsCreatedAt = ({ date, observations }) => {
             {
               title: 'Heure',
               dataKey: 'observedAt',
-              render: (obs) => <span>{dayjs(obs.observedAt || obs.createdAt).format('HH:mm')}</span>,
+              render: (obs) => <span>{dayjs(obs.observedAt || obs.createdAt).format('D MMM HH:mm')}</span>,
             },
             {
               title: 'Utilisateur',
@@ -1696,7 +1703,7 @@ const PersonCreatedAt = ({ date, persons, setSortBy, setSortOrder, sortBy, sortO
               onSortBy: setSortBy,
               sortOrder,
               sortBy,
-              render: (p) => <span>{dayjs(p.createdAt).format('HH:mm')}</span>,
+              render: (p) => <span>{dayjs(p.createdAt).format('D MMM HH:mm')}</span>,
             },
             {
               title: 'Personne (nom)',

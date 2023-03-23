@@ -8,9 +8,10 @@ import ActionOrConsultationName from './ActionOrConsultationName';
 import ActionStatus from './ActionStatus';
 import ExclamationMarkButton from './tailwind/ExclamationMarkButton';
 import PersonName from './PersonName';
-import { organisationState } from '../recoil/auth';
+import { organisationState, userState } from '../recoil/auth';
 import TagTeam from './TagTeam';
 import useSearchParamState from '../services/useSearchParamState';
+import { disableConsultationRow } from '../recoil/consultations';
 
 // TODO: remove inline style when UI is stabilized.
 
@@ -92,6 +93,7 @@ export default function ActionsWeekly({ actions, onCreateAction }) {
 function ActionsOfDay({ actions }) {
   const history = useHistory();
   const organisation = useRecoilValue(organisationState);
+  const user = useRecoilValue(userState);
 
   const sortedActions = [
     // Urgent actions first
@@ -112,6 +114,7 @@ function ActionsOfDay({ actions }) {
           key={action._id}
           onClick={() => {
             if (action.isConsultation) {
+              if (disableConsultationRow(action, user)) return;
               history.push(`/person/${action.person}?tab=Dossier+Médical&consultationId=${action._id}`);
             } else {
               history.push(`/action/${action._id}`);
@@ -120,6 +123,7 @@ function ActionsOfDay({ actions }) {
           className={[
             Boolean(action.isConsultation) ? 'tw-bg-[#DDF4FF99]' : Boolean(action.urgent) ? 'tw-bg-[#fecaca99]' : 'tw-bg-[#fafafa]',
             'tw-flex tw-cursor-pointer tw-flex-col tw-gap-2 tw-rounded-sm tw-border tw-border-gray-300 tw-p-1 tw-text-xs',
+            disableConsultationRow(action, user) ? 'tw-cursor-not-allowed' : '',
           ].join(' ')}>
           {(Boolean(action.isConsultation) || Boolean(action.urgent)) && (
             <div>

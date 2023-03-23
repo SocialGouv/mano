@@ -6,7 +6,9 @@ const { z } = require("zod");
 const { looseUuidRegex } = require("../utils");
 const { catchErrors } = require("../errors");
 const validateUser = require("../middleware/validateUser");
-const { Structure } = require("../db/sequelize");
+const { Structure, sequelize, Organisation } = require("../db/sequelize");
+const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
+const { serializeOrganisation } = require("../utils/data-serializer");
 
 router.post(
   "/",
@@ -107,6 +109,48 @@ router.get(
     const data = await Structure.findOne({ where: { _id, organisation: req.user.organisation } });
     if (!data) return res.status(404).send({ ok: false, error: "Not Found" });
     return res.status(200).send({ ok: true, data });
+  })
+);
+
+router.put(
+  "/category",
+  passport.authenticate("user", { session: false }),
+  validateUser("admin"),
+  validateEncryptionAndMigrations,
+  catchErrors(async (req, res, next) => {
+    try {
+      z.object({
+        structuresGroupedCategories: z.array(
+          z.object({
+            groupTitle: z.string(),
+            categories: z.array(z.string()),
+          })
+        ),
+        oldCategory: z.string(),
+        newCategory: z.string(),
+      }).parse(req.body);
+    } catch (e) {
+      const error = new Error(`Invalid request in category update: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+
+    const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
+    if (!organisation) return res.status(404).send({ ok: false, error: "Not Found" });
+
+    const { oldCategory, newCategory, structuresGroupedCategories = [] } = req.body;
+
+    await sequelize.transaction(async (tx) => {
+      // in every organisation structure, replace the old category with new category
+      await Structure.update(
+        { categories: sequelize.fn("array_replace", sequelize.col("categories"), oldCategory, newCategory) },
+        { where: { organisation: req.user.organisation }, transaction: tx }
+      );
+
+      organisation.set({ structuresGroupedCategories });
+      await organisation.save({ transaction: tx });
+    });
+    return res.status(200).send({ ok: true, data: serializeOrganisation(organisation) });
   })
 );
 

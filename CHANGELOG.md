@@ -1,3 +1,109 @@
+## [1.261.1](https://github.com/SocialGouv/mano/compare/v1.261.0...v1.261.1) (2023-03-22)
+
+
+### Bug Fixes
+
+* flex 1 design person ([97c7b75](https://github.com/SocialGouv/mano/commit/97c7b757e1ca0ee1c3316ddf777a0e7696069a33))
+
+# [1.261.0](https://github.com/SocialGouv/mano/compare/v1.260.1...v1.261.0) (2023-03-22)
+
+
+### Features
+
+* impression du nouveau dossier medical ([#1416](https://github.com/SocialGouv/mano/issues/1416)) ([20ad4cb](https://github.com/SocialGouv/mano/commit/20ad4cbc11592a0f8d78cee485f825dcbb821fee))
+
+## [1.260.1](https://github.com/SocialGouv/mano/compare/v1.260.0...v1.260.1) (2023-03-21)
+
+
+### Bug Fixes
+
+* fix migration ([82679d4](https://github.com/SocialGouv/mano/commit/82679d4347863519af7417901a2611181b28659a))
+
+# [1.260.0](https://github.com/SocialGouv/mano/compare/v1.259.1...v1.260.0) (2023-03-21)
+
+
+### Features
+
+* **dashboard:** possiblité de télécharger un export des personnes suivies en cliquant sur une part de camembert dans les stats ([#1413](https://github.com/SocialGouv/mano/issues/1413)) ([1772c52](https://github.com/SocialGouv/mano/commit/1772c52a60cb29df9bcb34631909e33fc2642281))
+
+## [1.259.1](https://github.com/SocialGouv/mano/compare/v1.259.0...v1.259.1) (2023-03-21)
+
+
+### Bug Fixes
+
+* sentry check ([656a45a](https://github.com/SocialGouv/mano/commit/656a45ae4257da3faa371bb699e0f70d0f0ba289))
+
+# [1.259.0](https://github.com/SocialGouv/mano/compare/v1.258.0...v1.259.0) (2023-03-20)
+
+
+### Features
+
+* **dashboard:** nouvelle présentation du dossier médical ([#1407](https://github.com/SocialGouv/mano/issues/1407)) ([76cf6d2](https://github.com/SocialGouv/mano/commit/76cf6d26e18c2a110c92704b0b752b752aade228))
+* **dashboard:** revision des acces user en mode restreint en rapport avec l'atelier de vendredi ([#1406](https://github.com/SocialGouv/mano/issues/1406)) ([80809e4](https://github.com/SocialGouv/mano/commit/80809e478211d883b121b99205d4bb1970e0ece6)), closes [#1412](https://github.com/SocialGouv/mano/issues/1412)
+
+# [1.258.0](https://github.com/SocialGouv/mano/compare/v1.257.1...v1.258.0) (2023-03-20)
+
+
+### Features
+
+* **dashboard:** gestion des catégories de structures depuis les paramètres de l'organisation ([#1382](https://github.com/SocialGouv/mano/issues/1382)) ([b4bda00](https://github.com/SocialGouv/mano/commit/b4bda0080b7845a495814c9e759cd7ee1b970fc8))
+
+## [1.257.1](https://github.com/SocialGouv/mano/compare/v1.257.0...v1.257.1) (2023-03-20)
+
+
+### Bug Fixes
+
+* **dashboard:** statistiques des maraudes de nuit seules dans leur organisation ([#1401](https://github.com/SocialGouv/mano/issues/1401)) ([9802801](https://github.com/SocialGouv/mano/commit/980280170b29506cce5185b723622bff18946aa4))
+
+# [1.257.0](https://github.com/SocialGouv/mano/compare/v1.256.2...v1.257.0) (2023-03-14)
+
+
+### Features
+
+* **dashboard:** bouton d'ajout de consultations dans les cpte rendu + selecteur dans la modale a la date du compte rendu en cours et non a la date du jour ([#1404](https://github.com/SocialGouv/mano/issues/1404)) ([72e1fa7](https://github.com/SocialGouv/mano/commit/72e1fa782be0282ce1df9de224d4cb8917899359))
+
+## [1.256.2](https://github.com/SocialGouv/mano/compare/v1.256.1...v1.256.2) (2023-03-13)
+
+
+### Bug Fixes
+
+* montre la date dans les comptes-rendus, pour que ce soit plus clair avec les maraudes de nuit ([#1400](https://github.com/SocialGouv/mano/issues/1400)) ([be4897d](https://github.com/SocialGouv/mano/commit/be4897d3a501453153e251dba77cc20b3d4e64a9))
+
+## [1.256.1](https://github.com/SocialGouv/mano/compare/v1.256.0...v1.256.1) (2023-03-13)
+
+
+### Bug Fixes
+
+* tests ([#1398](https://github.com/SocialGouv/mano/issues/1398)) ([f6b65d0](https://github.com/SocialGouv/mano/commit/f6b65d0658eaa796eb18368956a81998e5240e75))
+
+# [1.256.0](https://github.com/SocialGouv/mano/compare/v1.255.5...v1.256.0) (2023-03-10)
+
+
+### Features
+
+* **dashboard:** possibilité d'importer des personnes sorties de file active ([#1399](https://github.com/SocialGouv/mano/issues/1399)) ([88e01ef](https://github.com/SocialGouv/mano/commit/88e01ef3aa14cf0f0e6ba2ba3eafd8f495679de8))
+
+## [1.255.5](https://github.com/SocialGouv/mano/compare/v1.255.4...v1.255.5) (2023-03-10)
+
+
+### Bug Fixes
+
+* User model ([57daf25](https://github.com/SocialGouv/mano/commit/57daf25cccc746a0edc2de6c8038abcf84e21a05))
+
+## [1.255.4](https://github.com/SocialGouv/mano/compare/v1.255.3...v1.255.4) (2023-03-10)
+
+
+### Bug Fixes
+
+* **api:** import hashpassword ([862b396](https://github.com/SocialGouv/mano/commit/862b396ec22b061f025d36f520009cc0854abd54))
+
+## [1.255.3](https://github.com/SocialGouv/mano/compare/v1.255.2...v1.255.3) (2023-03-09)
+
+
+### Bug Fixes
+
+* **dashboard:** seul le user créateur d'une consultation peut cocher 'seulement visible par moi' + click sur consultation désactivée en mode hebdomadaire lorsque non visible par moi ([#1395](https://github.com/SocialGouv/mano/issues/1395)) ([e342f05](https://github.com/SocialGouv/mano/commit/e342f05280d1e30529416db70cea1a1b980485a2))
+
 ## [1.255.2](https://github.com/SocialGouv/mano/compare/v1.255.1...v1.255.2) (2023-03-09)
 
 

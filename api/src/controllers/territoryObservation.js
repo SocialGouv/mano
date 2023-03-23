@@ -12,7 +12,7 @@ const validateUser = require("../middleware/validateUser");
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
-  validateUser(["admin", "normal"]),
+  validateUser(["admin", "normal", "restricted-access"]),
   validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
     try {
@@ -92,7 +92,7 @@ router.get(
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
-  validateUser(["admin", "normal"]),
+  validateUser(["admin", "normal", "restricted-access"]),
   validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
     try {
@@ -142,7 +142,7 @@ router.put(
 router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
-  validateUser(["admin", "normal"]),
+  validateUser(["admin", "normal", "restricted-access"]),
   catchErrors(async (req, res, next) => {
     try {
       z.object({

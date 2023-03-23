@@ -17,7 +17,7 @@ import { toast } from 'react-toastify';
 import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from './tailwind/Modal';
 import SelectPerson from './SelectPerson';
 
-export default function ConsultationModal({ onClose, personId, consultation }) {
+export default function ConsultationModal({ onClose, personId, consultation, date }) {
   const organisation = useRecoilValue(organisationState);
   const team = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
@@ -30,7 +30,7 @@ export default function ConsultationModal({ onClose, personId, consultation }) {
     () =>
       consultation || {
         _id: uuidv4(),
-        dueAt: new Date(),
+        dueAt: date ? new Date(date) : new Date(),
         completedAt: new Date(),
         name: '',
         type: '',
@@ -41,7 +41,7 @@ export default function ConsultationModal({ onClose, personId, consultation }) {
         onlyVisibleBy: [],
         createdAt: new Date(),
       },
-    [organisation._id, personId, user._id, consultation]
+    [organisation._id, personId, user._id, consultation, date]
   );
   const [data, setData] = useState(initialState);
 
@@ -191,24 +191,28 @@ export default function ConsultationModal({ onClose, personId, consultation }) {
                 );
               })}
           </div>
-          <hr />
-          <div>
-            <div>
-              <label htmlFor="create-consultation-onlyme">
-                <input
-                  type="checkbox"
-                  id="create-consultation-onlyme"
-                  style={{ marginRight: '0.5rem' }}
-                  name="onlyVisibleByCreator"
-                  checked={data.onlyVisibleBy?.includes(user._id)}
-                  onChange={() => {
-                    setData({ ...data, onlyVisibleBy: data.onlyVisibleBy?.includes(user._id) ? [] : [user._id] });
-                  }}
-                />
-                Seulement visible par moi
-              </label>
-            </div>
-          </div>
+          {data.user === user._id && (
+            <>
+              <hr />
+              <div>
+                <div>
+                  <label htmlFor="create-consultation-onlyme">
+                    <input
+                      type="checkbox"
+                      id="create-consultation-onlyme"
+                      style={{ marginRight: '0.5rem' }}
+                      name="onlyVisibleByCreator"
+                      checked={data.onlyVisibleBy?.includes(user._id)}
+                      onChange={() => {
+                        setData({ ...data, onlyVisibleBy: data.onlyVisibleBy?.includes(user._id) ? [] : [user._id] });
+                      }}
+                    />
+                    Seulement visible par moi
+                  </label>
+                </div>
+              </div>
+            </>
+          )}
           <hr />
           <div className="-tw-mx-4 tw-flex tw-flex-wrap">
             <div className="tw-basis-1/2 tw-p-4">
@@ -299,6 +303,23 @@ export default function ConsultationModal({ onClose, personId, consultation }) {
         <button name="Annuler" type="button" className="button-cancel" onClick={() => onClose()}>
           Annuler
         </button>
+        {!isNewConsultation && (
+          <button
+            type="button"
+            name="cancel"
+            className="button-destructive"
+            onClick={async (e) => {
+              e.stopPropagation();
+              if (!window.confirm('Voulez-vous supprimer cette consultation ?')) return;
+              const response = await API.delete({ path: `/consultation/${consultation._id}` });
+              if (!response.ok) return;
+              setAllConsultations((all) => all.filter((t) => t._id !== consultation._id));
+              toast.success('Consultation supprimée !');
+              onClose();
+            }}>
+            Supprimer
+          </button>
+        )}
         <button type="submit" className="button-submit" form="add-consultation-form">
           Sauvegarder
         </button>

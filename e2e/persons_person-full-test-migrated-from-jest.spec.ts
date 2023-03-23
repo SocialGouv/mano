@@ -136,18 +136,20 @@ test("test", async ({ page }) => {
   await page.getByText("Rencontre enregistrée").click();
 
   await page.getByRole("button", { name: "Dossier Médical" }).click();
+  await page.getByRole("button", { name: "Modifier" }).click();
   await changeReactSelectValue(page, "person-select-gender", "Homme");
-  await page.getByRole("button", { name: "Mettre à jour" }).first().click();
-  await page.getByText("Mise à jour effectuée !").click();
+  await page.getByRole("button", { name: "Enregistrer" }).first().click();
+  await page.getByText("Mis à jour !").click();
+  await page.getByRole("button", { name: "Modifier" }).click();
+  await page.getByRole("dialog").getByText("Dossier Médical").click();
   await page.getByLabel("Numéro de sécurité sociale").click();
   await page.getByLabel("Numéro de sécurité sociale").fill("082");
-  await page.getByRole("button", { name: "Mettre à jour" }).nth(1).click();
-  await page.getByText("Mise à jour effectuée !").click();
+  await page.getByRole("button", { name: "Enregistrer" }).first().click();
+  await page.getByText("Mis à jour !").click();
 
-  await page.getByRole("button", { name: "💊 Ajouter un traitement" }).click();
+  await page.getByRole("button", { name: "Ajouter un traitement" }).click();
   await page.getByPlaceholder("Amoxicilline").click();
   await page.getByPlaceholder("Amoxicilline").fill("hdeyygdeygde");
-  await page.getByRole("dialog").getByRole("document").locator('div:has-text("Fréquence")').nth(4).click();
   await page.getByPlaceholder("1 fois par jour").click();
   await page.getByPlaceholder("1 fois par jour").fill("dedede");
   await page.getByPlaceholder("Angine").click();
@@ -166,8 +168,8 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Traitement créé !").click();
 
-  await expect(page.locator('small:has-text("dedededed")')).toBeVisible();
-  await page.getByRole("button", { name: "🩺 Ajouter une consultation" }).click();
+  await expect(page.getByText("dedede").first()).toBeVisible();
+  await page.getByRole("button", { name: "Ajouter une consultation" }).click();
   await page.getByLabel("Nom").click();
   await page.getByLabel("Nom").fill("AZAZAZAZAZAZAZAZA");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
@@ -175,7 +177,7 @@ test("test", async ({ page }) => {
   await clickOnEmptyReactSelect(page, "consultation-modal-type", "Médicale");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
 
-  await page.locator('small:has-text("Médicale")').click();
+  await page.getByText("AZAZAZAZAZAZAZAZA").click();
   await page.getByRole("button", { name: "Annuler" }).click();
   await page.getByRole("button", { name: "Lieux fréquentés (0)" }).click();
   await page.getByRole("button", { name: "Fermer" }).click();

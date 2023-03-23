@@ -20,6 +20,7 @@ const {
   Rencontre,
   Territory,
   Report,
+  User,
   TerritoryObservation,
 } = require("../db/sequelize");
 const mailservice = require("../utils/mailservice");
@@ -191,7 +192,6 @@ router.get(
   passport.authenticate("user", { session: false }),
   validateUser("superadmin"),
   catchErrors(async (req, res, next) => {
-    const startLoadingDate = Date.now();
     try {
       z.object({
         withCounters: z.optional(z.enum(["true", "false"])),
@@ -209,8 +209,7 @@ router.get(
       group: ["organisation"],
       attributes: ["organisation", [fn("COUNT", "TagName"), "countByOrg"]],
     };
-    const now = Date.now();
-    console.log("now");
+
     const actions = (await Action.findAll(countQuery)).map((item) => item.toJSON());
     const persons = (await Person.findAll(countQuery)).map((item) => item.toJSON());
     const groups = (await Group.findAll(countQuery)).map((item) => item.toJSON());
@@ -223,8 +222,6 @@ router.get(
     const observations = (await TerritoryObservation.findAll(countQuery)).map((item) => item.toJSON());
     const treatments = (await Treatment.findAll(countQuery)).map((item) => item.toJSON());
     const users = (await User.findAll(countQuery)).map((item) => item.toJSON());
-
-    console.log("counters", Date.now() - now);
 
     const data = organisations
       .map((org) => org.toJSON())
@@ -256,8 +253,6 @@ router.get(
         };
       });
 
-    console.log("end", Date.now() - now);
-
     return res.status(200).send({
       ok: true,
       data,
@@ -268,13 +263,14 @@ router.get(
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
-  validateUser(["admin", "normal"]),
+  validateUser(["admin", "normal", "restricted-access"]),
   catchErrors(async (req, res, next) => {
     try {
       const bodyToParse = {
         name: z.optional(z.string().min(1)),
         categories: z.optional(z.array(z.string().min(1))),
         actionsGroupedCategories: z.optional(z.array(z.object({ groupTitle: z.string(), categories: z.array(z.string().min(1)) }))),
+        structuresGroupedCategories: z.optional(z.array(z.object({ groupTitle: z.string(), categories: z.array(z.string().min(1)) }))),
         groupedServices: z.optional(z.array(z.object({ groupedServices: z.string(), services: z.array(z.string().min(1)) }))),
         collaborations: z.optional(z.array(z.string().min(1))),
         customFieldsObs: z.optional(z.array(customFieldSchema)),
@@ -334,6 +330,7 @@ router.put(
     if (req.body.hasOwnProperty("name")) updateOrg.name = req.body.name;
     if (req.body.hasOwnProperty("categories")) updateOrg.categories = req.body.categories;
     if (req.body.hasOwnProperty("actionsGroupedCategories")) updateOrg.actionsGroupedCategories = req.body.actionsGroupedCategories;
+    if (req.body.hasOwnProperty("structuresGroupedCategories")) updateOrg.structuresGroupedCategories = req.body.structuresGroupedCategories;
     if (req.body.hasOwnProperty("groupedServices")) updateOrg.groupedServices = req.body.groupedServices;
     if (req.body.hasOwnProperty("collaborations")) updateOrg.collaborations = req.body.collaborations;
     if (req.body.hasOwnProperty("customFieldsObs"))

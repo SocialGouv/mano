@@ -27,7 +27,7 @@ const personFields = [
     type: "boolean",
     label: "Sortie de file active",
     encrypted: true,
-    importable: false,
+    importable: true,
     options: ["Oui", "Non"],
     filterable: true,
   },

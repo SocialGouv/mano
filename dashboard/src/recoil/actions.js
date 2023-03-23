@@ -21,8 +21,8 @@ export const actionsCategoriesSelector = selector({
   },
 });
 
-export const flattenedCategoriesSelector = selector({
-  key: 'flattenedCategoriesSelector',
+export const flattenedActionsCategoriesSelector = selector({
+  key: 'flattenedActionsCategoriesSelector',
   get: ({ get }) => {
     const actionsGroupedCategories = get(actionsCategoriesSelector);
     return actionsGroupedCategories.reduce((allCategories, { categories }) => [...allCategories, ...categories], []);

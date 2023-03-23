@@ -42,7 +42,7 @@ const Drawer = () => {
             </NavLink>
           </li>
         )}
-        {['admin', 'normal'].includes(role) && (
+        {['admin', 'normal', 'restricted-access'].includes(role) && (
           <li>
             <NavLink to="/action" activeClassName="active">
               Agenda
@@ -56,7 +56,7 @@ const Drawer = () => {
             </NavLink>
           </li>
         )}
-        {['admin', 'normal'].includes(role) && !!organisation.territoriesEnabled && (
+        {['admin', 'normal', 'restricted-access'].includes(role) && !!organisation.territoriesEnabled && (
           <li>
             <NavLink to="/territory" activeClassName="active">
               Territoires

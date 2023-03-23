@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { organisationState, userState } from '../../../recoil/auth';
-import { CANCEL, DONE, flattenedCategoriesSelector, mappedIdsToLabels } from '../../../recoil/actions';
+import { CANCEL, DONE, flattenedActionsCategoriesSelector, mappedIdsToLabels } from '../../../recoil/actions';
 import { filteredPersonActionsSelector } from '../selectors/selectors';
 import { useHistory } from 'react-router-dom';
 import CreateActionModal from '../../../components/CreateActionModal';
@@ -12,6 +12,8 @@ import TagTeam from '../../../components/TagTeam';
 import ActionOrConsultationName from '../../../components/ActionOrConsultationName';
 import { formatDateWithNameOfDay, formatTime } from '../../../services/date';
 import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from '../../../components/tailwind/Modal';
+import { AgendaMutedIcon } from './AgendaMutedIcon';
+import { FullScreenIcon } from './FullScreenIcon';
 
 export const Actions = ({ person }) => {
   const data = person?.actions || [];
@@ -25,7 +27,7 @@ export const Actions = ({ person }) => {
     <>
       <div className="tw-relative">
         <div className="tw-sticky tw-top-0 tw-flex tw-bg-white tw-p-3">
-          <h4 className="tw-flex-1">Actions {filteredData.length ? `(${filteredData.length})` : ''}</h4>
+          <h4 className="tw-flex-1 tw-text-xl">Actions {filteredData.length ? `(${filteredData.length})` : ''}</h4>
           <div className="flex-col tw-flex tw-items-center tw-gap-2">
             <button
               aria-label="Ajouter une action"
@@ -35,13 +37,7 @@ export const Actions = ({ person }) => {
             </button>
             {Boolean(filteredData.length) && (
               <button className="tw-h-6 tw-w-6 tw-rounded-full tw-text-main tw-transition hover:tw-scale-125" onClick={() => setFullScreen(true)}>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-                  <path
-                    fillRule="evenodd"
-                    d="M15 3.75a.75.75 0 01.75-.75h4.5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0V5.56l-3.97 3.97a.75.75 0 11-1.06-1.06l3.97-3.97h-2.69a.75.75 0 01-.75-.75zm-12 0A.75.75 0 013.75 3h4.5a.75.75 0 010 1.5H5.56l3.97 3.97a.75.75 0 01-1.06 1.06L4.5 5.56v2.69a.75.75 0 01-1.5 0v-4.5zm11.47 11.78a.75.75 0 111.06-1.06l3.97 3.97v-2.69a.75.75 0 011.5 0v4.5a.75.75 0 01-.75.75h-4.5a.75.75 0 010-1.5h2.69l-3.97-3.97zm-4.94-1.06a.75.75 0 010 1.06L5.56 19.5h2.69a.75.75 0 010 1.5h-4.5a.75.75 0 01-.75-.75v-4.5a.75.75 0 011.5 0v2.69l3.97-3.97a.75.75 0 011.06 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
+                <FullScreenIcon />
               </button>
             )}
           </div>
@@ -87,7 +83,7 @@ export const Actions = ({ person }) => {
 };
 
 const ActionsFilters = ({ data, filteredData, setFilterCategories, setFilterStatus, filterStatus, filterCategories }) => {
-  const categories = useRecoilValue(flattenedCategoriesSelector);
+  const categories = useRecoilValue(flattenedActionsCategoriesSelector);
 
   const catsSelect = ['-- Aucune --', ...(categories || [])];
 
@@ -126,25 +122,7 @@ const ActionsFilters = ({ data, filteredData, setFilterCategories, setFilterStat
         </div>
       ) : (
         <div className="tw-mt-8 tw-w-full tw-text-center tw-text-gray-300">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="tw-mx-auto tw-mb-2 tw-h-16 tw-w-16 tw-text-gray-200"
-            width={24}
-            height={24}
-            viewBox="0 0 24 24"
-            strokeWidth="2"
-            stroke="currentColor"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-            <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4"></path>
-            <circle cx={18} cy={18} r={4}></circle>
-            <path d="M15 3v4"></path>
-            <path d="M7 3v4"></path>
-            <path d="M3 11h16"></path>
-            <path d="M18 16.496v1.504l1 1"></path>
-          </svg>
+          <AgendaMutedIcon />
           Aucune action pour le moment
         </div>
       )}
@@ -169,7 +147,6 @@ const ActionsTable = ({ filteredData }) => {
                 <div
                   className={['restricted-access'].includes(user.role) ? 'tw-cursor-not-allowed tw-py-2' : 'tw-cursor-pointer tw-py-2'}
                   onClick={() => {
-                    if (['restricted-access'].includes(user.role)) return;
                     history.push(`/action/${action._id}`);
                   }}>
                   <div className="tw-flex">
@@ -182,16 +159,12 @@ const ActionsTable = ({ filteredData }) => {
                   </div>
                   <div className="tw-mt-2 tw-flex">
                     <div className="tw-flex tw-flex-1 tw-flex-row tw-items-center">
-                      {!['restricted-access'].includes(user.role) && (
-                        <>
-                          {!!organisation.groupsEnabled && !!action.group && (
-                            <span className="tw-mr-2 tw-text-xl" aria-label="Action familiale" title="Action familiale">
-                              👪
-                            </span>
-                          )}
-                          <ActionOrConsultationName item={action} />
-                        </>
+                      {!!organisation.groupsEnabled && !!action.group && (
+                        <span className="tw-mr-2 tw-text-xl" aria-label="Action familiale" title="Action familiale">
+                          👪
+                        </span>
                       )}
+                      <ActionOrConsultationName item={action} />
                     </div>
                     <div className="tw-flex tw-flex-col tw-gap-px">
                       {Array.isArray(action?.teams) ? action.teams.map((e) => <TagTeam key={e} teamId={e} />) : <TagTeam teamId={action?.team} />}
