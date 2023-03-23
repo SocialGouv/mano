@@ -244,6 +244,7 @@ const Create = ({ onChange }) => {
                     </div>
                   </Col>
                 )}
+                {(values.role === 'restricted-access' && values.healthcareProfessional ? values.healthcareProfessional = false : null)}
                 </Row>
                 <br />
                 <Row>
