@@ -1,3 +1,10 @@
+## [1.261.3](https://github.com/SocialGouv/mano/compare/v1.261.2...v1.261.3) (2023-03-24)
+
+
+### Bug Fixes
+
+* **dashboard:** possibilité d'ouvrir une consulation depuis la list plein écran ([#1423](https://github.com/SocialGouv/mano/issues/1423)) ([f8c79d8](https://github.com/SocialGouv/mano/commit/f8c79d8a49b6956cd32f09f306c45640330bc8aa))
+
 ## [1.261.2](https://github.com/SocialGouv/mano/compare/v1.261.1...v1.261.2) (2023-03-24)
 
 
