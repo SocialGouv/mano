@@ -1,3 +1,10 @@
+## [1.261.2](https://github.com/SocialGouv/mano/compare/v1.261.1...v1.261.2) (2023-03-24)
+
+
+### Bug Fixes
+
+* bug de disparition de fichiers ([#1421](https://github.com/SocialGouv/mano/issues/1421)) ([37e5fb2](https://github.com/SocialGouv/mano/commit/37e5fb2f4fd717874fc607a7ec8fdc142d08cc47))
+
 ## [1.261.1](https://github.com/SocialGouv/mano/compare/v1.261.0...v1.261.1) (2023-03-22)
 
 
