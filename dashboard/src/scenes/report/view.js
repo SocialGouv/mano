@@ -51,7 +51,6 @@ import { useLocalStorage } from 'react-use';
 import useSearchParamState from '../../services/useSearchParamState';
 import { arrayOfitemsGroupedByActionSelector, arrayOfitemsGroupedByConsultationSelector } from '../../recoil/selectors';
 import ConsultationModal from '../../components/ConsultationModal';
-import { addHoursToDate } from '../../services/date.js';
 import CommentModal from '../person/components/CommentModal';
 
 
