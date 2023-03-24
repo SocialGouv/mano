@@ -625,9 +625,9 @@ router.put(
     if (email) user.email = sanitizeAll(email.trim().toLowerCase());
 
     if (healthcareProfessional !== undefined) user.set({ healthcareProfessional });
+    if (role) user.set({ role });
     if (role === "restricted-access") {
       user.set({ healthcareProfessional: false });
-      if (role) user.set({ role });
     }
     const tx = await User.sequelize.transaction();
     if (team && Array.isArray(team)) {
@@ -637,7 +637,7 @@ router.put(
         { transaction: tx }
       );
     }
-    console.log("***** put 641 ***** ");
+
     await user.save({ transaction: tx });
     await tx.commit();
 
@@ -673,7 +673,7 @@ router.delete(
       error.status = 400;
       return next(error);
     }
-    console.log("***** put 677 ***** ");
+
     const userId = req.params._id;
     const query = { where: { _id: userId, organisation: req.user.organisation } };
 

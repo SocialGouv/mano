@@ -168,6 +168,7 @@ const Create = ({ onChange }) => {
             initialValues={{ name: '', email: '', role: '', team: [], healthcareProfessional: false }}
             validate={(values) => {
               const errors = {};
+              if (values.role === 'restricted-access') values.healthcareProfessional = false;
               if (!values.name) errors.name = 'Le nom est obligatoire';
               if (!values.email) errors.email = "L'email est obligatoire";
               else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)) errors.email = "L'email est invalide";
