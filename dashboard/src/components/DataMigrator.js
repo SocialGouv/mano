@@ -319,6 +319,44 @@ export default function useDataMigrator() {
           migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
         }
       }
+      if (!organisation.migrations?.includes('retrieve-docs-from-persons-backup')) {
+        setLoadingText(LOADING_TEXT);
+        const personRes = await API.get({
+          path: '/person',
+          query: { organisation: organisationId, after: 0, withDeleted: false },
+        });
+        const personBackupRes = await API.get({
+          path: '/person-backup',
+          query: { organisation: organisationId, after: 0, withDeleted: false },
+        });
+        const personBackupWithDocuments = (personBackupRes.decryptedData || []).filter((e) => e.documents?.length);
+        const personsThatNeedToBeUpdated = (personRes.decryptedData || []).filter((e) => {
+          const personBackup = personBackupWithDocuments.find((pb) => pb._id === e._id);
+          if (!personBackup) return false;
+          if (e.documents?.length) return false;
+          return true;
+        });
+
+        const personsToUpdate = personsThatNeedToBeUpdated.map((person) => {
+          const personBackup = personBackupWithDocuments.find((pb) => pb._id === person._id);
+          if (!personBackup) return person;
+          return {
+            ...person,
+            documents: personBackup.documents,
+          };
+        });
+
+        const encryptedPersonsToMigrate = await Promise.all(personsToUpdate.map(preparePersonForEncryption).map(encryptItem));
+        const response = await API.put({
+          path: `/migration/retrieve-docs-from-persons-backup`,
+          body: { personsToUpdate: encryptedPersonsToMigrate },
+          query: { migrationLastUpdateAt },
+        });
+        if (response.ok) {
+          setOrganisation(response.organisation);
+          migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
+        }
+      }
     },
   };
 }

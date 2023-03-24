@@ -295,6 +295,29 @@ router.put(
           }
         }
 
+        if (req.params.migrationName === "retrieve-docs-from-persons-backup") {
+          try {
+            z.array(
+              z.object({
+                _id: z.string().regex(looseUuidRegex),
+                encrypted: z.string(),
+                encryptedEntityKey: z.string(),
+              })
+            ).parse(req.body.personsToUpdate);
+          } catch (e) {
+            const error = new Error(`Invalid request in retrieve-docs-from-persons-backup: ${e}`);
+            error.status = 400;
+            throw error;
+          }
+          for (const { _id, encrypted, encryptedEntityKey } of req.body.personsToUpdate) {
+            const person = await Person.findOne({ where: { _id, organisation: req.user.organisation }, transaction: tx });
+            if (person) {
+              person.set({ encrypted, encryptedEntityKey });
+              await person.save();
+            }
+          }
+        }
+
         organisation.set({
           migrations: [...(organisation.migrations || []), req.params.migrationName],
           migrating: false,
