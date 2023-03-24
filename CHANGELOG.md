@@ -1,3 +1,10 @@
+## [1.261.4](https://github.com/SocialGouv/mano/compare/v1.261.3...v1.261.4) (2023-03-24)
+
+
+### Bug Fixes
+
+* supression des documents non médicaux du dossier des personnes suivies ([#1422](https://github.com/SocialGouv/mano/issues/1422)) ([6105aeb](https://github.com/SocialGouv/mano/commit/6105aebd70407c3dba3034963e6a62a33fc5dce2))
+
 ## [1.261.3](https://github.com/SocialGouv/mano/compare/v1.261.2...v1.261.3) (2023-03-24)
 
 
