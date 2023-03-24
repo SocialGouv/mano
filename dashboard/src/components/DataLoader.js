@@ -149,7 +149,6 @@ export default function DataLoader() {
             if (stats.groups) newList.push('group');
             if (stats.consultations) newList.push('consultation');
             if (['admin', 'normal'].includes(user.role)) {
-              if (stats.consultations) newList.push('consultation');
               if (stats.treatments) newList.push('treatment');
               if (stats.medicalFiles) newList.push('medicalFile');
             }
