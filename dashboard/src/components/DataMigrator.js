@@ -288,20 +288,26 @@ export default function useDataMigrator() {
           path: '/medical-file',
           query: { organisation: organisationId, after: 0, withDeleted: false },
         });
-        const personsToUpdate = (personRes.decryptedData || []).map((_person) => {
-          if (!_person.documents?.length) return _person;
-          const medicalFile = medicalFileRes.decryptedData.find((mf) => mf.person === _person._id);
-          if (!medicalFile) return _person;
-          const medicalFileDocuments = medicalFile.documents || [];
+        const personsToUpdate = (personRes.decryptedData || [])
+          .filter((_person) => {
+            if (!_person.documents?.length) return false;
+            const medicalFile = medicalFileRes.decryptedData.find((mf) => mf.person === _person._id);
+            if (!medicalFile) return false;
+            return true;
+          })
+          .map((_person) => {
+            const medicalFile = medicalFileRes.decryptedData.find((mf) => mf.person === _person._id);
+            if (!medicalFile) return _person;
+            const medicalFileDocuments = medicalFile.documents || [];
 
-          return {
-            ..._person,
-            documents: _person.documents.filter((_doc) => {
-              if (medicalFileDocuments.find((_medicalDoc) => _medicalDoc._id === _doc._id)) return false;
-              return true;
-            }),
-          };
-        });
+            return {
+              ..._person,
+              documents: _person.documents.filter((_doc) => {
+                if (medicalFileDocuments.find((_medicalDoc) => _medicalDoc._id === _doc._id)) return false;
+                return true;
+              }),
+            };
+          });
         const encryptedPersonsToMigrate = await Promise.all(personsToUpdate.map(preparePersonForEncryption).map(encryptItem));
         const response = await API.put({
           path: `/migration/remove-medical-docs-from-persons`,
