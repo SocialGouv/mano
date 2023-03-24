@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Formik } from 'formik';
-import { addOneDay, formatDateWithFullMonth, formatDateWithNameOfDay, formatTime, getIsDayWithinHoursOffsetOfPeriod } from '../../services/date';
+import { addOneDay, addHoursToDate, formatDateWithFullMonth, formatDateWithNameOfDay, formatTime, getIsDayWithinHoursOffsetOfPeriod } from '../../services/date';
 import DateBloc from '../../components/DateBloc';
 import { HeaderStyled, Title as HeaderTitle } from '../../components/header';
 import BackButton, { BackButtonWrapper } from '../../components/backButton';
