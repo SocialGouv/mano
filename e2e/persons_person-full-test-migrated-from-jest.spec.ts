@@ -144,7 +144,7 @@ test("test", async ({ page }) => {
   await page.getByRole("dialog").getByText("Dossier Médical").click();
   await page.getByLabel("Numéro de sécurité sociale").click();
   await page.getByLabel("Numéro de sécurité sociale").fill("082");
-  await page.getByRole("button", { name: "Enregistrer" }).first().click();
+  await page.getByRole("button", { name: "Enregistrer" }).nth(1).click();
   await page.getByText("Mis à jour !").click();
 
   await page.getByRole("button", { name: "Ajouter un traitement" }).click();
