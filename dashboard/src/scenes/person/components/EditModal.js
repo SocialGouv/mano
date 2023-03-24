@@ -52,7 +52,7 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
       <ModalBody>
         <Formik
           enableReinitialize
-          initialValues={{ ...person, ...medicalFile }}
+          initialValues={person}
           onSubmit={async (body) => {
             if (!body.name?.trim()?.length) return toast.error('Une personne doit avoir un nom');
             if (!body.followedSince) body.followedSince = person.createdAt;
@@ -87,25 +87,6 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                 })
               );
 
-              // Medical file
-              if (isMedicalFile) {
-                const bodyMedicalFile = body;
-
-                const mfResponse = await API.put({
-                  path: `/medical-file/${medicalFile._id}`,
-                  body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({ ...medicalFile, ...bodyMedicalFile }),
-                });
-                if (mfResponse.ok) {
-                  setAllMedicalFiles((medicalFiles) =>
-                    medicalFiles.map((m) => {
-                      if (m._id === medicalFile._id) return mfResponse.decryptedData;
-                      return m;
-                    })
-                  );
-                } else {
-                  toast.error("Les données médicales n'ont pas été enregistrées");
-                }
-              }
               toast.success('Mis à jour !');
               onClose();
             } else {
@@ -130,113 +111,127 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                       <div>{!openPanels.includes('main') ? '+' : '-'}</div>
                     </div>
                     {openPanels.includes('main') && (
-                      <Row>
-                        <Col md={4}>
-                          <FormGroup>
-                            <Label htmlFor="name">Nom prénom ou Pseudonyme</Label>
-                            <Input name="name" id="name" value={values.name || ''} onChange={handleChange} />
-                          </FormGroup>
-                        </Col>
-                        <Col md={4}>
-                          <FormGroup>
-                            <Label htmlFor="otherNames">Autres pseudos</Label>
-                            <Input name="otherNames" id="otherNames" value={values.otherNames || ''} onChange={handleChange} />
-                          </FormGroup>
-                        </Col>
-                        <Col md={4}>
-                          <Label htmlFor="person-select-gender">Genre</Label>
-                          <SelectAsInput
-                            options={personFields.find((f) => f.name === 'gender').options}
-                            name="gender"
-                            value={values.gender || ''}
-                            onChange={handleChange}
-                            inputId="person-select-gender"
-                            classNamePrefix="person-select-gender"
-                          />
-                        </Col>
-
-                        <Col md={4}>
-                          <FormGroup>
-                            <Label htmlFor="person-birthdate">Date de naissance</Label>
-                            <div>
-                              <DatePicker name="birthdate" id="person-birthdate" defaultValue={values.birthdate} onChange={handleChange} />
-                            </div>
-                          </FormGroup>
-                        </Col>
-                        <Col md={4}>
-                          <FormGroup>
-                            <Label htmlFor="person-wanderingAt">En rue depuis le</Label>
-                            <div>
-                              <DatePicker name="wanderingAt" id="person-wanderingAt" defaultValue={values.wanderingAt} onChange={handleChange} />
-                            </div>
-                          </FormGroup>
-                        </Col>
-                        <Col md={4}>
-                          <FormGroup>
-                            <Label htmlFor="person-followedSince">Suivi(e) depuis le / Créé(e) le</Label>
-                            <div>
-                              <DatePicker
-                                id="person-followedSince"
-                                name="followedSince"
-                                defaultValue={values.followedSince || values.createdAt}
-                                onChange={handleChange}
-                              />
-                            </div>
-                          </FormGroup>
-                        </Col>
-                        <Col md={8}>
-                          <FormGroup>
-                            <Label htmlFor="person-select-assigned-team">Équipe(s) en charge</Label>
-                            <div>
-                              <SelectTeamMultiple
-                                onChange={(teamIds) => handleChange({ target: { value: teamIds, name: 'assignedTeams' } })}
-                                value={values.assignedTeams}
-                                colored
-                                inputId="person-select-assigned-team"
-                                classNamePrefix="person-select-assigned-team"
-                              />
-                            </div>
-                          </FormGroup>
-                        </Col>
-                        <Col md={4}>
-                          <FormGroup>
-                            <Label htmlFor="phone">Téléphone</Label>
-                            <Input name="phone" id="phone" value={values.phone || ''} onChange={handleChange} />
-                          </FormGroup>
-                        </Col>
-                        {!['restricted-access'].includes(user.role) && (
-                          <Col md={12}>
+                      <>
+                        <Row>
+                          <Col md={4}>
                             <FormGroup>
-                              <Label htmlFor="description">Description</Label>
-                              <Input
-                                type="textarea"
-                                className="!tw-text-sm"
-                                rows={5}
-                                name="description"
-                                id="description"
-                                value={values.description || ''}
-                                onChange={handleChange}
-                              />
+                              <Label htmlFor="name">Nom prénom ou Pseudonyme</Label>
+                              <Input name="name" id="name" value={values.name || ''} onChange={handleChange} />
                             </FormGroup>
                           </Col>
+                          <Col md={4}>
+                            <FormGroup>
+                              <Label htmlFor="otherNames">Autres pseudos</Label>
+                              <Input name="otherNames" id="otherNames" value={values.otherNames || ''} onChange={handleChange} />
+                            </FormGroup>
+                          </Col>
+                          <Col md={4}>
+                            <Label htmlFor="person-select-gender">Genre</Label>
+                            <SelectAsInput
+                              options={personFields.find((f) => f.name === 'gender').options}
+                              name="gender"
+                              value={values.gender || ''}
+                              onChange={handleChange}
+                              inputId="person-select-gender"
+                              classNamePrefix="person-select-gender"
+                            />
+                          </Col>
+
+                          <Col md={4}>
+                            <FormGroup>
+                              <Label htmlFor="person-birthdate">Date de naissance</Label>
+                              <div>
+                                <DatePicker name="birthdate" id="person-birthdate" defaultValue={values.birthdate} onChange={handleChange} />
+                              </div>
+                            </FormGroup>
+                          </Col>
+                          <Col md={4}>
+                            <FormGroup>
+                              <Label htmlFor="person-wanderingAt">En rue depuis le</Label>
+                              <div>
+                                <DatePicker name="wanderingAt" id="person-wanderingAt" defaultValue={values.wanderingAt} onChange={handleChange} />
+                              </div>
+                            </FormGroup>
+                          </Col>
+                          <Col md={4}>
+                            <FormGroup>
+                              <Label htmlFor="person-followedSince">Suivi(e) depuis le / Créé(e) le</Label>
+                              <div>
+                                <DatePicker
+                                  id="person-followedSince"
+                                  name="followedSince"
+                                  defaultValue={values.followedSince || values.createdAt}
+                                  onChange={handleChange}
+                                />
+                              </div>
+                            </FormGroup>
+                          </Col>
+                          <Col md={8}>
+                            <FormGroup>
+                              <Label htmlFor="person-select-assigned-team">Équipe(s) en charge</Label>
+                              <div>
+                                <SelectTeamMultiple
+                                  onChange={(teamIds) => handleChange({ target: { value: teamIds, name: 'assignedTeams' } })}
+                                  value={values.assignedTeams}
+                                  colored
+                                  inputId="person-select-assigned-team"
+                                  classNamePrefix="person-select-assigned-team"
+                                />
+                              </div>
+                            </FormGroup>
+                          </Col>
+                          <Col md={4}>
+                            <FormGroup>
+                              <Label htmlFor="phone">Téléphone</Label>
+                              <Input name="phone" id="phone" value={values.phone || ''} onChange={handleChange} />
+                            </FormGroup>
+                          </Col>
+                          {!['restricted-access'].includes(user.role) && (
+                            <Col md={12}>
+                              <FormGroup>
+                                <Label htmlFor="description">Description</Label>
+                                <Input
+                                  type="textarea"
+                                  className="!tw-text-sm"
+                                  rows={5}
+                                  name="description"
+                                  id="description"
+                                  value={values.description || ''}
+                                  onChange={handleChange}
+                                />
+                              </FormGroup>
+                            </Col>
+                          )}
+                          <Col md={12}>
+                            <FormGroup>
+                              <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20 }}>
+                                <label htmlFor="person-alertness-checkbox">
+                                  Personne très vulnérable, ou ayant besoin d'une attention particulière
+                                </label>
+                                <Input
+                                  id="person-alertness-checkbox"
+                                  type="checkbox"
+                                  name="alertness"
+                                  checked={values.alertness}
+                                  onChange={() => handleChange({ target: { value: !values.alertness, name: 'alertness' } })}
+                                />
+                              </div>
+                            </FormGroup>
+                          </Col>
+                        </Row>
+                        {isMedicalFile && (
+                          <div className="tw-flex tw-w-full tw-items-end tw-justify-end tw-gap-2">
+                            <ButtonCustom disabled={isSubmitting} color="secondary" onClick={onClose} title="Annuler" />
+                            <ButtonCustom
+                              disabled={isSubmitting || JSON.stringify(person) === JSON.stringify(values)}
+                              color="primary"
+                              type="submit"
+                              onClick={handleSubmit}
+                              title="Enregistrer"
+                            />
+                          </div>
                         )}
-                        <Col md={12}>
-                          <FormGroup>
-                            <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20 }}>
-                              <label htmlFor="person-alertness-checkbox">
-                                Personne très vulnérable, ou ayant besoin d'une attention particulière
-                              </label>
-                              <Input
-                                id="person-alertness-checkbox"
-                                type="checkbox"
-                                name="alertness"
-                                checked={values.alertness}
-                                onChange={() => handleChange({ target: { value: !values.alertness, name: 'alertness' } })}
-                              />
-                            </div>
-                          </FormGroup>
-                        </Col>
-                      </Row>
+                      </>
                     )}
                   </div>
                   {!isMedicalFile &&
@@ -271,23 +266,69 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                         </div>
                       );
                     })}
-                  {isMedicalFile && (
-                    <div key={'Dossier Médical'}>
-                      <div
-                        className="tw-mb-4 tw-flex tw-cursor-pointer tw-border-b tw-pb-2 tw-text-lg tw-font-semibold"
-                        onClick={() => {
-                          if (openPanels.includes('Dossier Médical')) {
-                            setOpenPanels(openPanels.filter((p) => p !== 'Dossier Médical'));
-                          } else {
-                            setOpenPanels([...openPanels, 'Dossier Médical']);
-                          }
-                        }}>
-                        <div className="tw-flex-1">Dossier Médical</div>
-                        <div>{!openPanels.includes('Dossier Médical') ? '+' : '-'}</div>
-                      </div>
+                </div>
+                {!isMedicalFile && (
+                  <div className="tw-flex tw-items-end tw-justify-end tw-gap-2">
+                    <ButtonCustom disabled={isSubmitting} color="secondary" onClick={onClose} title="Annuler" />
+                    <ButtonCustom
+                      disabled={isSubmitting || JSON.stringify(person) === JSON.stringify(values)}
+                      color="primary"
+                      type="submit"
+                      onClick={handleSubmit}
+                      title="Enregistrer"
+                    />
+                  </div>
+                )}
+              </>
+            );
+          }}
+        </Formik>
+        {isMedicalFile && (
+          <Formik
+            enableReinitialize
+            initialValues={medicalFile}
+            onSubmit={async (body) => {
+              body.entityKey = medicalFile.entityKey;
 
-                      <div className="[overflow-wrap:anywhere]">
-                        {openPanels.includes('Dossier Médical') && (
+              const bodyMedicalFile = body;
+
+              const mfResponse = await API.put({
+                path: `/medical-file/${medicalFile._id}`,
+                body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({ ...medicalFile, ...bodyMedicalFile }),
+              });
+              if (mfResponse.ok) {
+                setAllMedicalFiles((medicalFiles) =>
+                  medicalFiles.map((m) => {
+                    if (m._id === medicalFile._id) return mfResponse.decryptedData;
+                    return m;
+                  })
+                );
+                toast.success('Mis à jour !');
+                onClose();
+              } else {
+                toast.error("Les données médicales n'ont pas été enregistrées");
+              }
+            }}>
+            {({ values, handleChange, handleSubmit, isSubmitting, setFieldValue }) => {
+              return (
+                <>
+                  <div key={'Dossier Médical'}>
+                    <div
+                      className="tw-mb-4 tw-flex tw-cursor-pointer tw-border-b tw-pb-2 tw-text-lg tw-font-semibold"
+                      onClick={() => {
+                        if (openPanels.includes('Dossier Médical')) {
+                          setOpenPanels(openPanels.filter((p) => p !== 'Dossier Médical'));
+                        } else {
+                          setOpenPanels([...openPanels, 'Dossier Médical']);
+                        }
+                      }}>
+                      <div className="tw-flex-1">Dossier Médical</div>
+                      <div>{!openPanels.includes('Dossier Médical') ? '+' : '-'}</div>
+                    </div>
+
+                    <div className="[overflow-wrap:anywhere]">
+                      {openPanels.includes('Dossier Médical') && (
+                        <>
                           <Row>
                             {customFieldsMedicalFileWithLegacyFields
                               .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
@@ -295,25 +336,25 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                                 <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
                               ))}
                           </Row>
-                        )}
-                      </div>
+                          <div className="tw-flex tw-items-end tw-justify-end tw-gap-2">
+                            <ButtonCustom disabled={isSubmitting} color="secondary" onClick={onClose} title="Annuler" />
+                            <ButtonCustom
+                              disabled={isSubmitting || JSON.stringify(person) === JSON.stringify(values)}
+                              color="primary"
+                              type="submit"
+                              onClick={handleSubmit}
+                              title="Enregistrer"
+                            />
+                          </div>
+                        </>
+                      )}
                     </div>
-                  )}
-                </div>
-                <div className="tw-flex tw-items-end tw-justify-end tw-gap-2">
-                  <ButtonCustom disabled={isSubmitting} color="secondary" onClick={onClose} title="Annuler" />
-                  <ButtonCustom
-                    disabled={isSubmitting || JSON.stringify(person) === JSON.stringify(values)}
-                    color="primary"
-                    type="submit"
-                    onClick={handleSubmit}
-                    title="Enregistrer"
-                  />
-                </div>
-              </>
-            );
-          }}
-        </Formik>
+                  </div>
+                </>
+              );
+            }}
+          </Formik>
+        )}
       </ModalBody>
     </Modal>
   );

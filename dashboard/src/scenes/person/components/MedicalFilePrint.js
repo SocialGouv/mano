@@ -11,7 +11,6 @@ import { medicalFileState, customFieldsMedicalFileSelector } from '../../../reco
 import { useLocalStorage } from 'react-use';
 
 export function MedicalFilePrint({ person }) {
-  console.log('MedicalFilePrint', person);
   const organisation = useRecoilValue(organisationState);
   const allConsultations = useRecoilValue(arrayOfitemsGroupedByConsultationSelector);
   const allTreatments = useRecoilValue(treatmentsState);
