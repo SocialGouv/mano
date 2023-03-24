@@ -65,7 +65,7 @@ export const Consultations = ({ person }) => {
           setConsultationStatuses={setConsultationStatuses}
           consultationStatuses={consultationStatuses}
         />
-        <ModalContainer open={!!fullScreen} className="" size="full" onClose={() => setFullScreen(false)}>
+        <ModalContainer open={!!fullScreen} size="full" onClose={() => setFullScreen(false)}>
           <ModalHeader title={`Consultations de  ${person?.name} (${filteredData.length})`}>
             <div className="tw-mt-2 tw-w-full tw-max-w-2xl">
               <ConsultationsFilters
@@ -79,7 +79,7 @@ export const Consultations = ({ person }) => {
             </div>
           </ModalHeader>
           <ModalBody>
-            <ConsultationsTable filteredData={filteredData} person={person} />
+            <ConsultationsTable filteredData={filteredData} person={person} setCurrentConsultationId={setCurrentConsultationId} />
           </ModalBody>
           <ModalFooter>
             <button type="button" name="cancel" className="button-cancel" onClick={() => setFullScreen(false)}>
