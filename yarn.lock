@@ -2,13 +2,15 @@
 # yarn lockfile v1
 
 
-"@playwright/test@1.29.1":
-  version "1.29.1"
-  resolved "https://registry.yarnpkg.com/@playwright/test/-/test-1.29.1.tgz#f2ed4dc143b9c7825a7ad2703b2f1ac4354e1145"
-  integrity sha512-iQxk2DX5U9wOGV3+/Jh9OHPsw5H3mleUL2S4BgQuwtlAfK3PnKvn38m4Rg9zIViGHVW24opSm99HQm/UFLEy6w==
+"@playwright/test@1.32.1":
+  version "1.32.1"
+  resolved "https://registry.yarnpkg.com/@playwright/test/-/test-1.32.1.tgz#749c9791adb048c266277a39ba0f7e33fe593ffe"
+  integrity sha512-FTwjCuhlm1qHUGf4hWjfr64UMJD/z0hXYbk+O387Ioe6WdyZQ+0TBDAc6P+pHjx2xCv1VYNgrKbYrNixFWy4Dg==
   dependencies:
     "@types/node" "*"
-    playwright-core "1.29.1"
+    playwright-core "1.32.1"
+  optionalDependencies:
+    fsevents "2.3.2"
 
 "@types/node@*":
   version "18.11.4"
@@ -169,6 +171,11 @@ form-data@~2.3.2:
     asynckit "^0.4.0"
     combined-stream "^1.0.6"
     mime-types "^2.1.12"
+
+fsevents@2.3.2:
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/fsevents/-/fsevents-2.3.2.tgz#8a526f78b8fdf4623b709e0b975c52c24c02fd1a"
+  integrity sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==
 
 getpass@^0.1.1:
   version "0.1.7"
@@ -349,10 +356,10 @@ pgpass@1.x:
   dependencies:
     split2 "^4.1.0"
 
-playwright-core@1.29.1:
-  version "1.29.1"
-  resolved "https://registry.yarnpkg.com/playwright-core/-/playwright-core-1.29.1.tgz#9ec15d61c4bd2f386ddf6ce010db53a030345a47"
-  integrity sha512-20Ai3d+lMkWpI9YZYlxk8gxatfgax5STW8GaMozAHwigLiyiKQrdkt7gaoT9UQR8FIVDg6qVXs9IoZUQrDjIIg==
+playwright-core@1.32.1:
+  version "1.32.1"
+  resolved "https://registry.yarnpkg.com/playwright-core/-/playwright-core-1.32.1.tgz#5a10c32403323b07d75ea428ebeed866a80b76a1"
+  integrity sha512-KZYUQC10mXD2Am1rGlidaalNGYk3LU1vZqqNk0gT4XPty1jOqgup8KDP8l2CUlqoNKhXM5IfGjWgW37xvGllBA==
 
 postgres-array@~2.0.0:
   version "2.0.0"
