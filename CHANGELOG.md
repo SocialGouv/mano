@@ -1,3 +1,10 @@
+## [1.261.8](https://github.com/SocialGouv/mano/compare/v1.261.7...v1.261.8) (2023-03-27)
+
+
+### Bug Fixes
+
+* ne pas utiliser updatedAt pour les stats de personnes suivies ([#1431](https://github.com/SocialGouv/mano/issues/1431)) ([69b5673](https://github.com/SocialGouv/mano/commit/69b5673de98d2778927ce0e570db57de31235173))
+
 ## [1.261.7](https://github.com/SocialGouv/mano/compare/v1.261.6...v1.261.7) (2023-03-27)
 
 
