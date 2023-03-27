@@ -1,3 +1,10 @@
+## [1.261.7](https://github.com/SocialGouv/mano/compare/v1.261.6...v1.261.7) (2023-03-27)
+
+
+### Bug Fixes
+
+* night shift offset ([#1432](https://github.com/SocialGouv/mano/issues/1432)) ([a5b1ad0](https://github.com/SocialGouv/mano/commit/a5b1ad0bd71b55fa5dd0cb002965d9ddfa712437))
+
 ## [1.261.6](https://github.com/SocialGouv/mano/compare/v1.261.5...v1.261.6) (2023-03-27)
 
 
