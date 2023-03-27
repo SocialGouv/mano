@@ -38,6 +38,7 @@ import ReportsStats from './Reports';
 import ConsultationsStats from './Consultations';
 import MedicalFilesStats from './MedicalFiles';
 import ButtonCustom from '../../components/ButtonCustom';
+import dayjs from 'dayjs';
 
 const tabs = [
   'Général',
@@ -136,6 +137,7 @@ const Stats = () => {
     }
     return teamsIdsObject;
   }, [selectedTeams]);
+
   console.log('4', Date.now() - now);
   const teamsOffsetHours = useMemo(() => {
     const teamsIdsObject = {};
@@ -144,6 +146,12 @@ const Stats = () => {
     }
     return teamsIdsObject;
   }, [teams]);
+  const allSelectedTeamsAreNightShift = useMemo(() => {
+    for (const team of selectedTeams) {
+      if (!team.nightSession) return false;
+    }
+    return true;
+  }, [selectedTeams]);
   console.log('5', Date.now() - now);
   useTitle(`${activeTab} - Statistiques`);
   console.log('6', Date.now() - now);
@@ -199,16 +207,16 @@ const Stats = () => {
       },
       (personsFilteredByFiltersToBeFitleredByPeriod) => {
         console.log('9.1', Date.now() - now);
+        const offsetHours = allSelectedTeamsAreNightShift ? 12 : 0;
+        const startDate = dayjs(period.startDate).startOf('day').add(offsetHours, 'hour').toISOString();
+        const endDate = dayjs(period.endDate).startOf('day').add(1, 'day').add(offsetHours, 'hour').toISOString();
+
         const res = personsFilteredByFiltersToBeFitleredByPeriod.filter((_person) => {
-          const params = [{ referenceStartDay: period.startDate, referenceEndDay: period.endDate }, false];
-          // console.log((_person.assignedTeams || []).every((teamId) => teamsOffsetHours[teamId] === 12));
           if (!_person) return false;
           for (const date of _person.interactions) {
-            if (date < period.startDate) continue;
-            if (date > period.endDate) continue;
+            if (date < startDate) continue;
+            if (date > endDate) continue;
             return true;
-            // const isDayWithinHoursOffsetOfPeriod = getIsDayWithinHoursOffsetOfPeriod(date, ...params);
-            // if (isDayWithinHoursOffsetOfPeriod) return true;
           }
           return false;
         });
