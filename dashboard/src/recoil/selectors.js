@@ -112,18 +112,11 @@ export const itemsGroupedByPersonSelector = selector({
         formattedBirthDate: formatBirthDate(person.birthdate),
         age: formatAge(person.birthdate),
         interactions: [person.followedSince || person.createdAt],
-        interactionsObject: {
-          [person.followedSince || person.createdAt]: true,
-        },
         lastUpdateCheckForGDPR: person.followedSince || person.createdAt,
       };
       if (!person.history?.length) continue;
       for (const historyEntry of person.history) {
         personsObject[person._id].interactions.push(historyEntry.date);
-        personsObject[person._id].interactionsObject[historyEntry.date] = true;
-        if (historyEntry.date > personsObject[person._id].lastUpdateCheckForGDPR) {
-          personsObject[person._id].lastUpdateCheckForGDPR = historyEntry.date;
-        }
       }
     }
     const actions = Object.values(get(actionsWithCommentsSelector));
@@ -147,7 +140,6 @@ export const itemsGroupedByPersonSelector = selector({
       if (!person.documents?.length) continue;
       for (const document of person.documents) {
         personsObject[person._id].interactions.push(document.createdAt);
-        personsObject[person._id].interactionsObject[document.createdAt] = true;
         if (!document.group) continue;
         for (const personIdInGroup of personsObject[person._id].group.persons) {
           if (personIdInGroup === person._id) continue;
@@ -167,18 +159,6 @@ export const itemsGroupedByPersonSelector = selector({
       personsObject[action.person].interactions.push(action.dueAt);
       personsObject[action.person].interactions.push(action.createdAt);
       personsObject[action.person].interactions.push(action.completedAt);
-      personsObject[action.person].interactionsObject[action.dueAt] = true;
-      personsObject[action.person].interactionsObject[action.createdAt] = true;
-      personsObject[action.person].interactionsObject[action.completedAt] = true;
-      if (action.dueAt > personsObject[action.person].lastUpdateCheckForGDPR) {
-        personsObject[action.person].lastUpdateCheckForGDPR = action.dueAt;
-      }
-      if (action.createdAt > personsObject[action.person].lastUpdateCheckForGDPR) {
-        personsObject[action.person].lastUpdateCheckForGDPR = action.createdAt;
-      }
-      if (action.completedAt > personsObject[action.person].lastUpdateCheckForGDPR) {
-        personsObject[action.person].lastUpdateCheckForGDPR = action.completedAt;
-      }
       if (!!action.group) {
         const group = personsObject[action.person].group;
         if (!group) continue;
@@ -195,10 +175,6 @@ export const itemsGroupedByPersonSelector = selector({
       personsObject[comment.person].comments = personsObject[comment.person].comments || [];
       personsObject[comment.person].comments.push(comment);
       personsObject[comment.person].interactions.push(comment.date || comment.createdAt);
-      personsObject[comment.person].interactionsObject[comment.date || comment.createdAt] = true;
-      if ((comment.date || comment.createdAt) > personsObject[comment.person].lastUpdateCheckForGDPR) {
-        personsObject[comment.person].lastUpdateCheckForGDPR = comment.date || comment.createdAt;
-      }
       if (!!comment.group) {
         const group = personsObject[comment.person].group;
         if (!group) continue;
@@ -219,10 +195,6 @@ export const itemsGroupedByPersonSelector = selector({
       personsObject[relPersonPlace.person].relsPersonPlace = personsObject[relPersonPlace.person].relsPersonPlace || [];
       personsObject[relPersonPlace.person].relsPersonPlace.push(relPersonPlace);
       personsObject[relPersonPlace.person].interactions.push(relPersonPlace.createdAt);
-      personsObject[relPersonPlace.person].interactionsObject[relPersonPlace.createdAt] = true;
-      if (relPersonPlace.createdAt > personsObject[relPersonPlace.person].lastUpdateCheckForGDPR) {
-        personsObject[relPersonPlace.person].lastUpdateCheckForGDPR = relPersonPlace.createdAt;
-      }
     }
     if (user.healthcareProfessional) {
       for (const consultation of consultations) {
@@ -233,38 +205,18 @@ export const itemsGroupedByPersonSelector = selector({
         personsObject[consultation.person].interactions.push(consultation.dueAt);
         personsObject[consultation.person].interactions.push(consultation.createdAt);
         personsObject[consultation.person].interactions.push(consultation.completedAt);
-        personsObject[consultation.person].interactionsObject[consultation.dueAt] = true;
-        personsObject[consultation.person].interactionsObject[consultation.createdAt] = true;
-        personsObject[consultation.person].interactionsObject[consultation.completedAt] = true;
-        if (consultation.dueAt > personsObject[consultation.person].lastUpdateCheckForGDPR) {
-          personsObject[consultation.person].lastUpdateCheckForGDPR = consultation.dueAt;
-        }
-        if (consultation.createdAt > personsObject[consultation.person].lastUpdateCheckForGDPR) {
-          personsObject[consultation.person].lastUpdateCheckForGDPR = consultation.createdAt;
-        }
-        if (consultation.completedAt > personsObject[consultation.person].lastUpdateCheckForGDPR) {
-          personsObject[consultation.person].lastUpdateCheckForGDPR = consultation.completedAt;
-        }
       }
       for (const treatment of treatments) {
         if (!personsObject[treatment.person]) continue;
         personsObject[treatment.person].treatments = personsObject[treatment.person].treatments || [];
         personsObject[treatment.person].treatments.push(treatment);
         personsObject[treatment.person].interactions.push(treatment.createdAt);
-        personsObject[treatment.person].interactionsObject[treatment.createdAt] = true;
-        if (treatment.createdAt > personsObject[treatment.person].lastUpdateCheckForGDPR) {
-          personsObject[treatment.person].lastUpdateCheckForGDPR = treatment.createdAt;
-        }
       }
       for (const medicalFile of medicalFiles) {
         if (!personsObject[medicalFile.person]) continue;
         if (personsObject[medicalFile.person].medicalFile) continue;
         personsObject[medicalFile.person].medicalFile = medicalFile;
         personsObject[medicalFile.person].interactions.push(medicalFile.createdAt);
-        personsObject[medicalFile.person].interactionsObject[medicalFile.createdAt] = true;
-        if (medicalFile.createdAt > personsObject[medicalFile.person].lastUpdateCheckForGDPR) {
-          personsObject[medicalFile.person].lastUpdateCheckForGDPR = medicalFile.createdAt;
-        }
       }
     }
     for (const passage of passages) {
@@ -272,20 +224,12 @@ export const itemsGroupedByPersonSelector = selector({
       personsObject[passage.person].passages = personsObject[passage.person].passages || [];
       personsObject[passage.person].passages.push(passage);
       personsObject[passage.person].interactions.push(passage.date || passage.createdAt);
-      personsObject[passage.person].interactionsObject[passage.date || passage.createdAt] = true;
-      if ((passage.date || passage.createdAt) > personsObject[passage.person].lastUpdateCheckForGDPR) {
-        personsObject[passage.person].lastUpdateCheckForGDPR = passage.date || passage.createdAt;
-      }
     }
     for (const rencontre of rencontres) {
       if (!personsObject[rencontre.person]) continue;
       personsObject[rencontre.person].rencontres = personsObject[rencontre.person].rencontres || [];
       personsObject[rencontre.person].rencontres.push(rencontre);
       personsObject[rencontre.person].interactions.push(rencontre.date || rencontre.createdAt);
-      personsObject[rencontre.person].interactionsObject[rencontre.date || rencontre.createdAt] = true;
-      if ((rencontre.date || rencontre.createdAt) > personsObject[rencontre.person].lastUpdateCheckForGDPR) {
-        personsObject[rencontre.person].lastUpdateCheckForGDPR = rencontre.date || rencontre.createdAt;
-      }
     }
 
     for (const personId of Object.keys(personsObject)) {
