@@ -106,14 +106,19 @@ export const itemsGroupedByPersonSelector = selector({
     const user = get(userState);
     const usersObject = get(usersObjectSelector);
     for (const person of persons) {
+      console.log(typeof person.followedSince);
       personsObject[person._id] = {
         ...person,
         userPopulated: usersObject[person.user],
-        lastUpdateCheckForGDPR: person.createdAt,
+        lastUpdateCheckForGDPR: person.followedSince || person.createdAt,
         formattedBirthDate: formatBirthDate(person.birthdate),
         age: formatAge(person.birthdate),
+        interactions: [person.followedSince],
       };
       if (!person.history?.length) continue;
+      for (const historyEntry of person.history) {
+        person.interactions.push(historyEntry.date);
+      }
       personsObject[person._id].lastUpdateCheckForGDPR = person.history[person.history.length - 1].date;
     }
     const actions = Object.values(get(actionsWithCommentsSelector));
