@@ -333,16 +333,17 @@ export default function useDataMigrator() {
         const personsThatNeedToBeUpdated = (personRes.decryptedData || []).filter((e) => {
           const personBackup = personBackupWithDocuments.find((pb) => pb._id === e._id);
           if (!personBackup) return false;
-          if (e.documents?.length) return false;
           return true;
         });
 
         const personsToUpdate = personsThatNeedToBeUpdated.map((person) => {
           const personBackup = personBackupWithDocuments.find((pb) => pb._id === person._id);
           if (!personBackup) return person;
+          const backupDocuments = personBackup.documents || [];
+          const personDocuments = (person.documents || []).filter((doc) => !backupDocuments.find((bd) => bd._id === doc._id));
           return {
             ...person,
-            documents: personBackup.documents,
+            documents: [...backupDocuments, ...personDocuments],
           };
         });
 
