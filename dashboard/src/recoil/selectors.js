@@ -370,3 +370,29 @@ export const onlyFilledObservationsTerritories = selector({
     });
   },
 });
+
+export const populatedPassagesSelector = selector({
+  key: 'populatedPassagesSelector',
+  get: ({ get }) => {
+    const passages = get(passagesState);
+    const allPersonsAsObject = get(itemsGroupedByPersonSelector);
+    return passages.map((passage) => ({
+      ...passage,
+      type: !!passage.person ? 'Non-anonyme' : 'Anonyme',
+      gender: !passage.person ? null : allPersonsAsObject[passage.person]?.gender || 'Non renseigné',
+    }));
+  },
+});
+
+export const populatedRencontresSelector = selector({
+  key: 'populatedRencontresSelector',
+  get: ({ get }) => {
+    const rencontres = get(rencontresState);
+    const allPersonsAsObject = get(itemsGroupedByPersonSelector);
+    return rencontres.map((rencontre) => ({
+      ...rencontre,
+      type: 'Rencontres',
+      gender: !rencontre.person ? null : allPersonsAsObject[rencontre.person]?.gender || 'Non renseigné',
+    }));
+  },
+});

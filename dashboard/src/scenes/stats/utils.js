@@ -1,11 +1,10 @@
+import dayjs from 'dayjs';
 import { filterData } from '../../components/Filters';
-import { getIsDayWithinHoursOffsetOfPeriod } from '../../services/date';
 
 export const getDataForPeriod = (
   data,
   { startDate, endDate },
-  teamsOffsetHours,
-  { filters = [], field = 'createdAt', backupField = 'createdAt', teamField = null } = {},
+  { filters = [], field = 'createdAt', backupField = 'createdAt', allSelectedTeamsAreNightSession } = {},
   callback = null
 ) => {
   if (!!filters?.filter((f) => Boolean(f?.value)).length) data = filterData(data, filters);
@@ -16,19 +15,17 @@ export const getDataForPeriod = (
   if (callback) {
     return callback(data);
   }
+
+  const offsetHours = allSelectedTeamsAreNightSession ? 12 : 0;
+
+  const isoStartDate = dayjs(startDate).startOf('day').add(offsetHours, 'hour').toISOString();
+  const isoEndDate = dayjs(endDate).startOf('day').add(1, 'day').add(offsetHours, 'hour').toISOString();
+
   return data.filter((item) => {
-    const offsetHours = !teamField
-      ? 0
-      : Array.isArray(item[teamField])
-      ? item[teamField].every((teamId) => teamsOffsetHours[teamId] === 12)
-        ? 12
-        : 0
-      : teamsOffsetHours[item[teamField]];
-    return getIsDayWithinHoursOffsetOfPeriod(
-      item[field] || item[backupField] || item.createdAt,
-      { referenceStartDay: startDate, referenceEndDay: endDate },
-      offsetHours
-    );
+    const date = item[field] || item[backupField] || item.createdAt;
+    if (date < isoStartDate) return false;
+    if (date > isoEndDate) return false;
+    return true;
   });
 };
 
