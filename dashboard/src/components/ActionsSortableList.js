@@ -14,7 +14,7 @@ import useTitle from '../services/useTitle';
 import ConsultationButton from './ConsultationButton';
 import { disableConsultationRow } from '../recoil/consultations';
 import TagTeam from './TagTeam';
-import { useLocalStorage } from 'react-use';
+import { useLocalStorage } from '../services/useLocalStorage';
 import Page from './pagination';
 import useSearchParamState from '../services/useSearchParamState';
 

@@ -26,7 +26,7 @@ import { commentsState } from '../../recoil/comments';
 import useTitle from '../../services/useTitle';
 import ExclamationMarkButton from '../../components/tailwind/ExclamationMarkButton';
 import ConsultationButton from '../../components/ConsultationButton';
-import { useLocalStorage } from 'react-use';
+import { useLocalStorage } from '../../services/useLocalStorage';
 
 const personsWithFormattedBirthDateSelector = selector({
   key: 'personsWithFormattedBirthDateSelector',

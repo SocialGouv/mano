@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Formik } from 'formik';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { useLocalStorage } from 'react-use';
+import { useLocalStorage } from '../../services/useLocalStorage';
 import { SmallHeader } from '../../components/header';
 import Page from '../../components/pagination';
 import Loading from '../../components/loading';

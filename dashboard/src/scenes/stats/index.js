@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { useLocalStorage } from 'react-use';
 import { useRecoilValue } from 'recoil';
+import { useLocalStorage } from '../../services/useLocalStorage';
 import {
   fieldsPersonsCustomizableOptionsSelector,
   filterPersonsBaseSelector,
@@ -12,7 +12,6 @@ import { currentTeamState, organisationState, teamsState, userState } from '../.
 import { actionsCategoriesSelector, actionsState, DONE, flattenedActionsCategoriesSelector } from '../../recoil/actions';
 import { reportsState } from '../../recoil/reports';
 import { territoriesState } from '../../recoil/territory';
-import { rencontresState } from '../../recoil/rencontres';
 import { consultationsState } from '../../recoil/consultations';
 import { customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
 import {

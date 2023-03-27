@@ -9,7 +9,7 @@ import ActionOrConsultationName from '../../../components/ActionOrConsultationNa
 import { formatDateWithNameOfDay, formatTime } from '../../../services/date';
 import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from '../../../components/tailwind/Modal';
 import { arrayOfitemsGroupedByConsultationSelector } from '../../../recoil/selectors';
-import { useLocalStorage } from 'react-use';
+import { useLocalStorage } from '../../../services/useLocalStorage';
 import ConsultationModal from '../../../components/ConsultationModal';
 import { AgendaMutedIcon } from './AgendaMutedIcon';
 import { disableConsultationRow } from '../../../recoil/consultations';

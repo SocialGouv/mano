@@ -106,8 +106,8 @@ const DateRangePickerWithPresets = ({ period, setPeriod, preset, setPreset }) =>
   const [localStartDate, setLocalStartDate] = useState(null);
   const onChange = (dates) => {
     const [startDate, endDate] = dates;
-    console.log({ startDate, endDate });
-    // to prevent big calculations in parent component, we just save the startDate in local state
+    // to prevent big calculations in parent component when only startDate is selected
+    // we just save the startDate in local state, waiting for the endDate
     if (!endDate) return setLocalStartDate(startDate);
     setLocalStartDate(null);
     setPeriod({

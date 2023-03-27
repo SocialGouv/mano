@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
 import { selector, selectorFamily, useRecoilValue } from 'recoil';
-import { useLocalStorage } from 'react-use';
+import { useLocalStorage } from '../../services/useLocalStorage';
 import { SmallHeader } from '../../components/header';
 import Page from '../../components/pagination';
 import Search from '../../components/search';
