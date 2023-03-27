@@ -199,7 +199,11 @@ const Stats = () => {
           const res = personsFilteredByFiltersToBeFitleredByPeriod.filter((_person) => {
             const params = [
               { referenceStartDay: period.startDate, referenceEndDay: period.endDate },
+<<<<<<< HEAD
               (_person.assignedTeams || []).every((teamId) => teamsOffsetHours[teamId] === 12) ? 12 : 0,
+=======
+              (_person.assignedTeams || []).every((teamId) => teamsOffsetHours[teamId] === 12),
+>>>>>>> 4e5ef287 (fix: ne pas utiliser updatedAt pour les stats de personnes suivies)
             ];
             if (!_person) return false;
             for (const date of _person.interactions) {
