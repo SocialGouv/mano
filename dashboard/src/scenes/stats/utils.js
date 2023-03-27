@@ -21,6 +21,8 @@ export const getDataForPeriod = (
       ? 0
       : Array.isArray(item[teamField])
       ? item[teamField].every((teamId) => teamsOffsetHours[teamId] === 12)
+        ? 12
+        : 0
       : teamsOffsetHours[item[teamField]];
     return getIsDayWithinHoursOffsetOfPeriod(
       item[field] || item[backupField] || item.createdAt,
