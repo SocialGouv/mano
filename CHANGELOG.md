@@ -1,3 +1,10 @@
+## [1.261.6](https://github.com/SocialGouv/mano/compare/v1.261.5...v1.261.6) (2023-03-27)
+
+
+### Bug Fixes
+
+* preparation pour le retablissement des documents ([#1424](https://github.com/SocialGouv/mano/issues/1424)) ([8af2239](https://github.com/SocialGouv/mano/commit/8af2239c1a0f60d867c18c450e209e93ab3e5c4f))
+
 ## [1.261.5](https://github.com/SocialGouv/mano/compare/v1.261.4...v1.261.5) (2023-03-24)
 
 
