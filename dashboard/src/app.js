@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { Profiler, useEffect, useState } from 'react';
 import { RecoilEnv, RecoilRoot, useRecoilValue } from 'recoil';
 import RecoilNexus from 'recoil-nexus';
 import { Router, Switch, Redirect } from 'react-router-dom';
@@ -127,7 +127,6 @@ const App = ({ resetRecoil }) => {
           <RestrictedRoute path="/reception" component={Reception} />
           <RestrictedRoute path="/search" component={SearchView} />
           <RestrictedRoute path="/report" component={Report} />
-          <RestrictedRoute path="*" component={() => <Redirect to={'stats'} />} />
         </Switch>
         <DataLoader />
         <ModalConfirm />
@@ -154,7 +153,22 @@ const RestrictedRoute = ({ component: Component, _isLoggedIn, ...rest }) => {
       <div className="main">
         {!!user && !['superadmin'].includes(user.role) && <Drawer />}
         <main className="main-content">
-          <SentryRoute {...rest} render={(props) => (user ? <Component {...props} /> : <Redirect to={{ pathname: '/auth' }} />)} />
+          <SentryRoute
+            {...rest}
+            render={(props) =>
+              user ? (
+                <Profiler
+                  id={rest.path}
+                  onRender={(id, phase, actualDuration, baseDuration, startTime, commitTime) =>
+                    console.log({ id, phase, actualDuration, baseDuration, startTime, commitTime })
+                  }>
+                  <Component {...props} />
+                </Profiler>
+              ) : (
+                <Redirect to={{ pathname: '/auth' }} />
+              )
+            }
+          />
         </main>
       </div>
     </>

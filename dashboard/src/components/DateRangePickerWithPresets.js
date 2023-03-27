@@ -103,8 +103,13 @@ const DateRangePickerWithPresets = ({ period, setPeriod, preset, setPreset }) =>
     setShowDatepicker(true);
   };
 
+  const [localStartDate, setLocalStartDate] = useState(null);
   const onChange = (dates) => {
     const [startDate, endDate] = dates;
+    console.log({ startDate, endDate });
+    // to prevent big calculations in parent component, we just save the startDate in local state
+    if (!endDate) return setLocalStartDate(startDate);
+    setLocalStartDate(null);
     setPeriod({
       startDate: dateForDatePicker(startDate),
       endDate: dateForDatePicker(endDate),
@@ -153,10 +158,10 @@ const DateRangePickerWithPresets = ({ period, setPeriod, preset, setPreset }) =>
               inline
               locale="fr"
               name="date"
-              selected={dateForDatePicker(period.startDate)}
+              selected={dateForDatePicker(localStartDate || period.startDate)}
               onChange={onChange}
-              startDate={dateForDatePicker(period.startDate)}
-              endDate={dateForDatePicker(period.endDate)}
+              startDate={dateForDatePicker(localStartDate || period.startDate)}
+              endDate={dateForDatePicker(localStartDate ? null : period.endDate)}
             />
           </div>
         </OutsideClickHandler>
