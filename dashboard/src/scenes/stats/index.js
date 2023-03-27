@@ -183,6 +183,7 @@ const Stats = () => {
       }),
     [allPersons, filterByTeam, filterPersons, period, teamsOffsetHours]
   );
+
   const personsUpdated = useMemo(
     () =>
       getDataForPeriod(
@@ -194,37 +195,24 @@ const Stats = () => {
           field: 'followedSince',
           teamField: 'assignedTeams',
         },
-        (data) => {
-          const res = data.filter((item) => {
+        (personsFilteredByFiltersToBeFitleredByPeriod) => {
+          const res = personsFilteredByFiltersToBeFitleredByPeriod.filter((_person) => {
             const params = [
               { referenceStartDay: period.startDate, referenceEndDay: period.endDate },
-              (item.assignedTeams || []).every((teamId) => teamsOffsetHours[teamId] === 12) ? 12 : 0,
+              (_person.assignedTeams || []).every((teamId) => teamsOffsetHours[teamId] === 12) ? 12 : 0,
             ];
-            if (!item) return false;
-            return (
-              getIsDayWithinHoursOffsetOfPeriod(item.followedSince, ...params) ||
-              getIsDayWithinHoursOffsetOfPeriod(item.updatedAt, ...params) ||
-              item.actions?.some((a) => getIsDayWithinHoursOffsetOfPeriod(a.createdAt, ...params)) ||
-              item.actions?.some((a) => getIsDayWithinHoursOffsetOfPeriod(a.updatedAt, ...params)) ||
-              item.comments?.some((a) => getIsDayWithinHoursOffsetOfPeriod(a.createdAt, ...params)) ||
-              item.comments?.some((a) => getIsDayWithinHoursOffsetOfPeriod(a.updatedAt, ...params)) ||
-              item.passages?.some((a) => getIsDayWithinHoursOffsetOfPeriod(a.createdAt, ...params)) ||
-              item.passages?.some((a) => getIsDayWithinHoursOffsetOfPeriod(a.updatedAt, ...params)) ||
-              item.rencontres?.some((a) => getIsDayWithinHoursOffsetOfPeriod(a.createdAt, ...params)) ||
-              item.rencontres?.some((a) => getIsDayWithinHoursOffsetOfPeriod(a.updatedAt, ...params)) ||
-              item.relsPersonPlace?.some((a) => getIsDayWithinHoursOffsetOfPeriod(a.createdAt, ...params)) ||
-              item.relsPersonPlace?.some((a) => getIsDayWithinHoursOffsetOfPeriod(a.updatedAt, ...params)) ||
-              item.treatments?.some((a) => getIsDayWithinHoursOffsetOfPeriod(a.createdAt, ...params)) ||
-              item.treatments?.some((a) => getIsDayWithinHoursOffsetOfPeriod(a.updatedAt, ...params)) ||
-              item.consultations?.some((a) => getIsDayWithinHoursOffsetOfPeriod(a.createdAt, ...params)) ||
-              item.consultations?.some((a) => getIsDayWithinHoursOffsetOfPeriod(a.updatedAt, ...params))
-            );
+            if (!_person) return false;
+            for (const date of _person.interactions) {
+              if (getIsDayWithinHoursOffsetOfPeriod(date, ...params)) return true;
+            }
+            return false;
           });
           return res;
         }
       ),
     [filterByTeam, allPersons, period, teamsOffsetHours, filterPersons]
   );
+
   const personsForStats = useMemo(() => {
     const outOfActiveListFilter = filterPersons.find((f) => f.field === 'outOfActiveList')?.value;
     if (outOfActiveListFilter === 'Oui') return persons.filter((p) => p.outOfActiveList);
@@ -243,7 +231,7 @@ const Stats = () => {
     return personsUpdatedForStats.filter((person) => {
       if (!person) return false;
       if (!period.startDate || !period.endDate) return !!person.actions?.length;
-      const hasActions = person.actions?.some((a) => getIsDayWithinHoursOffsetOfPeriod(a.updatedAt, ...params));
+      const hasActions = person.actions?.some((a) => getIsDayWithinHoursOffsetOfPeriod(a.completedAt || a.dueAt, ...params));
       return hasActions;
     });
   }, [period.endDate, period.startDate, personsUpdatedForStats, selectedTeams, viewAllOrganisationData]);

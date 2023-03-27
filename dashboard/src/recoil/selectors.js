@@ -106,20 +106,25 @@ export const itemsGroupedByPersonSelector = selector({
     const user = get(userState);
     const usersObject = get(usersObjectSelector);
     for (const person of persons) {
-      console.log(typeof person.followedSince);
       personsObject[person._id] = {
         ...person,
         userPopulated: usersObject[person.user],
-        lastUpdateCheckForGDPR: person.followedSince || person.createdAt,
         formattedBirthDate: formatBirthDate(person.birthdate),
         age: formatAge(person.birthdate),
-        interactions: [person.followedSince],
+        interactions: [person.followedSince || person.createdAt],
+        interactionsObject: {
+          [person.followedSince || person.createdAt]: true,
+        },
+        lastUpdateCheckForGDPR: person.followedSince || person.createdAt,
       };
       if (!person.history?.length) continue;
       for (const historyEntry of person.history) {
-        person.interactions.push(historyEntry.date);
+        personsObject[person._id].interactions.push(historyEntry.date);
+        personsObject[person._id].interactionsObject[historyEntry.date] = true;
+        if (historyEntry.date > personsObject[person._id].lastUpdateCheckForGDPR) {
+          personsObject[person._id].lastUpdateCheckForGDPR = historyEntry.date;
+        }
       }
-      personsObject[person._id].lastUpdateCheckForGDPR = person.history[person.history.length - 1].date;
     }
     const actions = Object.values(get(actionsWithCommentsSelector));
     const comments = get(commentsState);
@@ -141,9 +146,8 @@ export const itemsGroupedByPersonSelector = selector({
     for (const person of persons) {
       if (!person.documents?.length) continue;
       for (const document of person.documents) {
-        if (document.createdAt > personsObject[person._id].lastUpdateCheckForGDPR) {
-          personsObject[person._id].lastUpdateCheckForGDPR = document.createdAt;
-        }
+        personsObject[person._id].interactions.push(document.createdAt);
+        personsObject[person._id].interactionsObject[document.createdAt] = true;
         if (!document.group) continue;
         for (const personIdInGroup of personsObject[person._id].group.persons) {
           if (personIdInGroup === person._id) continue;
@@ -160,11 +164,20 @@ export const itemsGroupedByPersonSelector = selector({
       if (!personsObject[action.person]) continue;
       personsObject[action.person].actions = personsObject[action.person].actions || [];
       personsObject[action.person].actions.push(action);
+      personsObject[action.person].interactions.push(action.dueAt);
+      personsObject[action.person].interactions.push(action.createdAt);
+      personsObject[action.person].interactions.push(action.completedAt);
+      personsObject[action.person].interactionsObject[action.dueAt] = true;
+      personsObject[action.person].interactionsObject[action.createdAt] = true;
+      personsObject[action.person].interactionsObject[action.completedAt] = true;
       if (action.dueAt > personsObject[action.person].lastUpdateCheckForGDPR) {
         personsObject[action.person].lastUpdateCheckForGDPR = action.dueAt;
       }
       if (action.createdAt > personsObject[action.person].lastUpdateCheckForGDPR) {
         personsObject[action.person].lastUpdateCheckForGDPR = action.createdAt;
+      }
+      if (action.completedAt > personsObject[action.person].lastUpdateCheckForGDPR) {
+        personsObject[action.person].lastUpdateCheckForGDPR = action.completedAt;
       }
       if (!!action.group) {
         const group = personsObject[action.person].group;
@@ -181,8 +194,10 @@ export const itemsGroupedByPersonSelector = selector({
       if (!personsObject[comment.person]) continue;
       personsObject[comment.person].comments = personsObject[comment.person].comments || [];
       personsObject[comment.person].comments.push(comment);
-      if (comment.createdAt > personsObject[comment.person].lastUpdateCheckForGDPR) {
-        personsObject[comment.person].lastUpdateCheckForGDPR = comment.createdAt;
+      personsObject[comment.person].interactions.push(comment.date || comment.createdAt);
+      personsObject[comment.person].interactionsObject[comment.date || comment.createdAt] = true;
+      if ((comment.date || comment.createdAt) > personsObject[comment.person].lastUpdateCheckForGDPR) {
+        personsObject[comment.person].lastUpdateCheckForGDPR = comment.date || comment.createdAt;
       }
       if (!!comment.group) {
         const group = personsObject[comment.person].group;
@@ -203,6 +218,8 @@ export const itemsGroupedByPersonSelector = selector({
       personsObject[relPersonPlace.person].places.push(place.name);
       personsObject[relPersonPlace.person].relsPersonPlace = personsObject[relPersonPlace.person].relsPersonPlace || [];
       personsObject[relPersonPlace.person].relsPersonPlace.push(relPersonPlace);
+      personsObject[relPersonPlace.person].interactions.push(relPersonPlace.createdAt);
+      personsObject[relPersonPlace.person].interactionsObject[relPersonPlace.createdAt] = true;
       if (relPersonPlace.createdAt > personsObject[relPersonPlace.person].lastUpdateCheckForGDPR) {
         personsObject[relPersonPlace.person].lastUpdateCheckForGDPR = relPersonPlace.createdAt;
       }
@@ -213,17 +230,28 @@ export const itemsGroupedByPersonSelector = selector({
         personsObject[consultation.person].consultations = personsObject[consultation.person].consultations || [];
         personsObject[consultation.person].consultations.push(consultation);
         personsObject[consultation.person].hasAtLeastOneConsultation = true;
+        personsObject[consultation.person].interactions.push(consultation.dueAt);
+        personsObject[consultation.person].interactions.push(consultation.createdAt);
+        personsObject[consultation.person].interactions.push(consultation.completedAt);
+        personsObject[consultation.person].interactionsObject[consultation.dueAt] = true;
+        personsObject[consultation.person].interactionsObject[consultation.createdAt] = true;
+        personsObject[consultation.person].interactionsObject[consultation.completedAt] = true;
+        if (consultation.dueAt > personsObject[consultation.person].lastUpdateCheckForGDPR) {
+          personsObject[consultation.person].lastUpdateCheckForGDPR = consultation.dueAt;
+        }
         if (consultation.createdAt > personsObject[consultation.person].lastUpdateCheckForGDPR) {
           personsObject[consultation.person].lastUpdateCheckForGDPR = consultation.createdAt;
         }
-        if (consultation.duedAt > personsObject[consultation.person].lastUpdateCheckForGDPR) {
-          personsObject[consultation.person].lastUpdateCheckForGDPR = consultation.dueAt;
+        if (consultation.completedAt > personsObject[consultation.person].lastUpdateCheckForGDPR) {
+          personsObject[consultation.person].lastUpdateCheckForGDPR = consultation.completedAt;
         }
       }
       for (const treatment of treatments) {
         if (!personsObject[treatment.person]) continue;
         personsObject[treatment.person].treatments = personsObject[treatment.person].treatments || [];
         personsObject[treatment.person].treatments.push(treatment);
+        personsObject[treatment.person].interactions.push(treatment.createdAt);
+        personsObject[treatment.person].interactionsObject[treatment.createdAt] = true;
         if (treatment.createdAt > personsObject[treatment.person].lastUpdateCheckForGDPR) {
           personsObject[treatment.person].lastUpdateCheckForGDPR = treatment.createdAt;
         }
@@ -232,7 +260,9 @@ export const itemsGroupedByPersonSelector = selector({
         if (!personsObject[medicalFile.person]) continue;
         if (personsObject[medicalFile.person].medicalFile) continue;
         personsObject[medicalFile.person].medicalFile = medicalFile;
-        if (medicalFile.creatededAt > personsObject[medicalFile.person].lastUpdateCheckForGDPR) {
+        personsObject[medicalFile.person].interactions.push(medicalFile.createdAt);
+        personsObject[medicalFile.person].interactionsObject[medicalFile.createdAt] = true;
+        if (medicalFile.createdAt > personsObject[medicalFile.person].lastUpdateCheckForGDPR) {
           personsObject[medicalFile.person].lastUpdateCheckForGDPR = medicalFile.createdAt;
         }
       }
@@ -241,18 +271,37 @@ export const itemsGroupedByPersonSelector = selector({
       if (!personsObject[passage.person]) continue;
       personsObject[passage.person].passages = personsObject[passage.person].passages || [];
       personsObject[passage.person].passages.push(passage);
-      if (passage.createdAt > personsObject[passage.person].lastUpdateCheckForGDPR) {
-        personsObject[passage.person].lastUpdateCheckForGDPR = passage.createdAt;
+      personsObject[passage.person].interactions.push(passage.date || passage.createdAt);
+      personsObject[passage.person].interactionsObject[passage.date || passage.createdAt] = true;
+      if ((passage.date || passage.createdAt) > personsObject[passage.person].lastUpdateCheckForGDPR) {
+        personsObject[passage.person].lastUpdateCheckForGDPR = passage.date || passage.createdAt;
       }
     }
     for (const rencontre of rencontres) {
       if (!personsObject[rencontre.person]) continue;
       personsObject[rencontre.person].rencontres = personsObject[rencontre.person].rencontres || [];
       personsObject[rencontre.person].rencontres.push(rencontre);
-      if (rencontre.createdAt > personsObject[rencontre.person].lastUpdateCheckForGDPR) {
-        personsObject[rencontre.person].lastUpdateCheckForGDPR = rencontre.createdAt;
+      personsObject[rencontre.person].interactions.push(rencontre.date || rencontre.createdAt);
+      personsObject[rencontre.person].interactionsObject[rencontre.date || rencontre.createdAt] = true;
+      if ((rencontre.date || rencontre.createdAt) > personsObject[rencontre.person].lastUpdateCheckForGDPR) {
+        personsObject[rencontre.person].lastUpdateCheckForGDPR = rencontre.date || rencontre.createdAt;
       }
     }
+
+    for (const personId of Object.keys(personsObject)) {
+      personsObject[personId].interactions = [
+        ...new Set(
+          personsObject[personId].interactions.sort((a, b) => {
+            // sort by date descending: the latest date at 0
+            if (a > b) return -1;
+            if (a < b) return 1;
+            return 0;
+          })
+        ),
+      ];
+      personsObject[personId].lastUpdateCheckForGDPR = personsObject[personId].interactions[0];
+    }
+
     return personsObject;
   },
 });
