@@ -106,6 +106,7 @@ export const itemsGroupedByPersonSelector = selector({
     const user = get(userState);
     const usersObject = get(usersObjectSelector);
     for (const person of persons) {
+      console.log(typeof person.followedSince);
       personsObject[person._id] = {
         ...person,
         userPopulated: usersObject[person.user],
