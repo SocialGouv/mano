@@ -13,7 +13,7 @@ import { disableConsultationRow } from '../recoil/consultations';
 import ExclamationMarkButton from './tailwind/ExclamationMarkButton';
 import { CANCEL, DONE, sortActionsOrConsultations } from '../recoil/actions';
 import TagTeam from './TagTeam';
-import { useLocalStorage } from 'react-use';
+import { useLocalStorage } from '../services/useLocalStorage';
 
 const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie', 'Créée le', 'Statut', 'Équipe(s) en charge'] }) => {
   const history = useHistory();

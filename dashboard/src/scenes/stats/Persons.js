@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { useHistory } from 'react-router';
 import { useRecoilValue } from 'recoil';
-import { useLocalStorage } from 'react-use';
+import { utils, writeFile } from 'xlsx';
+import { useLocalStorage } from '../../services/useLocalStorage';
 import { CustomResponsiveBar, CustomResponsivePie } from './charts';
 import Filters, { filterData } from '../../components/Filters';
 import { getDuration, getPieData } from './utils';
@@ -16,7 +17,6 @@ import TagTeam from '../../components/TagTeam';
 import Table from '../../components/table';
 import { dayjsInstance, formatDateWithFullMonth } from '../../services/date';
 import CustomFieldDisplay from '../../components/CustomFieldDisplay';
-import { utils, writeFile } from 'xlsx';
 
 const PersonStats = ({
   title,

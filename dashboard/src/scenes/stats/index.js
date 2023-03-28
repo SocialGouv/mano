@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { useLocalStorage } from 'react-use';
 import { useRecoilValue } from 'recoil';
+import { useLocalStorage } from '../../services/useLocalStorage';
 import {
   fieldsPersonsCustomizableOptionsSelector,
   filterPersonsBaseSelector,
@@ -12,13 +12,15 @@ import { currentTeamState, organisationState, teamsState, userState } from '../.
 import { actionsCategoriesSelector, actionsState, DONE, flattenedActionsCategoriesSelector } from '../../recoil/actions';
 import { reportsState } from '../../recoil/reports';
 import { territoriesState } from '../../recoil/territory';
-import { passagesState } from '../../recoil/passages';
-import { rencontresState } from '../../recoil/rencontres';
 import { consultationsState } from '../../recoil/consultations';
 import { customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
-import { personsWithMedicalFileMergedSelector, itemsGroupedByPersonSelector } from '../../recoil/selectors';
+import {
+  personsWithMedicalFileMergedSelector,
+  itemsGroupedByPersonSelector,
+  populatedPassagesSelector,
+  populatedRencontresSelector,
+} from '../../recoil/selectors';
 import { groupsState } from '../../recoil/groups';
-import { dayjsInstance, getIsDayWithinHoursOffsetOfPeriod } from '../../services/date';
 import useTitle from '../../services/useTitle';
 import DateRangePickerWithPresets, { formatPeriod } from '../../components/DateRangePickerWithPresets';
 import { useDataLoader } from '../../components/DataLoader';
@@ -38,6 +40,7 @@ import ReportsStats from './Reports';
 import ConsultationsStats from './Consultations';
 import MedicalFilesStats from './MedicalFiles';
 import ButtonCustom from '../../components/ButtonCustom';
+import dayjs from 'dayjs';
 
 const tabs = [
   'Général',
@@ -97,8 +100,8 @@ const Stats = () => {
   const allActions = useRecoilValue(actionsState);
   const allreports = useRecoilValue(reportsState);
   const allObservations = useRecoilValue(territoryObservationsState);
-  const allPassages = useRecoilValue(passagesState);
-  const allRencontres = useRecoilValue(rencontresState);
+  const allPassagesPopulated = useRecoilValue(populatedPassagesSelector);
+  const allRencontresPopulated = useRecoilValue(populatedRencontresSelector);
   const allGroups = useRecoilValue(groupsState);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
@@ -121,12 +124,10 @@ const Stats = () => {
   const [manuallySelectedTeams, setSelectedTeams] = useLocalStorage('stats-teams', [currentTeam]);
   const [actionsCategoriesGroups, setActionsCategoriesGroups] = useLocalStorage('stats-catGroups', []);
   const [actionsCategories, setActionsCategories] = useLocalStorage('stats-categories', []);
-
   const selectedTeams = useMemo(() => {
     if (viewAllOrganisationData) return teams;
     return manuallySelectedTeams;
   }, [manuallySelectedTeams, viewAllOrganisationData, teams]);
-
   const selectedTeamsIdsObject = useMemo(() => {
     const teamsIdsObject = {};
     for (const team of selectedTeams) {
@@ -135,16 +136,13 @@ const Stats = () => {
     return teamsIdsObject;
   }, [selectedTeams]);
 
-  const teamsOffsetHours = useMemo(() => {
-    const teamsIdsObject = {};
-    for (const team of teams) {
-      teamsIdsObject[team._id] = team.nightSession ? 12 : 0;
+  const allSelectedTeamsAreNightSession = useMemo(() => {
+    for (const team of selectedTeams) {
+      if (!team.nightSession) return false;
     }
-    return teamsIdsObject;
-  }, [teams]);
-
+    return true;
+  }, [selectedTeams]);
   useTitle(`${activeTab} - Statistiques`);
-
   const filterByTeam = useCallback(
     (elements, key) => {
       if (viewAllOrganisationData) return elements;
@@ -160,7 +158,6 @@ const Stats = () => {
     },
     [selectedTeamsIdsObject, viewAllOrganisationData]
   );
-
   const groupsForPersons = useCallback(
     (persons) => {
       const groupIds = new Set();
@@ -173,45 +170,42 @@ const Stats = () => {
     },
     [allGroups]
   );
-
   const persons = useMemo(
     () =>
-      getDataForPeriod(filterByTeam(allPersons, 'assignedTeams'), period, teamsOffsetHours, {
+      getDataForPeriod(filterByTeam(allPersons, 'assignedTeams'), period, {
         filters: filterPersons.filter((f) => f.field !== 'outOfActiveList'),
         field: 'followedSince',
-        teamField: 'assignedTeams',
+        allSelectedTeamsAreNightSession,
       }),
-    [allPersons, filterByTeam, filterPersons, period, teamsOffsetHours]
+    [allPersons, filterByTeam, filterPersons, period, allSelectedTeamsAreNightSession]
   );
+  const personsUpdated = useMemo(() => {
+    return getDataForPeriod(
+      filterByTeam(allPersons, 'assignedTeams'),
+      period,
+      {
+        filters: filterPersons.filter((f) => f.field !== 'outOfActiveList'),
+        field: 'followedSince',
+        allSelectedTeamsAreNightSession,
+      },
+      (personsFilteredByFiltersToBeFitleredByPeriod) => {
+        const offsetHours = allSelectedTeamsAreNightSession ? 12 : 0;
+        const startDate = dayjs(period.startDate).startOf('day').add(offsetHours, 'hour').toISOString();
+        const endDate = dayjs(period.endDate).startOf('day').add(1, 'day').add(offsetHours, 'hour').toISOString();
 
-  const personsUpdated = useMemo(
-    () =>
-      getDataForPeriod(
-        filterByTeam(allPersons, 'assignedTeams'),
-        period,
-        teamsOffsetHours,
-        {
-          filters: filterPersons.filter((f) => f.field !== 'outOfActiveList'),
-          field: 'followedSince',
-          teamField: 'assignedTeams',
-        },
-        (personsFilteredByFiltersToBeFitleredByPeriod) => {
-          const res = personsFilteredByFiltersToBeFitleredByPeriod.filter((_person) => {
-            const params = [
-              { referenceStartDay: period.startDate, referenceEndDay: period.endDate },
-              (_person.assignedTeams || []).every((teamId) => teamsOffsetHours[teamId] === 12) ? 12 : 0,
-            ];
-            if (!_person) return false;
-            for (const date of _person.interactions) {
-              if (getIsDayWithinHoursOffsetOfPeriod(date, ...params)) return true;
-            }
-            return false;
-          });
-          return res;
-        }
-      ),
-    [filterByTeam, allPersons, period, teamsOffsetHours, filterPersons]
-  );
+        const res = personsFilteredByFiltersToBeFitleredByPeriod.filter((_person) => {
+          if (!_person) return false;
+          for (const date of _person.interactions) {
+            if (date < startDate) continue;
+            if (date > endDate) continue;
+            return true;
+          }
+          return false;
+        });
+        return res;
+      }
+    );
+  }, [filterByTeam, allPersons, period, filterPersons, allSelectedTeamsAreNightSession]);
 
   const personsForStats = useMemo(() => {
     const outOfActiveListFilter = filterPersons.find((f) => f.field === 'outOfActiveList')?.value;
@@ -227,35 +221,40 @@ const Stats = () => {
   }, [filterPersons, personsUpdated]);
   const personsWithActions = useMemo(() => {
     const offsetHours = Boolean(viewAllOrganisationData) || selectedTeams.every((e) => !e.nightSession) ? 0 : 12;
-    const params = [{ referenceStartDay: period.startDate, referenceEndDay: period.endDate }, offsetHours];
+    const isoStartDate = period.startDate ? dayjs(period.startDate).startOf('day').add(offsetHours, 'hour').toISOString() : null;
+    const isoEndDate = period.endDate ? dayjs(period.endDate).startOf('day').add(1, 'day').add(offsetHours, 'hour').toISOString() : null;
+
     return personsUpdatedForStats.filter((person) => {
-      if (!person) return false;
-      if (!period.startDate || !period.endDate) return !!person.actions?.length;
-      const hasActions = person.actions?.some((a) => getIsDayWithinHoursOffsetOfPeriod(a.completedAt || a.dueAt, ...params));
-      return hasActions;
+      if (!person?.actions?.length) return false;
+      if (!isoStartDate || !isoEndDate) return !!person.actions?.length;
+      for (const action of person.actions) {
+        const date = action.completedAt || action.dueAt;
+        if (date < isoStartDate) continue;
+        if (date > isoEndDate) continue;
+        return true;
+      }
+      return false;
     });
   }, [period.endDate, period.startDate, personsUpdatedForStats, selectedTeams, viewAllOrganisationData]);
   const actions = useMemo(
     () =>
-      getDataForPeriod(filterByTeam(allActions, 'teams'), period, teamsOffsetHours, {
+      getDataForPeriod(filterByTeam(allActions, 'teams'), period, {
         field: 'completedAt',
         backupField: 'dueAt',
-        teamField: 'teams',
+        allSelectedTeamsAreNightSession,
       }),
-    [allActions, filterByTeam, period, teamsOffsetHours]
+    [allActions, filterByTeam, period, allSelectedTeamsAreNightSession]
   );
   const actionsFilteredByStatus = useMemo(
     () => actions.filter((a) => !actionsStatuses.length || actionsStatuses.includes(a.status)),
     [actions, actionsStatuses]
   );
-
   const filterableActionsCategories = useMemo(() => {
     if (!actionsCategoriesGroups.length) return ['-- Aucune --', ...allCategories];
     return groupsCategories
       .filter((group) => actionsCategoriesGroups.includes(group.groupTitle))
       .reduce((filteredCats, group) => [...filteredCats, ...group.categories], []);
   }, [actionsCategoriesGroups, allCategories, groupsCategories]);
-
   const actionsWithDetailedGroupAndCategories = useMemo(() => {
     const actionsDetailed = [];
     const categoriesGroupObject = {};
@@ -297,41 +296,35 @@ const Stats = () => {
   }, [actions.length, personsWithActions.length]);
   const consultations = useMemo(
     () =>
-      getDataForPeriod(allConsultations, period, teamsOffsetHours, {
+      getDataForPeriod(allConsultations, period, {
         field: 'completedAt',
         backupField: 'dueAt',
-        teamField: null,
+        allSelectedTeamsAreNightSession,
       }),
-    [allConsultations, period, teamsOffsetHours]
+    [allConsultations, period, allSelectedTeamsAreNightSession]
   );
   const observations = useMemo(
     () =>
       getDataForPeriod(
         filterByTeam(allObservations, 'team').filter((e) => !selectedTerritories.length || selectedTerritories.some((t) => e.territory === t._id)),
         period,
-        teamsOffsetHours,
-        { field: 'observedAt' }
+        { field: 'observedAt', allSelectedTeamsAreNightSession }
       ),
-    [allObservations, filterByTeam, period, teamsOffsetHours, selectedTerritories]
+    [allObservations, filterByTeam, period, selectedTerritories, allSelectedTeamsAreNightSession]
   );
   const passages = useMemo(() => {
-    const teamsPassages = filterByTeam(allPassages, 'team');
-    const populatedPassages = teamsPassages.map((passage) => ({
-      ...passage,
-      type: !!passage.person ? 'Non-anonyme' : 'Anonyme',
-      gender: !passage.person ? null : allPersonsAsObject[passage.person]?.gender || 'Non renseigné',
-    }));
-    return getDataForPeriod(populatedPassages, period, teamsOffsetHours, { field: 'date', teamField: 'team' });
-  }, [allPassages, filterByTeam, period, teamsOffsetHours, allPersonsAsObject]);
+    const teamsPassages = filterByTeam(allPassagesPopulated, 'team');
+    return getDataForPeriod(teamsPassages, period, { field: 'date', allSelectedTeamsAreNightSession });
+  }, [allPassagesPopulated, filterByTeam, period, allSelectedTeamsAreNightSession]);
   const personsInPassagesBeforePeriod = useMemo(() => {
     if (!period?.startDate) return [];
+    const offsetHours = Boolean(viewAllOrganisationData) || selectedTeams.every((e) => !e.nightSession) ? 0 : 12;
+    const isoStartDate = dayjs(period.startDate).startOf('day').add(offsetHours, 'hour').toISOString();
     const passagesIds = {};
     for (const passage of passages) {
       passagesIds[passage._id] = true;
     }
-    const passagesNotIncludedInPeriod = allPassages
-      .filter((p) => !passagesIds[p._id])
-      .filter((p) => dayjsInstance(p.date).isBefore(period.startDate));
+    const passagesNotIncludedInPeriod = allPassagesPopulated.filter((p) => !passagesIds[p._id]).filter((p) => p.date < isoStartDate);
     const personsOfPassages = {};
     for (const passage of passagesNotIncludedInPeriod) {
       if (!passage.person) continue;
@@ -340,8 +333,7 @@ const Stats = () => {
     }
     const arrayOfPersonsOfPassages = Object.values(personsOfPassages);
     return arrayOfPersonsOfPassages;
-  }, [allPassages, passages, period.startDate, allPersonsAsObject]);
-
+  }, [period.startDate, viewAllOrganisationData, selectedTeams, allPassagesPopulated, passages, allPersonsAsObject]);
   const personsInPassagesOfPeriod = useMemo(() => {
     const personsOfPassages = {};
     for (const passage of passages) {
@@ -352,23 +344,16 @@ const Stats = () => {
     const arrayOfPersonsOfPassages = Object.values(personsOfPassages);
     return arrayOfPersonsOfPassages;
   }, [passages, allPersonsAsObject]);
-
   const rencontres = useMemo(() => {
-    const teamsRencontres = filterByTeam(allRencontres, 'team');
-    const populatedRencontres = teamsRencontres.map((rencontre) => ({
-      ...rencontre,
-      type: 'Rencontres',
-      gender: !rencontre.person ? null : allPersonsAsObject[rencontre.person]?.gender || 'Non renseigné',
-    }));
-    return getDataForPeriod(populatedRencontres, period, teamsOffsetHours, { field: 'date', teamField: 'team' });
-  }, [allRencontres, filterByTeam, period, teamsOffsetHours, allPersonsAsObject]);
-
+    const teamsRencontres = filterByTeam(allRencontresPopulated, 'team');
+    return getDataForPeriod(teamsRencontres, period, { field: 'date', allSelectedTeamsAreNightSession });
+  }, [allRencontresPopulated, filterByTeam, period, allSelectedTeamsAreNightSession]);
   const personsInRencontresBeforePeriod = useMemo(() => {
     if (!period?.startDate) return [];
+    const offsetHours = Boolean(viewAllOrganisationData) || selectedTeams.every((e) => !e.nightSession) ? 0 : 12;
+    const isoStartDate = dayjs(period.startDate).startOf('day').add(offsetHours, 'hour').toISOString();
     const rencontresIds = rencontres.map((p) => p._id);
-    const rencontresNotIncludedInPeriod = allRencontres
-      .filter((p) => !rencontresIds.includes(p._id))
-      .filter((p) => dayjsInstance(p.date).isBefore(period.startDate));
+    const rencontresNotIncludedInPeriod = allRencontresPopulated.filter((p) => !rencontresIds.includes(p._id)).filter((p) => p.date < isoStartDate);
     const personsOfRencontres = {};
     for (const rencontre of rencontresNotIncludedInPeriod) {
       if (!rencontre.person) continue;
@@ -377,7 +362,7 @@ const Stats = () => {
     }
     const arrayOfPersonsOfRencontres = Object.values(personsOfRencontres);
     return arrayOfPersonsOfRencontres;
-  }, [allRencontres, rencontres, period.startDate, allPersonsAsObject]);
+  }, [period.startDate, viewAllOrganisationData, selectedTeams, rencontres, allRencontresPopulated, allPersonsAsObject]);
   const personsInRencontresOfPeriod = useMemo(() => {
     const personsOfRencontres = {};
     for (const rencontre of rencontres) {
@@ -389,8 +374,12 @@ const Stats = () => {
     return arrayOfPersonsOfRencontres;
   }, [rencontres, allPersonsAsObject]);
   const reports = useMemo(
-    () => getDataForPeriod(filterByTeam(allreports, 'team'), period, teamsOffsetHours, { field: 'date', teamField: 'team' }),
-    [allreports, filterByTeam, period, teamsOffsetHours]
+    () =>
+      getDataForPeriod(filterByTeam(allreports, 'team'), period, {
+        field: 'date',
+        allSelectedTeamsAreNightSession,
+      }),
+    [allreports, filterByTeam, period, allSelectedTeamsAreNightSession]
   );
   const reportsServices = useMemo(() => reports.map((rep) => (rep.services ? JSON.parse(rep.services) : null)).filter(Boolean), [reports]);
   const filterPersonsBase = useRecoilValue(filterPersonsBaseSelector);
@@ -411,7 +400,6 @@ const Stats = () => {
     ...fieldsPersonsCustomizableOptions.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
     ...flattenedCustomFieldsPersons.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
   ];
-
   return (
     <>
       <HeaderStyled className=" !tw-py-4 tw-px-0">

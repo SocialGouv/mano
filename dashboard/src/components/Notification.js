@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import React, { useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { useLocalStorage } from 'react-use';
+import { useLocalStorage } from '../services/useLocalStorage';
 import { theme } from '../config';
 import { actionsState, CANCEL, DONE, prepareActionForEncryption, sortActionsOrConsultations, TODO } from '../recoil/actions';
 import { currentTeamState, userState } from '../recoil/auth';

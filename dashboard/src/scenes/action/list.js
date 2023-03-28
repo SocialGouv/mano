@@ -15,7 +15,7 @@ import useSearchParamState from '../../services/useSearchParamState';
 import ButtonCustom from '../../components/ButtonCustom';
 import agendaIcon from '../../assets/icons/agenda-icon.svg';
 import ActionsCategorySelect from '../../components/tailwind/ActionsCategorySelect';
-import { useLocalStorage } from 'react-use';
+import { useLocalStorage } from '../../services/useLocalStorage';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import ConsultationModal from '../../components/ConsultationModal';
 import ActionsSortableList from '../../components/ActionsSortableList';

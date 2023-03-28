@@ -8,7 +8,7 @@ import { sortActionsOrConsultations } from '../../../recoil/actions';
 import { arrayOfitemsGroupedByConsultationSelector } from '../../../recoil/selectors';
 import { treatmentsState } from '../../../recoil/treatments';
 import { medicalFileState, customFieldsMedicalFileSelector } from '../../../recoil/medicalFiles';
-import { useLocalStorage } from 'react-use';
+import { useLocalStorage } from '../../../services/useLocalStorage';
 
 export function MedicalFilePrint({ person }) {
   const organisation = useRecoilValue(organisationState);

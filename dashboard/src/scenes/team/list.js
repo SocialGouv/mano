@@ -15,7 +15,7 @@ import API from '../../services/api';
 import OnboardingEndModal from '../../components/OnboardingEndModal';
 import { formatDateWithFullMonth } from '../../services/date';
 import useTitle from '../../services/useTitle';
-import { useLocalStorage } from 'react-use';
+import { useLocalStorage } from '../../services/useLocalStorage';
 
 const defaultSort = (a, b, sortOrder) => (sortOrder === 'ASC' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
 

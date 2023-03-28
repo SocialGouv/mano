@@ -11,7 +11,7 @@ import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import { dayjsInstance } from '../../services/date';
 import { selectedTeamsReportsSelector } from '../../recoil/selectors';
 import useSearchParamState from '../../services/useSearchParamState';
-import { useLocalStorage } from 'react-use';
+import { useLocalStorage } from '../../services/useLocalStorage';
 import API from '../../services/api';
 import { toast } from 'react-toastify';
 

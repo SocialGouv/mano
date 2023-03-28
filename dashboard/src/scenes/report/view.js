@@ -54,7 +54,7 @@ import Rencontre from '../../components/Rencontre';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import TagTeam from '../../components/TagTeam';
 import ReceptionService from '../../components/ReceptionService';
-import { useLocalStorage } from 'react-use';
+import { useLocalStorage } from '../../services/useLocalStorage';
 import useSearchParamState from '../../services/useSearchParamState';
 import { arrayOfitemsGroupedByActionSelector, arrayOfitemsGroupedByConsultationSelector } from '../../recoil/selectors';
 import ConsultationModal from '../../components/ConsultationModal';
@@ -1213,7 +1213,11 @@ const Consultations = ({ date, status, consultations, setSortOrder, setSortBy, s
   return (
     <>
       <StyledBox>
-        <ButtonCustom title={`Ajouter une consultation faite le ${formatDateWithFullMonth(date)}`} className="tw-ml-auto tw-mb-10" onClick={() => setShowModal(true)} />
+        <ButtonCustom
+          title={`Ajouter une consultation faite le ${formatDateWithFullMonth(date)}`}
+          className="tw-ml-auto tw-mb-10"
+          onClick={() => setShowModal(true)}
+        />
         <Table
           className="Table"
           title={`Consultation${moreThanOne ? 's' : ''} ${status === DONE ? 'faite' : 'annulée'}${
