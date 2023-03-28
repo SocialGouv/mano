@@ -15,7 +15,6 @@ const validateUser = require("../middleware/validateUser");
 const { capture } = require("../sentry");
 const { ExtractJwt } = require("passport-jwt");
 const { serializeUserWithTeamsAndOrganisation, serializeTeam } = require("../utils/data-serializer");
-const user = require("../models/user");
 
 const EMAIL_OR_PASSWORD_INVALID = "EMAIL_OR_PASSWORD_INVALID";
 const PASSWORD_NOT_VALIDATED = "PASSWORD_NOT_VALIDATED";
