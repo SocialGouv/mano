@@ -1,3 +1,10 @@
+## [1.261.9](https://github.com/SocialGouv/mano/compare/v1.261.8...v1.261.9) (2023-03-28)
+
+
+### Bug Fixes
+
+* stats perfs ([#1433](https://github.com/SocialGouv/mano/issues/1433)) ([be72706](https://github.com/SocialGouv/mano/commit/be72706704d5ef29e1411fd8c7937a8f4fd8ebd3))
+
 ## [1.261.8](https://github.com/SocialGouv/mano/compare/v1.261.7...v1.261.8) (2023-03-27)
 
 
