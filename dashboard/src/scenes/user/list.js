@@ -196,21 +196,21 @@ const Create = ({ onChange }) => {
                     <FormGroup>
                       <Label htmlFor="name">Nom</Label>
                       <Input name="name" id="name" value={values.name} onChange={handleChange} />
-                      {touched.name && errors.name && <Error>{errors.name}</Error>}
+                      {touched.name && errors.name && <div className="tw-mt-0.5 tw-text-xs tw-text-red-500">{errors.name}</div>}
                     </FormGroup>
                   </Col>
                   <Col md={6}>
                     <FormGroup>
                       <Label htmlFor="email">Email</Label>
                       <Input name="email" id="email" value={values.email} onChange={handleChange} />
-                      {touched.email && errors.email && <Error>{errors.email}</Error>}
+                      {touched.email && errors.email && <div className="tw-mt-0.5 tw-text-xs tw-text-red-500">{errors.email}</div>}
                     </FormGroup>
                   </Col>
                   <Col md={6}>
                     <FormGroup>
                       <Label htmlFor="role">Role</Label>
                       <SelectRole handleChange={handleChange} value={values.role} />
-                      {touched.role && errors.role && <Error>{errors.role}</Error>}
+                      {touched.role && errors.role && <div className="tw-mt-0.5 tw-text-xs tw-text-red-500">{errors.role}</div>}
                     </FormGroup>
                   </Col>
                   <Col md={6}>
@@ -223,7 +223,7 @@ const Create = ({ onChange }) => {
                           colored
                           inputId="team"
                         />
-                        {touched.team && errors.team && <Error>{errors.team}</Error>}
+                        {touched.team && errors.team && <div className="tw-mt-0.5 tw-text-xs tw-text-red-500">{errors.team}</div>}
                       </div>
                     </FormGroup>
                   </Col>
@@ -260,10 +260,5 @@ const Create = ({ onChange }) => {
     </CreateWrapper>
   );
 };
-
-const Error = styled.span`
-  color: red;
-  font-size: 11px;
-`;
 
 export default List;
