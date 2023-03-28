@@ -23,7 +23,6 @@ import useSearchParamState from '../../services/useSearchParamState';
 import { useDataLoader } from '../../components/DataLoader';
 
 const List = () => {
-  console.log('render');
   const organisation = useRecoilValue(organisationState);
   const history = useHistory();
   useTitle('Territoires');
