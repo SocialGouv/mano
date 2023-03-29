@@ -43,6 +43,7 @@ const getSettingTitle = (tabId) => {
   if (tabId === 'territories') return 'Territoires';
   if (tabId === 'export') return 'Export';
   if (tabId === 'import') return 'Import';
+  if (tabId === 'meet') return 'Passages/rencontres';
   return '';
 };
 
@@ -60,7 +61,7 @@ const View = () => {
   const [tab, setTab] = useState(!organisation.encryptionEnabled ? 'encryption' : 'infos');
   const scrollContainer = useRef(null);
   useTitle(`Organisation - ${getSettingTitle(tab)}`);
-
+  console.log('ORGA ', organisation.metEnabled);
   useEffect(() => {
     scrollContainer.current.scrollTo({ top: 0 });
     refresh();
@@ -148,6 +149,12 @@ const View = () => {
             disabled={!organisation.encryptionEnabled}>
             Territoires
           </button>
+          <button
+            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'meet' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
+            onClick={() => setTab('meet')}
+            disabled={!organisation.encryptionEnabled}>
+            Passages/rencontres
+          </button>
           <hr />
           <button
             className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'export' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
@@ -166,6 +173,8 @@ const View = () => {
               ...organisation,
               receptionEnabled: organisation.receptionEnabled || false,
               groupsEnabled: organisation.groupsEnabled || false,
+              passagesEnabled: organisation.passagesEnabled || false,
+              metEnabled: organisation.metEnabled || false,
             }}
             enableReinitialize
             onSubmit={async (body) => {
@@ -306,6 +315,57 @@ const View = () => {
                       </div>
                       <hr />
                       <ObservationsSettings />
+                    </>
+                  );
+                case 'meet':
+                  return (
+                    <>
+                      {console.log('ici : ', values.metEnabled)}
+                      <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Passages / rencontres</h3>
+                      <h4 className="tw-my-8">Activer les passages</h4>
+                      <FormGroup>
+                        <div className="tw-ml-5 tw-flex tw-w-4/5 tw-items-baseline">
+                          <input
+                            type="checkbox"
+                            className="tw-mr-2"
+                            name="passagesEnabled"
+                            id="passagesEnabled"
+                            checked={values.passagesEnabled || false}
+                            onChange={handleChange}
+                          />
+                          <label htmlFor="territoriesEnabled">
+                            Activer les passages vous permettra de comptabliser les personnes qui passent sur votre structure. Vous ne pouvez pas
+                            désactiver les passages si vous désactivez les rencontres.
+                          </label>
+                        </div>
+                      </FormGroup>
+                      <h4 className="tw-my-8">Activer les rencontres</h4>
+                      <FormGroup>
+                        <div className="tw-ml-5 tw-flex tw-w-4/5 tw-items-baseline">
+                          <input
+                            type="checkbox"
+                            className="tw-mr-2"
+                            name="metEnabled"
+                            id="metEnabled"
+                            checked={values.metEnabled || false}
+                            onChange={handleChange}
+                          />
+                          <label htmlFor="territoriesEnabled">
+                            Activer les rencontres vous permettra de comptabliser les personnes rencontrées en rue, vous ne pouvez pas désactiver les
+                            rencontres si vous désactivez les passages.
+                          </label>
+                        </div>
+                      </FormGroup>
+                      <div className="tw-mb-10 tw-flex tw-justify-end tw-gap-4">
+                        <ButtonCustom
+                          title={'Mettre à jour'}
+                          disabled={values.metEnabled === organisation.metEnabled && values.passagesEnabled === organisation.passagesEnabled}
+                          loading={isSubmitting}
+                          onClick={handleSubmit}
+                        />
+                      </div>
+                      <hr />
+                      {console.log('passages ', values.passagesEnabled, 'met ', values.metEnabled)}
                     </>
                   );
                 case 'persons':

@@ -4,12 +4,13 @@ import Passage from '../../../components/Passage';
 import Rencontre from '../../../components/Rencontre';
 import TagTeam from '../../../components/TagTeam';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../../components/tailwind/Modal';
-import { currentTeamState, usersState, userState } from '../../../recoil/auth';
+import { currentTeamState, usersState, userState, organisationState } from '../../../recoil/auth';
 import { dayjsInstance, formatDateTimeWithNameOfDay } from '../../../services/date';
 import { FullScreenIcon } from './FullScreenIcon';
 
 export default function PassagesRencontres({ person }) {
   const users = useRecoilValue(usersState);
+  const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
   const [passageToEdit, setPassageToEdit] = useState(null);
@@ -44,24 +45,28 @@ export default function PassagesRencontres({ person }) {
     <div className="tw-relative">
       <div className="tw-sticky tw-top-0 tw-z-50 tw-mb-3 tw-flex tw-bg-white tw-px-3 tw-pt-3 tw-text-main">
         <div className="tw-flex tw-flex-1">
-          <button
-            className={
-              selected === 'passages'
-                ? 'tw-rounded-t tw-border-t tw-border-l tw-border-r tw-border-slate-300 tw-p-1.5'
-                : 'tw-border-b tw-border-slate-300 tw-p-1.5'
-            }
-            onClick={() => setSelected('passages')}>
-            Passages ({personPassages.length})
-          </button>
-          <button
-            className={
-              selected === 'rencontres'
-                ? 'tw-rounded-t tw-border-t tw-border-l tw-border-r tw-border-slate-300 tw-p-1.5'
-                : 'tw-border-b tw-border-slate-300 tw-p-1.5'
-            }
-            onClick={() => setSelected('rencontres')}>
-            Rencontres ({personRencontres.length})
-          </button>
+          {Boolean(!!organisation.passagesEnabled) && (
+            <button
+              className={
+                selected === 'passages'
+                  ? 'tw-rounded-t tw-border-t tw-border-l tw-border-r tw-border-slate-300 tw-p-1.5'
+                  : 'tw-border-b tw-border-slate-300 tw-p-1.5'
+              }
+              onClick={() => setSelected('passages')}>
+              Passages ({personPassages.length})
+            </button>
+          )}
+          {Boolean(!!organisation.metEnabled) && (
+            <button
+              className={
+                selected === 'rencontres'
+                  ? 'tw-rounded-t tw-border-t tw-border-l tw-border-r tw-border-slate-300 tw-p-1.5'
+                  : 'tw-border-b tw-border-slate-300 tw-p-1.5'
+              }
+              onClick={() => setSelected('rencontres')}>
+              Rencontres ({personRencontres.length})
+            </button>
+          )}
         </div>
         <div className="flex-col tw-flex tw-items-center tw-gap-2">
           <button

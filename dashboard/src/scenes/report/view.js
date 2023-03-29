@@ -588,15 +588,23 @@ const View = () => {
                 <hr />
               </>
             )}
-            <DrawerLink id="report-button-passages" className={activeTab === 'passages' ? 'active' : ''} onClick={() => setActiveTab('passages')}>
-              Passages ({passages.length})
-            </DrawerLink>
-            <DrawerLink
-              id="report-button-rencontres"
-              className={activeTab === 'rencontres' ? 'active' : ''}
-              onClick={() => setActiveTab('rencontres')}>
-              Rencontres ({rencontres.length})
-            </DrawerLink>
+            {!!organisation.passagesEnabled && (
+              <>
+                <DrawerLink id="report-button-passages" className={activeTab === 'passages' ? 'active' : ''} onClick={() => setActiveTab('passages')}>
+                  Passages ({passages.length})
+                </DrawerLink>
+              </>
+            )}
+            {!!organisation.metEnabled && (
+              <>
+                <DrawerLink
+                  id="report-button-rencontres"
+                  className={activeTab === 'rencontres' ? 'active' : ''}
+                  onClick={() => setActiveTab('rencontres')}>
+                  Rencontres ({rencontres.length})
+                </DrawerLink>
+              </>
+            )}
             <hr />
             {!!organisation.territoriesEnabled && (
               <DrawerLink

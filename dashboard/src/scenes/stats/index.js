@@ -538,7 +538,7 @@ const Stats = () => {
             flattenedCustomFieldsPersons={flattenedCustomFieldsPersons}
           />
         )}
-        {activeTab === 'Passages' && (
+        {!!organisation.passageEnabled && activeTab === 'Passages' && (
           <PassagesStats
             passages={passages}
             personFields={personFields}
@@ -546,7 +546,7 @@ const Stats = () => {
             personsInPassagesBeforePeriod={personsInPassagesBeforePeriod}
           />
         )}
-        {activeTab === 'Rencontres' && (
+        {!!organisation.metEnabled && activeTab === 'Rencontres' && (
           <RencontresStats
             rencontres={rencontres}
             personFields={personFields}
