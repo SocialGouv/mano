@@ -16,7 +16,7 @@ export default function PassagesRencontres({ person }) {
   const [passageToEdit, setPassageToEdit] = useState(null);
   const [fullScreen, setFullScreen] = useState(false);
   const [rencontreToEdit, setRencontreToEdit] = useState(null);
-  const [selected, setSelected] = useState('passages');
+  const [selected, setSelected] = useState(!!organisation.passagesEnabled ? 'passages' : 'rencontres');
   const personPassages = useMemo(
     () => [...(person?.passages || [])].sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), 'day') ? 1 : -1)),
     [person]
@@ -45,7 +45,7 @@ export default function PassagesRencontres({ person }) {
     <div className="tw-relative">
       <div className="tw-sticky tw-top-0 tw-z-50 tw-mb-3 tw-flex tw-bg-white tw-px-3 tw-pt-3 tw-text-main">
         <div className="tw-flex tw-flex-1">
-          {Boolean(!!organisation.passagesEnabled) && (
+          {organisation.passagesEnabled === true && (
             <button
               className={
                 selected === 'passages'
@@ -56,7 +56,7 @@ export default function PassagesRencontres({ person }) {
               Passages ({personPassages.length})
             </button>
           )}
-          {Boolean(!!organisation.metEnabled) && (
+          {organisation.metEnabled === true && (
             <button
               className={
                 selected === 'rencontres'
@@ -71,7 +71,6 @@ export default function PassagesRencontres({ person }) {
         <div className="flex-col tw-flex tw-items-center tw-gap-2">
           <button
             className="tw-text-md tw-h-8 tw-w-8 tw-rounded-full tw-bg-main tw-font-bold tw-text-white tw-transition hover:tw-scale-125"
-            aria-label={selected === 'passages' ? 'Ajouter un passage' : 'Ajouter une rencontre'}
             onClick={() => {
               if (selected === 'rencontres') handleAddRencontre();
               else handleAddPassage();

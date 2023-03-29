@@ -61,7 +61,7 @@ const View = () => {
   const [tab, setTab] = useState(!organisation.encryptionEnabled ? 'encryption' : 'infos');
   const scrollContainer = useRef(null);
   useTitle(`Organisation - ${getSettingTitle(tab)}`);
-  console.log('ORGA ', organisation.metEnabled);
+
   useEffect(() => {
     scrollContainer.current.scrollTo({ top: 0 });
     refresh();
@@ -320,7 +320,6 @@ const View = () => {
                 case 'meet':
                   return (
                     <>
-                      {console.log('ici : ', values.metEnabled)}
                       <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Passages / rencontres</h3>
                       <h4 className="tw-my-8">Activer les passages</h4>
                       <FormGroup>
@@ -365,7 +364,6 @@ const View = () => {
                         />
                       </div>
                       <hr />
-                      {console.log('passages ', values.passagesEnabled, 'met ', values.metEnabled)}
                     </>
                   );
                 case 'persons':
