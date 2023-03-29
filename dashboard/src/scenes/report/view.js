@@ -1213,7 +1213,11 @@ const Consultations = ({ date, status, consultations, setSortOrder, setSortBy, s
   return (
     <>
       <StyledBox>
-        <ButtonCustom title={`Ajouter une consultation faite le ${formatDateWithFullMonth(date)}`} className="tw-ml-auto tw-mb-10" onClick={() => setShowModal(true)} />
+        <ButtonCustom
+          title={`Ajouter une consultation faite le ${formatDateWithFullMonth(date)}`}
+          className="tw-ml-auto tw-mb-10"
+          onClick={() => setShowModal(true)}
+        />
         <Table
           className="Table"
           title={`Consultation${moreThanOne ? 's' : ''} ${status === DONE ? 'faite' : 'annulée'}${
@@ -1347,8 +1351,6 @@ const CommentCreatedAt = ({ date, comments }) => {
   const [showModal, setShowModal] = useState(false);
   const person = useRecoilValue(userState);
 
-  console.log('comments', comments);
-  //console.log('person', person);
   if (!data) return <div />;
 
   return (

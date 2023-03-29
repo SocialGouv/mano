@@ -20,8 +20,6 @@ const CommentModal = ({ comment = {}, isNewComment, onClose, person }) => {
   const currentTeam = useRecoilValue(currentTeamState);
   const setComments = useSetRecoilState(commentsState);
 
-  console.log("c'est qui la personne ? : ", person);
-
   const canToggleGroupCheck = useMemo(
     () => !!organisation.groupsEnabled && !!person._id && groups.find((group) => group.persons.includes(person._id)),
     [groups, person._id, organisation.groupsEnabled]
