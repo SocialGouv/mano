@@ -467,6 +467,12 @@ const Stats = () => {
             if (['Services'].includes(tabCaption)) {
               return !!organisation.receptionEnabled;
             }
+            if (['Rencontres'].includes(tabCaption)) {
+              return !!organisation.metEnabled;
+            }
+            if (['Passages'].includes(tabCaption)) {
+              return !!organisation.passagesEnabled;
+            }
             return true;
           })
           .map((tabCaption, index) => {
