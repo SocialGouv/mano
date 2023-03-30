@@ -151,7 +151,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("link", { name: "Organisation" }).click();
   await page.getByRole("button", { name: "Personnes suivies" }).click();
 
-  await page.hover(`[data-test-id='${testPersonSocialField}']'`);
+  await page.hover(`[data-test-id='${testPersonSocialField}']`);
   await page
     .getByRole("button", {
       name: `Modifier le champ ${testPersonSocialField}`,
