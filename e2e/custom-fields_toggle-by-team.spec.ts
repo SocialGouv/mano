@@ -151,7 +151,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("link", { name: "Organisation" }).click();
   await page.getByRole("button", { name: "Personnes suivies" }).click();
 
-  await page.hover(`[data-test-id=${testPersonSocialField}]`);
+  await page.hover(`[data-test-id='${testPersonSocialField}']`);
   await page
     .getByRole("button", {
       name: `Modifier le champ ${testPersonSocialField}`,
@@ -163,7 +163,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Mise à jour !").click();
 
-  await page.hover(`[data-test-id=${testPersonMedicalField}]`);
+  await page.hover(`[data-test-id='${testPersonMedicalField}']`);
   await page
     .getByRole("button", {
       name: `Modifier le champ ${testPersonMedicalField}`,
@@ -176,7 +176,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByText("Mise à jour !").click();
 
   await page.getByRole("button", { name: "Dossier Médical 🧑‍⚕️" }).click();
-  await page.hover(`[data-test-id=${testMedicalFileField}]`);
+  await page.hover(`[data-test-id='${testMedicalFileField}']`);
   await page
     .getByRole("button", {
       name: `Modifier le champ ${testMedicalFileField}`,
@@ -202,7 +202,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
 
   await page.getByRole("button", { name: "Territoires" }).click();
 
-  await page.hover(`[data-test-id=${testObsTerritoryField}]`);
+  await page.hover(`[data-test-id='${testObsTerritoryField}']`);
   await page
     .getByRole("button", {
       name: `Modifier le champ ${testObsTerritoryField}`,
