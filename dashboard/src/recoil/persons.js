@@ -166,7 +166,7 @@ export const usePreparePersonForEncryption = () => {
   return preparePersonForEncryption;
 };
 
-const defaultSort = (a, b, sortOrder) => (sortOrder === 'ASC' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
+const defaultSort = (a, b, sortOrder) => (sortOrder === 'ASC' ? (a.name || '').localeCompare(b.name) : (b.name || '').localeCompare(a.name));
 
 export const sortPersons = (sortBy, sortOrder) => (a, b) => {
   if (sortBy === 'createdAt') {

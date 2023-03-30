@@ -17,7 +17,7 @@ import { formatDateWithFullMonth } from '../../services/date';
 import useTitle from '../../services/useTitle';
 import { useLocalStorage } from '../../services/useLocalStorage';
 
-const defaultSort = (a, b, sortOrder) => (sortOrder === 'ASC' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
+const defaultSort = (a, b, sortOrder) => (sortOrder === 'ASC' ? (a.name || '').localeCompare(b.name) : (b.name || '').localeCompare(a.name));
 
 const sortTeams = (sortBy, sortOrder) => (a, b) => {
   if (sortBy === 'createdAt') {

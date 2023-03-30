@@ -19,7 +19,7 @@ import useTitle from '../../services/useTitle';
 import SelectRole from '../../components/SelectRole';
 import { useLocalStorage } from '../../services/useLocalStorage';
 
-const defaultSort = (a, b, sortOrder) => (sortOrder === 'ASC' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
+const defaultSort = (a, b, sortOrder) => (sortOrder === 'ASC' ? (a.name || '').localeCompare(b.name) : (b.name || '').localeCompare(a.name));
 
 const sortUsers = (sortBy, sortOrder) => (a, b) => {
   if (sortBy === 'email') {
