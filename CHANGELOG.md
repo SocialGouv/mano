@@ -1,3 +1,10 @@
+## [1.261.11](https://github.com/SocialGouv/mano/compare/v1.261.10...v1.261.11) (2023-03-30)
+
+
+### Bug Fixes
+
+* **dashboard:** erreur quand les motifs de sortie de file active étaient inexistants MANO-E3 ([#1439](https://github.com/SocialGouv/mano/issues/1439)) ([54f67e0](https://github.com/SocialGouv/mano/commit/54f67e05763971306bfd41f753b13ca95c48dc0b))
+
 ## [1.261.10](https://github.com/SocialGouv/mano/compare/v1.261.9...v1.261.10) (2023-03-30)
 
 
