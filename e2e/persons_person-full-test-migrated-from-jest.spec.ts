@@ -195,7 +195,7 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Sortie de file active" }).click();
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText(personName + " est hors de la file active").click();
-  await page.getByText(personName + " est en dehors de la file active, pour le motif suivant : l").click();
+  await page.getByText(personName + " est en dehors de la file active depuis le").click();
   await page.getByRole("button", { name: "Réintégrer dans la file active" }).click();
   await page.getByText(personName + " est réintégré dans la file active").click();
   await page.getByRole("button", { name: "Sortie de file active" }).click();
