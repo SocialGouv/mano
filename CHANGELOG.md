@@ -1,3 +1,10 @@
+## [1.261.12](https://github.com/SocialGouv/mano/compare/v1.261.11...v1.261.12) (2023-03-30)
+
+
+### Bug Fixes
+
+* **dashboard:** tri fonctionnel quand il n'y a pas de nom ([#1442](https://github.com/SocialGouv/mano/issues/1442)) ([60fa7de](https://github.com/SocialGouv/mano/commit/60fa7de6a4f22c3b7349febe56186536a03d68e1))
+
 ## [1.261.11](https://github.com/SocialGouv/mano/compare/v1.261.10...v1.261.11) (2023-03-30)
 
 
