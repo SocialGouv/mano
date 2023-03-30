@@ -119,10 +119,16 @@ export default function View() {
       <div className="tw-pt-4" data-test-id={person?.name + currentTab}>
         {person.outOfActiveList && (
           <Alert color="warning" className="noprint">
-            {person?.name} est en dehors de la file active, pour{' '}
-            {person.outOfActiveListReasons.length > 1 ? 'les motifs suivants' : 'le motif suivant'} :{' '}
-            <b>{person.outOfActiveListReasons.join(', ')}</b>{' '}
-            {person.outOfActiveListDate && `le ${formatDateWithFullMonth(person.outOfActiveListDate)}`}
+            {person?.name} est en dehors de la file active
+            {person.outOfActiveListReasons?.length ? (
+              <>
+                , pour {person.outOfActiveListReasons.length > 1 ? 'les motifs suivants' : 'le motif suivant'} :{' '}
+                <b>{person.outOfActiveListReasons.join(', ')}</b>
+              </>
+            ) : (
+              ''
+            )}{' '}
+            {person.outOfActiveListDate && ` depuis le ${formatDateWithFullMonth(person.outOfActiveListDate)}`}
           </Alert>
         )}
         {currentTab === 'Résumé' && <Summary person={person} />}
