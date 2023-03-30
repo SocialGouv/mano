@@ -199,7 +199,7 @@ test("Actions", async ({ page }) => {
 
     await page.getByRole("button", { name: "Actions" }).click();
 
-    await page.hover(`id='${groupe2cat2}'`);
+    await page.hover(`id=${groupe2cat2}`);
     await page.getByRole("button", { name: `Modifier la catégorie ${groupe2cat2}` }).click();
 
     await page.getByPlaceholder(groupe2cat2).fill(groupe2cat2Renamed);
