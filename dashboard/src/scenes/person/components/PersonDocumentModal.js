@@ -19,7 +19,7 @@ export default function DocumentModal({ document, onClose, person, children, onD
   const organisation = useRecoilValue(organisationState);
 
   const canToggleGroupCheck = useMemo(
-    () => groupsDisabled && !!organisation.groupsEnabled && groups.find((group) => group.persons.includes(person._id)),
+    () => !groupsDisabled && !!organisation.groupsEnabled && groups.find((group) => group.persons.includes(person._id)),
     [groups, person._id, organisation.groupsEnabled, groupsDisabled]
   );
 

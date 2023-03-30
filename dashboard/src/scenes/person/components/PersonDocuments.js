@@ -34,7 +34,6 @@ const PersonDocuments = ({ person }) => {
           onDelete={async (document) => {
             if (!window.confirm('Voulez-vous vraiment supprimer ce document ?')) return;
             const _person = !document.person ? person : document.personPopulated;
-            debugger;
             await API.delete({ path: document.downloadPath ?? `/person/${document.person ?? person._id}/document/${document.file.filename}` });
             const personResponse = await API.put({
               path: `/person/${_person._id}`,
