@@ -1351,8 +1351,6 @@ const CommentCreatedAt = ({ date, comments }) => {
   const [showModal, setShowModal] = useState(false);
   const person = useRecoilValue(userState);
 
-  console.log('comments', comments);
-  //console.log('person', person);
   if (!data) return <div />;
 
   return (
