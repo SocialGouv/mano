@@ -85,7 +85,7 @@ test("Create action with comments", async ({ page }) => {
 
   await page.getByRole("link", { name: "Agenda" }).click();
   await expect(page).toHaveURL("http://localhost:8090/action?calendarTab=2");
-  await page.locator(`data-test-id=${actionFor2PersonName}`).getByText(person1Name).click();
+  await page.locator(`data-test-id='${actionFor2PersonName}'`).getByText(person1Name).click();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*/);
   await page.getByText(actionFor2PersonName).click();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/action\/.*/);

@@ -151,7 +151,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("link", { name: "Organisation" }).click();
   await page.getByRole("button", { name: "Personnes suivies" }).click();
 
-  await page.hover(`[data-test-id=${testPersonSocialField}]`);
+  await page.hover(`[data-test-id='${testPersonSocialField}']'`);
   await page
     .getByRole("button", {
       name: `Modifier le champ ${testPersonSocialField}`,
@@ -163,7 +163,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Mise à jour !").click();
 
-  await page.hover(`[data-test-id=${testPersonMedicalField}]`);
+  await page.hover(`[data-test-id='${testPersonMedicalField}']`);
   await page
     .getByRole("button", {
       name: `Modifier le champ ${testPersonMedicalField}`,
@@ -176,7 +176,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByText("Mise à jour !").click();
 
   await page.getByRole("button", { name: "Dossier Médical 🧑‍⚕️" }).click();
-  await page.hover(`[data-test-id=${testMedicalFileField}]`);
+  await page.hover(`[data-test-id='${testMedicalFileField}']`);
   await page
     .getByRole("button", {
       name: `Modifier le champ ${testMedicalFileField}`,
@@ -202,7 +202,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
 
   await page.getByRole("button", { name: "Territoires" }).click();
 
-  await page.hover(`[data-test-id=${testObsTerritoryField}]`);
+  await page.hover(`[data-test-id='${testObsTerritoryField}']`);
   await page
     .getByRole("button", {
       name: `Modifier le champ ${testObsTerritoryField}`,
@@ -228,15 +228,15 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("cell", { name: personName }).click();
   await page.getByRole("button", { name: "Modifier" }).click();
   await page.getByRole("dialog").getByText("Informations sociales").click();
-  await page.locator(`data-test-id=${testPersonSocialField}`).click();
+  await page.locator(`data-test-id='${testPersonSocialField}'`).click();
   await page.getByRole("dialog").getByText("Informations médicales").click();
-  await page.locator(`data-test-id=${testPersonMedicalField}`).click();
+  await page.locator(`data-test-id='${testPersonMedicalField}'`).click();
   await page.getByRole("button", { name: "Annuler" }).click();
 
   await page.getByRole("button", { name: "Dossier Médical" }).click();
   await page.getByText(testMedicalFileField).click();
   await page.getByText("- Médicale").click();
-  await page.locator(`data-test-id=${testConsultationField}`).click();
+  await page.locator(`data-test-id='${testConsultationField}'`).click();
 
   await page.getByRole("button", { name: "Annuler" }).click();
 
@@ -247,7 +247,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
 
   await page.getByText(`${testObsTerritoryField}: Magique`).click();
 
-  await page.locator(`data-test-id=${testObsTerritoryField}`).click();
+  await page.locator(`data-test-id='${testObsTerritoryField}'`).click();
 
   await page
     .locator('div[role="document"]:has-text("Modifier l\'observation×Nombre de personnes non connues hommes rencontréesNombre ")')
@@ -266,15 +266,15 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("cell", { name: personName }).click();
   await page.getByRole("button", { name: "Modifier" }).click();
   await page.getByRole("dialog").getByText("Informations sociales").click();
-  await expect(page.locator(`data-test-id=${testPersonSocialField}`)).toBeHidden();
+  await expect(page.locator(`data-test-id='${testPersonSocialField}'`)).toBeHidden();
   await page.getByRole("dialog").getByText("Informations médicales").click();
-  await expect(page.locator(`data-test-id=${testPersonMedicalField}`)).toBeHidden();
+  await expect(page.locator(`data-test-id='${testPersonMedicalField}'`)).toBeHidden();
   await page.getByRole("button", { name: "Annuler" }).click();
 
   await page.getByRole("button", { name: "Dossier Médical" }).click();
   await expect(page.getByText(testMedicalFileField)).toBeHidden();
   await page.getByText("- Médicale").click();
-  await expect(page.locator(`data-test-id=${testConsultationField}`)).toBeHidden();
+  await expect(page.locator(`data-test-id='${testConsultationField}'`)).toBeHidden();
   await page.getByRole("button", { name: "Annuler" }).click();
 
   await page.getByRole("link", { name: "Territoires" }).click();
@@ -285,7 +285,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await expect(page.getByText("Test champ perso observation: Magique")).toBeHidden();
   await page.getByText("Nombre de personnes non connues hommes rencontrées:").click();
 
-  await expect(page.locator(`data-test-id=${testObsTerritoryField}`)).toBeHidden();
+  await expect(page.locator(`data-test-id='${testObsTerritoryField}'`)).toBeHidden();
 
   await page
     .locator('div[role="document"]:has-text("Modifier l\'observation×Nombre de personnes non connues hommes rencontréesNombre ")')

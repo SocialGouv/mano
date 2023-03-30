@@ -130,7 +130,7 @@ test("Cross teams report", async ({ page }) => {
       `Accueil du ${dayjs().format("dddd D MMMM YYYY")} de l'équipe ${team1Name}`
     );
 
-    await expect(page.locator(`data-test-id=${person1action}`)).toBeVisible();
+    await expect(page.locator(`data-test-id='${person1action}'`)).toBeVisible();
 
     expect(page.locator('[id="passages-title"]')).toContainText("0 passage");
     await page.getByRole("button", { name: "Passage anonyme" }).click({ clickCount: 2 });
@@ -155,7 +155,7 @@ test("Cross teams report", async ({ page }) => {
       `Accueil du ${dayjs().format("dddd D MMMM YYYY")} de l'équipe ${team2Name}`
     );
 
-    await expect(page.locator(`data-test-id=${person2action}`)).toBeVisible();
+    await expect(page.locator(`data-test-id='${person2action}'`)).toBeVisible();
 
     expect(page.locator('[id="passages-title"]')).toContainText("0 passage");
     await page.getByRole("button", { name: "Passage anonyme" }).click({ clickCount: 4 });
@@ -177,16 +177,16 @@ test("Cross teams report", async ({ page }) => {
     await expect(page).toHaveURL(`http://localhost:8090/report/${dayjs().format("YYYY-MM-DD")}?tab=passages`);
     await page.getByText("Passages (2)").click();
     await page.getByText("Actions créées (1)").click();
-    await expect(page.locator(`data-test-id=${person1action}`)).toBeVisible();
-    await expect(page.locator(`data-test-id=${person2action}`)).toBeHidden();
+    await expect(page.locator(`data-test-id='${person1action}'`)).toBeVisible();
+    await expect(page.locator(`data-test-id='${person2action}'`)).toBeHidden();
     await page.getByText("Personnes créées (1)").click();
-    await expect(page.locator(`data-test-id=${person1Name}`)).toBeVisible();
-    await expect(page.locator(`data-test-id=${person2Name}`)).toBeHidden();
+    await expect(page.locator(`data-test-id='${person1Name}'`)).toBeVisible();
+    await expect(page.locator(`data-test-id='${person2Name}'`)).toBeHidden();
 
     await page.locator('[id="report-button-reception"]').click();
 
-    await expect(page.locator(`data-test-id=${team1Name}-Café-2`)).toBeVisible();
-    await expect(page.locator(`data-test-id=${team1Name}-Douche-3`)).toBeVisible();
+    await expect(page.locator(`data-test-id='${team1Name}-Café-2'`)).toBeVisible();
+    await expect(page.locator(`data-test-id='${team1Name}-Douche-3'`)).toBeVisible();
   });
 
   await test.step("should be able to add a collab and a description in team 1", async () => {
@@ -209,11 +209,11 @@ test("Cross teams report", async ({ page }) => {
 
     await page.getByText("Passages (4)").click();
     await page.getByText("Actions créées (1)").click();
-    await expect(page.locator(`data-test-id=${person1action}`)).toBeHidden();
-    await expect(page.locator(`data-test-id=${person2action}`)).toBeVisible();
+    await expect(page.locator(`data-test-id='${person1action}'`)).toBeHidden();
+    await expect(page.locator(`data-test-id='${person2action}'`)).toBeVisible();
     await page.getByText("Personnes créées (1)").click();
-    await expect(page.locator(`data-test-id=${person1Name}`)).toBeHidden();
-    await expect(page.locator(`data-test-id=${person2Name}`)).toBeVisible();
+    await expect(page.locator(`data-test-id='${person1Name}'`)).toBeHidden();
+    await expect(page.locator(`data-test-id='${person2Name}'`)).toBeVisible();
   });
 
   await test.step("should be able to add a collab and a description in team 2", async () => {
@@ -261,21 +261,21 @@ test("Cross teams report", async ({ page }) => {
     await page.getByRole("button", { name: "Afficher" }).first().click();
     await page.getByRole("button", { name: "Afficher" }).first().click();
 
-    await expect(page.locator(`data-test-id=${team1Name}-Café-2`)).toBeVisible();
-    await expect(page.locator(`data-test-id=${team1Name}-Douche-3`)).toBeVisible();
-    await expect(page.locator(`data-test-id=${team1Name}-Repas-0`)).toBeVisible();
+    await expect(page.locator(`data-test-id='${team1Name}-Café-2'`)).toBeVisible();
+    await expect(page.locator(`data-test-id='${team1Name}-Douche-3'`)).toBeVisible();
+    await expect(page.locator(`data-test-id='${team1Name}-Repas-0'`)).toBeVisible();
 
-    await expect(page.locator(`data-test-id=${team2Name}-Café-2`)).toBeVisible();
-    await expect(page.locator(`data-test-id=${team2Name}-Douche-0`)).toBeVisible();
-    await expect(page.locator(`data-test-id=${team2Name}-Repas-3`)).toBeVisible();
+    await expect(page.locator(`data-test-id='${team2Name}-Café-2'`)).toBeVisible();
+    await expect(page.locator(`data-test-id='${team2Name}-Douche-0'`)).toBeVisible();
+    await expect(page.locator(`data-test-id='${team2Name}-Repas-3'`)).toBeVisible();
 
     await page.getByText("Passages (6)").click();
     await page.getByText("Actions créées (2)").click();
-    await expect(page.locator(`data-test-id=${person1action}`)).toBeVisible();
-    await expect(page.locator(`data-test-id=${person2action}`)).toBeVisible();
+    await expect(page.locator(`data-test-id='${person1action}'`)).toBeVisible();
+    await expect(page.locator(`data-test-id='${person2action}'`)).toBeVisible();
     await page.getByText("Personnes créées (2)").click();
-    await expect(page.locator(`data-test-id=${person1Name}`)).toBeVisible();
-    await expect(page.locator(`data-test-id=${person2Name}`)).toBeVisible();
+    await expect(page.locator(`data-test-id='${person1Name}'`)).toBeVisible();
+    await expect(page.locator(`data-test-id='${person2Name}'`)).toBeVisible();
   });
 
   await test.step("should see list of reports and being able to click on it, click on prev and next", async () => {

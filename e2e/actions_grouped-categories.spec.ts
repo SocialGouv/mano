@@ -181,17 +181,17 @@ test("Actions", async ({ page }) => {
   await test.step("Check for proper categories on actions", async () => {
     await page.getByRole("link", { name: "Agenda" }).click();
 
-    await expect(page.locator(`data-test-id=${action1Name}${groupe1cat1}`)).toBeVisible();
+    await expect(page.locator(`data-test-id='${action1Name}${groupe1cat1}'`)).toBeVisible();
 
-    await expect(page.locator(`data-test-id=${action1Name}${groupe2cat1}`)).toBeVisible();
+    await expect(page.locator(`data-test-id='${action1Name}${groupe2cat1}'`)).toBeVisible();
 
-    await expect(page.locator(`data-test-id=${action2Name}${groupe1cat2}`)).toBeVisible();
+    await expect(page.locator(`data-test-id='${action2Name}${groupe1cat2}'`)).toBeVisible();
 
-    await expect(page.locator(`data-test-id=${action2Name}${groupe2cat2}`)).toBeVisible();
+    await expect(page.locator(`data-test-id='${action2Name}${groupe2cat2}'`)).toBeVisible();
 
-    await expect(page.locator(`data-test-id=${action3Name}${groupe3cat1ToBeDeleted}`)).toBeVisible();
+    await expect(page.locator(`data-test-id='${action3Name}${groupe3cat1ToBeDeleted}'`)).toBeVisible();
 
-    await expect(page.locator(`data-test-id=${action3Name}${groupe2cat2}`)).toBeVisible();
+    await expect(page.locator(`data-test-id='${action3Name}${groupe2cat2}'`)).toBeVisible();
   });
 
   await test.step("Update category name", async () => {
@@ -199,7 +199,7 @@ test("Actions", async ({ page }) => {
 
     await page.getByRole("button", { name: "Actions" }).click();
 
-    await page.hover(`id=${groupe2cat2}`);
+    await page.hover(`id='${groupe2cat2}'`);
     await page.getByRole("button", { name: `Modifier la catégorie ${groupe2cat2}` }).click();
 
     await page.getByPlaceholder(groupe2cat2).fill(groupe2cat2Renamed);
@@ -237,16 +237,16 @@ test("Actions", async ({ page }) => {
   await test.step("Check for proper categories on actions", async () => {
     await page.getByRole("link", { name: "Agenda" }).click();
 
-    await expect(page.locator(`data-test-id=${action1Name}${groupe1cat1}`)).toBeVisible();
+    await expect(page.locator(`data-test-id='${action1Name}${groupe1cat1}'`)).toBeVisible();
 
-    await expect(page.locator(`data-test-id=${action1Name}${groupe2cat1}`)).toBeVisible();
+    await expect(page.locator(`data-test-id='${action1Name}${groupe2cat1}'`)).toBeVisible();
 
-    await expect(page.locator(`data-test-id=${action2Name}${groupe1cat2}`)).toBeVisible();
+    await expect(page.locator(`data-test-id='${action2Name}${groupe1cat2}'`)).toBeVisible();
 
-    await expect(page.locator(`data-test-id=${action2Name}${groupe2cat2Renamed}`)).toBeVisible();
+    await expect(page.locator(`data-test-id='${action2Name}${groupe2cat2Renamed}'`)).toBeVisible();
 
-    await expect(page.locator(`data-test-id=${action3Name}${groupe3cat1ToBeDeleted}`)).toBeVisible();
+    await expect(page.locator(`data-test-id='${action3Name}${groupe3cat1ToBeDeleted}'`)).toBeVisible();
 
-    await expect(page.locator(`data-test-id=${action3Name}${groupe2cat2Renamed}`)).toBeVisible();
+    await expect(page.locator(`data-test-id='${action3Name}${groupe2cat2Renamed}'`)).toBeVisible();
   });
 });
