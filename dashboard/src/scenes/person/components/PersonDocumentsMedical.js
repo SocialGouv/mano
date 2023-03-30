@@ -74,7 +74,36 @@ const PersonDocumentsMedical = ({ person }) => {
   return (
     <div className="tw-relative">
       {documentToEdit && (
-        <DocumentModal document={documentToEdit} person={person} onClose={() => setDocumentToEdit(null)} key={documentToEdit._id}>
+        <DocumentModal
+          groupsDisabled
+          onDelete={async (document) => {
+            if (!window.confirm('Voulez-vous vraiment supprimer ce document ?')) return;
+            await API.delete({ path: document.downloadPath ?? `/person/${document.person ?? person._id}/document/${document.file.filename}` });
+            const medicalFileResponse = await API.put({
+              path: `/medical-file/${medicalFile._id}`,
+              body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({
+                ...medicalFile,
+                documents: medicalFile.documents.filter((d) => d._id !== document._id),
+              }),
+            });
+            if (medicalFileResponse.ok) {
+              const newMedicalFile = medicalFileResponse.decryptedData;
+              setAllMedicalFiles((allMedicalFiles) =>
+                allMedicalFiles.map((m) => {
+                  if (m._id === medicalFile._id) return newMedicalFile;
+                  return m;
+                })
+              );
+              toast.success('Document supprimé');
+            } else {
+              toast.error('Erreur lors de la suppression du document, vous pouvez contactez le support');
+            }
+            setDocumentToEdit(null);
+          }}
+          document={documentToEdit}
+          person={person}
+          onClose={() => setDocumentToEdit(null)}
+          key={documentToEdit._id}>
           {documentToEdit.type === 'treatment' ? (
             <button
               onClick={() => {
