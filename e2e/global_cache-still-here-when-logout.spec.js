@@ -53,12 +53,12 @@ test("Person creation", async ({ page }) => {
     await page.getByRole("button", { name: dayjs().format("YYYY-MM-DD") }).click();
 
     await page.getByText("Personnes créées (2)").click();
-    await expect(page.locator(`data-test-id='${person1Name}'`)).toBeVisible();
-    await expect(page.locator(`data-test-id='${person1Name}'`).getByRole("cell", { name: "User Admin Test - 5" })).toBeVisible();
-    await expect(page.locator(`data-test-id='${person1Name}'`).getByRole("cell", { name: "Team Test - 5" })).toBeVisible();
-    await expect(page.locator(`data-test-id='${person2Name}'`)).toBeVisible();
-    await expect(page.locator(`data-test-id='${person2Name}'`).getByRole("cell", { name: "User Admin Test - 5" })).toBeVisible();
-    await expect(page.locator(`data-test-id='${person2Name}'`).getByRole("cell", { name: "Team Test - 5" })).toBeVisible();
+    await expect(page.locator(`data-test-id=${person1Name}`)).toBeVisible();
+    await expect(page.locator(`data-test-id=${person1Name}`).getByRole("cell", { name: "User Admin Test - 5" })).toBeVisible();
+    await expect(page.locator(`data-test-id=${person1Name}`).getByRole("cell", { name: "Team Test - 5" })).toBeVisible();
+    await expect(page.locator(`data-test-id=${person2Name}`)).toBeVisible();
+    await expect(page.locator(`data-test-id=${person2Name}`).getByRole("cell", { name: "User Admin Test - 5" })).toBeVisible();
+    await expect(page.locator(`data-test-id=${person2Name}`).getByRole("cell", { name: "Team Test - 5" })).toBeVisible();
   });
 
   await page.getByRole("button", { name: "User Admin Test - 5" }).click();
