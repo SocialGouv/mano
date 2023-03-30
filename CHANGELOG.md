@@ -1,3 +1,11 @@
+## [1.261.10](https://github.com/SocialGouv/mano/compare/v1.261.9...v1.261.10) (2023-03-30)
+
+
+### Bug Fixes
+
+* podfile.lock ([#1435](https://github.com/SocialGouv/mano/issues/1435)) ([07839d0](https://github.com/SocialGouv/mano/commit/07839d0f590d7ff1ca61a2a2e5076538fe321dcd))
+* suppression des console.log inutils ([#1437](https://github.com/SocialGouv/mano/issues/1437)) ([95f085c](https://github.com/SocialGouv/mano/commit/95f085c96945bb6822fc5b258845df27c172bc26))
+
 ## [1.261.9](https://github.com/SocialGouv/mano/compare/v1.261.8...v1.261.9) (2023-03-28)
 
 
