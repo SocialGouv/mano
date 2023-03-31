@@ -14,6 +14,7 @@ import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirm
 import { capture } from '../../services/sentry';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../../recoil/auth';
+import { emailRegex } from '../../utils';
 
 const List = () => {
   const [organisations, setOrganisations] = useState(null);
@@ -205,7 +206,7 @@ const Create = ({ onChange, open, setOpen }) => {
               if (!values.name) errors.name = 'Le nom est obligatoire';
               if (!values.orgName) errors.orgName = "Le nom de l'organisation est obligatoire";
               if (!values.email) errors.email = "L'email est obligatoire";
-              else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)) errors.email = "L'email est invalide";
+              else if (!emailRegex.test(values.email)) errors.email = "L'email est invalide";
               return errors;
             }}
             onSubmit={async (body, actions) => {
