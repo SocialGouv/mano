@@ -1,3 +1,10 @@
+## [1.261.15](https://github.com/SocialGouv/mano/compare/v1.261.14...v1.261.15) (2023-03-31)
+
+
+### Bug Fixes
+
+* **dashboard:** certaines dates d'interactions étaient indéfinies et donc posaient problème dans le calcul des stats ([#1448](https://github.com/SocialGouv/mano/issues/1448)) ([c2fb97f](https://github.com/SocialGouv/mano/commit/c2fb97f4875c3508e5261664882ee14844d32e36))
+
 ## [1.261.14](https://github.com/SocialGouv/mano/compare/v1.261.13...v1.261.14) (2023-03-31)
 
 
