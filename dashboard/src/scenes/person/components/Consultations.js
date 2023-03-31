@@ -35,6 +35,11 @@ export const Consultations = ({ person }) => {
     [personConsultations, consultationStatuses, consultationTypes]
   );
 
+  const currentConsultation = useMemo(() => {
+    if (!currentConsultationId) return null;
+    return personConsultations.find((c) => c._id === currentConsultationId);
+  }, [personConsultations, currentConsultationId]);
+
   const data = personConsultations;
   const filteredData = personConsultationsFiltered;
 
@@ -94,6 +99,7 @@ export const Consultations = ({ person }) => {
       </div>
       {modalOpen && (
         <ConsultationModal
+          consultation={currentConsultation}
           onClose={() => {
             setCurrentConsultationId(null);
             setModalOpen(false);
