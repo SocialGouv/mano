@@ -10,7 +10,7 @@ import API from '../../../services/api';
 import { formatDateTimeWithNameOfDay } from '../../../services/date';
 import { download } from '../../../utils';
 
-export default function DocumentModal({ document, onClose, person, children, onDelete, groupsDisabled = true }) {
+export default function DocumentModal({ document, onClose, person, children, onDelete, groupsDisabled = false }) {
   const users = useRecoilValue(usersState);
   const preparePersonForEncryption = usePreparePersonForEncryption();
   const setPersons = useSetRecoilState(personsState);
