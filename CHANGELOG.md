@@ -1,3 +1,10 @@
+## [1.261.14](https://github.com/SocialGouv/mano/compare/v1.261.13...v1.261.14) (2023-03-31)
+
+
+### Bug Fixes
+
+* **dashboard:** le selecteur de date n'affichait plus les périodes quand elles étaient personnalisées ([#1447](https://github.com/SocialGouv/mano/issues/1447)) ([bdfa02d](https://github.com/SocialGouv/mano/commit/bdfa02de457166879aff0e4dd9b205b0096e44dc))
+
 ## [1.261.13](https://github.com/SocialGouv/mano/compare/v1.261.12...v1.261.13) (2023-03-31)
 
 
