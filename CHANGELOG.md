@@ -1,3 +1,10 @@
+## [1.261.13](https://github.com/SocialGouv/mano/compare/v1.261.12...v1.261.13) (2023-03-31)
+
+
+### Bug Fixes
+
+* **dashboard:** controle d l'email pour la modification d'un compte ([#1446](https://github.com/SocialGouv/mano/issues/1446)) ([b82bf65](https://github.com/SocialGouv/mano/commit/b82bf656b3fca008ebab3a86b3a374e4a196dd0f))
+
 ## [1.261.12](https://github.com/SocialGouv/mano/compare/v1.261.11...v1.261.12) (2023-03-30)
 
 
