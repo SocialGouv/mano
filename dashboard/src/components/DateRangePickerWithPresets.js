@@ -85,7 +85,7 @@ export const formatPeriod = ({ preset, period }) => {
   return `Entre... et le...`;
 };
 // https://reactdatepicker.com/#example-date-range
-const DateRangePickerWithPresets = ({ period, setPeriod, preset, setPreset }) => {
+const DateRangePickerWithPresets = ({ period, setPeriod, preset, setPreset, removePreset }) => {
   const [showDatePicker, setShowDatepicker] = useState(false);
   const [numberOfMonths, setNumberOfMonths] = useState(() => (window.innerWidth < 1100 ? 1 : 2));
 
@@ -114,7 +114,7 @@ const DateRangePickerWithPresets = ({ period, setPeriod, preset, setPreset }) =>
       startDate: dateForDatePicker(startDate),
       endDate: dateForDatePicker(endDate),
     });
-    setPreset(null);
+    removePreset();
   };
 
   const closeDatePicker = () => {

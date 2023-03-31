@@ -119,7 +119,7 @@ const Stats = () => {
   ]);
   const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('stats-viewAllOrganisationData', teams.length === 1);
   const [period, setPeriod] = useLocalStorage('period', { startDate: null, endDate: null });
-  const [preset, setPreset] = useLocalStorage('stats-date-preset', null);
+  const [preset, setPreset, removePreset] = useLocalStorage('stats-date-preset', null);
   const [actionsStatuses, setActionsStatuses] = useLocalStorage('stats-actionsStatuses', DONE);
   const [manuallySelectedTeams, setSelectedTeams] = useLocalStorage('stats-teams', [currentTeam]);
   const [actionsCategoriesGroups, setActionsCategoriesGroups] = useLocalStorage('stats-catGroups', []);
@@ -445,7 +445,7 @@ const Stats = () => {
       </HeaderStyled>
       <div className="noprint date-picker-container tw-mb-5 tw-flex tw-flex-wrap tw-items-center">
         <div className="tw-min-w-[15rem] tw-shrink-0 tw-basis-1/3 tw-p-0">
-          <DateRangePickerWithPresets period={period} setPeriod={setPeriod} preset={preset} setPreset={setPreset} />
+          <DateRangePickerWithPresets period={period} setPeriod={setPeriod} preset={preset} setPreset={setPreset} removePreset={removePreset} />
         </div>
         <div className="tw-flex tw-basis-2/3 tw-items-center tw-justify-end">
           <ButtonCustom color="link" title="Imprimer" onClick={window.print} />

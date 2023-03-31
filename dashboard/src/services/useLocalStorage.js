@@ -1,8 +1,8 @@
 import { useLocalStorageValue } from '@react-hookz/web/esm/useLocalStorageValue';
 
 export const useLocalStorage = (key, defaultValue) => {
-  const { value, set } = useLocalStorageValue(key, {
+  const { value, set, remove } = useLocalStorageValue(key, {
     defaultValue,
   });
-  return [value, set];
+  return [value, set, remove];
 };
