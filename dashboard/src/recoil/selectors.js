@@ -242,7 +242,11 @@ export const itemsGroupedByPersonSelector = selector({
             return 0;
           })
         ),
-      ];
+        // Some interactions may contain undefined values, such as dueAt for an action that is not completed yet. We filter them out.
+        // We could have done it before by checking with 'if' but it would have made more conditions in loops.
+        // If we do not filter them, when comparing for date periods in stats, we would have to check for undefined,
+        // otherwise we would have a bug that consider everybody "person suivies" in every period.
+      ].filter((i) => Boolean(i));
       personsObject[personId].lastUpdateCheckForGDPR = personsObject[personId].interactions[0];
     }
 
