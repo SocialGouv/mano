@@ -15,6 +15,7 @@ import { organisationState, userState } from '../../recoil/auth';
 import API from '../../services/api';
 import useTitle from '../../services/useTitle';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
+import { emailRegex } from '../../utils';
 
 const View = () => {
   const [localUser, setLocalUser] = useState(null);
@@ -52,6 +53,7 @@ const View = () => {
         onSubmit={async (body, actions) => {
           try {
             if (!body.team?.length) return toast.error('Au moins une équipe est obligatoire');
+            if (body.email && !emailRegex.test(body.email)) return toast.error('Email invalide');
             body.organisation = organisation._id;
             const res = await API.put({ path: `/user/${id}`, body });
             if (!res.ok) return actions.setSubmitting(false);

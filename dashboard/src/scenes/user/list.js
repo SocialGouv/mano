@@ -18,6 +18,7 @@ import { formatDateWithFullMonth } from '../../services/date';
 import useTitle from '../../services/useTitle';
 import SelectRole from '../../components/SelectRole';
 import { useLocalStorage } from '../../services/useLocalStorage';
+import { emailRegex } from '../../utils';
 
 const defaultSort = (a, b, sortOrder) => (sortOrder === 'ASC' ? (a.name || '').localeCompare(b.name) : (b.name || '').localeCompare(a.name));
 
@@ -170,7 +171,7 @@ const Create = ({ onChange }) => {
               const errors = {};
               if (!values.name) errors.name = 'Le nom est obligatoire';
               if (!values.email) errors.email = "L'email est obligatoire";
-              else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)) errors.email = "L'email est invalide";
+              else if (!emailRegex.test(values.email)) errors.email = "L'email est invalide";
               if (!values.role) errors.role = 'Le rôle est obligatoire';
               if (!values.team?.length) errors.team = 'Veuillez sélectionner une équipe';
               return errors;
