@@ -1,3 +1,10 @@
+## [1.261.17](https://github.com/SocialGouv/mano/compare/v1.261.16...v1.261.17) (2023-04-03)
+
+
+### Bug Fixes
+
+* **dashboard:** suppression des documents médicaux à nouveau possible ([#1443](https://github.com/SocialGouv/mano/issues/1443)) ([256997f](https://github.com/SocialGouv/mano/commit/256997fc02f306f37914021271d586218123133a))
+
 ## [1.261.16](https://github.com/SocialGouv/mano/compare/v1.261.15...v1.261.16) (2023-04-03)
 
 
