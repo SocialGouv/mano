@@ -1,3 +1,10 @@
+## [1.261.16](https://github.com/SocialGouv/mano/compare/v1.261.15...v1.261.16) (2023-04-03)
+
+
+### Bug Fixes
+
+* **dashboard:** sélection de la consultation quand on clique depuis n'importe quel endroit de l'application ([#1449](https://github.com/SocialGouv/mano/issues/1449)) ([8a6bd87](https://github.com/SocialGouv/mano/commit/8a6bd87031b266cada934b23b6aa094e71435b5c))
+
 ## [1.261.15](https://github.com/SocialGouv/mano/compare/v1.261.14...v1.261.15) (2023-03-31)
 
 
