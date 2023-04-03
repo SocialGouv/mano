@@ -29,7 +29,39 @@ const PersonDocuments = ({ person }) => {
 
   return (
     <div className="tw-relative">
-      {documentToEdit && <DocumentModal document={documentToEdit} person={person} onClose={() => setDocumentToEdit(null)} key={documentToEdit._id} />}
+      {documentToEdit && (
+        <DocumentModal
+          onDelete={async (document) => {
+            if (!window.confirm('Voulez-vous vraiment supprimer ce document ?')) return;
+            const _person = !document.person ? person : document.personPopulated;
+            await API.delete({ path: document.downloadPath ?? `/person/${document.person ?? person._id}/document/${document.file.filename}` });
+            const personResponse = await API.put({
+              path: `/person/${_person._id}`,
+              body: preparePersonForEncryption({
+                ..._person,
+                documents: _person.documents.filter((d) => d._id !== document._id),
+              }),
+            });
+            if (personResponse.ok) {
+              const newPerson = personResponse.decryptedData;
+              setPersons((persons) =>
+                persons.map((p) => {
+                  if (p._id === _person._id) return newPerson;
+                  return p;
+                })
+              );
+              toast.success('Document supprimé');
+            } else {
+              toast.error('Erreur lors de la suppression du document, vous pouvez contactez le support');
+            }
+            setDocumentToEdit(null);
+          }}
+          document={documentToEdit}
+          person={person}
+          onClose={() => setDocumentToEdit(null)}
+          key={documentToEdit._id}
+        />
+      )}
       <div className="tw-sticky tw-top-0 tw-z-50 tw-flex tw-bg-white tw-p-3">
         <h4 className="tw-flex-1 tw-text-xl">Documents {person?.documents?.length ? `(${person?.documents?.length})` : ''}</h4>
         <label

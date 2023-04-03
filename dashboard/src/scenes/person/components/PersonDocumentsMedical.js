@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import ConsultationModal from '../../../components/ConsultationModal';
 import { organisationState, usersState, userState } from '../../../recoil/auth';
+import { consultationsState, prepareConsultationForEncryption } from '../../../recoil/consultations';
 import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../../recoil/medicalFiles';
 import { arrayOfitemsGroupedByConsultationSelector } from '../../../recoil/selectors';
-import { treatmentsState } from '../../../recoil/treatments';
+import { prepareTreatmentForEncryption, treatmentsState } from '../../../recoil/treatments';
 import API from '../../../services/api';
 import { formatDateTimeWithNameOfDay } from '../../../services/date';
 import { capture } from '../../../services/sentry';
@@ -21,7 +22,8 @@ const PersonDocumentsMedical = ({ person }) => {
   const organisation = useRecoilValue(organisationState);
 
   const allConsultations = useRecoilValue(arrayOfitemsGroupedByConsultationSelector);
-  const [allTreatments] = useRecoilState(treatmentsState);
+  const setAllConsultations = useSetRecoilState(consultationsState);
+  const [allTreatments, setAllTreatments] = useRecoilState(treatmentsState);
   const [allMedicalFiles, setAllMedicalFiles] = useRecoilState(medicalFileState);
   const [consultation, setConsultation] = useState(false);
   const [treatment, setTreatment] = useState(false);
@@ -74,7 +76,83 @@ const PersonDocumentsMedical = ({ person }) => {
   return (
     <div className="tw-relative">
       {documentToEdit && (
-        <DocumentModal document={documentToEdit} person={person} onClose={() => setDocumentToEdit(null)} key={documentToEdit._id}>
+        <DocumentModal
+          groupsDisabled
+          onDelete={async (document) => {
+            if (!window.confirm('Voulez-vous vraiment supprimer ce document ?')) return;
+            await API.delete({ path: document.downloadPath ?? `/person/${document.person ?? person._id}/document/${document.file.filename}` });
+
+            if (document.type === 'treatment') {
+              const treatmentResponse = await API.put({
+                path: `/treatment/${document.treatment._id}`,
+                body: prepareTreatmentForEncryption({
+                  ...document.treatment,
+                  documents: document.treatment.documents.filter((d) => d._id !== document._id),
+                }),
+              });
+              if (treatmentResponse.ok) {
+                const newTreatment = treatmentResponse.decryptedData;
+                debugger;
+                setAllTreatments((allTreatments) =>
+                  allTreatments.map((t) => {
+                    if (t._id === document.treatment._id) return newTreatment;
+                    return t;
+                  })
+                );
+                toast.success('Document supprimé');
+              } else {
+                toast.error('Erreur lors de la suppression du document, vous pouvez contactez le support');
+                capture('Error while deleting treatment document', { treatment: document.treatment, document });
+              }
+            } else if (document.type === 'consultation') {
+              const consultationResponse = await API.put({
+                path: `/consultation/${document.consultation._id}`,
+                body: prepareConsultationForEncryption(organisation.consultations)({
+                  ...document.consultation,
+                  documents: document.consultation.documents.filter((d) => d._id !== document._id),
+                }),
+              });
+              if (consultationResponse.ok) {
+                const newConsultation = consultationResponse.decryptedData;
+                setAllConsultations((allConsultations) =>
+                  allConsultations.map((c) => {
+                    if (c._id === document.consultation._id) return newConsultation;
+                    return c;
+                  })
+                );
+                toast.success('Document supprimé');
+              } else {
+                toast.error('Erreur lors de la suppression du document, vous pouvez contactez le support');
+                capture('Error while deleting consultation document', { consultation: document.consultation, document });
+              }
+            } else {
+              const medicalFileResponse = await API.put({
+                path: `/medical-file/${medicalFile._id}`,
+                body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({
+                  ...medicalFile,
+                  documents: medicalFile.documents.filter((d) => d._id !== document._id),
+                }),
+              });
+              if (medicalFileResponse.ok) {
+                const newMedicalFile = medicalFileResponse.decryptedData;
+                setAllMedicalFiles((allMedicalFiles) =>
+                  allMedicalFiles.map((m) => {
+                    if (m._id === medicalFile._id) return newMedicalFile;
+                    return m;
+                  })
+                );
+                toast.success('Document supprimé');
+              } else {
+                toast.error('Erreur lors de la suppression du document, vous pouvez contactez le support');
+                capture('Error while deleting medical file document', { medicalFile, document });
+              }
+            }
+            setDocumentToEdit(null);
+          }}
+          document={documentToEdit}
+          person={person}
+          onClose={() => setDocumentToEdit(null)}
+          key={documentToEdit._id}>
           {documentToEdit.type === 'treatment' ? (
             <button
               onClick={() => {

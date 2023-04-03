@@ -10,7 +10,7 @@ import API from '../../../services/api';
 import { formatDateTimeWithNameOfDay } from '../../../services/date';
 import { download } from '../../../utils';
 
-export default function DocumentModal({ document, onClose, person, children }) {
+export default function DocumentModal({ document, onClose, person, children, onDelete, groupsDisabled = false }) {
   const users = useRecoilValue(usersState);
   const preparePersonForEncryption = usePreparePersonForEncryption();
   const setPersons = useSetRecoilState(personsState);
@@ -19,8 +19,8 @@ export default function DocumentModal({ document, onClose, person, children }) {
   const organisation = useRecoilValue(organisationState);
 
   const canToggleGroupCheck = useMemo(
-    () => !!organisation.groupsEnabled && groups.find((group) => group.persons.includes(person._id)),
-    [groups, person._id, organisation.groupsEnabled]
+    () => !groupsDisabled && !!organisation.groupsEnabled && groups.find((group) => group.persons.includes(person._id)),
+    [groups, person._id, organisation.groupsEnabled, groupsDisabled]
   );
 
   return (
@@ -94,26 +94,7 @@ export default function DocumentModal({ document, onClose, person, children }) {
           type="button"
           className="button-destructive"
           onClick={async () => {
-            if (!window.confirm('Voulez-vous vraiment supprimer ce document ?')) return;
-            const _person = !document.person ? person : document.personPopulated;
-            await API.delete({ path: document.downloadPath ?? `/person/${document.person ?? person._id}/document/${document.file.filename}` });
-            const personResponse = await API.put({
-              path: `/person/${_person._id}`,
-              body: preparePersonForEncryption({
-                ..._person,
-                documents: _person.documents.filter((d) => d._id !== document._id),
-              }),
-            });
-            if (personResponse.ok) {
-              const newPerson = personResponse.decryptedData;
-              setPersons((persons) =>
-                persons.map((p) => {
-                  if (p._id === _person._id) return newPerson;
-                  return p;
-                })
-              );
-            }
-            onClose();
+            onDelete(document);
           }}>
           Supprimer
         </button>
