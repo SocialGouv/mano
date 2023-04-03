@@ -91,7 +91,8 @@ const PersonDocumentsMedical = ({ person }) => {
                 }),
               });
               if (treatmentResponse.ok) {
-                const newTreatment = treatmentResponse.data;
+                const newTreatment = treatmentResponse.decryptedData;
+                debugger;
                 setAllTreatments((allTreatments) =>
                   allTreatments.map((t) => {
                     if (t._id === document.treatment._id) return newTreatment;
@@ -112,7 +113,7 @@ const PersonDocumentsMedical = ({ person }) => {
                 }),
               });
               if (consultationResponse.ok) {
-                const newConsultation = consultationResponse.data;
+                const newConsultation = consultationResponse.decryptedData;
                 setAllConsultations((allConsultations) =>
                   allConsultations.map((c) => {
                     if (c._id === document.consultation._id) return newConsultation;
