@@ -154,7 +154,7 @@ test("test", async ({ page }) => {
   await page.getByRole("link", { name: "Agenda" }).click();
   await page.getByText("La consultation").click();
   await page.getByRole("button", { name: "Annuler" }).click();
-  await page.getByText("le traitement - Rhume (1mg - 12 fois)").click();
+  await page.getByText("le traitement - Rhume - 1mg - 12 fois").click();
   await page.getByRole("button", { name: "Fermer" }).click();
   await page.getByText("La consultation").click();
   await page.getByRole("button", { name: "Annuler" }).click();

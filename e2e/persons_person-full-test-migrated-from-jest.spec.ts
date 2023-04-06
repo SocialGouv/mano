@@ -148,8 +148,6 @@ test("test", async ({ page }) => {
   await page.getByText("Mis à jour !").click();
 
   await page.getByRole("button", { name: "Ajouter un traitement" }).click();
-  await page.getByPlaceholder("Amoxicilline").click();
-  await page.getByPlaceholder("Amoxicilline").fill("hdeyygdeygde");
   await page.getByPlaceholder("1 fois par jour").click();
   await page.getByPlaceholder("1 fois par jour").fill("dedede");
   await page.getByPlaceholder("Angine").click();
@@ -162,9 +160,9 @@ test("test", async ({ page }) => {
   await page.getByLabel("Date de début").fill("2009-11-11");
   await page.getByLabel("Date de début").press("Enter");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
-  await page.getByText("Le dosage est obligatoire").click();
-  await page.getByPlaceholder("1mg").click();
-  await page.getByPlaceholder("1mg").fill("121212121");
+  await page.getByText("Le nom est obligatoire").click();
+  await page.getByPlaceholder("Amoxicilline").click();
+  await page.getByPlaceholder("Amoxicilline").fill("hdeyygdeygde");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Traitement créé !").click();
 
