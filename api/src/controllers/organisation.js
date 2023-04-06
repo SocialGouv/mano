@@ -29,6 +29,7 @@ const { looseUuidRegex, customFieldSchema, positiveIntegerRegex } = require("../
 const { capture } = require("../sentry");
 const { serializeOrganisation } = require("../utils/data-serializer");
 const { defaultSocialCustomFields, defaultMedicalCustomFields } = require("../utils/custom-fields/person");
+const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
 
 const JWT_MAX_AGE = 60 * 60 * 3; // 3 hours in s
 
@@ -264,6 +265,7 @@ router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal", "restricted-access"]),
+  validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
     try {
       const bodyToParse = {
