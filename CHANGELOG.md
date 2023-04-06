@@ -1,3 +1,10 @@
+## [1.261.18](https://github.com/SocialGouv/mano/compare/v1.261.17...v1.261.18) (2023-04-06)
+
+
+### Bug Fixes
+
+* **dashboard:** ajout cloche + vue des consultations + ne pas pouvoir etre pro de sante pour un acces restreint ([#1420](https://github.com/SocialGouv/mano/issues/1420)) ([27c2886](https://github.com/SocialGouv/mano/commit/27c2886b51d849df244c34840a4526db7dd8dd2c))
+
 ## [1.261.17](https://github.com/SocialGouv/mano/compare/v1.261.16...v1.261.17) (2023-04-03)
 
 
