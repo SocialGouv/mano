@@ -67,6 +67,20 @@ const TreatmentsTable = ({ filteredData, person }) => {
   const [treatmentEditOpen, setTreatmentEditOpen] = useState(false);
   const users = useRecoilValue(usersState);
 
+  const displayTreatment = (treatment) => {
+    let base = treatment.name;
+    if (treatment.indication) {
+      base += ` - ${treatment.indication}`;
+    }
+    if (treatment.dosage) {
+      base += ` - ${treatment.dosage}`;
+    }
+    if (treatment.frequency) {
+      base += ` - ${treatment.frequency}`;
+    }
+    return base;
+  };
+
   return (
     <>
       <table className="table">
@@ -87,12 +101,7 @@ const TreatmentsTable = ({ filteredData, person }) => {
                       </div>
                       <div>Créé par {treatment.user ? users.find((u) => u._id === treatment.user)?.name : ''}</div>
                     </div>
-                    <div className="tw-mt-2">
-                      {treatment.name} - {treatment.indication}{' '}
-                      <span className="text-muted">
-                        ({treatment.dosage} - {treatment.frequency})
-                      </span>
-                    </div>
+                    <div className="tw-mt-2">{displayTreatment(treatment)}</div>
                   </div>
                 </td>
               </tr>

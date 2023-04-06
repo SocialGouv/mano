@@ -50,9 +50,9 @@ const Treatment = ({ navigation, route }) => {
 
   const onSaveTreatment = async () => {
     if (!name) return Alert.alert('Veuillez indiquer un nom');
-    if (!dosage) return Alert.alert('Veuillez indiquer un dosage');
-    if (!frequency) return Alert.alert('Veuillez indiquer une fréquence');
-    if (!indication) return Alert.alert('Veuillez indiquer une indication');
+    // if (!dosage) return Alert.alert('Veuillez indiquer un dosage');
+    // if (!frequency) return Alert.alert('Veuillez indiquer une fréquence');
+    // if (!indication) return Alert.alert('Veuillez indiquer une indication');
     if (!startDate) return Alert.alert('Veuillez indiquer une date de début');
     Keyboard.dismiss();
     setPosting(true);
