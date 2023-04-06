@@ -72,7 +72,7 @@ const Drawer = () => {
             </li>
           </>
         )}
-        {['admin', 'normal'].includes(role) && (
+        {['admin', 'normal', 'restricted-access'].includes(role) && (
           <>
             <hr />
             {/* <li>
