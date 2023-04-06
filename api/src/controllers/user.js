@@ -212,7 +212,6 @@ router.get(
       error.status = 400;
       return next(error);
     }
-
     const { platform } = req.headers;
 
     const token = platform === "dashboard" ? req.cookies.jwt : platform === "android" ? ExtractJwt.fromAuthHeaderWithScheme("JWT")(req) : null;
@@ -322,7 +321,7 @@ router.post(
     const newUser = {
       name: sanitizeAll(name),
       role,
-      healthcareProfessional,
+      healthcareProfessional: role === "restricted-access" ? false : healthcareProfessional,
       email: sanitizeAll(email.trim().toLowerCase()),
       password: crypto.randomBytes(60).toString("hex"), // A useless password.
       organisation: req.user.organisation,
@@ -623,9 +622,12 @@ router.put(
 
     if (name) user.name = sanitizeAll(name);
     if (email) user.email = sanitizeAll(email.trim().toLowerCase());
+
     if (healthcareProfessional !== undefined) user.set({ healthcareProfessional });
     if (role) user.set({ role });
-
+    if (role === "restricted-access") {
+      user.set({ healthcareProfessional: false });
+    }
     const tx = await User.sequelize.transaction();
     if (team && Array.isArray(team)) {
       await RelUserTeam.destroy({ where: { user: _id }, transaction: tx });
@@ -634,6 +636,7 @@ router.put(
         { transaction: tx }
       );
     }
+
     await user.save({ transaction: tx });
     await tx.commit();
 
@@ -669,6 +672,7 @@ router.delete(
       error.status = 400;
       return next(error);
     }
+
     const userId = req.params._id;
     const query = { where: { _id: userId, organisation: req.user.organisation } };
 

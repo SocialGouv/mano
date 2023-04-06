@@ -159,7 +159,7 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Mettre à jour" }).click();
   await page.getByText("Mise à jour !").click();
   await page.getByText("Retour").click();
-  await page.getByRole("button", { name: "Action" }).click();
+  await page.getByText('Loading...Action').click();
   await page.getByLabel("Nom de l'action").fill("pouvoirajouteruneaction");
   await clickOnEmptyReactSelect(page, "create-action-person-select", "testrestrict");
   await page.getByRole("button", { name: "Sauvegarder" }).click();

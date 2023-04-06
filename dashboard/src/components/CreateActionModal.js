@@ -45,8 +45,6 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
     return response;
   };
 
-  //if (['restricted-access'].includes(user.role)) return null;
-
   return (
     <ModalContainer open={open} onClose={() => setOpen(false)} size="3xl">
       <ModalHeader title="Créer une nouvelle action" />

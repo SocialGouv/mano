@@ -169,6 +169,7 @@ const Create = ({ onChange }) => {
             initialValues={{ name: '', email: '', role: '', team: [], healthcareProfessional: false }}
             validate={(values) => {
               const errors = {};
+              if (values.role === 'restricted-access') values.healthcareProfessional = false;
               if (!values.name) errors.name = 'Le nom est obligatoire';
               if (!values.email) errors.email = "L'email est obligatoire";
               else if (!emailRegex.test(values.email)) errors.email = "L'email est invalide";
@@ -196,21 +197,21 @@ const Create = ({ onChange }) => {
                     <FormGroup>
                       <Label htmlFor="name">Nom</Label>
                       <Input name="name" id="name" value={values.name} onChange={handleChange} />
-                      {touched.name && errors.name && <Error>{errors.name}</Error>}
+                      {touched.name && errors.name && <div className="tw-mt-0.5 tw-text-xs tw-text-red-500">{errors.name}</div>}
                     </FormGroup>
                   </Col>
                   <Col md={6}>
                     <FormGroup>
                       <Label htmlFor="email">Email</Label>
                       <Input name="email" id="email" value={values.email} onChange={handleChange} />
-                      {touched.email && errors.email && <Error>{errors.email}</Error>}
+                      {touched.email && errors.email && <div className="tw-mt-0.5 tw-text-xs tw-text-red-500">{errors.email}</div>}
                     </FormGroup>
                   </Col>
                   <Col md={6}>
                     <FormGroup>
                       <Label htmlFor="role">Role</Label>
                       <SelectRole handleChange={handleChange} value={values.role} />
-                      {touched.role && errors.role && <Error>{errors.role}</Error>}
+                      {touched.role && errors.role && <div className="tw-mt-0.5 tw-text-xs tw-text-red-500">{errors.role}</div>}
                     </FormGroup>
                   </Col>
                   <Col md={6}>
@@ -223,26 +224,28 @@ const Create = ({ onChange }) => {
                           colored
                           inputId="team"
                         />
-                        {touched.team && errors.team && <Error>{errors.team}</Error>}
+                        {touched.team && errors.team && <div className="tw-mt-0.5 tw-text-xs tw-text-red-500">{errors.team}</div>}
                       </div>
                     </FormGroup>
                   </Col>
-                  <Col md={12}>
-                    <Label htmlFor="healthcareProfessional" style={{ marginBottom: 0 }}>
-                      <input
-                        type="checkbox"
-                        style={{ marginRight: '0.5rem' }}
-                        name="healthcareProfessional"
-                        id="healthcareProfessional"
-                        checked={values.healthcareProfessional}
-                        onChange={handleChange}
-                      />
-                      Professionnel·le de santé
-                    </Label>
-                    <div>
-                      <small className="text-muted">Un professionnel·le de santé à accès au dossier médical complet des personnes.</small>
-                    </div>
-                  </Col>
+                  {values.role !== 'restricted-access' && (
+                    <Col md={12}>
+                      <Label htmlFor="healthcareProfessional" style={{ marginBottom: 0 }}>
+                        <input
+                          type="checkbox"
+                          style={{ marginRight: '0.5rem' }}
+                          name="healthcareProfessional"
+                          id="healthcareProfessional"
+                          checked={values.healthcareProfessional}
+                          onChange={handleChange}
+                        />
+                        Professionnel·le de santé
+                      </Label>
+                      <div>
+                        <small className="text-muted">Un professionnel·le de santé a accès au dossier médical complet des personnes.</small>
+                      </div>
+                    </Col>
+                  )}
                 </Row>
                 <br />
                 <Row>
@@ -258,10 +261,5 @@ const Create = ({ onChange }) => {
     </CreateWrapper>
   );
 };
-
-const Error = styled.span`
-  color: red;
-  font-size: 11px;
-`;
 
 export default List;

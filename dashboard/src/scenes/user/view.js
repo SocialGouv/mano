@@ -104,6 +104,7 @@ const View = () => {
                   <SelectRole handleChange={handleChange} value={values.role} />
                 </FormGroup>
               </Col>
+              {values.role !== 'restricted-access' && (
               <Col md={12}>
                 <Label htmlFor="healthcareProfessional" style={{ marginBottom: 0 }}>
                   <input
@@ -122,6 +123,7 @@ const View = () => {
                   <small className="text-muted">Un·e professionnel·le de santé a accès au dossier médical complet des personnes.</small>
                 </div>
               </Col>
+              )}
             </Row>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
               {id !== user._id && (
