@@ -79,6 +79,7 @@ CREATE TABLE IF NOT EXISTS mano."Organisation" (
     "encryptionEnabled" boolean DEFAULT false,
     "encryptionLastUpdateAt" timestamp with time zone,
     encrypting boolean DEFAULT false,
+    "recryptingItemsLocally" boolean DEFAULT false,
     "receptionEnabled" boolean DEFAULT false,
     "groupsEnabled" boolean DEFAULT false,
     services text[],
