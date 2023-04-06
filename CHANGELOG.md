@@ -1,3 +1,10 @@
+## [1.261.20](https://github.com/SocialGouv/mano/compare/v1.261.19...v1.261.20) (2023-04-06)
+
+
+### Bug Fixes
+
+* minimum dashboard version ([d487db4](https://github.com/SocialGouv/mano/commit/d487db4d0313db9ac929400e96b5eb91bde897c6))
+
 ## [1.261.19](https://github.com/SocialGouv/mano/compare/v1.261.18...v1.261.19) (2023-04-06)
 
 
