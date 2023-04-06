@@ -51,9 +51,9 @@ export default function TreatmentModal({ onClose, isNewTreatment, treatment, per
           const errors = {};
           if (!values._id) errors._id = "L'identifiant est obligatoire";
           if (!values.name) errors.name = 'Le nom est obligatoire';
-          if (!values.dosage) errors.dosage = 'Le dosage est obligatoire';
-          if (!values.frequency) errors.frequency = 'La fréquence est obligatoire';
-          if (!values.indication) errors.indication = "L'indication est obligatoire";
+          // if (!values.dosage) errors.dosage = 'Le dosage est obligatoire';
+          // if (!values.frequency) errors.frequency = 'La fréquence est obligatoire';
+          // if (!values.indication) errors.indication = "L'indication est obligatoire";
           if (!values.startDate) errors.startDate = 'La date de début est obligatoire';
           if (!errors.startDate && outOfBoundariesDate(values.startDate))
             errors.startDate = 'La date de début de traitement est hors limites (entre 1900 et 2100)';
