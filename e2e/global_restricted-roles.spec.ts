@@ -300,8 +300,8 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.getByRole("link", { name: "Territoires" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Comptes rendus" })).toBeVisible();
 
-    await expect(page.getByRole("link", { name: "Structures" })).not.toBeVisible();
-    await expect(page.getByRole("link", { name: "Soliguide" })).not.toBeVisible();
+    await expect(page.getByRole("link", { name: "Structures" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Soliguide" })).toBeVisible();
 
     await expect(page.getByRole("link", { name: "Statistiques" })).not.toBeVisible();
 

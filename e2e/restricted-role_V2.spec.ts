@@ -136,8 +136,8 @@ test("test", async ({ page }) => {
   await expect(page.getByRole("link", { name: "Équipes" })).not.toBeVisible();
   await expect(page.getByRole("link", { name: "Organisation" })).not.toBeVisible();
   await expect(page.getByRole("link", { name: "Statistiques" })).not.toBeVisible();
-  await expect(page.getByRole("link", { name: "Soliguide" })).not.toBeVisible();
-  await expect(page.getByRole("link", { name: "Structures" })).not.toBeVisible();
+  await expect(page.getByRole("link", { name: "Soliguide" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Structures" })).toBeVisible();
 
   // menu navigation visible pour restricted
   await expect(page.getByRole("link", { name: "Comptes rendus" })).toBeVisible();
@@ -159,7 +159,7 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Mettre à jour" }).click();
   await page.getByText("Mise à jour !").click();
   await page.getByText("Retour").click();
-  await page.getByText('Loading...Action').click();
+  await page.getByText("Loading...Action").click();
   await page.getByLabel("Nom de l'action").fill("pouvoirajouteruneaction");
   await clickOnEmptyReactSelect(page, "create-action-person-select", "testrestrict");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
