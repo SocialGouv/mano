@@ -293,6 +293,7 @@ router.put(
           )
         ),
         encryptedVerificationKey: z.optional(z.string().min(1)),
+        recryptingItemsLocally: z.optional(z.boolean()),
         encryptionEnabled: z.optional(z.boolean()),
         receptionEnabled: z.optional(z.boolean()),
         territoriesEnabled: z.optional(z.boolean()),
@@ -349,6 +350,7 @@ router.put(
     if (req.body.hasOwnProperty("consultations"))
       updateOrg.consultations = typeof req.body.consultations === "string" ? JSON.parse(req.body.consultations) : req.body.consultations;
     if (req.body.hasOwnProperty("encryptedVerificationKey")) updateOrg.encryptedVerificationKey = req.body.encryptedVerificationKey;
+    if (req.body.hasOwnProperty("recryptingItemsLocally")) updateOrg.recryptingItemsLocally = req.body.recryptingItemsLocally;
     if (req.body.hasOwnProperty("encryptionEnabled")) updateOrg.encryptionEnabled = req.body.encryptionEnabled;
     if (req.body.hasOwnProperty("encryptionLastUpdateAt")) updateOrg.encryptionLastUpdateAt = req.body.encryptionLastUpdateAt;
     if (req.body.hasOwnProperty("receptionEnabled")) updateOrg.receptionEnabled = req.body.receptionEnabled;

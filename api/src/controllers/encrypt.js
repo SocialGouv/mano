@@ -177,6 +177,7 @@ router.post(
           encryptionEnabled: "true",
           encryptionLastUpdateAt: new Date(),
           encrypting: false,
+          recryptingItemsLocally: false,
           encryptedVerificationKey,
         });
         await organisation.save({ transaction: tx });

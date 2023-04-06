@@ -55,6 +55,12 @@ const EncryptionKey = ({ isMain }) => {
       setEncryptingStatus('Chiffrement des données...');
       const encryptedVerificationKey = await encryptVerificationKey(hashedOrgEncryptionKey);
 
+      const recryptingItemsLocallyResponse = await API.put({
+        path: `/organisation/${organisation._id}`,
+        body: { recryptingItemsLocally: true },
+      });
+      if (!recryptingItemsLocallyResponse.ok) throw new Error('Impossible de démarrer le rechiffrement');
+
       async function recrypt(path, callback = null) {
         setEncryptingStatus(`Chiffrement des données : (${path.replace('/', '')}s)`);
         const cryptedItems = await API.get({
@@ -179,6 +185,7 @@ const EncryptionKey = ({ isMain }) => {
       setEncryptionDone(false);
       await setOrgEncryptionKey(previousKey.current, { needDerivation: false });
       setEncryptingStatus("Erreur lors du chiffrement, veuillez contacter l'administrateur");
+      API.put({ path: `/organisation/${organisation._id}`, body: { recryptingItemsLocally: false } });
     }
   };
 
