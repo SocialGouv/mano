@@ -1,3 +1,11 @@
+## [1.261.19](https://github.com/SocialGouv/mano/compare/v1.261.18...v1.261.19) (2023-04-06)
+
+
+### Bug Fixes
+
+* accès restreint: soliguide + structure + changement status de l'action ([#1456](https://github.com/SocialGouv/mano/issues/1456)) ([12f0355](https://github.com/SocialGouv/mano/commit/12f035574e572be8a4f1f1e6347af13000aebace))
+* champs facultatifs pour les traitements ([#1454](https://github.com/SocialGouv/mano/issues/1454)) ([4a24852](https://github.com/SocialGouv/mano/commit/4a2485230f23df65c8c4cb39103251eb37c98e76))
+
 ## [1.261.18](https://github.com/SocialGouv/mano/compare/v1.261.17...v1.261.18) (2023-04-06)
 
 
