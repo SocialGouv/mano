@@ -1,3 +1,10 @@
+## [1.261.21](https://github.com/SocialGouv/mano/compare/v1.261.20...v1.261.21) (2023-04-07)
+
+
+### Bug Fixes
+
+* ne plus ajouter de commentaire dans les comptes-rendus ([#1458](https://github.com/SocialGouv/mano/issues/1458)) ([7dd1844](https://github.com/SocialGouv/mano/commit/7dd1844b8a977ce0188aad18e5ec581215935c08))
+
 ## [1.261.20](https://github.com/SocialGouv/mano/compare/v1.261.19...v1.261.20) (2023-04-06)
 
 
