@@ -58,7 +58,6 @@ import { useLocalStorage } from '../../services/useLocalStorage';
 import useSearchParamState from '../../services/useSearchParamState';
 import { arrayOfitemsGroupedByActionSelector, arrayOfitemsGroupedByConsultationSelector } from '../../recoil/selectors';
 import ConsultationModal from '../../components/ConsultationModal';
-import CommentModal from '../person/components/CommentModal';
 
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithFullMonth(date)}`;
@@ -1348,15 +1347,12 @@ const CommentCreatedAt = ({ date, comments }) => {
   const history = useHistory();
   const data = comments;
   const organisation = useRecoilValue(organisationState);
-  const [showModal, setShowModal] = useState(false);
-  const person = useRecoilValue(userState);
 
   if (!data) return <div />;
 
   return (
     <>
       <StyledBox>
-        <ButtonCustom title="Ajouter un commentaire" className="tw-ml-auto tw-mb-10" onClick={() => setShowModal(true)} />
         <Table
           className="Table"
           title={`Commentaires ajoutés le ${formatDateWithFullMonth(date)}`}
@@ -1448,7 +1444,6 @@ const CommentCreatedAt = ({ date, comments }) => {
             },
           ]}
         />
-        {showModal && <CommentModal isNewComment={true} person={person} onClose={() => setShowModal(false)} />}
       </StyledBox>
       <hr />
     </>
