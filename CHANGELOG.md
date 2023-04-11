@@ -1,3 +1,10 @@
+## [1.261.22](https://github.com/SocialGouv/mano/compare/v1.261.21...v1.261.22) (2023-04-11)
+
+
+### Bug Fixes
+
+* suppression du bruit dans sentry quand un rapport a failli être créé en double mano-ee ([#1463](https://github.com/SocialGouv/mano/issues/1463)) ([078b078](https://github.com/SocialGouv/mano/commit/078b078696115d1b3829fd69ae8778631af1f1f5))
+
 ## [1.261.21](https://github.com/SocialGouv/mano/compare/v1.261.20...v1.261.21) (2023-04-07)
 
 
