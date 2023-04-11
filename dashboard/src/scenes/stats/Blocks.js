@@ -12,8 +12,9 @@ export const Block = ({ data, title = 'Nombre de personnes suivies', help }) => 
 export const BlockDateWithTime = ({ data, field, help }) => {
   if (!data.filter((item) => Boolean(item[field.name])).length) return null;
 
-  const averageField =
-    data.filter((item) => Boolean(item[field.name])).reduce((total, item) => total + Date.parse(item[field.name]), 0) / (data.length || 1);
+  const filteredData = data.filter((item) => Boolean(item[field.name]));
+  const total = filteredData.reduce((acc, item) => acc + Date.parse(item[field.name]), 0);
+  const averageField = total / (filteredData.length || 1);
 
   const durationFromNowToAverage = Date.now() - averageField;
   const [count, unit] = getDuration(durationFromNowToAverage);
