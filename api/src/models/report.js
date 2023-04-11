@@ -20,6 +20,18 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
 
-  Report.init(schema, { sequelize, modelName: "Report", freezeTableName: true, timestamps: true, paranoid: true });
+  Report.init(schema, {
+    sequelize,
+    modelName: "Report",
+    freezeTableName: true,
+    timestamps: true,
+    paranoid: true,
+    indexes: [
+      {
+        unique: true,
+        fields: ["organisation", "team", "date"],
+      },
+    ],
+  });
   return Report;
 };
