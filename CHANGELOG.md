@@ -1,3 +1,10 @@
+## [1.261.23](https://github.com/SocialGouv/mano/compare/v1.261.22...v1.261.23) (2023-04-11)
+
+
+### Bug Fixes
+
+* **dashboard:** correction des statistiques de dates sur les champs persos qui affichaient n'importe quoi ([#1464](https://github.com/SocialGouv/mano/issues/1464)) ([8371a5b](https://github.com/SocialGouv/mano/commit/8371a5b4d5ab62dc09fcdf727c7ff263e7c6dd11))
+
 ## [1.261.22](https://github.com/SocialGouv/mano/compare/v1.261.21...v1.261.22) (2023-04-11)
 
 
