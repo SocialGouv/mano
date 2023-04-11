@@ -13,7 +13,7 @@ export const BlockDateWithTime = ({ data, field, help }) => {
   if (!data.filter((item) => Boolean(item[field.name])).length) return null;
 
   const filteredData = data.filter((item) => Boolean(item[field.name]));
-  const total = filteredData.reduce((total, item) => total + Date.parse(item[field.name]), 0);
+  const total = filteredData.reduce((acc, item) => acc + Date.parse(item[field.name]), 0);
   const averageField = total / (filteredData.length || 1);
 
   const durationFromNowToAverage = Date.now() - averageField;
