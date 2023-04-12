@@ -43,7 +43,7 @@ const getSettingTitle = (tabId) => {
   if (tabId === 'territories') return 'Territoires';
   if (tabId === 'export') return 'Export';
   if (tabId === 'import') return 'Import';
-  if (tabId === 'rencontres') return 'Passages/rencontres';
+  if (tabId === 'rencontres-passages') return 'Passages/rencontres';
   return '';
 };
 
@@ -150,8 +150,10 @@ const View = () => {
             Territoires
           </button>
           <button
-            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'recontres' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
-            onClick={() => setTab('rencontres')}
+            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'rencontres-passages' ? 'tw-text-main' : 'tw-text-zinc-600'].join(
+              ' '
+            )}
+            onClick={() => setTab('rencontres-passages')}
             disabled={!organisation.encryptionEnabled}>
             Passages/rencontres
           </button>
