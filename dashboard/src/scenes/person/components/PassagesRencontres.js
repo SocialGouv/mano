@@ -56,7 +56,7 @@ export default function PassagesRencontres({ person }) {
               Passages ({personPassages.length})
             </button>
           )}
-          {organisation.metEnabled === true && (
+          {organisation.rencontresEnabled === true && (
             <button
               className={
                 selected === 'rencontres'

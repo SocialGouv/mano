@@ -468,7 +468,7 @@ const Stats = () => {
               return !!organisation.receptionEnabled;
             }
             if (['Rencontres'].includes(tabCaption)) {
-              return !!organisation.metEnabled;
+              return !!organisation.rencontresEnabled;
             }
             if (['Passages'].includes(tabCaption)) {
               return !!organisation.passagesEnabled;
@@ -552,7 +552,7 @@ const Stats = () => {
             personsInPassagesBeforePeriod={personsInPassagesBeforePeriod}
           />
         )}
-        {!!organisation.metEnabled && activeTab === 'Rencontres' && (
+        {!!organisation.rencontresEnabled && activeTab === 'Rencontres' && (
           <RencontresStats
             rencontres={rencontres}
             personFields={personFields}

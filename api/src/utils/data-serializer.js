@@ -12,7 +12,7 @@ function serializeOrganisation(organisation) {
     receptionEnabled: organisation.receptionEnabled,
     territoriesEnabled: organisation.territoriesEnabled,
     passagesEnabled: organisation.passagesEnabled,
-    metEnabled: organisation.metEnabled,
+    rencontresEnabled: organisation.rencontresEnabled,
     encryptedVerificationKey: organisation.encryptedVerificationKey,
     migrations: organisation.migrations,
     migrationLastUpdateAt: organisation.migrationLastUpdateAt,

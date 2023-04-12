@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
     territoriesEnabled: { type: DataTypes.BOOLEAN },
     groupsEnabled: { type: DataTypes.BOOLEAN },
     passagesEnabled: { type: DataTypes.BOOLEAN },
-    metEnabled: { type: DataTypes.BOOLEAN },
+    rencontresEnabled: { type: DataTypes.BOOLEAN },
     groupedServices: {
       type: DataTypes.JSONB, // example: [{"groupTitle": "injection", categories: ["Garrot", "1cc"]}, { "groupTitle": "inhalation", "categories": ["Kit base", "Grille"]}]
     },

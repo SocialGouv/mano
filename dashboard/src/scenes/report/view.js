@@ -595,7 +595,7 @@ const View = () => {
                 </DrawerLink>
               </>
             )}
-            {!!organisation.metEnabled && (
+            {!!organisation.rencontresEnabled && (
               <>
                 <DrawerLink
                   id="report-button-rencontres"

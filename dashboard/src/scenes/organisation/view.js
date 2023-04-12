@@ -43,7 +43,7 @@ const getSettingTitle = (tabId) => {
   if (tabId === 'territories') return 'Territoires';
   if (tabId === 'export') return 'Export';
   if (tabId === 'import') return 'Import';
-  if (tabId === 'meet') return 'Passages/rencontres';
+  if (tabId === 'rencontres') return 'Passages/rencontres';
   return '';
 };
 
@@ -150,8 +150,8 @@ const View = () => {
             Territoires
           </button>
           <button
-            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'meet' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
-            onClick={() => setTab('meet')}
+            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'recontres' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
+            onClick={() => setTab('rencontres')}
             disabled={!organisation.encryptionEnabled}>
             Passages/rencontres
           </button>
@@ -174,7 +174,7 @@ const View = () => {
               receptionEnabled: organisation.receptionEnabled || false,
               groupsEnabled: organisation.groupsEnabled || false,
               passagesEnabled: organisation.passagesEnabled || false,
-              metEnabled: organisation.metEnabled || false,
+              rencontresEnabled: organisation.rencontresEnabled || false,
             }}
             enableReinitialize
             onSubmit={async (body) => {
@@ -317,7 +317,7 @@ const View = () => {
                       <ObservationsSettings />
                     </>
                   );
-                case 'meet':
+                case 'rencontres':
                   return (
                     <>
                       <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Passages / rencontres</h3>
@@ -344,9 +344,9 @@ const View = () => {
                           <input
                             type="checkbox"
                             className="tw-mr-2"
-                            name="metEnabled"
-                            id="metEnabled"
-                            checked={values.metEnabled || false}
+                            name="rencontresEnabled"
+                            id="rencontresEnabled"
+                            checked={values.recontresEnabled || false}
                             onChange={handleChange}
                           />
                           <label htmlFor="territoriesEnabled">
@@ -358,7 +358,9 @@ const View = () => {
                       <div className="tw-mb-10 tw-flex tw-justify-end tw-gap-4">
                         <ButtonCustom
                           title={'Mettre à jour'}
-                          disabled={values.metEnabled === organisation.metEnabled && values.passagesEnabled === organisation.passagesEnabled}
+                          disabled={
+                            values.rencontresEnabled === organisation.rencontresEnabled && values.passagesEnabled === organisation.passagesEnabled
+                          }
                           loading={isSubmitting}
                           onClick={handleSubmit}
                         />
