@@ -53,7 +53,6 @@ import { arrayOfitemsGroupedByActionSelector, arrayOfitemsGroupedByConsultationS
 import ConsultationModal from '../../components/ConsultationModal';
 import CommentModal from '../person/components/CommentModal';
 
-
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithFullMonth(date)}`;
   const nextDay = addOneDay(date);
