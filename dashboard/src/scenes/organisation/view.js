@@ -319,7 +319,7 @@ const View = () => {
                       <ObservationsSettings />
                     </>
                   );
-                case 'rencontres':
+                case 'rencontres-passages':
                   return (
                     <>
                       <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Passages / rencontres</h3>
@@ -335,8 +335,7 @@ const View = () => {
                             onChange={handleChange}
                           />
                           <label htmlFor="territoriesEnabled">
-                            Activer les passages vous permettra de comptabliser les personnes qui passent sur votre structure. Vous ne pouvez pas
-                            désactiver les passages si vous désactivez les rencontres.
+                            Activer les passages vous permettra de comptabliser les personnes qui passent sur votre structure.
                           </label>
                         </div>
                       </FormGroup>
@@ -348,12 +347,11 @@ const View = () => {
                             className="tw-mr-2"
                             name="rencontresEnabled"
                             id="rencontresEnabled"
-                            checked={values.recontresEnabled || false}
+                            checked={values.rencontresEnabled || false}
                             onChange={handleChange}
                           />
                           <label htmlFor="territoriesEnabled">
-                            Activer les rencontres vous permettra de comptabliser les personnes rencontrées en rue, vous ne pouvez pas désactiver les
-                            rencontres si vous désactivez les passages.
+                            Activer les rencontres vous permettra de comptabliser les personnes rencontrées en rue.
                           </label>
                         </div>
                       </FormGroup>

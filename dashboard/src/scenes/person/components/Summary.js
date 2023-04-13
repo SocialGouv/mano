@@ -1,5 +1,5 @@
 import { useRecoilValue } from 'recoil';
-import { userState } from '../../../recoil/auth';
+import { userState, organisationState } from '../../../recoil/auth';
 import { Actions } from './Actions';
 import { InfosMain } from './InfosMain';
 import PersonDocuments from './PersonDocuments';
@@ -14,6 +14,7 @@ import { customFieldsPersonsSelector } from '../../../recoil/persons';
 export default function Summary({ person }) {
   const user = useRecoilValue(userState);
   const customFieldsPersons = useRecoilValue(customFieldsPersonsSelector);
+  const organisation = useRecoilValue(organisationState);
 
   return (
     <>
@@ -24,6 +25,7 @@ export default function Summary({ person }) {
         <div className="tw-col-span-5 tw-h-0 tw-min-h-full tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
           <Actions person={person} />
         </div>
+
         <div className="tw-col-span-4 tw-h-0 tw-min-h-full tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
           {['restricted-access'].includes(user.role) ? <PassagesRencontres person={person} /> : <Comments person={person} />}
         </div>
@@ -36,10 +38,13 @@ export default function Summary({ person }) {
                 return <PersonCustomFields key={name} person={person} sectionName={name} fields={fields} />;
               })}
             </div>
+
             <div className="tw-col-span-4 tw-flex tw-h-0 tw-min-h-full tw-flex-col tw-gap-4 tw-overflow-auto">
-              <div className="tw-h-1/2 tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
-                <PassagesRencontres person={person} />
-              </div>
+              {(organisation.rencontresEnabled === true || organisation.passagesEnabled === true) && (
+                <div className="tw-h-1/2 tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+                  <PassagesRencontres person={person} />
+                </div>
+              )}
               <div className="tw-h-1/2 tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
                 <PersonDocuments person={person} />
               </div>

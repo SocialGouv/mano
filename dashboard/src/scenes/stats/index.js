@@ -544,7 +544,7 @@ const Stats = () => {
             flattenedCustomFieldsPersons={flattenedCustomFieldsPersons}
           />
         )}
-        {!!organisation.passageEnabled && activeTab === 'Passages' && (
+        {!!organisation.passagesEnabled && activeTab === 'Passages' && (
           <PassagesStats
             passages={passages}
             personFields={personFields}

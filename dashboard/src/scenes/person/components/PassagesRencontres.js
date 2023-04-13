@@ -42,121 +42,125 @@ export default function PassagesRencontres({ person }) {
     setPassageToEdit(null);
   };
   return (
-    <div className="tw-relative">
-      <div className="tw-sticky tw-top-0 tw-z-50 tw-mb-3 tw-flex tw-bg-white tw-px-3 tw-pt-3 tw-text-main">
-        <div className="tw-flex tw-flex-1">
-          {organisation.passagesEnabled === true && (
-            <button
-              className={
-                selected === 'passages'
-                  ? 'tw-rounded-t tw-border-t tw-border-l tw-border-r tw-border-slate-300 tw-p-1.5'
-                  : 'tw-border-b tw-border-slate-300 tw-p-1.5'
-              }
-              onClick={() => setSelected('passages')}>
-              Passages ({personPassages.length})
-            </button>
+    <>
+      {(organisation.rencontresEnabled === true || organisation.passagesEnabled === true) && (
+        <div className="tw-relative">
+          <div className="tw-sticky tw-top-0 tw-z-50 tw-mb-3 tw-flex tw-bg-white tw-px-3 tw-pt-3 tw-text-main">
+            <div className="tw-flex tw-flex-1">
+              {organisation.passagesEnabled === true && (
+                <button
+                  className={
+                    selected === 'passages'
+                      ? 'tw-rounded-t tw-border-t tw-border-l tw-border-r tw-border-slate-300 tw-p-1.5'
+                      : 'tw-border-b tw-border-slate-300 tw-p-1.5'
+                  }
+                  onClick={() => setSelected('passages')}>
+                  Passages ({personPassages.length})
+                </button>
+              )}
+              {organisation.rencontresEnabled === true && (
+                <button
+                  className={
+                    selected === 'rencontres'
+                      ? 'tw-rounded-t tw-border-t tw-border-l tw-border-r tw-border-slate-300 tw-p-1.5'
+                      : 'tw-border-b tw-border-slate-300 tw-p-1.5'
+                  }
+                  onClick={() => setSelected('rencontres')}>
+                  Rencontres ({personRencontres.length})
+                </button>
+              )}
+            </div>
+            <div className="flex-col tw-flex tw-items-center tw-gap-2">
+              <button
+                className="tw-text-md tw-h-8 tw-w-8 tw-rounded-full tw-bg-main tw-font-bold tw-text-white tw-transition hover:tw-scale-125"
+                aria-label={selected === 'passages' ? 'Ajouter un passage' : 'Ajouter une rencontre'}
+                onClick={() => {
+                  if (selected === 'rencontres') handleAddRencontre();
+                  else handleAddPassage();
+                }}>
+                ＋
+              </button>
+              {(selected === 'passages' ? Boolean(personPassages.length) : Boolean(personRencontres.length)) && (
+                <button className="tw-h-6 tw-w-6 tw-rounded-full tw-text-main tw-transition hover:tw-scale-125" onClick={() => setFullScreen(true)}>
+                  <FullScreenIcon />
+                </button>
+              )}
+            </div>
+          </div>
+          <ModalContainer open={!!fullScreen} size="full" onClose={() => setFullScreen(false)}>
+            <ModalHeader title={`${selected.capitalize()} de  ${person?.name} (${personPassages.length})`}></ModalHeader>
+            <ModalBody>
+              {selected === 'passages' ? (
+                <PassagesTable personPassages={personPassages} setPassageToEdit={setPassageToEdit} users={users} />
+              ) : (
+                <RencontresTable personRencontres={personRencontres} setRencontreToEdit={setRencontreToEdit} users={users} />
+              )}
+            </ModalBody>
+            <ModalFooter>
+              <button type="button" name="cancel" className="button-cancel" onClick={() => setFullScreen(false)}>
+                Fermer
+              </button>
+              <button
+                type="button"
+                className="button-submit"
+                onClick={() => {
+                  if (selected === 'rencontres') handleAddRencontre();
+                  else handleAddPassage();
+                }}>
+                ＋ Ajouter {selected === 'rencontres' ? 'une rencontre' : 'un passage'}
+              </button>
+            </ModalFooter>
+          </ModalContainer>
+          <Rencontre rencontre={rencontreToEdit} onFinished={() => setRencontreToEdit(null)} />
+          <Passage passage={passageToEdit} onFinished={() => setPassageToEdit(null)} />
+          {selected === 'passages' && !personPassages.length && (
+            <div className="tw-mt-8 tw-w-full tw-text-center tw-text-gray-300">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="tw-mx-auto tw-mb-2 tw-h-16 tw-w-16 tw-text-gray-200"
+                width={24}
+                height={24}
+                viewBox="0 0 24 24"
+                strokeWidth="2"
+                stroke="currentColor"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                <circle cx={12} cy={12} r={9}></circle>
+                <polyline points="12 7 12 12 15 15"></polyline>
+              </svg>
+              Aucun passage
+            </div>
           )}
-          {organisation.rencontresEnabled === true && (
-            <button
-              className={
-                selected === 'rencontres'
-                  ? 'tw-rounded-t tw-border-t tw-border-l tw-border-r tw-border-slate-300 tw-p-1.5'
-                  : 'tw-border-b tw-border-slate-300 tw-p-1.5'
-              }
-              onClick={() => setSelected('rencontres')}>
-              Rencontres ({personRencontres.length})
-            </button>
+          {selected === 'rencontres' && !personRencontres.length && (
+            <div className="tw-mt-8 tw-w-full tw-text-center tw-text-gray-300">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="tw-mx-auto tw-mb-2 tw-h-16 tw-w-16 tw-text-gray-200"
+                width={24}
+                height={24}
+                viewBox="0 0 24 24"
+                strokeWidth="2"
+                stroke="currentColor"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                <circle cx={12} cy={12} r={9}></circle>
+                <polyline points="12 7 12 12 15 15"></polyline>
+              </svg>
+              Aucune rencontre
+            </div>
           )}
-        </div>
-        <div className="flex-col tw-flex tw-items-center tw-gap-2">
-          <button
-            className="tw-text-md tw-h-8 tw-w-8 tw-rounded-full tw-bg-main tw-font-bold tw-text-white tw-transition hover:tw-scale-125"
-            aria-label={selected === 'passages' ? 'Ajouter un passage' : 'Ajouter une rencontre'}
-            onClick={() => {
-              if (selected === 'rencontres') handleAddRencontre();
-              else handleAddPassage();
-            }}>
-            ＋
-          </button>
-          {(selected === 'passages' ? Boolean(personPassages.length) : Boolean(personRencontres.length)) && (
-            <button className="tw-h-6 tw-w-6 tw-rounded-full tw-text-main tw-transition hover:tw-scale-125" onClick={() => setFullScreen(true)}>
-              <FullScreenIcon />
-            </button>
-          )}
-        </div>
-      </div>
-      <ModalContainer open={!!fullScreen} size="full" onClose={() => setFullScreen(false)}>
-        <ModalHeader title={`${selected.capitalize()} de  ${person?.name} (${personPassages.length})`}></ModalHeader>
-        <ModalBody>
           {selected === 'passages' ? (
             <PassagesTable personPassages={personPassages} setPassageToEdit={setPassageToEdit} users={users} />
           ) : (
             <RencontresTable personRencontres={personRencontres} setRencontreToEdit={setRencontreToEdit} users={users} />
           )}
-        </ModalBody>
-        <ModalFooter>
-          <button type="button" name="cancel" className="button-cancel" onClick={() => setFullScreen(false)}>
-            Fermer
-          </button>
-          <button
-            type="button"
-            className="button-submit"
-            onClick={() => {
-              if (selected === 'rencontres') handleAddRencontre();
-              else handleAddPassage();
-            }}>
-            ＋ Ajouter {selected === 'rencontres' ? 'une rencontre' : 'un passage'}
-          </button>
-        </ModalFooter>
-      </ModalContainer>
-      <Rencontre rencontre={rencontreToEdit} onFinished={() => setRencontreToEdit(null)} />
-      <Passage passage={passageToEdit} onFinished={() => setPassageToEdit(null)} />
-      {selected === 'passages' && !personPassages.length && (
-        <div className="tw-mt-8 tw-w-full tw-text-center tw-text-gray-300">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="tw-mx-auto tw-mb-2 tw-h-16 tw-w-16 tw-text-gray-200"
-            width={24}
-            height={24}
-            viewBox="0 0 24 24"
-            strokeWidth="2"
-            stroke="currentColor"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-            <circle cx={12} cy={12} r={9}></circle>
-            <polyline points="12 7 12 12 15 15"></polyline>
-          </svg>
-          Aucun passage
         </div>
       )}
-      {selected === 'rencontres' && !personRencontres.length && (
-        <div className="tw-mt-8 tw-w-full tw-text-center tw-text-gray-300">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="tw-mx-auto tw-mb-2 tw-h-16 tw-w-16 tw-text-gray-200"
-            width={24}
-            height={24}
-            viewBox="0 0 24 24"
-            strokeWidth="2"
-            stroke="currentColor"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-            <circle cx={12} cy={12} r={9}></circle>
-            <polyline points="12 7 12 12 15 15"></polyline>
-          </svg>
-          Aucune rencontre
-        </div>
-      )}
-      {selected === 'passages' ? (
-        <PassagesTable personPassages={personPassages} setPassageToEdit={setPassageToEdit} users={users} />
-      ) : (
-        <RencontresTable personRencontres={personRencontres} setRencontreToEdit={setRencontreToEdit} users={users} />
-      )}
-    </div>
+    </>
   );
 }
 
