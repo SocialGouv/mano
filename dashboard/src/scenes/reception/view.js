@@ -294,7 +294,7 @@ const Reception = () => {
               {passages.length} passage{passages.length > 1 ? 's' : ''}
             </h5>
             <ButtonCustom onClick={onAddAnonymousPassage} color="primary" icon={plusIcon} title="Passage anonyme" id="add-anonymous-passage" />
-            {!!passages.length && (
+            {!!passages.length && reportCreatedRef.current && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <ButtonCustom
                   onClick={() => history.push(`/report/${todaysReport?.date}?tab=passages`)}
