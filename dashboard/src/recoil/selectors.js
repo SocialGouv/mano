@@ -141,6 +141,7 @@ export const itemsGroupedByPersonSelector = selector({
       for (const document of person.documents) {
         personsObject[person._id].interactions.push(document.createdAt);
         if (!document.group) continue;
+        if (!personsObject[person._id].group) continue;
         for (const personIdInGroup of personsObject[person._id].group.persons) {
           if (personIdInGroup === person._id) continue;
           if (!personsObject[personIdInGroup]) continue;
