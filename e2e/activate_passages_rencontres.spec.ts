@@ -1,0 +1,271 @@
+import { test, expect } from '@playwright/test';
+import { populate } from "./scripts/populate-db";
+import { loginWith, logOut } from "./utils";
+import dayjs from "dayjs";
+
+test.beforeAll(async () => {
+  await populate();
+});
+
+test('test', async ({ page }) => {
+
+  const today = dayjs().format("YYYY-MM-DD");
+  const anotherDay =
+    dayjs().add(1, "day").month() === dayjs().month() ? dayjs().add(1, "day").format("YYYY-MM-DD") : dayjs().startOf("month").format("YYYY-MM-DD");
+
+  /* ************************************************************************* */
+  /* ****** PARTIE 1 TEST ADMIN 1 PASSAGE ACTIVE ET RENCONTRE DESACTIVE ****** */
+  /* ************************************************************************* */
+
+  await loginWith(page, "admin1@example.org", "secret", "plouf");
+
+  await page.getByRole('link', { name: 'Organisation' }).click();
+  await page.getByRole('button', { name: 'Passages/rencontres' }).click();
+  await page.locator('#passagesEnabled').check();
+  await page.locator('#rencontresEnabled').uncheck();
+  
+  await page.getByRole('button', { name: 'Mettre à jour' }).click();
+
+/* ***** accueil ***** */
+
+await page.getByRole('link', { name: 'Accueil' }).click();
+await page.locator('.person-select-and-create-reception__input-container').click();
+await page.locator('#person-select-and-create-reception').press('Home');
+await page.locator('#person-select-and-create-reception').press('Home');
+await page.locator('#person-select-and-create-reception').fill('test1');
+await page.locator('#react-select-5-option-0').click();
+await page.getByRole('button', { name: 'Passage' }).first().click();
+await page.getByRole('button', { name: 'Passage anonyme' }).click();
+
+/* ***** personnes suvies ***** */
+
+await page.getByRole('link', { name: 'Personnes suivies' }).click();
+await page.getByText('test1').click();
+
+await expect(page.getByRole("button", { name: 'Passages (1)' })).toBeVisible();
+await expect(page.getByRole("link", { name: 'Rencontres (0)' })).not.toBeVisible();
+
+await page.getByRole('button', { name: 'Ajouter un passage' }).click();
+await page.getByLabel('Commentaire').click();
+await page.getByLabel('Commentaire').fill('test passage');
+await page.getByRole('button', { name: 'Enregistrer' }).click();
+
+/* ***** comptes rendus ***** */
+
+await page.getByRole('link', { name: 'Comptes rendus' }).click();
+await page.getByRole('button', { name: today }).click();
+
+await expect(page.getByText('Passages (3)')).toBeVisible();
+await expect(page.getByText('Rencontres (0)')).not.toBeVisible();
+
+await page.getByText('Passages (3)').click();
+
+await page.getByText('Passages (3)').click();
+await expect(page.getByText('Nombre de passages anonymes 1passage')).toBeVisible();
+await expect(page.getByText('Nombre de passages non-anonymes 2passages')).toBeVisible();
+await page.getByRole('button', { name: 'Ajouter un passage ce jour' }).click();
+await page.locator('.person__input-container').click();
+await page.locator('#react-select-persons-option-0').click();
+await page.getByLabel('Commentaire').click();
+await page.getByLabel('Commentaire').fill('ajout passage');
+await page.getByRole('button', { name: 'Enregistrer' }).click();
+
+await page.getByRole('cell', { name: 'ajout passage' }).click();
+await page.getByLabel('Commentaire').click();
+await page.getByLabel('Commentaire').fill('ajout passage modification');
+await page.getByRole('button', { name: 'Enregistrer' }).click();
+
+/* ***** statistiques ***** */
+
+await page.getByRole('link', { name: 'Statistiques' }).click();
+await page.getByRole('button', { name: 'Passages' }).click();
+await expect(page.getByText('Nombre de passages ?Non-anonyme375%Anonyme125%Total4100%Non-anonymeAnonyme3 (75%')).toBeVisible();
+
+await page.getByRole('button', { name: 'Accueil' }).click();
+await page.getByText('Nombre de passages ?4').click();
+
+await expect (page.getByRole('button', { name: 'Rencontres' })).not.toBeVisible();
+
+/* ***** delog ***** */
+
+await logOut(page, "User Admin Test - 1");
+
+/* ****************************************************************************** */
+/* ****** PARTIE 2 TEST ADMIN 2 RENCONTRES ACTIVEES ET PASSAGES DESACTIVES ****** */
+/* ****************************************************************************** */
+
+await loginWith(page, "admin2@example.org", "secret", "plouf");
+
+await page.getByRole('link', { name: 'Organisation' }).click();
+await page.getByRole('button', { name: 'Passages/rencontres' }).click();
+await page.locator('#passagesEnabled').uncheck();
+await page.locator('#rencontresEnabled').check();
+
+await page.getByRole('button', { name: 'Mettre à jour' }).click();
+
+/* ***** accueil ***** */
+
+await page.getByRole('link', { name: 'Accueil' }).click();
+
+await expect (page.getByRole('button', { name: 'Passage anonyme' })).not.toBeVisible();
+await page.locator('.person-select-and-create-reception__input-container').click();
+await page.locator('#person-select-and-create-reception').fill('testpassage');
+await page.getByText('Créer "testpassage"').click();
+await expect (page.getByRole('button', { name: 'Passage' })).not.toBeVisible();
+
+/* ***** personnes suivies ***** */
+
+await page.getByRole('link', { name: 'Personnes suivies' }).click();
+await page.getByRole('button', { name: 'Créer une nouvelle personne' }).click();
+await page.getByLabel('Nom').click();
+await page.getByLabel('Nom').fill('testrencontres');
+await page.getByRole('button', { name: 'Sauvegarder' }).click();
+
+await page.getByRole('button', { name: 'Rencontres (0)' }).click();
+
+await expect(page.getByRole("link", { name: 'Passages (0)' })).not.toBeVisible();
+
+await page.getByRole('button', { name: 'Ajouter une rencontre' }).click();
+await page.getByLabel('Commentaire').click();
+await page.getByLabel('Commentaire').fill('ajouter une rencontre');
+await page.getByRole('button', { name: 'Enregistrer' }).click();
+//await page.getByText('ajouter une rencontre').click();
+//await page.getByLabel('Commentaire').click();
+//await page.getByLabel('Commentaire').fill('ajouter une rencontre modification');
+//await page.getByRole('button', { name: 'Enregistrer' }).click();
+
+/* ***** comptes rendus ***** */
+await page.getByRole('link', { name: 'Comptes rendus' }).click();
+await page.getByRole('button', { name: today }).click();
+await page.getByText('Rencontres (1)').click(); 
+
+await expect(page.getByText('Passages (0)')).not.toBeVisible();
+
+await page.getByRole('button', { name: 'Ajouter une rencontre ce jour' }).click();
+await page.getByLabel('Commentaire').click();
+await page.getByLabel('Commentaire').fill('test ajoute nouvelle rencontre');
+await page.locator('.person__input-container').click();
+await page.locator('#react-select-persons-option-0').click();
+await page.getByRole('button', { name: 'Enregistrer' }).click();
+await page.getByRole('cell', { name: 'test ajoute nouvelle rencontre' }).click();
+page.once('dialog', dialog => {
+    console.log(`Dialog message: ${dialog.message()}`);
+    dialog.dismiss().catch(() => {});
+  });
+
+  await page.getByRole('button', { name: 'Enregistrer' }).click();
+
+/* ***** statistiques ***** */
+
+  await page.getByRole('link', { name: 'Statistiques' }).click();
+  await page.getByRole('button', { name: 'Rencontres' }).filter({ hasText: 'Rencontres' }).click();
+  await page.getByText('Nombre de rencontres ?Rencontres2100%Total2100%Rencontres2 (100%)').click();
+
+  await expect (page.getByRole('button', { name: 'Passages' })).not.toBeVisible();
+
+  await page.getByRole('button', { name: 'Accueil' }).click();
+  await expect(page.getByText('Nombre de passages ?Non-anonyme00%Anonyme0%Total00%Non-anonymeAnonyme0 (0%')).not.toBeVisible();
+
+  await logOut(page, "User Admin Test - 2");
+
+/* *********************************************************************************** */
+/* ****** PARTIE 3 TEST ADMIN 3 + USER NORMAL RENCONTRES ET PASSAGES DESACTIVES ****** */
+/* *********************************************************************************** */
+
+  await loginWith(page, "admin3@example.org", "secret", "plouf");
+
+  await page.getByRole('link', { name: 'Organisation' }).click();
+  await page.getByRole('button', { name: 'Passages/rencontres' }).click();
+  await page.locator('#passagesEnabled').uncheck();
+  await page.locator('#rencontresEnabled').uncheck();
+
+  await page.getByRole('button', { name: 'Mettre à jour' }).click();
+
+  await logOut(page, "User Admin Test - 3");
+
+  await loginWith(page, "normal3@example.org", "secret", "plouf");
+
+  /* ***** Accueil ***** */
+
+  await page.getByRole('link', { name: 'Accueil' }).click();
+
+  await expect (page.getByRole('button', { name: 'Passage anonyme' })).not.toBeVisible();
+  await page.locator('.person-select-and-create-reception__input-container').click();
+  await page.locator('#person-select-and-create-reception').fill('testpassage');
+  await page.getByText('Créer "testpassage"').click();
+  await expect (page.getByRole('button', { name: 'Passage' })).not.toBeVisible();
+
+  /* ***** personnes suivies ***** */
+  await page.getByRole('link', { name: 'Personnes suivies' }).click();
+  await page.getByRole('button', { name: 'Créer une nouvelle personne' }).click();
+  await page.getByLabel('Nom').click();
+  await page.getByLabel('Nom').fill('testrencontrepassage');
+  await page.getByRole('button', { name: 'Sauvegarder' }).click();
+
+await expect(page.getByRole("link", { name: 'Passages (0)' })).not.toBeVisible();
+await expect(page.getByRole("link", { name: 'Rencontres (0)' })).not.toBeVisible();
+
+
+/* ***** comptes rendus ***** */
+
+  await page.getByRole('link', { name: 'Comptes rendus' }).click();
+  await page.getByRole('button', { name: today }).click();
+
+  await expect (page.getByRole('button', { name: 'Rencontres' })).not.toBeVisible();
+  await expect (page.getByRole('button', { name: 'Passages' })).not.toBeVisible();
+
+/* ***** statistiques ***** */
+
+  await page.getByRole('link', { name: 'Statistiques' }).click();
+
+  await expect (page.getByRole('button', { name: 'Passages' })).not.toBeVisible();
+  await expect (page.getByRole('button', { name: 'Rencontres' })).not.toBeVisible();
+
+  await expect (page.getByText('Nombre de passages ?0')).not.toBeVisible();
+
+  await logOut(page, "User Normal Test - 3");
+
+/* ******************************************************************************** */
+/* ****** PARTIE 4 TEST ADMIN 4 + USER NORMAL RENCONTRES ET PASSAGES ACTIVES ****** */
+/* ******************************************************************************** */
+
+  await loginWith(page, "admin4@example.org", "secret", "plouf");
+
+  
+  await page.getByRole('link', { name: 'Organisation' }).click();
+  await page.getByRole('button', { name: 'Passages/rencontres' }).click();
+  if (!page.locator('#passagesEnabled').isChecked() || !page.locator('#rencontresEnabled').isChecked()) {
+    await page.locator('#passagesEnabled').check();
+    await page.locator('#rencontresEnabled').check();
+    await page.getByRole('button', { name: 'Mettre à jour' }).click();
+  }
+  
+  /* ***** Personne suivies ***** */
+  await page.getByRole('link', { name: 'Personnes suivies' }).click();
+  await page.getByRole('link', { name: 'Personnes suivies' }).click();
+  await page.getByRole('button', { name: 'Créer une nouvelle personne' }).click();
+  await page.getByLabel('Nom').click();
+  await page.getByLabel('Nom').fill('testrencontrepassage');
+  await page.getByRole('button', { name: 'Sauvegarder' }).click();
+  await page.getByRole('button', { name: 'Rencontres (0)' }).click();
+  await page.getByRole('button', { name: 'Passages (0)' }).click();
+  await page.getByRole('button', { name: 'Ajouter un passage' }).click();
+  await page.getByRole('button', { name: 'Enregistrer' }).click();
+  await page.getByRole('button', { name: 'Rencontres (0)' }).click();
+  await page.getByRole('button', { name: 'Ajouter une rencontre' }).click();
+  await page.getByRole('button', { name: 'Enregistrer' }).click();
+
+  /* ***** comptes rendus ***** */
+  await page.getByRole('link', { name: 'Comptes rendus' }).click();
+  await page.getByRole('button', { name: today }).click();
+  await page.getByText('Passages (1)').click();
+  await page.getByText('Rencontres (1)').click();
+
+  /* ***** statistiques ***** */
+
+  await page.getByRole('link', { name: 'Statistiques' }).click();
+  await page.getByRole('button', { name: 'Rencontres' }).filter({ hasText: 'Rencontres' }).click();
+  await page.getByRole('button', { name: 'Passages' }).click();
+  await page.getByRole('button', { name: 'Accueil' }).click();
+  await page.getByText('Nombre de passages ?1').click();
+});
