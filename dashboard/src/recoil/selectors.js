@@ -15,6 +15,8 @@ import { treatmentsState } from './treatments';
 import { rencontresState } from './rencontres';
 import { groupsState } from './groups';
 
+const today = new Date().toISOString();
+
 const usersObjectSelector = selector({
   key: 'usersObjectSelector',
   get: ({ get }) => {
@@ -247,9 +249,13 @@ export const itemsGroupedByPersonSelector = selector({
         // If we do not filter them, when comparing for date periods in stats, we would have to check for undefined,
         // otherwise we would have a bug that consider everybody "person suivies" in every period.
       ].filter((i) => Boolean(i));
-      personsObject[personId].lastUpdateCheckForGDPR = personsObject[personId].interactions[0];
-    }
 
+      let i = 0;
+      while (i < personsObject[personId].interactions.length && personsObject[personId].interactions[i].slice(0, 10) > today.slice(0, 10)) {
+        i++;
+      }
+      personsObject[personId].lastUpdateCheckForGDPR = personsObject[personId].interactions[i];
+    }
     return personsObject;
   },
 });
