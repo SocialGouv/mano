@@ -1,3 +1,10 @@
+## [1.261.26](https://github.com/SocialGouv/mano/compare/v1.261.25...v1.261.26) (2023-04-21)
+
+
+### Bug Fixes
+
+* **dashboard:** probablement un problème quand une personne était dans une famille et l'a quitté mais avait des documents en commun ([#1469](https://github.com/SocialGouv/mano/issues/1469)) ([f3b3ff5](https://github.com/SocialGouv/mano/commit/f3b3ff577f1a5ae3cc0bfc448ada49d79b3ef5f0))
+
 ## [1.261.25](https://github.com/SocialGouv/mano/compare/v1.261.24...v1.261.25) (2023-04-21)
 
 
