@@ -265,7 +265,6 @@ router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal", "restricted-access"]),
-  validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
     try {
       const bodyToParse = {
