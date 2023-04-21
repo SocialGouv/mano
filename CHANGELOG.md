@@ -1,3 +1,10 @@
+## [1.261.25](https://github.com/SocialGouv/mano/compare/v1.261.24...v1.261.25) (2023-04-21)
+
+
+### Bug Fixes
+
+* **dashboard:** si les passages sont déjà mis à jour côté front mais que le rapport n'est pas encore créé, il faut empêcher de modifier les passages pour ne pas envoyer sur un rapport inexistant ([#1465](https://github.com/SocialGouv/mano/issues/1465)) ([5377450](https://github.com/SocialGouv/mano/commit/5377450ea8299a6883741194443994ca1c796963))
+
 ## [1.261.24](https://github.com/SocialGouv/mano/compare/v1.261.23...v1.261.24) (2023-04-21)
 
 
