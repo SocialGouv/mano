@@ -979,7 +979,7 @@ const ActionCompletedAt = ({ date, status, actions, setSortOrder, setSortBy, sor
   if (!data) return <div />;
 
   const moreThanOne = data.length > 1;
-  const dateForSelector = addHoursToDate(date, '12');
+  const dateForSelector = dayjs(date).add(12, 'hour');
   return (
     <>
       <StyledBox>
