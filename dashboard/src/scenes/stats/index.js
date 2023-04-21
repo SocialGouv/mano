@@ -500,6 +500,7 @@ const Stats = () => {
         {!!organisation.receptionEnabled && activeTab === 'Services' && <ServicesStats period={period} teamIds={selectedTeams.map((e) => e?._id)} />}
         {activeTab === 'Actions' && (
           <ActionsStats
+            originalDatasetLength={actionsFilteredByStatus.length}
             setActionsStatuses={setActionsStatuses}
             actionsStatuses={actionsStatuses}
             setActionsCategories={setActionsCategories}

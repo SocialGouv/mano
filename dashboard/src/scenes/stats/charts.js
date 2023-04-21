@@ -3,8 +3,8 @@ import { ResponsivePie } from '@nivo/pie';
 import { ResponsiveBar } from '@nivo/bar';
 import HelpButtonAndModal from '../../components/HelpButtonAndModal';
 
-export const CustomResponsivePie = ({ data = [], title, onItemClick, help }) => {
-  const total = data.reduce((sum, item) => sum + item.value, 0);
+export const CustomResponsivePie = ({ isMultiChoice, originalDatasetLength, data = [], title, onItemClick, help }) => {
+  const total = isMultiChoice ? originalDatasetLength : data.reduce((sum, item) => sum + item.value, 0);
 
   const onClick = ({ id }) => {
     if (!onItemClick) return;
@@ -37,18 +37,20 @@ export const CustomResponsivePie = ({ data = [], title, onItemClick, help }) => 
                   {total ? <td className="tw-border tw-border-zinc-400 tw-text-center">{`${Math.round((value / total) * 1000) / 10}%`}</td> : <></>}
                 </tr>
               ))}
-            <tr>
-              <td className="tw-border tw-border-zinc-400 tw-font-bold">Total</td>
-              <td className="tw-border tw-border-zinc-400 tw-text-center tw-font-bold">{total}</td>
-              {total ? <td className="tw-border tw-border-zinc-400 tw-text-center tw-font-bold">100%</td> : <></>}
-            </tr>
+            {!isMultiChoice && (
+              <tr>
+                <td className="tw-border tw-border-zinc-400 tw-font-bold">Total</td>
+                <td className="tw-border tw-border-zinc-400 tw-text-center tw-font-bold">{total}</td>
+                {total ? <td className="tw-border tw-border-zinc-400 tw-text-center tw-font-bold">100%</td> : <></>}
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
       <div
         className={[
           'tw-flex tw-h-80 tw-max-w-[50%] tw-basis-1/2 tw-items-center tw-justify-center tw-font-bold print:tw-w-[600px] print:tw-max-w-[55%] print:!tw-grow print:!tw-basis-0',
-          !!onItemClick ? '[&_path]:tw-cursor-pointer' : '',
+          onItemClick ? '[&_path]:tw-cursor-pointer' : '',
         ].join(' ')}>
         <ResponsivePie
           data={total ? data : []}

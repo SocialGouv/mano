@@ -124,9 +124,12 @@ const PersonStats = ({
             personsForStats.filter((p) => !!p.outOfActiveList)
           );
         }}
+        isMultiChoice
+        originalDatasetLength={personsForStats.filter((p) => !!p.outOfActiveList).length}
         data={getPieData(
           personsForStats.filter((p) => !!p.outOfActiveList),
-          'outOfActiveListReasons'
+          'outOfActiveListReasons',
+          { isMultiChoice: true }
         )}
       />
       <CustomFieldsStats

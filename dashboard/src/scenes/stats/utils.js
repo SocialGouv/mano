@@ -38,7 +38,7 @@ export const getDuration = (timestampFromNow) => {
   return [Math.round(inYears), 'années'];
 };
 
-export const getPieData = (source, key, { options = null, isBoolean = false, debug = false } = {}) => {
+export const getPieData = (source, key, { options = null, isBoolean = false, isMultiChoice = false, debug = false } = {}) => {
   const data = source.reduce(
     (newData, item) => {
       if (isBoolean) {

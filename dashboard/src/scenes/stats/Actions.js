@@ -7,6 +7,7 @@ import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../compo
 import ActionsSortableList from '../../components/ActionsSortableList';
 
 const ActionsStats = ({
+  originalDatasetLength,
   setActionsStatuses,
   actionsStatuses,
   setActionsCategories,
@@ -127,7 +128,9 @@ const ActionsStats = ({
       <CustomResponsivePie
         title="Répartition des actions par catégorie"
         help={`Si une action a plusieurs catégories, elle est comptabilisée dans chaque catégorie.\n\nAinsi, le total affiché peut être supérieur au nombre total d'actions.`}
-        data={getPieData(actionsWithDetailedGroupAndCategories, 'category', { options: allCategories })}
+        originalDatasetLength={originalDatasetLength}
+        data={getPieData(actionsWithDetailedGroupAndCategories, 'category', { isMultiChoice: true, options: allCategories })}
+        isMultiChoice
         field="category"
         onItemClick={(newCategorySlice) => {
           setActionsModalOpened(true);
