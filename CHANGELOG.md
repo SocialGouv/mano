@@ -1,3 +1,10 @@
+## [1.261.24](https://github.com/SocialGouv/mano/compare/v1.261.23...v1.261.24) (2023-04-21)
+
+
+### Bug Fixes
+
+* **dashboard:** titre et selecteur de l'ajout d'action dans les cpt rendu qui etait a la mauvaise date ([#1396](https://github.com/SocialGouv/mano/issues/1396)) ([05872da](https://github.com/SocialGouv/mano/commit/05872da2414f2f236eb401cf301b946fa709a4de))
+
 ## [1.261.23](https://github.com/SocialGouv/mano/compare/v1.261.22...v1.261.23) (2023-04-11)
 
 
