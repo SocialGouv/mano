@@ -17,7 +17,6 @@ module.exports = (sequelize, DataTypes) => {
     encryptionEnabled: { type: DataTypes.BOOLEAN },
     encryptionLastUpdateAt: DataTypes.DATE,
     encryptedVerificationKey: DataTypes.TEXT,
-    recryptingItemsLocally: { type: DataTypes.BOOLEAN, default: false },
     encrypting: { type: DataTypes.BOOLEAN, default: false },
     receptionEnabled: { type: DataTypes.BOOLEAN },
     territoriesEnabled: { type: DataTypes.BOOLEAN },
