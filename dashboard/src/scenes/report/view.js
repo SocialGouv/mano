@@ -6,11 +6,11 @@ import { toast } from 'react-toastify';
 import { Formik } from 'formik';
 import {
   addOneDay,
+  dayjsInstance,
   formatDateWithFullMonth,
   formatDateWithNameOfDay,
   formatTime,
   getIsDayWithinHoursOffsetOfPeriod,
-  startOfToday,
 } from '../../services/date';
 import DateBloc from '../../components/DateBloc';
 import { HeaderStyled, Title as HeaderTitle } from '../../components/header';
@@ -985,21 +985,19 @@ const ActionCompletedAt = ({ date, status, actions, setSortOrder, setSortBy, sor
   if (!data) return <div />;
 
   const moreThanOne = data.length > 1;
-
-  const completedAt = startOfToday().add(12, 'hours');
-
+  const dateForSelector = dayjsInstance(date).add(12, 'hour');
   return (
     <>
       <StyledBox>
         {status === DONE && (
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <CreateActionModal open={modalOpen} setOpen={(value) => setModalOpen(value)} completedAt={completedAt} isMulti />
+            <CreateActionModal open={modalOpen} setOpen={(value) => setModalOpen(value)} completedAt={dateForSelector} isMulti />
             <div className="noprint" style={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
               <ButtonCustom
                 icon={agendaIcon}
                 onClick={() => setModalOpen(true)}
                 color="primary"
-                title={`Créer une nouvelle action faite le ${formatDateWithFullMonth(completedAt)}`}
+                title={`Créer une nouvelle action faite le ${formatDateWithFullMonth(date)}`}
                 padding={'12px 24px'}
               />
             </div>
