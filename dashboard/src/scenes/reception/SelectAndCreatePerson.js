@@ -10,7 +10,7 @@ import { passagesState } from '../../recoil/passages';
 import { rencontresState } from '../../recoil/rencontres';
 import { useHistory } from 'react-router-dom';
 import ButtonCustom from '../../components/ButtonCustom';
-import { currentTeamState, userState } from '../../recoil/auth';
+import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import ExclamationMarkButton from '../../components/tailwind/ExclamationMarkButton';
 import { theme } from '../../config';
 import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
@@ -73,6 +73,7 @@ const SelectAndCreatePerson = ({ value, onChange, inputId, classNamePrefix }) =>
   const actions = useRecoilValue(actionsState);
   const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
+  const organisation = useRecoilValue(organisationState);
   const passages = useRecoilValue(passagesState);
   const rencontres = useRecoilValue(rencontresState);
 
@@ -98,6 +99,7 @@ const SelectAndCreatePerson = ({ value, onChange, inputId, classNamePrefix }) =>
   }, [actions]);
 
   const lastPassages = useMemo(() => {
+    if (!organisation.passagesEnabled) return [];
     return Object.values(
       passages
         .filter((passage) => Boolean(passage.person))
@@ -111,9 +113,10 @@ const SelectAndCreatePerson = ({ value, onChange, inputId, classNamePrefix }) =>
           return acc;
         }, {})
     );
-  }, [passages]);
+  }, [passages, organisation]);
 
   const lastRencontres = useMemo(() => {
+    if (!organisation.rencontresEnabled) return [];
     return Object.values(
       rencontres
         .filter((passage) => Boolean(passage.person))
@@ -127,7 +130,7 @@ const SelectAndCreatePerson = ({ value, onChange, inputId, classNamePrefix }) =>
           return acc;
         }, {})
     );
-  }, [rencontres]);
+  }, [rencontres, organisation]);
 
   return (
     <AsyncSelect
