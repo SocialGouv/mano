@@ -33,13 +33,17 @@ const PersonRow = ({ onPress, person, isPersonsSearchRow = false, showActionShee
 
   const onMorePress = async () => {
     const options = [
-      'Ajouter une rencontre',
       'Ajouter une action',
       ...(user.healthcareProfessional ? ['Ajouter une consultation'] : []),
       'Ajouter un commentaire',
       'Ajouter un lieu fréquenté',
       'Annuler',
     ];
+
+    if (organisation.rencontresEnabled) {
+      options.unshift('Ajouter une rencontre');
+    }
+
     showActionSheetWithOptions(
       {
         options,
