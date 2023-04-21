@@ -3,7 +3,7 @@ import { personsState } from './persons';
 import { placesState } from './places';
 import { relsPersonPlaceState } from './relPersonPlace';
 import { reportsState } from './reports';
-import { formatAge, formatBirthDate, isOnSameDay } from '../services/date';
+import { dayjsInstance, formatAge, formatBirthDate, isOnSameDay } from '../services/date';
 import { customFieldsObsSelector, territoryObservationsState } from './territoryObservations';
 import { selector, selectorFamily } from 'recoil';
 import { actionsState } from './actions';
@@ -15,7 +15,7 @@ import { treatmentsState } from './treatments';
 import { rencontresState } from './rencontres';
 import { groupsState } from './groups';
 
-const today = new Date().toISOString();
+const today = dayjsInstance().format('YYYY-MM-DD');
 
 const usersObjectSelector = selector({
   key: 'usersObjectSelector',
@@ -250,11 +250,7 @@ export const itemsGroupedByPersonSelector = selector({
         // otherwise we would have a bug that consider everybody "person suivies" in every period.
       ].filter((i) => Boolean(i));
 
-      let i = 0;
-      while (i < personsObject[personId].interactions.length && personsObject[personId].interactions[i].slice(0, 10) > today.slice(0, 10)) {
-        i++;
-      }
-      personsObject[personId].lastUpdateCheckForGDPR = personsObject[personId].interactions[i];
+      personsObject[personId].lastUpdateCheckForGDPR = personsObject[personId].interactions.filter((a) => a <= today)[0];
     }
     return personsObject;
   },
