@@ -52,10 +52,6 @@ export function formatCalendarDate(date) {
 
 /** MANIPULATION AND COMPARISON **/
 
-export function addHoursToDate(date, hours) {
-  return dayjs(date).add(hours, 'hour');
-}
-
 export function isOnSameDay(date1, date2) {
   return dayjs(date1).isSame(dayjs(date2), 'day');
 }

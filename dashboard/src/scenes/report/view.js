@@ -4,7 +4,14 @@ import styled from 'styled-components';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Formik } from 'formik';
-import { addOneDay, addHoursToDate, formatDateWithFullMonth, formatDateWithNameOfDay, formatTime, getIsDayWithinHoursOffsetOfPeriod } from '../../services/date';
+import {
+  addOneDay,
+  dayjsInstance,
+  formatDateWithFullMonth,
+  formatDateWithNameOfDay,
+  formatTime,
+  getIsDayWithinHoursOffsetOfPeriod,
+} from '../../services/date';
 import DateBloc from '../../components/DateBloc';
 import { HeaderStyled, Title as HeaderTitle } from '../../components/header';
 import BackButton, { BackButtonWrapper } from '../../components/backButton';
@@ -979,7 +986,7 @@ const ActionCompletedAt = ({ date, status, actions, setSortOrder, setSortBy, sor
   if (!data) return <div />;
 
   const moreThanOne = data.length > 1;
-  const dateForSelector = dayjs(date).add(12, 'hour');
+  const dateForSelector = dayjsInstance(date).add(12, 'hour');
   return (
     <>
       <StyledBox>
@@ -1204,7 +1211,11 @@ const Consultations = ({ date, status, consultations, setSortOrder, setSortBy, s
   return (
     <>
       <StyledBox>
-        <ButtonCustom title={`Ajouter une consultation faite le ${formatDateWithFullMonth(date)}`} className="tw-ml-auto tw-mb-10" onClick={() => setShowModal(true)} />
+        <ButtonCustom
+          title={`Ajouter une consultation faite le ${formatDateWithFullMonth(date)}`}
+          className="tw-ml-auto tw-mb-10"
+          onClick={() => setShowModal(true)}
+        />
         <Table
           className="Table"
           title={`Consultation${moreThanOne ? 's' : ''} ${status === DONE ? 'faite' : 'annulée'}${
