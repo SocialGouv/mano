@@ -335,7 +335,7 @@ const View = () => {
                             onChange={handleChange}
                           />
                           <label htmlFor="territoriesEnabled">
-                            Activer les passages vous permettra de comptabliser les personnes qui passent sur votre structure.
+                            Activer les passages vous permettra de comptabiliser les personnes qui passent sur votre structure.
                           </label>
                         </div>
                       </FormGroup>
@@ -351,7 +351,7 @@ const View = () => {
                             onChange={handleChange}
                           />
                           <label htmlFor="territoriesEnabled">
-                            Activer les rencontres vous permettra de comptabliser les personnes rencontrées en rue.
+                            Activer les rencontres vous permettra de comptabiliser les personnes rencontrées en rue.
                           </label>
                         </div>
                       </FormGroup>
