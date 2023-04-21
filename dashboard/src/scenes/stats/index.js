@@ -30,7 +30,7 @@ import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import ExportFormattedData from '../data-import-export/ExportFormattedData';
 import { getDataForPeriod } from './utils';
 import GeneralStats from './General';
-import ReceptionStats from './Reception';
+import ServicesStats from './Services';
 import ActionsStats from './Actions';
 import PersonStats from './Persons';
 import PassagesStats from './Passages';
@@ -44,7 +44,7 @@ import dayjs from 'dayjs';
 
 const tabs = [
   'Général',
-  'Accueil',
+  'Services',
   'Actions',
   'Personnes créées',
   'Personnes suivies',
@@ -120,8 +120,8 @@ const Stats = () => {
   const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('stats-viewAllOrganisationData', teams.length === 1);
   const [period, setPeriod] = useLocalStorage('period', { startDate: null, endDate: null });
   const [preset, setPreset, removePreset] = useLocalStorage('stats-date-preset', null);
-  const [actionsStatuses, setActionsStatuses] = useLocalStorage('stats-actionsStatuses', DONE);
   const [manuallySelectedTeams, setSelectedTeams] = useLocalStorage('stats-teams', [currentTeam]);
+  const [actionsStatuses, setActionsStatuses] = useLocalStorage('stats-actionsStatuses', DONE);
   const [actionsCategoriesGroups, setActionsCategoriesGroups] = useLocalStorage('stats-catGroups', []);
   const [actionsCategories, setActionsCategories] = useLocalStorage('stats-categories', []);
   const selectedTeams = useMemo(() => {
@@ -381,7 +381,6 @@ const Stats = () => {
       }),
     [allreports, filterByTeam, period, allSelectedTeamsAreNightSession]
   );
-  const reportsServices = useMemo(() => reports.map((rep) => (rep.services ? JSON.parse(rep.services) : null)).filter(Boolean), [reports]);
   const filterPersonsBase = useRecoilValue(filterPersonsBaseSelector);
   // Add enabled custom fields in filters.
   const filterPersonsWithAllFields = (withMedicalFiles = false) => [
@@ -465,7 +464,7 @@ const Stats = () => {
             if (['Observations'].includes(tabCaption)) {
               return !!organisation.territoriesEnabled;
             }
-            if (['Accueil'].includes(tabCaption)) {
+            if (['Services'].includes(tabCaption)) {
               return !!organisation.receptionEnabled;
             }
             return true;
@@ -498,14 +497,7 @@ const Stats = () => {
             numberOfActionsPerPersonConcernedByActions={numberOfActionsPerPersonConcernedByActions}
           />
         )}
-        {!!organisation.receptionEnabled && activeTab === 'Accueil' && (
-          <ReceptionStats
-            reportsServices={reportsServices}
-            passages={passages}
-            period={period}
-            teamsId={viewAllOrganisationData ? teams.map((e) => e?._id) : selectedTeams.map((e) => e?._id)}
-          />
-        )}
+        {!!organisation.receptionEnabled && activeTab === 'Services' && <ServicesStats period={period} teamIds={selectedTeams.map((e) => e?._id)} />}
         {activeTab === 'Actions' && (
           <ActionsStats
             setActionsStatuses={setActionsStatuses}

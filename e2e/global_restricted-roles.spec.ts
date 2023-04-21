@@ -116,7 +116,7 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.getByRole("link", { name: "Statistiques" })).toBeVisible();
     await page.getByRole("link", { name: "Statistiques" }).click();
     await expect(page.getByRole("list").getByText("Général")).toBeVisible();
-    await expect(page.getByRole("list").getByText("Accueil")).toBeVisible();
+    await expect(page.getByRole("list").getByText("Services")).toBeVisible();
     await expect(page.getByRole("list").getByText("Actions")).toBeVisible();
     await expect(page.getByRole("list").getByText("Personnes créées", { exact: true })).toBeVisible();
     await expect(page.getByRole("list").getByText("Personnes suivies", { exact: true })).toBeVisible();
@@ -183,7 +183,7 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.getByRole("link", { name: "Statistiques" })).toBeVisible();
     await page.getByRole("link", { name: "Statistiques" }).click();
     await expect(page.getByRole("list").getByText("Général")).toBeVisible();
-    await expect(page.getByRole("list").getByText("Accueil")).toBeVisible();
+    await expect(page.getByRole("list").getByText("Services")).toBeVisible();
     await expect(page.getByRole("list").getByText("Actions")).toBeVisible();
     await expect(page.getByRole("list").getByText("Personnes créées", { exact: true })).toBeVisible();
     await expect(page.getByRole("list").getByText("Personnes suivies", { exact: true })).toBeVisible();
@@ -246,7 +246,7 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.getByRole("link", { name: "Statistiques" })).toBeVisible();
     await page.getByRole("link", { name: "Statistiques" }).click();
     await expect(page.getByRole("list").getByText("Général")).toBeVisible();
-    await expect(page.getByRole("list").getByText("Accueil")).toBeVisible();
+    await expect(page.getByRole("list").getByText("Services")).toBeVisible();
     await expect(page.getByRole("list").getByText("Actions")).toBeVisible();
     await expect(page.getByRole("list").getByText("Personnes créées", { exact: true })).toBeVisible();
     await expect(page.getByRole("list").getByText("Personnes suivies", { exact: true })).toBeVisible();
