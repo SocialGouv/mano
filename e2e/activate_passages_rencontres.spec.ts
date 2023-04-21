@@ -128,7 +128,7 @@ test("test", async ({ page }) => {
   await page.getByLabel("Commentaire").click();
   await page.getByLabel("Commentaire").fill("je viens de créer une rencontre");
   await page.getByRole("button", { name: "Enregistrer" }).click();
-  await page.getByText("je viens de créer une rencontre").click();
+  await expect(page.getByText("je viens de créer une rencontre")).toBeVisible();
   await page.getByLabel("Commentaire").click();
   await page.getByLabel("Commentaire").fill("je viens de modifier une rencontre");
   await page.getByRole("button", { name: "Enregistrer" }).click();
