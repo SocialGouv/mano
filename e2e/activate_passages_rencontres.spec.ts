@@ -9,8 +9,6 @@ test.beforeAll(async () => {
 
 test("test", async ({ page }) => {
   const today = dayjs().format("YYYY-MM-DD");
-  const anotherDay =
-    dayjs().add(1, "day").month() === dayjs().month() ? dayjs().add(1, "day").format("YYYY-MM-DD") : dayjs().startOf("month").format("YYYY-MM-DD");
 
   /* ************************************************************************* */
   /* ****** PARTIE 1 TEST ADMIN 1 PASSAGE ACTIVE ET RENCONTRE DESACTIVE ****** */
@@ -24,6 +22,7 @@ test("test", async ({ page }) => {
   await page.locator("#rencontresEnabled").uncheck();
 
   await page.getByRole("button", { name: "Mettre à jour" }).click();
+  await page.getByText("Mise à jour !").click();
 
   /* ***** accueil ***** */
 
@@ -33,6 +32,7 @@ test("test", async ({ page }) => {
   await page.locator("#person-select-and-create-reception").press("Home");
   await page.locator("#person-select-and-create-reception").fill("test1");
   await page.locator("#react-select-5-option-0").click();
+  await page.getByText("Nouvelle personne ajoutée !").click();
   await page.getByRole("button", { name: "Passage" }).first().click();
   await page.getByRole("button", { name: "Passage anonyme" }).click();
 
@@ -48,6 +48,7 @@ test("test", async ({ page }) => {
   await page.getByLabel("Commentaire").click();
   await page.getByLabel("Commentaire").fill("test passage");
   await page.getByRole("button", { name: "Enregistrer" }).click();
+  await page.getByText("Passage enregistré").click();
 
   /* ***** comptes rendus ***** */
 
@@ -73,6 +74,7 @@ test("test", async ({ page }) => {
   await page.getByLabel("Commentaire").click();
   await page.getByLabel("Commentaire").fill("ajout passage modification");
   await page.getByRole("button", { name: "Enregistrer" }).click();
+  await page.getByText("Passage mis à jour").click();
 
   /* ***** statistiques ***** */
 
@@ -101,6 +103,7 @@ test("test", async ({ page }) => {
   await page.locator("#rencontresEnabled").check();
 
   await page.getByRole("button", { name: "Mettre à jour" }).click();
+  await page.getByText("Mise à jour !").click();
 
   /* ***** accueil ***** */
 
@@ -110,6 +113,7 @@ test("test", async ({ page }) => {
   await page.locator(".person-select-and-create-reception__input-container").click();
   await page.locator("#person-select-and-create-reception").fill("testpassage");
   await page.getByText('Créer "testpassage"').click();
+  await page.getByText("Nouvelle personne ajoutée !").click();
   await expect(page.getByRole("button", { name: "Passage" })).not.toBeVisible();
 
   /* ***** personnes suivies ***** */
@@ -119,7 +123,7 @@ test("test", async ({ page }) => {
   await page.getByLabel("Nom").click();
   await page.getByLabel("Nom").fill("testrencontres");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
-
+  await page.getByText("Création réussie !").click();
   await page.getByRole("button", { name: "Rencontres (0)" }).click();
 
   await expect(page.getByRole("link", { name: "Passages (0)" })).not.toBeVisible();
@@ -128,11 +132,12 @@ test("test", async ({ page }) => {
   await page.getByLabel("Commentaire").click();
   await page.getByLabel("Commentaire").fill("je viens de créer une rencontre");
   await page.getByRole("button", { name: "Enregistrer" }).click();
-  await expect(page.getByText("je viens de créer une rencontre")).toBeVisible();
+  await page.getByText("Rencontre enregistrée").click();
+  await page.getByText("je viens de créer une rencontre").first().click();
   await page.getByLabel("Commentaire").click();
   await page.getByLabel("Commentaire").fill("je viens de modifier une rencontre");
   await page.getByRole("button", { name: "Enregistrer" }).click();
-
+  await page.getByText("Rencontre mise à jour").click();
   /* ***** comptes rendus ***** */
   await page.getByRole("link", { name: "Comptes rendus" }).click();
   await page.getByRole("button", { name: today }).click();
