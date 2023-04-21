@@ -65,6 +65,11 @@ export const getPieData = (source, key, { options = null, isBoolean = false, isM
             newData[unregisteredOption]++;
           }
         }
+        if (isMultiChoice && Array.isArray(item[key]) && item[key].length > 1) {
+          const selectedChoices = options.filter((o) => item[key].includes(o)).join(' + ');
+          if (!newData[selectedChoices]) newData[selectedChoices] = 0;
+          newData[selectedChoices]++;
+        }
         return newData;
       }
       if (!newData[item[key]]) newData[item[key]] = 0;
@@ -73,6 +78,14 @@ export const getPieData = (source, key, { options = null, isBoolean = false, isM
     },
     { 'Non renseigné': 0, Oui: 0, Non: 0 }
   );
+
+  if (options && options.length) {
+    const keysWithValue = Object.keys(data);
+    return [...options.filter((o) => keysWithValue.includes(o)), ...keysWithValue.filter((k) => !options.includes(k))]
+      .map((key) => ({ id: key, label: key, value: data[key] }))
+      .filter((d) => d.value > 0);
+  }
+
   return Object.keys(data)
     .map((key) => ({ id: key, label: key, value: data[key] }))
     .filter((d) => d.value > 0);
