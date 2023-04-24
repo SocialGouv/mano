@@ -3,7 +3,7 @@ import { personsState } from './persons';
 import { placesState } from './places';
 import { relsPersonPlaceState } from './relPersonPlace';
 import { reportsState } from './reports';
-import { formatAge, formatBirthDate, isOnSameDay } from '../services/date';
+import { dayjsInstance, formatAge, formatBirthDate, isOnSameDay } from '../services/date';
 import { customFieldsObsSelector, territoryObservationsState } from './territoryObservations';
 import { selector, selectorFamily } from 'recoil';
 import { actionsState } from './actions';
@@ -14,6 +14,8 @@ import { medicalFileState } from './medicalFiles';
 import { treatmentsState } from './treatments';
 import { rencontresState } from './rencontres';
 import { groupsState } from './groups';
+
+const today = dayjsInstance().format('YYYY-MM-DD');
 
 const usersObjectSelector = selector({
   key: 'usersObjectSelector',
@@ -248,9 +250,9 @@ export const itemsGroupedByPersonSelector = selector({
         // If we do not filter them, when comparing for date periods in stats, we would have to check for undefined,
         // otherwise we would have a bug that consider everybody "person suivies" in every period.
       ].filter((i) => Boolean(i));
-      personsObject[personId].lastUpdateCheckForGDPR = personsObject[personId].interactions[0];
-    }
 
+      personsObject[personId].lastUpdateCheckForGDPR = personsObject[personId].interactions.filter((a) => a <= today)[0];
+    }
     return personsObject;
   },
 });
