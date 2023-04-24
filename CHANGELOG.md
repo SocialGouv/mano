@@ -1,3 +1,10 @@
+# [1.262.0](https://github.com/SocialGouv/mano/compare/v1.261.27...v1.262.0) (2023-04-24)
+
+
+### Features
+
+* stats pour groupes de services ([#1474](https://github.com/SocialGouv/mano/issues/1474)) ([05e71f8](https://github.com/SocialGouv/mano/commit/05e71f8d9ffb95fd456f01e840cf1e7132146551))
+
 ## [1.261.27](https://github.com/SocialGouv/mano/compare/v1.261.26...v1.261.27) (2023-04-24)
 
 
