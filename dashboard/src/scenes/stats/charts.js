@@ -3,8 +3,8 @@ import { ResponsivePie } from '@nivo/pie';
 import { ResponsiveBar } from '@nivo/bar';
 import HelpButtonAndModal from '../../components/HelpButtonAndModal';
 
-export const CustomResponsivePie = ({ isMultiChoice, originalDatasetLength, data = [], title, onItemClick, help }) => {
-  const total = isMultiChoice ? originalDatasetLength : data.reduce((sum, item) => sum + item.value, 0);
+export const CustomResponsivePie = ({ data = [], title, onItemClick, help }) => {
+  const total = data.reduce((sum, item) => sum + item.value, 0);
 
   const onClick = ({ id }) => {
     if (!onItemClick) return;
@@ -37,13 +37,11 @@ export const CustomResponsivePie = ({ isMultiChoice, originalDatasetLength, data
                   {total ? <td className="tw-border tw-border-zinc-400 tw-text-center">{`${Math.round((value / total) * 1000) / 10}%`}</td> : <></>}
                 </tr>
               ))}
-            {!isMultiChoice && (
-              <tr>
-                <td className="tw-border tw-border-zinc-400 tw-font-bold">Total</td>
-                <td className="tw-border tw-border-zinc-400 tw-text-center tw-font-bold">{total}</td>
-                {total ? <td className="tw-border tw-border-zinc-400 tw-text-center tw-font-bold">100%</td> : <></>}
-              </tr>
-            )}
+            <tr>
+              <td className="tw-border tw-border-zinc-400 tw-font-bold">Total</td>
+              <td className="tw-border tw-border-zinc-400 tw-text-center tw-font-bold">{total}</td>
+              {total ? <td className="tw-border tw-border-zinc-400 tw-text-center tw-font-bold">100%</td> : <></>}
+            </tr>
           </tbody>
         </table>
       </div>
@@ -79,11 +77,15 @@ export const CustomResponsivePie = ({ isMultiChoice, originalDatasetLength, data
 
 const getItemValue = (item) => Object.values(item)[1];
 
-export const CustomResponsiveBar = ({ title, data, categories, onItemClick, axisTitleX, axisTitleY, help }) => {
-  const total = data.reduce((sum, item) => sum + getItemValue(item), 0);
+export const CustomResponsiveBar = ({ title, data, categories, onItemClick, axisTitleX, axisTitleY, isMultiChoice, originalDatasetLength, help }) => {
+  if (!categories) {
+    categories = data.map((cat) => cat.name);
+  }
+  const total = isMultiChoice ? originalDatasetLength : data.reduce((sum, item) => sum + item.value, 0);
 
   const onClick = ({ id }) => {
     if (!onItemClick) return;
+    console.log('id', id);
     onItemClick(id);
   };
 
@@ -104,11 +106,13 @@ export const CustomResponsiveBar = ({ title, data, categories, onItemClick, axis
                 <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center">{`${Math.round((getItemValue(item) / total) * 1000) / 10}%`}</td>
               </tr>
             ))}
-            <tr>
-              <td className="tw-border tw-border-zinc-400 tw-p-1 tw-font-bold">Total</td>
-              <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center tw-font-bold">{total}</td>
-              <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center tw-font-bold">100%</td>
-            </tr>
+            {!isMultiChoice && (
+              <tr>
+                <td className="tw-border tw-border-zinc-400 tw-font-bold">Total</td>
+                <td className="tw-border tw-border-zinc-400 tw-text-center tw-font-bold">{total}</td>
+                {total ? <td className="tw-border tw-border-zinc-400 tw-text-center tw-font-bold">100%</td> : <></>}
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -124,6 +128,7 @@ export const CustomResponsiveBar = ({ title, data, categories, onItemClick, axis
           indexBy="name"
           margin={{ top: 40, right: 0, bottom: 50, left: 60 }}
           padding={0.3}
+          maxValue={originalDatasetLength}
           valueScale={{ type: 'linear' }}
           indexScale={{ type: 'band', round: true }}
           colors={{ scheme: 'set2' }}
@@ -133,10 +138,10 @@ export const CustomResponsiveBar = ({ title, data, categories, onItemClick, axis
           axisBottom={{
             tickSize: 5,
             tickPadding: 5,
-            tickRotation: 0,
+            tickRotation: -15,
             legend: axisTitleX,
             legendPosition: 'middle',
-            legendOffset: 35,
+            legendOffset: 45,
           }}
           axisLeft={{
             tickSize: 5,

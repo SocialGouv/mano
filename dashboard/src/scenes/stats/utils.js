@@ -90,3 +90,35 @@ export const getPieData = (source, key, { options = null, isBoolean = false, isM
     .map((key) => ({ id: key, label: key, value: data[key] }))
     .filter((d) => d.value > 0);
 };
+
+const initOptions = (options) => {
+  const objoptions = { 'Non renseigné': [] };
+  for (const cat of options) {
+    objoptions[cat] = [];
+  }
+  return objoptions;
+};
+
+export const getMultichoiceBarData = (source, key, { options = [], debug = false } = {}) => {
+  options = initOptions(options);
+
+  const reducedDataPerOption = source.reduce((newData, item) => {
+    if (!item[key] || !item[key].length) {
+      newData['Non renseigné'].push(item);
+      return newData;
+    }
+    const choices = typeof item[key] === 'string' ? item[key].split(',') : item[key];
+    for (const choice of choices) {
+      if (!newData[choice]) newData[choice] = [];
+      newData[choice].push(item);
+    }
+    return newData;
+  }, options);
+
+  const barData = Object.keys(reducedDataPerOption)
+    .filter((key) => reducedDataPerOption[key]?.length > 0)
+    .map((key) => ({ name: key, [key]: reducedDataPerOption[key]?.length }))
+    .sort((a, b) => (b[b.name] > a[a.name] ? 1 : -1));
+
+  return barData;
+};
