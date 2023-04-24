@@ -1,3 +1,10 @@
+## [1.261.27](https://github.com/SocialGouv/mano/compare/v1.261.26...v1.261.27) (2023-04-24)
+
+
+### Bug Fixes
+
+* **dashboard:** date d'interaction dans le futur ([#1472](https://github.com/SocialGouv/mano/issues/1472)) ([3045d5f](https://github.com/SocialGouv/mano/commit/3045d5fe601ec4009def270ba0893635c55ffe1c))
+
 ## [1.261.26](https://github.com/SocialGouv/mano/compare/v1.261.25...v1.261.26) (2023-04-21)
 
 
