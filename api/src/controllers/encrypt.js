@@ -84,8 +84,8 @@ router.post(
     }
 
     let organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
-    if (organisation.encrypting) {
-      return res.status(403).send({ ok: false, error: "L'organisation est déjà en cours de chiffrement" });
+    if (!organisation.encrypting) {
+      return res.status(403).send({ ok: false, error: "Erreur dans le processus de chiffrement" });
     }
     organisation.set({ encrypting: true });
     await organisation.save();
