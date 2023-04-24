@@ -64,7 +64,7 @@ const ServicesStats = ({ period, teamIds }) => {
         let totalServices = 0;
         for (const service of group.services) {
           if (!servicesFiltered.includes(service)) continue;
-          totalServices = totalServices + servicesFromDatabase[service];
+          totalServices = totalServices + (servicesFromDatabase[service] || 0);
         }
         return {
           id: group.groupTitle,
