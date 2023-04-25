@@ -61,10 +61,8 @@ const CustomFieldsStats = ({ customFields, data, additionalCols = [], dataTestId
           help={help?.(field.label.capitalize())}
           onItemClick={onSliceClick ? (newSlice) => onSliceClick?.(newSlice, field.name) : undefined}
           key={field.name}
-          isMultiChoice={field.type === 'multi-choice'}
           originalDatasetLength={data.length}
           data={getPieData(data, field.name, {
-            isMultiChoice: field.type === 'multi-choice',
             options: field.options,
             isBoolean: field.type === 'boolean',
           })}

@@ -38,7 +38,7 @@ export const getDuration = (timestampFromNow) => {
   return [Math.round(inYears), 'années'];
 };
 
-export const getPieData = (source, key, { options = null, isBoolean = false, isMultiChoice = false, debug = false } = {}) => {
+export const getPieData = (source, key, { options = null, isBoolean = false, debug = false } = {}) => {
   const data = source.reduce(
     (newData, item) => {
       if (isBoolean) {
@@ -64,11 +64,6 @@ export const getPieData = (source, key, { options = null, isBoolean = false, isM
             if (!newData[unregisteredOption]) newData[unregisteredOption] = 0;
             newData[unregisteredOption]++;
           }
-        }
-        if (isMultiChoice && Array.isArray(item[key]) && item[key].length > 1) {
-          const selectedChoices = options.filter((o) => item[key].includes(o)).join(' + ');
-          if (!newData[selectedChoices]) newData[selectedChoices] = 0;
-          newData[selectedChoices]++;
         }
         return newData;
       }
