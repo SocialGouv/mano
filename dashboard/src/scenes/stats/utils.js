@@ -74,13 +74,6 @@ export const getPieData = (source, key, { options = null, isBoolean = false, deb
     { 'Non renseigné': 0, Oui: 0, Non: 0 }
   );
 
-  if (options && options.length) {
-    const keysWithValue = Object.keys(data);
-    return [...options.filter((o) => keysWithValue.includes(o)), ...keysWithValue.filter((k) => !options.includes(k))]
-      .map((key) => ({ id: key, label: key, value: data[key] }))
-      .filter((d) => d.value > 0);
-  }
-
   return Object.keys(data)
     .map((key) => ({ id: key, label: key, value: data[key] }))
     .filter((d) => d.value > 0);
