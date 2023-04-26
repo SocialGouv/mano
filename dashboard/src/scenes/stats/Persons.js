@@ -288,8 +288,6 @@ export const AgeRangeBar = ({ persons, onItemClick }) => {
     .filter((key) => data[key]?.length > 0)
     .map((key) => ({ name: key, [key]: data[key]?.length }));
 
-  console.log('dataCount', dataCount);
-
   return (
     <CustomResponsiveBar
       title="Tranche d'âges"
