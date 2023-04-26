@@ -124,7 +124,6 @@ const PersonStats = ({
           );
         }}
         isMultiChoice
-        originalDatasetLength={personsForStats.filter((p) => !!p.outOfActiveList).length}
         axisTitleY="File active"
         axisTitleX="Raison de sortie de file active"
         data={getMultichoiceBarData(

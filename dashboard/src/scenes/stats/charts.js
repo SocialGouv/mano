@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ResponsivePie } from '@nivo/pie';
 import { ResponsiveBar } from '@nivo/bar';
 import HelpButtonAndModal from '../../components/HelpButtonAndModal';
@@ -77,26 +77,27 @@ export const CustomResponsivePie = ({ data = [], title, onItemClick, help }) => 
 
 const getItemValue = (item) => Object.values(item)[1];
 
-export const CustomResponsiveBar = ({ title, data, categories, onItemClick, axisTitleX, axisTitleY, isMultiChoice, originalDatasetLength, help }) => {
+export const CustomResponsiveBar = ({ title, data, categories, onItemClick, axisTitleX, axisTitleY, isMultiChoice, help }) => {
   // if we have too many categories with small data, we see nothing in the chart
   // so we filter this way:
   // - keep the first 15 categories whatever
   // - keep the others only if they represent more than 1% of the total
-  const chartData = data
-    .filter((c) => c.name !== 'Non renseigné')
-    .filter((item, index) => {
-      if (index < 15) return true;
-      return item[item.name] / originalDatasetLength > 0.01;
-    });
+  const chartData = data.filter((c) => c.name !== 'Non renseigné').filter((_, index) => index < 15);
   const showWarning = chartData.length < data.filter((c) => c.name !== 'Non renseigné').length;
   if (!categories) {
     categories = chartData.map((cat) => cat.name);
   }
-  const total = isMultiChoice ? originalDatasetLength : data.reduce((sum, item) => sum + item.value, 0);
+  // data is already
+  const total = useMemo(() => {
+    if (!isMultiChoice) return data.reduce((sum, item) => sum + item.value, 0);
+    // if we have multiple choice, data is sorted already in getMultichoiceBarData
+    const biggestItem = chartData[0]; // { name: 'A name', ['A name']: 123 }
+    const biggestItemValue = biggestItem[biggestItem.name];
+    return biggestItemValue || 1;
+  }, [data, chartData, isMultiChoice]);
 
   const onClick = ({ id }) => {
     if (!onItemClick) return;
-    console.log('id', id);
     onItemClick(id);
   };
 
@@ -135,7 +136,7 @@ export const CustomResponsiveBar = ({ title, data, categories, onItemClick, axis
         {!!showWarning && (
           <div className="tw-l-0 tw-r-0 tw-absolute tw-top-0 -tw-mt-5">
             <p className="tw-m-0 tw-mx-auto tw-w-3/4 tw-text-center tw-text-xs tw-font-normal tw-text-gray-500">
-              On n'affiche sur le graphique que les 15 premières catégories, et les autres seulement si elles représentent plus de 1% des données.
+              Le top-15 des catégories est affiché, les autres sont cachées pour une meilleure lisibilité.
             </p>
           </div>
         )}
@@ -146,7 +147,7 @@ export const CustomResponsiveBar = ({ title, data, categories, onItemClick, axis
           indexBy="name"
           margin={{ top: 10, right: 0, bottom: 60, left: 60 }}
           padding={0.3}
-          maxValue={originalDatasetLength}
+          maxValue={total}
           valueScale={{ type: 'linear' }}
           indexScale={{ type: 'band', round: true }}
           colors={{ scheme: 'set2' }}
@@ -160,13 +161,10 @@ export const CustomResponsiveBar = ({ title, data, categories, onItemClick, axis
             legend: axisTitleX,
             legendPosition: 'middle',
             legendOffset: 50,
-            legendTextStyle: {
-              fontSize: 12,
-              fontWeight: 'normal',
-            },
           }}
           axisLeft={{
             tickSize: 5,
+            format: (e) => (e ? Math.floor(e) === e && e : ''),
             tickPadding: 5,
             tickRotation: 0,
             legend: axisTitleY,

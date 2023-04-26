@@ -61,7 +61,6 @@ const CustomFieldsStats = ({ customFields, data, additionalCols = [], dataTestId
           help={help?.(field.label.capitalize())}
           onItemClick={onSliceClick ? (newSlice) => onSliceClick?.(newSlice, field.name) : undefined}
           key={field.name}
-          originalDatasetLength={data.length}
           data={getPieData(data, field.name, {
             options: field.options,
             isBoolean: field.type === 'boolean',
@@ -76,7 +75,6 @@ const CustomFieldsStats = ({ customFields, data, additionalCols = [], dataTestId
             onItemClick={onSliceClick ? (newSlice) => onSliceClick?.(newSlice, field.name) : undefined}
             key={field.name}
             isMultiChoice
-            originalDatasetLength={data.length}
             axisTitleY="File active"
             axisTitleX={field.name}
             data={getMultichoiceBarData(data, field.name, { options: field.options })}

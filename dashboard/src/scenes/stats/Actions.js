@@ -7,7 +7,6 @@ import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../compo
 import ActionsSortableList from '../../components/ActionsSortableList';
 
 const ActionsStats = ({
-  originalDatasetLength,
   setActionsStatuses,
   actionsStatuses,
   setActionsCategories,
@@ -133,7 +132,6 @@ const ActionsStats = ({
           setCategorySlice(newCategorySlice);
         }}
         isMultiChoice
-        originalDatasetLength={originalDatasetLength}
         axisTitleY="Actions"
         axisTitleX="Catégorie"
         data={getMultichoiceBarData(actionsWithDetailedGroupAndCategories, 'category')}
