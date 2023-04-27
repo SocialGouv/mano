@@ -89,7 +89,7 @@ export const CustomResponsiveBar = ({ title, data, categories, onItemClick, axis
   }
   // data is already
   const total = useMemo(() => {
-    if (!isMultiChoice) return data.reduce((sum, item) => sum + item.value, 0);
+    if (!isMultiChoice) return data.reduce((sum, item) => sum + getItemValue(item), 0);
     // if we have multiple choice, data is sorted already in getMultichoiceBarData
     const biggestItem = chartData[0]; // { name: 'A name', ['A name']: 123 }
     const biggestItemValue = biggestItem[biggestItem.name];
