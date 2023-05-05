@@ -82,9 +82,6 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Passages" }).click();
   await expect(page.getByText("Nombre de passages ?Non-anonyme375%Anonyme125%Total4100%Non-anonymeAnonyme3 (75%")).toBeVisible();
 
-  await page.getByRole("button", { name: "Accueil" }).click();
-  await page.getByText("Nombre de passages ?4").click();
-
   await expect(page.getByRole("button", { name: "Rencontres" })).not.toBeVisible();
 
   /* ***** delog ***** */
@@ -166,9 +163,6 @@ test("test", async ({ page }) => {
   await page.getByText("Nombre de rencontres ?Rencontres2100%Total2100%Rencontres2 (100%)").click();
 
   await expect(page.getByRole("button", { name: "Passages" })).not.toBeVisible();
-
-  await page.getByRole("button", { name: "Accueil" }).click();
-  await expect(page.getByText("Nombre de passages ?Non-anonyme00%Anonyme0%Total00%Non-anonymeAnonyme0 (0%")).not.toBeVisible();
 
   await logOut(page, "User Admin Test - 2");
 
@@ -268,6 +262,6 @@ test("test", async ({ page }) => {
   await page.getByRole("link", { name: "Statistiques" }).click();
   await page.getByRole("button", { name: "Rencontres" }).filter({ hasText: "Rencontres" }).click();
   await page.getByRole("button", { name: "Passages" }).click();
-  await page.getByRole("button", { name: "Accueil" }).click();
+
   await page.getByText("Nombre de passages ?1").click();
 });
