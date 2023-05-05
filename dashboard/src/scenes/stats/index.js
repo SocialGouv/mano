@@ -467,6 +467,12 @@ const Stats = () => {
             if (['Services'].includes(tabCaption)) {
               return !!organisation.receptionEnabled;
             }
+            if (['Rencontres'].includes(tabCaption)) {
+              return !!organisation.rencontresEnabled;
+            }
+            if (['Passages'].includes(tabCaption)) {
+              return !!organisation.passagesEnabled;
+            }
             return true;
           })
           .map((tabCaption, index) => {
@@ -538,7 +544,7 @@ const Stats = () => {
             flattenedCustomFieldsPersons={flattenedCustomFieldsPersons}
           />
         )}
-        {activeTab === 'Passages' && (
+        {!!organisation.passagesEnabled && activeTab === 'Passages' && (
           <PassagesStats
             passages={passages}
             personFields={personFields}
@@ -546,7 +552,7 @@ const Stats = () => {
             personsInPassagesBeforePeriod={personsInPassagesBeforePeriod}
           />
         )}
-        {activeTab === 'Rencontres' && (
+        {!!organisation.rencontresEnabled && activeTab === 'Rencontres' && (
           <RencontresStats
             rencontres={rencontres}
             personFields={personFields}

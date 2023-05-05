@@ -20,7 +20,7 @@ import TeamsMultiCheckBoxes from '../../components/MultiCheckBoxes/TeamsMultiChe
 import colors from '../../utils/colors';
 import PhoneIcon from '../../icons/PhoneIcon';
 import { placesState } from '../../recoil/places';
-import { teamsState } from '../../recoil/auth';
+import { organisationState, teamsState } from '../../recoil/auth';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
 import RencontreRow from './RencontreRow';
 import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
@@ -52,6 +52,7 @@ const PersonSummary = ({
     navigation.push('NewActionForm', { fromRoute: 'Person', person: personDB });
   };
 
+  const organisation = useRecoilValue(organisationState);
   const scrollViewRef = useRef(null);
   const descriptionRef = useRef(null);
   const newCommentRef = useRef(null);
@@ -270,13 +271,15 @@ const PersonSummary = ({
           onCommentWrite={onCommentWrite}
         />
       </SubList>
-      <SubList
-        label="Rencontres"
-        onAdd={onAddRencontre}
-        data={rencontres}
-        renderItem={(rencontre) => <RencontreRow key={rencontre._id} rencontre={rencontre} onUpdate={() => onUpdateRencontre(rencontre)} />}
-        ifEmpty="Pas de rencontres"
-      />
+      {organisation.rencontresEnabled && (
+        <SubList
+          label="Rencontres"
+          onAdd={onAddRencontre}
+          data={rencontres}
+          renderItem={(rencontre) => <RencontreRow key={rencontre._id} rencontre={rencontre} onUpdate={() => onUpdateRencontre(rencontre)} />}
+          ifEmpty="Pas de rencontres"
+        />
+      )}
       <SubList
         label="Lieux fréquentés"
         onAdd={onAddPlaceRequest}

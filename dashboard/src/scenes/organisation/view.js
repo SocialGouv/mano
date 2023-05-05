@@ -43,6 +43,7 @@ const getSettingTitle = (tabId) => {
   if (tabId === 'territories') return 'Territoires';
   if (tabId === 'export') return 'Export';
   if (tabId === 'import') return 'Import';
+  if (tabId === 'rencontres-passages') return 'Passages/rencontres';
   return '';
 };
 
@@ -148,6 +149,14 @@ const View = () => {
             disabled={!organisation.encryptionEnabled}>
             Territoires
           </button>
+          <button
+            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'rencontres-passages' ? 'tw-text-main' : 'tw-text-zinc-600'].join(
+              ' '
+            )}
+            onClick={() => setTab('rencontres-passages')}
+            disabled={!organisation.encryptionEnabled}>
+            Passages/rencontres
+          </button>
           <hr />
           <button
             className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'export' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
@@ -166,6 +175,8 @@ const View = () => {
               ...organisation,
               receptionEnabled: organisation.receptionEnabled || false,
               groupsEnabled: organisation.groupsEnabled || false,
+              passagesEnabled: organisation.passagesEnabled || false,
+              rencontresEnabled: organisation.rencontresEnabled || false,
             }}
             enableReinitialize
             onSubmit={async (body) => {
@@ -306,6 +317,55 @@ const View = () => {
                       </div>
                       <hr />
                       <ObservationsSettings />
+                    </>
+                  );
+                case 'rencontres-passages':
+                  return (
+                    <>
+                      <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Passages / rencontres</h3>
+                      <h4 className="tw-my-8">Activer les passages</h4>
+                      <FormGroup>
+                        <div className="tw-ml-5 tw-flex tw-w-4/5 tw-items-baseline">
+                          <input
+                            type="checkbox"
+                            className="tw-mr-2"
+                            name="passagesEnabled"
+                            id="passagesEnabled"
+                            checked={values.passagesEnabled || false}
+                            onChange={handleChange}
+                          />
+                          <label htmlFor="territoriesEnabled">
+                            Activer les passages vous permettra de comptabiliser les personnes qui passent sur votre structure.
+                          </label>
+                        </div>
+                      </FormGroup>
+                      <h4 className="tw-my-8">Activer les rencontres</h4>
+                      <FormGroup>
+                        <div className="tw-ml-5 tw-flex tw-w-4/5 tw-items-baseline">
+                          <input
+                            type="checkbox"
+                            className="tw-mr-2"
+                            name="rencontresEnabled"
+                            id="rencontresEnabled"
+                            checked={values.rencontresEnabled || false}
+                            onChange={handleChange}
+                          />
+                          <label htmlFor="territoriesEnabled">
+                            Activer les rencontres vous permettra de comptabiliser les personnes rencontrées en rue.
+                          </label>
+                        </div>
+                      </FormGroup>
+                      <div className="tw-mb-10 tw-flex tw-justify-end tw-gap-4">
+                        <ButtonCustom
+                          title={'Mettre à jour'}
+                          disabled={
+                            values.rencontresEnabled === organisation.rencontresEnabled && values.passagesEnabled === organisation.passagesEnabled
+                          }
+                          loading={isSubmitting}
+                          onClick={handleSubmit}
+                        />
+                      </div>
+                      <hr />
                     </>
                   );
                 case 'persons':

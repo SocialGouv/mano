@@ -13,7 +13,7 @@ import ButtonCustom from '../../components/ButtonCustom';
 import ActionsCalendar from '../../components/ActionsCalendar';
 import SelectStatus from '../../components/SelectStatus';
 import { actionsState, TODO } from '../../recoil/actions';
-import { currentTeamState, userState } from '../../recoil/auth';
+import { currentTeamState, userState, organisationState } from '../../recoil/auth';
 import { personsState } from '../../recoil/persons';
 import { selector, selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
 import API from '../../services/api';
@@ -103,7 +103,7 @@ const Reception = () => {
   useTitle('Accueil');
 
   const currentTeam = useRecoilValue(currentTeamState);
-
+  const organisation = useRecoilValue(organisationState);
   const setPassages = useSetRecoilState(passagesState);
   const passages = useRecoilValue(todaysPassagesSelector);
   const [status, setStatus] = useState(TODO);
@@ -267,16 +267,17 @@ const Reception = () => {
             )}
           </>
         )}
-
-        <ButtonCustom
-          onClick={onAddPassageForPersons}
-          color="primary"
-          style={{ height: 'fit-content' }}
-          icon={plusIcon}
-          title="Passage"
-          padding={'8px 14px'}
-          disabled={addingPassage || !selectedPersons.length}
-        />
+        {!!organisation.passagesEnabled && (
+          <ButtonCustom
+            onClick={onAddPassageForPersons}
+            color="primary"
+            style={{ height: 'fit-content' }}
+            icon={plusIcon}
+            title="Passage"
+            padding={'8px 14px'}
+            disabled={addingPassage || !selectedPersons.length}
+          />
+        )}
       </PersonsWrapper>
       <Row style={{ paddingBottom: 20, marginBottom: 20 }}>
         <Col md={8}>
@@ -289,23 +290,25 @@ const Reception = () => {
           <ActionsCalendar actions={dataConsolidated} columns={['Heure', 'Nom', 'Personne suivie', 'Statut']} />
         </Col>
         <Col md={4}>
-          <PassagesWrapper>
-            <h5 id="passages-title">
-              {passages.length} passage{passages.length > 1 ? 's' : ''}
-            </h5>
-            <ButtonCustom onClick={onAddAnonymousPassage} color="primary" icon={plusIcon} title="Passage anonyme" id="add-anonymous-passage" />
-            {!!passages.length && reportCreatedRef.current && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <ButtonCustom
-                  onClick={() => history.push(`/report/${todaysReport?.date}?tab=passages`)}
-                  color="link"
-                  title="Modifier les passages"
-                  padding="0px"
-                />
-                <ButtonCustom onClick={() => setTodaysPassagesOpen(true)} color="link" title="Voir les passages d'aujourd'hui" padding="0px" />
-              </div>
-            )}
-          </PassagesWrapper>
+          {!!organisation.passagesEnabled && (
+            <PassagesWrapper>
+              <h5 id="passages-title">
+                {passages.length} passage{passages.length > 1 ? 's' : ''}
+              </h5>
+              <ButtonCustom onClick={onAddAnonymousPassage} color="primary" icon={plusIcon} title="Passage anonyme" id="add-anonymous-passage" />
+              {!!passages.length && reportCreatedRef.current && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <ButtonCustom
+                    onClick={() => history.push(`/report/${todaysReport?.date}?tab=passages`)}
+                    color="link"
+                    title="Modifier les passages"
+                    padding="0px"
+                  />
+                  <ButtonCustom onClick={() => setTodaysPassagesOpen(true)} color="link" title="Voir les passages d'aujourd'hui" padding="0px" />
+                </div>
+              )}
+            </PassagesWrapper>
+          )}
           <ServicesWrapper>
             <h5 className="services-title">Services</h5>
             <div className="services-incrementators">
