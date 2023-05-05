@@ -79,20 +79,18 @@ const getItemValue = (item) => Object.values(item)[1];
 
 export const CustomResponsiveBar = ({ title, data, categories, onItemClick, axisTitleX, axisTitleY, isMultiChoice, help }) => {
   // if we have too many categories with small data, we see nothing in the chart
-  // so we filter this way:
-  // - keep the first 15 categories whatever
-  // - keep the others only if they represent more than 1% of the total
+  // so we filter by keeping the first 15 categories whatever
   const chartData = data.filter((c) => c.name !== 'Non renseigné').filter((_, index) => index < 15);
   const showWarning = chartData.length < data.filter((c) => c.name !== 'Non renseigné').length;
   if (!categories) {
     categories = chartData.map((cat) => cat.name);
   }
-  // data is already
+
   const total = useMemo(() => {
     if (!isMultiChoice) return data.reduce((sum, item) => sum + getItemValue(item), 0);
     // if we have multiple choice, data is sorted already in getMultichoiceBarData
     const biggestItem = chartData[0]; // { name: 'A name', ['A name']: 123 }
-    const biggestItemValue = biggestItem[biggestItem.name];
+    const biggestItemValue = biggestItem?.[biggestItem?.name];
     return biggestItemValue || 1;
   }, [data, chartData, isMultiChoice]);
 
