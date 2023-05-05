@@ -1,3 +1,10 @@
+# [1.263.0](https://github.com/SocialGouv/mano/compare/v1.262.4...v1.263.0) (2023-05-05)
+
+
+### Features
+
+* **dashboard:** possibilite d'activer ou desactiver les passages et les rencontres  ([#1438](https://github.com/SocialGouv/mano/issues/1438)) ([5afd7bc](https://github.com/SocialGouv/mano/commit/5afd7bc3f2eb6e9e138475f3e098a01d6e62d9bf))
+
 ## [1.262.4](https://github.com/SocialGouv/mano/compare/v1.262.3...v1.262.4) (2023-05-05)
 
 
