@@ -286,27 +286,59 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
         {isMedicalFile && (
           <Formik
             enableReinitialize
-            initialValues={medicalFile}
+            initialValues={{
+              ...medicalFile,
+              structureMedical: person.structureMedical,
+              healthInsurances: person.healthInsurances,
+            }}
             onSubmit={async (body) => {
               body.entityKey = medicalFile.entityKey;
-
               const bodyMedicalFile = body;
 
               const mfResponse = await API.put({
                 path: `/medical-file/${medicalFile._id}`,
                 body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({ ...medicalFile, ...bodyMedicalFile }),
               });
-              if (mfResponse.ok) {
+              let success = mfResponse.ok;
+              if (success) {
                 setAllMedicalFiles((medicalFiles) =>
                   medicalFiles.map((m) => {
                     if (m._id === medicalFile._id) return mfResponse.decryptedData;
                     return m;
                   })
                 );
+              }
+
+              // We have to save legacy fields in person
+              const structureMedical = flattenedCustomFieldsPersons.find((e) => e.name === 'structureMedical');
+              const healthInsurances = flattenedCustomFieldsPersons.find((e) => e.name === 'healthInsurances');
+              if (structureMedical || healthInsurances) {
+                const personResponse = await API.put({
+                  path: `/person/${person._id}`,
+                  body: preparePersonForEncryption({
+                    ...person,
+                    structureMedical: structureMedical ? body.structureMedical : undefined,
+                    healthInsurances: healthInsurances ? body.healthInsurances : undefined,
+                  }),
+                });
+                if (personResponse.ok) {
+                  const newPerson = personResponse.decryptedData;
+                  setPersons((persons) =>
+                    persons.map((p) => {
+                      if (p._id === person._id) return newPerson;
+                      return p;
+                    })
+                  );
+                } else {
+                  success = false;
+                }
+              }
+
+              if (!success) {
+                toast.error("Les données médicales n'ont pas été enregistrées");
+              } else {
                 toast.success('Mis à jour !');
                 onClose();
-              } else {
-                toast.error("Les données médicales n'ont pas été enregistrées");
               }
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting, setFieldValue }) => {
