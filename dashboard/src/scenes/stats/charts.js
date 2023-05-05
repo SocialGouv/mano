@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ResponsivePie } from '@nivo/pie';
 import { ResponsiveBar } from '@nivo/bar';
 import HelpButtonAndModal from '../../components/HelpButtonAndModal';
@@ -48,7 +48,7 @@ export const CustomResponsivePie = ({ data = [], title, onItemClick, help }) => 
       <div
         className={[
           'tw-flex tw-h-80 tw-max-w-[50%] tw-basis-1/2 tw-items-center tw-justify-center tw-font-bold print:tw-w-[600px] print:tw-max-w-[55%] print:!tw-grow print:!tw-basis-0',
-          !!onItemClick ? '[&_path]:tw-cursor-pointer' : '',
+          onItemClick ? '[&_path]:tw-cursor-pointer' : '',
         ].join(' ')}>
         <ResponsivePie
           data={total ? data : []}
@@ -77,8 +77,24 @@ export const CustomResponsivePie = ({ data = [], title, onItemClick, help }) => 
 
 const getItemValue = (item) => Object.values(item)[1];
 
-export const CustomResponsiveBar = ({ title, data, categories, onItemClick, axisTitleX, axisTitleY, help }) => {
-  const total = data.reduce((sum, item) => sum + getItemValue(item), 0);
+export const CustomResponsiveBar = ({ title, data, categories, onItemClick, axisTitleX, axisTitleY, isMultiChoice, help }) => {
+  // if we have too many categories with small data, we see nothing in the chart
+  // so we filter this way:
+  // - keep the first 15 categories whatever
+  // - keep the others only if they represent more than 1% of the total
+  const chartData = data.filter((c) => c.name !== 'Non renseigné').filter((_, index) => index < 15);
+  const showWarning = chartData.length < data.filter((c) => c.name !== 'Non renseigné').length;
+  if (!categories) {
+    categories = chartData.map((cat) => cat.name);
+  }
+  // data is already
+  const total = useMemo(() => {
+    if (!isMultiChoice) return data.reduce((sum, item) => sum + getItemValue(item), 0);
+    // if we have multiple choice, data is sorted already in getMultichoiceBarData
+    const biggestItem = chartData[0]; // { name: 'A name', ['A name']: 123 }
+    const biggestItemValue = biggestItem[biggestItem.name];
+    return biggestItemValue || 1;
+  }, [data, chartData, isMultiChoice]);
 
   const onClick = ({ id }) => {
     if (!onItemClick) return;
@@ -102,26 +118,36 @@ export const CustomResponsiveBar = ({ title, data, categories, onItemClick, axis
                 <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center">{`${Math.round((getItemValue(item) / total) * 1000) / 10}%`}</td>
               </tr>
             ))}
-            <tr>
-              <td className="tw-border tw-border-zinc-400 tw-p-1 tw-font-bold">Total</td>
-              <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center tw-font-bold">{total}</td>
-              <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center tw-font-bold">100%</td>
-            </tr>
+            {!isMultiChoice && (
+              <tr>
+                <td className="tw-border tw-border-zinc-400 tw-font-bold">Total</td>
+                <td className="tw-border tw-border-zinc-400 tw-text-center tw-font-bold">{total}</td>
+                {total ? <td className="tw-border tw-border-zinc-400 tw-text-center tw-font-bold">100%</td> : <></>}
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
       <div
         className={[
-          'tw-flex tw-h-80 tw-max-w-[50%] tw-basis-1/2 tw-items-center tw-justify-center tw-font-bold print:tw-w-[600px] print:tw-max-w-[60%] print:!tw-grow print:!tw-basis-0',
+          'tw-relative tw-flex tw-h-80 tw-max-w-[50%] tw-basis-1/2 tw-items-center tw-justify-center tw-font-bold print:tw-w-[600px] print:tw-max-w-[60%] print:!tw-grow print:!tw-basis-0',
           !!onItemClick ? '[&_rect]:tw-cursor-pointer' : '',
         ].join(' ')}>
+        {!!showWarning && (
+          <div className="tw-l-0 tw-r-0 tw-absolute tw-top-0 -tw-mt-5">
+            <p className="tw-m-0 tw-mx-auto tw-w-3/4 tw-text-center tw-text-xs tw-font-normal tw-text-gray-500">
+              Le top-15 des catégories est affiché, les autres sont cachées pour une meilleure lisibilité.
+            </p>
+          </div>
+        )}
         <ResponsiveBar
-          data={data.filter((c) => c.name !== 'Non renseigné')}
-          keys={categories.filter((c) => c !== 'Non renseigné')}
+          data={chartData}
+          keys={categories}
           onClick={onClick}
           indexBy="name"
-          margin={{ top: 40, right: 0, bottom: 50, left: 60 }}
+          margin={{ top: 10, right: 0, bottom: 60, left: 60 }}
           padding={0.3}
+          maxValue={total}
           valueScale={{ type: 'linear' }}
           indexScale={{ type: 'band', round: true }}
           colors={{ scheme: 'set2' }}
@@ -129,15 +155,16 @@ export const CustomResponsiveBar = ({ title, data, categories, onItemClick, axis
           axisTop={null}
           axisRight={null}
           axisBottom={{
-            tickSize: 5,
+            tickSize: 2,
             tickPadding: 5,
-            tickRotation: 0,
+            tickRotation: -15,
             legend: axisTitleX,
             legendPosition: 'middle',
-            legendOffset: 35,
+            legendOffset: 50,
           }}
           axisLeft={{
             tickSize: 5,
+            format: (e) => (e ? Math.floor(e) === e && e : ''),
             tickPadding: 5,
             tickRotation: 0,
             legend: axisTitleY,
@@ -147,23 +174,6 @@ export const CustomResponsiveBar = ({ title, data, categories, onItemClick, axis
           labelSkipWidth={0}
           labelSkipHeight={0}
           labelTextColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
-          legends={[
-            {
-              dataFrom: 'keys',
-              anchor: 'bottom-right',
-              direction: 'column',
-              justify: false,
-              translateX: 120,
-              translateY: 0,
-              itemsSpacing: 2,
-              itemWidth: 100,
-              itemHeight: 20,
-              itemDirection: 'left-to-right',
-              itemOpacity: 0.85,
-              symbolSize: 20,
-              effects: [{ on: 'hover', style: { itemOpacity: 1 } }],
-            },
-          ]}
           animate={true}
           motionStiffness={90}
           motionDamping={15}

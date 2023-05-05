@@ -5,7 +5,7 @@ import { utils, writeFile } from 'xlsx';
 import { useLocalStorage } from '../../services/useLocalStorage';
 import { CustomResponsiveBar, CustomResponsivePie } from './charts';
 import Filters, { filterData } from '../../components/Filters';
-import { getDuration, getPieData } from './utils';
+import { getDuration, getMultichoiceBarData, getPieData } from './utils';
 import Card from '../../components/Card';
 import { capture } from '../../services/sentry';
 import { Block } from './Blocks';
@@ -113,9 +113,8 @@ const PersonStats = ({
         data={getPieData(personsForStats, 'outOfActiveList', { isBoolean: true })}
         help={`${title} dans la période définie, sorties de la file active. La date de sortie de la file active n'est pas nécessairement dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
       />
-      <CustomResponsivePie
+      <CustomResponsiveBar
         title="Raison de sortie de file active"
-        field="outOfActiveListReasons"
         help={`Raisons de sortie de file active des ${title} dans la période définie, sorties de la file active. La date de sortie de la file active n'est pas nécessairement dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
         onItemClick={(newSlice) => {
           onSliceClick(
@@ -124,7 +123,10 @@ const PersonStats = ({
             personsForStats.filter((p) => !!p.outOfActiveList)
           );
         }}
-        data={getPieData(
+        isMultiChoice
+        axisTitleY="File active"
+        axisTitleX="Raison de sortie de file active"
+        data={getMultichoiceBarData(
           personsForStats.filter((p) => !!p.outOfActiveList),
           'outOfActiveListReasons'
         )}

@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react';
-import { CustomResponsivePie } from './charts';
+import { CustomResponsiveBar, CustomResponsivePie } from './charts';
 import { mappedIdsToLabels } from '../../recoil/actions';
 import SelectCustom from '../../components/SelectCustom';
-import { getPieData } from './utils';
+import { getMultichoiceBarData, getPieData } from './utils';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../components/tailwind/Modal';
 import ActionsSortableList from '../../components/ActionsSortableList';
 
@@ -124,15 +124,17 @@ const ActionsStats = ({
           setGroupSlice(newGroupSlice);
         }}
       />
-      <CustomResponsivePie
+      <CustomResponsiveBar
         title="Répartition des actions par catégorie"
         help={`Si une action a plusieurs catégories, elle est comptabilisée dans chaque catégorie.\n\nAinsi, le total affiché peut être supérieur au nombre total d'actions.`}
-        data={getPieData(actionsWithDetailedGroupAndCategories, 'category', { options: allCategories })}
-        field="category"
         onItemClick={(newCategorySlice) => {
           setActionsModalOpened(true);
           setCategorySlice(newCategorySlice);
         }}
+        isMultiChoice
+        axisTitleY="Actions"
+        axisTitleX="Catégorie"
+        data={getMultichoiceBarData(actionsWithDetailedGroupAndCategories, 'category')}
       />
       <SelectedActionsModal
         open={actionsModalOpened}

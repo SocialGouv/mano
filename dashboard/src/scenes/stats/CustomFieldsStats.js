@@ -1,9 +1,9 @@
 import { useRecoilValue } from 'recoil';
 import { currentTeamState } from '../../recoil/auth';
-import { CustomResponsivePie } from './charts';
+import { CustomResponsiveBar, CustomResponsivePie } from './charts';
 import { BlockDateWithTime, BlockTotal } from './Blocks';
 import Card from '../../components/Card';
-import { getPieData } from './utils';
+import { getMultichoiceBarData, getPieData } from './utils';
 
 function getColsSize(totalCols) {
   if (totalCols === 1) return 'full';
@@ -22,7 +22,8 @@ const CustomFieldsStats = ({ customFields, data, additionalCols = [], dataTestId
 
   const customFieldsNumber = customFieldsInStats.filter((field) => ['number'].includes(field.type));
   const customFieldsDate = customFieldsInStats.filter((field) => ['date', 'date-with-time'].includes(field.type));
-  const customFieldsResponsivePie = customFieldsInStats.filter((field) => ['boolean', 'yes-no', 'enum', 'multi-choice'].includes(field.type));
+  const customFieldsResponsivePie = customFieldsInStats.filter((field) => ['boolean', 'yes-no', 'enum'].includes(field.type));
+  const customFieldsResponsiveBar = customFieldsInStats.filter((field) => ['multi-choice'].includes(field.type));
 
   const totalCols = customFieldsNumber.length + customFieldsDate.length + additionalCols.length;
 
@@ -60,9 +61,26 @@ const CustomFieldsStats = ({ customFields, data, additionalCols = [], dataTestId
           help={help?.(field.label.capitalize())}
           onItemClick={onSliceClick ? (newSlice) => onSliceClick?.(newSlice, field.name) : undefined}
           key={field.name}
-          data={getPieData(data, field.name, { options: field.options, isBoolean: field.type === 'boolean' })}
+          data={getPieData(data, field.name, {
+            options: field.options,
+            isBoolean: field.type === 'boolean',
+          })}
         />
       ))}
+      {customFieldsResponsiveBar.map((field) => {
+        return (
+          <CustomResponsiveBar
+            title={field.label}
+            help={help?.(field.label.capitalize())}
+            onItemClick={onSliceClick ? (newSlice) => onSliceClick?.(newSlice, field.name) : undefined}
+            key={field.name}
+            isMultiChoice
+            axisTitleY="File active"
+            axisTitleX={field.name}
+            data={getMultichoiceBarData(data, field.name, { options: field.options })}
+          />
+        );
+      })}
     </>
   );
 };
