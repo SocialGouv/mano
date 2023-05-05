@@ -102,7 +102,7 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
                   'Actions',
                   actions
                     .reduce((uniqueActions, action) => {
-                      if (!uniqueActions.find((a) => a.id === action.id)) uniqueActions.push(action);
+                      if (!uniqueActions.find((a) => a._id === action._id)) uniqueActions.push(action);
                       return uniqueActions;
                     }, [])
                     .map(transformAction)
