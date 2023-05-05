@@ -286,7 +286,11 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
         {isMedicalFile && (
           <Formik
             enableReinitialize
-            initialValues={medicalFile}
+            initialValues={{
+              ...medicalFile,
+              structureMedical: person.structureMedical,
+              healthInsurances: person.healthInsurances,
+            }}
             onSubmit={async (body) => {
               body.entityKey = medicalFile.entityKey;
               const bodyMedicalFile = body;
