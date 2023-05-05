@@ -98,7 +98,15 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
             <MenuItem
               text="Actions"
               onClick={() => {
-                exportXlsx('Actions', actions.map(transformAction));
+                exportXlsx(
+                  'Actions',
+                  actions
+                    .reduce((uniqueActions, action) => {
+                      if (!uniqueActions.find((a) => a.id === action.id)) uniqueActions.push(action);
+                      return uniqueActions;
+                    }, [])
+                    .map(transformAction)
+                );
               }}
             />
           </div>
