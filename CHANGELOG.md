@@ -1,3 +1,10 @@
+## [1.262.3](https://github.com/SocialGouv/mano/compare/v1.262.2...v1.262.3) (2023-05-05)
+
+
+### Bug Fixes
+
+* **dashboard:** possibilité de modifier les champs legacy couverture médicale et structure médicale ([#1487](https://github.com/SocialGouv/mano/issues/1487)) ([2877733](https://github.com/SocialGouv/mano/commit/2877733658a78636f4b60fbf63707364a3ac6409)), closes [#1489](https://github.com/SocialGouv/mano/issues/1489)
+
 ## [1.262.2](https://github.com/SocialGouv/mano/compare/v1.262.1...v1.262.2) (2023-05-05)
 
 
