@@ -345,6 +345,7 @@ export const EditCustomField = ({ open, onDelete, data, editingField, onClose, o
                 </label>
                 <SelectDraggableAndEditable
                   inputId="options"
+                  key={JSON.stringify(field)}
                   name="options"
                   classNamePrefix="options"
                   onEditChoice={({ oldChoice, newChoice, options }) => {
@@ -366,9 +367,7 @@ export const EditCustomField = ({ open, onDelete, data, editingField, onClose, o
                     }
                   }}
                   creatable
-                  options={[...(editingField?.options || field?.options || [])]
-                    .sort((c1, c2) => c1?.localeCompare(c2))
-                    .map((opt) => ({ value: opt, label: opt }))}
+                  options={[...(field?.options || [])].sort((c1, c2) => c1?.localeCompare(c2)).map((opt) => ({ value: opt, label: opt }))}
                   value={(field.options || []).map((opt) => ({ value: opt, label: opt }))}
                   onChange={(v) => setField({ ...field, options: v.map((v) => v.value) })}
                 />
