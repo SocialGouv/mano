@@ -1,3 +1,10 @@
+## [1.262.4](https://github.com/SocialGouv/mano/compare/v1.262.3...v1.262.4) (2023-05-05)
+
+
+### Bug Fixes
+
+* **dashboard:** export des actions: suppression des doublons ([#1491](https://github.com/SocialGouv/mano/issues/1491)) ([0d9467b](https://github.com/SocialGouv/mano/commit/0d9467b305af3c6b7f0c192c9ac3565d0891c2c7))
+
 ## [1.262.3](https://github.com/SocialGouv/mano/compare/v1.262.2...v1.262.3) (2023-05-05)
 
 
