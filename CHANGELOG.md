@@ -1,3 +1,10 @@
+## [1.262.2](https://github.com/SocialGouv/mano/compare/v1.262.1...v1.262.2) (2023-05-05)
+
+
+### Bug Fixes
+
+* stats bar ([#1485](https://github.com/SocialGouv/mano/issues/1485)) ([64253eb](https://github.com/SocialGouv/mano/commit/64253eb90e8f1dcae797117fe1e48a3847e790d2))
+
 ## [1.262.1](https://github.com/SocialGouv/mano/compare/v1.262.0...v1.262.1) (2023-05-05)
 
 
