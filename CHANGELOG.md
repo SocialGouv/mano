@@ -1,3 +1,10 @@
+## [1.262.1](https://github.com/SocialGouv/mano/compare/v1.262.0...v1.262.1) (2023-05-05)
+
+
+### Bug Fixes
+
+* retirer la ligne Total des champs multi-choix ([#1475](https://github.com/SocialGouv/mano/issues/1475)) ([2b9b998](https://github.com/SocialGouv/mano/commit/2b9b998645d80787089fab88e454dd24f47a0731))
+
 # [1.262.0](https://github.com/SocialGouv/mano/compare/v1.261.27...v1.262.0) (2023-04-24)
 
 
