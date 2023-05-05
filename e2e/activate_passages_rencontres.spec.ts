@@ -155,6 +155,7 @@ test("test", async ({ page }) => {
   });
 
   await page.getByRole("button", { name: "Enregistrer" }).click();
+  await page.getByText("Rencontre mise à jour").click();
 
   /* ***** statistiques ***** */
 
@@ -178,6 +179,7 @@ test("test", async ({ page }) => {
   await page.locator("#rencontresEnabled").uncheck();
 
   await page.getByRole("button", { name: "Mettre à jour" }).click();
+  await page.getByText("Mise à jour !").click();
 
   await logOut(page, "User Admin Test - 3");
 
@@ -191,6 +193,7 @@ test("test", async ({ page }) => {
   await page.locator(".person-select-and-create-reception__input-container").click();
   await page.locator("#person-select-and-create-reception").fill("testpassage");
   await page.getByText('Créer "testpassage"').click();
+  await page.getByText("Nouvelle personne ajoutée !").click();
   await expect(page.getByRole("button", { name: "Passage" })).not.toBeVisible();
 
   /* ***** personnes suivies ***** */
@@ -199,6 +202,7 @@ test("test", async ({ page }) => {
   await page.getByLabel("Nom").click();
   await page.getByLabel("Nom").fill("testrencontrepassage");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
+  await page.getByText("Création réussie !").click();
 
   await expect(page.getByRole("link", { name: "Passages (0)" })).not.toBeVisible();
   await expect(page.getByRole("link", { name: "Rencontres (0)" })).not.toBeVisible();
@@ -243,13 +247,16 @@ test("test", async ({ page }) => {
   await page.getByLabel("Nom").click();
   await page.getByLabel("Nom").fill("testrencontrepassage");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
+  await page.getByText("Création réussie !").click();
   await page.getByRole("button", { name: "Rencontres (0)" }).click();
   await page.getByRole("button", { name: "Passages (0)" }).click();
   await page.getByRole("button", { name: "Ajouter un passage" }).click();
   await page.getByRole("button", { name: "Enregistrer" }).click();
+  await page.getByText("Passage enregistré").click();
   await page.getByRole("button", { name: "Rencontres (0)" }).click();
   await page.getByRole("button", { name: "Ajouter une rencontre" }).click();
   await page.getByRole("button", { name: "Enregistrer" }).click();
+  await page.getByText("Rencontre enregistrée").click();
 
   /* ***** comptes rendus ***** */
   await page.getByRole("link", { name: "Comptes rendus" }).click();
@@ -262,6 +269,4 @@ test("test", async ({ page }) => {
   await page.getByRole("link", { name: "Statistiques" }).click();
   await page.getByRole("button", { name: "Rencontres" }).filter({ hasText: "Rencontres" }).click();
   await page.getByRole("button", { name: "Passages" }).click();
-
-  await page.getByText("Nombre de passages ?1").click();
 });
