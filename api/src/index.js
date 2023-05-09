@@ -55,10 +55,9 @@ app.use(versionCheck);
 // Pre middleware
 app.use(express.urlencoded({ extended: true }));
 app.use((req, res, next) => {
-  const limitedSize = req.path.startsWith("/encrypt") ? "1gb" : "50mb";
+  const limitedSize = req.path.startsWith("/encrypt") ? "350mb" : "50mb";
   express.json({ limit: limitedSize })(req, res, next);
 });
-app.use(express.json({ limit: "50mb" }));
 app.use(helmet());
 app.use(cookieParser());
 
