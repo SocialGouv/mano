@@ -1,3 +1,10 @@
+## [1.263.1](https://github.com/SocialGouv/mano/compare/v1.263.0...v1.263.1) (2023-05-09)
+
+
+### Bug Fixes
+
+* **dashboard:** possibilité de renommer plusieurs fois un champ dans un choix multiple ([#1488](https://github.com/SocialGouv/mano/issues/1488)) ([6907d07](https://github.com/SocialGouv/mano/commit/6907d07def8076818a6d27aa3502fc4ec0e3a3ef))
+
 # [1.263.0](https://github.com/SocialGouv/mano/compare/v1.262.4...v1.263.0) (2023-05-05)
 
 
