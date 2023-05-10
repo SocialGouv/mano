@@ -1,11 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
+import dayjs from 'dayjs';
 import { View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 import * as Sentry from '@sentry/react-native';
 import ButtonTopPlus from '../../components/ButtonTopPlus';
-import { displayBirthDate } from '../../components/DateAndTimeInput';
 import { MyText } from '../../components/MyText';
 import RowContainer from '../../components/RowContainer';
 import TeamsTags from '../../components/TeamsTags';
@@ -87,8 +87,12 @@ const PersonRow = ({ onPress, person, isPersonsSearchRow = false, showActionShee
           <PersonName person={person} />
           {!isPersonsSearchRow && <ButtonTopPlus onPress={onMorePress} />}
         </CaptionsFirstLine>
-        {birthdate && !outOfActiveList && <Birthdate>{displayBirthDate(birthdate)}</Birthdate>}
-        {birthdate && outOfActiveList && <BirthdateMuted>{displayBirthDate(birthdate)}</BirthdateMuted>}
+        {birthdate && !outOfActiveList && (
+          <Birthdate>{`${dayjs().from(dayjs(person.birthdate), true)} (${dayjs(person.birthdate).format('DD/MM/YYYY')})`}</Birthdate>
+        )}
+        {birthdate && outOfActiveList && (
+          <BirthdateMuted>{`${dayjs().from(dayjs(person.birthdate), true)} (${dayjs(person.birthdate).format('DD/MM/YYYY')})`}</BirthdateMuted>
+        )}
         {children}
         <TeamsTags teams={person.assignedTeams} />
       </CaptionsContainer>
