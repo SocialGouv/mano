@@ -15,7 +15,7 @@ import { treatmentsState } from './treatments';
 import { rencontresState } from './rencontres';
 import { groupsState } from './groups';
 
-const today = dayjsInstance().format('YYYY-MM-DD');
+const tomorrow = dayjsInstance().add(1, 'day').format('YYYY-MM-DD');
 
 const usersObjectSelector = selector({
   key: 'usersObjectSelector',
@@ -251,7 +251,7 @@ export const itemsGroupedByPersonSelector = selector({
         // otherwise we would have a bug that consider everybody "person suivies" in every period.
       ].filter((i) => Boolean(i));
 
-      personsObject[personId].lastUpdateCheckForGDPR = personsObject[personId].interactions.filter((a) => a <= today)[0];
+      personsObject[personId].lastUpdateCheckForGDPR = personsObject[personId].interactions.filter((a) => a < tomorrow)[0];
     }
     return personsObject;
   },
