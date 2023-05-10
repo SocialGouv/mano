@@ -1,3 +1,10 @@
+## [1.263.2](https://github.com/SocialGouv/mano/compare/v1.263.1...v1.263.2) (2023-05-10)
+
+
+### Bug Fixes
+
+* **api:** try to restart to make the DB connected again ([574bb6e](https://github.com/SocialGouv/mano/commit/574bb6ee0c19ff5e40ebd6fa27496b0da80de5f2))
+
 ## [1.263.1](https://github.com/SocialGouv/mano/compare/v1.263.0...v1.263.1) (2023-05-09)
 
 
