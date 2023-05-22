@@ -37,9 +37,11 @@ dashboard:
   imagePackage: dashboard
 
 metabase:
+  ~chart: metabase
   enabled: false
 
 oauth2-proxy:
+  ~chart: oauth2-proxy
   enabled: false
 
 jobs:
