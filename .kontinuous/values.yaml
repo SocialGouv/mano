@@ -51,14 +51,17 @@ jobs:
       use: build
       with:
         imagePackage: www
-        context: website
+        dockerfile: website/Dockerfile
+        context: .
     build-api:
       use: build
       with:
         imagePackage: api
-        context: api
+        dockerfile: api/Dockerfile
+        context: .
     build-dashboard:
       use: build
       with:
         imagePackage: dashboard
-        context: dashboard
+        dockerfile: dashboard/Dockerfile
+        context: .
