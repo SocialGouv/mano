@@ -1,4 +1,5 @@
 www:
+  ~chart: app
   ~needs: [build-www]
   host: "app-{{ .Values.global.host }}"
   containerPort: 8080
@@ -13,6 +14,7 @@ www:
         more_set_headers "X-Content-Type-Options: nosniff";
 
 api:
+  ~chart: app
   ~needs: [build-api]
   host: "{{ .Values.global.host }}"
   enabled: true
@@ -27,6 +29,7 @@ api:
         name: "{{ .Values.global.pgSecretName }}"
 
 dashboard:
+  ~chart: app
   ~needs: [build-dashboard]
   host: "dashboard-{{ .Values.global.host }}"
   enabled: true
