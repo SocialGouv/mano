@@ -1,0 +1,21 @@
+www:
+  ~needs: [build-www, api]
+
+api:
+  ~needs: [build-api, seed]
+  volumes:
+    - name: files
+      emptyDir: {}
+  volumeMounts:
+    - mountPath: /mnt/files
+      name: files
+
+jobs:
+  runs:
+    - name: db
+      use: create-db
+    - name: seed
+      ~needs: [db]
+      use: seed-db
+      with:
+        seedPath: api/mocked-db.sql

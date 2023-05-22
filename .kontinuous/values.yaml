@@ -1,4 +1,5 @@
-app-www:
+www:
+  ~needs: [build-www]
   host: "app-{{ .Values.global.host }}"
   containerPort: 8080
   enabled: true
@@ -11,7 +12,8 @@ app-www:
         more_set_headers "X-XSS-Protection: 1; mode=block";
         more_set_headers "X-Content-Type-Options: nosniff";
 
-app-api:
+api:
+  ~needs: [build-api]
   host: "{{ .Values.global.host }}"
   enabled: true
   containerPort: 3000
@@ -24,7 +26,8 @@ app-api:
     - secretRef:
         name: "{{ .Values.global.pgSecretName }}"
 
-app-dashboard:
+dashboard:
+  ~needs: [build-dashboard]
   host: "dashboard-{{ .Values.global.host }}"
   enabled: true
   containerPort: 8080
@@ -35,3 +38,21 @@ metabase:
 
 oauth2-proxy:
   enabled: false
+
+jobs:
+  runs:
+    build-www:
+      use: build
+      with:
+        imagePackage: www
+        context: website
+    build-api:
+      use: build
+      with:
+        imagePackage: api
+        context: api
+    build-dashboard:
+      use: build
+      with:
+        imagePackage: dashboard
+        context: dashboard
