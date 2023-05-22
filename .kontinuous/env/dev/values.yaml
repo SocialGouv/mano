@@ -12,9 +12,9 @@ api:
 
 jobs:
   runs:
-    - name: db
+    db:
       use: create-db
-    - name: seed
+    seed:
       ~needs: [db]
       use: seed-db
       with:

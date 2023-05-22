@@ -43,6 +43,7 @@ oauth2-proxy:
   enabled: false
 
 jobs:
+  ~chart: jobs
   runs:
     build-www:
       use: build
