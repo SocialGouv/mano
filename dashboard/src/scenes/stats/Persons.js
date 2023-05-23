@@ -123,9 +123,10 @@ const PersonStats = ({
             personsForStats.filter((p) => !!p.outOfActiveList)
           );
         }}
-        isMultiChoice
         axisTitleY="File active"
         axisTitleX="Raison de sortie de file active"
+        isMultiChoice
+        totalForPercentage={personsForStats.filter((p) => !!p.outOfActiveList).length}
         data={getMultichoiceBarData(
           personsForStats.filter((p) => !!p.outOfActiveList),
           'outOfActiveListReasons'

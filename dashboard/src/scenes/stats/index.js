@@ -516,6 +516,7 @@ const Stats = () => {
             filterableActionsCategories={filterableActionsCategories}
             actionsWithDetailedGroupAndCategories={actionsWithDetailedGroupAndCategories}
             allCategories={allCategories}
+            actionsFilteredByStatus={actionsFilteredByStatus}
           />
         )}
         {activeTab === 'Personnes créées' && (

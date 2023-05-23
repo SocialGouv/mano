@@ -16,7 +16,7 @@ const ActionsStats = ({
   groupsCategories,
   filterableActionsCategories,
   actionsWithDetailedGroupAndCategories,
-  allCategories,
+  actionsFilteredByStatus,
 }) => {
   const [actionsModalOpened, setActionsModalOpened] = useState(false);
   const [groupSlice, setGroupSlice] = useState(null);
@@ -135,6 +135,7 @@ const ActionsStats = ({
         axisTitleY="Actions"
         axisTitleX="Catégorie"
         data={getMultichoiceBarData(actionsWithDetailedGroupAndCategories, 'category')}
+        totalForPercentage={actionsFilteredByStatus.length}
       />
       <SelectedActionsModal
         open={actionsModalOpened}
