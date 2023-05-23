@@ -1,8 +1,8 @@
-app-www:
+www:
   host: "mano-app.fabrique.social.gouv.fr"
   certSecretName: www-crt
 
-app-api:
+api:
   host: "mano.fabrique.social.gouv.fr"
   certSecretName: api-crt
   addVolumes:
@@ -17,7 +17,7 @@ app-api:
     - secretRef:
         name: "{{ .Values.global.pgSecretName }}"
 
-app-dashboard:
+dashboard:
   host: "dashboard-mano.fabrique.social.gouv.fr"
   certSecretName: dashboard-crt
 
