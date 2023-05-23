@@ -77,7 +77,7 @@ export const CustomResponsivePie = ({ data = [], title, onItemClick, help }) => 
 
 const getItemValue = (item) => Object.values(item)[1];
 
-export const CustomResponsiveBar = ({ title, data, categories, onItemClick, axisTitleX, axisTitleY, isMultiChoice, help }) => {
+export const CustomResponsiveBar = ({ title, data, categories, onItemClick, axisTitleX, axisTitleY, isMultiChoice, totalForPercentage, help }) => {
   // if we have too many categories with small data, we see nothing in the chart
   // so we filter by keeping the first 15 categories whatever
   const chartData = data.filter((c) => c.name !== 'Non renseigné').filter((_, index) => index < 15);
@@ -113,7 +113,9 @@ export const CustomResponsiveBar = ({ title, data, categories, onItemClick, axis
               <tr key={item.name} onClick={() => onClick({ id: item.name })}>
                 <td className="tw-border tw-border-zinc-400 tw-p-1">{item.name}</td>
                 <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center">{getItemValue(item)}</td>
-                <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center">{`${Math.round((getItemValue(item) / total) * 1000) / 10}%`}</td>
+                <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center">{`${
+                  Math.round((getItemValue(item) / (isMultiChoice ? totalForPercentage : total)) * 1000) / 10
+                }%`}</td>
               </tr>
             ))}
             {!isMultiChoice && (
