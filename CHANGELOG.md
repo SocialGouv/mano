@@ -1,3 +1,10 @@
+## [1.265.1](https://github.com/SocialGouv/mano/compare/v1.265.0...v1.265.1) (2023-05-23)
+
+
+### Bug Fixes
+
+* missing var in oauth2-proxy ([d17ab34](https://github.com/SocialGouv/mano/commit/d17ab34e96cb48f92e7133bfd3fa2def33fb8805))
+
 # [1.265.0](https://github.com/SocialGouv/mano/compare/v1.264.1...v1.265.0) (2023-05-23)
 
 
