@@ -20,19 +20,6 @@ export const convertDate = (date, showDay) => {
   }
 };
 
-export const displayBirthDate = (date, { reverse = false, roundHalf = false } = {}) => {
-  try {
-    if (!date) return 'JJ-MM-AAAA';
-    const birthdate = new Date(date).getBirthDate('fr');
-    const age = new Date(date).getAge('fr', roundHalf);
-    if (reverse) return `${age} (${birthdate})`;
-    return `${birthdate} (${age})`;
-  } catch (e) {
-    console.log('cannot convert birht date', e);
-    console.log(date);
-  }
-};
-
 const convertTime = (date) => {
   try {
     if (!date) return '';

@@ -1,12 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
+import dayjs from 'dayjs';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import ScrollContainer from '../../components/ScrollContainer';
 import Button from '../../components/Button';
 import InputLabelled from '../../components/InputLabelled';
 import ButtonsContainer from '../../components/ButtonsContainer';
 import SubList from '../../components/SubList';
-import DateAndTimeInput, { displayBirthDate } from '../../components/DateAndTimeInput';
+import DateAndTimeInput from '../../components/DateAndTimeInput';
 import GenderSelect from '../../components/Selects/GenderSelect';
 import colors from '../../utils/colors';
 import { currentTeamState, organisationState } from '../../recoil/auth';
@@ -169,7 +170,12 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
           showYear
         />
       ) : (
-        <InputLabelled label="Âge" value={displayBirthDate(person.birthdate, { reverse: true })} placeholder="JJ-MM-AAAA" editable={false} />
+        <InputLabelled
+          label="Âge"
+          value={`${dayjs().from(dayjs(person.birthdate), true)} (${dayjs(person.birthdate).format('DD/MM/YYYY')})`}
+          placeholder="JJ-MM-AAAA"
+          editable={false}
+        />
       )}
       {/* These custom fields are displayed by default, because they where displayed before they became custom fields */}
       {Boolean(flattenedCustomFieldsPersons.find((e) => e.name === 'healthInsurances')) && (

@@ -3,6 +3,7 @@ import { Linking, Text } from 'react-native';
 import styled from 'styled-components';
 import * as Sentry from '@sentry/react-native';
 import { useRecoilValue } from 'recoil';
+import dayjs from 'dayjs';
 import ScrollContainer from '../../components/ScrollContainer';
 import Button from '../../components/Button';
 import InputLabelled from '../../components/InputLabelled';
@@ -11,7 +12,7 @@ import ActionRow from '../../components/ActionRow';
 import CommentRow from '../Comments/CommentRow';
 import PlaceRow from '../Places/PlaceRow';
 import SubList from '../../components/SubList';
-import DateAndTimeInput, { displayBirthDate } from '../../components/DateAndTimeInput';
+import DateAndTimeInput from '../../components/DateAndTimeInput';
 import GenderSelect from '../../components/Selects/GenderSelect';
 import Spacer from '../../components/Spacer';
 import NewCommentInput from '../Comments/NewCommentInput';
@@ -137,7 +138,12 @@ const PersonSummary = ({
           showYear
         />
       ) : (
-        <InputLabelled label="Âge" value={displayBirthDate(person.birthdate, { reverse: true })} placeholder="JJ-MM-AAAA" editable={false} />
+        <InputLabelled
+          label="Âge"
+          value={`${dayjs().from(dayjs(person.birthdate), true)} (${dayjs(person.birthdate).format('DD/MM/YYYY')})`}
+          placeholder="JJ-MM-AAAA"
+          editable={false}
+        />
       )}
       {editable ? (
         <DateAndTimeInput
@@ -150,10 +156,7 @@ const PersonSummary = ({
       ) : (
         <InputLabelled
           label="Suivi(e) depuis / Créé(e) le"
-          value={displayBirthDate(person.followedSince, {
-            reverse: true,
-            roundHalf: true,
-          })}
+          value={`${dayjs().from(dayjs(person.followedSince), true)} (${dayjs(person.followedSince).format('DD/MM/YYYY')})`}
           placeholder="JJ-MM-AAAA"
           editable={false}
         />
@@ -169,7 +172,7 @@ const PersonSummary = ({
       ) : (
         <InputLabelled
           label="En rue depuis le"
-          value={displayBirthDate(person.wanderingAt, { reverse: true, roundHalf: true })}
+          value={`${dayjs().from(dayjs(person.wanderingAt), true)} (${dayjs(person.wanderingAt).format('DD/MM/YYYY')})`}
           placeholder="JJ-MM-AAAA"
           editable={false}
         />
