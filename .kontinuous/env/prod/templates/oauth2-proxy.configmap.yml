@@ -5,6 +5,7 @@ metadata:
   namespace: mano
 data:
   OAUTH2_PROXY_HTTP_ADDRESS: "0.0.0.0:4180"
+  OAUTH2_PROXY_SCOPE: "user:email"
   OAUTH2_PROXY_PROVIDER: github
   OAUTH2_PROXY_GITHUB_ORG: SocialGouv
   OAUTH2_PROXY_BANNER: Mano private access
