@@ -1,3 +1,12 @@
+## [1.263.3](https://github.com/SocialGouv/mano/compare/v1.263.2...v1.263.3) (2023-05-23)
+
+
+### Bug Fixes
+
+* **app:** date de suivi plus précise que 0.5 ans ([#1498](https://github.com/SocialGouv/mano/issues/1498)) ([b83090c](https://github.com/SocialGouv/mano/commit/b83090c467a50bedd170233535b810b7aa40cda4))
+* possibilité de rechiffrer des organisations avec beaucoup de données jusqu'à 350Mo ([#1490](https://github.com/SocialGouv/mano/issues/1490)) ([e322184](https://github.com/SocialGouv/mano/commit/e322184d6945529bf16dc997f40d9c13c13c81b6))
+* tri par date de dernière interaction ([#1497](https://github.com/SocialGouv/mano/issues/1497)) ([9cc22fd](https://github.com/SocialGouv/mano/commit/9cc22fdc90dbd5a74ac17645040008d27586bcd1))
+
 ## [1.263.2](https://github.com/SocialGouv/mano/compare/v1.263.1...v1.263.2) (2023-05-10)
 
 
