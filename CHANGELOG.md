@@ -1,3 +1,10 @@
+# [1.264.0](https://github.com/SocialGouv/mano/compare/v1.263.3...v1.264.0) (2023-05-23)
+
+
+### Features
+
+* deploy app ([9be14eb](https://github.com/SocialGouv/mano/commit/9be14eb049b49b83d6c1e0f2e3770f0118265f56))
+
 ## [1.263.3](https://github.com/SocialGouv/mano/compare/v1.263.2...v1.263.3) (2023-05-23)
 
 
