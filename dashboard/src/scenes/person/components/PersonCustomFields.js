@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react';
 import EditModal from './EditModal';
 import CustomFieldDisplay from '../../../components/CustomFieldDisplay';
 
-export default function PersonCustomFields({ person, sectionName, fields, colspan = 4, isMedicalFile = false }) {
+export default function PersonCustomFields({ person, sectionName, fields, colspan = null, isMedicalFile = false }) {
   const [editModal, setEditModal] = useState(false);
   const team = useRecoilValue(currentTeamState);
   const enabledFields = useMemo(() => {
@@ -31,7 +31,7 @@ export default function PersonCustomFields({ person, sectionName, fields, colspa
       {sectionName === 'Informations sociales' && !!person.description && <div className="my-4">{person.description}</div>}
       <Row>
         {enabledFields.map((field, i) => (
-          <Col key={field.label + i} md={colspan}>
+          <Col key={field.label + i} md={colspan || field.type === 'textarea' ? 8 : 4}>
             <div className="my-2 [overflow-wrap:anywhere]">
               <div className="tw-text-sm tw-font-semibold tw-text-gray-600">{field.label}</div>
               <div>
