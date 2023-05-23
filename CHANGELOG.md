@@ -1,3 +1,10 @@
+## [1.264.1](https://github.com/SocialGouv/mano/compare/v1.264.0...v1.264.1) (2023-05-23)
+
+
+### Bug Fixes
+
+* **dashboard:** pourcentage pour les statistiques de champs à choix multiple ([#1508](https://github.com/SocialGouv/mano/issues/1508)) ([cedb352](https://github.com/SocialGouv/mano/commit/cedb35219f63d3f863d896365664011a6f711819))
+
 # [1.264.0](https://github.com/SocialGouv/mano/compare/v1.263.3...v1.264.0) (2023-05-23)
 
 
