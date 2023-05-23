@@ -1,3 +1,15 @@
+# [1.265.0](https://github.com/SocialGouv/mano/compare/v1.264.1...v1.265.0) (2023-05-23)
+
+
+### Bug Fixes
+
+* revert release ([16d5708](https://github.com/SocialGouv/mano/commit/16d5708650cc6b5addd429c317fce63b19458571))
+
+
+### Features
+
+* ci on kontinuous ([#1507](https://github.com/SocialGouv/mano/issues/1507)) ([f602624](https://github.com/SocialGouv/mano/commit/f602624bbcf21d83dd4ec2e285b5e9426ead769a))
+
 ## [1.264.1](https://github.com/SocialGouv/mano/compare/v1.264.0...v1.264.1) (2023-05-23)
 
 
