@@ -1,3 +1,10 @@
+## [1.265.3](https://github.com/SocialGouv/mano/compare/v1.265.2...v1.265.3) (2023-05-30)
+
+
+### Bug Fixes
+
+* **app:** person row date crash ([#1517](https://github.com/SocialGouv/mano/issues/1517)) ([265428b](https://github.com/SocialGouv/mano/commit/265428b6c5b3de884f2aea5c51b134996afb1fe8))
+
 ## [1.265.2](https://github.com/SocialGouv/mano/compare/v1.265.1...v1.265.2) (2023-05-23)
 
 
