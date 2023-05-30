@@ -5,6 +5,15 @@ import './src/services/polyfills';
 import { name as appName, version } from './app.json';
 import './src/services/api-interface-with-app';
 import './src/services/encryption';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import isBetween from 'dayjs/plugin/isBetween';
+import dayjs from 'dayjs';
+import 'dayjs/locale/fr';
+
+dayjs.locale('fr');
+dayjs.locale('fr');
+dayjs.extend(relativeTime);
+dayjs.extend(isBetween);
 
 import * as Sentry from '@sentry/react-native';
 import { SENTRY_XXX } from './src/config';

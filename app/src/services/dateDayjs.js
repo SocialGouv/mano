@@ -1,11 +1,4 @@
-import relativeTime from 'dayjs/plugin/relativeTime';
-import isBetween from 'dayjs/plugin/isBetween';
 import dayjs from 'dayjs';
-import 'dayjs/locale/fr';
-
-dayjs.locale('fr');
-dayjs.extend(relativeTime);
-dayjs.extend(isBetween);
 
 /** FORMAT DATES **/
 
