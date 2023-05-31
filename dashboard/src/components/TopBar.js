@@ -8,9 +8,6 @@ import SelectTeam from './SelectTeam';
 
 import { theme } from '../config';
 
-import legal from '../assets/legal.pdf';
-import privacy from '../assets/privacy.pdf';
-import charte from '../assets/charte.pdf';
 import { currentTeamState, organisationState, teamsState, userState } from '../recoil/auth';
 import API from '../services/api';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -55,9 +52,9 @@ const TopBar = () => {
           />
         </div>
         <div className="tw-flex tw-flex-1 tw-justify-end [&_.dropdown-menu.show]:tw-z-[10000]">
-         <Notification />
+          <Notification />
           <ButtonDropdown direction="down" isOpen={dropdownOpen} toggle={() => setDropdownOpen(!dropdownOpen)}>
-          <RefreshButton/>
+            <RefreshButton />
             <DropdownToggleStyled>
               {user?.name}
               <div className="tw-ml-2.5 tw-flex tw-h-3 tw-w-3 tw-flex-1 tw-flex-col tw-justify-between">
@@ -82,13 +79,13 @@ const TopBar = () => {
                 href="https://framaforms.org/nouveau-questionnaire-de-satisfaction-de-mano-1627635427">
                 Donner mon avis sur Mano <OpenNewWindowIcon />
               </DropdownItem>
-              <DropdownItem tag="a" href={charte} target="_blank" rel="noreferrer">
+              <DropdownItem tag="a" href="/charte.pdf" target="_blank" rel="noreferrer">
                 Charte des Utilisateurs <OpenNewWindowIcon />
               </DropdownItem>
-              <DropdownItem tag="a" href={legal} target="_blank" rel="noreferrer">
+              <DropdownItem tag="a" href="/legal.pdf" target="_blank" rel="noreferrer">
                 Mentions Légales <OpenNewWindowIcon />
               </DropdownItem>
-              <DropdownItem tag="a" href={privacy} target="_blank" rel="noreferrer">
+              <DropdownItem tag="a" href="/privacy.pdf" target="_blank" rel="noreferrer">
                 Politique de Confidentialité <OpenNewWindowIcon />
               </DropdownItem>
               <DropdownItem divider />
@@ -136,8 +133,40 @@ const ColorHeadband = ({ teamId }) => {
   );
 };
 
-const teamsColors = ['#255c99cc', '#74776bcc', '#00c6a5cc', '#ff4b64cc', '#ef798acc', '#a066ffcc', '#00e6d6cc', '#124660cc', '#ff4f38cc', '#1b9476cc', '#4dbac7cc','#ffa500cc', '#e392dbcc', '#28A428cc', '#f5c000cc'];
-const borderColors = ['#255c99', '#74776b', '#00c6a5', '#ff4b64', '#ef798a', '#a066ff', '#00e6d6', '#124660', '#ff4f38', '#1b9476', '#4dbac7', '#ffa500', '#e392db', '#28a428', '#f5d000'];
+const teamsColors = [
+  '#255c99cc',
+  '#74776bcc',
+  '#00c6a5cc',
+  '#ff4b64cc',
+  '#ef798acc',
+  '#a066ffcc',
+  '#00e6d6cc',
+  '#124660cc',
+  '#ff4f38cc',
+  '#1b9476cc',
+  '#4dbac7cc',
+  '#ffa500cc',
+  '#e392dbcc',
+  '#28A428cc',
+  '#f5c000cc',
+];
+const borderColors = [
+  '#255c99',
+  '#74776b',
+  '#00c6a5',
+  '#ff4b64',
+  '#ef798a',
+  '#a066ff',
+  '#00e6d6',
+  '#124660',
+  '#ff4f38',
+  '#1b9476',
+  '#4dbac7',
+  '#ffa500',
+  '#e392db',
+  '#28a428',
+  '#f5d000',
+];
 
 const DropdownToggleStyled = styled(DropdownToggle)`
   border-radius: 40px !important;
