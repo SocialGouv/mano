@@ -1,3 +1,10 @@
+## [1.265.4](https://github.com/SocialGouv/mano/compare/v1.265.3...v1.265.4) (2023-05-31)
+
+
+### Bug Fixes
+
+* privacy policy ([#1518](https://github.com/SocialGouv/mano/issues/1518)) ([67950e0](https://github.com/SocialGouv/mano/commit/67950e07ae0efd3233b8e64e8c39259de0049458))
+
 ## [1.265.3](https://github.com/SocialGouv/mano/compare/v1.265.2...v1.265.3) (2023-05-30)
 
 
