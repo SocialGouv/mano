@@ -5,7 +5,6 @@ import ButtonCustom from '../../components/ButtonCustom';
 import { userState } from '../../recoil/auth';
 import API from '../../services/api';
 import { theme } from '../../config';
-import charte from '../../assets/charte.pdf';
 import OpenNewWindowIcon from '../../components/OpenNewWindowIcon';
 
 const Charte = () => {
@@ -28,8 +27,8 @@ const Charte = () => {
         <ol>
           <li>Présentation du dispositif et propriété des données</li>
           <p>
-            MANO est un outil destiné aux maraudes, équipes mobiles et professionnel·le·s intervenant sur des lieux d’accueil. Il comprend une application
-            accessible en rue et une interface web.
+            MANO est un outil destiné aux maraudes, équipes mobiles et professionnel·le·s intervenant sur des lieux d’accueil. Il comprend une
+            application accessible en rue et une interface web.
             <br />
             <br />
             Les données (personnes suivies, actions, territoires, statistiques, comptes-rendus) sont stockées par MANO sur des serveurs protégés et
@@ -55,8 +54,8 @@ const Charte = () => {
               Ces points sont l'occasion d’échanger sur les pratiques et expériences avec MANO et de remonter les besoins du terrain.
             </li>
             <li>
-              L’équipe MANO s’engage à prendre en compte les retours du terrain et à inclure les professionnel·le·s dans le processus de développement de
-              l'outil.
+              L’équipe MANO s’engage à prendre en compte les retours du terrain et à inclure les professionnel·le·s dans le processus de développement
+              de l'outil.
             </li>
           </ul>
           <li>Installation et prise en main</li>
@@ -141,7 +140,7 @@ const Charte = () => {
         </b>
       </Content>
       <Submit loading={loading} type="submit" color="primary" title="Accepter et continuer" onClick={onSigninValidated} />
-      <DownloadLink tag="a" href={charte} target="_blank" rel="noreferrer">
+      <DownloadLink tag="a" href="/charte.pdf" target="_blank" rel="noreferrer">
         Télécharger le .pdf <OpenNewWindowIcon />
       </DownloadLink>
     </Wrapper>

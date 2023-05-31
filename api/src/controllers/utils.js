@@ -29,8 +29,8 @@ router.get("/version", async (req, res) => {
       `La nouvelle version ${MOBILE_APP_VERSION} de Mano est disponible !`,
       `Vous avez la version ${req.headers.version} actuellement sur votre téléphone.
 Cette nouvelle version :
-- Intègre la fonctionnalité des sections de champs personnalisables des personnes suivies
-- Ouvre les consultations en mode lecture, et non en mode édition
+- Met à jour la politique de confidentialité de Mano
+- Fixe un bug sur la sélection des personnes lors de la création d'action
 `,
       [
         { text: "Télécharger", link: "https://mano-app.fabrique.social.gouv.fr/download" },

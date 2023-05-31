@@ -45,10 +45,7 @@ const CharteAcceptance = ({ navigation }) => {
           </Container>
           <PdfContainer>
             <PdfViewer
-              source={Platform.select({
-                ios: require('../../assets/charte.pdf'),
-                android: { uri: 'bundle-assets://charte.pdf' }, // android/app/src/main/assets/
-              })}
+              source={{ uri: 'https://dashboard-mano.fabrique.social.gouv.fr/charte.pdf' }}
               onPressLink={(url) => {
                 if (Linking.canOpenURL(url)) Linking.openURL(url);
               }}
