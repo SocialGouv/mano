@@ -18,11 +18,21 @@ Platform.select({
 
  */
 const PdfViewer = ({ title, source, noHeader = false }) => {
+  console.log('PdfViewer', source);
   const navigation = useNavigation();
   if (noHeader) {
     return (
       <Pdf
         source={source}
+        onLoadComplete={(numberOfPages, filePath) => {
+          console.log(`Number of pages: ${numberOfPages}`);
+        }}
+        onPageChanged={(page, numberOfPages) => {
+          console.log(`Current page: ${page}`);
+        }}
+        onError={(error) => {
+          console.log(error);
+        }}
         onPressLink={(url) => {
           if (Linking.canOpenURL(url)) Linking.openURL(url);
         }}
@@ -35,6 +45,15 @@ const PdfViewer = ({ title, source, noHeader = false }) => {
       <Container>
         <PdfStyled
           source={source}
+          onLoadComplete={(numberOfPages, filePath) => {
+            console.log(`Number of pages: ${numberOfPages}`);
+          }}
+          onPageChanged={(page, numberOfPages) => {
+            console.log(`Current page: ${page}`);
+          }}
+          onError={(error) => {
+            console.log(error);
+          }}
           onPressLink={(url) => {
             if (Linking.canOpenURL(url)) Linking.openURL(url);
           }}
