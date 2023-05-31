@@ -1,3 +1,10 @@
+## [1.265.5](https://github.com/SocialGouv/mano/compare/v1.265.4...v1.265.5) (2023-05-31)
+
+
+### Bug Fixes
+
+* bump version ([5efcb8f](https://github.com/SocialGouv/mano/commit/5efcb8fd13809917181f9190b17df2a4a9fa956f))
+
 ## [1.265.4](https://github.com/SocialGouv/mano/compare/v1.265.3...v1.265.4) (2023-05-31)
 
 
