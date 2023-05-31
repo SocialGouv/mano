@@ -1,3 +1,10 @@
+## [1.265.6](https://github.com/SocialGouv/mano/compare/v1.265.5...v1.265.6) (2023-05-31)
+
+
+### Bug Fixes
+
+* pdf viewer ([bfbaf54](https://github.com/SocialGouv/mano/commit/bfbaf54afa05c7054fa65f2a0b41aadec2906e8a))
+
 ## [1.265.5](https://github.com/SocialGouv/mano/compare/v1.265.4...v1.265.5) (2023-05-31)
 
 
