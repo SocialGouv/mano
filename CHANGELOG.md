@@ -1,3 +1,10 @@
+# [1.266.0](https://github.com/SocialGouv/mano/compare/v1.265.6...v1.266.0) (2023-06-01)
+
+
+### Features
+
+* MAJ des mentions légales app + dashbooard ([#1520](https://github.com/SocialGouv/mano/issues/1520)) ([ef2fb73](https://github.com/SocialGouv/mano/commit/ef2fb7347b9f2cd02531520d4cfeb3cacacf4129))
+
 ## [1.265.6](https://github.com/SocialGouv/mano/compare/v1.265.5...v1.265.6) (2023-05-31)
 
 
