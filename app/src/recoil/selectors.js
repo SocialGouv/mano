@@ -14,6 +14,7 @@ import { treatmentsState } from './treatments';
 import { medicalFileState } from './medicalFiles';
 import dayjs from 'dayjs';
 import { groupsState } from './groups';
+import { formatAge, formatBirthDate } from '../services/dateDayjs';
 
 export const personsSearchSelector = selectorFamily({
   key: 'personsSearchSelector',
@@ -85,7 +86,13 @@ export const itemsGroupedByPersonSelector = selector({
     const persons = get(personsState);
     const personsObject = {};
     for (const person of persons) {
-      personsObject[person._id] = { ...person };
+      personsObject[person._id] = {
+        ...person,
+        formattedBirthDate: formatBirthDate(person.birthdate),
+        age: formatAge(person.birthdate),
+        // remove anything that is not a number
+        formattedPhoneNumber: person.phone?.replace(/\D/g, ''),
+      };
     }
     const actions = Object.values(get(actionsWithCommentsSelector));
     const comments = get(commentsState);

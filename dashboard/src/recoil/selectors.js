@@ -113,6 +113,7 @@ export const itemsGroupedByPersonSelector = selector({
         userPopulated: usersObject[person.user],
         formattedBirthDate: formatBirthDate(person.birthdate),
         age: formatAge(person.birthdate),
+        formattedPhoneNumber: person.phone?.replace(/\D/g, ''),
         interactions: [person.followedSince || person.createdAt],
         lastUpdateCheckForGDPR: person.followedSince || person.createdAt,
       };
