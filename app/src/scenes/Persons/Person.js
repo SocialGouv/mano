@@ -115,11 +115,14 @@ const Person = ({ route, navigation }) => {
   };
 
   const onUpdatePerson = async (alert = true, stateToMerge = {}) => {
-    setUpdating(true);
     const personToUpdate = Object.assign({}, castToPerson(person), stateToMerge, {
       _id: personDB._id,
     });
     const oldPerson = persons.find((a) => a._id === personDB._id);
+    const existingPerson = persons.find((p) => personDB._id !== p._id && p.name === personToUpdate.name);
+    if (existingPerson) return Alert.alert('Une personne existe déjà à ce nom');
+
+    setUpdating(true);
 
     const historyEntry = {
       date: new Date(),
