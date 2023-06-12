@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react';
-import { CustomResponsiveBar, CustomResponsivePie } from './charts';
+import { CustomResponsiveBar } from './charts';
 import { mappedIdsToLabels } from '../../recoil/actions';
 import SelectCustom from '../../components/SelectCustom';
-import { getMultichoiceBarData, getPieData } from './utils';
+import { getMultichoiceBarData } from './utils';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../components/tailwind/Modal';
 import ActionsSortableList from '../../components/ActionsSortableList';
 
@@ -16,7 +16,6 @@ const ActionsStats = ({
   groupsCategories,
   filterableActionsCategories,
   actionsWithDetailedGroupAndCategories,
-  actionsFilteredByStatus,
 }) => {
   const [actionsModalOpened, setActionsModalOpened] = useState(false);
   const [groupSlice, setGroupSlice] = useState(null);
@@ -115,14 +114,21 @@ const ActionsStats = ({
           />
         </div>
       </div>
-      <CustomResponsivePie
+      <CustomResponsiveBar
         title="Répartition des actions par groupe"
         help={`Si une action a plusieurs catégories appartenant à plusieurs groupes, elle est comptabilisée dans chaque groupe.\n\nSi une action a plusieurs catégories appartenant au même groupe, elle est comptabilisée une seule fois dans ce groupe.\n\nAinsi, le total affiché peut être supérieur au nombre total d'actions.`}
-        data={getPieData(actionsDataForGroups, 'categoryGroup', { options: groupsCategories.map((group) => group.groupTitle) })}
         onItemClick={(newGroupSlice) => {
           setActionsModalOpened(true);
           setGroupSlice(newGroupSlice);
         }}
+        isMultiChoice
+        axisTitleY="Actions"
+        axisTitleX="Groupe"
+        data={getMultichoiceBarData(actionsWithDetailedGroupAndCategories, 'categoryGroup', {
+          options: groupsCategories.map((group) => group.groupTitle),
+          debug: true,
+        })}
+        totalUniqueItems={actionsDataForGroups.length}
       />
       <CustomResponsiveBar
         title="Répartition des actions par catégorie"
@@ -135,7 +141,7 @@ const ActionsStats = ({
         axisTitleY="Actions"
         axisTitleX="Catégorie"
         data={getMultichoiceBarData(actionsWithDetailedGroupAndCategories, 'category')}
-        totalForPercentage={actionsFilteredByStatus.length}
+        totalUniqueItems={actionsDataForGroups.length}
       />
       <SelectedActionsModal
         open={actionsModalOpened}

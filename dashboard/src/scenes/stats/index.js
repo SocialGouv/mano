@@ -255,6 +255,7 @@ const Stats = () => {
       .filter((group) => actionsCategoriesGroups.includes(group.groupTitle))
       .reduce((filteredCats, group) => [...filteredCats, ...group.categories], []);
   }, [actionsCategoriesGroups, allCategories, groupsCategories]);
+
   const actionsWithDetailedGroupAndCategories = useMemo(() => {
     const actionsDetailed = [];
     const categoriesGroupObject = {};
@@ -284,6 +285,7 @@ const Stats = () => {
         return actionsCategories.includes(a.category);
       });
   }, [actionsFilteredByStatus, groupsCategories, actionsCategoriesGroups, actionsCategories]);
+
   const numberOfActionsPerPerson = useMemo(() => {
     if (!personsUpdatedForStats.length) return 0;
     if (!actions.length) return 0;

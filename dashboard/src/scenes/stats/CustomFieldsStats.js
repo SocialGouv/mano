@@ -77,7 +77,7 @@ const CustomFieldsStats = ({ customFields, data, additionalCols = [], dataTestId
             isMultiChoice
             axisTitleY="File active"
             axisTitleX={field.name}
-            totalForPercentage={data.length}
+            totalUniqueItems={data.length}
             data={getMultichoiceBarData(data, field.name, { options: field.options })}
           />
         );
