@@ -1,3 +1,10 @@
+## [1.268.1](https://github.com/SocialGouv/mano/compare/v1.268.0...v1.268.1) (2023-06-12)
+
+
+### Bug Fixes
+
+* **app:** date relative complète pour 'Suivi depuis' et 'En rue depuis' ([#1533](https://github.com/SocialGouv/mano/issues/1533)) ([484f482](https://github.com/SocialGouv/mano/commit/484f482dd48553ed5c27b8eb4f2a0a43e7e111b6))
+
 # [1.268.0](https://github.com/SocialGouv/mano/compare/v1.267.1...v1.268.0) (2023-06-12)
 
 
