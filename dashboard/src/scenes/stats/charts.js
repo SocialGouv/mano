@@ -77,7 +77,18 @@ export const CustomResponsivePie = ({ data = [], title, onItemClick, help }) => 
 
 const getItemValue = (item) => Object.values(item)[1];
 
-export const CustomResponsiveBar = ({ title, data, categories, onItemClick, axisTitleX, axisTitleY, isMultiChoice, totalUniqueItems, help }) => {
+export const CustomResponsiveBar = ({
+  title,
+  data,
+  categories,
+  onItemClick,
+  axisTitleX,
+  axisTitleY,
+  isMultiChoice,
+  totalForMultiChoice,
+  totalTitleForMultiChoice,
+  help,
+}) => {
   // if we have too many categories with small data, we see nothing in the chart
   // so we filter by keeping the first 15 categories whatever
   const chartData = data.filter((c) => c.name !== 'Non renseigné').filter((_, index) => index < 15);
@@ -114,7 +125,7 @@ export const CustomResponsiveBar = ({ title, data, categories, onItemClick, axis
                 <td className="tw-border tw-border-zinc-400 tw-p-1">{item.name}</td>
                 <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center">{getItemValue(item)}</td>
                 <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center">{`${
-                  Math.round((getItemValue(item) / (isMultiChoice ? totalUniqueItems : total)) * 1000) / 10
+                  Math.round((getItemValue(item) / (isMultiChoice ? totalForMultiChoice : total)) * 1000) / 10
                 }%`}</td>
               </tr>
             ))}
@@ -125,13 +136,11 @@ export const CustomResponsiveBar = ({ title, data, categories, onItemClick, axis
                 {total ? <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center tw-font-bold ">100%</td> : <></>}
               </tr>
             )}
-            {!!isMultiChoice && totalUniqueItems && (
+            {!!isMultiChoice && totalForMultiChoice && (
               <tr>
-                <td className="tw-border tw-border-zinc-400 tw-p-1">
-                  <span className="tw-font-bold">Total d'éléments uniques</span> <br />{' '}
-                  <span className="tw-text-xs">(certains peuvent être comptabilisés plusieurs fois)</span>
-                </td>
-                <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center tw-font-bold">{totalUniqueItems}</td>
+                <td className="tw-border tw-border-zinc-400 tw-p-1">{totalTitleForMultiChoice}</td>
+                <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center tw-font-bold">{totalForMultiChoice}</td>
+                <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center tw-font-bold ">100%</td>
               </tr>
             )}
           </tbody>
@@ -167,7 +176,7 @@ export const CustomResponsiveBar = ({ title, data, categories, onItemClick, axis
             tickSize: 2,
             tickPadding: 5,
             tickRotation: -15,
-            legend: axisTitleX,
+            // legend: axisTitleX,
             legendPosition: 'middle',
             legendOffset: 50,
           }}

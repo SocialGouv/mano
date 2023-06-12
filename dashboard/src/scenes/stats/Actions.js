@@ -116,7 +116,7 @@ const ActionsStats = ({
       </div>
       <CustomResponsiveBar
         title="Répartition des actions par groupe"
-        help={`Si une action a plusieurs catégories appartenant à plusieurs groupes, elle est comptabilisée dans chaque groupe.\n\nSi une action a plusieurs catégories appartenant au même groupe, elle est comptabilisée une seule fois dans ce groupe.\n\nAinsi, le total affiché peut être supérieur au nombre total d'actions.`}
+        help={`Si une action a plusieurs catégories appartenant à plusieurs groupes, elle est comptabilisée dans chaque groupe.\n\nSi une action a plusieurs catégories appartenant au même groupe, elle est comptabilisée autant de fois dans ce groupe.\n\nAinsi, le total affiché peut être supérieur au nombre total d'actions.`}
         onItemClick={(newGroupSlice) => {
           setActionsModalOpened(true);
           setGroupSlice(newGroupSlice);
@@ -128,7 +128,10 @@ const ActionsStats = ({
           options: groupsCategories.map((group) => group.groupTitle),
           debug: true,
         })}
-        totalUniqueItems={actionsDataForGroups.length}
+        // here we decide that the total is NOT the total of actions
+        // but the total of actions splitted by category
+        totalForMultiChoice={actionsWithDetailedGroupAndCategories.length}
+        totalTitleForMultiChoice={<span className="tw-font-bold">Total</span>}
       />
       <CustomResponsiveBar
         title="Répartition des actions par catégorie"
@@ -141,7 +144,10 @@ const ActionsStats = ({
         axisTitleY="Actions"
         axisTitleX="Catégorie"
         data={getMultichoiceBarData(actionsWithDetailedGroupAndCategories, 'category')}
-        totalUniqueItems={actionsDataForGroups.length}
+        // here we decide that the total is NOT the total of actions
+        // but the total of actions splitted by category
+        totalForMultiChoice={actionsWithDetailedGroupAndCategories.length}
+        totalTitleForMultiChoice={<span className="tw-font-bold">Total</span>}
       />
       <SelectedActionsModal
         open={actionsModalOpened}

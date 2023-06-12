@@ -23,6 +23,12 @@ const MedicalFilesStats = ({ filterBase, filterPersons, setFilterPersons, person
         help={(label) =>
           `${label.capitalize()} des ${title} dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`
         }
+        totalTitleForMultiChoice={
+          <>
+            <span className="tw-font-bold">Total de personnes uniques</span> <br />{' '}
+            <span className="tw-text-xs">(certaines peuvent être comptabilisées plusieurs fois)</span>
+          </>
+        }
       />
     </>
   );

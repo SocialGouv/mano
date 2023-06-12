@@ -126,7 +126,13 @@ const PersonStats = ({
         axisTitleY="File active"
         axisTitleX="Raison de sortie de file active"
         isMultiChoice
-        totalUniqueItems={personsForStats.filter((p) => !!p.outOfActiveList).length}
+        totalForMultiChoice={personsForStats.filter((p) => !!p.outOfActiveList).length}
+        totalTitleForMultiChoice={
+          <>
+            <span className="tw-font-bold">Total de personnes uniques</span> <br />{' '}
+            <span className="tw-text-xs">(certaines peuvent être comptabilisées plusieurs fois)</span>
+          </>
+        }
         data={getMultichoiceBarData(
           personsForStats.filter((p) => !!p.outOfActiveList),
           'outOfActiveListReasons'
@@ -138,6 +144,12 @@ const PersonStats = ({
         onSliceClick={onSliceClick}
         help={(label) =>
           `${label.capitalize()} des ${title} dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`
+        }
+        totalTitleForMultiChoice={
+          <>
+            <span className="tw-font-bold">Total de personnes uniques</span> <br />{' '}
+            <span className="tw-text-xs">(certaines peuvent être comptabilisées plusieurs fois)</span>
+          </>
         }
       />
       <SelectedPersonsModal
