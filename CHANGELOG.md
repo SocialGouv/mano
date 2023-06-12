@@ -1,3 +1,10 @@
+## [1.268.3](https://github.com/SocialGouv/mano/compare/v1.268.2...v1.268.3) (2023-06-12)
+
+
+### Bug Fixes
+
+* **app,dashboard:** interdire à une personne d'avoir le même nom qu'une autre lors de l'édition ([#1531](https://github.com/SocialGouv/mano/issues/1531)) ([347f0f2](https://github.com/SocialGouv/mano/commit/347f0f27d6433d2fee8826288b778d23e701e670))
+
 ## [1.268.2](https://github.com/SocialGouv/mano/compare/v1.268.1...v1.268.2) (2023-06-12)
 
 
