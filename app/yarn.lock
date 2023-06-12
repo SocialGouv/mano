@@ -7654,10 +7654,10 @@ react-native-tab-view@^3.3.0:
   dependencies:
     use-latest-callback "^0.1.5"
 
-react-native-webview@^11.26.0:
-  version "11.26.1"
-  resolved "https://registry.yarnpkg.com/react-native-webview/-/react-native-webview-11.26.1.tgz#658c09ed5162dc170b361e48c2dd26c9712879da"
-  integrity sha512-hC7BkxOpf+z0UKhxFSFTPAM4shQzYmZHoELa6/8a/MspcjEP7ukYKpuSUTLDywQditT8yI9idfcKvfZDKQExGw==
+react-native-webview@^13.0.0:
+  version "13.2.1"
+  resolved "https://registry.yarnpkg.com/react-native-webview/-/react-native-webview-13.2.1.tgz#e2974339adc76450a2be686cdea1042fd025c2f0"
+  integrity sha512-2U5XEBg8nUlGBsFkG1QgLUVN+CJJxNvZfprXlgPUFsU2UhYiVs7GM1sJez1YcnZ2TWKMCd6nVrLRsPNiLhjqVg==
   dependencies:
     escape-string-regexp "2.0.0"
     invariant "2.2.4"

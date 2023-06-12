@@ -69,7 +69,7 @@
     "react-native-sodium": "^0.4.0",
     "react-native-svg": "^13.7.0",
     "react-native-tab-view": "^3.3.0",
-    "react-native-webview": "^11.26.0",
+    "react-native-webview": "^13.0.0",
     "recoil": "^0.7.6",
     "styled-components": "^5.2.1",
     "urijs": "^1.19.11"
