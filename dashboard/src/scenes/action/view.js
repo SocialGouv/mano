@@ -27,6 +27,7 @@ import ActionsCategorySelect from '../../components/tailwind/ActionsCategorySele
 import { groupsState } from '../../recoil/groups';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import DatePicker from '../../components/DatePicker';
+import AutoResizeTextarea from '../../components/AutoresizeTextArea';
 
 const actionByIdSelector = selectorFamily({
   key: 'actionByIdSelector',
@@ -209,13 +210,9 @@ const ActionView = () => {
                   {!['restricted-access'].includes(user.role) && (
                     <div className="tw-mb-4">
                       <label htmlFor="description">Description</label>
-                      <textarea
-                        className="tw-block tw-w-full tw-rounded tw-border tw-border-gray-300 tw-py-1.5 tw-px-3 tw-text-base tw-transition-all"
-                        name="description"
-                        id="description"
-                        value={values.description}
-                        onChange={handleChange}
-                      />
+                      <div className="tw-block tw-w-full tw-rounded tw-border tw-border-gray-300 tw-py-1.5 tw-px-3 tw-text-base tw-transition-all">
+                        <AutoResizeTextarea name="description" id="description" value={values.description} onChange={handleChange} />
+                      </div>
                     </div>
                   )}
                   {!!canToggleGroupCheck && (
