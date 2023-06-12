@@ -19,6 +19,7 @@ import { groupsState } from '../recoil/groups';
 import { ModalBody, ModalContainer, ModalHeader } from './tailwind/Modal';
 import SelectTeamMultiple from './SelectTeamMultiple';
 import DatePicker from './DatePicker';
+import AutoResizeTextarea from './AutoresizeTextArea';
 
 const CreateActionModal = ({ person = null, persons = null, isMulti = false, completedAt = null, dueAt, open = false, setOpen = () => {} }) => {
   const teams = useRecoilValue(teamsState);
@@ -168,7 +169,9 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
                     {!['restricted-access'].includes(user.role) && (
                       <FormGroup>
                         <Label htmlFor="description">Description</Label>
-                        <Input type="textarea" name="description" id="description" value={values.description} onChange={handleChange} />
+                        <div className="tw-block tw-w-full tw-rounded tw-border tw-border-gray-300 tw-py-1.5 tw-px-3 tw-text-base tw-transition-all">
+                          <AutoResizeTextarea name="description" id="description" value={values.description} onChange={handleChange} />
+                        </div>
                       </FormGroup>
                     )}
                     {!!canToggleGroupCheck && (

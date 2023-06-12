@@ -1,8 +1,7 @@
 export default function AutoResizeTextarea({ name, value, onChange, placeholder = 'Description' }) {
-  console.log('value', value);
   return (
-    <div className="relative h-min grow">
-      <div aria-hidden className="pointer-events-none invisible" placeholder={placeholder}>
+    <div className="tw-relative tw-h-min tw-w-full tw-grow">
+      <div aria-hidden className="tw-pointer-events-none tw-invisible" placeholder={placeholder}>
         {value?.split('\n').map((item, key) => (
           <span key={key}>
             {item}
@@ -10,7 +9,14 @@ export default function AutoResizeTextarea({ name, value, onChange, placeholder 
           </span>
         ))}
       </div>
-      <textarea defaultValue={value} name={name} id={name} onChange={onChange} className="absolute inset-0 h-full w-full" placeholder={placeholder} />
+      <textarea
+        defaultValue={value}
+        name={name}
+        id={name}
+        onChange={onChange}
+        className="tw-absolute tw-inset-0 tw-h-full tw-w-full"
+        placeholder={placeholder}
+      />
     </div>
   );
 }
