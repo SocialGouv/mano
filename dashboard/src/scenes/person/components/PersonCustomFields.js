@@ -31,7 +31,7 @@ export default function PersonCustomFields({ person, sectionName, fields, colspa
       {sectionName === 'Informations sociales' && !!person.description && <div className="my-4">{person.description}</div>}
       <Row>
         {enabledFields.map((field, i) => (
-          <Col key={field.label + i} md={colspan || field.type === 'textarea' ? 8 : 4}>
+          <Col key={field.label + i} md={colspan || field.type === 'textarea' ? 12 : 4}>
             <div className="my-2 [overflow-wrap:anywhere]">
               <div className="tw-text-sm tw-font-semibold tw-text-gray-600">{field.label}</div>
               <div>
