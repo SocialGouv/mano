@@ -6,7 +6,7 @@ import SelectCustom from './SelectCustom';
 import { capture } from '../services/sentry';
 import DatePicker from './DatePicker';
 
-const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 4, disabled, hideLabel = false }) => {
+const CustomFieldInput = ({ field, values, handleChange, model, colWidth = null, disabled, hideLabel = false }) => {
   const id = useMemo(() => {
     const slugifiedLabel =
       field.label
@@ -22,6 +22,8 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 4, di
     if (['enum'].includes(field.type)) return `${model}-custom-select-${slugifiedLabel}`;
     if (['multi-choice'].includes(field.type)) return `${model}-custom-select-${slugifiedLabel}`;
   }, [field, model]);
+
+  if (!colWidth) colWidth = field.type === 'textarea' ? 12 : 4;
 
   try {
     return (
