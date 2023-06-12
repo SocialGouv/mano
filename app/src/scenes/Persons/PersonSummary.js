@@ -80,6 +80,7 @@ const PersonSummary = ({
     await onUpdatePerson(false, { outOfActiveListReasons: [], outOfActiveList: false });
   };
 
+  console.log('personDB', personDB?._id);
   const populatedPersons = useRecoilValue(itemsGroupedByPersonSelector);
   const populatedPerson = useMemo(() => populatedPersons[personDB?._id] || {}, [populatedPersons, personDB._id]);
   const { actions, comments, rencontres, relsPersonPlace } = populatedPerson;

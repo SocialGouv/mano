@@ -12,21 +12,7 @@ import Search from '../../components/Search';
 import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
 import { selector, selectorFamily, useRecoilState, useRecoilValue } from 'recoil';
 import { loadingState, refreshTriggerState } from '../../components/Loader';
-import { formatBirthDate } from '../../services/dateDayjs';
 import { filterBySearch } from '../../utils/search';
-import { personsState } from '../../recoil/persons';
-
-const personsWithFormattedBirthDateSelector = selector({
-  key: 'personsWithFormattedBirthDateSelector',
-  get: ({ get }) => {
-    const persons = get(personsState);
-    const personsWithBirthdateFormatted = persons.map((person) => ({
-      ...person,
-      birthDate: formatBirthDate(person.birthDate),
-    }));
-    return personsWithBirthdateFormatted;
-  },
-});
 
 const arrayOfitemsGroupedByPersonSelector = selector({
   key: 'arrayOfitemsGroupedByPersonSelector',
@@ -36,25 +22,13 @@ const arrayOfitemsGroupedByPersonSelector = selector({
   },
 });
 
-const personsPopulatedWithFormattedBirthDateSelector = selector({
-  key: 'personsPopulatedWithFormattedBirthDateSelector',
-  get: ({ get }) => {
-    const persons = get(arrayOfitemsGroupedByPersonSelector);
-    const personsWithBirthdateFormatted = persons.map((person) => ({
-      ...person,
-      birthDate: formatBirthDate(person.birthDate),
-    }));
-    return personsWithBirthdateFormatted;
-  },
-});
-
 const personsFilteredSelector = selectorFamily({
   key: 'personsFilteredSelector',
   get:
     ({ filterTeams, filterOutOfActiveList, filterAlertness }) =>
     ({ get }) => {
-      const personWithBirthDate = get(personsPopulatedWithFormattedBirthDateSelector);
-      let personsFiltered = personWithBirthDate;
+      const persons = get(arrayOfitemsGroupedByPersonSelector);
+      let personsFiltered = persons;
       if (filterOutOfActiveList) {
         personsFiltered = personsFiltered.filter((p) => (filterOutOfActiveList === 'Oui' ? p.outOfActiveList : !p.outOfActiveList));
       }
@@ -78,7 +52,7 @@ const personsFilteredBySearchSelector = selectorFamily({
     ({ filterTeams, filterOutOfActiveList, filterAlertness, search }) =>
     ({ get }) => {
       if (!search?.length && !filterTeams.length && !filterOutOfActiveList && !filterAlertness) {
-        const persons = get(personsWithFormattedBirthDateSelector);
+        const persons = get(arrayOfitemsGroupedByPersonSelector);
         return persons;
       }
 
