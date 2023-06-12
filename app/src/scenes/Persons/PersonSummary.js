@@ -25,6 +25,7 @@ import { organisationState, teamsState } from '../../recoil/auth';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
 import RencontreRow from './RencontreRow';
 import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
+import { getRelativeTimeFrench } from '../../services/dateDayjs';
 
 const PersonSummary = ({
   navigation,
@@ -140,7 +141,7 @@ const PersonSummary = ({
       ) : (
         <InputLabelled
           label="Âge"
-          value={`${dayjs().from(dayjs(person.birthdate), true)} (${dayjs(person.birthdate).format('DD/MM/YYYY')})`}
+          value={person.birthdate ? `${dayjs().from(dayjs(person.birthdate), true)} (${dayjs(person.birthdate).format('DD/MM/YYYY')})` : null}
           placeholder="JJ-MM-AAAA"
           editable={false}
         />
@@ -155,8 +156,8 @@ const PersonSummary = ({
         />
       ) : (
         <InputLabelled
-          label="Suivi(e) depuis / Créé(e) le"
-          value={`${dayjs().from(dayjs(person.followedSince), true)} (${dayjs(person.followedSince).format('DD/MM/YYYY')})`}
+          label="Suivi(e) depuis / Créé(e) il y a"
+          value={`${getRelativeTimeFrench(dayjs(), person.followedSince)} (${dayjs(person.followedSince).format('DD/MM/YYYY')})`}
           placeholder="JJ-MM-AAAA"
           editable={false}
         />
@@ -171,8 +172,10 @@ const PersonSummary = ({
         />
       ) : (
         <InputLabelled
-          label="En rue depuis le"
-          value={`${dayjs().from(dayjs(person.wanderingAt), true)} (${dayjs(person.wanderingAt).format('DD/MM/YYYY')})`}
+          label="En rue depuis"
+          value={
+            person.wanderingAt ? `${getRelativeTimeFrench(dayjs(), person.wanderingAt)} (${dayjs(person.wanderingAt).format('DD/MM/YYYY')})` : null
+          }
           placeholder="JJ-MM-AAAA"
           editable={false}
         />
