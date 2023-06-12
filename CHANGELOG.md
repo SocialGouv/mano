@@ -1,3 +1,10 @@
+# [1.267.0](https://github.com/SocialGouv/mano/compare/v1.266.0...v1.267.0) (2023-06-12)
+
+
+### Features
+
+* **dashboard:** zone de texte sur plusieurs unités de largeur ([#1509](https://github.com/SocialGouv/mano/issues/1509)) ([f96d969](https://github.com/SocialGouv/mano/commit/f96d9690e219dfa53b3e38e07e294cec9414b6d9))
+
 # [1.266.0](https://github.com/SocialGouv/mano/compare/v1.265.6...v1.266.0) (2023-06-01)
 
 
