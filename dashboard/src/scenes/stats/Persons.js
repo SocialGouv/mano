@@ -197,7 +197,7 @@ export const BlockGroup = ({ title, groups }) => {
       );
     }
 
-    const avg = groups.reduce((total, group) => total + group.relations.length, 0) / groups.length;
+    const avg = Math.round((groups.reduce((total, group) => total + group.relations.length, 0) / groups.length) * 100) / 100;
     return (
       <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">
         <Card
