@@ -1,3 +1,10 @@
+## [1.267.1](https://github.com/SocialGouv/mano/compare/v1.267.0...v1.267.1) (2023-06-12)
+
+
+### Bug Fixes
+
+* **dashboard:** deux chiffres après la virgule pour la taille moyenne des familles ([cb5095d](https://github.com/SocialGouv/mano/commit/cb5095d2679bba95b1a71aca6e2e7aa6361db350))
+
 # [1.267.0](https://github.com/SocialGouv/mano/compare/v1.266.0...v1.267.0) (2023-06-12)
 
 
