@@ -1,3 +1,10 @@
+# [1.268.0](https://github.com/SocialGouv/mano/compare/v1.267.1...v1.268.0) (2023-06-12)
+
+
+### Features
+
+* **dashboard:** zone de description d'une action en mode édition/création s'adapte à la taille du contenu ([#1530](https://github.com/SocialGouv/mano/issues/1530)) ([02fcfbe](https://github.com/SocialGouv/mano/commit/02fcfbebbca18e12ec8e5b8424db5079c2c4fc47))
+
 ## [1.267.1](https://github.com/SocialGouv/mano/compare/v1.267.0...v1.267.1) (2023-06-12)
 
 
