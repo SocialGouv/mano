@@ -35,6 +35,32 @@ export function formatCalendarDate(date) {
   }
   return dayjs(date).format('ddd D MMM');
 }
+export function getRelativeTimeFrench(date1, date2) {
+  let years = dayjs(date1).diff(date2, 'year');
+  date2 = dayjs(date2).add(years, 'years');
+
+  let months = dayjs(date1).diff(date2, 'month');
+  date2 = dayjs(date2).add(months, 'months');
+
+  let days = dayjs(date1).diff(date2, 'day');
+
+  // Years and months
+  if (years > 0) {
+    if (months > 0) {
+      return `${years} an${years > 1 ? 's' : ''} et ${months} mois`;
+    } else {
+      return `${years} an${years > 1 ? 's' : ''}`;
+    }
+  }
+
+  // Months only
+  if (months > 0) {
+    return `${months} mois`;
+  }
+
+  // Days only
+  return `${days} jour${days > 1 ? 's' : ''}`;
+}
 
 /** MANIPULATION AND COMPARISON **/
 
