@@ -1,3 +1,10 @@
+## [1.268.2](https://github.com/SocialGouv/mano/compare/v1.268.1...v1.268.2) (2023-06-12)
+
+
+### Bug Fixes
+
+* **app,dashboard:** recherche par date de naissance et par telephone ([#1535](https://github.com/SocialGouv/mano/issues/1535)) ([75d396e](https://github.com/SocialGouv/mano/commit/75d396e96840c0aa6613f0ecd9222874c983aea0))
+
 ## [1.268.1](https://github.com/SocialGouv/mano/compare/v1.268.0...v1.268.1) (2023-06-12)
 
 
