@@ -11,7 +11,7 @@ import {
 import { outOfBoundariesDate } from '../../../services/date';
 import SelectTeamMultiple from '../../../components/SelectTeamMultiple';
 import { currentTeamState, userState } from '../../../recoil/auth';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import CustomFieldInput from '../../../components/CustomFieldInput';
 import { useMemo, useState } from 'react';
 import ButtonCustom from '../../../components/ButtonCustom';
@@ -29,7 +29,7 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
   const flattenedCustomFieldsPersons = useRecoilValue(flattenedCustomFieldsPersonsSelector);
   const allowedFieldsInHistory = useRecoilValue(allowedFieldsInHistorySelector);
   const team = useRecoilValue(currentTeamState);
-  const setPersons = useSetRecoilState(personsState);
+  const [persons, setPersons] = useRecoilState(personsState);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
   const [allMedicalFiles, setAllMedicalFiles] = useRecoilState(medicalFileState);
   const medicalFile = useMemo(() => (allMedicalFiles || []).find((m) => m.person === person._id), [allMedicalFiles, person._id]);
@@ -55,6 +55,8 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
           initialValues={person}
           onSubmit={async (body) => {
             if (!body.name?.trim()?.length) return toast.error('Une personne doit avoir un nom');
+            const existingPerson = persons.find((p) => p.name === body.name);
+            if (existingPerson) return toast.error('Une personne existe déjà à ce nom');
             if (!body.followedSince) body.followedSince = person.createdAt;
             if (outOfBoundariesDate(body.followedSince)) return toast.error('La date de suivi est hors limites (entre 1900 et 2100)');
             if (body.birthdate && outOfBoundariesDate(body.birthdate))
