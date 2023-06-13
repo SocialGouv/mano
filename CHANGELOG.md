@@ -1,3 +1,10 @@
+## [1.268.5](https://github.com/SocialGouv/mano/compare/v1.268.4...v1.268.5) (2023-06-13)
+
+
+### Bug Fixes
+
+* **app,dashboard:** suppression d'une personne, d'une relation familiale et d'une famille ([#1537](https://github.com/SocialGouv/mano/issues/1537)) ([474f325](https://github.com/SocialGouv/mano/commit/474f325b27d7e2d5abcd005daa4ea90e767d0412))
+
 ## [1.268.4](https://github.com/SocialGouv/mano/compare/v1.268.3...v1.268.4) (2023-06-13)
 
 
