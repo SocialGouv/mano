@@ -1,3 +1,10 @@
+## [1.268.7](https://github.com/SocialGouv/mano/compare/v1.268.6...v1.268.7) (2023-06-13)
+
+
+### Bug Fixes
+
+* migration ([71b8ff5](https://github.com/SocialGouv/mano/commit/71b8ff595d075ec99051169b48eb018ae2d941c0))
+
 ## [1.268.6](https://github.com/SocialGouv/mano/compare/v1.268.5...v1.268.6) (2023-06-13)
 
 
