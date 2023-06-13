@@ -324,7 +324,6 @@ router.delete(
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal"]),
   catchErrors(async (req, res, next) => {
-    console.log(req.body);
     try {
       z.object({ _id: z.string().regex(looseUuidRegex) }).parse(req.params);
     } catch (e) {
@@ -368,7 +367,7 @@ router.delete(
       }
     }
     try {
-      z.optional(z.string().regex(looseUuidRegex).parse(req.body.groupIdToDelete));
+      z.optional(z.string().regex(looseUuidRegex)).parse(req.body.groupIdToDelete);
     } catch (e) {
       const error = new Error(`Invalid request in person delete groupIdToDelete: ${e}`);
       error.status = 400;

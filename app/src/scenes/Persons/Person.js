@@ -27,6 +27,7 @@ import { consultationsState } from '../../recoil/consultations';
 import { treatmentsState } from '../../recoil/treatments';
 import { medicalFileState } from '../../recoil/medicalFiles';
 import { refreshTriggerState } from '../../components/Loader';
+import { groupsState } from '../../recoil/groups';
 
 const TabNavigator = createMaterialTopTabNavigator();
 
@@ -41,14 +42,15 @@ const Person = ({ route, navigation }) => {
   const preparePersonForEncryption = usePreparePersonForEncryption();
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const [persons, setPersons] = useRecoilState(personsState);
-  const [actions, setActions] = useRecoilState(actionsState);
-  const [comments, setComments] = useRecoilState(commentsState);
-  const [passages, setPassages] = useRecoilState(passagesState);
-  const [rencontres, setRencontres] = useRecoilState(rencontresState);
-  const [consultations, setConsultations] = useRecoilState(consultationsState);
-  const [treatments, setTreatments] = useRecoilState(treatmentsState);
-  const [medicalFiles, setMedicalFiles] = useRecoilState(medicalFileState);
-  const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
+  const actions = useRecoilValue(actionsState);
+  const groups = useRecoilValue(groupsState);
+  const comments = useRecoilValue(commentsState);
+  const passages = useRecoilValue(passagesState);
+  const rencontres = useRecoilValue(rencontresState);
+  const consultations = useRecoilValue(consultationsState);
+  const treatments = useRecoilValue(treatmentsState);
+  const medicalFiles = useRecoilValue(medicalFileState);
+  const relsPersonPlace = useRecoilValue(relsPersonPlaceState);
   const user = useRecoilValue(userState);
 
   const [personDB, setPersonDB] = useState(() => persons.find((p) => p._id === route.params?.person?._id));
@@ -200,15 +202,16 @@ const Person = ({ route, navigation }) => {
       relsPersonPlaceIdsToDelete: [],
     };
 
-    if (personDB.group) {
+    const group = groups.find((g) => g.persons.includes(personId));
+    if (group) {
       const updatedGroup = {
-        ...personDB.group,
-        persons: personDB.group.persons.filter((p) => p !== personDB._id),
-        relations: personDB.group.relations.filter((r) => !r.persons.includes(personDB._id)),
+        ...group,
+        persons: group.persons.filter((p) => p !== personDB._id),
+        relations: group.relations.filter((r) => !r.persons.includes(personDB._id)),
       };
-      const personTransferId = personDB.group.persons.find((p) => p !== personDB._id);
+      const personTransferId = group.persons.find((p) => p !== personDB._id);
       if (updatedGroup.relations.length === 0) {
-        body.groupIdToDelete = personDB.group._id;
+        body.groupIdToDelete = group._id;
       } else {
         body.groupToUpdate = updatedGroup;
       }
@@ -222,13 +225,11 @@ const Person = ({ route, navigation }) => {
                 ...action,
                 person: personTransferId,
                 user: action.user || user._id,
-                group: !body.groupIdToDelete,
               });
               return prepareActionForEncryption({
                 ...action,
                 person: personTransferId,
                 user: action.user || user._id,
-                group: !body.groupIdToDelete,
               });
             })
             .map(API.encryptItem)
@@ -237,12 +238,11 @@ const Person = ({ route, navigation }) => {
         body.commentsToTransfer = await Promise.all(
           comments
             .filter((c) => c.person === personDB._id && c.group === true)
-            .map((comment) => prepareCommentForEncryption({ ...comment, person: personTransferId, group: !body.groupIdToDelete }))
+            .map((comment) => prepareCommentForEncryption({ ...comment, person: personTransferId }))
             .map(API.encryptItem)
         );
       }
     }
-    return;
     const actionIdsToDelete = actions.filter((a) => a.group === false && a.person === personDB._id).map((a) => a._id);
     const commentIdsToDelete = comments
       .filter((c) => {
@@ -261,9 +261,11 @@ const Person = ({ route, navigation }) => {
     body.treatmentIdsToDelete = treatments.filter((c) => c.person === personDB._id).map((c) => c._id);
     body.medicalFileIdsToDelete = medicalFiles.filter((c) => c.person === personDB._id).map((c) => c._id);
 
+    console.log('ICI');
     const personRes = await API.delete({ path: `/person/${personDB._id}`, body });
     if (personRes?.ok) {
       Alert.alert('Personne supprimée !');
+      setPersons((persons) => persons.filter((p) => p._id !== personDB._id));
       setRefreshTrigger({ status: true, options: { showFullScreen: false, initialLoad: false } });
     }
     return true;
