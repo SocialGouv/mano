@@ -318,7 +318,7 @@ router.put(
           }
         }
 
-        if (req.params.migrationName === "fix-family-relation-deleted") {
+        if (req.params.migrationName === "fix-family-relation-user-deleted") {
           try {
             z.object({
               groupIdsToDestroy: z.array(z.string().regex(looseUuidRegex)),
@@ -331,7 +331,7 @@ router.put(
               ),
             }).parse(req.body);
           } catch (e) {
-            const error = new Error(`Invalid request in fix-family-relation-deleted migration: ${e}`);
+            const error = new Error(`Invalid request in fix-family-relation-user-deleted migration: ${e}`);
             error.status = 400;
             throw error;
           }

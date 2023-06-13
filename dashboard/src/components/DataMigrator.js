@@ -359,7 +359,7 @@ export default function useDataMigrator() {
           migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
         }
       }
-      if (!organisation.migrations?.includes('fix-family-relation-deleted')) {
+      if (!organisation.migrations?.includes('fix-family-relation-user-deleted')) {
         setLoadingText(LOADING_TEXT);
         const personRes = await API.get({
           path: '/person',
@@ -394,7 +394,7 @@ export default function useDataMigrator() {
 
         const encryptedGroupsToUpdate = await Promise.all(groupsToUpdate.map(prepareGroupForEncryption).map(encryptItem));
         const response = await API.put({
-          path: `/migration/fix-family-relation-deleted`,
+          path: `/migration/fix-family-relation-user-deleted`,
           body: { groupsToUpdate: encryptedGroupsToUpdate, groupIdsToDestroy },
           query: { migrationLastUpdateAt },
         });
