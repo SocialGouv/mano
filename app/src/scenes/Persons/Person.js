@@ -16,8 +16,8 @@ import {
   usePreparePersonForEncryption,
   flattenedCustomFieldsPersonsSelector,
 } from '../../recoil/persons';
-import { actionsState } from '../../recoil/actions';
-import { commentsState } from '../../recoil/comments';
+import { actionsState, prepareActionForEncryption } from '../../recoil/actions';
+import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { userState } from '../../recoil/auth';
 import API from '../../services/api';
@@ -182,6 +182,74 @@ const Person = ({ route, navigation }) => {
         setDeleting(false);
         return false;
       }
+    }
+
+    const body = {
+      groupToUpdate: null,
+      groupIdToDelete: null,
+      actionsToTransfer: [],
+      commentsToTransfer: [],
+      actionIdsToDelete: [],
+      commentIdsToDelete: [],
+      passageIdsToDelete: [],
+      rencontreIdsToDelete: [],
+      consultationIdsToDelete: [],
+      treatmentIdsToDelete: [],
+      medicalFileIdsToDelete: [],
+      relsPersonPlaceIdsToDelete: [],
+    };
+
+    if (personDB.group) {
+      const updatedGroup = {
+        ...personDB.group,
+        persons: personDB.group.persons.filter((p) => p !== personDB._id),
+        relations: personDB.group.relations.filter((r) => !r.persons.includes(personDB._id)),
+      };
+      const personTransferId = personDB.group.persons.find((p) => p !== personDB._id);
+      if (updatedGroup.relations.length === 0) {
+        body.groupIdToDelete = personDB.group._id;
+      } else {
+        body.groupToUpdate = updatedGroup;
+      }
+      if (personTransferId) {
+        body.actionsToTransfer = await Promise.all(
+          actions
+            .filter((a) => a.person === personDB._id && a.group === true)
+            .map((action) => prepareActionForEncryption({ ...action, person: personTransferId, user: action.user || user._id }))
+            .map(encryptItem)
+        );
+
+        body.commentsToTransfer = await Promise.all(
+          comments
+            .filter((c) => c.person === personDB._id && c.group === true)
+            .map((comment) => prepareCommentForEncryption({ ...comment, person: personTransferId }))
+            .map(encryptItem)
+        );
+      }
+    }
+    const actionIdsToDelete = actions.filter((a) => a.group === false && a.person === personDB._id).map((a) => a._id);
+    const commentIdsToDelete = comments
+      .filter((c) => {
+        if (c.group) return false;
+        if (actionIdsToDelete.includes(c.action)) return true;
+        if (c.person === personDB._id) return true;
+        return false;
+      })
+      .map((c) => c._id);
+    body.actionIdsToDelete = actionIdsToDelete;
+    body.commentIdsToDelete = commentIdsToDelete;
+    body.relsPersonPlaceIdsToDelete = relsPersonPlace.filter((rel) => rel.person === personDB._id).map((rel) => rel._id);
+    body.passageIdsToDelete = passages.filter((c) => c.person === personDB._id).map((c) => c._id);
+    body.rencontreIdsToDelete = rencontres.filter((c) => c.person === personDB._id).map((c) => c._id);
+    body.consultationIdsToDelete = consultations.filter((c) => c.person === personDB._id).map((c) => c._id);
+    body.treatmentIdsToDelete = treatments.filter((c) => c.person === personDB._id).map((c) => c._id);
+    body.medicalFileIdsToDelete = medicalFiles.filter((c) => c.person === personDB._id).map((c) => c._id);
+
+    const personRes = await API.delete({ path: `/person/${personDB._id}`, body });
+    if (personRes?.ok) {
+      toast.success('Suppression réussie');
+      refresh();
+      history.goBack();
     }
     const res = await API.delete({ path: `/person/${personId}` });
     if (res.error) {

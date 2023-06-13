@@ -8,6 +8,7 @@ import { dayjsInstance } from '../services/date';
 import { loadingTextState } from './DataLoader';
 import { looseUuidRegex } from '../utils';
 import { prepareCommentForEncryption } from '../recoil/comments';
+import { prepareGroupForEncryption } from '../recoil/groups';
 
 const LOADING_TEXT = 'Mise à jour des données de votre organisation…';
 
@@ -351,6 +352,50 @@ export default function useDataMigrator() {
         const response = await API.put({
           path: `/migration/retrieve-docs-from-persons-backup`,
           body: { personsToUpdate: encryptedPersonsToMigrate },
+          query: { migrationLastUpdateAt },
+        });
+        if (response.ok) {
+          setOrganisation(response.organisation);
+          migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
+        }
+      }
+      if (!organisation.migrations?.includes('fix-family-relation-deleted')) {
+        setLoadingText(LOADING_TEXT);
+        const personRes = await API.get({
+          path: '/person',
+          query: { organisation: organisationId, after: 0, withDeleted: false },
+        });
+        const persons = personRes.decryptedData;
+        const groupRes = await API.get({
+          path: '/group',
+          query: { organisation: organisationId, after: 0, withDeleted: false },
+        });
+
+        const groupsToUpdate = [];
+        const groupIdsToDestroy = [];
+        for (const group of groupRes.decryptedData) {
+          let updateGroup = false;
+          let updatedGroup = { ...group, persons: group.persons, relations: group.relations };
+          for (const person of group.persons) {
+            if (!persons.find((p) => p._id === person._id)) {
+              updateGroup = true;
+              updatedGroup.persons = updatedGroup.persons.filter((p) => p._id !== person._id);
+              updatedGroup.relations = updatedGroup.relations.filter((rel) => !rel.persons.includes(person._id));
+            }
+          }
+          if (updateGroup) {
+            if (group.relations.length === 0) {
+              groupIdsToDestroy.push(group._id);
+            } else {
+              groupsToUpdate.push(updatedGroup);
+            }
+          }
+        }
+
+        const encryptedGroupsToUpdate = await Promise.all(groupsToUpdate.map(prepareGroupForEncryption).map(encryptItem));
+        const response = await API.put({
+          path: `/migration/fix-family-relation-deleted`,
+          body: { groupsToUpdate: encryptedGroupsToUpdate, groupIdsToDestroy },
           query: { migrationLastUpdateAt },
         });
         if (response.ok) {

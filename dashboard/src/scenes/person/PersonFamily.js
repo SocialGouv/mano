@@ -13,13 +13,13 @@ import SelectPerson from '../../components/SelectPerson';
 import { useDataLoader } from '../../components/DataLoader';
 import PersonName from '../../components/PersonName';
 import { ModalContainer, ModalHeader, ModalBody, ModalFooter } from '../../components/tailwind/Modal';
-import { personsState } from '../../recoil/persons';
+import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
 
 const PersonFamily = ({ person }) => {
   const [groups, setGroups] = useRecoilState(groupsState);
   const user = useRecoilValue(userState);
   const personGroup = useRecoilValue(groupSelector({ personId: person?._id }));
-  const persons = useRecoilValue(personsState);
+  const itemsGroupedByPerson = useRecoilValue(itemsGroupedByPersonSelector);
   const [newRelationModalOpen, setNewRelationModalOpen] = useState(false);
   const [relationToEdit, setRelationToEdit] = useState(null);
   const { refresh } = useDataLoader();
@@ -89,9 +89,9 @@ const PersonFamily = ({ person }) => {
 
   const onDeleteRelation = async (relation) => {
     const personId1 = relation?.persons[0];
-    const personId1Name = persons.find((p) => p._id === personId1)?.name;
+    const personId1Name = itemsGroupedByPerson[personId1]?.name;
     const personId2 = relation?.persons[1];
-    const personId2Name = persons.find((p) => p._id === personId2)?.name;
+    const personId2Name = itemsGroupedByPerson[personId2]?.name;
     if (
       !window.confirm(
         `Voulez-vous vraiment supprimer le lien familial entre ${personId1Name} et ${personId2Name} ? Cette opération est irréversible.`
@@ -100,6 +100,15 @@ const PersonFamily = ({ person }) => {
       return;
     }
     const nextRelations = personGroup.relations.filter((_relation) => _relation._id !== relation._id);
+    if (!nextRelations.length) {
+      const deleteResponse = await API.delete({ path: `/group/${personGroup._id}` });
+      if (deleteResponse.ok) {
+        setGroups((groups) => groups.filter((group) => group._id !== personGroup._id));
+        setRelationToEdit(null);
+        toast.success('Le lien familial a été supprimé');
+        return;
+      }
+    }
     const nextGroup = {
       persons: [...new Set(nextRelations.reduce((_personIds, relation) => [..._personIds, ...relation.persons], []))],
       relations: nextRelations,
@@ -220,15 +229,15 @@ const NewRelation = ({ open, setOpen, onAddFamilyLink, person }) => {
 };
 
 const EditRelation = ({ open, setOpen, onEditRelation, onDeleteRelation, relationToEdit }) => {
-  const persons = useRecoilValue(personsState);
+  const itemsGroupedByPerson = useRecoilValue(itemsGroupedByPersonSelector);
+
   const personId1 = relationToEdit?.persons[0];
   const personId2 = relationToEdit?.persons[1];
-
+  const personId1Name = itemsGroupedByPerson[personId1]?.name;
+  const personId2Name = itemsGroupedByPerson[personId2]?.name;
   return (
     <ModalContainer open={open}>
-      <ModalHeader
-        title={`Éditer le lien familial entre ${persons.find((p) => p._id === personId1)?.name} et ${persons.find((p) => p._id === personId2)?.name}`}
-      />
+      <ModalHeader title={`Éditer le lien familial entre ${personId1Name} et ${personId2Name}`} />
       <ModalBody>
         <form
           key={JSON.stringify(relationToEdit)}

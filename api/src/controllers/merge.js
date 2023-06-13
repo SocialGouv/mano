@@ -62,7 +62,6 @@ router.post(
       error.status = 400;
       return next(error);
     }
-
     try {
       z.object({
         personToDeleteId: z.string().regex(looseUuidRegex),
