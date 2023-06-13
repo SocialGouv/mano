@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { Alert } from 'react-native';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import API from '../../services/api';
@@ -46,7 +46,7 @@ const Collaborations = ({ route, navigation }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onCreateCollaboration = async () => {
+  const onCreateCollaboration = useCallback(async () => {
     setPosting(true);
     const newCollaborations = [...new Set([...collaborations, collaboration])];
     const response = await API.put({ path: `/organisation/${organisation._id}`, body: { collaborations: newCollaborations } });
@@ -59,7 +59,7 @@ const Collaborations = ({ route, navigation }) => {
       setOrganisation(response.data);
       onSubmit(collaboration);
     }
-  };
+  }, [collaboration, collaborations, organisation._id, setOrganisation]);
 
   const onSubmit = async (newCollaboration) => {
     const reportToUpdate = await createReportAtDateIfNotExist(day); // to make sure we have the last one
@@ -126,6 +126,15 @@ const Collaborations = ({ route, navigation }) => {
   };
   const keyExtractor = (c) => c;
   const renderRow = ({ item: collaboration }) => <Row onPress={() => onSubmit(collaboration)} caption={collaboration} />;
+  const ListHeaderComponent = useMemo(
+    () => (
+      <>
+        <Button caption="Créer" disabled={!isReadyToSave} onPress={onCreateCollaboration} loading={posting} />
+        <Spacer height={15} />
+      </>
+    ),
+    [isReadyToSave, onCreateCollaboration, posting]
+  );
 
   return (
     <SceneContainer>
@@ -134,12 +143,7 @@ const Collaborations = ({ route, navigation }) => {
       <FlashListStyled
         data={data}
         estimatedItemSize={77}
-        ListHeaderComponent={() => (
-          <>
-            <Button caption="Créer" disabled={!isReadyToSave} onPress={onCreateCollaboration} loading={posting} />
-            <Spacer height={15} />
-          </>
-        )}
+        ListHeaderComponent={ListHeaderComponent}
         renderItem={renderRow}
         keyExtractor={keyExtractor}
         ListEmptyComponent={collaboration.length ? ListEmptyCollaboration(collaboration) : null}

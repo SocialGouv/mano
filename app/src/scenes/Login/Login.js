@@ -60,7 +60,6 @@ const Login = ({ navigation }) => {
           if (action.link) {
             action.onPress = () => {
               Linking.openURL(action.link);
-              if (action.event) logEvent(action.event, action.eventProps || {});
             };
           }
           return action;

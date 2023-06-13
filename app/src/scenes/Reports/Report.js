@@ -1,5 +1,4 @@
 import { useIsFocused } from '@react-navigation/native';
-import dayjs from 'dayjs';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, InteractionManager } from 'react-native';
 import { useRecoilValue, useSetRecoilState } from 'recoil';

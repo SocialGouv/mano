@@ -1,5 +1,4 @@
 import React from 'react';
-import { Platform } from 'react-native';
 import PdfViewer from '../../components/PdfViewer';
 
 const Privacy = () => (

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Platform, Linking, Dimensions } from 'react-native';
+import { Linking, Dimensions } from 'react-native';
 import Pdf from 'react-native-pdf';
 import API from '../../services/api';
 import SceneContainer from '../../components/SceneContainer';

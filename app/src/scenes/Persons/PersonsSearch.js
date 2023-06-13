@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
 import PersonRow from './PersonRow';
@@ -37,10 +37,10 @@ const PersonsSearch = ({ navigation, route }) => {
   };
 
   const keyExtractor = (person) => person._id;
-  const ListFooterComponent = () => {
+  const ListFooterComponent = useMemo(() => {
     if (!filteredPersons.length) return null;
     return <ListNoMorePersons />;
-  };
+  }, [filteredPersons.length]);
   const renderPersonRow = ({ item: person }) => <PersonRow onPress={() => onSelectPerson(person)} person={person} isPersonsSearchRow={true} />;
 
   return (

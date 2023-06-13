@@ -1,4 +1,4 @@
-import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
+import { AnimatedFlashList } from '@shopify/flash-list';
 import React from 'react';
 import { StyleSheet, Animated, Dimensions } from 'react-native';
 

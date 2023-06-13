@@ -11,7 +11,7 @@ import { reportsState } from './reports';
 import { groupsState } from './groups';
 import { relsPersonPlaceState } from './relPersonPlace';
 
-const usesetAllCachedDataRecoilStates = () => {
+const useResetAllCachedDataRecoilStates = () => {
   const setPersons = useSetRecoilState(personsState);
   const setActions = useSetRecoilState(actionsState);
   const setPlaces = useSetRecoilState(placesState);
@@ -40,4 +40,4 @@ const usesetAllCachedDataRecoilStates = () => {
   return setAll;
 };
 
-export default usesetAllCachedDataRecoilStates;
+export default useResetAllCachedDataRecoilStates;

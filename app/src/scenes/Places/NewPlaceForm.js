@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { Alert } from 'react-native';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import API from '../../services/api';
@@ -47,7 +47,7 @@ const NewPlaceForm = ({ route, navigation }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onCreatePlace = async () => {
+  const onCreatePlace = useCallback(async () => {
     setPosting(true);
     const response = await API.post({ path: '/place', body: preparePlaceForEncryption({ name, user: user._id }) });
     if (response.error) {
@@ -59,7 +59,7 @@ const NewPlaceForm = ({ route, navigation }) => {
       setPlaces((places) => [response.decryptedData, ...places].sort(sortByName));
       onSubmit(response.decryptedData);
     }
-  };
+  }, [name, setPlaces, user._id, onSubmit]);
 
   const onSubmit = async (place) => {
     if (person.relsPersonPlace?.find((rpp) => rpp.place === place._id)) {
@@ -126,6 +126,15 @@ const NewPlaceForm = ({ route, navigation }) => {
   };
   const keyExtractor = (structure) => structure._id;
   const renderRow = ({ item: place }) => <Row onPress={() => onSubmit(place)} caption={place.name} />;
+  const ListHeaderComponent = useMemo(
+    () => (
+      <>
+        <Button caption="Créer" disabled={!isReadyToSave} onPress={onCreatePlace} loading={posting} />
+        <Spacer height={15} />
+      </>
+    ),
+    [isReadyToSave, onCreatePlace, posting]
+  );
 
   return (
     <SceneContainer>
@@ -134,12 +143,7 @@ const NewPlaceForm = ({ route, navigation }) => {
       <FlashListStyled
         data={data}
         estimatedItemSize={77}
-        ListHeaderComponent={() => (
-          <>
-            <Button caption="Créer" disabled={!isReadyToSave} onPress={onCreatePlace} loading={posting} />
-            <Spacer height={15} />
-          </>
-        )}
+        ListHeaderComponent={ListHeaderComponent}
         renderItem={renderRow}
         keyExtractor={keyExtractor}
         ListEmptyComponent={name.length ? ListEmptyPlaceWithName(name) : null}

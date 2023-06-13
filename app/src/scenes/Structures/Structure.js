@@ -42,7 +42,6 @@ const Structure = ({ navigation, route }) => {
   const [structure, setStructure] = useState(() => castToStructure(route?.params?.structure));
   const [updating, setUpdating] = useState(false);
   const [editable, setEditable] = useState(route.params?.editable || false);
-  const [cagetoriesUpdated, setCagetoriesUpdated] = useState(false);
 
   const onBack = () => {
     backRequestHandledRef.current = true;
@@ -134,10 +133,9 @@ const Structure = ({ navigation, route }) => {
 
   const isUpdateDisabled = useMemo(() => {
     const newStructure = { ...structureDB, ...castToStructure(structure) };
-    if (cagetoriesUpdated) return false;
     if (JSON.stringify(castToStructure(structureDB)) !== JSON.stringify(castToStructure(newStructure))) return false;
     return true;
-  }, [cagetoriesUpdated, structure, structureDB]);
+  }, [structure, structureDB]);
 
   const formatGoogleMapUrl = useMemo(() => {
     const { adresse, city, postcode } = structure;
