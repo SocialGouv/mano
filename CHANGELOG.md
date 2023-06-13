@@ -1,3 +1,10 @@
+## [1.268.4](https://github.com/SocialGouv/mano/compare/v1.268.3...v1.268.4) (2023-06-13)
+
+
+### Bug Fixes
+
+* **dashboard:** edit person ([d72e159](https://github.com/SocialGouv/mano/commit/d72e1593c68992116ce0e135b1e19b6407146d63))
+
 ## [1.268.3](https://github.com/SocialGouv/mano/compare/v1.268.2...v1.268.3) (2023-06-12)
 
 
