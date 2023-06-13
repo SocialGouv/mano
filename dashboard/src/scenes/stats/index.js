@@ -298,12 +298,12 @@ const Stats = () => {
   }, [actions.length, personsWithActions.length]);
   const consultations = useMemo(
     () =>
-      getDataForPeriod(allConsultations, period, {
+      getDataForPeriod(filterByTeam(allConsultations, 'teams'), period, {
         field: 'completedAt',
         backupField: 'dueAt',
         allSelectedTeamsAreNightSession,
       }),
-    [allConsultations, period, allSelectedTeamsAreNightSession]
+    [allConsultations, filterByTeam, period, allSelectedTeamsAreNightSession]
   );
   const observations = useMemo(
     () =>

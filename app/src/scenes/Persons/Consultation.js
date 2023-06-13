@@ -69,6 +69,7 @@ const Consultation = ({ navigation, route }) => {
         completedAt: consult.completedAt || null,
         onlyVisibleBy: consult.onlyVisibleBy || [],
         user: consult.user || user._id,
+        teams: consult.teams || [],
         organisation: consult.organisation || organisation._id,
       };
     },
@@ -127,7 +128,11 @@ const Consultation = ({ navigation, route }) => {
     } else {
       consultation.completedAt = null;
     }
-    const body = prepareConsultationForEncryption(organisation.consultations)({ ...consultation, _id: consultationDB?._id });
+    const body = prepareConsultationForEncryption(organisation.consultations)({
+      teams: [currentTeam._id],
+      ...consultation,
+      _id: consultationDB?._id,
+    });
     const consultationResponse = isNew
       ? await API.post({ path: '/consultation', body })
       : await API.put({ path: `/consultation/${consultationDB._id}`, body });

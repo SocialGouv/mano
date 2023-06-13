@@ -17,7 +17,7 @@ import CustomFieldInput from '../../components/CustomFieldInput';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import UserName from '../../components/UserName';
 import Table from '../../components/table';
-import { organisationState, teamsState, userState } from '../../recoil/auth';
+import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
 import API, { encryptItem } from '../../services/api';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import { actionsState, prepareActionForEncryption } from '../../recoil/actions';
@@ -66,6 +66,7 @@ const MergeTwoPersons = ({ person }) => {
   const teams = useRecoilValue(teamsState);
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
+  const currentTeam = useRecoilValue(currentTeamState);
   const comments = useRecoilValue(commentsState);
   const actions = useRecoilValue(actionsState);
   const passages = useRecoilValue(passagesState);
@@ -266,7 +267,13 @@ const MergeTwoPersons = ({ person }) => {
 
                 const mergedConsultations = consultations
                   .filter((consultation) => consultation.person === personToMergeAndDelete._id)
-                  .map((consultation) => prepareConsultationForEncryption(organisation.consultations)({ ...consultation, person: originPerson._id }));
+                  .map((consultation) =>
+                    prepareConsultationForEncryption(organisation.consultations)({
+                      team: currentTeam?._id, // previous consultations were not linked to a team
+                      ...consultation,
+                      person: originPerson._id,
+                    })
+                  );
 
                 const mergedTreatments = treatments
                   .filter((t) => t.person === personToMergeAndDelete._id)
