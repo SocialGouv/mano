@@ -376,11 +376,11 @@ export default function useDataMigrator() {
         for (const group of groupRes.decryptedData) {
           let updateGroup = false;
           let updatedGroup = { ...group, persons: group.persons, relations: group.relations };
-          for (const person of group.persons) {
-            if (!persons.find((p) => p._id === person._id)) {
+          for (const personId of group.persons) {
+            if (!persons.find((p) => p._id === personId)) {
               updateGroup = true;
-              updatedGroup.persons = updatedGroup.persons.filter((p) => p._id !== person._id);
-              updatedGroup.relations = updatedGroup.relations.filter((rel) => !rel.persons.includes(person._id));
+              updatedGroup.persons = updatedGroup.persons.filter((p) => p._id !== personId);
+              updatedGroup.relations = updatedGroup.relations.filter((rel) => !rel.persons.includes(personId));
             }
           }
           if (updateGroup) {
