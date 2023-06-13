@@ -8,7 +8,7 @@ export const consultationsState = atom({
   default: [],
 });
 
-export const encryptedFields = ['name', 'type', 'person', 'user', 'documents'];
+export const encryptedFields = ['name', 'type', 'person', 'user', 'documents', 'comments'];
 
 export const prepareConsultationForEncryption = (customFieldsConsultations) => (consultation) => {
   try {

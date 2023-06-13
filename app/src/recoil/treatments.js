@@ -8,7 +8,7 @@ export const treatmentsState = atom({
   default: [],
 });
 
-const encryptedFields = ['person', 'user', 'startDate', 'endDate', 'name', 'dosage', 'frequency', 'indication', 'documents'];
+const encryptedFields = ['person', 'user', 'startDate', 'endDate', 'name', 'dosage', 'frequency', 'indication', 'documents', 'comments'];
 
 export const prepareTreatmentForEncryption = (treatment) => {
   try {
