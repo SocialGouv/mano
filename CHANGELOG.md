@@ -1,3 +1,10 @@
+## [1.268.6](https://github.com/SocialGouv/mano/compare/v1.268.5...v1.268.6) (2023-06-13)
+
+
+### Bug Fixes
+
+* **dashboard:** calcul du total des stats des éléments à choix multiple ([#1529](https://github.com/SocialGouv/mano/issues/1529)) ([4c0e441](https://github.com/SocialGouv/mano/commit/4c0e44137816076ebe59c09d20ac9586d80f678b))
+
 ## [1.268.5](https://github.com/SocialGouv/mano/compare/v1.268.4...v1.268.5) (2023-06-13)
 
 
