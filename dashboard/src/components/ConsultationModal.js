@@ -3,7 +3,7 @@ import ReactDatePicker from 'react-datepicker';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { v4 as uuidv4 } from 'uuid';
 import { CANCEL, DONE, TODO } from '../recoil/actions';
-import { currentTeamState, organisationState, userState } from '../recoil/auth';
+import { currentTeamState, organisationState, teamsState, userState } from '../recoil/auth';
 import { consultationsState, defaultConsultationFields, prepareConsultationForEncryption } from '../recoil/consultations';
 import API from '../services/api';
 import { dateForDatePicker, dayjsInstance } from '../services/date';
@@ -16,33 +16,40 @@ import SelectStatus from './SelectStatus';
 import { toast } from 'react-toastify';
 import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from './tailwind/Modal';
 import SelectPerson from './SelectPerson';
+import SelectTeamMultiple from './SelectTeamMultiple';
 
 export default function ConsultationModal({ onClose, personId, consultation, date }) {
   const organisation = useRecoilValue(organisationState);
-  const team = useRecoilValue(currentTeamState);
+  const teams = useRecoilValue(teamsState);
+  const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
   const setModalConfirmState = useSetRecoilState(modalConfirmState);
   const setAllConsultations = useSetRecoilState(consultationsState);
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const isNewConsultation = !consultation;
-  const initialState = useMemo(
-    () =>
-      consultation || {
-        _id: uuidv4(),
-        dueAt: date ? new Date(date) : new Date(),
-        completedAt: new Date(),
-        name: '',
-        type: '',
-        status: TODO,
-        user: user._id,
-        person: personId || null,
-        organisation: organisation._id,
-        onlyVisibleBy: [],
-        createdAt: new Date(),
-      },
-    [organisation._id, personId, user._id, consultation, date]
-  );
+  const initialState = useMemo(() => {
+    if (consultation) {
+      return {
+        teams: teams.length === 1 ? [teams[0]._id] : consultation.teams,
+        ...consultation,
+      };
+    }
+    return {
+      _id: uuidv4(),
+      dueAt: date ? new Date(date) : new Date(),
+      completedAt: new Date(),
+      name: '',
+      type: '',
+      status: TODO,
+      teams: teams.length === 1 ? [teams[0]._id] : consultation.teams,
+      user: user._id,
+      person: personId || null,
+      organisation: organisation._id,
+      onlyVisibleBy: [],
+      createdAt: new Date(),
+    };
+  }, [organisation._id, personId, user._id, consultation, date, teams]);
   const [data, setData] = useState(initialState);
 
   async function handleSubmit() {
@@ -55,6 +62,9 @@ export default function ConsultationModal({ onClose, personId, consultation, dat
     }
     if (!body.person) {
       return toast.error('Veuillez sélectionner une personne suivie');
+    }
+    if (!body.teams.length) {
+      return toast.error('Veuillez sélectionner au moins une équipe');
     }
     if ([DONE, CANCEL].includes(body.status)) {
       body.completedAt = body.completedAt || new Date();
@@ -133,8 +143,8 @@ export default function ConsultationModal({ onClose, personId, consultation, dat
             e.preventDefault();
             handleSubmit();
           }}>
-          <div>
-            {!personId && (
+          <div className="-tw-mx-4 tw-flex tw-flex-wrap">
+            <div className="tw-flex tw-basis-1/2 tw-flex-col tw-p-4">
               <SelectPerson
                 value={data.person}
                 onChange={(e) => {
@@ -143,7 +153,17 @@ export default function ConsultationModal({ onClose, personId, consultation, dat
                 isMulti={false}
                 inputId="create-consultation-person-select"
               />
-            )}
+            </div>
+            <div className="tw-flex tw-basis-1/2 tw-flex-col tw-p-4">
+              <label htmlFor="create-consultation-team">Équipe(s) en charge</label>
+              <SelectTeamMultiple
+                onChange={(teamIds) => setData({ ...data, teams: teamIds })}
+                value={data.teams}
+                colored
+                inputId="create-consultation-team-select"
+                classNamePrefix="create-consultation-team-select"
+              />
+            </div>
           </div>
           <div className="-tw-mx-4 tw-flex tw-flex-wrap">
             <div className="tw-flex tw-basis-1/2 tw-flex-col tw-p-4">
@@ -175,7 +195,7 @@ export default function ConsultationModal({ onClose, personId, consultation, dat
             </div>
             {organisation.consultations
               .find((e) => e.name === data.type)
-              ?.fields.filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
+              ?.fields.filter((f) => f.enabled || f.enabledTeams?.includes(currentTeam._id))
               .map((field) => {
                 return (
                   <CustomFieldInput
