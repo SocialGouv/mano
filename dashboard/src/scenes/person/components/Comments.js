@@ -37,28 +37,7 @@ export default function Comments({ person }) {
           </div>
         </div>
 
-        {!comments.length && (
-          <div className="tw-mt-8 tw-w-full tw-text-center tw-text-gray-300">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="tw-mx-auto tw-mb-2 tw-h-16 tw-w-16 tw-text-gray-200"
-              width={24}
-              height={24}
-              viewBox="0 0 24 24"
-              strokeWidth="2"
-              stroke="currentColor"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round">
-              <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-              <path d="M3 20l1.3 -3.9a9 8 0 1 1 3.4 2.9l-4.7 1"></path>
-              <line x1={12} y1={12} x2={12} y2="12.01"></line>
-              <line x1={8} y1={12} x2={8} y2="12.01"></line>
-              <line x1={16} y1={12} x2={16} y2="12.01"></line>
-            </svg>
-            Aucun commentaire
-          </div>
-        )}
+        {!comments.length && <NoComment />}
         <ModalContainer open={!!fullScreen} size="full" onClose={() => setFullScreen(false)}>
           <ModalHeader title={`Commentaires de  ${person?.name} (${comments.length})`}></ModalHeader>
           <ModalBody>
@@ -81,9 +60,45 @@ export default function Comments({ person }) {
   );
 }
 
+const NoComment = ({ onNewComment }) => {
+  return (
+    <>
+      <div className="tw-mt-8 tw-w-full tw-text-center tw-text-gray-300">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="tw-mx-auto tw-mb-2 tw-h-16 tw-w-16 tw-text-gray-200"
+          width={24}
+          height={24}
+          viewBox="0 0 24 24"
+          strokeWidth="2"
+          stroke="currentColor"
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+          <path d="M3 20l1.3 -3.9a9 8 0 1 1 3.4 2.9l-4.7 1"></path>
+          <line x1={12} y1={12} x2={12} y2="12.01"></line>
+          <line x1={8} y1={12} x2={8} y2="12.01"></line>
+          <line x1={16} y1={12} x2={16} y2="12.01"></line>
+        </svg>
+        Aucun commentaire
+      </div>
+      {!!onNewComment && (
+        <button type="button" className="button-submit" onClick={onNewComment}>
+          ＋ Ajouter un commentaire
+        </button>
+      )}
+    </>
+  );
+};
+
 const CommentsTable = ({ comments, setCommentToEdit }) => {
   const users = useRecoilValue(usersState);
   const organisation = useRecoilValue(organisationState);
+
+  if (!comments.length) {
+    return <NoComment />;
+  }
 
   return (
     <table className="table table-striped">
