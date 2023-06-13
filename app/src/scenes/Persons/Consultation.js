@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, Keyboard, View } from 'react-native';
 import { useRecoilValue, useRecoilState } from 'recoil';
+import { useFocusEffect } from '@react-navigation/native';
 import ScrollContainer from '../../components/ScrollContainer';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
@@ -23,8 +24,6 @@ import ButtonDelete from '../../components/ButtonDelete';
 import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
 import { dayjsInstance } from '../../services/dateDayjs';
 import InputFromSearchList from '../../components/InputFromSearchList';
-import { useFocusEffect } from '@react-navigation/native';
-import { MyText } from '../../components/MyText';
 
 const cleanValue = (value) => {
   if (typeof value === 'string') return (value || '').trim();
@@ -45,7 +44,7 @@ const Consultation = ({ navigation, route }) => {
         user: user._id,
       };
     }
-  }, [allConsultations, route?.params?.consultationDB?._id]);
+  }, [allConsultations, route?.params?.consultationDB?._id, user._id]);
 
   const isNew = !consultationDB?._id;
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();

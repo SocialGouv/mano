@@ -10,10 +10,11 @@ import ButtonsContainer from '../../components/ButtonsContainer';
 import TerritoryMultiCheckBoxes from '../../components/MultiCheckBoxes/TerritoryMultiCheckBoxes';
 import SubList from '../../components/SubList';
 import TerritoryObservationRow from './TerritoryObservationRow';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { prepareTerritoryForEncryption, territoriesState } from '../../recoil/territory';
 import { territoryObservationsState } from '../../recoil/territoryObservations';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
+import { userState } from '../../recoil/auth';
 
 const castToTerritory = (territory = {}) => ({
   name: territory.name?.trim() || '',
@@ -24,6 +25,7 @@ const castToTerritory = (territory = {}) => ({
 });
 
 const Territory = ({ route, navigation }) => {
+  const user = useRecoilValue(userState);
   const [territories, setTerritories] = useRecoilState(territoriesState);
   const [territoryDB, setTerritoryDB] = useState(() => territories.find((territory) => territory._id === route.params?.territory?._id));
 

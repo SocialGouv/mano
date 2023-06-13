@@ -30,7 +30,6 @@ import { currentTeamState, organisationState, userState } from '../../recoil/aut
 import { capture } from '../../services/sentry';
 import CheckboxLabelled from '../../components/CheckboxLabelled';
 import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
-import { dayjsInstance } from '../../services/dateDayjs';
 import { groupsState } from '../../recoil/groups';
 import { useFocusEffect } from '@react-navigation/native';
 

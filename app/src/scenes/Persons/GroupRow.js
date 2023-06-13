@@ -5,7 +5,6 @@ import { useRecoilValue } from 'recoil';
 import { MyText } from '../../components/MyText';
 import UserName from '../../components/UserName';
 import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
-import { PersonName } from './PersonRow';
 
 const GroupRow = ({ relation, onMorePress, person }) => {
   const navigation = useNavigation();

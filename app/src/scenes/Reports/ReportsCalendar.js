@@ -7,7 +7,6 @@ import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
 import ScrollContainer from '../../components/ScrollContainer';
 import { currentTeamState } from '../../recoil/auth';
-import { reportsState } from '../../recoil/reports';
 import colors from '../../utils/colors';
 import { refreshTriggerState } from '../../components/Loader';
 import { currentTeamReportsSelector } from './selectors';

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { Animated } from 'react-native';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
@@ -11,7 +11,6 @@ import Row from '../../components/Row';
 import { TerritoryIcon } from '../../icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { territoriesSearchSelector } from '../../recoil/selectors';
-import API from '../../services/api';
 import { useNavigation } from '@react-navigation/native';
 import { refreshTriggerState, loadingState } from '../../components/Loader';
 
@@ -31,10 +30,10 @@ const TerritoriesList = () => {
   const onCreateTerritoryRequest = () => navigation.navigate('NewTerritoryForm');
 
   const keyExtractor = (territory) => territory._id;
-  const ListFooterComponent = () => {
+  const ListFooterComponent = useMemo(() => {
     if (!territories.length) return null;
     return <ListNoMoreTerritories />;
-  };
+  }, [territories.length]);
   const renderRow = ({ item: territory }) => {
     const { name } = territory;
     return (

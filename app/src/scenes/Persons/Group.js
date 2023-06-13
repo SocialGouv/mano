@@ -1,11 +1,8 @@
 import React from 'react';
-import styled from 'styled-components';
-import { Alert, View } from 'react-native';
+import { Alert } from 'react-native';
 import ScrollContainer from '../../components/ScrollContainer';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
-import { MyText } from '../../components/MyText';
-import colors from '../../utils/colors';
 import { useRecoilValue } from 'recoil';
 import { organisationState } from '../../recoil/auth';
 import GroupRow from './GroupRow';
@@ -45,15 +42,5 @@ const Group = ({ personDB, navigation }) => {
     </SceneContainer>
   );
 };
-
-const OutOfActiveListSelectWapper = styled(View)`
-  margin-top: 20px;
-`;
-
-const Category = styled(MyText)`
-  font-size: 15px;
-  color: ${colors.app.color};
-  margin: 15px 0;
-`;
 
 export default Group;

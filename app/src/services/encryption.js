@@ -158,7 +158,9 @@ const decryptFile = async (fileAsBase64, encryptedEntityKey, masterKey) => {
       entityKey_bytes_array
     );
     return content_uint8array;
-  } catch (e) { }
+  } catch (e) {
+    console.log('error decryptFile', e);
+  }
 };
 
 const _decrypt_after_extracting_nonce_uint8array = async (nonce_and_cypher_uint8array, key_b64) => {

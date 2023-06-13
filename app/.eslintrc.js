@@ -15,6 +15,7 @@ module.exports = {
   rules: {
     'no-duplicate-imports': 'error',
     'no-shadow': 'off',
+    'no-extra-boolean-cast': 'off',
     'react/no-did-update-set-state': 'off',
     'object-curly-spacing': ['error', 'always'],
     quotes: ['error', 'single', { avoidEscape: true, allowTemplateLiterals: false }],

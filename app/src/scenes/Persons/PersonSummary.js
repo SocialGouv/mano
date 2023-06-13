@@ -25,7 +25,7 @@ import { organisationState, teamsState } from '../../recoil/auth';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
 import RencontreRow from './RencontreRow';
 import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
-import { getRelativeTimeFrench } from '../../services/dateDayjs';
+import { formatDateWithFullMonth, getRelativeTimeFrench } from '../../services/dateDayjs';
 
 const PersonSummary = ({
   navigation,
@@ -304,10 +304,6 @@ const PersonSummary = ({
 const Row = styled.View`
   flex-direction: row;
   align-items: center;
-  margin-bottom: 30px;
-`;
-
-const ButtonContainer = styled.View`
   margin-bottom: 30px;
 `;
 

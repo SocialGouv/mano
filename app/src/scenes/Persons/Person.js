@@ -104,7 +104,7 @@ const Person = ({ route, navigation }) => {
   useFocusEffect(
     useCallback(() => {
       setPerson(castToPerson(personDB));
-    }, [personDB])
+    }, [personDB, castToPerson])
   );
 
   const onEdit = () => setEditable((e) => !e);
