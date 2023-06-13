@@ -87,7 +87,7 @@ const initOptions = (options) => {
   return objoptions;
 };
 
-export const getMultichoiceBarData = (source, key, { options = [], debug = false } = {}) => {
+export const getMultichoiceBarData = (source, key, { options = [] } = {}) => {
   options = initOptions(options);
 
   const reducedDataPerOption = source.reduce((newData, item, index) => {

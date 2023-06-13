@@ -58,13 +58,7 @@ export const filterData = (data, filters, returnWholeArray = false) => {
               if (itemValue === filterValue) return item;
             } else {
               if (itemValue?.includes?.(filterValue)) {
-                if (returnWholeArray) return item;
-                let newValues = itemValue.filter((value) => value !== filterValue);
-                if (!newValues.length) newValues = ['Uniquement'];
-                return {
-                  ...item,
-                  [filter.field]: newValues,
-                };
+                return item;
               }
             }
           }

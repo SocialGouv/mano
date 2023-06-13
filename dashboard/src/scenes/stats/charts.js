@@ -82,7 +82,7 @@ export const CustomResponsiveBar = ({
   data,
   categories,
   onItemClick,
-  axisTitleX,
+  // axisTitleX,
   axisTitleY,
   isMultiChoice,
   totalForMultiChoice,
@@ -140,7 +140,7 @@ export const CustomResponsiveBar = ({
               <tr>
                 <td className="tw-border tw-border-zinc-400 tw-p-1">{totalTitleForMultiChoice}</td>
                 <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center tw-font-bold">{totalForMultiChoice}</td>
-                <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center tw-font-bold ">100%</td>
+                {/* <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center tw-font-bold ">100%</td> */}
               </tr>
             )}
           </tbody>

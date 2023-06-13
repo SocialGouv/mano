@@ -38,6 +38,7 @@ const PersonStats = ({
     const newSlicefield = filterBase.find((f) => f.field === fieldName);
     setSliceField(newSlicefield);
     setSliceValue(newSlice);
+    console.log({ personConcerned });
     const slicedData =
       newSlicefield.type === 'boolean'
         ? personConcerned.filter((p) => (newSlice === 'Non' ? !p[newSlicefield.field] : !!p[newSlicefield.field]))
@@ -127,12 +128,7 @@ const PersonStats = ({
         axisTitleX="Raison de sortie de file active"
         isMultiChoice
         totalForMultiChoice={personsForStats.filter((p) => !!p.outOfActiveList).length}
-        totalTitleForMultiChoice={
-          <>
-            <span className="tw-font-bold">Total de personnes uniques</span> <br />{' '}
-            <span className="tw-text-xs">(certaines peuvent être comptabilisées plusieurs fois)</span>
-          </>
-        }
+        totalTitleForMultiChoice={<span className="tw-font-bold">Nombre de personnes concernées</span>}
         data={getMultichoiceBarData(
           personsForStats.filter((p) => !!p.outOfActiveList),
           'outOfActiveListReasons'
@@ -145,12 +141,7 @@ const PersonStats = ({
         help={(label) =>
           `${label.capitalize()} des ${title} dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`
         }
-        totalTitleForMultiChoice={
-          <>
-            <span className="tw-font-bold">Total de personnes uniques</span> <br />{' '}
-            <span className="tw-text-xs">(certaines peuvent être comptabilisées plusieurs fois)</span>
-          </>
-        }
+        totalTitleForMultiChoice={<span className="tw-font-bold">Nombre de personnes concernées</span>}
       />
       <SelectedPersonsModal
         open={personsModalOpened}
@@ -528,7 +519,10 @@ const SelectedPersonsModal = ({ open, onClose, persons, title, onAfterLeave, sli
               {
                 title: sliceField.label,
                 dataKey: sliceField,
-                render: (person) => <CustomFieldDisplay type={sliceField.type} value={person[sliceField.field]} />,
+                render: (person) => {
+                  console.log('person', person, sliceField.field, person[sliceField.field]);
+                  return <CustomFieldDisplay type={sliceField.type} value={person[sliceField.field]} />;
+                },
               },
               { title: 'Équipe(s) en charge', dataKey: 'assignedTeams', render: (person) => <Teams teams={teams} person={person} /> },
               {

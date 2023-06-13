@@ -36,12 +36,7 @@ const ConsultationsStats = ({ consultations }) => {
               data={consultations.filter((d) => d.type === c.name)}
               customFields={c.fields}
               help={(label) => `${label.capitalize()} des consultations réalisées dans la période définie.`}
-              totalTitleForMultiChoice={
-                <>
-                  <span className="tw-font-bold">Total de consultations uniques</span> <br />{' '}
-                  <span className="tw-text-xs">(certaines peuvent être comptabilisées plusieurs fois)</span>
-                </>
-              }
+              totalTitleForMultiChoice={<span className="tw-font-bold">Nombre de consultations concernées</span>}
             />
           </div>
         );
