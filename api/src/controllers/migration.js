@@ -8,7 +8,7 @@ const { looseUuidRegex, dateRegex } = require("../utils");
 const { capture } = require("../sentry");
 const validateUser = require("../middleware/validateUser");
 const { serializeOrganisation } = require("../utils/data-serializer");
-const { Organisation, Person, Action, Comment, Report, Team, Service, sequelize } = require("../db/sequelize");
+const { Organisation, Person, Action, Comment, Report, Team, Service, sequelize, Group } = require("../db/sequelize");
 
 router.put(
   "/:migrationName",
@@ -314,6 +314,32 @@ router.put(
             if (person) {
               person.set({ encrypted, encryptedEntityKey });
               await person.save();
+            }
+          }
+        }
+
+        if (req.params.migrationName === "fix-family-relation-deleted") {
+          try {
+            z.object({
+              groupIdsToDestroy: z.array(z.string().regex(looseUuidRegex)),
+              groupsToUpdate: z.array(
+                z.object({
+                  _id: z.string().regex(looseUuidRegex),
+                  encrypted: z.string(),
+                  encryptedEntityKey: z.string(),
+                })
+              ),
+            }).parse(req.body);
+          } catch (e) {
+            const error = new Error(`Invalid request in fix-family-relation-deleted migration: ${e}`);
+            error.status = 400;
+            throw error;
+          }
+          for (const { _id, encrypted, encryptedEntityKey } of req.body.groupsToUpdate) {
+            const group = await Group.findOne({ where: { _id, organisation: req.user.organisation }, transaction: tx });
+            if (group) {
+              group.set({ encrypted, encryptedEntityKey });
+              await group.save();
             }
           }
         }

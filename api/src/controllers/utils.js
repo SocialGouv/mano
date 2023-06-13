@@ -29,8 +29,11 @@ router.get("/version", async (req, res) => {
       `La nouvelle version ${MOBILE_APP_VERSION} de Mano est disponible !`,
       `Vous avez la version ${req.headers.version} actuellement sur votre téléphone.
 Cette nouvelle version :
-- Met à jour la politique de confidentialité de Mano
-- Fixe un bug sur la sélection des personnes lors de la création d'action
+- Fixe un bug de recherche par date d'anniversaire
+- Fix un bug de suppression des liens familiaux et de personnes suivies
+- Améliore la recherche par numéro de téléphone
+- Empêche de renommer une personne avec un nom de personne déjà existant
+- Affiche les durées précises de "Suivi(e) depuis" et "En rue depuis"
 `,
       [
         { text: "Télécharger", link: "https://mano-app.fabrique.social.gouv.fr/download" },

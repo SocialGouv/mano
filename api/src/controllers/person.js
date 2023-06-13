@@ -8,7 +8,19 @@ const multer = require("multer");
 const crypto = require("crypto");
 const { z } = require("zod");
 const { catchErrors } = require("../errors");
-const { Person } = require("../db/sequelize");
+const {
+  Person,
+  Action,
+  Comment,
+  Group,
+  Passage,
+  Rencontre,
+  Consultation,
+  Treatment,
+  MedicalFile,
+  RelPersonPlace,
+  sequelize,
+} = require("../db/sequelize");
 const { STORAGE_DIRECTORY } = require("../config");
 const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
 const validateUser = require("../middleware/validateUser");
@@ -313,20 +325,125 @@ router.delete(
   validateUser(["admin", "normal"]),
   catchErrors(async (req, res, next) => {
     try {
-      z.object({
-        _id: z.string().regex(looseUuidRegex),
-      }).parse(req.params);
+      z.object({ _id: z.string().regex(looseUuidRegex) }).parse(req.params);
     } catch (e) {
       const error = new Error(`Invalid request in person delete: ${e}`);
       error.status = 400;
       return next(error);
     }
-    const query = { where: { _id: req.params._id, organisation: req.user.organisation } };
+    const arraysOfItemsToTransfer = ["actionsToTransfer", "commentsToTransfer"];
+    for (const key of arraysOfItemsToTransfer) {
+      try {
+        z.array(
+          z.object({
+            _id: z.string().regex(looseUuidRegex),
+            encrypted: z.string(),
+            encryptedEntityKey: z.string(),
+          })
+        ).parse(req.body[key]);
+      } catch (e) {
+        const error = new Error(`Invalid request in person delete ${key}: ${e}`);
+        error.status = 400;
+        return next(error);
+      }
+    }
+    const arraysOfIdsToDelete = [
+      "actionIdsToDelete",
+      "commentIdsToDelete",
+      "passageIdsToDelete",
+      "rencontreIdsToDelete",
+      "consultationIdsToDelete",
+      "treatmentIdsToDelete",
+      "medicalFileIdsToDelete",
+      "relsPersonPlaceIdsToDelete",
+    ];
+    for (const key of arraysOfIdsToDelete) {
+      try {
+        z.array(z.string().regex(looseUuidRegex)).parse(req.body[key]);
+      } catch (e) {
+        const error = new Error(`Invalid request in person delete ${key}: ${e}`);
+        error.status = 400;
+        return next(error);
+      }
+    }
+    try {
+      z.optional(z.string().regex(looseUuidRegex)).parse(req.body.groupIdToDelete);
+    } catch (e) {
+      const error = new Error(`Invalid request in person delete groupIdToDelete: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+    try {
+      z.optional(
+        z.object({
+          _id: z.string().regex(looseUuidRegex),
+          encrypted: z.string(),
+          encryptedEntityKey: z.string(),
+        })
+      ).parse(req.body.groupToUpdate);
+    } catch (e) {
+      const error = new Error(`Invalid request in person delete groupToUpdate: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
 
-    let person = await Person.findOne(query);
-    if (!person) return res.status(404).send({ ok: false, error: "Not Found" });
+    await sequelize.transaction(async (tx) => {
+      const {
+        groupToUpdate,
+        groupIdToDelete,
+        actionsToTransfer,
+        commentsToTransfer,
+        actionIdsToDelete,
+        commentIdsToDelete,
+        passageIdsToDelete,
+        rencontreIdsToDelete,
+        consultationIdsToDelete,
+        treatmentIdsToDelete,
+        medicalFileIdsToDelete,
+        relsPersonPlaceIdsToDelete,
+      } = req.body;
 
-    await person.destroy();
+      let person = await Person.findOne({ where: { _id: req.params._id, organisation: req.user.organisation } });
+      if (person) await person.destroy({ transaction: tx });
+
+      for (let { encrypted, encryptedEntityKey, _id } of actionsToTransfer) {
+        await Action.update({ encrypted, encryptedEntityKey }, { where: { _id, organisation: req.user.organisation }, transaction: tx });
+      }
+      for (let { encrypted, encryptedEntityKey, _id } of commentsToTransfer) {
+        await Comment.update({ encrypted, encryptedEntityKey }, { where: { _id, organisation: req.user.organisation }, transaction: tx });
+      }
+      if (groupToUpdate) {
+        await Group.update(groupToUpdate, { where: { _id: groupToUpdate._id, organisation: req.user.organisation }, transaction: tx });
+      }
+      if (groupIdToDelete) {
+        await Group.destroy({ where: { _id: groupIdToDelete, organisation: req.user.organisation }, transaction: tx });
+      }
+      for (let _id of actionIdsToDelete) {
+        await Action.destroy({ where: { _id, organisation: req.user.organisation }, transaction: tx });
+      }
+      for (let _id of commentIdsToDelete) {
+        await Comment.destroy({ where: { _id, organisation: req.user.organisation }, transaction: tx });
+      }
+      for (let _id of passageIdsToDelete) {
+        await Passage.destroy({ where: { _id, organisation: req.user.organisation }, transaction: tx });
+      }
+      for (let _id of rencontreIdsToDelete) {
+        await Rencontre.destroy({ where: { _id, organisation: req.user.organisation }, transaction: tx });
+      }
+      for (let _id of consultationIdsToDelete) {
+        await Consultation.destroy({ where: { _id, organisation: req.user.organisation }, transaction: tx });
+      }
+      for (let _id of treatmentIdsToDelete) {
+        await Treatment.destroy({ where: { _id, organisation: req.user.organisation }, transaction: tx });
+      }
+      for (let _id of medicalFileIdsToDelete) {
+        await MedicalFile.destroy({ where: { _id, organisation: req.user.organisation }, transaction: tx });
+      }
+      for (let _id of relsPersonPlaceIdsToDelete) {
+        await RelPersonPlace.destroy({ where: { _id, organisation: req.user.organisation }, transaction: tx });
+      }
+    });
+
     res.status(200).send({ ok: true });
   })
 );
