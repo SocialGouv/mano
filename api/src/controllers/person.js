@@ -8,7 +8,19 @@ const multer = require("multer");
 const crypto = require("crypto");
 const { z } = require("zod");
 const { catchErrors } = require("../errors");
-const { Person, Action, Comment, Group, Passage, Rencontre, Consultation, Treatment, MedicalFile, RelPersonPlace } = require("../db/sequelize");
+const {
+  Person,
+  Action,
+  Comment,
+  Group,
+  Passage,
+  Rencontre,
+  Consultation,
+  Treatment,
+  MedicalFile,
+  RelPersonPlace,
+  sequelize,
+} = require("../db/sequelize");
 const { STORAGE_DIRECTORY } = require("../config");
 const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
 const validateUser = require("../middleware/validateUser");
@@ -312,6 +324,7 @@ router.delete(
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal"]),
   catchErrors(async (req, res, next) => {
+    console.log(req.body);
     try {
       z.object({ _id: z.string().regex(looseUuidRegex) }).parse(req.params);
     } catch (e) {
@@ -322,7 +335,13 @@ router.delete(
     const arraysOfItemsToTransfer = ["actionsToTransfer", "commentsToTransfer"];
     for (const key of arraysOfItemsToTransfer) {
       try {
-        z.array(z.string().regex(looseUuidRegex)).parse(req.body[key]);
+        z.array(
+          z.object({
+            _id: z.string().regex(looseUuidRegex),
+            encrypted: z.string(),
+            encryptedEntityKey: z.string(),
+          })
+        ).parse(req.body[key]);
       } catch (e) {
         const error = new Error(`Invalid request in person delete ${key}: ${e}`);
         error.status = 400;
@@ -387,10 +406,6 @@ router.delete(
 
       let person = await Person.findOne({ where: { _id: req.params._id, organisation: req.user.organisation } });
       if (person) await person.destroy({ transaction: tx });
-
-      for (let { encrypted, encryptedEntityKey, _id } of [mergedPerson]) {
-        await Person.update({ encrypted, encryptedEntityKey }, { where: { _id, organisation: req.user.organisation }, transaction: tx });
-      }
 
       for (let { encrypted, encryptedEntityKey, _id } of actionsToTransfer) {
         await Action.update({ encrypted, encryptedEntityKey }, { where: { _id, organisation: req.user.organisation }, transaction: tx });

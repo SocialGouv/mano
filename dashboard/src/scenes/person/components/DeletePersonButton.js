@@ -1,8 +1,7 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { personsState } from '../../../recoil/persons';
+import { useRecoilValue } from 'recoil';
 import { actionsState, prepareActionForEncryption } from '../../../recoil/actions';
 import API, { encryptItem } from '../../../services/api';
 import { commentsState, prepareCommentForEncryption } from '../../../recoil/comments';
@@ -17,8 +16,6 @@ import { userState } from '../../../recoil/auth';
 import { useDataLoader } from '../../../components/DataLoader';
 
 const DeletePersonButton = ({ person }) => {
-  const setPersons = useSetRecoilState(personsState);
-
   const actions = useRecoilValue(actionsState);
   const comments = useRecoilValue(commentsState);
   const passages = useRecoilValue(passagesState);
@@ -53,8 +50,8 @@ const DeletePersonButton = ({ person }) => {
         }
 
         const body = {
-          groupToUpdate: null,
-          groupIdToDelete: null,
+          // groupToUpdate: undefined,
+          // groupIdToDelete: undefined,
           actionsToTransfer: [],
           commentsToTransfer: [],
           actionIdsToDelete: [],
