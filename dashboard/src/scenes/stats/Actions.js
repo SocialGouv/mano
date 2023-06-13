@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react';
-import { CustomResponsiveBar, CustomResponsivePie } from './charts';
+import { CustomResponsiveBar } from './charts';
 import { mappedIdsToLabels } from '../../recoil/actions';
 import SelectCustom from '../../components/SelectCustom';
-import { getMultichoiceBarData, getPieData } from './utils';
+import { getMultichoiceBarData } from './utils';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../components/tailwind/Modal';
 import ActionsSortableList from '../../components/ActionsSortableList';
 
@@ -16,7 +16,6 @@ const ActionsStats = ({
   groupsCategories,
   filterableActionsCategories,
   actionsWithDetailedGroupAndCategories,
-  actionsFilteredByStatus,
 }) => {
   const [actionsModalOpened, setActionsModalOpened] = useState(false);
   const [groupSlice, setGroupSlice] = useState(null);
@@ -115,14 +114,24 @@ const ActionsStats = ({
           />
         </div>
       </div>
-      <CustomResponsivePie
+      <CustomResponsiveBar
         title="Répartition des actions par groupe"
-        help={`Si une action a plusieurs catégories appartenant à plusieurs groupes, elle est comptabilisée dans chaque groupe.\n\nSi une action a plusieurs catégories appartenant au même groupe, elle est comptabilisée une seule fois dans ce groupe.\n\nAinsi, le total affiché peut être supérieur au nombre total d'actions.`}
-        data={getPieData(actionsDataForGroups, 'categoryGroup', { options: groupsCategories.map((group) => group.groupTitle) })}
+        help={`Si une action a plusieurs catégories appartenant à plusieurs groupes, elle est comptabilisée dans chaque groupe.\n\nSi une action a plusieurs catégories appartenant au même groupe, elle est comptabilisée autant de fois dans ce groupe.\n\nAinsi, le total affiché peut être supérieur au nombre total d'actions.`}
         onItemClick={(newGroupSlice) => {
           setActionsModalOpened(true);
           setGroupSlice(newGroupSlice);
         }}
+        isMultiChoice
+        axisTitleY="Actions"
+        axisTitleX="Groupe"
+        data={getMultichoiceBarData(actionsWithDetailedGroupAndCategories, 'categoryGroup', {
+          options: groupsCategories.map((group) => group.groupTitle),
+          debug: true,
+        })}
+        // here we decide that the total is NOT the total of actions
+        // but the total of actions splitted by category
+        totalForMultiChoice={actionsWithDetailedGroupAndCategories.length}
+        totalTitleForMultiChoice={<span className="tw-font-bold">Total</span>}
       />
       <CustomResponsiveBar
         title="Répartition des actions par catégorie"
@@ -135,7 +144,10 @@ const ActionsStats = ({
         axisTitleY="Actions"
         axisTitleX="Catégorie"
         data={getMultichoiceBarData(actionsWithDetailedGroupAndCategories, 'category')}
-        totalForPercentage={actionsFilteredByStatus.length}
+        // here we decide that the total is NOT the total of actions
+        // but the total of actions splitted by category
+        totalForMultiChoice={actionsWithDetailedGroupAndCategories.length}
+        totalTitleForMultiChoice={<span className="tw-font-bold">Total</span>}
       />
       <SelectedActionsModal
         open={actionsModalOpened}

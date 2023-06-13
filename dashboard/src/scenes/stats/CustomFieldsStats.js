@@ -12,7 +12,7 @@ function getColsSize(totalCols) {
   return '1/4';
 }
 
-const CustomFieldsStats = ({ customFields, data, additionalCols = [], dataTestId = '', help, onSliceClick }) => {
+const CustomFieldsStats = ({ customFields, data, additionalCols = [], dataTestId = '', help, onSliceClick, totalTitleForMultiChoice }) => {
   const team = useRecoilValue(currentTeamState);
 
   const customFieldsInStats = customFields
@@ -77,7 +77,8 @@ const CustomFieldsStats = ({ customFields, data, additionalCols = [], dataTestId
             isMultiChoice
             axisTitleY="File active"
             axisTitleX={field.name}
-            totalForPercentage={data.length}
+            totalForMultiChoice={data.length}
+            totalTitleForMultiChoice={totalTitleForMultiChoice}
             data={getMultichoiceBarData(data, field.name, { options: field.options })}
           />
         );

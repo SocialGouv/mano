@@ -35,6 +35,7 @@ const ObservationsStats = ({ territories, setSelectedTerritories, observations, 
         help={(label) =>
           `${label.capitalize()} des observations des territoires sélectionnés, dans la période définie.\n\nLa moyenne de cette données est basée sur le nombre d'observations faites.`
         }
+        totalTitleForMultiChoice={<span className="tw-font-bold">Nombre d'observations concernées</span>}
       />
     </>
   );

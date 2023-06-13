@@ -87,15 +87,16 @@ const initOptions = (options) => {
   return objoptions;
 };
 
-export const getMultichoiceBarData = (source, key, { options = [], debug = false } = {}) => {
+export const getMultichoiceBarData = (source, key, { options = [] } = {}) => {
   options = initOptions(options);
 
-  const reducedDataPerOption = source.reduce((newData, item) => {
+  const reducedDataPerOption = source.reduce((newData, item, index) => {
     if (!item[key] || !item[key].length) {
       newData['Non renseigné'].push(item);
       return newData;
     }
     const choices = typeof item[key] === 'string' ? item[key].split(',') : item[key];
+
     for (const choice of choices) {
       if (!newData[choice]) newData[choice] = [];
       newData[choice].push(item);
