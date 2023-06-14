@@ -31,7 +31,7 @@ export default function ConsultationModal({ onClose, personId, consultation, dat
   const initialState = useMemo(() => {
     if (consultation) {
       return {
-        teams: teams.length === 1 ? [teams[0]._id] : consultation.teams,
+        teams: consultation.teams ?? teams.length === 1 ? [teams[0]._id] : [],
         ...consultation,
       };
     }
@@ -42,7 +42,7 @@ export default function ConsultationModal({ onClose, personId, consultation, dat
       name: '',
       type: '',
       status: TODO,
-      teams: teams.length === 1 ? [teams[0]._id] : consultation.teams,
+      teams: teams.length === 1 ? [teams[0]._id] : [],
       user: user._id,
       person: personId || null,
       organisation: organisation._id,
