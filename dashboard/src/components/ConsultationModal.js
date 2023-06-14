@@ -16,6 +16,7 @@ import SelectStatus from './SelectStatus';
 import { toast } from 'react-toastify';
 import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from './tailwind/Modal';
 import SelectPerson from './SelectPerson';
+import { CommentsModule } from './CommentsGeneric';
 
 export default function ConsultationModal({ onClose, personId, consultation, date }) {
   const organisation = useRecoilValue(organisationState);
@@ -175,7 +176,7 @@ export default function ConsultationModal({ onClose, personId, consultation, dat
                   activeTab === 'Commentaires' && 'tw-border-x-zinc-200 tw-border-t-zinc-200 tw-bg-white',
                 ].join(' ')}
                 onClick={() => setActiveTab('Commentaires')}>
-                Commentaires
+                Commentaires {data?.comments?.length ? `(${data.comments.length})` : ''}
               </button>
             </li>
           </ul>
@@ -320,7 +321,6 @@ export default function ConsultationModal({ onClose, personId, consultation, dat
           <div className={['tw-flex tw-min-h-screen tw-w-full tw-flex-col tw-gap-4 tw-px-8', activeTab !== 'Documents' ? 'tw-hidden' : ''].join(' ')}>
             {data.person && (
               <Documents
-                title="Documents"
                 personId={data.person}
                 documents={data.documents}
                 onAdd={async (docResponse) => {
@@ -349,7 +349,20 @@ export default function ConsultationModal({ onClose, personId, consultation, dat
           </div>
           <div
             className={['tw-flex tw-min-h-screen tw-w-full tw-flex-col tw-gap-4 tw-px-8', activeTab !== 'Commentaires' ? 'tw-hidden' : ''].join(' ')}>
-            <CommentsTable />
+            <CommentsModule
+              comments={data.comments}
+              type="consultation"
+              onDeleteComment={(comment) => {
+                setData({ ...data, comments: data.comments.filter((c) => c._id !== comment._id) });
+              }}
+              onSubmitComment={(comment, isNewComment) => {
+                if (isNewComment) {
+                  setData({ ...data, comments: [...data.comments, { ...comment, _id: uuidv4() }] });
+                } else {
+                  setData({ ...data, comments: data.comments.map((c) => (c._id === comment._id ? comment : c)) });
+                }
+              }}
+            />
           </div>
         </form>
       </ModalBody>

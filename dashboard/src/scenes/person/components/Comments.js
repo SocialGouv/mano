@@ -97,7 +97,7 @@ const CommentsTable = ({ comments, setCommentToEdit }) => {
   const organisation = useRecoilValue(organisationState);
 
   if (!comments.length) {
-    return <NoComment />;
+    return null;
   }
 
   return (

@@ -210,7 +210,7 @@ const ActionView = () => {
                   {!['restricted-access'].includes(user.role) && (
                     <div className="tw-mb-4">
                       <label htmlFor="description">Description</label>
-                      <div className="tw-block tw-w-full tw-rounded tw-border tw-border-gray-300 tw-py-1.5 tw-px-3 tw-text-base tw-transition-all">
+                      <div className="tw-block tw-w-full tw-rounded tw-border tw-border-gray-300 tw-text-base tw-transition-all">
                         <AutoResizeTextarea name="description" id="description" value={values.description} onChange={handleChange} />
                       </div>
                     </div>
