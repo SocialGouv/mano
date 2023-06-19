@@ -9,16 +9,14 @@ import ButtonDelete from '../../components/ButtonDelete';
 import { useRecoilValue } from 'recoil';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import CheckboxLabelled from '../../components/CheckboxLabelled';
-import { groupsState } from '../../recoil/groups';
 
-const NewCommentInput = ({ person, forwardRef, onFocus, onCommentWrite, canToggleUrgentCheck, onCreate, canToggleGroupCheckProp = false }) => {
+const NewCommentInput = ({ forwardRef, onFocus, onCommentWrite, onCreate, canToggleUrgentCheck, canToggleGroupCheck }) => {
   const [comment, setComment] = useState('');
   const [urgent, setUrgent] = useState(false);
   const [group, setGroup] = useState(false);
   const [posting, setPosting] = useState(false);
   const currentTeam = useRecoilValue(currentTeamState);
   const organisation = useRecoilValue(organisationState);
-  const groups = useRecoilValue(groupsState);
   const user = useRecoilValue(userState);
 
   const onCreateComment = async () => {
@@ -60,8 +58,6 @@ const NewCommentInput = ({ person, forwardRef, onFocus, onCommentWrite, canToggl
     setComment(newComment);
     onCommentWrite?.(newComment);
   };
-
-  const canToggleGroupCheck = canToggleGroupCheckProp && !!organisation.groupsEnabled && groups.find((group) => group.persons.includes(person));
 
   return (
     <>

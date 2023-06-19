@@ -240,16 +240,16 @@ const Treatment = ({ navigation, route }) => {
             <CommentRow
               key={comment._id}
               comment={comment}
-              onUpdate={
-                comment.team
-                  ? () =>
-                      navigation.push('ActionComment', {
-                        ...comment,
-                        commentTitle: name || 'Traitement',
-                        fromRoute: 'Treatment',
-                      })
-                  : null
-              }
+              onDelete={async () => {
+                // need to pass `medicalFileToSave` if we want last comment to be taken into account
+                // https://react.dev/reference/react/useState#ive-updated-the-state-but-logging-gives-me-the-old-value
+                onSaveTreatment(treatmentDB.comments.map.filter((c) => c._id !== comment._id));
+              }}
+              onUpdate={async (commentUpdated) => {
+                // need to pass `medicalFileToSave` if we want last comment to be taken into account
+                // https://react.dev/reference/react/useState#ive-updated-the-state-but-logging-gives-me-the-old-value
+                onSaveTreatment(treatmentDB.comments.map((c) => (c._id === comment._id ? commentUpdated : c)));
+              }}
             />
           )}
           ifEmpty="Pas encore de commentaire">

@@ -69,7 +69,6 @@ const ActionsNavigator = () => {
       <ActionsStack.Screen name="NewActionForm" component={NewActionForm} />
       <ActionsStack.Screen name="PersonsSearch" component={PersonsSearch} />
       <ActionsStack.Screen name="NewPersonForm" component={NewPersonForm} />
-      <ActionsStack.Screen name="ActionComment" component={Comment} />
 
       <ActionsStack.Screen name="Person" component={Person} />
       <ActionsStack.Screen name="PersonsOutOfActiveListReason" component={PersonsOutOfActiveListReason} />
@@ -104,7 +103,6 @@ const PersonsNavigator = () => {
       <PersonsStack.Screen name="Action" component={Action} />
       <PersonsStack.Screen name="NewActionForm" component={NewActionForm} />
       <PersonsStack.Screen name="PersonsSearch" component={PersonsSearch} />
-      <PersonsStack.Screen name="ActionComment" component={Comment} />
     </PersonsStack.Navigator>
   );
 };
@@ -137,7 +135,6 @@ const NotificationsNavigator = () => {
   return (
     <NotificationsStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Notifications">
       <NotificationsStack.Screen name="NotificationsList" component={Notifications} />
-      <NotificationsStack.Screen name="ActionComment" component={Comment} />
       <NotificationsStack.Screen name="PersonComment" component={Comment} />
     </NotificationsStack.Navigator>
   );
@@ -155,7 +152,6 @@ const ReportsNavigator = () => {
       <ReportsStack.Screen name="NewActionForm" component={NewActionForm} />
       <ReportsStack.Screen name="PersonsSearch" component={PersonsSearch} />
       <ActionsStack.Screen name="NewPersonForm" component={NewPersonForm} />
-      <ReportsStack.Screen name="ActionComment" component={Comment} />
 
       <ReportsStack.Screen name="Person" component={Person} />
       <ReportsStack.Screen name="PersonsOutOfActiveListReason" component={PersonsOutOfActiveListReason} />

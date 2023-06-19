@@ -361,16 +361,26 @@ const Consultation = ({ navigation, route }) => {
               <CommentRow
                 key={comment._id}
                 comment={comment}
-                onUpdate={
-                  comment.team
-                    ? () =>
-                        navigation.push('ActionComment', {
-                          ...comment,
-                          commentTitle: consultation?.name || 'Consultation',
-                          fromRoute: 'Consultation',
-                        })
-                    : null
-                }
+                onDelete={async () => {
+                  const consultationToSave = {
+                    ...consultation,
+                    comments: consultation.comments.filter((c) => c._id !== comment._id),
+                  };
+                  setConsultation(consultationToSave); // optimistic UI
+                  // need to pass `consultationToSave` if we want last comment to be taken into account
+                  // https://react.dev/reference/react/useState#ive-updated-the-state-but-logging-gives-me-the-old-value
+                  onSaveConsultationRequest({ goBackOnSave: false, consultationToSave });
+                }}
+                onUpdate={async (commentUpdated) => {
+                  const consultationToSave = {
+                    ...consultation,
+                    comments: consultation.comments.map((c) => (c._id === comment._id ? commentUpdated : c)),
+                  };
+                  setConsultation(consultationToSave); // optimistic UI
+                  // need to pass `consultationToSave` if we want last comment to be taken into account
+                  // https://react.dev/reference/react/useState#ive-updated-the-state-but-logging-gives-me-the-old-value
+                  onSaveConsultationRequest({ goBackOnSave: false, consultationToSave });
+                }}
               />
             )}
             ifEmpty="Pas encore de commentaire">

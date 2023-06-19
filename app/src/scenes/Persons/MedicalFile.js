@@ -314,16 +314,26 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
           <CommentRow
             key={comment._id}
             comment={comment}
-            onUpdate={
-              comment.team && comment.type === 'medical-file'
-                ? () =>
-                    navigation.push('ActionComment', {
-                      ...comment,
-                      commentTitle: 'Commentaire',
-                      fromRoute: 'Treatment',
-                    })
-                : null
-            }
+            onDelete={async () => {
+              const medicalFileToSave = {
+                ...medicalFile,
+                comments: medicalFile.comments.filter((c) => c._id !== comment._id),
+              };
+              setMedicalFile(medicalFileToSave); // optimistic UI
+              // need to pass `medicalFileToSave` if we want last comment to be taken into account
+              // https://react.dev/reference/react/useState#ive-updated-the-state-but-logging-gives-me-the-old-value
+              onUpdateRequest({ goBackOnSave: false, medicalFileToSave });
+            }}
+            onUpdate={async (commentUpdated) => {
+              const medicalFileToSave = {
+                ...medicalFile,
+                comments: medicalFile.comments.map((c) => (c._id === comment._id ? commentUpdated : c)),
+              };
+              setMedicalFile(medicalFileToSave); // optimistic UI
+              // need to pass `medicalFileToSave` if we want last comment to be taken into account
+              // https://react.dev/reference/react/useState#ive-updated-the-state-but-logging-gives-me-the-old-value
+              onUpdateRequest({ goBackOnSave: false, medicalFileToSave });
+            }}
           />
         )}
         ifEmpty="Pas encore de commentaire">
@@ -333,10 +343,11 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
           onCommentWrite={setWritingComment}
           onCreate={(newComment) => {
             const newComments = [{ ...newComment, type: 'medical-file', _id: uuidv4() }, ...(medicalFile.comments || [])];
+            const medicalFileToSave = { ...medicalFile, comments: newComments };
+            setMedicalFile(medicalFileToSave); // optimistic UI
             // need to pass comments as parameters if we want last comment to be taken into account
             // https://react.dev/reference/react/useState#ive-updated-the-state-but-logging-gives-me-the-old-value
-            setMedicalFile({ ...medicalFile, comments: newComments });
-            onUpdateRequest({ ...medicalFile, comments: newComments });
+            onUpdateRequest(medicalFileToSave);
           }}
         />
       </SubList>

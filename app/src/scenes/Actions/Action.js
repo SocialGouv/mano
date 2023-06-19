@@ -506,14 +506,38 @@ const Action = ({ navigation, route }) => {
             <CommentRow
               key={comment._id}
               comment={comment}
+              canToggleUrgentCheck
+              onDelete={async () => {
+                const response = await API.delete({ path: `/comment/${comment._id}` });
+                if (response.error) {
+                  Alert.alert(response.error);
+                  return false;
+                }
+                setComments((comments) => comments.filter((p) => p._id !== comment._id));
+                return true;
+              }}
               onUpdate={
                 comment.team
-                  ? () =>
-                      navigation.push('ActionComment', {
-                        ...comment,
-                        commentTitle: name,
-                        fromRoute: 'Action',
-                      })
+                  ? async (commentUpdated) => {
+                      commentUpdated.action = actionDB?._id;
+                      const response = await API.put({
+                        path: `/comment/${comment._id}`,
+                        body: prepareCommentForEncryption(commentUpdated),
+                      });
+                      if (response.error) {
+                        Alert.alert(response.error);
+                        return false;
+                      }
+                      if (response.ok) {
+                        setComments((comments) =>
+                          comments.map((c) => {
+                            if (c._id === comment._id) return response.decryptedData;
+                            return c;
+                          })
+                        );
+                        return true;
+                      }
+                    }
                   : null
               }
             />
@@ -523,8 +547,7 @@ const Action = ({ navigation, route }) => {
             <NewCommentInput
               forwardRef={newCommentRef}
               onFocus={() => _scrollToInput(newCommentRef)}
-              action={actionDB?._id}
-              canToggleGroupCheckProp
+              canToggleUrgentCheck
               onCommentWrite={setWritingComment}
               onCreate={async (newComment) => {
                 const body = {
