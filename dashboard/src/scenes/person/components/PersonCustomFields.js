@@ -11,6 +11,7 @@ export default function PersonCustomFields({ person, sectionName, fields, colspa
   const enabledFields = useMemo(() => {
     return fields.filter((f) => f.enabled || f.enabledTeams?.includes(team._id));
   }, [fields, team]);
+  if (!enabledFields.length) return null;
   return (
     <div className="p-3 border tw-min-h-[200px] tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
       {Boolean(editModal) && (
