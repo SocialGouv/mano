@@ -1,3 +1,10 @@
+## [1.268.9](https://github.com/SocialGouv/mano/compare/v1.268.8...v1.268.9) (2023-06-19)
+
+
+### Bug Fixes
+
+* **dashboard:** dossier médical sur deux colonnes ([bd5ae3f](https://github.com/SocialGouv/mano/commit/bd5ae3ffb66a5757399aede478eece77bc5eb5bc))
+
 ## [1.268.8](https://github.com/SocialGouv/mano/compare/v1.268.7...v1.268.8) (2023-06-13)
 
 
