@@ -1,3 +1,10 @@
+# [1.269.0](https://github.com/SocialGouv/mano/compare/v1.268.9...v1.269.0) (2023-06-19)
+
+
+### Features
+
+* **dashboard:** ne pas afficher une section lorsqu'il n'y a pas de champ custo ([#1545](https://github.com/SocialGouv/mano/issues/1545)) ([6f6939a](https://github.com/SocialGouv/mano/commit/6f6939a1b411203e57de7e43d87126fcec7ebfa5))
+
 ## [1.268.9](https://github.com/SocialGouv/mano/compare/v1.268.8...v1.268.9) (2023-06-19)
 
 
