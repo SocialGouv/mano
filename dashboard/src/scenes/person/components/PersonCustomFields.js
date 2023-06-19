@@ -30,19 +30,21 @@ export default function PersonCustomFields({ person, sectionName, fields, colspa
       </div>
       {sectionName === 'Informations sociales' && !!person.description && <div className="my-4">{person.description}</div>}
       <Row>
-        {enabledFields.map((field, i) => (
-          <Col key={field.label + i} md={colspan || field.type === 'textarea' ? 12 : 4}>
-            <div className="my-2 [overflow-wrap:anywhere]">
-              <div className="tw-text-sm tw-font-semibold tw-text-gray-600">{field.label}</div>
-              <div>
-                <CustomFieldDisplay
-                  type={field.type}
-                  value={isMedicalFile ? person[field.name] || person.medicalFile?.[field.name] : person[field.name]}
-                />
+        {enabledFields.map((field, i) => {
+          return (
+            <Col key={field.label + i} md={field.type === 'textarea' ? 12 : colspan ?? 4}>
+              <div className="my-2 [overflow-wrap:anywhere]">
+                <div className="tw-text-sm tw-font-semibold tw-text-gray-600">{field.label}</div>
+                <div>
+                  <CustomFieldDisplay
+                    type={field.type}
+                    value={isMedicalFile ? person[field.name] || person.medicalFile?.[field.name] : person[field.name]}
+                  />
+                </div>
               </div>
-            </div>
-          </Col>
-        ))}
+            </Col>
+          );
+        })}
       </Row>
     </div>
   );
