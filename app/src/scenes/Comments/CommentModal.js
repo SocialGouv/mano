@@ -23,8 +23,6 @@ const CommentModal = ({ title = 'Commentaire', visible, commentDB, onClose, onUp
   const [group, setGroup] = useState(commentDB?.group || false);
   const [updating, setUpdating] = useState(false);
 
-  console.log('commentDB', commentDB);
-
   const isUpdateDisabled = useMemo(() => {
     if ((commentDB?.comment || '') !== comment) return false;
     if ((commentDB?.urgent || false) !== urgent) return false;

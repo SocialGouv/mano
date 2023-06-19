@@ -34,6 +34,7 @@ const Treatment = ({ navigation, route }) => {
   const [startDate, setStartDate] = useState(treatmentDB?.startDate || null);
   const [endDate, setEndDate] = useState(treatmentDB?.endDate || null);
   const [documents, setDocuments] = useState(treatmentDB?.documents || []);
+  const [comments, setComments] = useState(treatmentDB?.comments || []);
   const [posting, setPosting] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [writingComment, setWritingComment] = useState('');
@@ -53,7 +54,7 @@ const Treatment = ({ navigation, route }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onSaveTreatment = async (comments = null) => {
+  const onSaveTreatment = async ({ goBackOnSave = true, comments = null } = {}) => {
     if (!comments) comments = treatmentDB?.comments || [];
     if (!name) return Alert.alert('Veuillez indiquer un nom');
     // if (!dosage) return Alert.alert('Veuillez indiquer un dosage');
@@ -75,7 +76,7 @@ const Treatment = ({ navigation, route }) => {
       user: treatmentDB?.user ?? user._id,
     });
     const treatmentResponse = isNew ? await API.post({ path: '/treatment', body }) : await API.put({ path: `/treatment/${treatmentDB._id}`, body });
-    if (!treatmentResponse.ok) return;
+    if (!treatmentResponse.ok) return false;
     if (isNew) {
       setAllTreatments((all) => [...all, treatmentResponse.decryptedData].sort((a, b) => new Date(b.startDate) - new Date(a.startDate)));
     } else {
@@ -88,7 +89,9 @@ const Treatment = ({ navigation, route }) => {
           .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
       );
     }
-    onBack();
+    setPosting(false);
+    if (goBackOnSave) onBack();
+    return true;
   };
 
   const isDisabled = useMemo(() => {
@@ -235,20 +238,27 @@ const Treatment = ({ navigation, route }) => {
         <SubList
           label="Commentaires"
           key={treatmentDB?._id}
-          data={treatmentDB.comments}
+          data={comments}
           renderItem={(comment) => (
             <CommentRow
               key={comment._id}
               comment={comment}
               onDelete={async () => {
+                const newComments = comments.filter((c) => c._id !== comment._id);
+                setComments(newComments); // optimistic UI
                 // need to pass `medicalFileToSave` if we want last comment to be taken into account
                 // https://react.dev/reference/react/useState#ive-updated-the-state-but-logging-gives-me-the-old-value
-                onSaveTreatment(treatmentDB.comments.map.filter((c) => c._id !== comment._id));
+                return onSaveTreatment({ goBackOnSave: false, comments: newComments });
               }}
               onUpdate={async (commentUpdated) => {
+                const newComments = comments.map((c) => (c._id === comment._id ? commentUpdated : c));
+                setComments(newComments); // optimistic UI
                 // need to pass `medicalFileToSave` if we want last comment to be taken into account
                 // https://react.dev/reference/react/useState#ive-updated-the-state-but-logging-gives-me-the-old-value
-                onSaveTreatment(treatmentDB.comments.map((c) => (c._id === comment._id ? commentUpdated : c)));
+                return onSaveTreatment({
+                  goBackOnSave: false,
+                  comments: newComments,
+                });
               }}
             />
           )}
@@ -258,9 +268,14 @@ const Treatment = ({ navigation, route }) => {
             onFocus={() => _scrollToInput(newCommentRef)}
             onCommentWrite={setWritingComment}
             onCreate={(newComment) => {
+              const newComments = [{ ...newComment, type: 'treatment', _id: uuidv4() }, comments];
+              setComments(newComments); // optimistic UI
               // need to pass comments as parameters if we want last comment to be taken into account
               // https://react.dev/reference/react/useState#ive-updated-the-state-but-logging-gives-me-the-old-value
-              onSaveTreatment([{ ...newComment, type: 'treatment', _id: uuidv4() }, ...(treatmentDB.comments || [])]);
+              return onSaveTreatment({
+                goBackOnSave: false,
+                comments: newComments,
+              });
             }}
           />
         </SubList>

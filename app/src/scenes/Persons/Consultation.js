@@ -139,7 +139,7 @@ const Consultation = ({ navigation, route }) => {
       const consultationResponse = isNew
         ? await API.post({ path: '/consultation', body })
         : await API.put({ path: `/consultation/${consultationDB._id}`, body });
-      if (!consultationResponse.ok) return;
+      if (!consultationResponse.ok) return false;
       if (isNew) {
         setAllConsultations((all) => [...all, consultationResponse.decryptedData].sort((a, b) => new Date(b.startDate) - new Date(a.startDate)));
       } else {
@@ -164,6 +164,7 @@ const Consultation = ({ navigation, route }) => {
       } else {
         setPosting(false);
         setConsultation(castToConsultation(consultationResponse.decryptedData));
+        return true;
       }
     },
     [consultation]
@@ -369,7 +370,7 @@ const Consultation = ({ navigation, route }) => {
                   setConsultation(consultationToSave); // optimistic UI
                   // need to pass `consultationToSave` if we want last comment to be taken into account
                   // https://react.dev/reference/react/useState#ive-updated-the-state-but-logging-gives-me-the-old-value
-                  onSaveConsultationRequest({ goBackOnSave: false, consultationToSave });
+                  return onSaveConsultationRequest({ goBackOnSave: false, consultationToSave });
                 }}
                 onUpdate={async (commentUpdated) => {
                   const consultationToSave = {
@@ -379,7 +380,7 @@ const Consultation = ({ navigation, route }) => {
                   setConsultation(consultationToSave); // optimistic UI
                   // need to pass `consultationToSave` if we want last comment to be taken into account
                   // https://react.dev/reference/react/useState#ive-updated-the-state-but-logging-gives-me-the-old-value
-                  onSaveConsultationRequest({ goBackOnSave: false, consultationToSave });
+                  return onSaveConsultationRequest({ goBackOnSave: false, consultationToSave });
                 }}
               />
             )}

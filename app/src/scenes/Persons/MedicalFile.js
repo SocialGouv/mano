@@ -191,7 +191,9 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
       })
     );
     setMedicalFile(response.decryptedData);
-    await onUpdatePerson();
+    const personResponse = await onUpdatePerson();
+    if (!personResponse.ok) return false;
+    return true;
   };
 
   const onGoToConsultation = (consultationDB) => navigation.navigate('Consultation', { personDB, consultationDB });
@@ -314,26 +316,44 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
           <CommentRow
             key={comment._id}
             comment={comment}
-            onDelete={async () => {
-              const medicalFileToSave = {
-                ...medicalFile,
-                comments: medicalFile.comments.filter((c) => c._id !== comment._id),
-              };
-              setMedicalFile(medicalFileToSave); // optimistic UI
-              // need to pass `medicalFileToSave` if we want last comment to be taken into account
-              // https://react.dev/reference/react/useState#ive-updated-the-state-but-logging-gives-me-the-old-value
-              onUpdateRequest({ goBackOnSave: false, medicalFileToSave });
-            }}
-            onUpdate={async (commentUpdated) => {
-              const medicalFileToSave = {
-                ...medicalFile,
-                comments: medicalFile.comments.map((c) => (c._id === comment._id ? commentUpdated : c)),
-              };
-              setMedicalFile(medicalFileToSave); // optimistic UI
-              // need to pass `medicalFileToSave` if we want last comment to be taken into account
-              // https://react.dev/reference/react/useState#ive-updated-the-state-but-logging-gives-me-the-old-value
-              onUpdateRequest({ goBackOnSave: false, medicalFileToSave });
-            }}
+            itemName={
+              ['consultation', 'treatment'].includes(comment.type) ? `${comment.type === 'consultation' ? 'Consultation' : 'Traitement'}` : null
+            }
+            onItemNamePress={
+              ['consultation', 'treatment'].includes(comment.type)
+                ? () => (comment.type === 'consultation' ? onGoToConsultation(comment.consultation) : onGoToTreatment(comment.treatment))
+                : null
+            }
+            onDelete={
+              comment.type === 'medical-file'
+                ? async () => {
+                    const medicalFileToSave = {
+                      ...medicalFile,
+                      comments: medicalFile.comments.filter((c) => c._id !== comment._id),
+                    };
+                    setMedicalFile(medicalFileToSave); // optimistic UI
+                    // need to pass `medicalFileToSave` if we want last comment to be taken into account
+                    // https://react.dev/reference/react/useState#ive-updated-the-state-but-logging-gives-me-the-old-value
+                    const success = await onUpdateRequest(medicalFileToSave);
+                    return success;
+                  }
+                : null
+            }
+            onUpdate={
+              comment.type === 'medical-file'
+                ? async (commentUpdated) => {
+                    const medicalFileToSave = {
+                      ...medicalFile,
+                      comments: medicalFile.comments.map((c) => (c._id === comment._id ? commentUpdated : c)),
+                    };
+                    setMedicalFile(medicalFileToSave); // optimistic UI
+                    // need to pass `medicalFileToSave` if we want last comment to be taken into account
+                    // https://react.dev/reference/react/useState#ive-updated-the-state-but-logging-gives-me-the-old-value
+                    const success = await onUpdateRequest(medicalFileToSave);
+                    return success;
+                  }
+                : null
+            }
           />
         )}
         ifEmpty="Pas encore de commentaire">

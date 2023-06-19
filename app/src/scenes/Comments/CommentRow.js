@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 import { Alert } from 'react-native';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { organisationState } from '../../recoil/auth';
-import API from '../../services/api';
-import { commentsState } from '../../recoil/comments';
 import BubbleRow from '../../components/BubbleRow';
 import CommentModal from './CommentModal';
 
@@ -19,11 +17,11 @@ const CommentRow = ({
   canToggleGroupCheck,
 }) => {
   const organisation = useRecoilValue(organisationState);
-  const setComments = useSetRecoilState(commentsState);
   const [updateModalVisible, setUpdateModalVisible] = useState(false);
 
   const onMorePress = async () => {
-    const options = ['Supprimer', 'Annuler'];
+    const options = ['Annuler'];
+    if (onDelete) options.unshift('Supprimer');
     if (onUpdate) options.unshift('Modifier');
     showActionSheetWithOptions(
       {
@@ -52,11 +50,10 @@ const CommentRow = ({
     ]);
   };
 
-  // console.log('comment', comment);
   return (
     <>
       <BubbleRow
-        onMorePress={onMorePress}
+        onMorePress={onDelete || onUpdate ? onMorePress : null}
         caption={comment.comment}
         date={comment.date || comment.createdAt}
         user={comment.user}
