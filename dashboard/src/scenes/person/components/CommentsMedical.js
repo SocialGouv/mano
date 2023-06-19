@@ -1,35 +1,18 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { toast } from 'react-toastify';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import React, { useMemo, useState } from 'react';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import ConsultationModal from '../../../components/ConsultationModal';
-import { organisationState, usersState, userState } from '../../../recoil/auth';
-import { consultationsState, prepareConsultationForEncryption } from '../../../recoil/consultations';
-import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../../recoil/medicalFiles';
+import { medicalFileState } from '../../../recoil/medicalFiles';
 import { arrayOfitemsGroupedByConsultationSelector } from '../../../recoil/selectors';
-import { prepareTreatmentForEncryption, treatmentsState } from '../../../recoil/treatments';
-import API from '../../../services/api';
-import { formatDateTimeWithNameOfDay } from '../../../services/date';
-import { capture } from '../../../services/sentry';
-import DocumentModal from './PersonDocumentModal';
+import { treatmentsState } from '../../../recoil/treatments';
 import TreatmentModal from './TreatmentModal';
 import { CommentsModule } from '../../../components/CommentsGeneric';
 
 const CommentsMedical = ({ person }) => {
-  const [documentToEdit, setDocumentToEdit] = useState(null);
-
-  const user = useRecoilValue(userState);
-  const [resetFileInputKey, setResetFileInputKey] = useState(0); // to be able to use file input multiple times
-  const users = useRecoilValue(usersState);
-  const organisation = useRecoilValue(organisationState);
-
   const allConsultations = useRecoilValue(arrayOfitemsGroupedByConsultationSelector);
-  const setAllConsultations = useSetRecoilState(consultationsState);
-  const [allTreatments, setAllTreatments] = useRecoilState(treatmentsState);
+  const allTreatments = useRecoilValue(treatmentsState);
   const [allMedicalFiles, setAllMedicalFiles] = useRecoilState(medicalFileState);
   const [consultation, setConsultation] = useState(false);
   const [treatment, setTreatment] = useState(false);
-
-  const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
 
   const personConsultations = useMemo(() => (allConsultations || []).filter((c) => c.person === person._id), [allConsultations, person._id]);
 
@@ -48,8 +31,10 @@ const CommentsMedical = ({ person }) => {
         ?.map((consultation) => consultation.comments?.map((doc) => ({ ...doc, type: 'consultation', consultation })))
         .filter(Boolean)
         .flat() || [];
-    const otherDocs = medicalFile?.comments || [];
-    return [...treatmentsComments, ...consultationsComments, ...otherDocs].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    const otherComments = medicalFile?.comments || [];
+    return [...treatmentsComments, ...consultationsComments, ...otherComments].sort(
+      (a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt)
+    );
   }, [personConsultations, medicalFile?.comments, treatments]);
 
   const comments = allMedicalComments;
@@ -76,23 +61,31 @@ const CommentsMedical = ({ person }) => {
       )}
       <CommentsModule
         comments={comments}
+        typeForNewComment="medical-file"
+        color="blue-900"
         showPanel
         onDeleteComment={(comment) => {
-          handleChange({
-            currentTarget: {
-              value: values.comments.filter((c) => c._id !== comment._id),
-              name: 'comments',
-            },
+          setAllMedicalFiles((medicalFiles) => {
+            return medicalFiles.map((_medicalFile) => {
+              if (_medicalFile._id !== medicalFile._id) return _medicalFile;
+              return {
+                ..._medicalFile,
+                comments: _medicalFile.comments.filter((c) => c._id !== comment._id),
+              };
+            });
           });
         }}
         onSubmitComment={(comment, isNewComment) => {
-          handleChange({
-            currentTarget: {
-              value: isNewComment
-                ? [...values.comments, { ...comment, _id: uuidv4() }]
-                : values.comments.map((c) => (c._id === comment._id ? comment : c)),
-              name: 'comments',
-            },
+          setAllMedicalFiles((medicalFiles) => {
+            return medicalFiles.map((_medicalFile) => {
+              if (_medicalFile._id !== medicalFile._id) return _medicalFile;
+              return {
+                ..._medicalFile,
+                comments: isNewComment
+                  ? [...(_medicalFile.comments || []), comment]
+                  : _medicalFile.comments.map((c) => (c._id === comment._id ? comment : c)),
+              };
+            });
           });
         }}
       />

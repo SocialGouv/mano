@@ -351,8 +351,9 @@ export default function ConsultationModal({ onClose, personId, consultation, dat
             className={['tw-flex tw-min-h-screen tw-w-full tw-flex-col tw-gap-4 tw-px-8', activeTab !== 'Commentaires' ? 'tw-hidden' : ''].join(' ')}>
             <CommentsModule
               comments={data.comments}
-              type="consultation"
+              typeForNewComment="consultation"
               onDeleteComment={(comment) => {
+                console.log('delete comment', comment);
                 setData({ ...data, comments: data.comments.filter((c) => c._id !== comment._id) });
               }}
               onSubmitComment={(comment, isNewComment) => {

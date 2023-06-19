@@ -13,6 +13,7 @@ import { useEffect, useMemo } from 'react';
 import PersonDocumentsMedical from './PersonDocumentsMedical';
 import { MedicalFilePrint } from './MedicalFilePrint';
 import API from '../../../services/api';
+import CommentsMedical from './CommentsMedical';
 
 export default function MedicalFile({ person }) {
   const user = useRecoilValue(userState);
@@ -56,7 +57,7 @@ export default function MedicalFile({ person }) {
           <Consultations person={person} />
         </div>
         <div className="tw-col-span-4 tw-h-0 tw-min-h-full tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
-          <PersonDocumentsMedical person={person} />
+          {['restricted-access'].includes(user.role) ? <PersonDocumentsMedical person={person} /> : <CommentsMedical person={person} />}
         </div>
       </div>
       {!['restricted-access'].includes(user.role) && (
@@ -68,12 +69,22 @@ export default function MedicalFile({ person }) {
                 key={'Dossier Médical'}
                 person={person}
                 sectionName={'Dossier Médical'}
-                fields={customFieldsMedicalFileWithLegacyFields}
+                fields={[
+                  ...customFieldsMedicalFileWithLegacyFields,
+                  ...customFieldsMedicalFileWithLegacyFields,
+                  ...customFieldsMedicalFileWithLegacyFields,
+                  ...customFieldsMedicalFileWithLegacyFields,
+                ]}
                 colspan={6}
               />
             </div>
-            <div className="tw-col-span-6 tw-h-0 tw-min-h-full tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
-              <Treatments person={person} />
+            <div className="tw-col-span-6 tw-flex tw-h-0 tw-min-h-full tw-flex-col tw-gap-4 tw-overflow-auto">
+              <div className="tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+                <Treatments person={person} />
+              </div>
+              <div className="tw-h-1/2 tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+                <PersonDocumentsMedical person={person} />
+              </div>
             </div>
           </div>
           <div className="noprint tw-mt-4 tw-flex tw-justify-end tw-gap-2">

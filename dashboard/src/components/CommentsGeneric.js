@@ -12,6 +12,7 @@ import { FullScreenIcon } from '../scenes/person/components/FullScreenIcon';
 import DatePicker from './DatePicker';
 import { outOfBoundariesDate } from '../services/date';
 import AutoResizeTextarea from './AutoresizeTextArea';
+import { capture } from '../services/sentry';
 
 /*
 3 components:
@@ -27,17 +28,19 @@ import AutoResizeTextarea from './AutoresizeTextArea';
  * @param {Object} props
  * @param {Array} props.comments
  * @param {String} props.title
+ * @param {String} props.typeForNewComment (person|action|passage|rencontre|medical-file|consultation|treatment)
  * @param {Boolean} props.showPanel
  * @param {Boolean} props.canToggleGroupCheck
  * @param {Boolean} props.canToggleUrgentCheck
  * @param {Function} props.onDeleteComment
  * @param {Function} props.onSubmitComment
+ * @param {String} props.color (main|blue-900)
  */
 
 export function CommentsModule({
   comments = [],
   title = 'Commentaires',
-  type, // 'person' | 'action' | 'passage' | 'rencontre' | 'medicalfile' | 'consultation' | 'treatment'
+  typeForNewComment, // person|action|passage|rencontre|medical-file|consultation|treatment
   person = null,
   action = null,
   showPanel = false,
@@ -45,7 +48,9 @@ export function CommentsModule({
   canToggleUrgentCheck = false,
   onDeleteComment,
   onSubmitComment,
+  color = 'main', // main|blue-900
 }) {
+  if (!typeForNewComment) throw new Error('typeForNewComment is required');
   if (!onDeleteComment) throw new Error('onDeleteComment is required');
   if (!onSubmitComment) throw new Error('onSubmitComment is required');
   const [modalCreateOpen, setModalCreateOpen] = useState(false);
@@ -61,21 +66,29 @@ export function CommentsModule({
             <div className="flex-col tw-flex tw-items-center tw-gap-2">
               <button
                 aria-label="Ajouter un commentaire"
-                className="tw-text-md tw-h-8 tw-w-8 tw-rounded-full tw-bg-main tw-font-bold tw-text-white tw-transition hover:tw-scale-125"
+                className={`tw-text-md tw-h-8 tw-w-8 tw-rounded-full tw-bg-${color} tw-font-bold tw-text-white tw-transition hover:tw-scale-125`}
                 onClick={() => setModalCreateOpen(true)}>
                 ＋
               </button>
               {Boolean(comments.length) && (
-                <button className="tw-h-6 tw-w-6 tw-rounded-full tw-text-main tw-transition hover:tw-scale-125" onClick={() => setFullScreen(true)}>
+                <button
+                  className={`tw-h-6 tw-w-6 tw-rounded-full tw-text-${color} tw-transition hover:tw-scale-125`}
+                  onClick={() => setFullScreen(true)}>
                   <FullScreenIcon />
                 </button>
               )}
             </div>
           </div>
-          <CommentsTable comments={comments} onEditComment={setCommentToEdit} onAddComment={() => setModalCreateOpen(true)} />
+          <CommentsTable comments={comments} color={color} onEditComment={setCommentToEdit} onAddComment={() => setModalCreateOpen(true)} />
         </div>
       ) : (
-        <CommentsTable showAddCommentButton comments={comments} onEditComment={setCommentToEdit} onAddComment={() => setModalCreateOpen(true)} />
+        <CommentsTable
+          showAddCommentButton
+          comments={comments}
+          color={color}
+          onEditComment={setCommentToEdit}
+          onAddComment={() => setModalCreateOpen(true)}
+        />
       )}
       {!!modalCreateOpen && (
         <CommentModal
@@ -83,9 +96,9 @@ export function CommentsModule({
           onClose={() => setModalCreateOpen(false)}
           onDelete={onDeleteComment}
           onSubmit={onSubmitComment}
+          typeForNewComment={typeForNewComment}
           canToggleGroupCheck={canToggleGroupCheck}
           canToggleUrgentCheck={canToggleUrgentCheck}
-          type={type}
           person={person}
           action={action}
         />
@@ -97,9 +110,9 @@ export function CommentsModule({
           onClose={() => setCommentToEdit(null)}
           onDelete={onDeleteComment}
           onSubmit={onSubmitComment}
+          typeForNewComment={typeForNewComment}
           canToggleGroupCheck={canToggleGroupCheck}
           canToggleUrgentCheck={canToggleUrgentCheck}
-          type={type}
           person={person}
           action={action}
         />
@@ -111,12 +124,13 @@ export function CommentsModule({
         onAddComment={() => setModalCreateOpen(true)}
         onClose={() => setFullScreen(false)}
         title={title}
+        color={color}
       />
     </>
   );
 }
 
-export function CommentsFullScreen({ open, comments, onClose, title, onEditComment, onAddComment }) {
+export function CommentsFullScreen({ open, comments, onClose, title, color, onEditComment, onAddComment }) {
   return (
     <ModalContainer open={open} size="full" onClose={onClose}>
       <ModalHeader title={title} />
@@ -127,7 +141,7 @@ export function CommentsFullScreen({ open, comments, onClose, title, onEditComme
         <button type="button" name="cancel" className="button-cancel" onClick={onClose}>
           Fermer
         </button>
-        <button type="button" className="button-submit" onClick={onAddComment}>
+        <button type="button" className={`button-submit !tw-bg-${color}`} onClick={onAddComment}>
           ＋ Ajouter un commentaire
         </button>
       </ModalFooter>
@@ -135,7 +149,7 @@ export function CommentsFullScreen({ open, comments, onClose, title, onEditComme
   );
 }
 
-export function CommentsTable({ comments, onEditComment, onAddComment, showAddCommentButton }) {
+export function CommentsTable({ comments, onEditComment, onAddComment, color, showAddCommentButton }) {
   const users = useRecoilValue(usersState);
   const organisation = useRecoilValue(organisationState);
 
@@ -162,7 +176,7 @@ export function CommentsTable({ comments, onEditComment, onAddComment, showAddCo
           </svg>
           Aucun commentaire pour le moment
         </div>
-        <button type="button" className="button-submit" onClick={onAddComment}>
+        <button type="button" className={`button-submit !tw-bg-${color}`} onClick={onAddComment}>
           ＋ Ajouter un commentaire
         </button>
       </div>
@@ -171,17 +185,25 @@ export function CommentsTable({ comments, onEditComment, onAddComment, showAddCo
 
   return (
     <>
-      <div className="tw-my-1.5 tw-flex tw-justify-center">
-        <button type="button" className="button-submit" onClick={onAddComment}>
-          ＋ Ajouter un commentaire
-        </button>
-      </div>
+      {showAddCommentButton && (
+        <div className="tw-my-1.5 tw-flex tw-justify-center">
+          <button type="button" className={`button-submit !tw-bg-${color}`} onClick={onAddComment}>
+            ＋ Ajouter un commentaire
+          </button>
+        </div>
+      )}
       <table className="table table-striped">
         <tbody className="small">
           {(comments || []).map((comment) => {
             if (!comment.type) throw new Error('type is required');
-            if (comment.type === 'person' && !comment.person) throw new Error('person is required');
-            if (comment.type === 'action' && !comment.action) throw new Error('action is required');
+            if (comment.type === 'person' && !comment.person) {
+              capture(new Error('person is required'), { extra: { comment } });
+              return null;
+            }
+            if (comment.type === 'action' && !comment.action) {
+              capture(new Error('action is required'), { extra: { comment } });
+              return null;
+            }
             return (
               <tr key={comment._id}>
                 <td
@@ -209,7 +231,7 @@ export function CommentsTable({ comments, onEditComment, onAddComment, showAddCo
                       <div className="small">Créé par {users.find((e) => e._id === comment.user)?.name}</div>
                     </div>
                     <div className="tw-flex tw-gap-2">
-                      {comment.type && (
+                      {['treatment', 'consultation', 'action', 'passage', 'rencontre'].includes(comment.type) && (
                         <div>
                           <div className="tw-rounded tw-border tw-border-blue-900 tw-bg-blue-900/10 tw-px-1">
                             {comment.type === 'treatment' && 'Traitement'}
@@ -235,7 +257,18 @@ export function CommentsTable({ comments, onEditComment, onAddComment, showAddCo
   );
 }
 
-function CommentModal({ comment = {}, isNewComment, onClose, onDelete, onSubmit, canToggleGroupCheck, canToggleUrgentCheck, type, action, person }) {
+function CommentModal({
+  comment = {},
+  isNewComment,
+  onClose,
+  onDelete,
+  onSubmit,
+  canToggleGroupCheck,
+  canToggleUrgentCheck,
+  typeForNewComment,
+  action,
+  person,
+}) {
   const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
   const currentTeam = useRecoilValue(currentTeamState);
@@ -267,12 +300,14 @@ function CommentModal({ comment = {}, isNewComment, onClose, onDelete, onSubmit,
               date: body.date || new Date(),
               team: body.team || currentTeam._id,
               organisation: organisation._id,
+              type: comment.type ?? typeForNewComment,
             };
 
             if (comment._id) commentBody._id = comment._id;
             if (action) commentBody.action = action;
             if (person) commentBody.person = person;
-            if (type) commentBody.type = type;
+            if (commentBody.type === 'action' && !action) throw new Error('action is required');
+            if (commentBody.type === 'person' && !person) throw new Error('person is required');
 
             await onSubmit(commentBody, isNewComment);
 
@@ -380,7 +415,7 @@ function CommentModal({ comment = {}, isNewComment, onClose, onDelete, onSubmit,
                     onClick={async () => {
                       if (!window.confirm('Voulez-vous vraiment supprimer ce commentaire ?')) return;
                       window.sessionStorage.removeItem('currentComment');
-                      await onDelete();
+                      await onDelete(comment);
                       onClose();
                     }}>
                     Supprimer

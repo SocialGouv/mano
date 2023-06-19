@@ -224,7 +224,7 @@ export default function TreatmentModal({ onClose, isNewTreatment, treatment, per
                 )}>
                 <CommentsModule
                   comments={values.comments}
-                  type="treatment"
+                  typeForNewComment="treatment"
                   onDeleteComment={(comment) => {
                     handleChange({
                       currentTarget: {
