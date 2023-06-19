@@ -524,7 +524,22 @@ const Action = ({ navigation, route }) => {
               forwardRef={newCommentRef}
               onFocus={() => _scrollToInput(newCommentRef)}
               action={actionDB?._id}
+              canToggleGroupCheckProp
               onCommentWrite={setWritingComment}
+              onCreate={async (newComment) => {
+                const body = {
+                  ...newComment,
+                  action: actionDB?._id,
+                };
+                const response = await API.post({ path: '/comment', body: prepareCommentForEncryption(body) });
+                if (!response.ok) {
+                  Alert.alert(response.error || response.code);
+                  return;
+                }
+
+                setComments((comments) => [response.decryptedData, ...comments]);
+                await createReportAtDateIfNotExist(response.decryptedData.date);
+              }}
             />
           )}
         </SubList>

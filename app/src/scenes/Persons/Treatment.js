@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, Keyboard, View } from 'react-native';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { v4 as uuidv4 } from 'uuid';
 import ScrollContainer from '../../components/ScrollContainer';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
@@ -15,6 +16,9 @@ import Label from '../../components/Label';
 import ButtonDelete from '../../components/ButtonDelete';
 import ButtonsContainer from '../../components/ButtonsContainer';
 import { userState } from '../../recoil/auth';
+import SubList from '../../components/SubList';
+import CommentRow from '../Comments/CommentRow';
+import NewCommentInput from '../Comments/NewCommentInput';
 
 const Treatment = ({ navigation, route }) => {
   const setAllTreatments = useSetRecoilState(treatmentsState);
@@ -32,6 +36,7 @@ const Treatment = ({ navigation, route }) => {
   const [documents, setDocuments] = useState(treatmentDB?.documents || []);
   const [posting, setPosting] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [writingComment, setWritingComment] = useState('');
 
   const backRequestHandledRef = useRef(null);
   const handleBeforeRemove = (e) => {
@@ -48,7 +53,8 @@ const Treatment = ({ navigation, route }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onSaveTreatment = async () => {
+  const onSaveTreatment = async (comments = null) => {
+    if (!comments) comments = treatmentDB?.comments || [];
     if (!name) return Alert.alert('Veuillez indiquer un nom');
     // if (!dosage) return Alert.alert('Veuillez indiquer un dosage');
     // if (!frequency) return Alert.alert('Veuillez indiquer une fréquence');
@@ -65,6 +71,7 @@ const Treatment = ({ navigation, route }) => {
       endDate,
       person: personDB._id,
       documents,
+      comments,
       user: treatmentDB?.user ?? user._id,
     });
     const treatmentResponse = isNew ? await API.post({ path: '/treatment', body }) : await API.put({ path: `/treatment/${treatmentDB._id}`, body });
@@ -102,7 +109,28 @@ const Treatment = ({ navigation, route }) => {
     setTimeout(() => setPosting(false), 250);
   };
 
-  const onGoBackRequested = () => {
+  const onGoBackRequested = async () => {
+    if (writingComment.length) {
+      const goToNextStep = await new Promise((res) =>
+        Alert.alert("Vous êtes en train d'écrire un commentaire, n'oubliez pas de cliquer sur créer !", null, [
+          {
+            text: "Oui c'est vrai !",
+            onPress: () => res(false),
+          },
+          {
+            text: 'Ne pas enregistrer ce commentaire',
+            onPress: () => res(true),
+            style: 'destructive',
+          },
+          {
+            text: 'Annuler',
+            onPress: () => res(false),
+            style: 'cancel',
+          },
+        ])
+      );
+      if (!goToNextStep) return;
+    }
     if (isDisabled) return onBack();
     Alert.alert('Voulez-vous enregistrer ce traitement ?', null, [
       {
@@ -149,7 +177,21 @@ const Treatment = ({ navigation, route }) => {
     Alert.alert('Traitement supprimé !');
     onBack();
   };
-
+  const scrollViewRef = useRef(null);
+  const newCommentRef = useRef(null);
+  const _scrollToInput = (ref) => {
+    if (!ref.current) return;
+    if (!scrollViewRef.current) return;
+    setTimeout(() => {
+      ref.current.measureLayout(
+        scrollViewRef.current,
+        (x, y, width, height) => {
+          scrollViewRef.current.scrollTo({ y: y - 100, animated: true });
+        },
+        (error) => console.log('error scrolling', error)
+      );
+    }, 250);
+  };
   return (
     <SceneContainer testID="new-treatment-form">
       <ScreenTitle
@@ -157,7 +199,7 @@ const Treatment = ({ navigation, route }) => {
         onBack={onGoBackRequested}
         testID="new-treatment"
       />
-      <ScrollContainer keyboardShouldPersistTaps="handled">
+      <ScrollContainer ref={scrollViewRef} keyboardShouldPersistTaps="handled">
         <View>
           <InputLabelled label="Nom" value={name} onChangeText={setName} placeholder="Amoxicilline" testID="new-treatment-name" />
           <InputLabelled label="Dosage" value={dosage} onChangeText={setDosage} placeholder="1mg" testID="new-treatment-dosage" />
@@ -190,6 +232,38 @@ const Treatment = ({ navigation, route }) => {
             />
           </ButtonsContainer>
         </View>
+        <SubList
+          label="Commentaires"
+          key={treatmentDB?._id}
+          data={treatmentDB.comments}
+          renderItem={(comment) => (
+            <CommentRow
+              key={comment._id}
+              comment={comment}
+              onUpdate={
+                comment.team
+                  ? () =>
+                      navigation.push('ActionComment', {
+                        ...comment,
+                        commentTitle: name || 'Traitement',
+                        fromRoute: 'Treatment',
+                      })
+                  : null
+              }
+            />
+          )}
+          ifEmpty="Pas encore de commentaire">
+          <NewCommentInput
+            forwardRef={newCommentRef}
+            onFocus={() => _scrollToInput(newCommentRef)}
+            onCommentWrite={setWritingComment}
+            onCreate={(newComment) => {
+              // need to pass comments as parameters if we want last comment to be taken into account
+              // https://react.dev/reference/react/useState#ive-updated-the-state-but-logging-gives-me-the-old-value
+              onSaveTreatment([{ ...newComment, type: 'treatment', _id: uuidv4() }, ...(treatmentDB.comments || [])]);
+            }}
+          />
+        </SubList>
       </ScrollContainer>
     </SceneContainer>
   );

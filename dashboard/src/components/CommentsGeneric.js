@@ -101,6 +101,7 @@ export function CommentsModule({
           canToggleUrgentCheck={canToggleUrgentCheck}
           person={person}
           action={action}
+          color={color}
         />
       )}
       {!!commentToEdit && (
@@ -115,6 +116,7 @@ export function CommentsModule({
           canToggleUrgentCheck={canToggleUrgentCheck}
           person={person}
           action={action}
+          color={color}
         />
       )}
       <CommentsFullScreen
@@ -194,7 +196,7 @@ export function CommentsTable({ comments, onEditComment, onAddComment, color, sh
       )}
       <table className="table table-striped">
         <tbody className="small">
-          {(comments || []).map((comment) => {
+          {(comments || []).map((comment, i) => {
             if (!comment.type) throw new Error('type is required');
             if (comment.type === 'person' && !comment.person) {
               capture(new Error('person is required'), { extra: { comment } });
@@ -230,7 +232,7 @@ export function CommentsTable({ comments, onEditComment, onAddComment, color, sh
                       </div>
                       <div className="small">Créé par {users.find((e) => e._id === comment.user)?.name}</div>
                     </div>
-                    <div className="tw-flex tw-gap-2">
+                    <div className="tw-flex tw-items-center tw-gap-2">
                       {['treatment', 'consultation', 'action', 'passage', 'rencontre'].includes(comment.type) && (
                         <div>
                           <div className="tw-rounded tw-border tw-border-blue-900 tw-bg-blue-900/10 tw-px-1">
@@ -268,6 +270,7 @@ function CommentModal({
   typeForNewComment,
   action,
   person,
+  color,
 }) {
   const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
@@ -421,7 +424,7 @@ function CommentModal({
                     Supprimer
                   </button>
                 )}
-                <button type="submit" onClick={handleSubmit} className="button-submit" disabled={isSubmitting}>
+                <button type="submit" onClick={handleSubmit} className={`button-submit !tw-bg-${color}`} disabled={isSubmitting}>
                   Enregistrer
                 </button>
               </ModalFooter>

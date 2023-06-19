@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, Keyboard, View } from 'react-native';
 import { useRecoilValue, useRecoilState } from 'recoil';
 import { useFocusEffect } from '@react-navigation/native';
+import { v4 as uuidv4 } from 'uuid';
 import ScrollContainer from '../../components/ScrollContainer';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
@@ -24,6 +25,9 @@ import ButtonDelete from '../../components/ButtonDelete';
 import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
 import { dayjsInstance } from '../../services/dateDayjs';
 import InputFromSearchList from '../../components/InputFromSearchList';
+import CommentRow from '../Comments/CommentRow';
+import SubList from '../../components/SubList';
+import NewCommentInput from '../Comments/NewCommentInput';
 
 const cleanValue = (value) => {
   if (typeof value === 'string') return (value || '').trim();
@@ -36,6 +40,7 @@ const Consultation = ({ navigation, route }) => {
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
   const person = route?.params?.personDB || route?.params?.person;
+
   const consultationDB = useMemo(() => {
     if (route?.params?.consultationDB?._id) {
       return allConsultations.find((c) => c._id === route?.params?.consultationDB?._id);
@@ -48,6 +53,7 @@ const Consultation = ({ navigation, route }) => {
 
   const isNew = !consultationDB?._id;
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
+  const [writingComment, setWritingComment] = useState('');
 
   const castToConsultation = useCallback(
     (consult = {}) => {
@@ -115,49 +121,53 @@ const Consultation = ({ navigation, route }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editable, consultation.status, consultation.onlyVisibleBy]);
 
-  const onSaveConsultationRequest = async ({ goBackOnSave = true } = {}) => {
-    if (!consultation.status) return Alert.alert('Veuillez indiquer un status');
-    if (!consultation.dueAt) return Alert.alert('Veuillez indiquer une date');
-    if (!consultation.type) return Alert.alert('Veuillez indiquer un type');
-    if (!consultation.person) return Alert.alert('Veuillez ajouter une personne');
-    Keyboard.dismiss();
-    setPosting(true);
-    if ([DONE, CANCEL].includes(consultation.status)) {
-      if (!consultation.completedAt) consultation.completedAt = new Date();
-    } else {
-      consultation.completedAt = null;
-    }
-    const body = prepareConsultationForEncryption(organisation.consultations)({ ...consultation, _id: consultationDB?._id });
-    const consultationResponse = isNew
-      ? await API.post({ path: '/consultation', body })
-      : await API.put({ path: `/consultation/${consultationDB._id}`, body });
-    if (!consultationResponse.ok) return;
-    if (isNew) {
-      setAllConsultations((all) => [...all, consultationResponse.decryptedData].sort((a, b) => new Date(b.startDate) - new Date(a.startDate)));
-    } else {
-      setAllConsultations((all) =>
-        all
-          .map((c) => {
-            if (c._id === consultationDB._id) return consultationResponse.decryptedData;
-            return c;
-          })
-          .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
-      );
-    }
-    const { createdAt, completedAt } = consultationResponse.decryptedData;
-    await createReportAtDateIfNotExist(createdAt);
-    if (!!completedAt) {
-      if (dayjsInstance(completedAt).format('YYYY-MM-DD') !== dayjsInstance(createdAt).format('YYYY-MM-DD')) {
-        await createReportAtDateIfNotExist(completedAt);
+  const onSaveConsultationRequest = useCallback(
+    async ({ goBackOnSave = true, consultationToSave = null } = {}) => {
+      if (!consultationToSave) consultationToSave = consultation;
+      if (!consultationToSave.status) return Alert.alert('Veuillez indiquer un status');
+      if (!consultationToSave.dueAt) return Alert.alert('Veuillez indiquer une date');
+      if (!consultationToSave.type) return Alert.alert('Veuillez indiquer un type');
+      if (!consultationToSave.person) return Alert.alert('Veuillez ajouter une personne');
+      Keyboard.dismiss();
+      setPosting(true);
+      if ([DONE, CANCEL].includes(consultationToSave.status)) {
+        if (!consultationToSave.completedAt) consultationToSave.completedAt = new Date();
+      } else {
+        consultationToSave.completedAt = null;
       }
-    }
-    if (goBackOnSave) {
-      onBack();
-    } else {
-      setPosting(false);
-      setConsultation(castToConsultation(consultationResponse.decryptedData));
-    }
-  };
+      const body = prepareConsultationForEncryption(organisation.consultations)({ ...consultationToSave, _id: consultationDB?._id });
+      const consultationResponse = isNew
+        ? await API.post({ path: '/consultation', body })
+        : await API.put({ path: `/consultation/${consultationDB._id}`, body });
+      if (!consultationResponse.ok) return;
+      if (isNew) {
+        setAllConsultations((all) => [...all, consultationResponse.decryptedData].sort((a, b) => new Date(b.startDate) - new Date(a.startDate)));
+      } else {
+        setAllConsultations((all) =>
+          all
+            .map((c) => {
+              if (c._id === consultationDB._id) return consultationResponse.decryptedData;
+              return c;
+            })
+            .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
+        );
+      }
+      const { createdAt, completedAt } = consultationResponse.decryptedData;
+      await createReportAtDateIfNotExist(createdAt);
+      if (!!completedAt) {
+        if (dayjsInstance(completedAt).format('YYYY-MM-DD') !== dayjsInstance(createdAt).format('YYYY-MM-DD')) {
+          await createReportAtDateIfNotExist(completedAt);
+        }
+      }
+      if (goBackOnSave) {
+        onBack();
+      } else {
+        setPosting(false);
+        setConsultation(castToConsultation(consultationResponse.decryptedData));
+      }
+    },
+    [consultation]
+  );
 
   const onDeleteRequest = () => {
     Alert.alert('Voulez-vous vraiment supprimer cette consultation ?', 'Cette opération est irréversible.', [
@@ -197,7 +207,28 @@ const Consultation = ({ navigation, route }) => {
     setTimeout(() => setDeleting(false), 250);
   };
 
-  const onGoBackRequested = () => {
+  const onGoBackRequested = async () => {
+    if (writingComment.length) {
+      const goToNextStep = await new Promise((res) =>
+        Alert.alert("Vous êtes en train d'écrire un commentaire, n'oubliez pas de cliquer sur créer !", null, [
+          {
+            text: "Oui c'est vrai !",
+            onPress: () => res(false),
+          },
+          {
+            text: 'Ne pas enregistrer ce commentaire',
+            onPress: () => res(true),
+            style: 'destructive',
+          },
+          {
+            text: 'Annuler',
+            onPress: () => res(false),
+            style: 'cancel',
+          },
+        ])
+      );
+      if (!goToNextStep) return;
+    }
     if (isDisabled) return onBack();
     Alert.alert('Voulez-vous enregistrer cette consultation ?', null, [
       {
@@ -220,6 +251,21 @@ const Consultation = ({ navigation, route }) => {
 
   const onSearchPerson = () => navigation.push('PersonsSearch', { fromRoute: 'Consultation' });
 
+  const scrollViewRef = useRef(null);
+  const newCommentRef = useRef(null);
+  const _scrollToInput = (ref) => {
+    if (!ref.current) return;
+    if (!scrollViewRef.current) return;
+    setTimeout(() => {
+      ref.current.measureLayout(
+        scrollViewRef.current,
+        (x, y, width, height) => {
+          scrollViewRef.current.scrollTo({ y: y - 100, animated: true });
+        },
+        (error) => console.log('error scrolling', error)
+      );
+    }, 250);
+  };
   return (
     <SceneContainer testID="consultation-form">
       <ScreenTitle
@@ -232,7 +278,7 @@ const Consultation = ({ navigation, route }) => {
         saving={posting}
         testID="consultation"
       />
-      <ScrollContainer keyboardShouldPersistTaps="handled">
+      <ScrollContainer ref={scrollViewRef} keyboardShouldPersistTaps="handled">
         <View>
           {!!isNew && !route?.params?.personDB && (
             <InputFromSearchList label="Personne concernée" value={person?.name || '-- Aucune --'} onSearchRequest={onSearchPerson} />
@@ -307,6 +353,43 @@ const Consultation = ({ navigation, route }) => {
               testID="consultation-create"
             />
           </ButtonsContainer>
+          <SubList
+            label="Commentaires"
+            key={consultationDB?._id}
+            data={consultation.comments}
+            renderItem={(comment) => (
+              <CommentRow
+                key={comment._id}
+                comment={comment}
+                onUpdate={
+                  comment.team
+                    ? () =>
+                        navigation.push('ActionComment', {
+                          ...comment,
+                          commentTitle: consultation?.name || 'Consultation',
+                          fromRoute: 'Consultation',
+                        })
+                    : null
+                }
+              />
+            )}
+            ifEmpty="Pas encore de commentaire">
+            <NewCommentInput
+              forwardRef={newCommentRef}
+              onFocus={() => _scrollToInput(newCommentRef)}
+              onCommentWrite={setWritingComment}
+              onCreate={(newComment) => {
+                const consultationToSave = {
+                  ...consultation,
+                  comments: [{ ...newComment, type: 'consultation', _id: uuidv4() }, ...(consultation.comments || [])],
+                };
+                setConsultation(consultationToSave); // optimistic UI
+                // need to pass `consultationToSave` if we want last comment to be taken into account
+                // https://react.dev/reference/react/useState#ive-updated-the-state-but-logging-gives-me-the-old-value
+                onSaveConsultationRequest({ goBackOnSave: false, consultationToSave });
+              }}
+            />
+          </SubList>
         </View>
       </ScrollContainer>
     </SceneContainer>

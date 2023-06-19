@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useRef } from 'react';
 import { Linking, Text } from 'react-native';
 import styled from 'styled-components';
 import * as Sentry from '@sentry/react-native';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import dayjs from 'dayjs';
 import ScrollContainer from '../../components/ScrollContainer';
 import Button from '../../components/Button';
@@ -26,6 +26,8 @@ import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirm
 import RencontreRow from './RencontreRow';
 import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
 import { formatDateWithFullMonth, getRelativeTimeFrench } from '../../services/dateDayjs';
+import { commentsState } from '../../recoil/comments';
+import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
 
 const PersonSummary = ({
   navigation,
@@ -55,6 +57,9 @@ const PersonSummary = ({
   };
 
   const organisation = useRecoilValue(organisationState);
+  const setComments = useSetRecoilState(commentsState);
+  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
+
   const scrollViewRef = useRef(null);
   const descriptionRef = useRef(null);
   const newCommentRef = useRef(null);
@@ -274,7 +279,22 @@ const PersonSummary = ({
           forwardRef={newCommentRef}
           onFocus={() => _scrollToInput(newCommentRef)}
           person={personDB?._id}
+          canToggleGroupCheckProp
           onCommentWrite={onCommentWrite}
+          onCreate={async (newComment) => {
+            const body = {
+              ...newComment,
+              person: personDB?._id,
+            };
+            const response = await API.post({ path: '/comment', body: prepareCommentForEncryption(body) });
+            if (!response.ok) {
+              Alert.alert(response.error || response.code);
+              return;
+            }
+
+            setComments((comments) => [response.decryptedData, ...comments]);
+            await createReportAtDateIfNotExist(response.decryptedData.date);
+          }}
         />
       </SubList>
       {organisation.rencontresEnabled && (

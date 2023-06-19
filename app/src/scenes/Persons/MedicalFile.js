@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import dayjs from 'dayjs';
 import { useRecoilState, useRecoilValue } from 'recoil';
+import { v4 as uuidv4 } from 'uuid';
 import ScrollContainer from '../../components/ScrollContainer';
 import Button from '../../components/Button';
 import InputLabelled from '../../components/InputLabelled';
@@ -23,6 +24,9 @@ import Document from '../../components/Document';
 import DocumentsManager from '../../components/DocumentsManager';
 import { MyText } from '../../components/MyText';
 import { flattenedCustomFieldsPersonsSelector } from '../../recoil/persons';
+import CommentRow from '../Comments/CommentRow';
+import NewCommentInput from '../Comments/NewCommentInput';
+import { Alert } from 'react-native';
 
 const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, editable, onEdit, isUpdateDisabled, backgroundColor, onChange }) => {
   const organisation = useRecoilValue(organisationState);
@@ -41,6 +45,7 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
 
   const medicalFileDB = useMemo(() => (allMedicalFiles || []).find((m) => m.person === personDB._id), [allMedicalFiles, personDB._id]);
   const [medicalFile, setMedicalFile] = useState(medicalFileDB);
+  const [writingComment, setWritingComment] = useState('');
 
   useEffect(() => {
     if (!medicalFileDB) {
@@ -57,6 +62,24 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [medicalFileDB]);
 
+  const backRequestHandledRef = useRef(null);
+  const handleBeforeRemove = (e) => {
+    if (backRequestHandledRef.current === true) return;
+    e.preventDefault();
+    onGoBackRequested();
+  };
+  const onBack = () => {
+    backRequestHandledRef.current = true;
+    navigation.goBack();
+  };
+  useEffect(() => {
+    const beforeRemoveListenerUnsbscribe = navigation.addListener('beforeRemove', handleBeforeRemove);
+    return () => {
+      beforeRemoveListenerUnsbscribe();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const allMedicalDocuments = useMemo(() => {
     const ordonnances =
       treatments
@@ -72,7 +95,25 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
     return [...ordonnances, ...consultationsDocs, ...otherDocs].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   }, [consultations, medicalFile, treatments]);
 
+  const allMedicalComments = useMemo(() => {
+    const treatmentsComments =
+      treatments
+        ?.map((treatment) => treatment.comments?.map((doc) => ({ ...doc, type: 'treatment', treatment })))
+        .filter(Boolean)
+        .flat() || [];
+    const consultationsComments =
+      consultations
+        ?.map((consultation) => consultation.comments?.map((doc) => ({ ...doc, type: 'consultation', consultation })))
+        .filter(Boolean)
+        .flat() || [];
+    const otherComments = medicalFile?.comments || [];
+    return [...treatmentsComments, ...consultationsComments, ...otherComments].sort(
+      (a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt)
+    );
+  }, [consultations, medicalFile, treatments]);
+
   const scrollViewRef = useRef(null);
+  const newCommentRef = useRef(null);
   const refs = useRef({});
   const _scrollToInput = (ref) => {
     if (!ref.current) return;
@@ -93,10 +134,54 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
     return true;
   }, [medicalFileDB, medicalFile]);
 
-  const onUpdateRequest = async () => {
+  const onGoBackRequested = async () => {
+    if (writingComment.length) {
+      const goToNextStep = await new Promise((res) =>
+        Alert.alert("Vous êtes en train d'écrire un commentaire, n'oubliez pas de cliquer sur créer !", null, [
+          {
+            text: "Oui c'est vrai !",
+            onPress: () => res(false),
+          },
+          {
+            text: 'Ne pas enregistrer ce commentaire',
+            onPress: () => res(true),
+            style: 'destructive',
+          },
+          {
+            text: 'Annuler',
+            onPress: () => res(false),
+            style: 'cancel',
+          },
+        ])
+      );
+      if (!goToNextStep) return;
+    }
+    if (isMedicalFileUpdateDisabled) return onBack();
+    Alert.alert('Voulez-vous enregistrer ?', null, [
+      {
+        text: 'Enregistrer',
+        onPress: async () => {
+          const response = await onGoBackRequested();
+          if (response.ok) onBack();
+        },
+      },
+      {
+        text: 'Ne pas enregistrer',
+        onPress: onBack,
+        style: 'destructive',
+      },
+      {
+        text: 'Annuler',
+        style: 'cancel',
+      },
+    ]);
+  };
+
+  const onUpdateRequest = async (latestMedicalFile) => {
+    if (!latestMedicalFile) latestMedicalFile = medicalFile;
     const response = await API.put({
       path: `/medical-file/${medicalFileDB._id}`,
-      body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({ ...medicalFileDB, ...medicalFile }),
+      body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({ ...medicalFileDB, ...latestMedicalFile }),
     });
     if (!response.ok) return;
     setAllMedicalFiles((medicalFiles) =>
@@ -150,7 +235,7 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
 
   return (
     <ScrollContainer ref={scrollViewRef} backgroundColor={backgroundColor || colors.app.color} testID="person-summary">
-      <BackButton onPress={navigation.goBack}>
+      <BackButton onPress={onGoBackRequested}>
         <MyText color={colors.app.color}>{'<'} Retour vers la personne</MyText>
       </BackButton>
       <InputLabelled
@@ -221,6 +306,40 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
           loading={updating}
         />
       </ButtonsContainer>
+      <SubList
+        label="Commentaires"
+        key={medicalFileDB?._id + allMedicalComments.length}
+        data={allMedicalComments}
+        renderItem={(comment) => (
+          <CommentRow
+            key={comment._id}
+            comment={comment}
+            onUpdate={
+              comment.team && comment.type === 'medical-file'
+                ? () =>
+                    navigation.push('ActionComment', {
+                      ...comment,
+                      commentTitle: 'Commentaire',
+                      fromRoute: 'Treatment',
+                    })
+                : null
+            }
+          />
+        )}
+        ifEmpty="Pas encore de commentaire">
+        <NewCommentInput
+          forwardRef={newCommentRef}
+          onFocus={() => _scrollToInput(newCommentRef)}
+          onCommentWrite={setWritingComment}
+          onCreate={(newComment) => {
+            const newComments = [{ ...newComment, type: 'medical-file', _id: uuidv4() }, ...(medicalFile.comments || [])];
+            // need to pass comments as parameters if we want last comment to be taken into account
+            // https://react.dev/reference/react/useState#ive-updated-the-state-but-logging-gives-me-the-old-value
+            setMedicalFile({ ...medicalFile, comments: newComments });
+            onUpdateRequest({ ...medicalFile, comments: newComments });
+          }}
+        />
+      </SubList>
       <SubList
         label="Traitements"
         onAdd={() => onGoToTreatment()}

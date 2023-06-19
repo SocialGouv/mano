@@ -72,7 +72,8 @@
     "react-native-webview": "^11.26.0",
     "recoil": "^0.7.6",
     "styled-components": "^5.2.1",
-    "urijs": "^1.19.11"
+    "urijs": "^1.19.11",
+    "uuid": "^3.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

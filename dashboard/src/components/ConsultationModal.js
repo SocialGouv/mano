@@ -358,7 +358,7 @@ export default function ConsultationModal({ onClose, personId, consultation, dat
               }}
               onSubmitComment={(comment, isNewComment) => {
                 if (isNewComment) {
-                  setData({ ...data, comments: [...data.comments, { ...comment, _id: uuidv4() }] });
+                  setData({ ...data, comments: [{ ...comment, _id: uuidv4() }, ...data.comments] });
                 } else {
                   setData({ ...data, comments: data.comments.map((c) => (c._id === comment._id ? comment : c)) });
                 }

@@ -237,7 +237,7 @@ export default function TreatmentModal({ onClose, isNewTreatment, treatment, per
                     handleChange({
                       currentTarget: {
                         value: isNewComment
-                          ? [...values.comments, { ...comment, _id: uuidv4() }]
+                          ? [{ ...comment, _id: uuidv4() }, ...values.comments]
                           : values.comments.map((c) => (c._id === comment._id ? comment : c)),
                         name: 'comments',
                       },

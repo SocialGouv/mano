@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
+import { v4 as uuidv4 } from 'uuid';
 import ConsultationModal from '../../../components/ConsultationModal';
 import { medicalFileState } from '../../../recoil/medicalFiles';
 import { arrayOfitemsGroupedByConsultationSelector } from '../../../recoil/selectors';
@@ -82,7 +83,7 @@ const CommentsMedical = ({ person }) => {
               return {
                 ..._medicalFile,
                 comments: isNewComment
-                  ? [...(_medicalFile.comments || []), comment]
+                  ? [{ ...comment, _id: uuidv4() }, ...(_medicalFile.comments || [])]
                   : _medicalFile.comments.map((c) => (c._id === comment._id ? comment : c)),
               };
             });

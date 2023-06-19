@@ -78,6 +78,7 @@ const ActionsNavigator = () => {
       <ActionsStack.Screen name="NewPersonPlaceForm" component={NewPlaceForm} />
       <ActionsStack.Screen name="PersonComment" component={Comment} />
 
+      <PersonsStack.Screen name="Treatment" component={Treatment} />
       <ActionsStack.Screen name="Consultation" component={Consultation} />
     </ActionsStack.Navigator>
   );

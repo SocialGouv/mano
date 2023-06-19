@@ -69,12 +69,7 @@ export default function MedicalFile({ person }) {
                 key={'Dossier Médical'}
                 person={person}
                 sectionName={'Dossier Médical'}
-                fields={[
-                  ...customFieldsMedicalFileWithLegacyFields,
-                  ...customFieldsMedicalFileWithLegacyFields,
-                  ...customFieldsMedicalFileWithLegacyFields,
-                  ...customFieldsMedicalFileWithLegacyFields,
-                ]}
+                fields={customFieldsMedicalFileWithLegacyFields}
                 colspan={6}
               />
             </div>
