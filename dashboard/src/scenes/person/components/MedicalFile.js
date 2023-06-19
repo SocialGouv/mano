@@ -1,5 +1,5 @@
-import { useRecoilValue } from 'recoil';
-import { userState } from '../../../recoil/auth';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { organisationState, userState } from '../../../recoil/auth';
 import { Consultations } from './Consultations';
 import { InfosMain } from './InfosMain';
 import PersonCustomFields from './PersonCustomFields';
@@ -7,16 +7,18 @@ import DeletePersonButton from './DeletePersonButton';
 import OutOfActiveList from '../OutOfActiveList';
 import MergeTwoPersons from '../MergeTwoPersons';
 import { flattenedCustomFieldsPersonsSelector } from '../../../recoil/persons';
-import { customFieldsMedicalFileSelector } from '../../../recoil/medicalFiles';
+import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../../recoil/medicalFiles';
 import { Treatments } from './Treatments';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import PersonDocumentsMedical from './PersonDocumentsMedical';
 import { MedicalFilePrint } from './MedicalFilePrint';
+import API from '../../../services/api';
 
 export default function MedicalFile({ person }) {
   const user = useRecoilValue(userState);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
   const flattenedCustomFieldsPersons = useRecoilValue(flattenedCustomFieldsPersonsSelector);
+  const organisation = useRecoilValue(organisationState);
   // These custom fields are displayed by default, because they where displayed before they became custom fields
   const customFieldsMedicalFileWithLegacyFields = useMemo(() => {
     const c = [...customFieldsMedicalFile];
@@ -27,6 +29,22 @@ export default function MedicalFile({ person }) {
     return c;
   }, [customFieldsMedicalFile, flattenedCustomFieldsPersons]);
 
+  const [allMedicalFiles, setAllMedicalFiles] = useRecoilState(medicalFileState);
+  const medicalFile = useMemo(() => (allMedicalFiles || []).find((m) => m.person === person._id), [allMedicalFiles, person._id]);
+
+  useEffect(() => {
+    if (!medicalFile) {
+      (async () => {
+        const response = await API.post({
+          path: '/medical-file',
+          body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({ person: person._id, documents: [], organisation: organisation._id }),
+        });
+        if (!response.ok) return;
+        setAllMedicalFiles((medicalFiles) => [...medicalFiles, response.decryptedData]);
+      })();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [medicalFile]);
   return (
     <>
       {!process.env.REACT_APP_TEST_PLAYWRIGHT && <MedicalFilePrint person={person} />}

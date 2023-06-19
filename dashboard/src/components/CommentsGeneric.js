@@ -27,9 +27,6 @@ import AutoResizeTextarea from './AutoresizeTextArea';
  * @param {Object} props
  * @param {Array} props.comments
  * @param {String} props.title
- * @param {String} props.type
- * @param {Object} props.person
- * @param {Object} props.action
  * @param {Boolean} props.showPanel
  * @param {Boolean} props.canToggleGroupCheck
  * @param {Boolean} props.canToggleUrgentCheck
@@ -49,9 +46,6 @@ export function CommentsModule({
   onDeleteComment,
   onSubmitComment,
 }) {
-  if (!type) throw new Error('type is required');
-  if (type === 'person' && !person) throw new Error('person is required');
-  if (type === 'action' && !action) throw new Error('action is required');
   if (!onDeleteComment) throw new Error('onDeleteComment is required');
   if (!onSubmitComment) throw new Error('onSubmitComment is required');
   const [modalCreateOpen, setModalCreateOpen] = useState(false);
@@ -185,6 +179,9 @@ export function CommentsTable({ comments, onEditComment, onAddComment, showAddCo
       <table className="table table-striped">
         <tbody className="small">
           {(comments || []).map((comment) => {
+            if (!comment.type) throw new Error('type is required');
+            if (comment.type === 'person' && !comment.person) throw new Error('person is required');
+            if (comment.type === 'action' && !comment.action) throw new Error('action is required');
             return (
               <tr key={comment._id}>
                 <td
