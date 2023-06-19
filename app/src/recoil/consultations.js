@@ -8,7 +8,7 @@ export const consultationsState = atom({
   default: [],
 });
 
-export const encryptedFields = ['name', 'type', 'person', 'user', 'documents', 'comments'];
+export const encryptedFields = ['name', 'type', 'person', 'user',  'teams', 'documents', 'comments'];
 
 export const prepareConsultationForEncryption = (customFieldsConsultations) => (consultation) => {
   try {
@@ -18,6 +18,11 @@ export const prepareConsultationForEncryption = (customFieldsConsultations) => (
     if (!looseUuidRegex.test(consultation.user)) {
       throw new Error('Consultation is missing user');
     }
+    // we don't force the team (yet) because it's blocking with automatic updates of consultation
+    // like merge people + change custom fields
+    // if (!looseUuidRegex.test(consultation.teams)) {
+    //   throw new Error('Consultation is missing teams');
+    // }
   } catch (error) {
     Alert.alert(
       "La consultation n'a pas été sauvegardée car son format était incorrect.",

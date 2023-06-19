@@ -3,7 +3,7 @@ import ReactDatePicker from 'react-datepicker';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { v4 as uuidv4 } from 'uuid';
 import { CANCEL, DONE, TODO } from '../recoil/actions';
-import { currentTeamState, organisationState, userState } from '../recoil/auth';
+import { currentTeamState, organisationState, teamsState, userState } from '../recoil/auth';
 import { consultationsState, defaultConsultationFields, prepareConsultationForEncryption } from '../recoil/consultations';
 import API from '../services/api';
 import { dateForDatePicker, dayjsInstance } from '../services/date';
@@ -17,10 +17,12 @@ import { toast } from 'react-toastify';
 import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from './tailwind/Modal';
 import SelectPerson from './SelectPerson';
 import { CommentsModule } from './CommentsGeneric';
+import SelectTeamMultiple from './SelectTeamMultiple';
 
 export default function ConsultationModal({ onClose, personId, consultation, date }) {
   const organisation = useRecoilValue(organisationState);
-  const team = useRecoilValue(currentTeamState);
+  const teams = useRecoilValue(teamsState);
+  const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
   const setModalConfirmState = useSetRecoilState(modalConfirmState);
   const setAllConsultations = useSetRecoilState(consultationsState);
@@ -32,6 +34,7 @@ export default function ConsultationModal({ onClose, personId, consultation, dat
       return {
         documents: [],
         comments: [],
+        teams: consultation.teams ?? teams.length === 1 ? [teams[0]._id] : [],
         ...consultation,
       };
     }
@@ -42,6 +45,7 @@ export default function ConsultationModal({ onClose, personId, consultation, dat
       name: '',
       type: '',
       status: TODO,
+      teams: teams.length === 1 ? [teams[0]._id] : [],
       user: user._id,
       person: personId || null,
       organisation: organisation._id,
@@ -50,7 +54,8 @@ export default function ConsultationModal({ onClose, personId, consultation, dat
       comments: [],
       createdAt: new Date(),
     };
-  }, [organisation._id, personId, user._id, consultation, date]);
+  }, [organisation._id, personId, user._id, consultation, date, teams]);
+
   const [data, setData] = useState(initialState);
   const [activeTab, setActiveTab] = useState('Informations');
 
@@ -64,6 +69,9 @@ export default function ConsultationModal({ onClose, personId, consultation, dat
     }
     if (!body.person) {
       return toast.error('Veuillez sélectionner une personne suivie');
+    }
+    if (!body.teams.length) {
+      return toast.error('Veuillez sélectionner au moins une équipe');
     }
     if ([DONE, CANCEL].includes(body.status)) {
       body.completedAt = body.completedAt || new Date();
@@ -182,8 +190,8 @@ export default function ConsultationModal({ onClose, personId, consultation, dat
           </ul>
           <div
             className={['tw-flex tw-min-h-screen tw-w-full tw-flex-col tw-gap-4 tw-px-8', activeTab !== 'Informations' ? 'tw-hidden' : ''].join(' ')}>
-            <div>
-              {!personId && (
+            <div className="-tw-mx-4 tw-flex tw-flex-wrap">
+              <div className="tw-flex tw-basis-1/2 tw-flex-col tw-p-4">
                 <SelectPerson
                   value={data.person}
                   onChange={(e) => {
@@ -192,18 +200,84 @@ export default function ConsultationModal({ onClose, personId, consultation, dat
                   isMulti={false}
                   inputId="create-consultation-person-select"
                 />
-              )}
-            </div>
-            <div className="-tw-mx-4 tw-flex tw-flex-wrap">
+              </div>
               <div className="tw-flex tw-basis-1/2 tw-flex-col tw-p-4">
-                <label htmlFor="create-consultation-name">Nom (facultatif)</label>
-                <input
-                  className="form-text tailwindui"
-                  id="create-consultation-name"
-                  name="name"
-                  value={data.name}
-                  onChange={(e) => setData({ ...data, name: e.currentTarget.value })}
+                <label htmlFor="create-consultation-team">Équipe(s) en charge</label>
+                <SelectTeamMultiple
+                  onChange={(teamIds) => setData({ ...data, teams: teamIds })}
+                  value={data.teams}
+                  colored
+                  inputId="create-consultation-team-select"
+                  classNamePrefix="create-consultation-team-select"
                 />
+              </div>
+            </div>
+            
+          <div className="-tw-mx-4 tw-flex tw-flex-wrap">
+            <div className="tw-flex tw-basis-1/2 tw-flex-col tw-p-4">
+              <label htmlFor="create-consultation-name">Nom (facultatif)</label>
+              <input
+                className="form-text tailwindui"
+                id="create-consultation-name"
+                name="name"
+                value={data.name}
+                onChange={(e) => setData({ ...data, name: e.currentTarget.value })}
+              />
+            </div>
+            <div className="tw-basis-1/2 tw-p-4">
+              <label htmlFor="type" className="form-text tailwindui">
+                Type
+              </label>
+              <SelectAsInput
+                id="type"
+                name="type"
+                inputId="consultation-modal-type"
+                classNamePrefix="consultation-modal-type"
+                value={data.type}
+                onChange={(e) => {
+                  setData({ ...data, type: e.currentTarget.value });
+                }}
+                placeholder="-- Type de consultation --"
+                options={organisation.consultations.map((e) => e.name)}
+              />
+            </div>
+            {organisation.consultations
+              .find((e) => e.name === data.type)
+              ?.fields.filter((f) => f.enabled || f.enabledTeams?.includes(currentTeam._id))
+              .map((field) => {
+                return (
+                  <CustomFieldInput
+                    colWidth={6}
+                    model="person"
+                    values={data}
+                    handleChange={(e) => {
+                      setData({ ...data, [(e.currentTarget || e.target).name]: (e.currentTarget || e.target).value });
+                    }}
+                    field={field}
+                    key={field.name}
+                  />
+                );
+              })}
+          </div>
+          {data.user === user._id && (
+            <>
+              <hr />
+              <div>
+                <div>
+                  <label htmlFor="create-consultation-onlyme">
+                    <input
+                      type="checkbox"
+                      id="create-consultation-onlyme"
+                      style={{ marginRight: '0.5rem' }}
+                      name="onlyVisibleByCreator"
+                      checked={data.onlyVisibleBy?.includes(user._id)}
+                      onChange={() => {
+                        setData({ ...data, onlyVisibleBy: data.onlyVisibleBy?.includes(user._id) ? [] : [user._id] });
+                      }}
+                    />
+                    Seulement visible par moi
+                  </label>
+                </div>
               </div>
               <div className="tw-basis-1/2 tw-p-4">
                 <label htmlFor="type" className="form-text tailwindui">
