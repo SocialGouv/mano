@@ -44,7 +44,11 @@ const PersonDocumentsMedical = ({ person }) => {
         .flat() || [];
     const consultationsDocs =
       personConsultations
-        ?.map((consultation) => consultation.documents?.map((doc) => ({ ...doc, type: 'consultation', consultation })))
+        ?.filter((consultation) => {
+          if (!consultation?.onlyVisibleBy?.length) return true;
+          return consultation.onlyVisibleBy.includes(user._id);
+        })
+        .map((consultation) => consultation.documents?.map((doc) => ({ ...doc, type: 'consultation', consultation })))
         .filter(Boolean)
         .flat() || [];
     const otherDocs = medicalFile?.documents || [];

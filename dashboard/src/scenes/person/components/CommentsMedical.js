@@ -7,10 +7,12 @@ import { arrayOfitemsGroupedByConsultationSelector } from '../../../recoil/selec
 import { treatmentsState } from '../../../recoil/treatments';
 import TreatmentModal from './TreatmentModal';
 import { CommentsModule } from '../../../components/CommentsGeneric';
+import { userState } from '../../../recoil/auth';
 
 const CommentsMedical = ({ person }) => {
   const allConsultations = useRecoilValue(arrayOfitemsGroupedByConsultationSelector);
   const allTreatments = useRecoilValue(treatmentsState);
+  const user = useRecoilValue(userState);
   const [allMedicalFiles, setAllMedicalFiles] = useRecoilState(medicalFileState);
   const [consultation, setConsultation] = useState(false);
   const [treatment, setTreatment] = useState(false);
@@ -29,7 +31,11 @@ const CommentsMedical = ({ person }) => {
         .flat() || [];
     const consultationsComments =
       personConsultations
-        ?.map((consultation) => consultation.comments?.map((doc) => ({ ...doc, type: 'consultation', consultation })))
+        ?.filter((consultation) => {
+          if (!consultation?.onlyVisibleBy?.length) return true;
+          return consultation.onlyVisibleBy.includes(user._id);
+        })
+        .map((consultation) => consultation.comments?.map((doc) => ({ ...doc, type: 'consultation', consultation })))
         .filter(Boolean)
         .flat() || [];
     const otherComments = medicalFile?.comments || [];
