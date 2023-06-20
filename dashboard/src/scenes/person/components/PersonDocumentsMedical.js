@@ -53,7 +53,7 @@ const PersonDocumentsMedical = ({ person }) => {
         .flat() || [];
     const otherDocs = medicalFile?.documents || [];
     return [...ordonnances, ...consultationsDocs, ...otherDocs].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  }, [personConsultations, medicalFile?.documents, treatments]);
+  }, [personConsultations, medicalFile?.documents, treatments, user._id]);
 
   const documents = allMedicalDocuments;
 

@@ -42,7 +42,7 @@ const CommentsMedical = ({ person }) => {
     return [...treatmentsComments, ...consultationsComments, ...otherComments].sort(
       (a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt)
     );
-  }, [personConsultations, medicalFile?.comments, treatments]);
+  }, [personConsultations, medicalFile?.comments, treatments, user._id]);
 
   const comments = allMedicalComments;
 
