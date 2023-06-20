@@ -212,73 +212,19 @@ export default function ConsultationModal({ onClose, personId, consultation, dat
                 />
               </div>
             </div>
-            
-          <div className="-tw-mx-4 tw-flex tw-flex-wrap">
-            <div className="tw-flex tw-basis-1/2 tw-flex-col tw-p-4">
-              <label htmlFor="create-consultation-name">Nom (facultatif)</label>
-              <input
-                className="form-text tailwindui"
-                id="create-consultation-name"
-                name="name"
-                value={data.name}
-                onChange={(e) => setData({ ...data, name: e.currentTarget.value })}
-              />
-            </div>
-            <div className="tw-basis-1/2 tw-p-4">
-              <label htmlFor="type" className="form-text tailwindui">
-                Type
-              </label>
-              <SelectAsInput
-                id="type"
-                name="type"
-                inputId="consultation-modal-type"
-                classNamePrefix="consultation-modal-type"
-                value={data.type}
-                onChange={(e) => {
-                  setData({ ...data, type: e.currentTarget.value });
-                }}
-                placeholder="-- Type de consultation --"
-                options={organisation.consultations.map((e) => e.name)}
-              />
-            </div>
-            {organisation.consultations
-              .find((e) => e.name === data.type)
-              ?.fields.filter((f) => f.enabled || f.enabledTeams?.includes(currentTeam._id))
-              .map((field) => {
-                return (
-                  <CustomFieldInput
-                    colWidth={6}
-                    model="person"
-                    values={data}
-                    handleChange={(e) => {
-                      setData({ ...data, [(e.currentTarget || e.target).name]: (e.currentTarget || e.target).value });
-                    }}
-                    field={field}
-                    key={field.name}
-                  />
-                );
-              })}
-          </div>
-          {data.user === user._id && (
-            <>
-              <hr />
-              <div>
-                <div>
-                  <label htmlFor="create-consultation-onlyme">
-                    <input
-                      type="checkbox"
-                      id="create-consultation-onlyme"
-                      style={{ marginRight: '0.5rem' }}
-                      name="onlyVisibleByCreator"
-                      checked={data.onlyVisibleBy?.includes(user._id)}
-                      onChange={() => {
-                        setData({ ...data, onlyVisibleBy: data.onlyVisibleBy?.includes(user._id) ? [] : [user._id] });
-                      }}
-                    />
-                    Seulement visible par moi
-                  </label>
-                </div>
+
+            <div className="-tw-mx-4 tw-flex tw-flex-wrap">
+              <div className="tw-flex tw-basis-1/2 tw-flex-col tw-p-4">
+                <label htmlFor="create-consultation-name">Nom (facultatif)</label>
+                <input
+                  className="form-text tailwindui"
+                  id="create-consultation-name"
+                  name="name"
+                  value={data.name}
+                  onChange={(e) => setData({ ...data, name: e.currentTarget.value })}
+                />
               </div>
+
               <div className="tw-basis-1/2 tw-p-4">
                 <label htmlFor="type" className="form-text tailwindui">
                   Type
@@ -298,7 +244,7 @@ export default function ConsultationModal({ onClose, personId, consultation, dat
               </div>
               {organisation.consultations
                 .find((e) => e.name === data.type)
-                ?.fields.filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
+                ?.fields.filter((f) => f.enabled || f.enabledTeams?.includes(currentTeam._id))
                 .map((field) => {
                   return (
                     <CustomFieldInput
