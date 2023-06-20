@@ -248,7 +248,7 @@ export default function ConsultationModal({ onClose, personId, consultation, dat
                 .map((field) => {
                   return (
                     <CustomFieldInput
-                      colWidth={6}
+                      colWidth={field.type === 'textarea' ? 12 : 6}
                       model="person"
                       values={data}
                       handleChange={(e) => {

@@ -239,7 +239,7 @@ const TerritoryObservation = ({ route, navigation }) => {
             .filter((f) => f)
             .filter((f) => f.enabled || f.enabledTeams?.includes(currentTeam._id))
             .map((field) => {
-              const { label, name } = field;
+              const { label, name, type } = field;
               return (
                 <CustomFieldInput
                   key={label}
