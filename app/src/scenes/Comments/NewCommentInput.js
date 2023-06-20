@@ -6,25 +6,18 @@ import InputMultilineAutoAdjust from '../../components/InputMultilineAutoAdjust'
 import Spacer from '../../components/Spacer';
 import ButtonsContainer from '../../components/ButtonsContainer';
 import ButtonDelete from '../../components/ButtonDelete';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
+import { useRecoilValue } from 'recoil';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
-import API from '../../services/api';
-import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
 import CheckboxLabelled from '../../components/CheckboxLabelled';
-import { groupsState } from '../../recoil/groups';
 
-const NewCommentInput = ({ person, action, forwardRef, onFocus, onCommentWrite }) => {
+const NewCommentInput = ({ forwardRef, onFocus, onCommentWrite, onCreate, canToggleUrgentCheck, canToggleGroupCheck }) => {
   const [comment, setComment] = useState('');
   const [urgent, setUrgent] = useState(false);
   const [group, setGroup] = useState(false);
   const [posting, setPosting] = useState(false);
-  const setComments = useSetRecoilState(commentsState);
   const currentTeam = useRecoilValue(currentTeamState);
   const organisation = useRecoilValue(organisationState);
-  const groups = useRecoilValue(groupsState);
   const user = useRecoilValue(userState);
-  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const onCreateComment = async () => {
     setPosting(true);
@@ -35,19 +28,10 @@ const NewCommentInput = ({ person, action, forwardRef, onFocus, onCommentWrite }
       urgent,
       group,
     };
-    if (person) body.person = person;
-    if (action) body.action = action;
     if (!body.user) body.user = user._id;
     if (!body.team) body.team = currentTeam._id;
     if (!body.organisation) body.organisation = organisation._id;
-    const response = await API.post({ path: '/comment', body: prepareCommentForEncryption(body) });
-    if (!response.ok) {
-      setPosting(false);
-      Alert.alert(response.error || response.code);
-      return;
-    }
-    setComments((comments) => [response.decryptedData, ...comments]);
-    await createReportAtDateIfNotExist(response.decryptedData.date);
+    await onCreate(body);
     Keyboard.dismiss();
     setPosting(false);
     setComment('');
@@ -74,7 +58,6 @@ const NewCommentInput = ({ person, action, forwardRef, onFocus, onCommentWrite }
     setComment(newComment);
     onCommentWrite?.(newComment);
   };
-  const canToggleGroupCheck = !!organisation.groupsEnabled && groups.find((group) => group.persons.includes(person));
 
   return (
     <>
@@ -82,12 +65,14 @@ const NewCommentInput = ({ person, action, forwardRef, onFocus, onCommentWrite }
       {!!comment.length && (
         <>
           <Spacer />
-          <CheckboxLabelled
-            label="Commentaire prioritaire (ce commentaire sera mis en avant par rapport aux autres)"
-            alone
-            onPress={() => setUrgent((u) => !u)}
-            value={urgent}
-          />
+          {!!canToggleUrgentCheck && (
+            <CheckboxLabelled
+              label="Commentaire prioritaire (ce commentaire sera mis en avant par rapport aux autres)"
+              alone
+              onPress={() => setUrgent((u) => !u)}
+              value={urgent}
+            />
+          )}
           {!!canToggleGroupCheck && (
             <CheckboxLabelled
               label="Commentaire familial (ce commentaire sera visible pour toute la famille)"

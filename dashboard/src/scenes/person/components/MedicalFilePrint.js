@@ -106,7 +106,18 @@ export function MedicalFilePrint({ person }) {
       </div>
       <div className="printonly">
         {(treatments || []).map((c) => {
-          const hiddenKeys = ['_id', 'name', 'documents', 'encryptedEntityKey', 'entityKey', 'updatedAt', 'createdAt', 'person', 'organisation'];
+          const hiddenKeys = [
+            '_id',
+            'name',
+            'documents',
+            'comments',
+            'encryptedEntityKey',
+            'entityKey',
+            'updatedAt',
+            'createdAt',
+            'person',
+            'organisation',
+          ];
           return (
             <div key={c._id} className="tw-mb-8">
               <h4>{c.name}</h4>
@@ -147,6 +158,7 @@ export function MedicalFilePrint({ person }) {
             '_id',
             'name',
             'documents',
+            'comments',
             'encryptedEntityKey',
             'entityKey',
             'onlyVisibleBy',

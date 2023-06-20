@@ -36,20 +36,6 @@ const PersonDocumentsMedical = ({ person }) => {
 
   const medicalFile = useMemo(() => (allMedicalFiles || []).find((m) => m.person === person._id), [allMedicalFiles, person._id]);
 
-  useEffect(() => {
-    if (!medicalFile) {
-      (async () => {
-        const response = await API.post({
-          path: '/medical-file',
-          body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({ person: person._id, documents: [], organisation: organisation._id }),
-        });
-        if (!response.ok) return;
-        setAllMedicalFiles((medicalFiles) => [...medicalFiles, response.decryptedData]);
-      })();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [medicalFile]);
-
   const allMedicalDocuments = useMemo(() => {
     const ordonnances =
       treatments

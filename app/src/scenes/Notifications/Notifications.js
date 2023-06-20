@@ -1,9 +1,9 @@
-import { selector, useRecoilState, useRecoilValue } from 'recoil';
+import { selector, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import * as Sentry from '@sentry/react-native';
 import React, { useCallback, useMemo } from 'react';
 import { actionsState, TODO } from '../../recoil/actions';
 import { currentTeamState } from '../../recoil/auth';
-import { commentsState } from '../../recoil/comments';
+import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
 import { refreshTriggerState } from '../../components/Loader';
@@ -14,6 +14,8 @@ import styled from 'styled-components';
 import { MyText } from '../../components/MyText';
 import { ListEmptyUrgent, ListEmptyUrgentAction, ListEmptyUrgentComment } from '../../components/ListEmptyContainer';
 import { actionsObjectSelector, personsObjectSelector } from '../../recoil/selectors';
+import API from '../../services/api';
+import { Alert } from 'react-native';
 
 export const urgentItemsSelector = selector({
   key: 'urgentItemsSelector',
@@ -66,6 +68,7 @@ export const urgentItemsSelector = selector({
 const Notifications = ({ navigation }) => {
   const { actionsFiltered, commentsFiltered } = useRecoilValue(urgentItemsSelector);
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
+  const setComments = useSetRecoilState(commentsState);
 
   const onRefresh = useCallback(async () => {
     setRefreshTrigger({ status: true, options: { showFullScreen: false, initialLoad: false } });
@@ -118,17 +121,42 @@ const Notifications = ({ navigation }) => {
       return (
         <CommentRow
           key={comment._id}
-          comment={{ ...comment, urgent: false }}
+          comment={comment}
           itemName={`${comment.type === 'action' ? 'Action' : 'Personne suivie'} : ${commentedItem?.name}`}
           onItemNamePress={() => (comment.type === 'action' ? onActionPress(comment.action) : onPseudoPress(comment.person))}
+          canToggleUrgentCheck
+          onDelete={async () => {
+            const response = await API.delete({ path: `/comment/${comment._id}` });
+            if (response.error) {
+              Alert.alert(response.error);
+              return false;
+            }
+            setComments((comments) => comments.filter((p) => p._id !== comment._id));
+            return true;
+          }}
           onUpdate={
             comment.team
-              ? () =>
-                  navigation.push(comment.type === 'action' ? 'ActionComment' : 'PersonComment', {
-                    ...comment,
-                    commentTitle: commentedItem?.name,
-                    fromRoute: 'Notifications',
-                  })
+              ? async (commentUpdated) => {
+                  if (comment.type === 'action') commentUpdated.action = comment.action._id;
+                  if (comment.type === 'person') commentUpdated.person = comment.person._id;
+                  const response = await API.put({
+                    path: `/comment/${comment._id}`,
+                    body: prepareCommentForEncryption(commentUpdated),
+                  });
+                  if (response.error) {
+                    Alert.alert(response.error);
+                    return false;
+                  }
+                  if (response.ok) {
+                    setComments((comments) =>
+                      comments.map((c) => {
+                        if (c._id === comment._id) return response.decryptedData;
+                        return c;
+                      })
+                    );
+                    return true;
+                  }
+                }
               : null
           }
         />
