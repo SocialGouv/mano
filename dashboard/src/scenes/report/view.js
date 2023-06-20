@@ -715,12 +715,12 @@ const View = () => {
             )}
             {activeTab === 'passages' && (
               <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                <PassagesCreatedAt date={dateString} passages={passages} />
+                <PassagesCreatedAt date={dateString} passages={passages} selectedTeams={selectedTeams} />
               </div>
             )}
             {activeTab === 'rencontres' && (
               <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                <RencontresCreatedAt date={dateString} rencontres={rencontres} />
+                <RencontresCreatedAt date={dateString} rencontres={rencontres} selectedTeams={selectedTeams} />
               </div>
             )}
             {activeTab === 'territory-observations' && (
@@ -1456,7 +1456,7 @@ const CommentCreatedAt = ({ date, comments }) => {
   );
 };
 
-const PassagesCreatedAt = ({ date, passages }) => {
+const PassagesCreatedAt = ({ date, passages, selectedTeams }) => {
   const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
   const [passageToEdit, setPassageToEdit] = useState(null);
@@ -1476,7 +1476,7 @@ const PassagesCreatedAt = ({ date, passages }) => {
               setPassageToEdit({
                 date: dayjs(date),
                 user: user._id,
-                team: currentTeam._id,
+                team: selectedTeams?.length === 1 ? selectedTeams[0]._id : currentTeam._id,
               })
             }
           />
@@ -1545,7 +1545,7 @@ const PassagesCreatedAt = ({ date, passages }) => {
   );
 };
 
-const RencontresCreatedAt = ({ date, rencontres }) => {
+const RencontresCreatedAt = ({ date, rencontres, selectedTeams }) => {
   const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
   const [rencontreToEdit, setRencontreToEdit] = useState(null);
@@ -1564,7 +1564,7 @@ const RencontresCreatedAt = ({ date, rencontres }) => {
               setRencontreToEdit({
                 date: dayjs(date),
                 user: user._id,
-                team: currentTeam._id,
+                team: selectedTeams?.length === 1 ? selectedTeams[0]._id : currentTeam._id,
               })
             }
           />
