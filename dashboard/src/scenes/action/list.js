@@ -59,10 +59,21 @@ const actionsByTeamAndStatusSelector = selectorFamily({
 const consultationsByStatusSelector = selectorFamily({
   key: 'consultationsByStatusSelector',
   get:
-    ({ statuses }) =>
+    ({ statuses, teamIds, viewAllOrganisationData }) =>
     ({ get }) => {
       const consultations = get(arrayOfitemsGroupedByConsultationSelector);
-      const consultationsByStatus = consultations.filter((consult) => !statuses.length || statuses.includes(consult.status));
+      const consultationsByStatus = consultations.filter((consultation) => {
+        if (!viewAllOrganisationData) {
+          if (teamIds.length) {
+            if (!consultation.teams?.length) return true;
+            return teamIds.some((t) => consultation.teams.includes(t));
+          }
+        }
+        if (statuses.length) {
+          if (!statuses.includes(consultation.status)) return false;
+        }
+        return true;
+      });
       return consultationsByStatus;
     },
 });
@@ -74,7 +85,7 @@ const dataFilteredBySearchSelector = selectorFamily({
     ({ get }) => {
       const actions = get(actionsByTeamAndStatusSelector({ statuses, categories, teamIds, viewAllOrganisationData, actionsWithNoCategory }));
       // When we filter by category, we don't want to see all consultations.
-      const consultations = categories?.length ? [] : get(consultationsByStatusSelector({ statuses }));
+      const consultations = categories?.length ? [] : get(consultationsByStatusSelector({ statuses, teamIds, viewAllOrganisationData }));
       if (!search) {
         return [...actions, ...consultations];
       }

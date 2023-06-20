@@ -73,11 +73,11 @@ export default function MedicalFile({ person }) {
                 colspan={6}
               />
             </div>
-            <div className="tw-col-span-6 tw-flex tw-h-0 tw-min-h-full tw-flex-col tw-gap-4 tw-overflow-auto">
-              <div className="tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+            <div className="tw-col-span-6 tw-flex tw-min-h-full tw-flex-col tw-gap-4">
+              <div className="tw-min-h-[200px] tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
                 <Treatments person={person} />
               </div>
-              <div className="tw-h-1/2 tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+              <div className="tw-min-h-[200px] tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
                 <PersonDocumentsMedical person={person} />
               </div>
             </div>
