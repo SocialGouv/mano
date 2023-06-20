@@ -11,7 +11,7 @@ import SubList from '../../components/SubList';
 import DateAndTimeInput from '../../components/DateAndTimeInput';
 import GenderSelect from '../../components/Selects/GenderSelect';
 import colors from '../../utils/colors';
-import { currentTeamState, organisationState } from '../../recoil/auth';
+import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { consultationsState } from '../../recoil/consultations';
 import { treatmentsState } from '../../recoil/treatments';
 import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../recoil/medicalFiles';
@@ -31,6 +31,7 @@ import { Alert } from 'react-native';
 const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, editable, onEdit, isUpdateDisabled, backgroundColor, onChange }) => {
   const organisation = useRecoilValue(organisationState);
   const currentTeam = useRecoilValue(currentTeamState);
+  const user = useRecoilValue(userState);
 
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
   const flattenedCustomFieldsPersons = useRecoilValue(flattenedCustomFieldsPersonsSelector);
@@ -88,8 +89,13 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
         .flat() || [];
     const consultationsDocs =
       consultations
-        ?.map((consultation) => consultation.documents?.map((doc) => ({ ...doc, type: 'consultation', consultation })))
+        ?.filter((consultation) => {
+          if (!consultation?.onlyVisibleBy?.length) return true;
+          return consultation.onlyVisibleBy.includes(user._id);
+        })
+        .map((consultation) => consultation.documents?.map((doc) => ({ ...doc, type: 'consultation', consultation })))
         .filter(Boolean)
+
         .flat() || [];
     const otherDocs = medicalFile?.documents || [];
     return [...ordonnances, ...consultationsDocs, ...otherDocs].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -103,14 +109,18 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
         .flat() || [];
     const consultationsComments =
       consultations
-        ?.map((consultation) => consultation.comments?.map((doc) => ({ ...doc, type: 'consultation', consultation })))
+        ?.filter((consultation) => {
+          if (!consultation?.onlyVisibleBy?.length) return true;
+          return consultation.onlyVisibleBy.includes(user._id);
+        })
+        .map((consultation) => consultation.comments?.map((doc) => ({ ...doc, type: 'consultation', consultation })))
         .filter(Boolean)
         .flat() || [];
     const otherComments = medicalFile?.comments || [];
     return [...treatmentsComments, ...consultationsComments, ...otherComments].sort(
       (a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt)
     );
-  }, [consultations, medicalFile, treatments]);
+  }, [consultations, medicalFile, treatments, user]);
 
   const scrollViewRef = useRef(null);
   const newCommentRef = useRef(null);
