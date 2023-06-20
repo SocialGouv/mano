@@ -91,8 +91,8 @@ CREATE TABLE IF NOT EXISTS mano."Organisation" (
     "migrationLastUpdateAt" timestamp with time zone,
     migrating boolean DEFAULT false,
     "customFieldsMedicalFile" jsonb,
-    "territoriesEnabled" boolean DEFAULT true
-    "passagesEnabled" boolean DEFAULT true
+    "territoriesEnabled" boolean DEFAULT true,
+    "passagesEnabled" boolean DEFAULT true,
     "rencontresEnabled" boolean DEFAULT true
 );
 

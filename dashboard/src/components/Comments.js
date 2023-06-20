@@ -200,7 +200,7 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, onDelete, n
     <>
       {!!newComment && (
         <div>
-          <ButtonCustom title="Ajouter un commentaire" onClick={() => setOpen(true)} style={{ marginBottom: 20 }} />
+          <ButtonCustom title="＋ Ajouter un commentaire" onClick={() => setOpen(true)} style={{ marginBottom: 20 }} />
         </div>
       )}
       <ModalContainer

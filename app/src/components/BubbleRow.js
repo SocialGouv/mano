@@ -28,11 +28,13 @@ const BubbleRow = ({ onMorePress, caption, date, user, metaCaption, urgent, grou
         {new Date(date).getLocaleDateAndTime('fr')}
       </CreationDate>
     </CaptionsContainer>
-    <OnMoreContainer hitSlop={hitSlop} onPress={onMorePress}>
-      <Dot />
-      <Dot />
-      <Dot />
-    </OnMoreContainer>
+    {!!onMorePress && (
+      <OnMoreContainer hitSlop={hitSlop} onPress={onMorePress}>
+        <Dot />
+        <Dot />
+        <Dot />
+      </OnMoreContainer>
+    )}
   </Container>
 );
 

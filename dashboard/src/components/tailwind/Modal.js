@@ -118,9 +118,9 @@ const ModalHeader = ({ children, title }) => {
   );
 };
 
-const ModalBody = ({ children, className = '' }) => {
+const ModalBody = ({ children, className = '', overflowY = true }) => {
   return (
-    <div className="tw-shrink tw-bg-white tw-pb-4">
+    <div className={['tw-shrink tw-bg-white tw-pb-4', overflowY ? 'tw-overflow-y-auto' : ''].join(' ')}>
       <div className="sm:tw-flex sm:tw-items-start">
         <div className={['tw-w-full tw-text-center sm:tw-mt-0 sm:tw-text-left', className].join(' ')}>{children}</div>
       </div>

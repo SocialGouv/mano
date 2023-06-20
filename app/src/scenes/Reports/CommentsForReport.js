@@ -1,4 +1,4 @@
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import * as Sentry from '@sentry/react-native';
 import React, { useCallback } from 'react';
 import SceneContainer from '../../components/SceneContainer';
@@ -9,7 +9,11 @@ import CommentRow from '../Comments/CommentRow';
 import { ListNoMoreComments } from '../../components/ListEmptyContainer';
 import { commentsForReport } from './selectors';
 import { getPeriodTitle } from './utils';
-import { currentTeamState } from '../../recoil/auth';
+import { currentTeamState, organisationState } from '../../recoil/auth';
+import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
+import { Alert } from 'react-native';
+import API from '../../services/api';
+import { groupsState } from '../../recoil/groups';
 const keyExtractor = (item) => item._id;
 
 const CommentsForReport = ({ navigation, route }) => {
@@ -17,6 +21,9 @@ const CommentsForReport = ({ navigation, route }) => {
   const comments = useRecoilValue(commentsForReport({ date }));
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
   const currentTeam = useRecoilValue(currentTeamState);
+  const organisation = useRecoilValue(organisationState);
+  const groups = useRecoilValue(groupsState);
+  const setComments = useSetRecoilState(commentsState);
 
   const onRefresh = useCallback(async () => {
     setRefreshTrigger({ status: true, options: { showFullScreen: false, initialLoad: false } });
@@ -48,16 +55,44 @@ const CommentsForReport = ({ navigation, route }) => {
       <CommentRow
         key={comment._id}
         comment={comment}
+        canToggleUrgentCheck
+        canToggleGroupCheck={
+          !!organisation.groupsEnabled && comment.person?._id && groups.find((group) => group.persons.includes(comment.person._id))
+        }
         itemName={`${comment.type === 'action' ? 'Action' : 'Personne suivie'} : ${commentedItem?.name}`}
         onItemNamePress={() => (comment.type === 'action' ? onActionPress(comment.action) : onPseudoPress(comment.person))}
+        onDelete={async () => {
+          const response = await API.delete({ path: `/comment/${comment._id}` });
+          if (response.error) {
+            Alert.alert(response.error);
+            return false;
+          }
+          setComments((comments) => comments.filter((p) => p._id !== comment._id));
+          return true;
+        }}
         onUpdate={
           comment.team
-            ? () =>
-                navigation.push(comment.type === 'action' ? 'ActionComment' : 'PersonComment', {
-                  ...comment,
-                  commentTitle: commentedItem?.name,
-                  fromRoute: 'CommentsForReport',
-                })
+            ? async (commentUpdated) => {
+                if (comment.type === 'action') commentUpdated.action = comment.action._id;
+                if (comment.type === 'person') commentUpdated.person = comment.person._id;
+                const response = await API.put({
+                  path: `/comment/${comment._id}`,
+                  body: prepareCommentForEncryption(commentUpdated),
+                });
+                if (response.error) {
+                  Alert.alert(response.error);
+                  return false;
+                }
+                if (response.ok) {
+                  setComments((comments) =>
+                    comments.map((c) => {
+                      if (c._id === comment._id) return response.decryptedData;
+                      return c;
+                    })
+                  );
+                  return true;
+                }
+              }
             : null
         }
       />
