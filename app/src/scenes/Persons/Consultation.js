@@ -136,11 +136,12 @@ const Consultation = ({ navigation, route }) => {
       } else {
         consultationToSave.completedAt = null;
       }
-      const body = prepareConsultationForEncryption(organisation.consultations)({ 
-        teams: [currentTeam._id],
-        ...consultationToSave, 
-        _id: consultationDB?._id
+      const body = prepareConsultationForEncryption(organisation.consultations)({
+        ...consultationToSave,
+        teams: isNew ? [currentTeam._id] : consultationToSave.teams,
+        _id: consultationDB?._id,
       });
+      console.log('body', body);
       const consultationResponse = isNew
         ? await API.post({ path: '/consultation', body })
         : await API.put({ path: `/consultation/${consultationDB._id}`, body });

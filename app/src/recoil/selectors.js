@@ -306,11 +306,17 @@ Actions and Consultations
 
 */
 
-const consultationsSelector = selector({
-  key: 'consultationsSelector',
+const consultationsForCurrentTeamSelector = selector({
+  key: 'consultationsForCurrentTeamSelector',
   get: ({ get }) => {
     const consultations = get(consultationsState);
-    return consultations.map((c) => ({ ...c, isConsultation: true }));
+    const currentTeam = get(currentTeamState);
+    return consultations
+      .filter((consultation) => {
+        if (!consultation.teams?.length) return true;
+        return consultation.teams.includes(currentTeam._id);
+      })
+      .map((c) => ({ ...c, isConsultation: true }));
   },
 });
 
@@ -318,7 +324,7 @@ const actionsAndConsultationsSelector = selector({
   key: 'actionsAndConsultationsSelector',
   get: ({ get }) => {
     const actions = get(actionsForCurrentTeamSelector);
-    const consultations = get(consultationsSelector);
+    const consultations = get(consultationsForCurrentTeamSelector);
     return [...actions, ...consultations];
   },
 });
