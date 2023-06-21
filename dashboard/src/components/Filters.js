@@ -44,7 +44,7 @@ export const filterItem =
       if (['boolean'].includes(filter.type)) {
         if (filter.value === 'Oui' && !!itemValue) continue;
         if (filter.value === 'Non' && !itemValue) continue;
-        return null;
+        return false;
       }
       if (['date-with-time', 'date'].includes(filter.type)) {
         const { date, comparator } = filter.value;
@@ -52,7 +52,7 @@ export const filterItem =
           if (!itemValue) continue;
           return false;
         }
-        if (!itemValue) return null;
+        if (!itemValue) return false;
         if (comparator === 'before') {
           if (dayjsInstance(itemValue).isBefore(date)) continue;
           return false;
@@ -107,7 +107,7 @@ export const filterItem =
       }
       if (!isSelected) return false;
     }
-    return true;
+    return item;
   };
 
 export const filterData = (data, filters) => {
