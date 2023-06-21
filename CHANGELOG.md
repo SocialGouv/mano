@@ -1,3 +1,10 @@
+## [1.269.1](https://github.com/SocialGouv/mano/compare/v1.269.0...v1.269.1) (2023-06-21)
+
+
+### Bug Fixes
+
+* **dashbaord:** l'équipe par défaut dans les passages/rencontres créés dans les comptes-rendus est l'équipe dont on voit le compte-rendu, pas l'équipe su délecteur global ([#1552](https://github.com/SocialGouv/mano/issues/1552)) ([67a37f3](https://github.com/SocialGouv/mano/commit/67a37f3126115c0f97d196fd9785d10b668c982a))
+
 # [1.269.0](https://github.com/SocialGouv/mano/compare/v1.268.9...v1.269.0) (2023-06-19)
 
 
