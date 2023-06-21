@@ -19,8 +19,7 @@
     "build:android-apk": "cd android && ./gradlew clean && ./gradlew assembleRelease && cd ../",
     "build:android-apk-preproduction": "echo -p \"please update either .env.production with the preproduction values until we found a better solution 🥸\" && cd android && ./gradlew clean && ./gradlew assembleRelease && cd ../",
     "deploy:android": "./upload.sh",
-    "build-and-deploy:android": "npm run build:android-apk && ./upload.sh",
-    "build-and-deploy-preprod:android": "npm run build:android-apk-preproduction && ./upload-preprod.sh",
+    "build-and-deploy-preprod:android": "npm run build:android-apk && ./upload-preprod.sh",
     "update-mobile-app-version": "node ./update-mobile-app-version.js",
     "publish-release-to-github": "node ./publish-release-to-github.js"
   },
