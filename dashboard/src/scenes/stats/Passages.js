@@ -2,11 +2,23 @@ import React from 'react';
 import { CustomResponsivePie } from './charts';
 import { getPieData } from './utils';
 import { AgeRangeBar } from './Persons';
+import Filters from '../../components/Filters';
 
-const PassagesStats = ({ passages, personFields, personsInPassagesOfPeriod, personsInPassagesBeforePeriod }) => {
+const PassagesStats = ({
+  passages,
+  personFields,
+  personsInPassagesOfPeriod,
+  personsInPassagesBeforePeriod,
+  filterBase,
+  filterPersons,
+  setFilterPersons,
+}) => {
   return (
     <>
       <h3 className="tw-my-5 tw-text-xl">Statistiques des passages</h3>
+      <div className="tw-flex tw-basis-full tw-items-center">
+        <Filters title="Filtrer par personnes suivies:" base={filterBase} filters={filterPersons} onChange={setFilterPersons} />
+      </div>
       <CustomResponsivePie
         title="Nombre de passages"
         data={getPieData(passages, 'type', { options: ['Anonyme', 'Non-anonyme'] })}

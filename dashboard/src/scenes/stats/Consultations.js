@@ -5,12 +5,16 @@ import { organisationState } from '../../recoil/auth';
 import { useRecoilValue } from 'recoil';
 import { Block } from './Blocks';
 import CustomFieldsStats from './CustomFieldsStats';
+import Filters from '../../components/Filters';
 
-const ConsultationsStats = ({ consultations }) => {
+const ConsultationsStats = ({ consultations, filterBase, filterPersons, setFilterPersons }) => {
   const organisation = useRecoilValue(organisationState);
   return (
     <>
       <h3 className="tw-my-5 tw-text-xl">Statistiques des consultations</h3>
+      <div className="tw-flex tw-basis-full tw-items-center">
+        <Filters title="Filtrer par personnes suivies:" base={filterBase} filters={filterPersons} onChange={setFilterPersons} />
+      </div>
       <div className="tw-mb-5 tw-flex tw-justify-center">
         <Block
           data={consultations}

@@ -17,6 +17,7 @@ import TagTeam from '../../components/TagTeam';
 import Table from '../../components/table';
 import { dayjsInstance, formatDateWithFullMonth } from '../../services/date';
 import CustomFieldDisplay from '../../components/CustomFieldDisplay';
+import { groupsState } from '../../recoil/groups';
 
 const PersonStats = ({
   title,
@@ -25,14 +26,25 @@ const PersonStats = ({
   filterPersons,
   setFilterPersons,
   personsForStats,
-  groupsForPersons,
   personFields,
   flattenedCustomFieldsPersons,
 }) => {
+  const allGroups = useRecoilValue(groupsState);
+
   const [personsModalOpened, setPersonsModalOpened] = useState(false);
   const [sliceField, setSliceField] = useState(null);
   const [sliceValue, setSliceValue] = useState(null);
   const [slicedData, setSlicedData] = useState([]);
+
+  const groupsForPersons = useMemo(() => {
+    const groupIds = new Set();
+    for (const person of personsForStats) {
+      if (person.group) {
+        groupIds.add(person.group._id);
+      }
+    }
+    return allGroups.filter((group) => groupIds.has(group._id));
+  }, [personsForStats, allGroups]);
 
   const onSliceClick = (newSlice, fieldName, personConcerned = personsForStats) => {
     const newSlicefield = filterBase.find((f) => f.field === fieldName);
@@ -52,13 +64,13 @@ const PersonStats = ({
   };
   return (
     <>
-      <h3 className="tw-my-5 tw-text-xl">Statistiques des personnes suivies</h3>
+      <h3 className="tw-my-5 tw-text-xl">Statistiques des {title}</h3>
       <Filters base={filterBase} filters={filterPersons} onChange={setFilterPersons} />
       <div className="-tw-mx-4 tw-flex tw-flex-wrap">
         <Block data={personsForStats} title={`Nombre de ${title}`} help={firstBlockHelp} />
         <BlockCreatedAt persons={personsForStats} />
         <BlockWanderingAt persons={personsForStats} />
-        <BlockGroup groups={groupsForPersons(personsForStats)} title={`Nombre de familles dans lesquelles se trouvent des ${title}`} />
+        <BlockGroup groups={groupsForPersons} title={`Nombre de familles dans lesquelles se trouvent des ${title}`} />
       </div>
       <CustomResponsivePie
         title="Genre"

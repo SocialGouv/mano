@@ -1,11 +1,23 @@
 import React from 'react';
 import { CustomResponsivePie } from './charts';
 import { getPieData } from './utils';
+import Filters from '../../components/Filters';
 
-const RencontresStats = ({ rencontres, personFields, personsInRencontresOfPeriod, personsInRencontresBeforePeriod }) => {
+const RencontresStats = ({
+  rencontres,
+  personFields,
+  personsInRencontresOfPeriod,
+  personsInRencontresBeforePeriod,
+  filterBase,
+  filterPersons,
+  setFilterPersons,
+}) => {
   return (
     <>
       <h3 className="tw-my-5 tw-text-xl">Statistiques des rencontres</h3>
+      <div className="tw-flex tw-basis-full tw-items-center">
+        <Filters title="Filtrer par personnes suivies:" base={filterBase} filters={filterPersons} onChange={setFilterPersons} />
+      </div>
       <CustomResponsivePie
         title="Nombre de rencontres"
         data={getPieData(rencontres, 'type', { options: ['Anonyme', 'Non-anonyme'] })}

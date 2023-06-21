@@ -226,7 +226,11 @@ export const itemsGroupedByPersonSelector = selector({
     for (const passage of passages) {
       if (!personsObject[passage.person]) continue;
       personsObject[passage.person].passages = personsObject[passage.person].passages || [];
-      personsObject[passage.person].passages.push(passage);
+      personsObject[passage.person].passages.push({
+        ...passage,
+        type: 'Non-anonyme',
+        gender: personsObject[passage.person]?.gender || 'Non renseigné',
+      });
       personsObject[passage.person].interactions.push(passage.date || passage.createdAt);
     }
     for (const rencontre of rencontres) {
