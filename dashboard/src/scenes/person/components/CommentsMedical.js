@@ -2,17 +2,19 @@ import React, { useMemo, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { v4 as uuidv4 } from 'uuid';
 import ConsultationModal from '../../../components/ConsultationModal';
-import { medicalFileState } from '../../../recoil/medicalFiles';
+import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../../recoil/medicalFiles';
 import { arrayOfitemsGroupedByConsultationSelector } from '../../../recoil/selectors';
 import { treatmentsState } from '../../../recoil/treatments';
 import TreatmentModal from './TreatmentModal';
 import { CommentsModule } from '../../../components/CommentsGeneric';
 import { userState } from '../../../recoil/auth';
+import API from '../../../services/api';
 
 const CommentsMedical = ({ person }) => {
   const allConsultations = useRecoilValue(arrayOfitemsGroupedByConsultationSelector);
   const allTreatments = useRecoilValue(treatmentsState);
   const user = useRecoilValue(userState);
+  const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
   const [allMedicalFiles, setAllMedicalFiles] = useRecoilState(medicalFileState);
   const [consultation, setConsultation] = useState(false);
   const [treatment, setTreatment] = useState(false);
@@ -23,6 +25,7 @@ const CommentsMedical = ({ person }) => {
 
   const medicalFile = useMemo(() => (allMedicalFiles || []).find((m) => m.person === person._id), [allMedicalFiles, person._id]);
 
+  console.log('medicalFile', medicalFile);
   const allMedicalComments = useMemo(() => {
     const treatmentsComments =
       treatments
@@ -71,27 +74,53 @@ const CommentsMedical = ({ person }) => {
         typeForNewComment="medical-file"
         color="blue-900"
         showPanel
-        onDeleteComment={(comment) => {
+        onDeleteComment={async (comment) => {
+          const newMedicalFile = {
+            ...medicalFile,
+            comments: medicalFile.comments.filter((c) => c._id !== comment._id),
+          };
+          // optimistic UI
           setAllMedicalFiles((medicalFiles) => {
             return medicalFiles.map((_medicalFile) => {
               if (_medicalFile._id !== medicalFile._id) return _medicalFile;
-              return {
-                ..._medicalFile,
-                comments: _medicalFile.comments.filter((c) => c._id !== comment._id),
-              };
+              return newMedicalFile;
+            });
+          });
+          const response = await API.put({
+            path: `/medical-file/${medicalFile._id}`,
+            body: prepareMedicalFileForEncryption(customFieldsMedicalFile)(newMedicalFile),
+          });
+          if (!response.ok) return;
+          setAllMedicalFiles((medicalFiles) => {
+            return medicalFiles.map((_medicalFile) => {
+              if (_medicalFile._id !== medicalFile._id) return _medicalFile;
+              return response.decryptedData;
             });
           });
         }}
-        onSubmitComment={(comment, isNewComment) => {
+        onSubmitComment={async (comment, isNewComment) => {
+          const newMedicalFile = {
+            ...medicalFile,
+            comments: isNewComment
+              ? [{ ...comment, _id: uuidv4() }, ...(medicalFile.comments || [])]
+              : medicalFile.comments.map((c) => (c._id === comment._id ? comment : c)),
+          };
+          // optimistic UI
           setAllMedicalFiles((medicalFiles) => {
             return medicalFiles.map((_medicalFile) => {
               if (_medicalFile._id !== medicalFile._id) return _medicalFile;
-              return {
-                ..._medicalFile,
-                comments: isNewComment
-                  ? [{ ...comment, _id: uuidv4() }, ...(_medicalFile.comments || [])]
-                  : _medicalFile.comments.map((c) => (c._id === comment._id ? comment : c)),
-              };
+              return newMedicalFile;
+            });
+          });
+          const response = await API.put({
+            path: `/medical-file/${medicalFile._id}`,
+            body: prepareMedicalFileForEncryption(customFieldsMedicalFile)(newMedicalFile),
+          });
+          if (!response.ok) return;
+          setAllMedicalFiles((medicalFiles) => {
+            return medicalFiles.map((_medicalFile) => {
+              if (_medicalFile._id !== medicalFile._id) return _medicalFile;
+              return response.decryptedData;
             });
           });
         }}

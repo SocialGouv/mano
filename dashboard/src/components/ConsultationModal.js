@@ -342,6 +342,7 @@ export default function ConsultationModal({ onClose, personId, consultation, dat
             {data.person && (
               <Documents
                 personId={data.person}
+                color="blue-900"
                 documents={data.documents}
                 onAdd={async (docResponse) => {
                   const { data: file, encryptedEntityKey } = docResponse;
@@ -371,6 +372,7 @@ export default function ConsultationModal({ onClose, personId, consultation, dat
             className={['tw-flex tw-min-h-screen tw-w-full tw-flex-col tw-gap-4 tw-px-8', activeTab !== 'Commentaires' ? 'tw-hidden' : ''].join(' ')}>
             <CommentsModule
               comments={data.comments}
+              color="blue-900"
               typeForNewComment="consultation"
               onDeleteComment={(comment) => {
                 console.log('delete comment', comment);
@@ -408,7 +410,7 @@ export default function ConsultationModal({ onClose, personId, consultation, dat
             Supprimer
           </button>
         )}
-        <button type="submit" className="button-submit" form="add-consultation-form">
+        <button type="submit" className="button-submit !tw-bg-blue-900" form="add-consultation-form">
           Sauvegarder
         </button>
       </ModalFooter>

@@ -186,6 +186,7 @@ export default function TreatmentModal({ onClose, isNewTreatment, treatment, per
                 )}>
                 <Documents
                   title="Documents"
+                  color="blue-900"
                   personId={person._id}
                   documents={values.documents}
                   onAdd={async (docResponse) => {
@@ -224,6 +225,7 @@ export default function TreatmentModal({ onClose, isNewTreatment, treatment, per
                 )}>
                 <CommentsModule
                   comments={values.comments}
+                  color="blue-900"
                   typeForNewComment="treatment"
                   onDeleteComment={(comment) => {
                     handleChange({
@@ -268,7 +270,7 @@ export default function TreatmentModal({ onClose, isNewTreatment, treatment, per
                 </button>
               )}
               <button
-                className="button-submit"
+                className="button-submit !tw-bg-blue-900"
                 type="button"
                 disabled={isSubmitting || JSON.stringify(values) === JSON.stringify(currentTreatment)}
                 onClick={() => !isSubmitting && handleSubmit()}>

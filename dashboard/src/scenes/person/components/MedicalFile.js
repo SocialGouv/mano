@@ -36,6 +36,7 @@ export default function MedicalFile({ person }) {
   useEffect(() => {
     if (!medicalFile) {
       (async () => {
+        console.log('CRETAE MEDICAL FILE AGAIN');
         const response = await API.post({
           path: '/medical-file',
           body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({ person: person._id, documents: [], organisation: organisation._id }),

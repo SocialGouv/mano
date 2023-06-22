@@ -20,6 +20,7 @@ const Documents = ({
   additionalColumns = [],
   conditionForDelete = () => true,
   onRowClick = null,
+  color = 'main', // main/blue-900
 }) => {
   const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
@@ -42,7 +43,7 @@ const Documents = ({
       <div className="tw-my-1.5 tw-flex tw-items-center tw-justify-between">
         {!!onAdd && (
           <div className="tw-mx-auto tw-flex">
-            <label className="button-submit">
+            <label className={`button-submit !tw-bg-${color}`}>
               ＋ Ajouter un document
               <input
                 key={resetFileInputKey}

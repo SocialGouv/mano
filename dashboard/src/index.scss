@@ -140,6 +140,16 @@ table.table-selego {
   }
 }
 
+@media screen {
+  .table-selego.medical tbody > tr:nth-child(odd) {
+    background-color: #457a9d;
+    color: #fff;
+  }
+  .table-selego.medical tbody > tr:nth-child(even) {
+    background-color: #e6f4fe;
+  }
+}
+
 /* react-datepicker */
 
 .stats-datepicker .react-datepicker {

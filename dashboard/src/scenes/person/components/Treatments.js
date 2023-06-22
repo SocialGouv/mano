@@ -7,6 +7,7 @@ import TreatmentModal from './TreatmentModal';
 import { treatmentsState } from '../../../recoil/treatments';
 import { AgendaMutedIcon } from './AgendaMutedIcon';
 import { FullScreenIcon } from './FullScreenIcon';
+import useSearchParamState from '../../../services/useSearchParamState';
 
 export const Treatments = ({ person }) => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -64,8 +65,14 @@ export const Treatments = ({ person }) => {
 
 const TreatmentsTable = ({ filteredData, person }) => {
   const user = useRecoilValue(userState);
-  const [treatmentEditOpen, setTreatmentEditOpen] = useState(false);
+  const [currentTreatmentId, setCurrentTreatmentId] = useSearchParamState('treatmentId', null);
   const users = useRecoilValue(usersState);
+  const allTreatments = useRecoilValue(treatmentsState);
+
+  const currentTreatment = useMemo(() => {
+    if (!currentTreatmentId) return null;
+    return allTreatments.find((t) => t._id === currentTreatmentId);
+  }, [allTreatments, currentTreatmentId]);
 
   const displayTreatment = (treatment) => {
     let base = treatment.name;
@@ -87,12 +94,16 @@ const TreatmentsTable = ({ filteredData, person }) => {
         <tbody className="small">
           {filteredData.map((treatment, i) => {
             return (
-              <tr key={treatment._id} className={i % 2 ? 'tw-bg-slate-50/80' : 'tw-bg-slate-100/80'}>
+              <tr
+                key={treatment._id}
+                className={['tw-w-full tw-border-t tw-border-zinc-200 tw-bg-blue-900', Boolean(i % 2) ? 'tw-bg-opacity-0' : 'tw-bg-opacity-5'].join(
+                  ' '
+                )}>
                 <td>
                   <div
                     className={['restricted-access'].includes(user.role) ? 'tw-cursor-not-allowed tw-py-2' : 'tw-cursor-pointer tw-py-2'}
                     onClick={() => {
-                      setTreatmentEditOpen(treatment);
+                      setCurrentTreatmentId(treatment._id);
                     }}>
                     <div className="tw-flex">
                       <div className="tw-flex tw-flex-1 tw-items-center">
@@ -109,7 +120,7 @@ const TreatmentsTable = ({ filteredData, person }) => {
           })}
         </tbody>
       </table>
-      {treatmentEditOpen && <TreatmentModal treatment={treatmentEditOpen} person={person} onClose={() => setTreatmentEditOpen(false)} />}
+      {currentTreatment && <TreatmentModal treatment={currentTreatment} person={person} onClose={() => setCurrentTreatmentId(null)} />}
     </>
   );
 };

@@ -37,7 +37,7 @@ import { personsState, sortPersons } from '../../recoil/persons';
 import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import { territoriesState } from '../../recoil/territory';
 import PersonName from '../../components/PersonName';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { selector, useRecoilValue, useSetRecoilState } from 'recoil';
 import IncrementorSmall from '../../components/IncrementorSmall';
 import API from '../../services/api';
 import { passagesState } from '../../recoil/passages';
@@ -56,8 +56,10 @@ import TagTeam from '../../components/TagTeam';
 import ReceptionService from '../../components/ReceptionService';
 import { useLocalStorage } from '../../services/useLocalStorage';
 import useSearchParamState from '../../services/useSearchParamState';
-import { arrayOfitemsGroupedByActionSelector, arrayOfitemsGroupedByConsultationSelector } from '../../recoil/selectors';
+import { arrayOfitemsGroupedByActionSelector, arrayOfitemsGroupedByConsultationSelector, personsObjectSelector } from '../../recoil/selectors';
 import ConsultationModal from '../../components/ConsultationModal';
+import { treatmentsState } from '../../recoil/treatments';
+import { medicalFileState } from '../../recoil/medicalFiles';
 
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithFullMonth(date)}`;
@@ -65,13 +67,43 @@ const getPeriodTitle = (date, nightSession) => {
   return `Nuit du ${formatDateWithFullMonth(date)} au ${formatDateWithFullMonth(nextDay)}`;
 };
 
+const commentsMedicalSelector = selector({
+  key: 'commentsMedicalSelector',
+  get: ({ get }) => {
+    const consultations = get(arrayOfitemsGroupedByConsultationSelector);
+    const treatments = get(treatmentsState);
+    const medicalFiles = get(medicalFileState);
+    const allPersonsAsObject = get(personsObjectSelector);
+
+    const comments = [];
+    for (const consultation of consultations) {
+      for (const comment of consultation.comments || []) {
+        comments.push({ ...comment, type: 'consultation', consultation: consultation._id, person: allPersonsAsObject[consultation.person] });
+      }
+    }
+    for (const treatment of treatments) {
+      for (const comment of treatment.comments || []) {
+        comments.push({ ...comment, type: 'treatment', treatment: treatment._id, person: allPersonsAsObject[treatment.person] });
+      }
+    }
+    for (const medicalFile of medicalFiles) {
+      for (const comment of medicalFile.comments || []) {
+        comments.push({ ...comment, type: 'medical-file', medicalFile: medicalFile._id, person: allPersonsAsObject[medicalFile.person] });
+      }
+    }
+    return comments.sort((a, b) => new Date(a.date) - new Date(b.date));
+  },
+});
+
 const View = () => {
   const { dateString } = useParams();
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
   const allComments = useRecoilValue(commentsState);
+  const allCommentsMedical = useRecoilValue(commentsMedicalSelector);
   const allPersons = useRecoilValue(personsState);
+  const allPersonsAsObject = useRecoilValue(personsObjectSelector);
   const teams = useRecoilValue(teamsState);
   const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('reports-allOrg', teams.length === 1);
   const [selectedTeamIds, setSelectedTeamIds] = useLocalStorage('reports-teams', [currentTeam._id]);
@@ -229,14 +261,14 @@ const View = () => {
           const commentPopulated = { ...comment };
           if (comment.person) {
             const personId = comment?.person;
-            commentPopulated.person = allPersons.find((p) => p._id === personId);
+            commentPopulated.person = allPersonsAsObject[personId];
             commentPopulated.type = 'person';
           }
           if (comment.action) {
             const actionId = comment?.action;
             const action = allActions.find((p) => p._id === actionId);
             commentPopulated.action = action;
-            commentPopulated.person = allPersons.find((p) => p._id === action?.person);
+            commentPopulated.person = allPersonsAsObject[action?.person];
             commentPopulated.type = 'action';
           }
           return commentPopulated;
@@ -248,6 +280,21 @@ const View = () => {
         })
         .sort((a, b) => new Date(a.date || a.createdAt) - new Date(b.date || b.createdAt)),
     [allComments, selectedTeamsObject, dateString, allPersons, allActions]
+  );
+
+  const commentsMedical = useMemo(
+    () =>
+      allCommentsMedical
+        ?.filter((c) => !!selectedTeamsObject[c.team])
+        .filter((c) => {
+          const currentTeam = selectedTeamsObject[c.team];
+          return getIsDayWithinHoursOffsetOfPeriod(
+            c.date,
+            { referenceStartDay: dateString, referenceEndDay: dateString },
+            currentTeam?.nightSession ? 12 : 0
+          );
+        }),
+    [allCommentsMedical, selectedTeamsObject, dateString]
   );
 
   const allRencontres = useRecoilValue(rencontresState);
@@ -389,6 +436,7 @@ const View = () => {
               sortOrder={actionsSortOrder}
             />
             <CommentCreatedAt date={dateString} comments={comments} />
+            {!!user.healthcareProfessional && <CommentCreatedAt date={dateString} comments={commentsMedical} medical />}
           </>
         )}
         <PassagesCreatedAt date={dateString} passages={passages} />
@@ -527,17 +575,14 @@ const View = () => {
         </div>
       </HeaderStyled>
       <div
-        className="noprint"
-        style={{
-          height: '100%',
-          display: viewAllOrganisationData || selectedTeamIds.length ? 'flex' : 'none',
-          overflow: 'hidden',
-          flex: 1,
-          marginTop: '1rem',
-          borderTop: '1px solid #eee',
-        }}>
-        <div style={{ display: 'flex', overflow: 'hidden', flex: 1 }}>
-          <Drawer title="Navigation dans les catégories du compte-rendu">
+        className={[
+          'noprint tw-mt-4 tw-h-full tw-flex-1 tw-overflow-hidden tw-border-t tw-border-gray-200',
+          viewAllOrganisationData || selectedTeamIds.length ? 'tw-flex' : 'tw-hidden',
+        ].join(' ')}>
+        <div className="tw-flex tw-flex-1 tw-overflow-hidden">
+          <nav
+            className="tw-flex tw-h-full tw-w-56 tw-shrink-0 tw-flex-col tw-items-start tw-overflow-auto tw-bg-main tw-bg-opacity-10 tw-pt-5 tw-pl-2.5 [&_button]:tw-text-left [&_hr]:tw-mb-0 [&_hr]:tw-mt-4"
+            title="Navigation dans les catégories du compte-rendu">
             {!['restricted-access'].includes(user.role) && (
               <>
                 <DrawerLink id="report-button-resume" className={activeTab === 'resume' ? 'active' : ''} onClick={() => setActiveTab('resume')}>
@@ -585,6 +630,14 @@ const View = () => {
                   onClick={() => setActiveTab('comment-created')}>
                   Commentaires ({comments.length})
                 </DrawerLink>
+                {!!user.healthcareProfessional && (
+                  <DrawerLink
+                    id="report-button-comment-medical-created"
+                    className={activeTab === 'comment-medical-created' ? 'active' : ''}
+                    onClick={() => setActiveTab('comment-medical-created')}>
+                    Commentaires médicaux ({commentsMedical.length})
+                  </DrawerLink>
+                )}
                 <hr />
               </>
             )}
@@ -648,30 +701,20 @@ const View = () => {
                 </DrawerLink>
               </>
             )}
-          </Drawer>
-          <div
-            ref={scrollContainer}
-            style={{
-              display: 'flex',
-              overflow: 'auto',
-              flex: 1,
-              height: '100%',
-              width: '100%',
-              padding: '15px 25px 0px',
-              backgroundColor: '#fff',
-            }}>
+          </nav>
+          <div ref={scrollContainer} className="tw-flex tw-h-full tw-w-full tw-flex-1 tw-overflow-auto tw-bg-white tw-px-6 tw-pt-4 tw-pb-0">
             {activeTab === 'resume' && (
-              <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
+              <div className="tw-min-h-full tw-w-full tw-overflow-auto">
                 <DescriptionAndCollaborations reports={selectedTeamsReports} selectedTeamsObject={selectedTeamsObject} dateString={dateString} />
               </div>
             )}
             {activeTab === 'reception' && !!organisation.services && !!organisation.receptionEnabled && (
-              <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
+              <div className="tw-min-h-full tw-w-full tw-overflow-auto">
                 <Reception reports={selectedTeamsReports} dateString={dateString} selectedTeamsObject={selectedTeamsObject} />
               </div>
             )}
             {activeTab === 'action-completed' && (
-              <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
+              <div className="tw-min-h-full tw-w-full tw-overflow-auto">
                 <ActionCompletedAt
                   date={dateString}
                   status={DONE}
@@ -684,7 +727,7 @@ const View = () => {
               </div>
             )}
             {activeTab === 'action-created' && (
-              <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
+              <div className="tw-min-h-full tw-w-full tw-overflow-auto">
                 <ActionCreatedAt
                   date={dateString}
                   actions={actionsCreatedAt}
@@ -696,7 +739,7 @@ const View = () => {
               </div>
             )}
             {activeTab === 'action-cancelled' && (
-              <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
+              <div className="tw-min-h-full tw-w-full tw-overflow-auto">
                 <ActionCompletedAt
                   date={dateString}
                   status={CANCEL}
@@ -709,27 +752,32 @@ const View = () => {
               </div>
             )}
             {activeTab === 'comment-created' && (
-              <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
+              <div className="tw-min-h-full tw-w-full tw-overflow-auto">
                 <CommentCreatedAt date={dateString} comments={comments} />
               </div>
             )}
+            {activeTab === 'comment-medical-created' && (
+              <div className="tw-min-h-full tw-w-full tw-overflow-auto">
+                <CommentCreatedAt date={dateString} comments={commentsMedical} medical />
+              </div>
+            )}
             {activeTab === 'passages' && (
-              <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
+              <div className="tw-min-h-full tw-w-full tw-overflow-auto">
                 <PassagesCreatedAt date={dateString} passages={passages} selectedTeams={selectedTeams} />
               </div>
             )}
             {activeTab === 'rencontres' && (
-              <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
+              <div className="tw-min-h-full tw-w-full tw-overflow-auto">
                 <RencontresCreatedAt date={dateString} rencontres={rencontres} selectedTeams={selectedTeams} />
               </div>
             )}
             {activeTab === 'territory-observations' && (
-              <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
+              <div className="tw-min-h-full tw-w-full tw-overflow-auto">
                 <TerritoryObservationsCreatedAt date={dateString} reports={selectedTeamsReports} observations={observations} />
               </div>
             )}
             {activeTab === 'persons-created' && (
-              <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
+              <div className="tw-min-h-full tw-w-full tw-overflow-auto">
                 <PersonCreatedAt
                   date={dateString}
                   reports={selectedTeamsReports}
@@ -742,7 +790,7 @@ const View = () => {
               </div>
             )}
             {activeTab === 'consultations' && (
-              <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
+              <div className="tw-min-h-full tw-w-full tw-overflow-auto">
                 <Consultations
                   date={dateString}
                   status={DONE}
@@ -755,7 +803,7 @@ const View = () => {
               </div>
             )}
             {activeTab === 'consultations-created' && (
-              <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
+              <div className="tw-min-h-full tw-w-full tw-overflow-auto">
                 <ConsultationsCreatedAt
                   date={dateString}
                   consultations={consultationsCreatedAt}
@@ -767,7 +815,7 @@ const View = () => {
               </div>
             )}
             {activeTab === 'consultations-cancelled' && (
-              <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
+              <div className="tw-min-h-full tw-w-full tw-overflow-auto">
                 <Consultations
                   date={dateString}
                   status={CANCEL}
@@ -1349,7 +1397,145 @@ const ConsultationsCreatedAt = ({ date, consultations }) => {
   );
 };
 
-const CommentCreatedAt = ({ date, comments }) => {
+const CommentCreatedAt = ({ date, comments, medical }) => {
+  const history = useHistory();
+  const data = comments;
+  const organisation = useRecoilValue(organisationState);
+
+  if (!data) return <div />;
+
+  return (
+    <>
+      <StyledBox>
+        <Table
+          className={medical ? 'medical' : ''}
+          title={`Commentaires ajoutés le ${formatDateWithFullMonth(date)}`}
+          data={data}
+          noData="Pas de commentaire ajouté ce jour"
+          onRowClick={(comment) => {
+            try {
+              console.log('comment', comment);
+              switch (comment.type) {
+                case 'action':
+                  history.push(`/action/${comment.action._id}`);
+                  break;
+                case 'person':
+                  history.push(`/person/${comment.person._id}`);
+                  break;
+                case 'consultation':
+                  history.push(`/person/${comment.person._id}?tab=Dossier+Médical&consultationId=${comment.consultation}`);
+                  break;
+                case 'treatment':
+                  history.push(`/person/${comment.person._id}?tab=Dossier+Médical&treatmentId=${comment.treatment}`);
+                  break;
+                case 'medical-file':
+                  history.push(`/person/${comment.person._id}?tab=Dossier+Médical`);
+                  break;
+                default:
+                  break;
+              }
+            } catch (errorLoadingComment) {
+              capture(errorLoadingComment, { extra: { message: 'error loading comment from report', comment, date } });
+            }
+          }}
+          rowKey="_id"
+          dataTestId="comment"
+          columns={[
+            {
+              title: '',
+              dataKey: 'urgent',
+              small: true,
+              render: (comment) => {
+                return (
+                  <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
+                    {!!comment.urgent && <ExclamationMarkButton />}
+                    {!!organisation.groupsEnabled && !!comment.group && (
+                      <span className="tw-text-3xl" aria-label="Commentaire familial" title="Commentaire familial">
+                        👪
+                      </span>
+                    )}
+                  </div>
+                );
+              },
+            },
+            {
+              title: 'Heure',
+              dataKey: 'date',
+              render: (comment) => <span>{dayjs(comment.date || comment.createdAt).format('D MMM HH:mm')}</span>,
+            },
+            {
+              title: 'Utilisateur',
+              dataKey: 'user',
+              render: (comment) => <UserName id={comment.user} />,
+            },
+            {
+              title: 'Type',
+              dataKey: 'type',
+              render: (comment) => (
+                <span>
+                  {comment.type === 'action' && 'Action'}
+                  {comment.type === 'person' && 'Personne suivie'}
+                  {comment.type === 'consultation' && 'Consultation'}
+                  {comment.type === 'treatment' && 'Traitement'}
+                  {comment.type === 'medical-file' && 'Dossier médical'}
+                </span>
+              ),
+            },
+            {
+              title: 'Nom',
+              dataKey: 'person',
+              render: (comment) => {
+                if (comment.type === 'action') {
+                  return (
+                    <>
+                      <b>{comment.action?.name}</b>
+                      <br />
+                      <i>(pour {comment.person?.name || ''})</i>
+                    </>
+                  );
+                }
+                return (
+                  <>
+                    <i>(pour {comment.person?.name || ''})</i>
+                  </>
+                );
+              },
+            },
+            {
+              title: 'Commentaire',
+              dataKey: 'comment',
+              render: (comment) => {
+                return (
+                  <p>
+                    {comment.comment
+                      ? comment.comment.split('\n').map((c, i, a) => {
+                          if (i === a.length - 1) return c;
+                          return (
+                            <React.Fragment key={i}>
+                              {c}
+                              <br />
+                            </React.Fragment>
+                          );
+                        })
+                      : ''}
+                  </p>
+                );
+              },
+            },
+            {
+              title: 'Équipe en charge',
+              dataKey: 'team',
+              render: (comment) => <TagTeam teamId={comment?.team} />,
+            },
+          ]}
+        />
+      </StyledBox>
+      <hr />
+    </>
+  );
+};
+
+const CommentMedicalCreatedAt = ({ date, comments }) => {
   const history = useHistory();
   const data = comments;
   const organisation = useRecoilValue(organisationState);

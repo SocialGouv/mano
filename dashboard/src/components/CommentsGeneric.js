@@ -194,7 +194,7 @@ export function CommentsTable({ comments, onEditComment, onAddComment, color, sh
           </button>
         </div>
       )}
-      <table className="table table-striped">
+      <table className="table">
         <tbody className="small">
           {(comments || []).map((comment, i) => {
             if (!comment.type) throw new Error('type is required');
@@ -207,7 +207,7 @@ export function CommentsTable({ comments, onEditComment, onAddComment, color, sh
               return null;
             }
             return (
-              <tr key={comment._id}>
+              <tr key={comment._id} className={[`tw-bg-${color}`, i % 2 ? 'tw-bg-opacity-0' : 'tw-bg-opacity-5'].join(' ')}>
                 <td
                   onClick={() => {
                     onEditComment(comment);

@@ -245,7 +245,9 @@ const PersonDocumentsMedical = ({ person }) => {
               key={doc._id}
               data-test-id={doc.downloadPath}
               aria-label={`Document ${doc.name}`}
-              className={['tw-w-full tw-border-t tw-border-zinc-200', Boolean(index % 2) ? '' : 'tw-bg-zinc-100'].join(' ')}
+              className={['tw-w-full tw-border-t tw-border-zinc-200 tw-bg-blue-900', Boolean(index % 2) ? 'tw-bg-opacity-0' : 'tw-bg-opacity-5'].join(
+                ' '
+              )}
               onClick={() => {
                 setDocumentToEdit(doc);
               }}>
