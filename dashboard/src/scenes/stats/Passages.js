@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { CustomResponsivePie } from './charts';
 import { getPieData } from './utils';
 import { AgeRangeBar } from './Persons';
@@ -7,17 +7,27 @@ import Filters from '../../components/Filters';
 const PassagesStats = ({
   passages,
   personFields,
-  personsInPassagesOfPeriod,
+  personsWithPassages,
   personsInPassagesBeforePeriod,
   filterBase,
   filterPersons,
   setFilterPersons,
 }) => {
+  const filterTitle = useMemo(() => {
+    if (!filterPersons.length) {
+      if (personsWithPassages.length === 1) return `Filtrer par personnes suivies (${personsWithPassages.length} personne concernée sans filtre) :`;
+      return `Filtrer par personnes suivies (${personsWithPassages.length} personnes concernées sans filtre) :`;
+    }
+    if (personsWithPassages.length === 1)
+      return `Filtrer par personnes suivies (${personsWithPassages.length} personne concernée par le filtre actuel) :`;
+    return `Filtrer par personnes suivies (${personsWithPassages.length} personnes concernées par le filtre actuel) :`;
+  }, [filterPersons, personsWithPassages]);
+
   return (
     <>
       <h3 className="tw-my-5 tw-text-xl">Statistiques des passages</h3>
       <div className="tw-flex tw-basis-full tw-items-center">
-        <Filters title="Filtrer par personnes suivies:" base={filterBase} filters={filterPersons} onChange={setFilterPersons} />
+        <Filters title={filterTitle} base={filterBase} filters={filterPersons} onChange={setFilterPersons} />
       </div>
       <CustomResponsivePie
         title="Nombre de passages"
@@ -36,7 +46,7 @@ const PassagesStats = ({
       <CustomResponsivePie
         title="Nombre de personnes différentes passées (passages anonymes exclus)"
         help={`Répartition par genre des passages non-anonymes (c'est-à-dire attachés à une personne) et uniques enregistrés dans la période définie.\n\nEn d'autres termes, si une personne est passée plusieurs fois, elle n'est comptabilisée ici qu'une seule fois.\n\nSi aucune période n'est définie, on considère l'ensemble des passages.`}
-        data={getPieData(personsInPassagesOfPeriod, 'gender', {
+        data={getPieData(personsWithPassages, 'gender', {
           options: [...personFields.find((f) => f.name === 'gender').options, 'Non précisé'],
         })}
       />
@@ -44,12 +54,12 @@ const PassagesStats = ({
         title="Nombre de nouvelles personnes passées (passages anonymes exclus)"
         help={`Répartition par genre des passages concernant des personnes créées pendant la période définie, enregistrés dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des passages.`}
         data={getPieData(
-          personsInPassagesOfPeriod.filter((personId) => !personsInPassagesBeforePeriod.includes(personId)),
+          personsWithPassages.filter((person) => !personsInPassagesBeforePeriod[person._id]),
           'gender',
           { options: [...personFields.find((f) => f.name === 'gender').options, 'Non précisé'] }
         )}
       />
-      <AgeRangeBar persons={personsInPassagesOfPeriod} />
+      <AgeRangeBar persons={personsWithPassages} />
     </>
   );
 };

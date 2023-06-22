@@ -140,7 +140,7 @@ const DateRangePickerWithPresets = ({ period, setPeriod, preset, setPreset, remo
       </button>
       {!!showDatePicker && (
         <OutsideClickHandler onOutsideClick={closeDatePicker}>
-          <div className="stats-datepicker tw-absolute tw-top-12 tw-z-50 tw-flex tw-flex-nowrap tw-items-center tw-justify-end tw-overflow-x-auto tw-rounded-lg tw-border tw-border-gray-300 tw-bg-white tw-pl-56 lg:tw-min-w-[45rem]">
+          <div className="stats-datepicker tw-absolute tw-top-12 tw-z-[1000] tw-flex tw-flex-nowrap tw-items-center tw-justify-end tw-overflow-x-auto tw-rounded-lg tw-border tw-border-gray-300 tw-bg-white tw-pl-56 lg:tw-min-w-[45rem]">
             <div className="tw-absolute tw-top-0 tw-left-0 tw-bottom-0 tw-ml-2 tw-box-border tw-flex tw-max-h-full tw-w-56 tw-flex-1 tw-flex-col tw-items-start tw-justify-start tw-overflow-y-scroll">
               {periods.map((p) => (
                 <button

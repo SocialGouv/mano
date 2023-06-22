@@ -3,11 +3,12 @@ import { Block } from './Blocks';
 import Filters from '../../components/Filters';
 
 const GeneralStats = ({
-  // personsForStats,
+  personsCreated,
   personsUpdated,
   rencontres,
   actions,
-  numberOfActionsPerPersonConcernedByActions,
+  // numberOfActionsPerPersonConcernedByActions,
+  personsWithActions,
   filterBase,
   filterPersons,
   setFilterPersons,
@@ -19,11 +20,11 @@ const GeneralStats = ({
         <Filters title="Filtrer par personnes suivies:" base={filterBase} filters={filterPersons} onChange={setFilterPersons} />
       </div>
       <div className="-tw-mx-4 tw-flex tw-flex-wrap">
-        {/* <Block
-          data={personsForStats}
+        <Block
+          data={personsCreated}
           title="Nombre de personnes créées"
           help={`Nombre de personnes dont la date 'Suivi(e) depuis' se situe dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
-        /> */}
+        />
         <Block
           data={personsUpdated}
           title="Nombre de personnes suivies"
@@ -39,10 +40,15 @@ const GeneralStats = ({
           title="Nombre d'actions"
           help={`Nombre d'actions enregistrées dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des actions.`}
         />
-        <Block
+        {/* <Block
           data={numberOfActionsPerPersonConcernedByActions}
           title="Nombre d'actions par personne concernée par au moins une action"
           help={`Moyenne d'actions créées par "personne suivie" <b>pour lesquelles au moins une action a été créée</b> dans la période définie.\n\nSi aucune période n'est définie, on considère la totalité des actions par rapport à la totalité des personnes.`}
+        /> */}
+        <Block
+          data={personsWithActions}
+          title="Nombre de personnes suivies concernées par au moins une action"
+          help={`Nombre de personnes suivies <b>pour lesquelles au moins une action a été créée</b> dans la période définie.\n\nSi aucune période n'est définie, on considère la totalité des actions par rapport à la totalité des personnes.`}
         />
       </div>
     </>

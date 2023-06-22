@@ -25,6 +25,7 @@ const ActionsStats = ({
   filterBase,
   filterPersons,
   setFilterPersons,
+  personsWithActions,
 }) => {
   const [actionsModalOpened, setActionsModalOpened] = useState(false);
   const [groupSlice, setGroupSlice] = useState(null);
@@ -66,11 +67,20 @@ const ActionsStats = ({
     return [];
   }, [actionsDataForGroups, actionsWithDetailedGroupAndCategories, groupSlice, categorySlice]);
 
+  const filterTitle = useMemo(() => {
+    if (!filterPersons.length) {
+      if (personsWithActions === 1) return `Filtrer par personnes suivies (${personsWithActions} personne concernée sans filtre) :`;
+      return `Filtrer par personnes suivies (${personsWithActions} personnes concernées sans filtre) :`;
+    }
+    if (personsWithActions === 1) return `Filtrer par personnes suivies (${personsWithActions} personne concernée par le filtre actuel) :`;
+    return `Filtrer par personnes suivies (${personsWithActions} personnes concernées par le filtre actuel) :`;
+  }, [filterPersons, personsWithActions]);
+
   return (
     <>
       <h3 className="tw-my-5 tw-text-xl">Statistiques des actions</h3>
       <div className="tw-flex tw-basis-full tw-items-center">
-        <Filters title="Filtrer par personnes suivies:" base={filterBase} filters={filterPersons} onChange={setFilterPersons} />
+        <Filters title={filterTitle} base={filterBase} filters={filterPersons} onChange={setFilterPersons} />
       </div>
       <div className="tw-mb-5 tw-flex tw-basis-full tw-items-center">
         <label htmlFor="filter-by-status" className="tw-w-64 tw-shrink-0">

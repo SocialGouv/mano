@@ -45,14 +45,14 @@ const tabs = [
   'Général',
   'Services',
   'Actions',
-  // 'Personnes créées',
+  'Personnes créées',
   'Personnes suivies',
   'Passages',
   'Rencontres',
   'Observations',
   'Comptes-rendus',
   'Consultations',
-  // 'Dossiers médicaux des personnes créées',
+  'Dossiers médicaux des personnes créées',
   'Dossiers médicaux des personnes suivies',
 ];
 
@@ -110,22 +110,32 @@ const itemsForStatsSelector = selectorFamily({
       const isoStartDate = period.startDate ? dayjs(period.startDate).startOf('day').add(offsetHours, 'hour').toISOString() : null;
       const isoEndDate = period.endDate ? dayjs(period.endDate).startOf('day').add(1, 'day').add(offsetHours, 'hour').toISOString() : null;
 
+      const personsCreated = [];
       const personsUpdated = [];
       const personsWithActions = {};
       const actionsFilteredByPersons = [];
       const consultationsFilteredByPersons = [];
+      const personsWithConsultations = {};
       const passagesFilteredByPersons = [];
+      const personsWithPassages = {};
+      const personsInPassagesBeforePeriod = {};
       const rencontresFilteredByPersons = [];
+      const personsWithRencontres = {};
+      const personsInRencontresBeforePeriod = {};
       const noPeriodSelected = !isoStartDate || !isoEndDate;
-      for (let [index, person] of Object.entries(allPersons)) {
+      for (let [indexString, person] of Object.entries(allPersons)) {
         // get the persons concerned by filters
-        if (!filterItem(filtersExceptOutOfActiveList, Number(index) === 0)(person)) continue;
+        if (!filterItem(filtersExceptOutOfActiveList)(person)) continue;
         if (outOfActiveListFilter === 'Oui' && !person.outOfActiveList) continue;
         if (outOfActiveListFilter === 'Non' && !!person.outOfActiveList) continue;
         // get persons for stats for period
+        const createdDate = person.followedSince || person.createdAt;
+
         if (noPeriodSelected) {
           personsUpdated.push(person);
+          personsCreated.push(person);
         } else {
+          if (createdDate >= isoStartDate && createdDate <= isoEndDate) personsCreated.push(person);
           for (const date of person.interactions) {
             if (date < isoStartDate) continue;
             if (date > isoEndDate) continue;
@@ -151,48 +161,68 @@ const itemsForStatsSelector = selectorFamily({
           if (!filterItemByTeam(consultation, 'teams')) continue;
           if (noPeriodSelected) {
             consultationsFilteredByPersons.push(consultation);
+            personsWithConsultations[person._id] = person;
             continue;
           }
           const date = consultation.completedAt || consultation.dueAt;
           if (date < isoStartDate) continue;
           if (date > isoEndDate) continue;
           consultationsFilteredByPersons.push(consultation);
+          personsWithConsultations[person._id] = person;
         }
-        for (const passage of person.passages || []) {
-          if (!filterItemByTeam(passage, 'team')) continue;
-          if (noPeriodSelected) {
+        if (!!person.passages?.length) {
+          for (const passage of person.passages) {
+            if (!filterItemByTeam(passage, 'team')) continue;
+            if (noPeriodSelected) {
+              passagesFilteredByPersons.push(passage);
+              personsWithPassages[person._id] = person;
+              continue;
+            }
+            const date = passage.date;
+            if (date < isoStartDate) continue;
+            if (date > isoEndDate) continue;
             passagesFilteredByPersons.push(passage);
-            continue;
+            personsWithPassages[person._id] = person;
+            // if (person._id === 'ffd41d5a-c273-4548-b94b-750354ff3aff') {
+            //   console.log('passage', createdDate, isoStartDate, createdDate < isoStartDate);
+            // }
+            if (createdDate < isoStartDate) {
+              // console.log('passage before period', person._id, person.firstName);
+              personsInPassagesBeforePeriod[person._id] = person;
+            }
           }
-          const date = passage.date;
-          if (date < isoStartDate) continue;
-          if (date > isoEndDate) continue;
-          passagesFilteredByPersons.push(passage);
         }
-        for (const rencontre of person.rencontres || []) {
-          if (!filterItemByTeam(rencontre, 'team')) continue;
-          if (noPeriodSelected) {
-            passagesFilteredByPersons.push(rencontre);
-            continue;
+        if (!!person.rencontres?.length) {
+          for (const rencontre of person.rencontres) {
+            if (!filterItemByTeam(rencontre, 'team')) continue;
+            if (noPeriodSelected) {
+              rencontresFilteredByPersons.push(rencontre);
+              personsWithRencontres[person._id] = person;
+              continue;
+            }
+            const date = rencontre.date;
+            if (date < isoStartDate) continue;
+            if (date > isoEndDate) continue;
+            rencontresFilteredByPersons.push(rencontre);
+            personsWithRencontres[person._id] = person;
+            if (createdDate < isoStartDate) personsInRencontresBeforePeriod[person._id] = person;
           }
-          const date = rencontre.date;
-          if (date < isoStartDate) continue;
-          if (date > isoEndDate) continue;
-          rencontresFilteredByPersons.push(rencontre);
         }
       }
 
-      const numberOfActionsPerPersonConcernedByActions = !Object.keys(personsWithActions).length
-        ? 0
-        : Math.round((actionsFilteredByPersons.length / Object.keys(personsWithActions).length) * 10) / 10;
-
       return {
+        personsCreated,
         personsUpdated,
-        numberOfActionsPerPersonConcernedByActions,
+        personsWithActions: Object.keys(personsWithActions).length,
         actionsFilteredByPersons,
-        passagesFilteredByPersons,
-        rencontresFilteredByPersons,
+        personsWithConsultations: Object.keys(personsWithConsultations).length,
         consultationsFilteredByPersons,
+        personsWithPassages: Object.values(personsWithPassages),
+        personsInPassagesBeforePeriod,
+        passagesFilteredByPersons,
+        personsWithRencontres: Object.values(personsWithRencontres),
+        personsInRencontresBeforePeriod,
+        rencontresFilteredByPersons,
       };
     },
 });
@@ -303,20 +333,26 @@ const Stats = () => {
    *
     FILTERS THE ACTIONS/PASSAGES/RENCONTRES/CONSULTATIONS BY PERSONS AND BY TEAM
     The big memo below is used for
-    - getting the persons with actions for average actions per person
-    - getting the actions filtered by team and by persons
-    - getting the passages filtered by team and by persons
-    - getting the rencontres filtered by team and by persons
+    - getting the actions filtered by team and by persons - and the number of persons with actions
+    - getting the consultations filtered by team and by persons - and the number of persons with consultations
+    - getting the passages filtered by team and by persons - and the number of persons with passages
+    - getting the rencontres filtered by team and by persons - and the number of persons with rencontres
    *
   */
 
   const {
-    numberOfActionsPerPersonConcernedByActions,
-    actionsFilteredByPersons,
+    personsCreated,
     personsUpdated,
-    passagesFilteredByPersons,
-    rencontresFilteredByPersons,
+    personsWithActions,
+    actionsFilteredByPersons,
+    personsWithConsultations,
     consultationsFilteredByPersons,
+    personsWithPassages,
+    personsInPassagesBeforePeriod,
+    passagesFilteredByPersons,
+    personsWithRencontres,
+    personsInRencontresBeforePeriod,
+    rencontresFilteredByPersons,
   } = useRecoilValue(
     itemsForStatsSelector({
       period,
@@ -358,14 +394,21 @@ const Stats = () => {
         actionsDetailed.push(action);
       }
     }
-    return actionsDetailed
+    const _actionsWithDetailedGroupAndCategories = actionsDetailed
       .filter((a) => !actionsCategoriesGroups.length || actionsCategoriesGroups.includes(a.categoryGroup))
       .filter((a) => {
         if (!actionsCategories.length) return true;
         if (actionsCategories.length === 1 && actionsCategories[0] === '-- Aucune --') return !a.categories?.length;
         return actionsCategories.includes(a.category);
       });
+    return _actionsWithDetailedGroupAndCategories;
   }, [actionsFilteredByPersons, groupsCategories, actionsCategoriesGroups, actionsCategories, actionsStatuses]);
+
+  const passages = useMemo(() => {
+    if (!!filterPersons.length) return passagesFilteredByPersons;
+    const teamsPassages = filterArrayByTeam(allPassagesPopulated, 'team');
+    return getDataForPeriod(teamsPassages, period, { field: 'date', allSelectedTeamsAreNightSession });
+  }, [allPassagesPopulated, filterArrayByTeam, period, allSelectedTeamsAreNightSession, passagesFilteredByPersons, filterPersons]);
 
   const observations = useMemo(
     () =>
@@ -378,71 +421,6 @@ const Stats = () => {
       ),
     [allObservations, filterArrayByTeam, period, selectedTerritories, allSelectedTeamsAreNightSession]
   );
-
-  const passages = useMemo(() => {
-    if (filterPersons.length) return passagesFilteredByPersons;
-    const teamsPassages = filterArrayByTeam(allPassagesPopulated, 'team');
-    return getDataForPeriod(teamsPassages, period, { field: 'date', allSelectedTeamsAreNightSession });
-  }, [allPassagesPopulated, filterArrayByTeam, period, allSelectedTeamsAreNightSession, passagesFilteredByPersons, filterPersons]);
-  const personsInPassagesBeforePeriod = useMemo(() => {
-    if (!period?.startDate) return [];
-    const offsetHours = Boolean(viewAllOrganisationData) || selectedTeams.every((e) => !e.nightSession) ? 0 : 12;
-    const isoStartDate = dayjs(period.startDate).startOf('day').add(offsetHours, 'hour').toISOString();
-    const passagesIds = {};
-    for (const passage of passages) {
-      passagesIds[passage._id] = true;
-    }
-    const passagesNotIncludedInPeriod = allPassagesPopulated.filter((p) => !passagesIds[p._id]).filter((p) => p.date < isoStartDate);
-    const personsOfPassages = {};
-    for (const passage of passagesNotIncludedInPeriod) {
-      if (!passage.person) continue;
-      if (!!personsOfPassages[passage.person]) continue;
-      personsOfPassages[passage.person] = allPersonsAsObject[passage.person] || { _id: passage.person, gender: 'Non précisé' };
-    }
-    const arrayOfPersonsOfPassages = Object.values(personsOfPassages);
-    return arrayOfPersonsOfPassages;
-  }, [period.startDate, viewAllOrganisationData, selectedTeams, allPassagesPopulated, passages, allPersonsAsObject]);
-  const personsInPassagesOfPeriod = useMemo(() => {
-    const personsOfPassages = {};
-    for (const passage of passages) {
-      if (!passage.person) continue;
-      if (!!personsOfPassages[passage.person]) continue;
-      personsOfPassages[passage.person] = allPersonsAsObject[passage.person] || { _id: passage.person, gender: 'Non précisé' };
-    }
-    const arrayOfPersonsOfPassages = Object.values(personsOfPassages);
-    return arrayOfPersonsOfPassages;
-  }, [passages, allPersonsAsObject]);
-
-  const rencontres = useMemo(() => {
-    if (filterPersons.length) return rencontresFilteredByPersons;
-    const teamsRencontres = filterArrayByTeam(allRencontresPopulated, 'team');
-    return getDataForPeriod(teamsRencontres, period, { field: 'date', allSelectedTeamsAreNightSession });
-  }, [allRencontresPopulated, filterArrayByTeam, period, allSelectedTeamsAreNightSession, rencontresFilteredByPersons, filterPersons]);
-  const personsInRencontresBeforePeriod = useMemo(() => {
-    if (!period?.startDate) return [];
-    const offsetHours = Boolean(viewAllOrganisationData) || selectedTeams.every((e) => !e.nightSession) ? 0 : 12;
-    const isoStartDate = dayjs(period.startDate).startOf('day').add(offsetHours, 'hour').toISOString();
-    const rencontresIds = rencontres.map((p) => p._id);
-    const rencontresNotIncludedInPeriod = allRencontresPopulated.filter((p) => !rencontresIds.includes(p._id)).filter((p) => p.date < isoStartDate);
-    const personsOfRencontres = {};
-    for (const rencontre of rencontresNotIncludedInPeriod) {
-      if (!rencontre.person) continue;
-      if (!!personsOfRencontres[rencontre.person]) continue;
-      personsOfRencontres[rencontre.person] = allPersonsAsObject[rencontre.person] || { _id: rencontre.person, gender: 'Non précisé' };
-    }
-    const arrayOfPersonsOfRencontres = Object.values(personsOfRencontres);
-    return arrayOfPersonsOfRencontres;
-  }, [period.startDate, viewAllOrganisationData, selectedTeams, rencontres, allRencontresPopulated, allPersonsAsObject]);
-  const personsInRencontresOfPeriod = useMemo(() => {
-    const personsOfRencontres = {};
-    for (const rencontre of rencontres) {
-      if (!rencontre.person) continue;
-      if (!!personsOfRencontres[rencontre.person]) continue;
-      personsOfRencontres[rencontre.person] = allPersonsAsObject[rencontre.person] || { _id: rencontre.person, gender: 'Non précisé' };
-    }
-    const arrayOfPersonsOfRencontres = Object.values(personsOfRencontres);
-    return arrayOfPersonsOfRencontres;
-  }, [rencontres, allPersonsAsObject]);
 
   const reports = useMemo(
     () =>
@@ -519,11 +497,7 @@ const Stats = () => {
         </div>
         <div className="tw-flex tw-basis-2/3 tw-items-center tw-justify-end">
           <ButtonCustom color="link" title="Imprimer" onClick={window.print} />
-          <ExportFormattedData
-            // personCreated={personsForStats}
-            personUpdated={personsUpdated}
-            actions={actionsWithDetailedGroupAndCategories}
-          />
+          <ExportFormattedData personCreated={personsCreated} personUpdated={personsUpdated} actions={actionsWithDetailedGroupAndCategories} />
         </div>
       </div>
       <ul className="noprint tw-mb-5 tw-flex tw-list-none tw-flex-wrap tw-border-b tw-border-zinc-200 tw-pl-0">
@@ -566,11 +540,12 @@ const Stats = () => {
       <div className="print:tw-flex print:tw-flex-col print:tw-px-8 print:tw-py-4">
         {activeTab === 'Général' && (
           <GeneralStats
-            // personsForStats={personsForStats}
+            personsCreated={personsCreated}
             personsUpdated={personsUpdated}
-            rencontres={rencontres}
+            rencontres={rencontresFilteredByPersons}
             actions={actionsFilteredByPersons}
-            numberOfActionsPerPersonConcernedByActions={numberOfActionsPerPersonConcernedByActions}
+            // numberOfActionsPerPersonConcernedByActions={numberOfActionsPerPersonConcernedByActions}
+            personsWithActions={personsWithActions}
             // filter by persons
             filterBase={filterPersonsWithAllFields()}
             filterPersons={filterPersons}
@@ -594,23 +569,24 @@ const Stats = () => {
             actionsCategories={actionsCategories}
             filterableActionsCategories={filterableActionsCategories}
             // filter by persons
+            personsWithActions={personsWithActions}
             filterBase={filterPersonsWithAllFields()}
             filterPersons={filterPersons}
             setFilterPersons={setFilterPersons}
           />
         )}
-        {/* {activeTab === 'Personnes créées' && (
+        {activeTab === 'Personnes créées' && (
           <PersonStats
             title="personnes créées"
             firstBlockHelp={`Nombre de personnes dont la date 'Suivi(e) depuis le / Créé(e) le' se situe dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
             filterBase={filterPersonsWithAllFields()}
             filterPersons={filterPersons}
             setFilterPersons={setFilterPersons}
-            personsForStats={personsForStats}
+            personsForStats={personsCreated}
             personFields={personFields}
             flattenedCustomFieldsPersons={flattenedCustomFieldsPersons}
           />
-        )} */}
+        )}
         {activeTab === 'Personnes suivies' && (
           <PersonStats
             title="personnes suivies"
@@ -628,9 +604,9 @@ const Stats = () => {
           <PassagesStats
             passages={passages}
             personFields={personFields}
-            personsInPassagesOfPeriod={personsInPassagesOfPeriod}
             personsInPassagesBeforePeriod={personsInPassagesBeforePeriod}
             // filter by persons
+            personsWithPassages={personsWithPassages}
             filterBase={filterPersonsWithAllFields()}
             filterPersons={filterPersons}
             setFilterPersons={setFilterPersons}
@@ -638,11 +614,11 @@ const Stats = () => {
         )}
         {!!organisation.rencontresEnabled && activeTab === 'Rencontres' && (
           <RencontresStats
-            rencontres={rencontres}
+            rencontres={rencontresFilteredByPersons}
             personFields={personFields}
-            personsInRencontresOfPeriod={personsInRencontresOfPeriod}
             personsInRencontresBeforePeriod={personsInRencontresBeforePeriod}
             // filter by persons
+            personsWithRencontres={personsWithRencontres}
             filterBase={filterPersonsWithAllFields()}
             filterPersons={filterPersons}
             setFilterPersons={setFilterPersons}
@@ -662,22 +638,24 @@ const Stats = () => {
             {activeTab === 'Consultations' && (
               <ConsultationsStats
                 consultations={consultationsFilteredByPersons} // filter by persons
+                // filter by persons
+                personsWithConsultations={personsWithConsultations}
                 filterBase={filterPersonsWithAllFields()}
                 filterPersons={filterPersons}
                 setFilterPersons={setFilterPersons}
               />
             )}
-            {/* {activeTab === 'Dossiers médicaux des personnes créées' && (
+            {activeTab === 'Dossiers médicaux des personnes créées' && (
               <MedicalFilesStats
                 filterBase={filterPersonsWithAllFields(true)}
                 title="personnes créées"
                 filterPersons={filterPersons}
                 setFilterPersons={setFilterPersons}
-                personsForStats={personsForStats}
+                personsForStats={personsCreated}
                 customFieldsMedicalFile={customFieldsMedicalFile}
                 personFields={personFields}
               />
-            )} */}
+            )}
             {activeTab === 'Dossiers médicaux des personnes suivies' && (
               <MedicalFilesStats
                 title="personnes suivies"
