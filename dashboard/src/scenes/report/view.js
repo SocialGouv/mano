@@ -279,7 +279,7 @@ const View = () => {
           return a;
         })
         .sort((a, b) => new Date(a.date || a.createdAt) - new Date(b.date || b.createdAt)),
-    [allComments, selectedTeamsObject, dateString, allPersons, allActions]
+    [allComments, selectedTeamsObject, dateString, allActions, allPersonsAsObject]
   );
 
   const commentsMedical = useMemo(
@@ -1535,113 +1535,6 @@ const CommentCreatedAt = ({ date, comments, medical }) => {
   );
 };
 
-const CommentMedicalCreatedAt = ({ date, comments }) => {
-  const history = useHistory();
-  const data = comments;
-  const organisation = useRecoilValue(organisationState);
-
-  if (!data) return <div />;
-
-  return (
-    <>
-      <StyledBox>
-        <Table
-          className="Table"
-          title={`Commentaires ajoutés le ${formatDateWithFullMonth(date)}`}
-          data={data}
-          noData="Pas de commentaire ajouté ce jour"
-          onRowClick={(comment) => {
-            try {
-              history.push(`/${comment.type}/${comment[comment.type]._id}`);
-            } catch (errorLoadingComment) {
-              capture(errorLoadingComment, { extra: { message: 'error loading comment from report', comment, date } });
-            }
-          }}
-          rowKey="_id"
-          dataTestId="comment"
-          columns={[
-            {
-              title: '',
-              dataKey: 'urgent',
-              small: true,
-              render: (comment) => {
-                return (
-                  <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
-                    {!!comment.urgent && <ExclamationMarkButton />}
-                    {!!organisation.groupsEnabled && !!comment.group && (
-                      <span className="tw-text-3xl" aria-label="Commentaire familial" title="Commentaire familial">
-                        👪
-                      </span>
-                    )}
-                  </div>
-                );
-              },
-            },
-            {
-              title: 'Heure',
-              dataKey: 'date',
-              render: (comment) => <span>{dayjs(comment.date || comment.createdAt).format('D MMM HH:mm')}</span>,
-            },
-            {
-              title: 'Utilisateur',
-              dataKey: 'user',
-              render: (comment) => <UserName id={comment.user} />,
-            },
-            {
-              title: 'Type',
-              dataKey: 'type',
-              render: (comment) => <span>{comment.type === 'action' ? 'Action' : 'Personne suivie'}</span>,
-            },
-            {
-              title: 'Nom',
-              dataKey: 'person',
-              render: (comment) => (
-                <>
-                  <b></b>
-                  <b>{comment[comment.type]?.name}</b>
-                  {comment.type === 'action' && (
-                    <>
-                      <br />
-                      <i>(pour {comment.person?.name || ''})</i>
-                    </>
-                  )}
-                </>
-              ),
-            },
-            {
-              title: 'Commentaire',
-              dataKey: 'comment',
-              render: (comment) => {
-                return (
-                  <p>
-                    {comment.comment
-                      ? comment.comment.split('\n').map((c, i, a) => {
-                          if (i === a.length - 1) return c;
-                          return (
-                            <React.Fragment key={i}>
-                              {c}
-                              <br />
-                            </React.Fragment>
-                          );
-                        })
-                      : ''}
-                  </p>
-                );
-              },
-            },
-            {
-              title: 'Équipe en charge',
-              dataKey: 'team',
-              render: (comment) => <TagTeam teamId={comment?.team} />,
-            },
-          ]}
-        />
-      </StyledBox>
-      <hr />
-    </>
-  );
-};
-
 const PassagesCreatedAt = ({ date, passages, selectedTeams }) => {
   const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
@@ -2121,26 +2014,6 @@ const DescriptionBox = styled(StyledBox)`
     ${(props) => props.report?.description?.length < 1 && props.report?.collaborations?.length < 1 && 'display: none !important;'}
     margin-bottom: 40px;
     page-break-inside: avoid;
-  }
-`;
-
-const Drawer = styled.nav`
-  padding-top: 20px;
-  padding-left: 10px;
-  width: 200px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  flex-shrink: 0;
-  height: 100%;
-  background-color: ${theme.main}22;
-  overflow: auto;
-  button {
-    text-align: left;
-  }
-  hr {
-    margin-bottom: 0rem;
-    margin-top: 1rem;
   }
 `;
 
