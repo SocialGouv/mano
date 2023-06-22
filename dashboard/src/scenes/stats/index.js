@@ -106,7 +106,7 @@ const itemsForStatsSelector = selectorFamily({
 
       const allPersons = get(personsWithMedicalFileMergedSelector);
 
-      const offsetHours = allSelectedTeamsAreNightSession ? 0 : 12;
+      const offsetHours = allSelectedTeamsAreNightSession ? 12 : 0;
       const isoStartDate = period.startDate ? dayjs(period.startDate).startOf('day').add(offsetHours, 'hour').toISOString() : null;
       const isoEndDate = period.endDate ? dayjs(period.endDate).startOf('day').add(1, 'day').add(offsetHours, 'hour').toISOString() : null;
 
