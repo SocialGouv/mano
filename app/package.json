@@ -1,6 +1,6 @@
 {
   "name": "mano",
-  "version": "2.34.0",
+  "version": "2.35.0",
   "private": true,
   "scripts": {
     "get-ip": "./get-ip.sh",
@@ -19,8 +19,7 @@
     "build:android-apk": "cd android && ./gradlew clean && ./gradlew assembleRelease && cd ../",
     "build:android-apk-preproduction": "echo -p \"please update either .env.production with the preproduction values until we found a better solution 🥸\" && cd android && ./gradlew clean && ./gradlew assembleRelease && cd ../",
     "deploy:android": "./upload.sh",
-    "build-and-deploy:android": "npm run build:android-apk && ./upload.sh",
-    "build-and-deploy-preprod:android": "npm run build:android-apk-preproduction && ./upload-preprod.sh",
+    "build-and-deploy-preprod:android": "npm run build:android-apk && ./upload-preprod.sh",
     "update-mobile-app-version": "node ./update-mobile-app-version.js",
     "publish-release-to-github": "node ./publish-release-to-github.js"
   },
@@ -72,7 +71,8 @@
     "react-native-webview": "^11.26.0",
     "recoil": "^0.7.6",
     "styled-components": "^5.2.1",
-    "urijs": "^1.19.11"
+    "urijs": "^1.19.11",
+    "uuid": "^3.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

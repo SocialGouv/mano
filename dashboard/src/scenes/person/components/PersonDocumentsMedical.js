@@ -36,20 +36,6 @@ const PersonDocumentsMedical = ({ person }) => {
 
   const medicalFile = useMemo(() => (allMedicalFiles || []).find((m) => m.person === person._id), [allMedicalFiles, person._id]);
 
-  useEffect(() => {
-    if (!medicalFile) {
-      (async () => {
-        const response = await API.post({
-          path: '/medical-file',
-          body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({ person: person._id, documents: [], organisation: organisation._id }),
-        });
-        if (!response.ok) return;
-        setAllMedicalFiles((medicalFiles) => [...medicalFiles, response.decryptedData]);
-      })();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [medicalFile]);
-
   const allMedicalDocuments = useMemo(() => {
     const ordonnances =
       treatments
@@ -58,12 +44,16 @@ const PersonDocumentsMedical = ({ person }) => {
         .flat() || [];
     const consultationsDocs =
       personConsultations
-        ?.map((consultation) => consultation.documents?.map((doc) => ({ ...doc, type: 'consultation', consultation })))
+        ?.filter((consultation) => {
+          if (!consultation?.onlyVisibleBy?.length) return true;
+          return consultation.onlyVisibleBy.includes(user._id);
+        })
+        .map((consultation) => consultation.documents?.map((doc) => ({ ...doc, type: 'consultation', consultation })))
         .filter(Boolean)
         .flat() || [];
     const otherDocs = medicalFile?.documents || [];
     return [...ordonnances, ...consultationsDocs, ...otherDocs].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  }, [personConsultations, medicalFile?.documents, treatments]);
+  }, [personConsultations, medicalFile?.documents, treatments, user._id]);
 
   const documents = allMedicalDocuments;
 
@@ -255,7 +245,9 @@ const PersonDocumentsMedical = ({ person }) => {
               key={doc._id}
               data-test-id={doc.downloadPath}
               aria-label={`Document ${doc.name}`}
-              className={['tw-w-full tw-border-t tw-border-zinc-200', Boolean(index % 2) ? '' : 'tw-bg-zinc-100'].join(' ')}
+              className={['tw-w-full tw-border-t tw-border-zinc-200 tw-bg-blue-900', Boolean(index % 2) ? 'tw-bg-opacity-0' : 'tw-bg-opacity-5'].join(
+                ' '
+              )}
               onClick={() => {
                 setDocumentToEdit(doc);
               }}>

@@ -169,7 +169,7 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
                     {!['restricted-access'].includes(user.role) && (
                       <FormGroup>
                         <Label htmlFor="description">Description</Label>
-                        <div className="tw-block tw-w-full tw-rounded tw-border tw-border-gray-300 tw-py-1.5 tw-px-3 tw-text-base tw-transition-all">
+                        <div className="tw-block tw-w-full tw-overflow-hidden tw-rounded tw-border tw-border-gray-300 tw-text-base tw-transition-all">
                           <AutoResizeTextarea name="description" id="description" value={values.description} onChange={handleChange} />
                         </div>
                       </FormGroup>

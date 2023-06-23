@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo, useRef } from 'react';
-import { Linking, Text } from 'react-native';
+import { Alert, Linking, Text } from 'react-native';
 import styled from 'styled-components';
 import * as Sentry from '@sentry/react-native';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import dayjs from 'dayjs';
 import ScrollContainer from '../../components/ScrollContainer';
 import Button from '../../components/Button';
@@ -26,6 +26,10 @@ import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirm
 import RencontreRow from './RencontreRow';
 import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
 import { formatDateWithFullMonth, getRelativeTimeFrench } from '../../services/dateDayjs';
+import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
+import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
+import { groupsState } from '../../recoil/groups';
+import API from '../../services/api';
 
 const PersonSummary = ({
   navigation,
@@ -42,19 +46,15 @@ const PersonSummary = ({
   onDelete,
   onBack,
 }) => {
-  const onCommentUpdate = (comment) => {
-    navigation.navigate('PersonComment', {
-      ...comment,
-      commentTitle: personDB.name,
-      fromRoute: 'Person',
-    });
-  };
-
   const onAddActionRequest = () => {
     navigation.push('NewActionForm', { fromRoute: 'Person', person: personDB });
   };
 
   const organisation = useRecoilValue(organisationState);
+  const setComments = useSetRecoilState(commentsState);
+  const groups = useRecoilValue(groupsState);
+  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
+
   const scrollViewRef = useRef(null);
   const descriptionRef = useRef(null);
   const newCommentRef = useRef(null);
@@ -268,13 +268,69 @@ const PersonSummary = ({
       <SubList
         label="Commentaires"
         data={comments}
-        renderItem={(comment) => <CommentRow key={comment._id} comment={comment} onUpdate={comment.team ? () => onCommentUpdate(comment) : null} />}
+        renderItem={(comment) => (
+          <CommentRow
+            key={comment._id}
+            comment={comment}
+            canToggleGroupCheck={!!organisation.groupsEnabled && groups.find((group) => group.persons.includes(personDB?._id))}
+            canToggleUrgentCheck
+            onDelete={async () => {
+              const response = await API.delete({ path: `/comment/${comment._id}` });
+              if (response.error) {
+                Alert.alert(response.error);
+                return false;
+              }
+              setComments((comments) => comments.filter((p) => p._id !== comment._id));
+              return true;
+            }}
+            onUpdate={
+              comment.team
+                ? async (commentUpdated) => {
+                    commentUpdated.person = personDB?._id;
+                    const response = await API.put({
+                      path: `/comment/${comment._id}`,
+                      body: prepareCommentForEncryption(commentUpdated),
+                    });
+                    if (response.error) {
+                      Alert.alert(response.error);
+                      return false;
+                    }
+                    if (response.ok) {
+                      setComments((comments) =>
+                        comments.map((c) => {
+                          if (c._id === comment._id) return response.decryptedData;
+                          return c;
+                        })
+                      );
+                      return true;
+                    }
+                  }
+                : null
+            }
+          />
+        )}
         ifEmpty="Pas encore de commentaire">
         <NewCommentInput
           forwardRef={newCommentRef}
           onFocus={() => _scrollToInput(newCommentRef)}
           person={personDB?._id}
+          canToggleGroupCheck={!!organisation.groupsEnabled && groups.find((group) => group.persons.includes(personDB?._id))}
+          canToggleUrgentCheck
           onCommentWrite={onCommentWrite}
+          onCreate={async (newComment) => {
+            const body = {
+              ...newComment,
+              person: personDB?._id,
+            };
+            const response = await API.post({ path: '/comment', body: prepareCommentForEncryption(body) });
+            if (!response.ok) {
+              Alert.alert(response.error || response.code);
+              return;
+            }
+
+            setComments((comments) => [response.decryptedData, ...comments]);
+            await createReportAtDateIfNotExist(response.decryptedData.date);
+          }}
         />
       </SubList>
       {organisation.rencontresEnabled && (

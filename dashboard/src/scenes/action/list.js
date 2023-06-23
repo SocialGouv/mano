@@ -25,7 +25,7 @@ const showAsOptions = ['Calendrier', 'Liste', 'Hebdomadaire'];
 const actionsByTeamAndStatusSelector = selectorFamily({
   key: 'actionsByTeamAndStatusSelector',
   get:
-    ({ statuses, categories, teamIds, viewAllOrganisationData, actionsWithNoCategory }) =>
+    ({ statuses, categories, teamIds, viewAllOrganisationData, viewNoTeamData, actionsWithNoCategory }) =>
     ({ get }) => {
       const actions = get(arrayOfitemsGroupedByActionSelector);
 
@@ -37,6 +37,13 @@ const actionsByTeamAndStatusSelector = selectorFamily({
             } else {
               if (!teamIds.includes(action.team)) return false;
             }
+          }
+        }
+        if (viewNoTeamData) {
+          if (Array.isArray(action.teams)) {
+            if (action.teams.length) return false;
+          } else {
+            if (action.team) return false;
           }
         }
         if (statuses.length) {
@@ -59,10 +66,24 @@ const actionsByTeamAndStatusSelector = selectorFamily({
 const consultationsByStatusSelector = selectorFamily({
   key: 'consultationsByStatusSelector',
   get:
-    ({ statuses }) =>
+    ({ statuses, teamIds, viewAllOrganisationData, viewNoTeamData }) =>
     ({ get }) => {
       const consultations = get(arrayOfitemsGroupedByConsultationSelector);
-      const consultationsByStatus = consultations.filter((consult) => !statuses.length || statuses.includes(consult.status));
+      const consultationsByStatus = consultations.filter((consultation) => {
+        if (!viewAllOrganisationData) {
+          if (teamIds.length) {
+            if (!consultation.teams?.length) return true;
+            return teamIds.some((t) => consultation.teams.includes(t));
+          }
+        }
+        if (viewNoTeamData) {
+          if (consultation.teams?.length) return false;
+        }
+        if (statuses.length) {
+          if (!statuses.includes(consultation.status)) return false;
+        }
+        return true;
+      });
       return consultationsByStatus;
     },
 });
@@ -70,11 +91,15 @@ const consultationsByStatusSelector = selectorFamily({
 const dataFilteredBySearchSelector = selectorFamily({
   key: 'dataFilteredBySearchSelector',
   get:
-    ({ search, statuses, categories, teamIds, viewAllOrganisationData, actionsWithNoCategory }) =>
+    ({ search, statuses, categories, teamIds, viewAllOrganisationData, viewNoTeamData, actionsWithNoCategory }) =>
     ({ get }) => {
-      const actions = get(actionsByTeamAndStatusSelector({ statuses, categories, teamIds, viewAllOrganisationData, actionsWithNoCategory }));
+      const actions = get(
+        actionsByTeamAndStatusSelector({ statuses, categories, teamIds, viewNoTeamData, viewAllOrganisationData, actionsWithNoCategory })
+      );
       // When we filter by category, we don't want to see all consultations.
-      const consultations = categories?.length ? [] : get(consultationsByStatusSelector({ statuses }));
+      const consultations = categories?.length
+        ? []
+        : get(consultationsByStatusSelector({ statuses, teamIds, viewNoTeamData, viewAllOrganisationData }));
       if (!search) {
         return [...actions, ...consultations];
       }
@@ -100,12 +125,21 @@ const List = () => {
   const [statuses, setStatuses] = useLocalStorage('action-statuses', [TODO]);
   const [selectedTeamIds, setSelectedTeamIds] = useLocalStorage('action-teams', [currentTeam._id]);
   const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('action-allOrg', false);
+  const [viewNoTeamData, setViewNoTeamData] = useLocalStorage('action-noTeam', false);
   const [actionsWithNoCategory, setActionsWithNoCategory] = useLocalStorage('action-noCategory', false);
 
   const [actionDate, setActionDate] = useState(new Date());
   const [showAs, setShowAs] = useLocalStorage('action-showAs', showAsOptions[0]); // calendar, list
   const dataConsolidated = useRecoilValue(
-    dataFilteredBySearchSelector({ search, statuses, categories, teamIds: selectedTeamIds, viewAllOrganisationData, actionsWithNoCategory })
+    dataFilteredBySearchSelector({
+      search,
+      statuses,
+      categories,
+      teamIds: selectedTeamIds,
+      viewAllOrganisationData,
+      viewNoTeamData,
+      actionsWithNoCategory,
+    })
   );
 
   return (
@@ -211,7 +245,7 @@ const List = () => {
               }}
               value={selectedTeamIds}
               colored
-              isDisabled={viewAllOrganisationData}
+              isDisabled={viewAllOrganisationData || viewNoTeamData}
             />
             {teams.length > 1 && (
               <label htmlFor="viewAllOrganisationData" className="tw-flex tw-items-center tw-text-sm">
@@ -220,9 +254,22 @@ const List = () => {
                   type="checkbox"
                   className="tw-mr-2"
                   checked={viewAllOrganisationData}
+                  disabled={viewNoTeamData}
                   onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
                 />
-                Actions de toute l'organisation
+                Actions/consultations de toute l'organisation
+              </label>
+            )}
+            {teams.length > 1 && (
+              <label htmlFor="viewNoTeamData" className="tw-flex tw-items-center tw-text-sm">
+                <input
+                  id="viewNoTeamData"
+                  type="checkbox"
+                  className="tw-mr-2"
+                  checked={viewNoTeamData}
+                  onChange={() => setViewNoTeamData(!viewNoTeamData)}
+                />
+                Actions/consultations sans équipe attribuée
               </label>
             )}
           </div>

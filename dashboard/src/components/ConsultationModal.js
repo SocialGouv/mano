@@ -3,7 +3,7 @@ import ReactDatePicker from 'react-datepicker';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { v4 as uuidv4 } from 'uuid';
 import { CANCEL, DONE, TODO } from '../recoil/actions';
-import { currentTeamState, organisationState, userState } from '../recoil/auth';
+import { currentTeamState, organisationState, teamsState, userState } from '../recoil/auth';
 import { consultationsState, defaultConsultationFields, prepareConsultationForEncryption } from '../recoil/consultations';
 import API from '../services/api';
 import { dateForDatePicker, dayjsInstance } from '../services/date';
@@ -16,34 +16,48 @@ import SelectStatus from './SelectStatus';
 import { toast } from 'react-toastify';
 import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from './tailwind/Modal';
 import SelectPerson from './SelectPerson';
+import { CommentsModule } from './CommentsGeneric';
+import SelectTeamMultiple from './SelectTeamMultiple';
 
 export default function ConsultationModal({ onClose, personId, consultation, date }) {
   const organisation = useRecoilValue(organisationState);
-  const team = useRecoilValue(currentTeamState);
+  const teams = useRecoilValue(teamsState);
+  const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
   const setModalConfirmState = useSetRecoilState(modalConfirmState);
   const setAllConsultations = useSetRecoilState(consultationsState);
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const isNewConsultation = !consultation;
-  const initialState = useMemo(
-    () =>
-      consultation || {
-        _id: uuidv4(),
-        dueAt: date ? new Date(date) : new Date(),
-        completedAt: new Date(),
-        name: '',
-        type: '',
-        status: TODO,
-        user: user._id,
-        person: personId || null,
-        organisation: organisation._id,
-        onlyVisibleBy: [],
-        createdAt: new Date(),
-      },
-    [organisation._id, personId, user._id, consultation, date]
-  );
+  const initialState = useMemo(() => {
+    if (consultation) {
+      return {
+        documents: [],
+        comments: [],
+        teams: consultation.teams ?? teams.length === 1 ? [teams[0]._id] : [],
+        ...consultation,
+      };
+    }
+    return {
+      _id: uuidv4(),
+      dueAt: date ? new Date(date) : new Date(),
+      completedAt: new Date(),
+      name: '',
+      type: '',
+      status: TODO,
+      teams: teams.length === 1 ? [teams[0]._id] : [],
+      user: user._id,
+      person: personId || null,
+      organisation: organisation._id,
+      onlyVisibleBy: [],
+      documents: [],
+      comments: [],
+      createdAt: new Date(),
+    };
+  }, [organisation._id, personId, user._id, consultation, date, teams]);
+
   const [data, setData] = useState(initialState);
+  const [activeTab, setActiveTab] = useState('Informations');
 
   async function handleSubmit() {
     const body = { ...data };
@@ -55,6 +69,9 @@ export default function ConsultationModal({ onClose, personId, consultation, dat
     }
     if (!body.person) {
       return toast.error('Veuillez sélectionner une personne suivie');
+    }
+    if (!body.teams.length) {
+      return toast.error('Veuillez sélectionner au moins une équipe');
     }
     if ([DONE, CANCEL].includes(body.status)) {
       body.completedAt = body.completedAt || new Date();
@@ -128,175 +145,248 @@ export default function ConsultationModal({ onClose, personId, consultation, dat
       <ModalBody>
         <form
           id="add-consultation-form"
-          className="tw-mt-4 tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8"
+          className="tw-flex tw-h-full tw-w-full tw-flex-col"
           onSubmit={(e) => {
             e.preventDefault();
             handleSubmit();
           }}>
-          <div>
-            {!personId && (
-              <SelectPerson
-                value={data.person}
-                onChange={(e) => {
-                  setData({ ...data, person: e.currentTarget.value });
-                }}
-                isMulti={false}
-                inputId="create-consultation-person-select"
-              />
-            )}
-          </div>
-          <div className="-tw-mx-4 tw-flex tw-flex-wrap">
-            <div className="tw-flex tw-basis-1/2 tw-flex-col tw-p-4">
-              <label htmlFor="create-consultation-name">Nom (facultatif)</label>
-              <input
-                className="form-text tailwindui"
-                id="create-consultation-name"
-                name="name"
-                value={data.name}
-                onChange={(e) => setData({ ...data, name: e.currentTarget.value })}
-              />
-            </div>
-            <div className="tw-basis-1/2 tw-p-4">
-              <label htmlFor="type" className="form-text tailwindui">
-                Type
-              </label>
-              <SelectAsInput
-                id="type"
-                name="type"
-                inputId="consultation-modal-type"
-                classNamePrefix="consultation-modal-type"
-                value={data.type}
-                onChange={(e) => {
-                  setData({ ...data, type: e.currentTarget.value });
-                }}
-                placeholder="-- Type de consultation --"
-                options={organisation.consultations.map((e) => e.name)}
-              />
-            </div>
-            {organisation.consultations
-              .find((e) => e.name === data.type)
-              ?.fields.filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
-              .map((field) => {
-                return (
-                  <CustomFieldInput
-                    colWidth={6}
-                    model="person"
-                    values={data}
-                    handleChange={(e) => {
-                      setData({ ...data, [(e.currentTarget || e.target).name]: (e.currentTarget || e.target).value });
-                    }}
-                    field={field}
-                    key={field.name}
-                  />
-                );
-              })}
-          </div>
-          {data.user === user._id && (
-            <>
-              <hr />
-              <div>
-                <div>
-                  <label htmlFor="create-consultation-onlyme">
-                    <input
-                      type="checkbox"
-                      id="create-consultation-onlyme"
-                      style={{ marginRight: '0.5rem' }}
-                      name="onlyVisibleByCreator"
-                      checked={data.onlyVisibleBy?.includes(user._id)}
-                      onChange={() => {
-                        setData({ ...data, onlyVisibleBy: data.onlyVisibleBy?.includes(user._id) ? [] : [user._id] });
-                      }}
-                    />
-                    Seulement visible par moi
-                  </label>
-                </div>
-              </div>
-            </>
-          )}
-          <hr />
-          <div className="-tw-mx-4 tw-flex tw-flex-wrap">
-            <div className="tw-basis-1/2 tw-p-4">
-              <label htmlFor="new-consultation-select-status">Statut</label>
-              <SelectStatus
-                name="status"
-                value={data.status || ''}
-                onChange={(e) => {
-                  setData({ ...data, status: e.target.value });
-                }}
-                inputId="new-consultation-select-status"
-                classNamePrefix="new-consultation-select-status"
-              />
-            </div>
-            <div className="tw-basis-1/2 tw-p-4">
-              <label htmlFor="create-consultation-dueat">Date prévue</label>
-              <div>
-                <ReactDatePicker
-                  locale="fr"
-                  className="form-control"
-                  id="create-consultation-dueat"
-                  selected={dateForDatePicker(data.dueAt)}
-                  onChange={(dueAt) => {
-                    setData({ ...data, dueAt });
+          <ul className="noprint tw-mb-5 tw-mt-4 tw-flex tw-list-none tw-flex-wrap tw-border-b tw-border-zinc-200 tw-px-2">
+            <li className="tw-cursor-pointer">
+              <button
+                type="button"
+                className={[
+                  '-tw-mb-px tw-block tw-rounded-t-md tw-border tw-border-transparent tw-py-2 tw-px-4',
+                  activeTab !== 'Informations' && 'tw-text-main75',
+                  activeTab === 'Informations' && 'tw-border-x-zinc-200 tw-border-t-zinc-200 tw-bg-white',
+                ].join(' ')}
+                onClick={() => setActiveTab('Informations')}>
+                Informations
+              </button>
+            </li>
+            <li className="tw-cursor-pointer">
+              <button
+                type="button"
+                className={[
+                  '-tw-mb-px tw-block tw-rounded-t-md tw-border tw-border-transparent tw-py-2 tw-px-4',
+                  activeTab !== 'Documents' && 'tw-text-main75',
+                  activeTab === 'Documents' && 'tw-border-x-zinc-200 tw-border-t-zinc-200 tw-bg-white',
+                ].join(' ')}
+                onClick={() => setActiveTab('Documents')}>
+                Documents {data?.documents?.length ? `(${data.documents.length})` : ''}
+              </button>
+            </li>
+            <li className="tw-cursor-pointer">
+              <button
+                type="button"
+                className={[
+                  '-tw-mb-px tw-block tw-rounded-t-md tw-border tw-border-transparent tw-py-2 tw-px-4',
+                  activeTab !== 'Commentaires' && 'tw-text-main75',
+                  activeTab === 'Commentaires' && 'tw-border-x-zinc-200 tw-border-t-zinc-200 tw-bg-white',
+                ].join(' ')}
+                onClick={() => setActiveTab('Commentaires')}>
+                Commentaires {data?.comments?.length ? `(${data.comments.length})` : ''}
+              </button>
+            </li>
+          </ul>
+          <div
+            className={['tw-flex tw-min-h-screen tw-w-full tw-flex-col tw-gap-4 tw-px-8', activeTab !== 'Informations' ? 'tw-hidden' : ''].join(' ')}>
+            <div className="-tw-mx-4 tw-flex tw-flex-wrap">
+              <div className="tw-flex tw-basis-1/2 tw-flex-col tw-p-4">
+                <SelectPerson
+                  value={data.person}
+                  onChange={(e) => {
+                    setData({ ...data, person: e.currentTarget.value });
                   }}
-                  timeInputLabel="Heure :"
-                  dateFormat={'dd/MM/yyyy HH:mm'}
-                  showTimeInput
+                  isMulti={false}
+                  inputId="create-consultation-person-select"
+                />
+              </div>
+              <div className="tw-flex tw-basis-1/2 tw-flex-col tw-p-4">
+                <label htmlFor="create-consultation-team">Équipe(s) en charge</label>
+                <SelectTeamMultiple
+                  onChange={(teamIds) => setData({ ...data, teams: teamIds })}
+                  value={data.teams}
+                  colored
+                  inputId="create-consultation-team-select"
+                  classNamePrefix="create-consultation-team-select"
                 />
               </div>
             </div>
 
-            {[DONE, CANCEL].includes(data.status) && (
-              <>
-                <div className="tw-basis-1/2 tw-p-4" />
-                <div className="tw-basis-1/2 tw-p-4">
-                  <label htmlFor="create-consultation-completedAt">Date réalisée</label>
-                  <div>
-                    <ReactDatePicker
-                      locale="fr"
-                      className="form-control"
-                      id="create-consultation-completedAt"
-                      selected={dateForDatePicker(data.completedAt || dayjsInstance())}
-                      onChange={(completedAt) => {
-                        setData({ ...data, completedAt });
+            <div className="-tw-mx-4 tw-flex tw-flex-wrap">
+              <div className="tw-flex tw-basis-1/2 tw-flex-col tw-p-4">
+                <label htmlFor="create-consultation-name">Nom (facultatif)</label>
+                <input
+                  className="form-text tailwindui"
+                  id="create-consultation-name"
+                  name="name"
+                  value={data.name}
+                  onChange={(e) => setData({ ...data, name: e.currentTarget.value })}
+                />
+              </div>
+
+              <div className="tw-basis-1/2 tw-p-4">
+                <label htmlFor="type" className="form-text tailwindui">
+                  Type
+                </label>
+                <SelectAsInput
+                  id="type"
+                  name="type"
+                  inputId="consultation-modal-type"
+                  classNamePrefix="consultation-modal-type"
+                  value={data.type}
+                  onChange={(e) => {
+                    setData({ ...data, type: e.currentTarget.value });
+                  }}
+                  placeholder="-- Type de consultation --"
+                  options={organisation.consultations.map((e) => e.name)}
+                />
+              </div>
+              {organisation.consultations
+                .find((e) => e.name === data.type)
+                ?.fields.filter((f) => f.enabled || f.enabledTeams?.includes(currentTeam._id))
+                .map((field) => {
+                  return (
+                    <CustomFieldInput
+                      colWidth={field.type === 'textarea' ? 12 : 6}
+                      model="person"
+                      values={data}
+                      handleChange={(e) => {
+                        setData({ ...data, [(e.currentTarget || e.target).name]: (e.currentTarget || e.target).value });
                       }}
-                      timeInputLabel="Heure :"
-                      dateFormat={'dd/MM/yyyy HH:mm'}
-                      showTimeInput
+                      field={field}
+                      key={field.name}
                     />
+                  );
+                })}
+            </div>
+            {data.user === user._id && (
+              <>
+                <hr />
+                <div>
+                  <div>
+                    <label htmlFor="create-consultation-onlyme">
+                      <input
+                        type="checkbox"
+                        id="create-consultation-onlyme"
+                        style={{ marginRight: '0.5rem' }}
+                        name="onlyVisibleByCreator"
+                        checked={data.onlyVisibleBy?.includes(user._id)}
+                        onChange={() => {
+                          setData({ ...data, onlyVisibleBy: data.onlyVisibleBy?.includes(user._id) ? [] : [user._id] });
+                        }}
+                      />
+                      Seulement visible par moi
+                    </label>
                   </div>
                 </div>
               </>
             )}
+            <hr />
+            <div className="-tw-mx-4 tw-flex tw-flex-wrap">
+              <div className="tw-basis-1/2 tw-p-4">
+                <label htmlFor="new-consultation-select-status">Statut</label>
+                <SelectStatus
+                  name="status"
+                  value={data.status || ''}
+                  onChange={(e) => {
+                    setData({ ...data, status: e.target.value });
+                  }}
+                  inputId="new-consultation-select-status"
+                  classNamePrefix="new-consultation-select-status"
+                />
+              </div>
+              <div className="tw-basis-1/2 tw-p-4">
+                <label htmlFor="create-consultation-dueat">Date prévue</label>
+                <div>
+                  <ReactDatePicker
+                    locale="fr"
+                    className="form-control"
+                    id="create-consultation-dueat"
+                    selected={dateForDatePicker(data.dueAt)}
+                    onChange={(dueAt) => {
+                      setData({ ...data, dueAt });
+                    }}
+                    timeInputLabel="Heure :"
+                    dateFormat={'dd/MM/yyyy HH:mm'}
+                    showTimeInput
+                  />
+                </div>
+              </div>
+
+              {[DONE, CANCEL].includes(data.status) && (
+                <>
+                  <div className="tw-basis-1/2 tw-p-4" />
+                  <div className="tw-basis-1/2 tw-p-4">
+                    <label htmlFor="create-consultation-completedAt">Date réalisée</label>
+                    <div>
+                      <ReactDatePicker
+                        locale="fr"
+                        className="form-control"
+                        id="create-consultation-completedAt"
+                        selected={dateForDatePicker(data.completedAt || dayjsInstance())}
+                        onChange={(completedAt) => {
+                          setData({ ...data, completedAt });
+                        }}
+                        timeInputLabel="Heure :"
+                        dateFormat={'dd/MM/yyyy HH:mm'}
+                        showTimeInput
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
-          <hr />
-          {data.person && (
-            <Documents
-              title="Documents"
-              personId={data.person}
-              documents={data.documents || []}
-              onAdd={async (docResponse) => {
-                const { data: file, encryptedEntityKey } = docResponse;
-                setData({
-                  ...data,
-                  documents: [
-                    ...(data.documents || []),
-                    {
-                      _id: file.filename,
-                      name: file.originalname,
-                      encryptedEntityKey,
-                      createdAt: new Date(),
-                      createdBy: user._id,
-                      downloadPath: `/person/${data.person}/document/${file.filename}`,
-                      file,
-                    },
-                  ],
-                });
+          <div className={['tw-flex tw-min-h-screen tw-w-full tw-flex-col tw-gap-4 tw-px-8', activeTab !== 'Documents' ? 'tw-hidden' : ''].join(' ')}>
+            {data.person && (
+              <Documents
+                personId={data.person}
+                color="blue-900"
+                documents={data.documents}
+                onAdd={async (docResponse) => {
+                  const { data: file, encryptedEntityKey } = docResponse;
+                  setData({
+                    ...data,
+                    documents: [
+                      ...data.documents,
+                      {
+                        _id: file.filename,
+                        name: file.originalname,
+                        encryptedEntityKey,
+                        createdAt: new Date(),
+                        createdBy: user._id,
+                        downloadPath: `/person/${data.person}/document/${file.filename}`,
+                        file,
+                      },
+                    ],
+                  });
+                }}
+                onDelete={async (document) => {
+                  setData({ ...data, documents: data.documents.filter((d) => d._id !== document._id) });
+                }}
+              />
+            )}
+          </div>
+          <div
+            className={['tw-flex tw-min-h-screen tw-w-full tw-flex-col tw-gap-4 tw-px-8', activeTab !== 'Commentaires' ? 'tw-hidden' : ''].join(' ')}>
+            <CommentsModule
+              comments={data.comments}
+              color="blue-900"
+              typeForNewComment="consultation"
+              onDeleteComment={(comment) => {
+                console.log('delete comment', comment);
+                setData({ ...data, comments: data.comments.filter((c) => c._id !== comment._id) });
               }}
-              onDelete={async (document) => {
-                setData({ ...data, documents: data.documents.filter((d) => d._id !== document._id) });
+              onSubmitComment={(comment, isNewComment) => {
+                if (isNewComment) {
+                  setData({ ...data, comments: [{ ...comment, _id: uuidv4() }, ...data.comments] });
+                } else {
+                  setData({ ...data, comments: data.comments.map((c) => (c._id === comment._id ? comment : c)) });
+                }
               }}
             />
-          )}
+          </div>
         </form>
       </ModalBody>
       <ModalFooter>
@@ -320,7 +410,7 @@ export default function ConsultationModal({ onClose, personId, consultation, dat
             Supprimer
           </button>
         )}
-        <button type="submit" className="button-submit" form="add-consultation-form">
+        <button type="submit" className="button-submit !tw-bg-blue-900" form="add-consultation-form">
           Sauvegarder
         </button>
       </ModalFooter>

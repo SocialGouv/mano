@@ -15,12 +15,12 @@ const BellIcon = ({ size = 30, color, notificationsNumber }) => (
         fill={color}
         fillRule="nonzero"
       />
-      {!!notificationsNumber && (
-        <Badge>
-          <NotificationsNumber>{notificationsNumber}</NotificationsNumber>
-        </Badge>
-      )}
     </SvgStyled>
+    {!!notificationsNumber && (
+      <Badge>
+        <NotificationsNumber>{notificationsNumber}</NotificationsNumber>
+      </Badge>
+    )}
   </Container>
 );
 

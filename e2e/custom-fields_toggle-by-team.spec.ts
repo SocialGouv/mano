@@ -125,6 +125,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("button", { name: "Ajouter une consultation" }).click();
   await page.getByRole("textbox", { name: "Nom (facultatif)" }).fill("Consult");
   await clickOnEmptyReactSelect(page, "consultation-modal-type", "Médicale");
+  await clickOnEmptyReactSelect(page, "create-consultation-team-select", "Team Test - 4");
   await page.getByLabel(testConsultationField).click();
   await page.getByLabel(testConsultationField).fill("Super");
   await page.getByRole("button", { name: "Sauvegarder" }).click();

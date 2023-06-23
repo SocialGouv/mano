@@ -1,6 +1,6 @@
 const { VERSION, MINIMUM_DASHBOARD_VERSION } = require("../config");
 
-const MINIMUM_MOBILE_APP_VERSION = [2, 31, 0];
+const MINIMUM_MOBILE_APP_VERSION = [2, 35, 0];
 
 module.exports = ({ headers: { version, platform } }, res, next) => {
   if (platform === "website") return next();
@@ -28,9 +28,8 @@ module.exports = ({ headers: { version, platform } }, res, next) => {
         inAppMessage: [
           `Veuillez mettre à jour votre application\u00A0!`,
           `Les fonctionnalités de cette nouvelle version sont\u00A0:
-- Compatibilité avec la personnalissation intégrale du dossier des personnes suivies (paramétrage sur navigateur)
-- Possibilité de rajouter des pdfs dans les documents d'une personne suivie
-- Possibilité de rechercher avec plusieurs mots différents dans la liste des personnes suivies.`,
+- Compatibilité avec les consultations par équipe
+- Possibilité de rajouter des commentaires dans les consultations, les traitements et les dossiers médicaux`,
           [{ text: "Télécharger la dernière version", link: "https://mano-app.fabrique.social.gouv.fr/download" }],
         ],
       });
