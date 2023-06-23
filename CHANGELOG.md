@@ -1,3 +1,10 @@
+## [1.270.2](https://github.com/SocialGouv/mano/compare/v1.270.1...v1.270.2) (2023-06-23)
+
+
+### Bug Fixes
+
+* **api:** remove cache for mano download url ([a54e6d6](https://github.com/SocialGouv/mano/commit/a54e6d6f2532275f20fe20fb5521ad15e5eebf29))
+
 ## [1.270.1](https://github.com/SocialGouv/mano/compare/v1.270.0...v1.270.1) (2023-06-23)
 
 
