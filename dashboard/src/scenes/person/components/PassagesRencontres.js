@@ -46,13 +46,13 @@ export default function PassagesRencontres({ person }) {
     if (!currentPassageId) return null;
     if (currentPassageId === 'new') return { person: person._id, user: user._id, team: currentTeam._id };
     return personPassages.find((p) => p._id === currentPassageId);
-  }, [currentPassageId, personPassages]);
+  }, [currentPassageId, personPassages, person, user, currentTeam]);
 
   const currentRencontre = useMemo(() => {
     if (!currentRencontreId) return null;
     if (currentRencontreId === 'new') return { person: person._id, user: user._id, team: currentTeam._id };
     return personRencontres.find((p) => p._id === currentRencontreId);
-  }, [currentRencontreId, personRencontres]);
+  }, [currentRencontreId, personRencontres, person, user, currentTeam]);
 
   if (!organisation.passagesEnabled && !organisation.rencontresEnabled) {
     return null;

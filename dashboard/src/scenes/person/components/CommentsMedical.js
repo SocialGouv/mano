@@ -2,10 +2,7 @@ import React, { useMemo } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { v4 as uuidv4 } from 'uuid';
 import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../../recoil/medicalFiles';
-import { arrayOfitemsGroupedByConsultationSelector } from '../../../recoil/selectors';
-import { treatmentsState } from '../../../recoil/treatments';
 import { CommentsModule } from '../../../components/CommentsGeneric';
-import { userState } from '../../../recoil/auth';
 import API from '../../../services/api';
 
 const CommentsMedical = ({ person }) => {
