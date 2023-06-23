@@ -1,3 +1,10 @@
+## [1.270.1](https://github.com/SocialGouv/mano/compare/v1.270.0...v1.270.1) (2023-06-23)
+
+
+### Bug Fixes
+
+* **dashboard:** paramètres de champs custos cachés lorsqu'on scroll jusqu'èn bas ([#1561](https://github.com/SocialGouv/mano/issues/1561)) ([b817406](https://github.com/SocialGouv/mano/commit/b81740697705a39b67fc1f3be75fb21e54eeef7e))
+
 # [1.270.0](https://github.com/SocialGouv/mano/compare/v1.269.1...v1.270.0) (2023-06-23)
 
 
