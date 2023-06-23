@@ -1,3 +1,10 @@
+# [1.270.0](https://github.com/SocialGouv/mano/compare/v1.269.1...v1.270.0) (2023-06-23)
+
+
+### Features
+
+* **app, dashboard:** commentaires dans les dossiers médicaux + consultations par équipe  ([#1551](https://github.com/SocialGouv/mano/issues/1551)) ([5b39a89](https://github.com/SocialGouv/mano/commit/5b39a8962cb9c1ed59caacf3f931c9fdd6d7e176)), closes [#1550](https://github.com/SocialGouv/mano/issues/1550)
+
 ## [1.269.1](https://github.com/SocialGouv/mano/compare/v1.269.0...v1.269.1) (2023-06-21)
 
 
