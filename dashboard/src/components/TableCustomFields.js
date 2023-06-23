@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useRecoilState } from 'recoil';
 import { organisationState } from '../recoil/auth';
@@ -255,6 +255,7 @@ const TableCustomFields = ({
 export const EditCustomField = ({ open, onDelete, data, editingField, onClose, onSaveField, isNewField, onEditChoice, onlyOptionsEditable }) => {
   const [field, setField] = useState(() => editingField || newCustomField());
   const fieldIsUsed = useMemo(() => !isNewField && !!data.find((p) => p[field?.name]), [data, field?.name, isNewField]);
+  const bodyRef = useRef(null);
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -301,7 +302,7 @@ export const EditCustomField = ({ open, onDelete, data, editingField, onClose, o
   return (
     <ModalContainer open={open} onClose={() => onClose(null)} size="3xl">
       <ModalHeader title={!isNewField ? 'Modifier le champ' : 'Créer un nouveau champ'} />
-      <ModalBody>
+      <ModalBody ref={bodyRef}>
         <form id="custom-field-form" className="tw-flex tw-w-full tw-flex-wrap tw-px-4" onSubmit={onSubmit}>
           <div className="tw-basis-full tw-p-4">
             <input type="hidden" name="name" value={field.name} />
@@ -329,6 +330,9 @@ export const EditCustomField = ({ open, onDelete, data, editingField, onClose, o
               inputId="type"
               classNamePrefix="type"
               name="type"
+              onMenuScrollToBottom={() => {
+                bodyRef.current.scrollTo({ top: bodyRef.current.scrollHeight, behavior: 'smooth' });
+              }}
               isDisabled={typeIsDisabled || onlyOptionsEditable}
               isOptionDisabled={optionIsDisabled}
               options={typeOptions}
