@@ -13,12 +13,7 @@ import { actionsCategoriesSelector, DONE, flattenedActionsCategoriesSelector } f
 import { reportsState } from '../../recoil/reports';
 import { territoriesState } from '../../recoil/territory';
 import { customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
-import {
-  personsWithMedicalFileMergedSelector,
-  itemsGroupedByPersonSelector,
-  populatedPassagesSelector,
-  populatedRencontresSelector,
-} from '../../recoil/selectors';
+import { personsWithMedicalFileMergedSelector, populatedPassagesSelector } from '../../recoil/selectors';
 import useTitle from '../../services/useTitle';
 import DateRangePickerWithPresets, { formatPeriod } from '../../components/DateRangePickerWithPresets';
 import { useDataLoader } from '../../components/DataLoader';
@@ -123,7 +118,7 @@ const itemsForStatsSelector = selectorFamily({
       const personsWithRencontres = {};
       const personsInRencontresBeforePeriod = {};
       const noPeriodSelected = !isoStartDate || !isoEndDate;
-      for (let [indexString, person] of Object.entries(allPersons)) {
+      for (let person of allPersons) {
         // get the persons concerned by filters
         if (!filterItem(filtersExceptOutOfActiveList)(person)) continue;
         if (outOfActiveListFilter === 'Oui' && !person.outOfActiveList) continue;
@@ -233,11 +228,9 @@ const Stats = () => {
   const currentTeam = useRecoilValue(currentTeamState);
   const teams = useRecoilValue(teamsState);
 
-  const allPersonsAsObject = useRecoilValue(itemsGroupedByPersonSelector);
   const allreports = useRecoilValue(reportsState);
   const allObservations = useRecoilValue(territoryObservationsState);
   const allPassagesPopulated = useRecoilValue(populatedPassagesSelector);
-  const allRencontresPopulated = useRecoilValue(populatedRencontresSelector);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
   const flattenedCustomFieldsPersons = useRecoilValue(flattenedCustomFieldsPersonsSelector);
