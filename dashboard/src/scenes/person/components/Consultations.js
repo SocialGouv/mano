@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useRecoilValue } from 'recoil';
+import { useLocation, useHistory } from 'react-router-dom';
 import { organisationState, userState } from '../../../recoil/auth';
 import { CANCEL, DONE, mappedIdsToLabels } from '../../../recoil/actions';
 import SelectCustom from '../../../components/SelectCustom';
@@ -14,12 +15,16 @@ import ConsultationModal from '../../../components/ConsultationModal';
 import { AgendaMutedIcon } from './AgendaMutedIcon';
 import { disableConsultationRow } from '../../../recoil/consultations';
 import { FullScreenIcon } from './FullScreenIcon';
-import useSearchParamState from '../../../services/useSearchParamState';
 
 export const Consultations = ({ person }) => {
-  const [currentConsultationId, setCurrentConsultationId] = useSearchParamState('consultationId', null);
-  const [modalOpen, setModalOpen] = useState(!!currentConsultationId);
+  const [modalOpen, setModalOpen] = useState(false);
   const [fullScreen, setFullScreen] = useState(false);
+  const history = useHistory();
+  const { search } = useLocation();
+  const currentConsultationId = useMemo(() => {
+    const searchParams = new URLSearchParams(search);
+    return searchParams.get('consultationId');
+  }, [search]);
 
   const allConsultations = useRecoilValue(arrayOfitemsGroupedByConsultationSelector);
   const [consultationTypes, setConsultationTypes] = useLocalStorage('consultation-types', []);
@@ -38,7 +43,11 @@ export const Consultations = ({ person }) => {
   const currentConsultation = useMemo(() => {
     if (!currentConsultationId) return null;
     return personConsultations.find((c) => c._id === currentConsultationId);
-  }, [personConsultations, currentConsultationId]);
+  }, [personConsultations, search]);
+
+  if (!!currentConsultationId && !modalOpen) {
+    setModalOpen(true);
+  }
 
   const data = personConsultations;
   const filteredData = personConsultationsFiltered;
@@ -84,24 +93,24 @@ export const Consultations = ({ person }) => {
             </div>
           </ModalHeader>
           <ModalBody>
-            <ConsultationsTable filteredData={filteredData} person={person} setCurrentConsultationId={setCurrentConsultationId} />
+            <ConsultationsTable filteredData={filteredData} person={person} />
           </ModalBody>
           <ModalFooter>
             <button type="button" name="cancel" className="button-cancel" onClick={() => setFullScreen(false)}>
               Fermer
             </button>
-            <button type="button" className="button-submit" onClick={() => setModalOpen(true)}>
+            <button type="button" className="button-submit !tw-bg-blue-900" onClick={() => setModalOpen(true)}>
               ＋ Ajouter une consultation
             </button>
           </ModalFooter>
         </ModalContainer>
-        <ConsultationsTable filteredData={filteredData} person={person} setCurrentConsultationId={setCurrentConsultationId} />
+        <ConsultationsTable filteredData={filteredData} person={person} />
       </div>
       {modalOpen && (
         <ConsultationModal
           consultation={currentConsultation}
           onClose={() => {
-            setCurrentConsultationId(null);
+            history.push(`/person/${person._id}?tab=Dossier+Médical`);
             setModalOpen(false);
           }}
           personId={person._id}
@@ -157,9 +166,9 @@ const ConsultationsFilters = ({ data, filteredData, setConsultationTypes, setCon
   );
 };
 
-const ConsultationsTable = ({ filteredData, person, setCurrentConsultationId }) => {
+const ConsultationsTable = ({ filteredData, person }) => {
   const user = useRecoilValue(userState);
-  const [consultationEditOpen, setConsultationEditOpen] = useState(false);
+  const history = useHistory();
 
   return (
     <>
@@ -179,8 +188,7 @@ const ConsultationsTable = ({ filteredData, person, setCurrentConsultationId }) 
                     }
                     onClick={() => {
                       if (disableConsultationRow(consultation, user)) return;
-                      setCurrentConsultationId(consultation._id);
-                      setConsultationEditOpen(consultation);
+                      history.push(`/person/${person._id}?tab=Dossier+Médical&consultationId=${consultation._id}`);
                     }}>
                     <div className="tw-flex">
                       <div className="tw-flex-1">{`${date}${time}`}</div>
@@ -214,16 +222,6 @@ const ConsultationsTable = ({ filteredData, person, setCurrentConsultationId }) 
           })}
         </tbody>
       </table>
-      {Boolean(consultationEditOpen) && (
-        <ConsultationModal
-          consultation={consultationEditOpen}
-          onClose={() => {
-            setCurrentConsultationId(null);
-            setConsultationEditOpen(false);
-          }}
-          personId={person._id}
-        />
-      )}
     </>
   );
 };

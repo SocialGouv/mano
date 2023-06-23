@@ -78,17 +78,17 @@ const commentsMedicalSelector = selector({
     const comments = [];
     for (const consultation of consultations) {
       for (const comment of consultation.comments || []) {
-        comments.push({ ...comment, type: 'consultation', consultation: consultation._id, person: allPersonsAsObject[consultation.person] });
+        comments.push({ ...comment, type: 'consultation', consultation: consultation, person: allPersonsAsObject[consultation.person] });
       }
     }
     for (const treatment of treatments) {
       for (const comment of treatment.comments || []) {
-        comments.push({ ...comment, type: 'treatment', treatment: treatment._id, person: allPersonsAsObject[treatment.person] });
+        comments.push({ ...comment, type: 'treatment', treatment: treatment, person: allPersonsAsObject[treatment.person] });
       }
     }
     for (const medicalFile of medicalFiles) {
       for (const comment of medicalFile.comments || []) {
-        comments.push({ ...comment, type: 'medical-file', medicalFile: medicalFile._id, person: allPersonsAsObject[medicalFile.person] });
+        comments.push({ ...comment, type: 'medical-file', person: allPersonsAsObject[medicalFile.person] });
       }
     }
     return comments.sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -1423,10 +1423,10 @@ const CommentCreatedAt = ({ date, comments, medical }) => {
                   history.push(`/person/${comment.person._id}`);
                   break;
                 case 'consultation':
-                  history.push(`/person/${comment.person._id}?tab=Dossier+Médical&consultationId=${comment.consultation}`);
+                  history.push(`/person/${comment.person._id}?tab=Dossier+Médical&consultationId=${comment.consultation._id}`);
                   break;
                 case 'treatment':
-                  history.push(`/person/${comment.person._id}?tab=Dossier+Médical&treatmentId=${comment.treatment}`);
+                  history.push(`/person/${comment.person._id}?tab=Dossier+Médical&treatmentId=${comment.treatment._id}`);
                   break;
                 case 'medical-file':
                   history.push(`/person/${comment.person._id}?tab=Dossier+Médical`);

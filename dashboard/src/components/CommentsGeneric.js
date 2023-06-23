@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useRecoilValue } from 'recoil';
+import { useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Formik } from 'formik';
 import ExclamationMarkButton from './tailwind/ExclamationMarkButton';
@@ -79,7 +80,13 @@ export function CommentsModule({
               )}
             </div>
           </div>
-          <CommentsTable comments={comments} color={color} onEditComment={setCommentToEdit} onAddComment={() => setModalCreateOpen(true)} />
+          <CommentsTable
+            withClickableLabel
+            comments={comments}
+            color={color}
+            onEditComment={setCommentToEdit}
+            onAddComment={() => setModalCreateOpen(true)}
+          />
         </div>
       ) : (
         <CommentsTable
@@ -137,7 +144,7 @@ export function CommentsFullScreen({ open, comments, onClose, title, color, onEd
     <ModalContainer open={open} size="full" onClose={onClose}>
       <ModalHeader title={title} />
       <ModalBody>
-        <CommentsTable comments={comments} onEditComment={onEditComment} onAddComment={onAddComment} />
+        <CommentsTable comments={comments} onEditComment={onEditComment} onAddComment={onAddComment} withClickableLabel />
       </ModalBody>
       <ModalFooter>
         <button type="button" name="cancel" className="button-cancel" onClick={onClose}>
@@ -151,9 +158,10 @@ export function CommentsFullScreen({ open, comments, onClose, title, color, onEd
   );
 }
 
-export function CommentsTable({ comments, onEditComment, onAddComment, color, showAddCommentButton }) {
+export function CommentsTable({ comments, onEditComment, onAddComment, color, showAddCommentButton, withClickableLabel }) {
   const users = useRecoilValue(usersState);
   const organisation = useRecoilValue(organisationState);
+  const history = useHistory();
 
   if (!comments.length) {
     return (
@@ -233,8 +241,36 @@ export function CommentsTable({ comments, onEditComment, onAddComment, color, sh
                       <div className="small">Créé par {users.find((e) => e._id === comment.user)?.name}</div>
                     </div>
                     <div className="tw-flex tw-items-center tw-gap-2">
-                      {['treatment', 'consultation', 'action', 'passage', 'rencontre'].includes(comment.type) && (
-                        <div>
+                      {!!withClickableLabel && ['treatment', 'consultation', 'action', 'passage', 'rencontre'].includes(comment.type) && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            try {
+                              console.log('comment', comment);
+                              switch (comment.type) {
+                                case 'action':
+                                  history.push(`/action/${comment.action._id}`);
+                                  break;
+                                case 'person':
+                                  history.push(`/person/${comment.person._id}`);
+                                  break;
+                                case 'consultation':
+                                  history.push(`/person/${comment.person._id}?tab=Dossier+Médical&consultationId=${comment.consultation._id}`);
+                                  break;
+                                case 'treatment':
+                                  history.push(`/person/${comment.person._id}?tab=Dossier+Médical&treatmentId=${comment.treatment._id}`);
+                                  break;
+                                case 'medical-file':
+                                  history.push(`/person/${comment.person._id}?tab=Dossier+Médical`);
+                                  break;
+                                default:
+                                  break;
+                              }
+                            } catch (errorLoadingComment) {
+                              capture(errorLoadingComment, { extra: { message: 'error loading comment tag button', comment } });
+                            }
+                          }}>
                           <div className="tw-rounded tw-border tw-border-blue-900 tw-bg-blue-900/10 tw-px-1">
                             {comment.type === 'treatment' && 'Traitement'}
                             {comment.type === 'consultation' && 'Consultation'}
@@ -242,7 +278,7 @@ export function CommentsTable({ comments, onEditComment, onAddComment, color, sh
                             {comment.type === 'passage' && 'Passage'}
                             {comment.type === 'rencontre' && 'Rencontre'}
                           </div>
-                        </div>
+                        </button>
                       )}
                       <div className="tw-max-w-fit">
                         <TagTeam teamId={comment.team} />

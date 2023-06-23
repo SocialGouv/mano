@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import ConsultationModal from '../../../components/ConsultationModal';
+import { useHistory } from 'react-router-dom';
 import { organisationState, usersState, userState } from '../../../recoil/auth';
 import { consultationsState, prepareConsultationForEncryption } from '../../../recoil/consultations';
 import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../../recoil/medicalFiles';
@@ -11,7 +11,6 @@ import API from '../../../services/api';
 import { formatDateTimeWithNameOfDay } from '../../../services/date';
 import { capture } from '../../../services/sentry';
 import DocumentModal from './PersonDocumentModal';
-import TreatmentModal from './TreatmentModal';
 
 const PersonDocumentsMedical = ({ person }) => {
   const [documentToEdit, setDocumentToEdit] = useState(null);
@@ -20,13 +19,12 @@ const PersonDocumentsMedical = ({ person }) => {
   const [resetFileInputKey, setResetFileInputKey] = useState(0); // to be able to use file input multiple times
   const users = useRecoilValue(usersState);
   const organisation = useRecoilValue(organisationState);
+  const history = useHistory();
 
   const allConsultations = useRecoilValue(arrayOfitemsGroupedByConsultationSelector);
   const setAllConsultations = useSetRecoilState(consultationsState);
   const [allTreatments, setAllTreatments] = useRecoilState(treatmentsState);
   const [allMedicalFiles, setAllMedicalFiles] = useRecoilState(medicalFileState);
-  const [consultation, setConsultation] = useState(false);
-  const [treatment, setTreatment] = useState(false);
 
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
 
@@ -146,7 +144,7 @@ const PersonDocumentsMedical = ({ person }) => {
           {documentToEdit.type === 'treatment' ? (
             <button
               onClick={() => {
-                setTreatment(documentToEdit.treatment);
+                history.push(`/person/${person._id}?tab=Dossier+Médical&treatmentId=${documentToEdit.treatment}`);
                 setDocumentToEdit(null);
               }}
               className="button-classic">
@@ -155,32 +153,14 @@ const PersonDocumentsMedical = ({ person }) => {
           ) : documentToEdit.type === 'consultation' ? (
             <button
               onClick={() => {
-                setConsultation(documentToEdit.consultation);
+                history.push(`/person/${person._id}?tab=Dossier+Médical&consultationId=${documentToEdit.consultation}`);
                 setDocumentToEdit(null);
               }}
               className="button-classic">
-              Voir la consultation associé
+              Voir la consultation associée
             </button>
           ) : null}
         </DocumentModal>
-      )}
-      {consultation && (
-        <ConsultationModal
-          consultation={consultation}
-          onClose={() => {
-            setConsultation(false);
-          }}
-          personId={person._id}
-        />
-      )}
-      {treatment && (
-        <TreatmentModal
-          treatment={treatment}
-          onClose={() => {
-            setTreatment(false);
-          }}
-          person={person}
-        />
       )}
       <div className="tw-sticky tw-top-0 tw-z-50 tw-flex tw-bg-white tw-p-3">
         <h4 className="tw-flex-1 tw-text-xl">Documents {documents?.length ? `(${documents?.length})` : ''}</h4>

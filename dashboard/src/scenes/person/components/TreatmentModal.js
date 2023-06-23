@@ -20,11 +20,12 @@ import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from '../../../co
  * @param {Object} props.treatment
  * @param {Object} props.person
  */
-export default function TreatmentModal({ onClose, isNewTreatment, treatment, person }) {
+export default function TreatmentModal({ onClose, treatment, person }) {
   const setAllTreatments = useSetRecoilState(treatmentsState);
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
 
+  const isNewTreatment = !treatment?._id;
   const currentTreatment = useMemo(() => {
     if (isNewTreatment) {
       return {

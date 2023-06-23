@@ -1,11 +1,9 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { v4 as uuidv4 } from 'uuid';
-import ConsultationModal from '../../../components/ConsultationModal';
 import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../../recoil/medicalFiles';
 import { arrayOfitemsGroupedByConsultationSelector } from '../../../recoil/selectors';
 import { treatmentsState } from '../../../recoil/treatments';
-import TreatmentModal from './TreatmentModal';
 import { CommentsModule } from '../../../components/CommentsGeneric';
 import { userState } from '../../../recoil/auth';
 import API from '../../../services/api';
@@ -16,8 +14,6 @@ const CommentsMedical = ({ person }) => {
   const user = useRecoilValue(userState);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
   const [allMedicalFiles, setAllMedicalFiles] = useRecoilState(medicalFileState);
-  const [consultation, setConsultation] = useState(false);
-  const [treatment, setTreatment] = useState(false);
 
   const personConsultations = useMemo(() => (allConsultations || []).filter((c) => c.person === person._id), [allConsultations, person._id]);
 
@@ -25,11 +21,10 @@ const CommentsMedical = ({ person }) => {
 
   const medicalFile = useMemo(() => (allMedicalFiles || []).find((m) => m.person === person._id), [allMedicalFiles, person._id]);
 
-  console.log('medicalFile', medicalFile);
   const allMedicalComments = useMemo(() => {
     const treatmentsComments =
       treatments
-        ?.map((treatment) => treatment.comments?.map((doc) => ({ ...doc, type: 'treatment', treatment })))
+        ?.map((treatment) => treatment.comments?.map((comment) => ({ ...comment, type: 'treatment', treatment, person })))
         .filter(Boolean)
         .flat() || [];
     const consultationsComments =
@@ -38,10 +33,10 @@ const CommentsMedical = ({ person }) => {
           if (!consultation?.onlyVisibleBy?.length) return true;
           return consultation.onlyVisibleBy.includes(user._id);
         })
-        .map((consultation) => consultation.comments?.map((doc) => ({ ...doc, type: 'consultation', consultation })))
+        .map((consultation) => consultation.comments?.map((comment) => ({ ...comment, type: 'consultation', consultation, person })))
         .filter(Boolean)
         .flat() || [];
-    const otherComments = medicalFile?.comments || [];
+    const otherComments = medicalFile?.comments?.map((comment) => ({ ...comment, type: 'medical-file', person })) || [];
     return [...treatmentsComments, ...consultationsComments, ...otherComments].sort(
       (a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt)
     );
@@ -51,24 +46,6 @@ const CommentsMedical = ({ person }) => {
 
   return (
     <div className="tw-relative">
-      {consultation && (
-        <ConsultationModal
-          consultation={consultation}
-          onClose={() => {
-            setConsultation(false);
-          }}
-          personId={person._id}
-        />
-      )}
-      {treatment && (
-        <TreatmentModal
-          treatment={treatment}
-          onClose={() => {
-            setTreatment(false);
-          }}
-          person={person}
-        />
-      )}
       <CommentsModule
         comments={comments}
         typeForNewComment="medical-file"
