@@ -180,16 +180,17 @@ export const itemsGroupedByPersonSelector = selector({
       }
     }
     for (const comment of comments) {
+      if (comment._id === '9094ad26-e89d-41af-a6ea-8e9caeccd236') console.log(comment);
       if (comment.action) {
         const person = personPerAction[comment.action];
         if (!person) continue;
         if (!personsObject[person]) continue;
         personsObject[person].comments = personsObject[person].comments || [];
-        personsObject[person].comments.push({ ...comment, type: 'action' });
+        personsObject[person].comments.push({ ...comment, type: 'action', date: comment.date || comment.createdAt });
       }
       if (!personsObject[comment.person]) continue;
       personsObject[comment.person].comments = personsObject[comment.person].comments || [];
-      personsObject[comment.person].comments.push({ ...comment, type: 'person' });
+      personsObject[comment.person].comments.push({ ...comment, type: 'person', date: comment.date || comment.createdAt });
       personsObject[comment.person].interactions.push(comment.date || comment.createdAt);
       if (!!comment.group) {
         const group = personsObject[comment.person].group;
@@ -226,7 +227,12 @@ export const itemsGroupedByPersonSelector = selector({
           personsObject[consultation.person].interactions.push(comment.date);
           if (!consultationIsVisibleByMe) continue;
           personsObject[consultation.person].commentsMedical = personsObject[consultation.person].commentsMedical || [];
-          personsObject[consultation.person].commentsMedical.push({ ...comment, person: consultation.person, type: 'consultation' });
+          personsObject[consultation.person].commentsMedical.push({
+            ...comment,
+            person: consultation.person,
+            type: 'consultation',
+            _id: comment.date + consultation._id,
+          });
         }
       }
       for (const treatment of treatments) {
@@ -237,7 +243,12 @@ export const itemsGroupedByPersonSelector = selector({
         for (const comment of treatment.comments || []) {
           personsObject[treatment.person].interactions.push(comment.date);
           personsObject[treatment.person].commentsMedical = personsObject[treatment.person].commentsMedical || [];
-          personsObject[treatment.person].commentsMedical.push({ ...comment, person: treatment.person, type: 'treatment' });
+          personsObject[treatment.person].commentsMedical.push({
+            ...comment,
+            person: treatment.person,
+            type: 'treatment',
+            _id: comment.date + treatment._id,
+          });
         }
       }
       for (const medicalFile of medicalFiles) {
@@ -248,7 +259,12 @@ export const itemsGroupedByPersonSelector = selector({
         for (const comment of medicalFile.comments || []) {
           personsObject[medicalFile.person].interactions.push(comment.date);
           personsObject[medicalFile.person].commentsMedical = personsObject[medicalFile.person].commentsMedical || [];
-          personsObject[medicalFile.person].commentsMedical.push({ ...comment, person: medicalFile.person, type: 'medical-file' });
+          personsObject[medicalFile.person].commentsMedical.push({
+            ...comment,
+            person: medicalFile.person,
+            type: 'medical-file',
+            _id: comment.date + medicalFile._id,
+          });
         }
       }
     }
@@ -270,6 +286,7 @@ export const itemsGroupedByPersonSelector = selector({
           passage: passage._id,
           date: passage.date,
           user: passage.user,
+          _id: passage.date + passage._id,
         });
       }
     }
@@ -287,6 +304,7 @@ export const itemsGroupedByPersonSelector = selector({
           team: rencontre.team,
           user: rencontre.user,
           date: rencontre.date,
+          _id: rencontre.date + rencontre._id,
         });
       }
     }

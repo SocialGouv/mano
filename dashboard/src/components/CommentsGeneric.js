@@ -324,6 +324,7 @@ function CommentModal({
         <Formik
           initialValues={{ urgent: false, group: false, ...comment, comment: comment.comment || window.sessionStorage.getItem('currentComment') }}
           onSubmit={async (body, actions) => {
+            console.log('body', body);
             if (!body.user && !isNewComment) return toast.error("L'utilisateur est obligatoire");
             if (!body.date && !isNewComment) return toast.error('La date est obligatoire');
             if (!body.comment) return toast.error('Le commentaire est obligatoire');
@@ -339,13 +340,13 @@ function CommentModal({
               team: body.team || currentTeam._id,
               organisation: organisation._id,
               type: comment.type ?? typeForNewComment,
+              action: action ?? body.action,
+              person: person ?? body.person,
             };
 
             if (comment._id) commentBody._id = comment._id;
-            if (action) commentBody.action = action;
-            if (person) commentBody.person = person;
-            if (commentBody.type === 'action' && !action) throw new Error('action is required');
-            if (commentBody.type === 'person' && !person) throw new Error('person is required');
+            if (commentBody.type === 'action' && !commentBody.action) throw new Error('action is required');
+            if (commentBody.type === 'person' && !commentBody.person) throw new Error('person is required');
 
             await onSubmit(commentBody, isNewComment);
 

@@ -224,6 +224,7 @@ const Action = ({ navigation, route }) => {
         team: currentTeam._id,
         user: user._id,
         organisation: organisation._id,
+        date: new Date().toISOString(),
       };
       const commentResponse = await API.post({ path: '/comment', body: prepareCommentForEncryption(comment) });
       if (commentResponse.ok) setComments((comments) => [commentResponse.decryptedData, ...comments]);

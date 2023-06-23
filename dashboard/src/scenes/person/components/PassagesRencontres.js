@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useRecoilValue } from 'recoil';
+import { useLocation, useHistory } from 'react-router-dom';
 import Passage from '../../../components/Passage';
 import Rencontre from '../../../components/Rencontre';
 import TagTeam from '../../../components/TagTeam';
@@ -17,6 +18,13 @@ export default function PassagesRencontres({ person }) {
   const [fullScreen, setFullScreen] = useState(false);
   const [rencontreToEdit, setRencontreToEdit] = useState(null);
   const [selected, setSelected] = useState(organisation.passagesEnabled ? 'passages' : 'rencontres');
+  const history = useHistory();
+  const { search } = useLocation();
+  const currentPassageId = useMemo(() => {
+    const searchParams = new URLSearchParams(search);
+    return searchParams.get('passageId');
+  }, [search]);
+
   const personPassages = useMemo(
     () => [...(person?.passages || [])].sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), 'day') ? 1 : -1)),
     [person]
@@ -41,6 +49,11 @@ export default function PassagesRencontres({ person }) {
     });
     setPassageToEdit(null);
   };
+
+  const currentPassage = useMemo(() => {
+    if (!currentPassageId) return null;
+    return personPassages.find((p) => p._id === currentPassageId);
+  }, [currentPassageId, personPassages]);
 
   if (!organisation.passagesEnabled && !organisation.rencontresEnabled) {
     return null;
@@ -94,9 +107,9 @@ export default function PassagesRencontres({ person }) {
         <ModalHeader title={`${selected.capitalize()} de  ${person?.name} (${personPassages.length})`}></ModalHeader>
         <ModalBody>
           {selected === 'passages' ? (
-            <PassagesTable personPassages={personPassages} setPassageToEdit={setPassageToEdit} users={users} />
+            <PassagesTable personPassages={personPassages} users={users} />
           ) : (
-            <RencontresTable personRencontres={personRencontres} setRencontreToEdit={setRencontreToEdit} users={users} />
+            <RencontresTable personRencontres={personRencontres} users={users} />
           )}
         </ModalBody>
         <ModalFooter>
@@ -114,8 +127,18 @@ export default function PassagesRencontres({ person }) {
           </button>
         </ModalFooter>
       </ModalContainer>
-      <Rencontre rencontre={rencontreToEdit} onFinished={() => setRencontreToEdit(null)} />
-      <Passage passage={passageToEdit} onFinished={() => setPassageToEdit(null)} />
+      <Rencontre
+        rencontre={rencontreToEdit}
+        onFinished={() => {
+          history.push(`/person/${person._id}`);
+        }}
+      />
+      <Passage
+        passage={currentPassage}
+        onFinished={() => {
+          history.push(`/person/${person._id}`);
+        }}
+      />
       {selected === 'passages' && !personPassages.length && (
         <div className="tw-mt-8 tw-w-full tw-text-center tw-text-gray-300">
           <svg
@@ -157,15 +180,16 @@ export default function PassagesRencontres({ person }) {
         </div>
       )}
       {selected === 'passages' ? (
-        <PassagesTable personPassages={personPassages} setPassageToEdit={setPassageToEdit} users={users} />
+        <PassagesTable personPassages={personPassages} users={users} />
       ) : (
-        <RencontresTable personRencontres={personRencontres} setRencontreToEdit={setRencontreToEdit} users={users} />
+        <RencontresTable personRencontres={personRencontres} users={users} />
       )}
     </div>
   );
 }
 
-function PassagesTable({ personPassages, setPassageToEdit, users }) {
+function PassagesTable({ personPassages, users }) {
+  const history = useHistory();
   return (
     <table className="table table-striped">
       <tbody className="small">
@@ -174,7 +198,7 @@ function PassagesTable({ personPassages, setPassageToEdit, users }) {
             <tr
               key={passage._id}
               onClick={() => {
-                setPassageToEdit(passage);
+                history.push(`/person/${passage.person}?passageId=${passage._id}`);
               }}>
               <td>
                 <div>{formatDateTimeWithNameOfDay(passage.date || passage.createdAt)}</div>
@@ -196,13 +220,18 @@ function PassagesTable({ personPassages, setPassageToEdit, users }) {
   );
 }
 
-function RencontresTable({ personRencontres, setRencontreToEdit, users }) {
+function RencontresTable({ personRencontres, users }) {
+  const history = useHistory();
   return (
     <table className="table table-striped">
       <tbody className="small">
         {(personRencontres || []).map((rencontre) => {
           return (
-            <tr key={rencontre._id} onClick={() => setRencontreToEdit(rencontre)}>
+            <tr
+              key={rencontre._id}
+              onClick={() => {
+                history.push(`/person/${rencontre.person}?rencontreId=${rencontre._id}`);
+              }}>
               <td>
                 <div>{formatDateTimeWithNameOfDay(rencontre.date || rencontre.createdAt)}</div>
                 <div style={{ overflowWrap: 'anywhere' }}>
