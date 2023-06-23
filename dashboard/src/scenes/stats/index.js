@@ -403,6 +403,8 @@ const Stats = () => {
     return getDataForPeriod(teamsPassages, period, { field: 'date', allSelectedTeamsAreNightSession });
   }, [allPassagesPopulated, filterArrayByTeam, period, allSelectedTeamsAreNightSession, passagesFilteredByPersons, filterPersons]);
 
+  console.log({ passages, allPassagesPopulated, period, allSelectedTeamsAreNightSession, passagesFilteredByPersons, filterPersons });
+
   const observations = useMemo(
     () =>
       getDataForPeriod(

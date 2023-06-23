@@ -68,10 +68,7 @@ const ActionsStats = ({
   }, [actionsDataForGroups, actionsWithDetailedGroupAndCategories, groupSlice, categorySlice]);
 
   const filterTitle = useMemo(() => {
-    if (!filterPersons.length) {
-      if (personsWithActions === 1) return `Filtrer par personnes suivies (${personsWithActions} personne concernée sans filtre) :`;
-      return `Filtrer par personnes suivies (${personsWithActions} personnes concernées sans filtre) :`;
-    }
+    if (!filterPersons.length) return `Filtrer par personnes suivies :`;
     if (personsWithActions === 1) return `Filtrer par personnes suivies (${personsWithActions} personne concernée par le filtre actuel) :`;
     return `Filtrer par personnes suivies (${personsWithActions} personnes concernées par le filtre actuel) :`;
   }, [filterPersons, personsWithActions]);

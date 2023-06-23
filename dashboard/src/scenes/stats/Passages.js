@@ -14,10 +14,7 @@ const PassagesStats = ({
   setFilterPersons,
 }) => {
   const filterTitle = useMemo(() => {
-    if (!filterPersons.length) {
-      if (personsWithPassages.length === 1) return `Filtrer par personnes suivies (${personsWithPassages.length} personne concernée sans filtre) :`;
-      return `Filtrer par personnes suivies (${personsWithPassages.length} personnes concernées sans filtre) :`;
-    }
+    if (!filterPersons.length) return `Filtrer par personnes suivies :`;
     if (personsWithPassages.length === 1)
       return `Filtrer par personnes suivies (${personsWithPassages.length} personne concernée par le filtre actuel) :`;
     return `Filtrer par personnes suivies (${personsWithPassages.length} personnes concernées par le filtre actuel) :`;

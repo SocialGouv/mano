@@ -14,11 +14,7 @@ const RencontresStats = ({
   setFilterPersons,
 }) => {
   const filterTitle = useMemo(() => {
-    if (!filterPersons.length) {
-      if (personsWithRencontres.length === 1)
-        return `Filtrer par personnes suivies (${personsWithRencontres.length} personne concernée sans filtre) :`;
-      return `Filtrer par personnes suivies (${personsWithRencontres.length} personnes concernées sans filtre) :`;
-    }
+    if (!filterPersons.length) return `Filtrer par personnes suivies :`;
     if (personsWithRencontres.length === 1)
       return `Filtrer par personnes suivies (${personsWithRencontres.length} personne concernée par le filtre actuel) :`;
     return `Filtrer par personnes suivies (${personsWithRencontres.length} personnes concernées par le filtre actuel) :`;

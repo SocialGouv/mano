@@ -11,10 +11,7 @@ const ConsultationsStats = ({ consultations, personsWithConsultations, filterBas
   const organisation = useRecoilValue(organisationState);
 
   const filterTitle = useMemo(() => {
-    if (!filterPersons.length) {
-      if (personsWithConsultations === 1) return `Filtrer par personnes suivies (${personsWithConsultations} personne concernée sans filtre) :`;
-      return `Filtrer par personnes suivies (${personsWithConsultations} personnes concernées sans filtre) :`;
-    }
+    if (!filterPersons.length) return `Filtrer par personnes suivies :`;
     if (personsWithConsultations === 1)
       return `Filtrer par personnes suivies (${personsWithConsultations} personne concernée par le filtre actuel) :`;
     return `Filtrer par personnes suivies (${personsWithConsultations} personnes concernées par le filtre actuel) :`;

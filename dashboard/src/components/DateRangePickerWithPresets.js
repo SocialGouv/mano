@@ -98,6 +98,20 @@ const DateRangePickerWithPresets = ({ period, setPeriod, preset, setPreset, remo
     return () => window.removeEventListener('resize', handleWindowResize);
   });
 
+  useEffect(() => {
+    // we need to reset the period everyday, because
+    // if today is 2023-06-23, the period "Aujourd'hui" will be set to 2023-06-23
+    // but on the day after, the period "Aujourd'hui" will be kept to 2023-06-23
+    // so the user will see "Aujourd'hui" but the period will actually be yesterday
+    // so we need to reset the period everyday
+    const dateOnWhichThePeriodWasSetByTheUser = window.localStorage.getItem('user-set-the-period-on-date');
+    if (dateOnWhichThePeriodWasSetByTheUser !== dayjsInstance().format('YYYY-MM-DD')) {
+      setPeriod({ startDate: null, endDate: null });
+      removePreset();
+      window.localStorage.setItem('user-set-the-period-on-date', dayjsInstance().format('YYYY-MM-DD'));
+    }
+  });
+
   const openDatePicker = (event) => {
     if (!!showDatePicker) return event.preventDefault();
     setShowDatepicker(true);
