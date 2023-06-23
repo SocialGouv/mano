@@ -8,7 +8,6 @@ import TreatmentModal from './TreatmentModal';
 import { treatmentsState } from '../../../recoil/treatments';
 import { AgendaMutedIcon } from './AgendaMutedIcon';
 import { FullScreenIcon } from './FullScreenIcon';
-import useSearchParamState from '../../../services/useSearchParamState';
 
 export const Treatments = ({ person }) => {
   const [modalOpen, setModalOpen] = useState(false);

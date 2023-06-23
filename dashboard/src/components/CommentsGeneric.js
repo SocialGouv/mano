@@ -220,49 +220,45 @@ export function CommentsTable({ comments, onEditComment, onAddComment, color, sh
                   onClick={() => {
                     onEditComment(comment);
                   }}>
-                  <div className="tw-flex tw-items-center tw-justify-between">
-                    <div className="tw-flex tw-flex-col tw-gap-2">
-                      <div className="tw-mb-4 tw-flex tw-items-center tw-align-middle">
-                        {!!comment.urgent && <ExclamationMarkButton className="tw-mr-4" />}
-                        <div className="tw-text-xs">{formatDateTimeWithNameOfDay(comment.date || comment.createdAt)}</div>
-                      </div>
-                      <div className="tw-flex tw-items-start">
-                        {!!organisation.groupsEnabled && !!comment.group && (
-                          <span className="tw-mr-2 tw-text-xl" aria-label="Commentaire familial" title="Commentaire familial">
-                            👪
-                          </span>
-                        )}
-                        <div className="tw-break-words">
-                          {(comment.comment || '').split('\n').map((e, i) => (
-                            <p key={e + i}>{e}</p>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="small">Créé par {users.find((e) => e._id === comment.user)?.name}</div>
+                  <div className="tw-flex tw-w-full tw-flex-col tw-gap-2">
+                    <div className="tw-mb-4 tw-flex tw-items-center tw-align-middle">
+                      {!!comment.urgent && <ExclamationMarkButton className="tw-mr-4" />}
+                      <div className="tw-text-xs">{formatDateTimeWithNameOfDay(comment.date || comment.createdAt)}</div>
                     </div>
-                    <div className="tw-flex tw-items-center tw-gap-2">
+                    <div className="tw-flex tw-items-start">
+                      {!!organisation.groupsEnabled && !!comment.group && (
+                        <span className="tw-mr-2 tw-text-xl" aria-label="Commentaire familial" title="Commentaire familial">
+                          👪
+                        </span>
+                      )}
+                      <div className="tw-break-words">
+                        {(comment.comment || '').split('\n').map((e, i) => (
+                          <p key={e + i}>{e}</p>
+                        ))}
+                      </div>
                       {!!withClickableLabel && ['treatment', 'consultation', 'action', 'passage', 'rencontre'].includes(comment.type) && (
                         <button
                           type="button"
+                          className="tw-ml-auto tw-block"
                           onClick={(e) => {
                             e.stopPropagation();
                             try {
                               console.log('comment', comment);
                               switch (comment.type) {
                                 case 'action':
-                                  history.push(`/action/${comment.action._id}`);
+                                  history.push(`/action/${comment.action}`);
                                   break;
                                 case 'person':
-                                  history.push(`/person/${comment.person._id}`);
+                                  history.push(`/person/${comment.person}`);
                                   break;
                                 case 'consultation':
-                                  history.push(`/person/${comment.person._id}?tab=Dossier+Médical&consultationId=${comment.consultation._id}`);
+                                  history.push(`/person/${comment.person}?tab=Dossier+Médical&consultationId=${comment.consultation._id}`);
                                   break;
                                 case 'treatment':
-                                  history.push(`/person/${comment.person._id}?tab=Dossier+Médical&treatmentId=${comment.treatment._id}`);
+                                  history.push(`/person/${comment.person}?tab=Dossier+Médical&treatmentId=${comment.treatment._id}`);
                                   break;
                                 case 'medical-file':
-                                  history.push(`/person/${comment.person._id}?tab=Dossier+Médical`);
+                                  history.push(`/person/${comment.person}?tab=Dossier+Médical`);
                                   break;
                                 default:
                                   break;
@@ -280,7 +276,10 @@ export function CommentsTable({ comments, onEditComment, onAddComment, color, sh
                           </div>
                         </button>
                       )}
-                      <div className="tw-max-w-fit">
+                    </div>
+                    <div className="small tw-flex tw-items-end tw-justify-between">
+                      <p className="tw-mb-0 tw-basis-1/2">Créé par {users.find((e) => e._id === comment.user)?.name}</p>
+                      <div className="tw-max-w-fit tw-basis-1/2">
                         <TagTeam teamId={comment.team} />
                       </div>
                     </div>

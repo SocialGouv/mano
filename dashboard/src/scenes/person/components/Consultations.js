@@ -43,7 +43,7 @@ export const Consultations = ({ person }) => {
   const currentConsultation = useMemo(() => {
     if (!currentConsultationId) return null;
     return personConsultations.find((c) => c._id === currentConsultationId);
-  }, [personConsultations, search]);
+  }, [personConsultations, currentConsultationId]);
 
   if (!!currentConsultationId && !modalOpen) {
     setModalOpen(true);

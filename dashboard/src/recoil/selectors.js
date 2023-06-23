@@ -139,6 +139,7 @@ export const itemsGroupedByPersonSelector = selector({
         personsObject[person].group = group;
       }
     }
+
     for (const person of persons) {
       if (!person.documents?.length) continue;
       for (const document of person.documents) {
@@ -156,8 +157,12 @@ export const itemsGroupedByPersonSelector = selector({
       }
     }
 
+    // to dispatch comments efficiently
+    const personPerAction = {};
+
     for (const action of actions) {
       if (!personsObject[action.person]) continue;
+      personPerAction[action._id] = action.person;
       personsObject[action.person].actions = personsObject[action.person].actions || [];
       personsObject[action.person].actions.push(action);
       personsObject[action.person].interactions.push(action.dueAt);
@@ -175,9 +180,16 @@ export const itemsGroupedByPersonSelector = selector({
       }
     }
     for (const comment of comments) {
+      if (comment.action) {
+        const person = personPerAction[comment.action];
+        if (!person) continue;
+        if (!personsObject[person]) continue;
+        personsObject[person].comments = personsObject[person].comments || [];
+        personsObject[person].comments.push({ ...comment, type: 'action' });
+      }
       if (!personsObject[comment.person]) continue;
       personsObject[comment.person].comments = personsObject[comment.person].comments || [];
-      personsObject[comment.person].comments.push(comment);
+      personsObject[comment.person].comments.push({ ...comment, type: 'person' });
       personsObject[comment.person].interactions.push(comment.date || comment.createdAt);
       if (!!comment.group) {
         const group = personsObject[comment.person].group;
@@ -209,18 +221,35 @@ export const itemsGroupedByPersonSelector = selector({
         personsObject[consultation.person].interactions.push(consultation.dueAt);
         personsObject[consultation.person].interactions.push(consultation.createdAt);
         personsObject[consultation.person].interactions.push(consultation.completedAt);
+        const consultationIsVisibleByMe = consultation.onlyVisibleBy.length === 0 || consultation.onlyVisibleBy.includes(user._id);
+        for (const comment of consultation.comments || []) {
+          personsObject[consultation.person].interactions.push(comment.date);
+          if (!consultationIsVisibleByMe) continue;
+          personsObject[consultation.person].commentsMedical = personsObject[consultation.person].commentsMedical || [];
+          personsObject[consultation.person].commentsMedical.push({ ...comment, person: consultation.person, type: 'consultation' });
+        }
       }
       for (const treatment of treatments) {
         if (!personsObject[treatment.person]) continue;
         personsObject[treatment.person].treatments = personsObject[treatment.person].treatments || [];
         personsObject[treatment.person].treatments.push(treatment);
         personsObject[treatment.person].interactions.push(treatment.createdAt);
+        for (const comment of treatment.comments || []) {
+          personsObject[treatment.person].interactions.push(comment.date);
+          personsObject[treatment.person].commentsMedical = personsObject[treatment.person].commentsMedical || [];
+          personsObject[treatment.person].commentsMedical.push({ ...comment, person: treatment.person, type: 'treatment' });
+        }
       }
       for (const medicalFile of medicalFiles) {
         if (!personsObject[medicalFile.person]) continue;
         if (personsObject[medicalFile.person].medicalFile) continue;
         personsObject[medicalFile.person].medicalFile = medicalFile;
         personsObject[medicalFile.person].interactions.push(medicalFile.createdAt);
+        for (const comment of medicalFile.comments || []) {
+          personsObject[medicalFile.person].interactions.push(comment.date);
+          personsObject[medicalFile.person].commentsMedical = personsObject[medicalFile.person].commentsMedical || [];
+          personsObject[medicalFile.person].commentsMedical.push({ ...comment, person: medicalFile.person, type: 'medical-file' });
+        }
       }
     }
     for (const passage of passages) {
@@ -232,12 +261,34 @@ export const itemsGroupedByPersonSelector = selector({
         gender: personsObject[passage.person]?.gender || 'Non renseigné',
       });
       personsObject[passage.person].interactions.push(passage.date || passage.createdAt);
+      if (passage.comment) {
+        personsObject[passage.person].comments = personsObject[passage.person].comments || [];
+        personsObject[passage.person].comments.push({
+          comment: passage.comment,
+          type: 'passage',
+          team: passage.team,
+          passage: passage._id,
+          date: passage.date,
+          user: passage.user,
+        });
+      }
     }
     for (const rencontre of rencontres) {
       if (!personsObject[rencontre.person]) continue;
       personsObject[rencontre.person].rencontres = personsObject[rencontre.person].rencontres || [];
       personsObject[rencontre.person].rencontres.push(rencontre);
       personsObject[rencontre.person].interactions.push(rencontre.date || rencontre.createdAt);
+      if (rencontre.comment) {
+        personsObject[rencontre.person].comments = personsObject[rencontre.person].comments || [];
+        personsObject[rencontre.person].comments.push({
+          comment: rencontre.comment,
+          type: 'rencontre',
+          rencontre: rencontre._id,
+          team: rencontre.team,
+          user: rencontre.user,
+          date: rencontre.date,
+        });
+      }
     }
 
     for (const personId of Object.keys(personsObject)) {
