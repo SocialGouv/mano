@@ -292,7 +292,6 @@ const List = () => {
           </div>
         </div>
       </div>
-
       {showAs === showAsOptions[2] && (
         <div className="tw-min-h-screen [overflow-wrap:anywhere]">
           <ActionsWeekly
@@ -304,7 +303,6 @@ const List = () => {
           />
         </div>
       )}
-
       {showAs === showAsOptions[0] && (
         <div className="tw-min-h-screen">
           <ActionsCalendar actions={dataConsolidated} />
@@ -316,13 +314,12 @@ const List = () => {
         </div>
       )}
       <CreateActionModal dueAt={actionDate} open={modalOpen} setOpen={(value) => setModalOpen(value)} disabled={!currentTeam} isMulti refreshable />
-      {showConsultationModal && (
-        <ConsultationModal
-          onClose={() => {
-            setShowConsultationModal(false);
-          }}
-        />
-      )}
+      <ConsultationModal
+        open={showConsultationModal}
+        onClose={() => {
+          setShowConsultationModal(false);
+        }}
+      />
     </>
   );
 };

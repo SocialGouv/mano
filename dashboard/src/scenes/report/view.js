@@ -1579,7 +1579,7 @@ const PassagesCreatedAt = ({ date, passages, selectedTeams }) => {
             />
           </Col>
         </Row>
-        <Passage passage={passageToEdit} onFinished={() => setPassageToEdit(null)} />
+        <Passage passage={passageToEdit} personId={passageToEdit?.person} onFinished={() => setPassageToEdit(null)} />
         {!!passages.length && (
           <Table
             className="Table"
@@ -1659,7 +1659,7 @@ const RencontresCreatedAt = ({ date, rencontres, selectedTeams }) => {
             />
           </Col>
         </Row>
-        <Rencontre rencontre={rencontreToEdit} onFinished={() => setRencontreToEdit(null)} />
+        <Rencontre rencontre={rencontreToEdit} personId={rencontreToEdit?.person} onFinished={() => setRencontreToEdit(null)} />
         {!!rencontres.length && (
           <Table
             className="Table"

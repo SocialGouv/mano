@@ -14,15 +14,17 @@ export default function PassagesRencontres({ person }) {
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
-  const [passageToEdit, setPassageToEdit] = useState(null);
   const [fullScreen, setFullScreen] = useState(false);
-  const [rencontreToEdit, setRencontreToEdit] = useState(null);
   const [selected, setSelected] = useState(organisation.passagesEnabled ? 'passages' : 'rencontres');
   const history = useHistory();
   const { search } = useLocation();
   const currentPassageId = useMemo(() => {
     const searchParams = new URLSearchParams(search);
     return searchParams.get('passageId');
+  }, [search]);
+  const currentRencontreId = useMemo(() => {
+    const searchParams = new URLSearchParams(search);
+    return searchParams.get('rencontreId');
   }, [search]);
 
   const personPassages = useMemo(
@@ -34,26 +36,23 @@ export default function PassagesRencontres({ person }) {
     [person]
   );
   const handleAddPassage = () => {
-    setPassageToEdit({
-      user: user._id,
-      team: currentTeam._id,
-      person: person._id,
-    });
-    setRencontreToEdit(null);
+    history.push(`/person/${person._id}?passageId=new`);
   };
   const handleAddRencontre = () => {
-    setRencontreToEdit({
-      user: user._id,
-      team: currentTeam._id,
-      person: person._id,
-    });
-    setPassageToEdit(null);
+    history.push(`/person/${person._id}?rencontreId=new`);
   };
 
   const currentPassage = useMemo(() => {
     if (!currentPassageId) return null;
+    if (currentPassageId === 'new') return { person: person._id, user: user._id, team: currentTeam._id };
     return personPassages.find((p) => p._id === currentPassageId);
   }, [currentPassageId, personPassages]);
+
+  const currentRencontre = useMemo(() => {
+    if (!currentRencontreId) return null;
+    if (currentRencontreId === 'new') return { person: person._id, user: user._id, team: currentTeam._id };
+    return personRencontres.find((p) => p._id === currentRencontreId);
+  }, [currentRencontreId, personRencontres]);
 
   if (!organisation.passagesEnabled && !organisation.rencontresEnabled) {
     return null;
@@ -128,15 +127,17 @@ export default function PassagesRencontres({ person }) {
         </ModalFooter>
       </ModalContainer>
       <Rencontre
-        rencontre={rencontreToEdit}
+        rencontre={currentRencontre}
+        personId={person._id}
         onFinished={() => {
-          history.push(`/person/${person._id}`);
+          history.replace(`/person/${person._id}`);
         }}
       />
       <Passage
         passage={currentPassage}
+        personId={person._id}
         onFinished={() => {
-          history.push(`/person/${person._id}`);
+          history.replace(`/person/${person._id}`);
         }}
       />
       {selected === 'passages' && !personPassages.length && (

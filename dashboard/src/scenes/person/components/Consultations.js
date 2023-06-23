@@ -106,16 +106,15 @@ export const Consultations = ({ person }) => {
         </ModalContainer>
         <ConsultationsTable filteredData={filteredData} person={person} />
       </div>
-      {modalOpen && (
-        <ConsultationModal
-          consultation={currentConsultation}
-          onClose={() => {
-            history.push(`/person/${person._id}?tab=Dossier+Médical`);
-            setModalOpen(false);
-          }}
-          personId={person._id}
-        />
-      )}
+      <ConsultationModal
+        open={modalOpen}
+        consultation={currentConsultation}
+        onClose={() => {
+          history.push(`/person/${person._id}?tab=Dossier+Médical`);
+          setModalOpen(false);
+        }}
+        personId={person._id}
+      />
     </>
   );
 };

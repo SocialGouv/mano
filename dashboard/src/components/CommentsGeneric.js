@@ -218,7 +218,27 @@ export function CommentsTable({ comments, onEditComment, onAddComment, color, sh
               <tr key={comment._id} className={[`tw-bg-${color}`, i % 2 ? 'tw-bg-opacity-0' : 'tw-bg-opacity-5'].join(' ')}>
                 <td
                   onClick={() => {
-                    onEditComment(comment);
+                    switch (comment.type) {
+                      case 'action':
+                      case 'person':
+                      case 'medical-file':
+                        onEditComment(comment);
+                        break;
+                      case 'passage':
+                        history.push(`/person/${comment.person}?passageId=${comment.passage}`);
+                        break;
+                      case 'rencontre':
+                        history.push(`/person/${comment.person}?rencontreId=${comment.rencontre}`);
+                        break;
+                      case 'consultation':
+                        history.push(`/person/${comment.person}?tab=Dossier+Médical&consultationId=${comment.consultation._id}`);
+                        break;
+                      case 'treatment':
+                        history.push(`/person/${comment.person}?tab=Dossier+Médical&treatmentId=${comment.treatment._id}`);
+                        break;
+                      default:
+                        break;
+                    }
                   }}>
                   <div className="tw-flex tw-w-full tw-flex-col tw-gap-2">
                     <div className="tw-mb-4 tw-flex tw-items-center tw-align-middle">
@@ -243,13 +263,18 @@ export function CommentsTable({ comments, onEditComment, onAddComment, color, sh
                           onClick={(e) => {
                             e.stopPropagation();
                             try {
-                              console.log('comment', comment);
                               switch (comment.type) {
                                 case 'action':
                                   history.push(`/action/${comment.action}`);
                                   break;
                                 case 'person':
                                   history.push(`/person/${comment.person}`);
+                                  break;
+                                case 'passage':
+                                  history.push(`/person/${comment.person}?passageId=${comment.passage}`);
+                                  break;
+                                case 'rencontre':
+                                  history.push(`/person/${comment.person}?rencontreId=${comment.rencontre}`);
                                   break;
                                 case 'consultation':
                                   history.push(`/person/${comment.person}?tab=Dossier+Médical&consultationId=${comment.consultation._id}`);

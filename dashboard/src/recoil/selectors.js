@@ -229,6 +229,7 @@ export const itemsGroupedByPersonSelector = selector({
           personsObject[consultation.person].commentsMedical = personsObject[consultation.person].commentsMedical || [];
           personsObject[consultation.person].commentsMedical.push({
             ...comment,
+            consultation,
             person: consultation.person,
             type: 'consultation',
             _id: comment.date + consultation._id,
@@ -245,6 +246,7 @@ export const itemsGroupedByPersonSelector = selector({
           personsObject[treatment.person].commentsMedical = personsObject[treatment.person].commentsMedical || [];
           personsObject[treatment.person].commentsMedical.push({
             ...comment,
+            treatment,
             person: treatment.person,
             type: 'treatment',
             _id: comment.date + treatment._id,
@@ -283,6 +285,7 @@ export const itemsGroupedByPersonSelector = selector({
           comment: passage.comment,
           type: 'passage',
           team: passage.team,
+          person: passage.person,
           passage: passage._id,
           date: passage.date,
           user: passage.user,
@@ -301,6 +304,7 @@ export const itemsGroupedByPersonSelector = selector({
           comment: rencontre.comment,
           type: 'rencontre',
           rencontre: rencontre._id,
+          person: rencontre.person,
           team: rencontre.team,
           user: rencontre.user,
           date: rencontre.date,
