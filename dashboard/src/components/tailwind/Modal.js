@@ -1,4 +1,4 @@
-import { Fragment, useRef } from 'react';
+import { Fragment, forwardRef, useRef } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 
 // inspired by https://tailwindui.com/components/application-ui/overlays/modals#component-47a5888a08838ad98779d50878d359b3
@@ -103,7 +103,7 @@ const nullFunction = () => null;
 
 const ModalHeader = ({ children, title }) => {
   return (
-    <div className="tw-flex tw-w-full tw-shrink-0 tw-items-center tw-justify-between tw-rounded-t-lg tw-border-b tw-border-gray-200 tw-bg-white">
+    <div className="tw-order-1 tw-flex tw-w-full tw-shrink-0 tw-items-center tw-justify-between tw-rounded-t-lg tw-border-b tw-border-gray-200 tw-bg-white">
       <div className="tw-w-full tw-py-4 sm:tw-flex sm:tw-items-start">
         <div className="tw-mt-3 tw-w-full tw-text-center sm:tw-mt-0 sm:tw-text-left">
           {!!title && (
@@ -118,19 +118,19 @@ const ModalHeader = ({ children, title }) => {
   );
 };
 
-const ModalBody = ({ children, className = '', overflowY = true }) => {
+const ModalBody = forwardRef(({ children, className = '', overflowY = true }, ref) => {
   return (
-    <div className={['tw-shrink tw-bg-white tw-pb-4', overflowY ? 'tw-overflow-y-auto' : ''].join(' ')}>
+    <div ref={ref} className={['tw-z-[99999] tw-order-2 tw-shrink tw-pb-4', overflowY ? 'tw-overflow-y-auto' : ''].join(' ')}>
       <div className="sm:tw-flex sm:tw-items-start">
         <div className={['tw-w-full tw-text-center sm:tw-mt-0 sm:tw-text-left', className].join(' ')}>{children}</div>
       </div>
     </div>
   );
-};
+});
 
 const ModalFooter = ({ children }) => {
   return (
-    <div className="tw-shrink-0 tw-rounded-b-lg tw-border-t tw-border-gray-200 tw-bg-gray-50 tw-px-4 tw-py-3 sm:tw-flex sm:tw-justify-end sm:tw-px-6">
+    <div className="tw-order-3 tw-shrink-0 tw-rounded-b-lg tw-border-t tw-border-gray-200 tw-bg-gray-50 tw-px-4 tw-py-3 sm:tw-flex sm:tw-justify-end sm:tw-px-6">
       {children}
     </div>
   );
