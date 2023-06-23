@@ -36,7 +36,7 @@ Cette nouvelle version :
 - Affiche les durées précises de "Suivi(e) depuis" et "En rue depuis"
 `,
       [
-        { text: "Télécharger", link: "https://mano-app.fabrique.social.gouv.fr/download" },
+        { text: "Télécharger", link: `https://mano-app.fabrique.social.gouv.fr/download?ts=${Date.now()}` },
         { text: "Plus tard", style: "cancel" },
       ],
       { cancelable: true },

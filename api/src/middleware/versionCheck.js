@@ -30,7 +30,7 @@ module.exports = ({ headers: { version, platform } }, res, next) => {
           `Les fonctionnalités de cette nouvelle version sont\u00A0:
 - Compatibilité avec les consultations par équipe
 - Possibilité de rajouter des commentaires dans les consultations, les traitements et les dossiers médicaux`,
-          [{ text: "Télécharger la dernière version", link: "https://mano-app.fabrique.social.gouv.fr/download" }],
+          [{ text: "Télécharger la dernière version", link: `https://mano-app.fabrique.social.gouv.fr/download?ts=${Date.now()}` }],
         ],
       });
     }
