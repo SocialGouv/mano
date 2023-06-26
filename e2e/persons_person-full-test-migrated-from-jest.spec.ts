@@ -182,7 +182,8 @@ test("test", async ({ page }) => {
 
   await page.getByRole("button", { name: "Historique" }).click();
   await page.locator('[data-test-id="Autres pseudos\\: \\"\\" ➔ \\"test pseudo\\""]').click();
-  await page.getByText("Retour").click();
+
+  await page.getByRole("link", { name: "Personnes suivies" }).click();
   await expect(page).toHaveURL("http://localhost:8090/person");
   await page.getByText(personName).click();
   await page.getByText("hello action").click();
