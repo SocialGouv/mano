@@ -162,7 +162,7 @@ test("test", async ({ page }) => {
 
   await page.getByRole("link", { name: "Statistiques" }).click();
   await page.getByRole("button", { name: "Rencontres" }).filter({ hasText: "Rencontres" }).click();
-  await page.getByText("Nombre de rencontres ?Rencontres2100%Total2100%Rencontres2 (100%)").click();
+  await page.getByText("Nombre de rencontres ?2").click();
 
   await expect(page.getByRole("button", { name: "Passages" })).not.toBeVisible();
 

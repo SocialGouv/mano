@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { CustomResponsivePie } from './charts';
 import { getPieData } from './utils';
 import Filters from '../../components/Filters';
+import { Block } from './Blocks';
 
 const RencontresStats = ({
   rencontres,
@@ -26,9 +27,9 @@ const RencontresStats = ({
       <div className="tw-flex tw-basis-full tw-items-center">
         <Filters title={filterTitle} base={filterBase} filters={filterPersons} onChange={setFilterPersons} />
       </div>
-      <CustomResponsivePie
+      <Block
+        data={rencontres.length}
         title="Nombre de rencontres"
-        data={getPieData(rencontres, 'type', { options: ['Anonyme', 'Non-anonyme'] })}
         help={`Nombre de rencontres enregistrées dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des rencontres.`}
       />
       <CustomResponsivePie
