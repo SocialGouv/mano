@@ -381,7 +381,6 @@ export default function ConsultationModal({ open, onClose, personId, consultatio
               color="blue-900"
               typeForNewComment="consultation"
               onDeleteComment={(comment) => {
-                console.log('delete comment', comment);
                 setData({ ...data, comments: data.comments.filter((c) => c._id !== comment._id) });
               }}
               onSubmitComment={(comment, isNewComment) => {

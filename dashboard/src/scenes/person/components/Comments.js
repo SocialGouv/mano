@@ -24,7 +24,8 @@ export default function Comments({ person }) {
     <div className="tw-relative">
       <CommentsModule
         comments={comments}
-        typeForNewComment="medical-file"
+        person={person._id}
+        typeForNewComment="person"
         canToggleGroupCheck={canToggleGroupCheck}
         canToggleUrgentCheck
         showPanel
