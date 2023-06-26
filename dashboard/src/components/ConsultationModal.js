@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import ReactDatePicker from 'react-datepicker';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { v4 as uuidv4 } from 'uuid';
@@ -19,7 +19,7 @@ import SelectPerson from './SelectPerson';
 import { CommentsModule } from './CommentsGeneric';
 import SelectTeamMultiple from './SelectTeamMultiple';
 
-export default function ConsultationModal({ onClose, personId, consultation, date }) {
+export default function ConsultationModal({ open, onClose, personId, consultation, date }) {
   const organisation = useRecoilValue(organisationState);
   const teams = useRecoilValue(teamsState);
   const currentTeam = useRecoilValue(currentTeamState);
@@ -57,6 +57,10 @@ export default function ConsultationModal({ onClose, personId, consultation, dat
   }, [organisation._id, personId, user._id, consultation, date, teams]);
 
   const [data, setData] = useState(initialState);
+  useEffect(() => {
+    setData(initialState);
+  }, [initialState]);
+
   const [activeTab, setActiveTab] = useState('Informations');
 
   async function handleSubmit() {
@@ -113,10 +117,12 @@ export default function ConsultationModal({ onClose, personId, consultation, dat
 
   return (
     <ModalContainer
-      open={true}
+      open={open}
       size="3xl"
       onClose={() => {
         if (JSON.stringify(data) === JSON.stringify(initialState)) return onClose();
+        console.log('data', data);
+        console.log('initialState', initialState);
         setModalConfirmState({
           open: true,
           options: {
@@ -375,7 +381,6 @@ export default function ConsultationModal({ onClose, personId, consultation, dat
               color="blue-900"
               typeForNewComment="consultation"
               onDeleteComment={(comment) => {
-                console.log('delete comment', comment);
                 setData({ ...data, comments: data.comments.filter((c) => c._id !== comment._id) });
               }}
               onSubmitComment={(comment, isNewComment) => {

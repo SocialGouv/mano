@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useRecoilValue } from 'recoil';
+import { useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Formik } from 'formik';
 import ExclamationMarkButton from './tailwind/ExclamationMarkButton';
@@ -79,7 +80,13 @@ export function CommentsModule({
               )}
             </div>
           </div>
-          <CommentsTable comments={comments} color={color} onEditComment={setCommentToEdit} onAddComment={() => setModalCreateOpen(true)} />
+          <CommentsTable
+            withClickableLabel
+            comments={comments}
+            color={color}
+            onEditComment={setCommentToEdit}
+            onAddComment={() => setModalCreateOpen(true)}
+          />
         </div>
       ) : (
         <CommentsTable
@@ -137,7 +144,7 @@ export function CommentsFullScreen({ open, comments, onClose, title, color, onEd
     <ModalContainer open={open} size="full" onClose={onClose}>
       <ModalHeader title={title} />
       <ModalBody>
-        <CommentsTable comments={comments} onEditComment={onEditComment} onAddComment={onAddComment} />
+        <CommentsTable comments={comments} onEditComment={onEditComment} onAddComment={onAddComment} withClickableLabel />
       </ModalBody>
       <ModalFooter>
         <button type="button" name="cancel" className="button-cancel" onClick={onClose}>
@@ -151,9 +158,10 @@ export function CommentsFullScreen({ open, comments, onClose, title, color, onEd
   );
 }
 
-export function CommentsTable({ comments, onEditComment, onAddComment, color, showAddCommentButton }) {
+export function CommentsTable({ comments, onEditComment, onAddComment, color, showAddCommentButton, withClickableLabel }) {
   const users = useRecoilValue(usersState);
   const organisation = useRecoilValue(organisationState);
+  const history = useHistory();
 
   if (!comments.length) {
     return (
@@ -210,31 +218,80 @@ export function CommentsTable({ comments, onEditComment, onAddComment, color, sh
               <tr key={comment._id} className={[`tw-bg-${color}`, i % 2 ? 'tw-bg-opacity-0' : 'tw-bg-opacity-5'].join(' ')}>
                 <td
                   onClick={() => {
-                    onEditComment(comment);
+                    switch (comment.type) {
+                      case 'action':
+                      case 'person':
+                      case 'medical-file':
+                        onEditComment(comment);
+                        break;
+                      case 'passage':
+                        history.push(`/person/${comment.person}?passageId=${comment.passage}`);
+                        break;
+                      case 'rencontre':
+                        history.push(`/person/${comment.person}?rencontreId=${comment.rencontre}`);
+                        break;
+                      case 'consultation':
+                        history.push(`/person/${comment.person}?tab=Dossier+Médical&consultationId=${comment.consultation._id}`);
+                        break;
+                      case 'treatment':
+                        history.push(`/person/${comment.person}?tab=Dossier+Médical&treatmentId=${comment.treatment._id}`);
+                        break;
+                      default:
+                        break;
+                    }
                   }}>
-                  <div className="tw-flex tw-items-center tw-justify-between">
-                    <div className="tw-flex tw-flex-col tw-gap-2">
-                      <div className="tw-mb-4 tw-flex tw-items-center tw-align-middle">
-                        {!!comment.urgent && <ExclamationMarkButton className="tw-mr-4" />}
-                        <div className="tw-text-xs">{formatDateTimeWithNameOfDay(comment.date || comment.createdAt)}</div>
-                      </div>
-                      <div className="tw-flex tw-items-start">
-                        {!!organisation.groupsEnabled && !!comment.group && (
-                          <span className="tw-mr-2 tw-text-xl" aria-label="Commentaire familial" title="Commentaire familial">
-                            👪
-                          </span>
-                        )}
-                        <div className="tw-break-words">
-                          {(comment.comment || '').split('\n').map((e, i) => (
-                            <p key={e + i}>{e}</p>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="small">Créé par {users.find((e) => e._id === comment.user)?.name}</div>
+                  <div className="tw-flex tw-w-full tw-flex-col tw-gap-2">
+                    <div className="tw-mb-4 tw-flex tw-items-center tw-align-middle">
+                      {!!comment.urgent && <ExclamationMarkButton className="tw-mr-4" />}
+                      <div className="tw-text-xs">{formatDateTimeWithNameOfDay(comment.date || comment.createdAt)}</div>
                     </div>
-                    <div className="tw-flex tw-items-center tw-gap-2">
-                      {['treatment', 'consultation', 'action', 'passage', 'rencontre'].includes(comment.type) && (
-                        <div>
+                    <div className="tw-flex tw-items-start">
+                      {!!organisation.groupsEnabled && !!comment.group && (
+                        <span className="tw-mr-2 tw-text-xl" aria-label="Commentaire familial" title="Commentaire familial">
+                          👪
+                        </span>
+                      )}
+                      <div className="tw-break-words">
+                        {(comment.comment || '').split('\n').map((e, i) => (
+                          <p key={e + i}>{e}</p>
+                        ))}
+                      </div>
+                      {!!withClickableLabel && ['treatment', 'consultation', 'action', 'passage', 'rencontre'].includes(comment.type) && (
+                        <button
+                          type="button"
+                          className="tw-ml-auto tw-block"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            try {
+                              switch (comment.type) {
+                                case 'action':
+                                  history.push(`/action/${comment.action}`);
+                                  break;
+                                case 'person':
+                                  history.push(`/person/${comment.person}`);
+                                  break;
+                                case 'passage':
+                                  history.push(`/person/${comment.person}?passageId=${comment.passage}`);
+                                  break;
+                                case 'rencontre':
+                                  history.push(`/person/${comment.person}?rencontreId=${comment.rencontre}`);
+                                  break;
+                                case 'consultation':
+                                  history.push(`/person/${comment.person}?tab=Dossier+Médical&consultationId=${comment.consultation._id}`);
+                                  break;
+                                case 'treatment':
+                                  history.push(`/person/${comment.person}?tab=Dossier+Médical&treatmentId=${comment.treatment._id}`);
+                                  break;
+                                case 'medical-file':
+                                  history.push(`/person/${comment.person}?tab=Dossier+Médical`);
+                                  break;
+                                default:
+                                  break;
+                              }
+                            } catch (errorLoadingComment) {
+                              capture(errorLoadingComment, { extra: { message: 'error loading comment tag button', comment } });
+                            }
+                          }}>
                           <div className="tw-rounded tw-border tw-border-blue-900 tw-bg-blue-900/10 tw-px-1">
                             {comment.type === 'treatment' && 'Traitement'}
                             {comment.type === 'consultation' && 'Consultation'}
@@ -242,9 +299,12 @@ export function CommentsTable({ comments, onEditComment, onAddComment, color, sh
                             {comment.type === 'passage' && 'Passage'}
                             {comment.type === 'rencontre' && 'Rencontre'}
                           </div>
-                        </div>
+                        </button>
                       )}
-                      <div className="tw-max-w-fit">
+                    </div>
+                    <div className="small tw-flex tw-items-end tw-justify-between">
+                      <p className="tw-mb-0 tw-basis-1/2">Créé par {users.find((e) => e._id === comment.user)?.name}</p>
+                      <div className="tw-max-w-fit tw-basis-1/2">
                         <TagTeam teamId={comment.team} />
                       </div>
                     </div>
@@ -289,6 +349,7 @@ function CommentModal({
         <Formik
           initialValues={{ urgent: false, group: false, ...comment, comment: comment.comment || window.sessionStorage.getItem('currentComment') }}
           onSubmit={async (body, actions) => {
+            console.log('body', body);
             if (!body.user && !isNewComment) return toast.error("L'utilisateur est obligatoire");
             if (!body.date && !isNewComment) return toast.error('La date est obligatoire');
             if (!body.comment) return toast.error('Le commentaire est obligatoire');
@@ -304,13 +365,13 @@ function CommentModal({
               team: body.team || currentTeam._id,
               organisation: organisation._id,
               type: comment.type ?? typeForNewComment,
+              action: action ?? body.action,
+              person: person ?? body.person,
             };
 
             if (comment._id) commentBody._id = comment._id;
-            if (action) commentBody.action = action;
-            if (person) commentBody.person = person;
-            if (commentBody.type === 'action' && !action) throw new Error('action is required');
-            if (commentBody.type === 'person' && !person) throw new Error('person is required');
+            if (commentBody.type === 'action' && !commentBody.action) throw new Error('action is required');
+            if (commentBody.type === 'person' && !commentBody.person) throw new Error('person is required');
 
             await onSubmit(commentBody, isNewComment);
 

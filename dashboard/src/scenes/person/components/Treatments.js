@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useRecoilValue } from 'recoil';
+import { useLocation, useHistory } from 'react-router-dom';
 import { usersState, userState } from '../../../recoil/auth';
 import { formatDateWithFullMonth } from '../../../services/date';
 import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from '../../../components/tailwind/Modal';
@@ -7,7 +8,6 @@ import TreatmentModal from './TreatmentModal';
 import { treatmentsState } from '../../../recoil/treatments';
 import { AgendaMutedIcon } from './AgendaMutedIcon';
 import { FullScreenIcon } from './FullScreenIcon';
-import useSearchParamState from '../../../services/useSearchParamState';
 
 export const Treatments = ({ person }) => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -15,10 +15,24 @@ export const Treatments = ({ person }) => {
   const allTreatments = useRecoilValue(treatmentsState);
   const treatments = useMemo(() => (allTreatments || []).filter((t) => t.person === person._id), [allTreatments, person._id]);
   const filteredData = treatments;
+  const history = useHistory();
+  const { search } = useLocation();
+  const currentTreatmentId = useMemo(() => {
+    const searchParams = new URLSearchParams(search);
+    return searchParams.get('treatmentId');
+  }, [search]);
+
+  const currentTreatment = useMemo(() => {
+    if (!currentTreatmentId) return null;
+    return allTreatments.find((t) => t._id === currentTreatmentId);
+  }, [allTreatments, currentTreatmentId]);
+
+  if (!!currentTreatmentId && !modalOpen) {
+    setModalOpen(true);
+  }
 
   return (
     <>
-      {modalOpen && <TreatmentModal isNewTreatment person={person} onClose={() => setModalOpen(false)} />}
       <div className="tw-relative">
         <div className="tw-sticky tw-top-0 tw-z-10 tw-flex tw-bg-white tw-p-3">
           <h4 className="tw-flex-1 tw-text-xl">Traitements {filteredData.length ? `(${filteredData.length})` : ''}</h4>
@@ -45,7 +59,7 @@ export const Treatments = ({ person }) => {
             <button type="button" name="cancel" className="button-cancel" onClick={() => setFullScreen(false)}>
               Fermer
             </button>
-            <button type="button" className="button-submit" onClick={() => setModalOpen(true)}>
+            <button type="button" className="button-submit !tw-bg-blue-900" onClick={() => setModalOpen(true)}>
               ＋ Ajouter un traitement
             </button>
           </ModalFooter>
@@ -59,20 +73,24 @@ export const Treatments = ({ person }) => {
           </div>
         )}
       </div>
+      {modalOpen && (
+        <TreatmentModal
+          treatment={currentTreatment}
+          person={person}
+          onClose={() => {
+            history.push(`/person/${person._id}?tab=Dossier+Médical`);
+            setModalOpen(false);
+          }}
+        />
+      )}
     </>
   );
 };
 
 const TreatmentsTable = ({ filteredData, person }) => {
   const user = useRecoilValue(userState);
-  const [currentTreatmentId, setCurrentTreatmentId] = useSearchParamState('treatmentId', null);
   const users = useRecoilValue(usersState);
-  const allTreatments = useRecoilValue(treatmentsState);
-
-  const currentTreatment = useMemo(() => {
-    if (!currentTreatmentId) return null;
-    return allTreatments.find((t) => t._id === currentTreatmentId);
-  }, [allTreatments, currentTreatmentId]);
+  const history = useHistory();
 
   const displayTreatment = (treatment) => {
     let base = treatment.name;
@@ -89,39 +107,36 @@ const TreatmentsTable = ({ filteredData, person }) => {
   };
 
   return (
-    <>
-      <table className="table">
-        <tbody className="small">
-          {filteredData.map((treatment, i) => {
-            return (
-              <tr
-                key={treatment._id}
-                className={['tw-w-full tw-border-t tw-border-zinc-200 tw-bg-blue-900', Boolean(i % 2) ? 'tw-bg-opacity-0' : 'tw-bg-opacity-5'].join(
-                  ' '
-                )}>
-                <td>
-                  <div
-                    className={['restricted-access'].includes(user.role) ? 'tw-cursor-not-allowed tw-py-2' : 'tw-cursor-pointer tw-py-2'}
-                    onClick={() => {
-                      setCurrentTreatmentId(treatment._id);
-                    }}>
-                    <div className="tw-flex">
-                      <div className="tw-flex tw-flex-1 tw-items-center">
-                        <TreatmentDate treatment={treatment} />
-                        {Boolean(treatment.documents?.length) && <div className="tw-ml-2 tw-text-xs">{treatment.documents?.length} document(s)</div>}
-                      </div>
-                      <div>Créé par {treatment.user ? users.find((u) => u._id === treatment.user)?.name : ''}</div>
+    <table className="table">
+      <tbody className="small">
+        {filteredData.map((treatment, i) => {
+          return (
+            <tr
+              key={treatment._id}
+              className={['tw-w-full tw-border-t tw-border-zinc-200 tw-bg-blue-900', Boolean(i % 2) ? 'tw-bg-opacity-0' : 'tw-bg-opacity-5'].join(
+                ' '
+              )}>
+              <td>
+                <div
+                  className={['restricted-access'].includes(user.role) ? 'tw-cursor-not-allowed tw-py-2' : 'tw-cursor-pointer tw-py-2'}
+                  onClick={() => {
+                    history.push(`/person/${person._id}?tab=Dossier+Médical&treatmentId=${treatment._id}`);
+                  }}>
+                  <div className="tw-flex">
+                    <div className="tw-flex tw-flex-1 tw-items-center">
+                      <TreatmentDate treatment={treatment} />
+                      {Boolean(treatment.documents?.length) && <div className="tw-ml-2 tw-text-xs">{treatment.documents?.length} document(s)</div>}
                     </div>
-                    <div className="tw-mt-2">{displayTreatment(treatment)}</div>
+                    <div>Créé par {treatment.user ? users.find((u) => u._id === treatment.user)?.name : ''}</div>
                   </div>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-      {currentTreatment && <TreatmentModal treatment={currentTreatment} person={person} onClose={() => setCurrentTreatmentId(null)} />}
-    </>
+                  <div className="tw-mt-2">{displayTreatment(treatment)}</div>
+                </div>
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
   );
 };
 

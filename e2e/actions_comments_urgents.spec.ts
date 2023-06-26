@@ -29,7 +29,7 @@ test("Create action with comments", async ({ page }) => {
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*/);
-  await page.getByRole("button", { name: "Ajouter un commentaire" }).click();
+  await page.getByRole("button", { name: "Ajouter un commentaire" }).first().click();
   await page.getByRole("textbox", { name: "Commentaire" }).fill("commentaire prioritaire pour une personne");
   await page.getByText("Commentaire prioritaire Ce commentaire sera mis en avant par rapport aux autres").click();
   await page.getByRole("button", { name: "Enregistrer" }).click();

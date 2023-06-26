@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { Formik } from 'formik';
 import ButtonCustom from './ButtonCustom';
 import SelectUser from './SelectUser';
-import { teamsState, userState } from '../recoil/auth';
+import { currentTeamState, teamsState, userState } from '../recoil/auth';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import API from '../services/api';
 import { rencontresState, prepareRencontreForEncryption } from '../recoil/rencontres';
@@ -14,10 +14,11 @@ import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIf
 import DatePicker from './DatePicker';
 import { outOfBoundariesDate } from '../services/date';
 
-const Rencontre = ({ rencontre, onFinished }) => {
+const Rencontre = ({ rencontre, personId, onFinished }) => {
   const user = useRecoilValue(userState);
   const teams = useRecoilValue(teamsState);
   const [open, setOpen] = useState(false);
+  const currentTeam = useRecoilValue(currentTeamState);
 
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
@@ -66,8 +67,9 @@ const Rencontre = ({ rencontre, onFinished }) => {
               if (isNew) {
                 const newRencontre = {
                   date: body.date,
-                  team: body.team,
-                  user: body.user,
+                  team: currentTeam._id,
+                  user: user._id,
+                  person: personId,
                   comment: body.comment,
                 };
 

@@ -2,10 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Modal, Input, Col, Row, ModalHeader, ModalBody, FormGroup, Label } from 'reactstrap';
 import { toast } from 'react-toastify';
 import { Formik } from 'formik';
-
 import ButtonCustom from './ButtonCustom';
 import SelectUser from './SelectUser';
-import { teamsState, userState } from '../recoil/auth';
+import { currentTeamState, teamsState, userState } from '../recoil/auth';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import API from '../services/api';
 import { passagesState, preparePassageForEncryption } from '../recoil/passages';
@@ -15,10 +14,11 @@ import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIf
 import DatePicker from './DatePicker';
 import { outOfBoundariesDate } from '../services/date';
 
-const Passage = ({ passage, onFinished }) => {
+const Passage = ({ passage, personId, onFinished }) => {
   const user = useRecoilValue(userState);
   const teams = useRecoilValue(teamsState);
   const [open, setOpen] = useState(false);
+  const currentTeam = useRecoilValue(currentTeamState);
 
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
@@ -40,6 +40,7 @@ const Passage = ({ passage, onFinished }) => {
       if (passageRes.ok) {
         toast.success('Suppression réussie');
         setOpen(false);
+        onFinished();
         setPassages((passages) => passages.filter((p) => p._id !== passage._id));
       }
     }
@@ -68,8 +69,9 @@ const Passage = ({ passage, onFinished }) => {
               if (isNew) {
                 const newPassage = {
                   date: body.date,
-                  team: body.team,
-                  user: body.user,
+                  team: currentTeam._id,
+                  user: user._id,
+                  person: personId,
                   comment: body.comment,
                 };
 

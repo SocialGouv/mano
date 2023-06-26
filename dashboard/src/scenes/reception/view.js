@@ -335,7 +335,7 @@ const PassagesToday = ({ passages, isOpen, setOpen }) => {
     <Modal isOpen={isOpen} toggle={() => setOpen(false)} size="lg" backdrop="static">
       <ModalHeader toggle={() => setOpen(false)}>Passages du {formatDateWithNameOfDay(now())}</ModalHeader>
       <ModalBody>
-        <Passage passage={passageToEdit} onFinished={() => setPassageToEdit(null)} />
+        <Passage passage={passageToEdit} personId={passageToEdit?.person} onFinished={() => setPassageToEdit(null)} />
         {!!passages.length && (
           <Table
             className="Table"

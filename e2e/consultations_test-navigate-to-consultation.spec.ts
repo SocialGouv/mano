@@ -148,6 +148,7 @@ test("test", async ({ page }) => {
   );
 
   await page.goBack();
+  await page.goBack();
   await expect(page).toHaveURL(
     /http:\/\/localhost:8090\/report\/[0-9]{4}-[0-9]{2}-[0-9]{2}\?reportsTeam=%5B%22[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}%22%5D/
   );
@@ -164,6 +165,7 @@ test("test", async ({ page }) => {
     /http:\/\/localhost:8090\/person\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\?tab=Dossier\+M%C3%A9dical/
   );
 
+  await page.goBack();
   await page.goBack();
   await expect(page).toHaveURL(
     /http:\/\/localhost:8090\/report\/[0-9]{4}-[0-9]{2}-[0-9]{2}\?reportsTeam=%5B%22[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}%22%5D/

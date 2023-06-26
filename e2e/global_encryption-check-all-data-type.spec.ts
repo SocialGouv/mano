@@ -40,7 +40,7 @@ test("test", async ({ page }) => {
   await page.getByText("Mise à jour !").click();
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await page.getByText(premier).click();
-  await page.getByRole("button", { name: "Ajouter un commentaire" }).click();
+  await page.getByRole("button", { name: "Ajouter un commentaire" }).first().click();
   await page.getByRole("textbox", { name: "Commentaire" }).fill("commentaire test");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Commentaire enregistré").click();
@@ -168,10 +168,10 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Résumé" }).click();
   await page.getByText("SUIVI HOP").click();
   await page.getByText("MDEIDAL").click();
-  await page.getByText("le passage").click();
+  await page.getByText("le passage").first().click();
   await page.getByRole("button", { name: "Close" }).click();
   await page.getByRole("button", { name: "Rencontres (1)" }).click();
-  await page.getByText("La rencontre").click();
+  await page.getByText("La rencontre").first().click();
   await page.getByRole("button", { name: "Close" }).click();
   await page.getByRole("link", { name: "Territoires" }).click();
   await page.getByText(testTerritoire).click();

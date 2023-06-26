@@ -105,7 +105,7 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
 
-  await page.locator("button[aria-label='Ajouter un commentaire']").click();
+  await page.locator("button[aria-label='Ajouter un commentaire']").first().click();
   await page.getByRole("textbox", { name: "Commentaire" }).click();
   await page.getByRole("textbox", { name: "Commentaire" }).fill("Premier commentaire");
   await page.getByText("Commentaire prioritaire Ce commentaire sera mis en avant par rapport aux autres").click();
@@ -182,7 +182,8 @@ test("test", async ({ page }) => {
 
   await page.getByRole("button", { name: "Historique" }).click();
   await page.locator('[data-test-id="Autres pseudos\\: \\"\\" ➔ \\"test pseudo\\""]').click();
-  await page.getByText("Retour").click();
+
+  await page.getByRole("link", { name: "Personnes suivies" }).click();
   await expect(page).toHaveURL("http://localhost:8090/person");
   await page.getByText(personName).click();
   await page.getByText("hello action").click();
