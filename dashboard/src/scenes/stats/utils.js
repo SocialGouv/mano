@@ -18,8 +18,8 @@ export const getDataForPeriod = (
 
   const offsetHours = allSelectedTeamsAreNightSession ? 12 : 0;
 
-  const isoStartDate = dayjs(startDate).startOf('day').add(offsetHours, 'hour').toISOString();
-  const isoEndDate = dayjs(endDate).startOf('day').add(1, 'day').add(offsetHours, 'hour').toISOString();
+  const isoStartDate = dayjs(startDate).startOf('day').utc(true).add(offsetHours, 'hour').toISOString();
+  const isoEndDate = dayjs(endDate).startOf('day').utc(true).add(1, 'day').add(offsetHours, 'hour').toISOString();
 
   return data.filter((item) => {
     const date = item[field] || item[backupField] || item.createdAt;

@@ -121,8 +121,8 @@ export const getIsDayWithinHoursOffsetOfDay = (dayToTest, referenceDay, offsetHo
 export const getIsDayWithinHoursOffsetOfPeriod = (dayToTest, { referenceStartDay, referenceEndDay }, offsetHours = -12) => {
   if (!dayToTest) return false;
 
-  const startDate = dayjs(referenceStartDay).startOf('day').add(offsetHours, 'hour');
-  const endDate = dayjs(referenceEndDay).startOf('day').add(1, 'day').add(offsetHours, 'hour');
+  const startDate = dayjs(referenceStartDay).startOf('day').utc(true).add(offsetHours, 'hour');
+  const endDate = dayjs(referenceEndDay).startOf('day').utc(true).add(1, 'day').add(offsetHours, 'hour');
 
   // Parameter 4 is a string with two characters; '[' means inclusive, '(' exclusive
   // '()' excludes start and end date (default)
