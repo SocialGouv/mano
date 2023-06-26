@@ -87,6 +87,7 @@ const itemsForStatsSelector = selectorFamily({
   get:
     ({ period, filterPersons, selectedTeamsIdsObject, viewAllOrganisationData, allSelectedTeamsAreNightSession }) =>
     ({ get }) => {
+      const activeFilters = filterPersons.filter((f) => f.value);
       const filterItemByTeam = (item, key) => {
         if (viewAllOrganisationData) return true;
         if (Array.isArray(item[key])) {
@@ -96,8 +97,8 @@ const itemsForStatsSelector = selectorFamily({
         }
         return !!selectedTeamsIdsObject[item[key]];
       };
-      const filtersExceptOutOfActiveList = filterPersons.filter((f) => f.field !== 'outOfActiveList');
-      const outOfActiveListFilter = filterPersons.find((f) => f.field === 'outOfActiveList')?.value;
+      const filtersExceptOutOfActiveList = activeFilters.filter((f) => f.field !== 'outOfActiveList');
+      const outOfActiveListFilter = activeFilters.find((f) => f.field === 'outOfActiveList')?.value;
 
       const allPersons = get(personsWithMedicalFileMergedSelector);
 
@@ -222,6 +223,14 @@ const itemsForStatsSelector = selectorFamily({
     },
 });
 
+const filterMakingThingsClearAboutOutOfActiveListStatus = {
+  field: 'outOfActiveList',
+  value: "Oui et non (c'est-à-dire tout le monde)",
+  type: 'multi-choice',
+};
+
+const initFilters = [filterMakingThingsClearAboutOutOfActiveListStatus];
+
 const Stats = () => {
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
@@ -242,9 +251,7 @@ const Stats = () => {
 
   const [selectedTerritories, setSelectedTerritories] = useLocalStorage('stats-territories', []);
   const [activeTab, setActiveTab] = useLocalStorage('stats-tabCaption', 'Général');
-  const [filterPersons, setFilterPersons] = useLocalStorage('stats-filterPersons-defaultEverybody', [
-    { field: 'outOfActiveList', value: "Oui et non (c'est-à-dire tout le monde)", type: 'multi-choice' },
-  ]);
+  const [filterPersons, setFilterPersons] = useLocalStorage('stats-filterPersons-defaultEverybody', initFilters);
   const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('stats-viewAllOrganisationData', teams.length === 1);
   const [period, setPeriod] = useLocalStorage('period', { startDate: null, endDate: null });
   const [preset, setPreset, removePreset] = useLocalStorage('stats-date-preset', null);
@@ -398,12 +405,16 @@ const Stats = () => {
   }, [actionsFilteredByPersons, groupsCategories, actionsCategoriesGroups, actionsCategories, actionsStatuses]);
 
   const passages = useMemo(() => {
-    if (!!filterPersons.length) return passagesFilteredByPersons;
+    const activeFilters = filterPersons.filter((f) => f.value);
+    if (!!activeFilters.length) {
+      if (activeFilters.length > 1) return passagesFilteredByPersons;
+      const filter = activeFilters[0];
+      if (filter.type !== filterMakingThingsClearAboutOutOfActiveListStatus.type) return passagesFilteredByPersons;
+      if (filter.value !== filterMakingThingsClearAboutOutOfActiveListStatus.value) return passagesFilteredByPersons;
+    }
     const teamsPassages = filterArrayByTeam(allPassagesPopulated, 'team');
     return getDataForPeriod(teamsPassages, period, { field: 'date', allSelectedTeamsAreNightSession });
   }, [allPassagesPopulated, filterArrayByTeam, period, allSelectedTeamsAreNightSession, passagesFilteredByPersons, filterPersons]);
-
-  console.log({ passages, allPassagesPopulated, period, allSelectedTeamsAreNightSession, passagesFilteredByPersons, filterPersons });
 
   const observations = useMemo(
     () =>
