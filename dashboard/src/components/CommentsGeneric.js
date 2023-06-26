@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -14,6 +14,8 @@ import DatePicker from './DatePicker';
 import { outOfBoundariesDate } from '../services/date';
 import AutoResizeTextarea from './AutoresizeTextArea';
 import { capture } from '../services/sentry';
+import UserName from './UserName';
+import CustomFieldDisplay from './CustomFieldDisplay';
 
 /*
 3 components:
@@ -55,6 +57,7 @@ export function CommentsModule({
   if (!onDeleteComment) throw new Error('onDeleteComment is required');
   if (!onSubmitComment) throw new Error('onSubmitComment is required');
   const [modalCreateOpen, setModalCreateOpen] = useState(false);
+  const [commentToDisplay, setCommentToDisplay] = useState(null);
   const [commentToEdit, setCommentToEdit] = useState(null);
   const [fullScreen, setFullScreen] = useState(false);
 
@@ -84,7 +87,7 @@ export function CommentsModule({
             withClickableLabel
             comments={comments}
             color={color}
-            onEditComment={setCommentToEdit}
+            onDisplayComment={setCommentToDisplay}
             onAddComment={() => setModalCreateOpen(true)}
           />
         </div>
@@ -93,7 +96,7 @@ export function CommentsModule({
           showAddCommentButton
           comments={comments}
           color={color}
-          onEditComment={setCommentToEdit}
+          onDisplayComment={setCommentToDisplay}
           onAddComment={() => setModalCreateOpen(true)}
         />
       )}
@@ -126,10 +129,23 @@ export function CommentsModule({
           color={color}
         />
       )}
+      {!!commentToDisplay && (
+        <CommentDisplay
+          comment={commentToDisplay}
+          onClose={() => setCommentToDisplay(null)}
+          onEditComment={() => {
+            setCommentToDisplay(null);
+            setCommentToEdit(commentToDisplay);
+          }}
+          canToggleGroupCheck={canToggleGroupCheck}
+          canToggleUrgentCheck={canToggleUrgentCheck}
+          color={color}
+        />
+      )}
       <CommentsFullScreen
         open={!!fullScreen}
         comments={comments}
-        onEditComment={setCommentToEdit}
+        onDisplayComment={setCommentToDisplay}
         onAddComment={() => setModalCreateOpen(true)}
         onClose={() => setFullScreen(false)}
         title={title}
@@ -139,12 +155,12 @@ export function CommentsModule({
   );
 }
 
-export function CommentsFullScreen({ open, comments, onClose, title, color, onEditComment, onAddComment }) {
+export function CommentsFullScreen({ open, comments, onClose, title, color, onDisplayComment, onAddComment }) {
   return (
     <ModalContainer open={open} size="full" onClose={onClose}>
       <ModalHeader title={title} />
       <ModalBody>
-        <CommentsTable comments={comments} onEditComment={onEditComment} onAddComment={onAddComment} withClickableLabel />
+        <CommentsTable comments={comments} onDisplayComment={onDisplayComment} onAddComment={onAddComment} withClickableLabel />
       </ModalBody>
       <ModalFooter>
         <button type="button" name="cancel" className="button-cancel" onClick={onClose}>
@@ -158,7 +174,7 @@ export function CommentsFullScreen({ open, comments, onClose, title, color, onEd
   );
 }
 
-export function CommentsTable({ comments, onEditComment, onAddComment, color, showAddCommentButton, withClickableLabel }) {
+export function CommentsTable({ comments, onDisplayComment, onAddComment, color, showAddCommentButton, withClickableLabel }) {
   const users = useRecoilValue(usersState);
   const organisation = useRecoilValue(organisationState);
   const history = useHistory();
@@ -215,14 +231,14 @@ export function CommentsTable({ comments, onEditComment, onAddComment, color, sh
               return null;
             }
             return (
-              <tr key={comment._id} className={[`tw-bg-${color}`, i % 2 ? 'tw-bg-opacity-0' : 'tw-bg-opacity-5'].join(' ')}>
+              <tr key={comment._id} className={[`tw-bg-${color} tw-w-full`, i % 2 ? 'tw-bg-opacity-0' : 'tw-bg-opacity-5'].join(' ')}>
                 <td
                   onClick={() => {
                     switch (comment.type) {
                       case 'action':
                       case 'person':
                       case 'medical-file':
-                        onEditComment(comment);
+                        onDisplayComment(comment);
                         break;
                       case 'passage':
                         history.push(`/person/${comment.person}?passageId=${comment.passage}`);
@@ -231,29 +247,31 @@ export function CommentsTable({ comments, onEditComment, onAddComment, color, sh
                         history.push(`/person/${comment.person}?rencontreId=${comment.rencontre}`);
                         break;
                       case 'consultation':
-                        history.push(`/person/${comment.person}?tab=Dossier+Médical&consultationId=${comment.consultation._id}`);
+                        history.push(`/person/${comment.person}?tab=Dossier+Médical&consultationId=${comment.consultation}`);
                         break;
                       case 'treatment':
-                        history.push(`/person/${comment.person}?tab=Dossier+Médical&treatmentId=${comment.treatment._id}`);
+                        history.push(`/person/${comment.person}?tab=Dossier+Médical&treatmentId=${comment.treatment}`);
                         break;
                       default:
                         break;
                     }
                   }}>
-                  <div className="tw-flex tw-w-full tw-flex-col tw-gap-2">
+                  <div className="tw-flex tw-w-full tw-flex-col tw-gap-2 tw-overflow-hidden">
                     <div className="tw-mb-4 tw-flex tw-items-center tw-align-middle">
                       {!!comment.urgent && <ExclamationMarkButton className="tw-mr-4" />}
-                      <div className="tw-text-xs">{formatDateTimeWithNameOfDay(comment.date || comment.createdAt)}</div>
+                      <div className="tw-text-xs tw-opacity-50">{formatDateTimeWithNameOfDay(comment.date || comment.createdAt)}</div>
                     </div>
-                    <div className="tw-flex tw-items-start">
+                    <div className="tw-flex tw-w-full tw-flex-shrink tw-items-start">
                       {!!organisation.groupsEnabled && !!comment.group && (
                         <span className="tw-mr-2 tw-text-xl" aria-label="Commentaire familial" title="Commentaire familial">
                           👪
                         </span>
                       )}
-                      <div className="tw-break-words">
+                      <div className="[overflow-wrap:anywhere]">
                         {(comment.comment || '').split('\n').map((e, i) => (
-                          <p key={e + i}>{e}</p>
+                          <p key={e + i} className="tw-mb-0">
+                            {e}
+                          </p>
                         ))}
                       </div>
                       {!!withClickableLabel && ['treatment', 'consultation', 'action', 'passage', 'rencontre'].includes(comment.type) && (
@@ -303,7 +321,7 @@ export function CommentsTable({ comments, onEditComment, onAddComment, color, sh
                       )}
                     </div>
                     <div className="small tw-flex tw-items-end tw-justify-between">
-                      <p className="tw-mb-0 tw-basis-1/2">Créé par {users.find((e) => e._id === comment.user)?.name}</p>
+                      <p className="tw-mb-0 tw-basis-1/2 tw-opacity-50">Créé par {users.find((e) => e._id === comment.user)?.name}</p>
                       <div className="tw-max-w-fit tw-basis-1/2">
                         <TagTeam teamId={comment.team} />
                       </div>
@@ -315,6 +333,86 @@ export function CommentsTable({ comments, onEditComment, onAddComment, color, sh
           })}
         </tbody>
       </table>
+    </>
+  );
+}
+
+function CommentDisplay({ comment, onClose, onEditComment, canToggleUrgentCheck, canToggleGroupCheck, color = 'main' }) {
+  const user = useRecoilValue(userState);
+
+  console.log('comment', comment);
+
+  const isEditable = useMemo(() => {
+    if (comment.user === user?._id) return true;
+    if (['action', 'person'].includes(comment.type)) return true;
+    return false;
+  }, [comment, user]);
+
+  return (
+    <>
+      <ModalContainer open size="3xl">
+        <ModalHeader toggle={onClose} title="Commentaire" />
+        <ModalBody className="tw-px-4 tw-py-2">
+          <div className="tw-flex tw-w-full tw-flex-col tw-gap-6">
+            <div className="tw-my-2 tw-flex tw-gap-8">
+              <div className="tw-basis-1/2 [overflow-wrap:anywhere]">
+                <div className="tw-text-sm tw-font-semibold tw-text-gray-600">Créé par</div>
+                <UserName id={comment.user} />
+              </div>
+              <div className="tw-basis-1/2 [overflow-wrap:anywhere]">
+                <div className="tw-text-sm tw-font-semibold tw-text-gray-600">Créé le / Concerne le</div>
+                <div>
+                  <CustomFieldDisplay type="date" value={comment.date || comment.createdAt} />
+                </div>
+              </div>
+            </div>
+            <div className="tw-flex tw-flex-1 tw-flex-col">
+              <div className="tw-basis-full [overflow-wrap:anywhere]">
+                <div className="tw-text-sm tw-font-semibold tw-text-gray-600">Commentaire</div>
+                <div>
+                  <CustomFieldDisplay type="textarea" value={comment.comment} />
+                </div>
+              </div>
+            </div>
+            {(!!canToggleUrgentCheck || !!canToggleGroupCheck) && (
+              <div className="tw-flex tw-gap-8">
+                {!!canToggleUrgentCheck && (
+                  <div className="tw-flex tw-flex-1 tw-flex-col">
+                    <label htmlFor="create-comment-urgent">
+                      <input type="checkbox" id="create-comment-urgent" className="tw-mr-2" name="urgent" checked={comment.urgent} disabled />
+                      Commentaire prioritaire <br />
+                      <small className="text-muted">Ce commentaire sera mis en avant par rapport aux autres</small>
+                    </label>
+                  </div>
+                )}
+                {!!canToggleGroupCheck && (
+                  <div className="tw-flex tw-flex-1 tw-flex-col">
+                    <label htmlFor="create-comment-for-group">
+                      <input type="checkbox" className="tw-mr-2" id="create-comment-for-group" name="group" checked={comment.group} disabled />
+                      Commentaire familial <br />
+                      <small className="text-muted">Ce commentaire sera valable pour chaque membre de la famille</small>
+                    </label>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </ModalBody>
+        <ModalFooter>
+          <button
+            type="button"
+            name="cancel"
+            className="button-cancel"
+            onClick={() => {
+              onClose();
+            }}>
+            Fermer
+          </button>
+          <button type="submit" onClick={onEditComment} className={`button-submit !tw-bg-${color}`} disabled={!isEditable}>
+            Modifier
+          </button>
+        </ModalFooter>
+      </ModalContainer>
     </>
   );
 }
@@ -336,6 +434,13 @@ function CommentModal({
   const organisation = useRecoilValue(organisationState);
   const currentTeam = useRecoilValue(currentTeamState);
 
+  const isEditable = useMemo(() => {
+    if (isNewComment) return true;
+    if (comment.user === user?._id) return true;
+    if (['action', 'person'].includes(comment.type)) return true;
+    return false;
+  }, [comment, isNewComment, user]);
+
   return (
     <>
       <ModalContainer
@@ -344,7 +449,7 @@ function CommentModal({
           window.sessionStorage.removeItem('currentComment');
           onClose();
         }}
-        size="lg">
+        size="3xl">
         <ModalHeader toggle={onClose} title={isNewComment ? 'Créer un commentaire' : 'Éditer le commentaire'} />
         <Formik
           initialValues={{ urgent: false, group: false, ...comment, comment: comment.comment || window.sessionStorage.getItem('currentComment') }}
@@ -392,7 +497,7 @@ function CommentModal({
                         <label htmlFor="user">Créé par</label>
                         <SelectUser
                           inputId="user"
-                          isDisabled={isNewComment}
+                          isDisabled={isNewComment || !isEditable}
                           value={values.user || user._id}
                           onChange={(userId) => handleChange({ target: { value: userId, name: 'user' } })}
                         />
@@ -402,6 +507,7 @@ function CommentModal({
                         <DatePicker
                           required
                           withTime
+                          disabled={!isEditable}
                           id="date"
                           defaultValue={(values.date || values.createdAt) ?? new Date()}
                           onChange={handleChange}

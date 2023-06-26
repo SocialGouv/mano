@@ -122,8 +122,6 @@ export default function ConsultationModal({ open, onClose, personId, consultatio
       size="3xl"
       onClose={() => {
         if (JSON.stringify(data) === JSON.stringify(initialState)) return onClose();
-        console.log('data', data);
-        console.log('initialState', initialState);
         setModalConfirmState({
           open: true,
           options: {
@@ -152,7 +150,7 @@ export default function ConsultationModal({ open, onClose, personId, consultatio
         title={
           <>
             {consultation ? 'Modifier une consultation' : 'Ajouter une consultation'}
-            {consultation && (
+            {!!consultation && consultation.user && (
               <UserName
                 className="tw-block tw-text-right tw-text-base tw-font-normal tw-italic"
                 id={consultation.user}
@@ -416,7 +414,7 @@ export default function ConsultationModal({ open, onClose, personId, consultatio
           <button
             type="button"
             name="cancel"
-            disabled={consultation.user !== user._id}
+            disabled={!!consultation && consultation.user !== user._id}
             title="Supprimer cette consultation - seul le créateur peut supprimer une consultation"
             className="button-destructive"
             onClick={async (e) => {
@@ -436,7 +434,7 @@ export default function ConsultationModal({ open, onClose, personId, consultatio
           type="submit"
           className="button-submit !tw-bg-blue-900"
           form="add-consultation-form"
-          disabled={consultation.user !== user._id}>
+          disabled={!!consultation && consultation.user !== user._id}>
           Sauvegarder
         </button>
       </ModalFooter>
