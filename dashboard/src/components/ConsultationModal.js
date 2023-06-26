@@ -18,6 +18,7 @@ import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from './tailwind/
 import SelectPerson from './SelectPerson';
 import { CommentsModule } from './CommentsGeneric';
 import SelectTeamMultiple from './SelectTeamMultiple';
+import UserName from './UserName';
 
 export default function ConsultationModal({ open, onClose, personId, consultation, date }) {
   const organisation = useRecoilValue(organisationState);
@@ -147,7 +148,20 @@ export default function ConsultationModal({ open, onClose, personId, consultatio
           },
         });
       }}>
-      <ModalHeader title={consultation ? 'Modifier une consultation' : 'Ajouter une consultation'} />
+      <ModalHeader
+        title={
+          <>
+            {consultation ? 'Modifier une consultation' : 'Ajouter une consultation'}
+            {consultation && (
+              <UserName
+                className="tw-block tw-text-right tw-text-base tw-font-normal tw-italic"
+                id={consultation.user}
+                wrapper={(name) => ` (créée par ${name})`}
+              />
+            )}
+          </>
+        }
+      />
       <ModalBody>
         <form
           id="add-consultation-form"
@@ -402,6 +416,8 @@ export default function ConsultationModal({ open, onClose, personId, consultatio
           <button
             type="button"
             name="cancel"
+            disabled={consultation.user !== user._id}
+            title="Supprimer cette consultation - seul le créateur peut supprimer une consultation"
             className="button-destructive"
             onClick={async (e) => {
               e.stopPropagation();
@@ -415,7 +431,12 @@ export default function ConsultationModal({ open, onClose, personId, consultatio
             Supprimer
           </button>
         )}
-        <button type="submit" className="button-submit !tw-bg-blue-900" form="add-consultation-form">
+        <button
+          title="MAJ cette consultation - seul le créateur peut supprimer une consultation"
+          type="submit"
+          className="button-submit !tw-bg-blue-900"
+          form="add-consultation-form"
+          disabled={consultation.user !== user._id}>
           Sauvegarder
         </button>
       </ModalFooter>
