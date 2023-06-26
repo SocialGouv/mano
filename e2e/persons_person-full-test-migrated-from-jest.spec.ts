@@ -105,7 +105,7 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
 
-  await page.locator("button[aria-label='Ajouter un commentaire']").click();
+  await page.locator("button[aria-label='Ajouter un commentaire']").first().click();
   await page.getByRole("textbox", { name: "Commentaire" }).click();
   await page.getByRole("textbox", { name: "Commentaire" }).fill("Premier commentaire");
   await page.getByText("Commentaire prioritaire Ce commentaire sera mis en avant par rapport aux autres").click();

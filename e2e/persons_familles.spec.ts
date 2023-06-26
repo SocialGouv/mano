@@ -201,7 +201,7 @@ test("Familles", async ({ page }) => {
     await page.getByRole("link", { name: "Personnes suivies" }).click();
     await page.getByRole("cell", { name: person1Name }).click();
 
-    await page.locator("button[aria-label='Ajouter un commentaire']").click();
+    await page.locator("button[aria-label='Ajouter un commentaire']").first().click();
     await page.getByRole("textbox", { name: "Commentaire" }).fill(comment1Name);
     await page.getByLabel("Commentaire familial Ce commentaire sera valable pour chaque membre de la famille").check();
     await page.getByRole("button", { name: "Enregistrer" }).click();
