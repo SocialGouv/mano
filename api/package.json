@@ -1,6 +1,6 @@
 {
   "name": "api_mano",
-  "version": "1.270.2",
+  "version": "1.271.0",
   "mobileAppVersion": "2.35.0",
   "description": "",
   "main": "index.js",

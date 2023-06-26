@@ -1,3 +1,10 @@
+# [1.271.0](https://github.com/SocialGouv/mano/compare/v1.270.2...v1.271.0) (2023-06-26)
+
+
+### Features
+
+* **dashboard:** pouvoir filtrer par personne sur les stats ([#1553](https://github.com/SocialGouv/mano/issues/1553)) ([221f2d1](https://github.com/SocialGouv/mano/commit/221f2d15771e43116aa36a23644daa6b5e75d4b7))
+
 ## [1.270.2](https://github.com/SocialGouv/mano/compare/v1.270.1...v1.270.2) (2023-06-23)
 
 
