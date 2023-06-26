@@ -199,7 +199,7 @@ export const itemsGroupedByPersonSelector = selector({
           if (!personsObject[person]) continue;
           if (person === comment.person) continue;
           personsObject[person].comments = personsObject[person].comments || [];
-          personsObject[person].comments.push(comment);
+          personsObject[person].comments.push({ ...comment, type: 'person', date: comment.date || comment.createdAt });
         }
       }
     }
