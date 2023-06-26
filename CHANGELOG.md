@@ -1,3 +1,10 @@
+# [1.272.0](https://github.com/SocialGouv/mano/compare/v1.271.0...v1.272.0) (2023-06-26)
+
+
+### Features
+
+* **dashboard:** voir les commentaires de passage/rencontre/action dans le panel de commentaires du dossier d'une personne suivie ([#1560](https://github.com/SocialGouv/mano/issues/1560)) ([2ccefe8](https://github.com/SocialGouv/mano/commit/2ccefe8fbf46666c0d282f82614c18cbdd5f6726))
+
 # [1.271.0](https://github.com/SocialGouv/mano/compare/v1.270.2...v1.271.0) (2023-06-26)
 
 
