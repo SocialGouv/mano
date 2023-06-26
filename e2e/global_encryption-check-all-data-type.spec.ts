@@ -168,10 +168,10 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Résumé" }).click();
   await page.getByText("SUIVI HOP").click();
   await page.getByText("MDEIDAL").click();
-  await page.getByText("le passage").click();
+  await page.getByText("le passage").first().click();
   await page.getByRole("button", { name: "Close" }).click();
   await page.getByRole("button", { name: "Rencontres (1)" }).click();
-  await page.getByText("La rencontre").click();
+  await page.getByText("La rencontre").first().click();
   await page.getByRole("button", { name: "Close" }).click();
   await page.getByRole("link", { name: "Territoires" }).click();
   await page.getByText(testTerritoire).click();
