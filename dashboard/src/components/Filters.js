@@ -3,70 +3,115 @@ import SelectCustom from './SelectCustom';
 import { dayjsInstance, isOnSameDay } from '../services/date';
 import DatePicker from './DatePicker';
 
-export const filterData = (data, filters, returnWholeArray = false) => {
-  if (!!filters?.filter((f) => Boolean(f?.value)).length) {
+export const filterItem =
+  (filters, debug = false) =>
+  (item) => {
+    // for now an item needs to fulfill ALL items to be displayed
+    if (!filters?.filter((f) => Boolean(f?.value)).length) return item;
     for (let filter of filters) {
+      if (debug) console.log('filter', filter);
       if (!filter.field || !filter.value) continue;
-      data = data
-        .map((item, index) => {
-          const itemValue = item[filter.field];
-          if (['number'].includes(filter.type)) {
-            const { number, number2, comparator } = filter.value;
-            if (comparator === 'unfilled') return !itemValue ? item : null;
-            if (!itemValue) return null;
-            if (comparator === 'between') {
-              if (Number(number) < Number(number2)) {
-                return Number(itemValue) >= Number(number) && Number(itemValue) <= Number(number2) ? item : null;
-              } else {
-                return Number(itemValue) >= Number(number2) && Number(itemValue) <= Number(number) ? item : null;
-              }
-            }
-            if (comparator === 'equals') return Number(itemValue) === Number(number) ? item : null;
-            if (comparator === 'lower') return Number(itemValue) < Number(number) ? item : null;
-            if (comparator === 'greater') return Number(itemValue) > Number(number) ? item : null;
+      const itemValue = item[filter.field];
+      if (['number'].includes(filter.type)) {
+        const { number, number2, comparator } = filter.value;
+        if (comparator === 'unfilled') {
+          if (!!itemValue) return false;
+          continue;
+        }
+        if (!itemValue) return false;
+        if (comparator === 'between') {
+          if (Number(number) < Number(number2)) {
+            if (Number(itemValue) >= Number(number) && Number(itemValue) <= Number(number2)) continue;
+            return false;
+          } else {
+            if (Number(itemValue) >= Number(number2) && Number(itemValue) <= Number(number)) continue;
+            return false;
           }
-          if (['boolean'].includes(filter.type)) {
-            if (filter.value === 'Oui' && !!itemValue) return item;
-            if (filter.value === 'Non' && !itemValue) return item;
-            return null;
-          }
-          if (['date-with-time', 'date'].includes(filter.type)) {
-            const { date, comparator } = filter.value;
-            if (comparator === 'unfilled') return !itemValue ? item : null;
-            if (!itemValue) return null;
-            if (comparator === 'before') return dayjsInstance(itemValue).isBefore(date) ? item : null;
-            if (comparator === 'after') return dayjsInstance(itemValue).isAfter(date) ? item : null;
-            if (comparator === 'equals') return isOnSameDay(itemValue, date) ? item : null;
-          }
+        }
+        if (comparator === 'equals') {
+          if (Number(itemValue) === Number(number)) continue;
+          return false;
+        }
+        if (comparator === 'lower') {
+          if (Number(itemValue) < Number(number)) continue;
+          return false;
+        }
+        if (comparator === 'greater') {
+          if (Number(itemValue) > Number(number)) continue;
+          return false;
+        }
+      }
+      if (['boolean'].includes(filter.type)) {
+        if (filter.value === 'Oui' && !!itemValue) continue;
+        if (filter.value === 'Non' && !itemValue) continue;
+        return false;
+      }
+      if (['date-with-time', 'date'].includes(filter.type)) {
+        const { date, comparator } = filter.value;
+        if (comparator === 'unfilled') {
+          if (!itemValue) continue;
+          return false;
+        }
+        if (!itemValue) return false;
+        if (comparator === 'before') {
+          if (dayjsInstance(itemValue).isBefore(date)) continue;
+          return false;
+        }
+        if (comparator === 'after') {
+          if (dayjsInstance(itemValue).isAfter(date)) continue;
+          return false;
+        }
+        if (comparator === 'equals') {
+          if (isOnSameDay(itemValue, date)) continue;
+          return false;
+        }
+      }
 
-          if (typeof itemValue === 'boolean') {
-            if (!itemValue) return filter.value === 'Non renseigné' ? item : null;
-            return itemValue === (filter.value === 'Oui') ? item : null;
-          }
+      if (typeof itemValue === 'boolean') {
+        if (!itemValue) {
+          if (filter.value === 'Non renseigné') continue;
+          return false;
+        }
+        if (itemValue === (filter.value === 'Oui')) continue;
+        return false;
+      }
 
-          const arrayFilterValue = Array.isArray(filter.value) ? filter.value : [filter.value];
-          if (!arrayFilterValue.length) return item;
-          for (const filterValue of arrayFilterValue) {
-            if (!itemValue?.length && filterValue === 'Non renseigné') return item;
-            if (typeof itemValue === 'string') {
-              // For type text we trim and lower case the value.
-              if (filter.type === 'text') {
-                const trimmedItemValue = (itemValue || '').trim().toLowerCase();
-                const trimmedFilterValue = (filterValue || '').trim().toLowerCase();
-                if (trimmedItemValue.includes(trimmedFilterValue)) return item;
-              }
-              if (itemValue === filterValue) return item;
-            } else {
-              if (itemValue?.includes?.(filterValue)) {
-                return item;
-              }
+      const arrayFilterValue = Array.isArray(filter.value) ? filter.value : [filter.value];
+      if (!arrayFilterValue.length) continue;
+      // here the item needs to fulfill at least one filter value
+      let isSelected = false;
+      for (const filterValue of arrayFilterValue) {
+        if (!itemValue?.length && filterValue === 'Non renseigné') {
+          isSelected = true;
+          break;
+        }
+        if (typeof itemValue === 'string') {
+          // For type text we trim and lower case the value.
+          if (filter.type === 'text') {
+            const trimmedItemValue = (itemValue || '').trim().toLowerCase();
+            const trimmedFilterValue = (filterValue || '').trim().toLowerCase();
+            if (trimmedItemValue.includes(trimmedFilterValue)) {
+              isSelected = true;
+              break;
             }
           }
-          return null;
-        })
-        .filter(Boolean);
+          if (itemValue === filterValue) {
+            isSelected = true;
+            break;
+          }
+        } else {
+          if (itemValue?.includes?.(filterValue)) {
+            isSelected = true;
+          }
+        }
+      }
+      if (!isSelected) return false;
     }
-  }
+    return item;
+  };
+
+export const filterData = (data, filters) => {
+  data = data.map(filterItem(filters)).filter(Boolean);
   return data;
 };
 
@@ -116,7 +161,7 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :', saveInURLParams
   return (
     <>
       <div className="printonly tw-flex tw-gap-2">
-        <p>Filtres:</p>
+        <p>{title}</p>
         <ul>
           {filters.map((filter, index) => {
             if (!filter?.field) return null;

@@ -98,6 +98,20 @@ const DateRangePickerWithPresets = ({ period, setPeriod, preset, setPreset, remo
     return () => window.removeEventListener('resize', handleWindowResize);
   });
 
+  useEffect(() => {
+    // we need to reset the period everyday, because
+    // if today is 2023-06-23, the period "Aujourd'hui" will be set to 2023-06-23
+    // but on the day after, the period "Aujourd'hui" will be kept to 2023-06-23
+    // so the user will see "Aujourd'hui" but the period will actually be yesterday
+    // so we need to reset the period everyday
+    const dateOnWhichThePeriodWasSetByTheUser = window.localStorage.getItem('user-set-the-period-on-date');
+    if (dateOnWhichThePeriodWasSetByTheUser !== dayjsInstance().format('YYYY-MM-DD')) {
+      setPeriod({ startDate: null, endDate: null });
+      removePreset();
+      window.localStorage.setItem('user-set-the-period-on-date', dayjsInstance().format('YYYY-MM-DD'));
+    }
+  });
+
   const openDatePicker = (event) => {
     if (!!showDatePicker) return event.preventDefault();
     setShowDatepicker(true);
@@ -140,7 +154,7 @@ const DateRangePickerWithPresets = ({ period, setPeriod, preset, setPreset, remo
       </button>
       {!!showDatePicker && (
         <OutsideClickHandler onOutsideClick={closeDatePicker}>
-          <div className="stats-datepicker tw-absolute tw-top-12 tw-z-50 tw-flex tw-flex-nowrap tw-items-center tw-justify-end tw-overflow-x-auto tw-rounded-lg tw-border tw-border-gray-300 tw-bg-white tw-pl-56 lg:tw-min-w-[45rem]">
+          <div className="stats-datepicker tw-absolute tw-top-12 tw-z-[1000] tw-flex tw-flex-nowrap tw-items-center tw-justify-end tw-overflow-x-auto tw-rounded-lg tw-border tw-border-gray-300 tw-bg-white tw-pl-56 lg:tw-min-w-[45rem]">
             <div className="tw-absolute tw-top-0 tw-left-0 tw-bottom-0 tw-ml-2 tw-box-border tw-flex tw-max-h-full tw-w-56 tw-flex-1 tw-flex-col tw-items-start tw-justify-start tw-overflow-y-scroll">
               {periods.map((p) => (
                 <button

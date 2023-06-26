@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { useRecoilValue } from 'recoil';
+import { selectorFamily, useRecoilValue } from 'recoil';
 import { useLocalStorage } from '../../services/useLocalStorage';
 import {
   fieldsPersonsCustomizableOptionsSelector,
@@ -9,18 +9,11 @@ import {
 } from '../../recoil/persons';
 import { customFieldsObsSelector, territoryObservationsState } from '../../recoil/territoryObservations';
 import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
-import { actionsCategoriesSelector, actionsState, DONE, flattenedActionsCategoriesSelector } from '../../recoil/actions';
+import { actionsCategoriesSelector, DONE, flattenedActionsCategoriesSelector } from '../../recoil/actions';
 import { reportsState } from '../../recoil/reports';
 import { territoriesState } from '../../recoil/territory';
-import { consultationsState } from '../../recoil/consultations';
 import { customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
-import {
-  personsWithMedicalFileMergedSelector,
-  itemsGroupedByPersonSelector,
-  populatedPassagesSelector,
-  populatedRencontresSelector,
-} from '../../recoil/selectors';
-import { groupsState } from '../../recoil/groups';
+import { personsWithMedicalFileMergedSelector, populatedPassagesSelector } from '../../recoil/selectors';
 import useTitle from '../../services/useTitle';
 import DateRangePickerWithPresets, { formatPeriod } from '../../components/DateRangePickerWithPresets';
 import { useDataLoader } from '../../components/DataLoader';
@@ -41,6 +34,7 @@ import ConsultationsStats from './Consultations';
 import MedicalFilesStats from './MedicalFiles';
 import ButtonCustom from '../../components/ButtonCustom';
 import dayjs from 'dayjs';
+import { filterItem } from '../../components/Filters';
 
 const tabs = [
   'Général',
@@ -88,21 +82,164 @@ const StatsLoader = () => {
   return <Stats />;
 };
 
+const itemsForStatsSelector = selectorFamily({
+  key: 'itemsForStatsSelector',
+  get:
+    ({ period, filterPersons, selectedTeamsIdsObject, viewAllOrganisationData, allSelectedTeamsAreNightSession }) =>
+    ({ get }) => {
+      const activeFilters = filterPersons.filter((f) => f.value);
+      const filterItemByTeam = (item, key) => {
+        if (viewAllOrganisationData) return true;
+        if (Array.isArray(item[key])) {
+          for (const team of item[key]) {
+            if (selectedTeamsIdsObject[team]) return true;
+          }
+        }
+        return !!selectedTeamsIdsObject[item[key]];
+      };
+      const filtersExceptOutOfActiveList = activeFilters.filter((f) => f.field !== 'outOfActiveList');
+      const outOfActiveListFilter = activeFilters.find((f) => f.field === 'outOfActiveList')?.value;
+
+      const allPersons = get(personsWithMedicalFileMergedSelector);
+
+      const offsetHours = allSelectedTeamsAreNightSession ? 12 : 0;
+      const isoStartDate = period.startDate ? dayjs(period.startDate).startOf('day').add(offsetHours, 'hour').toISOString() : null;
+      const isoEndDate = period.endDate ? dayjs(period.endDate).startOf('day').add(1, 'day').add(offsetHours, 'hour').toISOString() : null;
+
+      const personsCreated = [];
+      const personsUpdated = [];
+      const personsWithActions = {};
+      const actionsFilteredByPersons = [];
+      const consultationsFilteredByPersons = [];
+      const personsWithConsultations = {};
+      const passagesFilteredByPersons = [];
+      const personsWithPassages = {};
+      const personsInPassagesBeforePeriod = {};
+      const rencontresFilteredByPersons = [];
+      const personsWithRencontres = {};
+      const personsInRencontresBeforePeriod = {};
+      const noPeriodSelected = !isoStartDate || !isoEndDate;
+      for (let person of allPersons) {
+        // get the persons concerned by filters
+        if (!filterItem(filtersExceptOutOfActiveList)(person)) continue;
+        if (outOfActiveListFilter === 'Oui' && !person.outOfActiveList) continue;
+        if (outOfActiveListFilter === 'Non' && !!person.outOfActiveList) continue;
+        // get persons for stats for period
+        const createdDate = person.followedSince || person.createdAt;
+
+        if (noPeriodSelected) {
+          personsUpdated.push(person);
+          personsCreated.push(person);
+        } else {
+          if (createdDate >= isoStartDate && createdDate <= isoEndDate) personsCreated.push(person);
+          for (const date of person.interactions) {
+            if (date < isoStartDate) continue;
+            if (date > isoEndDate) continue;
+            personsUpdated.push(person);
+            break;
+          }
+        }
+        // get actions for stats for period
+        for (const action of person.actions || []) {
+          if (!filterItemByTeam(action, 'teams')) continue;
+          if (noPeriodSelected) {
+            actionsFilteredByPersons.push(action);
+            personsWithActions[person._id] = person;
+            continue;
+          }
+          const date = action.completedAt || action.dueAt;
+          if (date < isoStartDate) continue;
+          if (date > isoEndDate) continue;
+          actionsFilteredByPersons.push(action);
+          personsWithActions[person._id] = person;
+        }
+        for (const consultation of person.consultations || []) {
+          if (!filterItemByTeam(consultation, 'teams')) continue;
+          if (noPeriodSelected) {
+            consultationsFilteredByPersons.push(consultation);
+            personsWithConsultations[person._id] = person;
+            continue;
+          }
+          const date = consultation.completedAt || consultation.dueAt;
+          if (date < isoStartDate) continue;
+          if (date > isoEndDate) continue;
+          consultationsFilteredByPersons.push(consultation);
+          personsWithConsultations[person._id] = person;
+        }
+        if (!!person.passages?.length) {
+          for (const passage of person.passages) {
+            if (!filterItemByTeam(passage, 'team')) continue;
+            if (noPeriodSelected) {
+              passagesFilteredByPersons.push(passage);
+              personsWithPassages[person._id] = person;
+              continue;
+            }
+            const date = passage.date;
+            if (date < isoStartDate) continue;
+            if (date > isoEndDate) continue;
+            passagesFilteredByPersons.push(passage);
+            personsWithPassages[person._id] = person;
+            // if (person._id === 'ffd41d5a-c273-4548-b94b-750354ff3aff') {
+            //   console.log('passage', createdDate, isoStartDate, createdDate < isoStartDate);
+            // }
+            if (createdDate < isoStartDate) {
+              // console.log('passage before period', person._id, person.firstName);
+              personsInPassagesBeforePeriod[person._id] = person;
+            }
+          }
+        }
+        if (!!person.rencontres?.length) {
+          for (const rencontre of person.rencontres) {
+            if (!filterItemByTeam(rencontre, 'team')) continue;
+            if (noPeriodSelected) {
+              rencontresFilteredByPersons.push(rencontre);
+              personsWithRencontres[person._id] = person;
+              continue;
+            }
+            const date = rencontre.date;
+            if (date < isoStartDate) continue;
+            if (date > isoEndDate) continue;
+            rencontresFilteredByPersons.push(rencontre);
+            personsWithRencontres[person._id] = person;
+            if (createdDate < isoStartDate) personsInRencontresBeforePeriod[person._id] = person;
+          }
+        }
+      }
+
+      return {
+        personsCreated,
+        personsUpdated,
+        personsWithActions: Object.keys(personsWithActions).length,
+        actionsFilteredByPersons,
+        personsWithConsultations: Object.keys(personsWithConsultations).length,
+        consultationsFilteredByPersons,
+        personsWithPassages: Object.values(personsWithPassages),
+        personsInPassagesBeforePeriod,
+        passagesFilteredByPersons,
+        personsWithRencontres: Object.values(personsWithRencontres),
+        personsInRencontresBeforePeriod,
+        rencontresFilteredByPersons,
+      };
+    },
+});
+
+const filterMakingThingsClearAboutOutOfActiveListStatus = {
+  field: 'outOfActiveList',
+  value: "Oui et non (c'est-à-dire tout le monde)",
+  type: 'multi-choice',
+};
+
+const initFilters = [filterMakingThingsClearAboutOutOfActiveListStatus];
+
 const Stats = () => {
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
   const teams = useRecoilValue(teamsState);
 
-  const allPersons = useRecoilValue(personsWithMedicalFileMergedSelector);
-  const allPersonsAsObject = useRecoilValue(itemsGroupedByPersonSelector);
-  const allConsultations = useRecoilValue(consultationsState);
-  const allActions = useRecoilValue(actionsState);
   const allreports = useRecoilValue(reportsState);
   const allObservations = useRecoilValue(territoryObservationsState);
   const allPassagesPopulated = useRecoilValue(populatedPassagesSelector);
-  const allRencontresPopulated = useRecoilValue(populatedRencontresSelector);
-  const allGroups = useRecoilValue(groupsState);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
   const flattenedCustomFieldsPersons = useRecoilValue(flattenedCustomFieldsPersonsSelector);
@@ -114,9 +251,7 @@ const Stats = () => {
 
   const [selectedTerritories, setSelectedTerritories] = useLocalStorage('stats-territories', []);
   const [activeTab, setActiveTab] = useLocalStorage('stats-tabCaption', 'Général');
-  const [filterPersons, setFilterPersons] = useLocalStorage('stats-filterPersons-defaultEverybody', [
-    { field: 'outOfActiveList', value: "Oui et non (c'est-à-dire tout le monde)", type: 'multi-choice' },
-  ]);
+  const [filterPersons, setFilterPersons] = useLocalStorage('stats-filterPersons-defaultEverybody', initFilters);
   const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('stats-viewAllOrganisationData', teams.length === 1);
   const [period, setPeriod] = useLocalStorage('period', { startDate: null, endDate: null });
   const [preset, setPreset, removePreset] = useLocalStorage('stats-date-preset', null);
@@ -124,6 +259,21 @@ const Stats = () => {
   const [actionsStatuses, setActionsStatuses] = useLocalStorage('stats-actionsStatuses', DONE);
   const [actionsCategoriesGroups, setActionsCategoriesGroups] = useLocalStorage('stats-catGroups', []);
   const [actionsCategories, setActionsCategories] = useLocalStorage('stats-categories', []);
+
+  useTitle(`${activeTab} - Statistiques`);
+
+  /*
+   *
+    FILTERS BY TEAM TOOLS
+    Options are: we clicked on 'view all organisation data' or we selected manually some teams
+    Base on those options we get
+    - selectedTeams: the teams we want to display
+    - selectedTeamsIdsObject: an object with the ids of the selected teams as keys, to loop faster - O(1) instead of O(n)
+    - allSelectedTeamsAreNightSession: a boolean to know if all the selected teams are night sessions
+    - filterArrayByTeam: a function to filter an array of elements by team
+   *
+  */
+
   const selectedTeams = useMemo(() => {
     if (viewAllOrganisationData) return teams;
     return manuallySelectedTeams;
@@ -135,15 +285,14 @@ const Stats = () => {
     }
     return teamsIdsObject;
   }, [selectedTeams]);
-
   const allSelectedTeamsAreNightSession = useMemo(() => {
     for (const team of selectedTeams) {
       if (!team.nightSession) return false;
     }
     return true;
   }, [selectedTeams]);
-  useTitle(`${activeTab} - Statistiques`);
-  const filterByTeam = useCallback(
+
+  const filterArrayByTeam = useCallback(
     (elements, key) => {
       if (viewAllOrganisationData) return elements;
       const filteredElements = elements.filter((e) => {
@@ -158,97 +307,62 @@ const Stats = () => {
     },
     [selectedTeamsIdsObject, viewAllOrganisationData]
   );
-  const groupsForPersons = useCallback(
-    (persons) => {
-      const groupIds = new Set();
-      for (const person of persons) {
-        if (person.group) {
-          groupIds.add(person.group._id);
-        }
-      }
-      return allGroups.filter((group) => groupIds.has(group._id));
-    },
-    [allGroups]
-  );
-  const persons = useMemo(
-    () =>
-      getDataForPeriod(filterByTeam(allPersons, 'assignedTeams'), period, {
-        filters: filterPersons.filter((f) => f.field !== 'outOfActiveList'),
-        field: 'followedSince',
-        allSelectedTeamsAreNightSession,
-      }),
-    [allPersons, filterByTeam, filterPersons, period, allSelectedTeamsAreNightSession]
-  );
-  const personsUpdated = useMemo(() => {
-    return getDataForPeriod(
-      filterByTeam(allPersons, 'assignedTeams'),
+
+  /*
+   *
+    FILTERS THE PERSONS
+    We have two stats pages for persons: stats on the creation date and stats on last interation date
+    We do the filtering step by step
+    1. We filter the persons by the teams
+    2. We filter the persons by the filters EXCEPT the 'outOfActiveList' filter
+    3. We filter the persons by the 'outOfActiveList' filter
+   *
+  */
+
+  // const persons = useMemo(
+  //   () =>
+  //     getDataForPeriod(filterArrayByTeam(allPersons, 'assignedTeams'), period, {
+  //       filters: filterPersons.filter((f) => f.field !== 'outOfActiveList'),
+  //       field: 'followedSince',
+  //       allSelectedTeamsAreNightSession,
+  //     }),
+  //   [allPersons, filterArrayByTeam, filterPersons, period, allSelectedTeamsAreNightSession]
+  // );
+
+  /*
+   *
+    FILTERS THE ACTIONS/PASSAGES/RENCONTRES/CONSULTATIONS BY PERSONS AND BY TEAM
+    The big memo below is used for
+    - getting the actions filtered by team and by persons - and the number of persons with actions
+    - getting the consultations filtered by team and by persons - and the number of persons with consultations
+    - getting the passages filtered by team and by persons - and the number of persons with passages
+    - getting the rencontres filtered by team and by persons - and the number of persons with rencontres
+   *
+  */
+
+  const {
+    personsCreated,
+    personsUpdated,
+    personsWithActions,
+    actionsFilteredByPersons,
+    personsWithConsultations,
+    consultationsFilteredByPersons,
+    personsWithPassages,
+    personsInPassagesBeforePeriod,
+    passagesFilteredByPersons,
+    personsWithRencontres,
+    personsInRencontresBeforePeriod,
+    rencontresFilteredByPersons,
+  } = useRecoilValue(
+    itemsForStatsSelector({
       period,
-      {
-        filters: filterPersons.filter((f) => f.field !== 'outOfActiveList'),
-        field: 'followedSince',
-        allSelectedTeamsAreNightSession,
-      },
-      (personsFilteredByFiltersToBeFitleredByPeriod) => {
-        const offsetHours = allSelectedTeamsAreNightSession ? 12 : 0;
-        const startDate = dayjs(period.startDate).startOf('day').add(offsetHours, 'hour').toISOString();
-        const endDate = dayjs(period.endDate).startOf('day').add(1, 'day').add(offsetHours, 'hour').toISOString();
-
-        const res = personsFilteredByFiltersToBeFitleredByPeriod.filter((_person) => {
-          if (!_person) return false;
-          for (const date of _person.interactions) {
-            if (date < startDate) continue;
-            if (date > endDate) continue;
-            return true;
-          }
-          return false;
-        });
-        return res;
-      }
-    );
-  }, [filterByTeam, allPersons, period, filterPersons, allSelectedTeamsAreNightSession]);
-
-  const personsForStats = useMemo(() => {
-    const outOfActiveListFilter = filterPersons.find((f) => f.field === 'outOfActiveList')?.value;
-    if (outOfActiveListFilter === 'Oui') return persons.filter((p) => p.outOfActiveList);
-    if (outOfActiveListFilter === 'Non') return persons.filter((p) => !p.outOfActiveList);
-    return persons;
-  }, [filterPersons, persons]);
-  const personsUpdatedForStats = useMemo(() => {
-    const outOfActiveListFilter = filterPersons.find((f) => f.field === 'outOfActiveList')?.value;
-    if (outOfActiveListFilter === 'Oui') return personsUpdated.filter((p) => p.outOfActiveList);
-    if (outOfActiveListFilter === 'Non') return personsUpdated.filter((p) => !p.outOfActiveList);
-    return personsUpdated;
-  }, [filterPersons, personsUpdated]);
-  const personsWithActions = useMemo(() => {
-    const offsetHours = Boolean(viewAllOrganisationData) || selectedTeams.every((e) => !e.nightSession) ? 0 : 12;
-    const isoStartDate = period.startDate ? dayjs(period.startDate).startOf('day').add(offsetHours, 'hour').toISOString() : null;
-    const isoEndDate = period.endDate ? dayjs(period.endDate).startOf('day').add(1, 'day').add(offsetHours, 'hour').toISOString() : null;
-
-    return personsUpdatedForStats.filter((person) => {
-      if (!person?.actions?.length) return false;
-      if (!isoStartDate || !isoEndDate) return !!person.actions?.length;
-      for (const action of person.actions) {
-        const date = action.completedAt || action.dueAt;
-        if (date < isoStartDate) continue;
-        if (date > isoEndDate) continue;
-        return true;
-      }
-      return false;
-    });
-  }, [period.endDate, period.startDate, personsUpdatedForStats, selectedTeams, viewAllOrganisationData]);
-  const actions = useMemo(
-    () =>
-      getDataForPeriod(filterByTeam(allActions, 'teams'), period, {
-        field: 'completedAt',
-        backupField: 'dueAt',
-        allSelectedTeamsAreNightSession,
-      }),
-    [allActions, filterByTeam, period, allSelectedTeamsAreNightSession]
+      filterPersons,
+      selectedTeamsIdsObject,
+      viewAllOrganisationData,
+      allSelectedTeamsAreNightSession,
+    })
   );
-  const actionsFilteredByStatus = useMemo(
-    () => actions.filter((a) => !actionsStatuses.length || actionsStatuses.includes(a.status)),
-    [actions, actionsStatuses]
-  );
+
   const filterableActionsCategories = useMemo(() => {
     if (!actionsCategoriesGroups.length) return ['-- Aucune --', ...allCategories];
     return groupsCategories
@@ -264,7 +378,10 @@ const Stats = () => {
         categoriesGroupObject[category] = groupCategory.groupTitle;
       }
     }
-    for (const action of actionsFilteredByStatus) {
+    for (const action of actionsFilteredByPersons) {
+      if (!!actionsStatuses.length && !actionsStatuses.includes(action.status)) {
+        continue;
+      }
       if (!!action.categories?.length) {
         for (const category of action.categories) {
           actionsDetailed.push({
@@ -277,111 +394,47 @@ const Stats = () => {
         actionsDetailed.push(action);
       }
     }
-    return actionsDetailed
+    const _actionsWithDetailedGroupAndCategories = actionsDetailed
       .filter((a) => !actionsCategoriesGroups.length || actionsCategoriesGroups.includes(a.categoryGroup))
       .filter((a) => {
         if (!actionsCategories.length) return true;
         if (actionsCategories.length === 1 && actionsCategories[0] === '-- Aucune --') return !a.categories?.length;
         return actionsCategories.includes(a.category);
       });
-  }, [actionsFilteredByStatus, groupsCategories, actionsCategoriesGroups, actionsCategories]);
+    return _actionsWithDetailedGroupAndCategories;
+  }, [actionsFilteredByPersons, groupsCategories, actionsCategoriesGroups, actionsCategories, actionsStatuses]);
 
-  const numberOfActionsPerPerson = useMemo(() => {
-    if (!personsUpdatedForStats.length) return 0;
-    if (!actions.length) return 0;
-    return Math.round((actions.length / personsUpdatedForStats.length) * 10) / 10;
-  }, [actions.length, personsUpdatedForStats.length]);
-  const numberOfActionsPerPersonConcernedByActions = useMemo(() => {
-    if (!personsWithActions.length) return 0;
-    if (!actions.length) return 0;
-    return Math.round((actions.length / personsWithActions.length) * 10) / 10;
-  }, [actions.length, personsWithActions.length]);
-  const consultations = useMemo(
-    () =>
-      getDataForPeriod(filterByTeam(allConsultations, 'teams'), period, {
-        field: 'completedAt',
-        backupField: 'dueAt',
-        allSelectedTeamsAreNightSession,
-      }),
-    [allConsultations, filterByTeam, period, allSelectedTeamsAreNightSession]
-  );
+  const passages = useMemo(() => {
+    const activeFilters = filterPersons.filter((f) => f.value);
+    if (!!activeFilters.length) {
+      if (activeFilters.length > 1) return passagesFilteredByPersons;
+      const filter = activeFilters[0];
+      if (filter.type !== filterMakingThingsClearAboutOutOfActiveListStatus.type) return passagesFilteredByPersons;
+      if (filter.value !== filterMakingThingsClearAboutOutOfActiveListStatus.value) return passagesFilteredByPersons;
+    }
+    const teamsPassages = filterArrayByTeam(allPassagesPopulated, 'team');
+    return getDataForPeriod(teamsPassages, period, { field: 'date', allSelectedTeamsAreNightSession });
+  }, [allPassagesPopulated, filterArrayByTeam, period, allSelectedTeamsAreNightSession, passagesFilteredByPersons, filterPersons]);
+
   const observations = useMemo(
     () =>
       getDataForPeriod(
-        filterByTeam(allObservations, 'team').filter((e) => !selectedTerritories.length || selectedTerritories.some((t) => e.territory === t._id)),
+        filterArrayByTeam(allObservations, 'team').filter(
+          (e) => !selectedTerritories.length || selectedTerritories.some((t) => e.territory === t._id)
+        ),
         period,
         { field: 'observedAt', allSelectedTeamsAreNightSession }
       ),
-    [allObservations, filterByTeam, period, selectedTerritories, allSelectedTeamsAreNightSession]
+    [allObservations, filterArrayByTeam, period, selectedTerritories, allSelectedTeamsAreNightSession]
   );
-  const passages = useMemo(() => {
-    const teamsPassages = filterByTeam(allPassagesPopulated, 'team');
-    return getDataForPeriod(teamsPassages, period, { field: 'date', allSelectedTeamsAreNightSession });
-  }, [allPassagesPopulated, filterByTeam, period, allSelectedTeamsAreNightSession]);
-  const personsInPassagesBeforePeriod = useMemo(() => {
-    if (!period?.startDate) return [];
-    const offsetHours = Boolean(viewAllOrganisationData) || selectedTeams.every((e) => !e.nightSession) ? 0 : 12;
-    const isoStartDate = dayjs(period.startDate).startOf('day').add(offsetHours, 'hour').toISOString();
-    const passagesIds = {};
-    for (const passage of passages) {
-      passagesIds[passage._id] = true;
-    }
-    const passagesNotIncludedInPeriod = allPassagesPopulated.filter((p) => !passagesIds[p._id]).filter((p) => p.date < isoStartDate);
-    const personsOfPassages = {};
-    for (const passage of passagesNotIncludedInPeriod) {
-      if (!passage.person) continue;
-      if (!!personsOfPassages[passage.person]) continue;
-      personsOfPassages[passage.person] = allPersonsAsObject[passage.person] || { _id: passage.person, gender: 'Non précisé' };
-    }
-    const arrayOfPersonsOfPassages = Object.values(personsOfPassages);
-    return arrayOfPersonsOfPassages;
-  }, [period.startDate, viewAllOrganisationData, selectedTeams, allPassagesPopulated, passages, allPersonsAsObject]);
-  const personsInPassagesOfPeriod = useMemo(() => {
-    const personsOfPassages = {};
-    for (const passage of passages) {
-      if (!passage.person) continue;
-      if (!!personsOfPassages[passage.person]) continue;
-      personsOfPassages[passage.person] = allPersonsAsObject[passage.person] || { _id: passage.person, gender: 'Non précisé' };
-    }
-    const arrayOfPersonsOfPassages = Object.values(personsOfPassages);
-    return arrayOfPersonsOfPassages;
-  }, [passages, allPersonsAsObject]);
-  const rencontres = useMemo(() => {
-    const teamsRencontres = filterByTeam(allRencontresPopulated, 'team');
-    return getDataForPeriod(teamsRencontres, period, { field: 'date', allSelectedTeamsAreNightSession });
-  }, [allRencontresPopulated, filterByTeam, period, allSelectedTeamsAreNightSession]);
-  const personsInRencontresBeforePeriod = useMemo(() => {
-    if (!period?.startDate) return [];
-    const offsetHours = Boolean(viewAllOrganisationData) || selectedTeams.every((e) => !e.nightSession) ? 0 : 12;
-    const isoStartDate = dayjs(period.startDate).startOf('day').add(offsetHours, 'hour').toISOString();
-    const rencontresIds = rencontres.map((p) => p._id);
-    const rencontresNotIncludedInPeriod = allRencontresPopulated.filter((p) => !rencontresIds.includes(p._id)).filter((p) => p.date < isoStartDate);
-    const personsOfRencontres = {};
-    for (const rencontre of rencontresNotIncludedInPeriod) {
-      if (!rencontre.person) continue;
-      if (!!personsOfRencontres[rencontre.person]) continue;
-      personsOfRencontres[rencontre.person] = allPersonsAsObject[rencontre.person] || { _id: rencontre.person, gender: 'Non précisé' };
-    }
-    const arrayOfPersonsOfRencontres = Object.values(personsOfRencontres);
-    return arrayOfPersonsOfRencontres;
-  }, [period.startDate, viewAllOrganisationData, selectedTeams, rencontres, allRencontresPopulated, allPersonsAsObject]);
-  const personsInRencontresOfPeriod = useMemo(() => {
-    const personsOfRencontres = {};
-    for (const rencontre of rencontres) {
-      if (!rencontre.person) continue;
-      if (!!personsOfRencontres[rencontre.person]) continue;
-      personsOfRencontres[rencontre.person] = allPersonsAsObject[rencontre.person] || { _id: rencontre.person, gender: 'Non précisé' };
-    }
-    const arrayOfPersonsOfRencontres = Object.values(personsOfRencontres);
-    return arrayOfPersonsOfRencontres;
-  }, [rencontres, allPersonsAsObject]);
+
   const reports = useMemo(
     () =>
-      getDataForPeriod(filterByTeam(allreports, 'team'), period, {
+      getDataForPeriod(filterArrayByTeam(allreports, 'team'), period, {
         field: 'date',
         allSelectedTeamsAreNightSession,
       }),
-    [allreports, filterByTeam, period, allSelectedTeamsAreNightSession]
+    [allreports, filterArrayByTeam, period, allSelectedTeamsAreNightSession]
   );
   const filterPersonsBase = useRecoilValue(filterPersonsBaseSelector);
   // Add enabled custom fields in filters.
@@ -450,11 +503,7 @@ const Stats = () => {
         </div>
         <div className="tw-flex tw-basis-2/3 tw-items-center tw-justify-end">
           <ButtonCustom color="link" title="Imprimer" onClick={window.print} />
-          <ExportFormattedData
-            personCreated={personsForStats}
-            personUpdated={personsUpdatedForStats}
-            actions={actionsWithDetailedGroupAndCategories}
-          />
+          <ExportFormattedData personCreated={personsCreated} personUpdated={personsUpdated} actions={actionsWithDetailedGroupAndCategories} />
         </div>
       </div>
       <ul className="noprint tw-mb-5 tw-flex tw-list-none tw-flex-wrap tw-border-b tw-border-zinc-200 tw-pl-0">
@@ -497,28 +546,39 @@ const Stats = () => {
       <div className="print:tw-flex print:tw-flex-col print:tw-px-8 print:tw-py-4">
         {activeTab === 'Général' && (
           <GeneralStats
-            personsForStats={personsForStats}
-            personsUpdatedForStats={personsUpdatedForStats}
-            rencontres={rencontres}
-            actions={actions}
-            numberOfActionsPerPerson={numberOfActionsPerPerson}
-            numberOfActionsPerPersonConcernedByActions={numberOfActionsPerPersonConcernedByActions}
+            personsCreated={personsCreated}
+            personsUpdated={personsUpdated}
+            rencontres={rencontresFilteredByPersons}
+            actions={actionsFilteredByPersons}
+            // numberOfActionsPerPersonConcernedByActions={numberOfActionsPerPersonConcernedByActions}
+            personsWithActions={personsWithActions}
+            // filter by persons
+            filterBase={filterPersonsWithAllFields()}
+            filterPersons={filterPersons}
+            setFilterPersons={setFilterPersons}
           />
         )}
         {!!organisation.receptionEnabled && activeTab === 'Services' && <ServicesStats period={period} teamIds={selectedTeams.map((e) => e?._id)} />}
         {activeTab === 'Actions' && (
           <ActionsStats
+            // data
+            actionsWithDetailedGroupAndCategories={actionsWithDetailedGroupAndCategories}
+            // filter by status
             setActionsStatuses={setActionsStatuses}
             actionsStatuses={actionsStatuses}
-            setActionsCategories={setActionsCategories}
-            actionsCategories={actionsCategories}
+            // filter by group
             setActionsCategoriesGroups={setActionsCategoriesGroups}
             actionsCategoriesGroups={actionsCategoriesGroups}
             groupsCategories={groupsCategories}
+            // filter by category
+            setActionsCategories={setActionsCategories}
+            actionsCategories={actionsCategories}
             filterableActionsCategories={filterableActionsCategories}
-            actionsWithDetailedGroupAndCategories={actionsWithDetailedGroupAndCategories}
-            allCategories={allCategories}
-            actionsFilteredByStatus={actionsFilteredByStatus}
+            // filter by persons
+            personsWithActions={personsWithActions}
+            filterBase={filterPersonsWithAllFields()}
+            filterPersons={filterPersons}
+            setFilterPersons={setFilterPersons}
           />
         )}
         {activeTab === 'Personnes créées' && (
@@ -528,8 +588,7 @@ const Stats = () => {
             filterBase={filterPersonsWithAllFields()}
             filterPersons={filterPersons}
             setFilterPersons={setFilterPersons}
-            personsForStats={personsForStats}
-            groupsForPersons={groupsForPersons}
+            personsForStats={personsCreated}
             personFields={personFields}
             flattenedCustomFieldsPersons={flattenedCustomFieldsPersons}
           />
@@ -538,29 +597,37 @@ const Stats = () => {
           <PersonStats
             title="personnes suivies"
             firstBlockHelp={`Nombre de personnes pour lesquelles il s'est passé quelque chose durant la période sélectionnée:\n\ncréation, modification, commentaire, action, rencontre, passage, lieu fréquenté, consultation, traitement.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
+            personsForStats={personsUpdated}
+            personFields={personFields}
+            flattenedCustomFieldsPersons={flattenedCustomFieldsPersons}
+            // filter by persons
             filterBase={filterPersonsWithAllFields()}
             filterPersons={filterPersons}
             setFilterPersons={setFilterPersons}
-            personsForStats={personsUpdatedForStats}
-            groupsForPersons={groupsForPersons}
-            personFields={personFields}
-            flattenedCustomFieldsPersons={flattenedCustomFieldsPersons}
           />
         )}
         {!!organisation.passagesEnabled && activeTab === 'Passages' && (
           <PassagesStats
             passages={passages}
             personFields={personFields}
-            personsInPassagesOfPeriod={personsInPassagesOfPeriod}
             personsInPassagesBeforePeriod={personsInPassagesBeforePeriod}
+            // filter by persons
+            personsWithPassages={personsWithPassages}
+            filterBase={filterPersonsWithAllFields()}
+            filterPersons={filterPersons}
+            setFilterPersons={setFilterPersons}
           />
         )}
         {!!organisation.rencontresEnabled && activeTab === 'Rencontres' && (
           <RencontresStats
-            rencontres={rencontres}
+            rencontres={rencontresFilteredByPersons}
             personFields={personFields}
-            personsInRencontresOfPeriod={personsInRencontresOfPeriod}
             personsInRencontresBeforePeriod={personsInRencontresBeforePeriod}
+            // filter by persons
+            personsWithRencontres={personsWithRencontres}
+            filterBase={filterPersonsWithAllFields()}
+            filterPersons={filterPersons}
+            setFilterPersons={setFilterPersons}
           />
         )}
         {activeTab === 'Observations' && (
@@ -574,27 +641,37 @@ const Stats = () => {
         {activeTab === 'Comptes-rendus' && <ReportsStats reports={reports} />}
         {user.healthcareProfessional && (
           <>
-            {activeTab === 'Consultations' && <ConsultationsStats consultations={consultations} />}
+            {activeTab === 'Consultations' && (
+              <ConsultationsStats
+                consultations={consultationsFilteredByPersons} // filter by persons
+                // filter by persons
+                personsWithConsultations={personsWithConsultations}
+                filterBase={filterPersonsWithAllFields()}
+                filterPersons={filterPersons}
+                setFilterPersons={setFilterPersons}
+              />
+            )}
             {activeTab === 'Dossiers médicaux des personnes créées' && (
               <MedicalFilesStats
                 filterBase={filterPersonsWithAllFields(true)}
                 title="personnes créées"
                 filterPersons={filterPersons}
                 setFilterPersons={setFilterPersons}
-                personsForStats={personsForStats}
+                personsForStats={personsCreated}
                 customFieldsMedicalFile={customFieldsMedicalFile}
                 personFields={personFields}
               />
             )}
             {activeTab === 'Dossiers médicaux des personnes suivies' && (
               <MedicalFilesStats
-                filterBase={filterPersonsWithAllFields(true)}
-                filterPersons={filterPersons}
                 title="personnes suivies"
-                setFilterPersons={setFilterPersons}
-                personsForStats={personsUpdatedForStats}
+                personsForStats={personsUpdated}
                 customFieldsMedicalFile={customFieldsMedicalFile}
                 personFields={personFields}
+                // filter by persons
+                filterBase={filterPersonsWithAllFields(true)}
+                filterPersons={filterPersons}
+                setFilterPersons={setFilterPersons}
               />
             )}
           </>

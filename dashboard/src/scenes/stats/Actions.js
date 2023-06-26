@@ -5,17 +5,27 @@ import SelectCustom from '../../components/SelectCustom';
 import { getMultichoiceBarData } from './utils';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../components/tailwind/Modal';
 import ActionsSortableList from '../../components/ActionsSortableList';
+import Filters from '../../components/Filters';
 
 const ActionsStats = ({
+  // data
+  actionsWithDetailedGroupAndCategories,
+  // filter by status
   setActionsStatuses,
   actionsStatuses,
-  setActionsCategories,
-  actionsCategories,
+  // filter by group
   setActionsCategoriesGroups,
   actionsCategoriesGroups,
   groupsCategories,
+  // filter by category
+  setActionsCategories,
+  actionsCategories,
   filterableActionsCategories,
-  actionsWithDetailedGroupAndCategories,
+  // filter by persons
+  filterBase,
+  filterPersons,
+  setFilterPersons,
+  personsWithActions,
 }) => {
   const [actionsModalOpened, setActionsModalOpened] = useState(false);
   const [groupSlice, setGroupSlice] = useState(null);
@@ -57,11 +67,20 @@ const ActionsStats = ({
     return [];
   }, [actionsDataForGroups, actionsWithDetailedGroupAndCategories, groupSlice, categorySlice]);
 
+  const filterTitle = useMemo(() => {
+    if (!filterPersons.length) return `Filtrer par personnes suivies :`;
+    if (personsWithActions === 1) return `Filtrer par personnes suivies (${personsWithActions} personne concernée par le filtre actuel) :`;
+    return `Filtrer par personnes suivies (${personsWithActions} personnes concernées par le filtre actuel) :`;
+  }, [filterPersons, personsWithActions]);
+
   return (
     <>
       <h3 className="tw-my-5 tw-text-xl">Statistiques des actions</h3>
+      <div className="tw-flex tw-basis-full tw-items-center">
+        <Filters title={filterTitle} base={filterBase} filters={filterPersons} onChange={setFilterPersons} />
+      </div>
       <div className="tw-mb-5 tw-flex tw-basis-full tw-items-center">
-        <label htmlFor="filter-by-status" className="tw-mx-5 tw-w-64 tw-shrink-0">
+        <label htmlFor="filter-by-status" className="tw-w-64 tw-shrink-0">
           Filtrer par statut :
         </label>
         <div className="tw-basis-[500px]">
@@ -79,7 +98,7 @@ const ActionsStats = ({
         </div>
       </div>
       <div className="tw-mb-5 tw-flex tw-basis-full tw-items-center">
-        <label htmlFor="filter-by-status" className="tw-mx-5 tw-w-64 tw-shrink-0">
+        <label htmlFor="filter-by-status" className="tw-w-64 tw-shrink-0">
           Filtrer par groupe de catégories :
         </label>
         <div className="tw-basis-[500px]">
@@ -97,7 +116,7 @@ const ActionsStats = ({
         </div>
       </div>
       <div className="tw-mb-5 tw-flex tw-basis-full tw-items-center">
-        <label htmlFor="filter-by-status" className="tw-mx-5 tw-w-64 tw-shrink-0">
+        <label htmlFor="filter-by-status" className="tw-w-64 tw-shrink-0">
           Filtrer par catégorie:
         </label>
         <div className="tw-basis-[500px]">
@@ -114,6 +133,7 @@ const ActionsStats = ({
           />
         </div>
       </div>
+
       <CustomResponsiveBar
         title="Répartition des actions par groupe"
         help={`Si une action a plusieurs catégories appartenant à plusieurs groupes, elle est comptabilisée dans chaque groupe.\n\nSi une action a plusieurs catégories appartenant au même groupe, elle est comptabilisée autant de fois dans ce groupe.\n\nAinsi, le total affiché peut être supérieur au nombre total d'actions.`}

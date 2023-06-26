@@ -1,16 +1,28 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { CustomResponsivePie } from './charts';
 import { getPieData } from './utils';
 import { organisationState } from '../../recoil/auth';
 import { useRecoilValue } from 'recoil';
 import { Block } from './Blocks';
 import CustomFieldsStats from './CustomFieldsStats';
+import Filters from '../../components/Filters';
 
-const ConsultationsStats = ({ consultations }) => {
+const ConsultationsStats = ({ consultations, personsWithConsultations, filterBase, filterPersons, setFilterPersons }) => {
   const organisation = useRecoilValue(organisationState);
+
+  const filterTitle = useMemo(() => {
+    if (!filterPersons.length) return `Filtrer par personnes suivies :`;
+    if (personsWithConsultations === 1)
+      return `Filtrer par personnes suivies (${personsWithConsultations} personne concernée par le filtre actuel) :`;
+    return `Filtrer par personnes suivies (${personsWithConsultations} personnes concernées par le filtre actuel) :`;
+  }, [filterPersons, personsWithConsultations]);
+
   return (
     <>
       <h3 className="tw-my-5 tw-text-xl">Statistiques des consultations</h3>
+      <div className="tw-flex tw-basis-full tw-items-center">
+        <Filters title={filterTitle} base={filterBase} filters={filterPersons} onChange={setFilterPersons} />
+      </div>
       <div className="tw-mb-5 tw-flex tw-justify-center">
         <Block
           data={consultations}
