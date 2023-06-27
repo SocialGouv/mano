@@ -106,7 +106,8 @@ export const Consultations = ({ person }) => {
         open={Boolean(currentConsultation) || modalOpen}
         consultation={currentConsultation}
         onClose={() => {
-          history.goBack();
+          if (currentConsultation) history.goBack();
+          if (modalOpen) setModalOpen(false);
         }}
         personId={person._id}
       />
