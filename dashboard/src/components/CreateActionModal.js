@@ -64,7 +64,7 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
         commentUrgent: false,
       });
     }
-  }, [open, person, persons, teams, dueAt, completedAt]);
+  }, [open, person, persons, teams, dueAt, completedAt, isMulti]);
 
   const isOnePerson = typeof data?.person === 'string' || data?.person?.length === 1;
   const onlyPerson = !isOnePerson ? null : typeof data?.person === 'string' ? data.person : data.person?.[0];
