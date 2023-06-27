@@ -1335,7 +1335,7 @@ const Consultations = ({ date, status, consultations, setSortOrder, setSortBy, s
             },
           ]}
         />
-        {showModal && <ConsultationModal date={date} onClose={() => setShowModal(false)} />}
+        <ConsultationModal open={showModal} date={date} onClose={() => setShowModal(false)} />
       </StyledBox>
       <hr />
     </>

@@ -45,10 +45,6 @@ export const Consultations = ({ person }) => {
     return personConsultations.find((c) => c._id === currentConsultationId);
   }, [personConsultations, currentConsultationId]);
 
-  if (!!currentConsultationId && !modalOpen) {
-    setModalOpen(true);
-  }
-
   const data = personConsultations;
   const filteredData = personConsultationsFiltered;
 
@@ -107,11 +103,11 @@ export const Consultations = ({ person }) => {
         <ConsultationsTable filteredData={filteredData} person={person} />
       </div>
       <ConsultationModal
-        open={modalOpen}
+        open={Boolean(currentConsultation) || modalOpen}
         consultation={currentConsultation}
         onClose={() => {
-          history.push(`/person/${person._id}?tab=Dossier+Médical`);
-          setModalOpen(false);
+          if (currentConsultation) history.goBack();
+          if (modalOpen) setModalOpen(false);
         }}
         personId={person._id}
       />
