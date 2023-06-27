@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 
@@ -44,21 +44,28 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
   };
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [data, setData] = useState({
-    name: '',
-    person: isMulti ? persons : person,
-    teams: teams.length === 1 ? [teams[0]._id] : [],
-    dueAt: dueAt || (!!completedAt ? new Date(completedAt) : new Date()),
-    withTime: false,
-    status: !!completedAt ? DONE : TODO,
-    completedAt,
-    categories: [],
-    description: '',
-    urgent: false,
-    group: false,
-    comment: '',
-    commentUrgent: false,
-  });
+  const [data, setData] = useState({});
+
+  useEffect(() => {
+    if (open) {
+      setData({
+        name: '',
+        person: isMulti ? persons : person,
+        teams: teams.length === 1 ? [teams[0]._id] : [],
+        dueAt: dueAt || (!!completedAt ? new Date(completedAt) : new Date()),
+        withTime: false,
+        status: !!completedAt ? DONE : TODO,
+        completedAt,
+        categories: [],
+        description: '',
+        urgent: false,
+        group: false,
+        comment: '',
+        commentUrgent: false,
+      });
+    }
+  }, [open, person, persons, teams, dueAt, completedAt]);
+
   const isOnePerson = typeof data?.person === 'string' || data?.person?.length === 1;
   const onlyPerson = !isOnePerson ? null : typeof data?.person === 'string' ? data.person : data.person?.[0];
   const canToggleGroupCheck = !!organisation.groupsEnabled && !!onlyPerson && groups.find((group) => group.persons.includes(onlyPerson));

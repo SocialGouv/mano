@@ -27,6 +27,8 @@ const ActionsStats = ({
   setFilterPersons,
   personsWithActions,
 }) => {
+  console.log({ actionsWithDetailedGroupAndCategories: actionsWithDetailedGroupAndCategories.map((a) => [a._id, a.categoryGroup, a.categories]) });
+
   const [actionsModalOpened, setActionsModalOpened] = useState(false);
   const [groupSlice, setGroupSlice] = useState(null);
   const [categorySlice, setCategorySlice] = useState(null);
