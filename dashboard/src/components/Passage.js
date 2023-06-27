@@ -75,6 +75,8 @@ const Passage = ({ passage, personId, onFinished }) => {
                   comment: body.comment,
                 };
 
+                console.log('newPassage', newPassage);
+
                 if (body.anonymous) {
                   for (let i = 0; i < body.anonymousNumberOfPassages; i++) {
                     const response = await API.post({
@@ -88,6 +90,7 @@ const Passage = ({ passage, personId, onFinished }) => {
                   await createReportAtDateIfNotExist(newPassage.date);
                 } else if (showMultiSelect) {
                   for (const person of body.persons) {
+                    console.log('newPassage', { ...newPassage, person });
                     const response = await API.post({
                       path: '/passage',
                       body: preparePassageForEncryption({ ...newPassage, person }),
@@ -110,7 +113,7 @@ const Passage = ({ passage, personId, onFinished }) => {
 
                 setOpen(false);
                 onFinished();
-                toast.success(body.person.length > 1 ? 'Passage enregistré' : 'Passages enregistrés');
+                toast.success(body.person?.length > 1 ? 'Passage enregistré' : 'Passages enregistrés');
                 actions.setSubmitting(false);
                 return;
               }
