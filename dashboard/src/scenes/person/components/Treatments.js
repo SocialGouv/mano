@@ -27,10 +27,6 @@ export const Treatments = ({ person }) => {
     return allTreatments.find((t) => t._id === currentTreatmentId);
   }, [allTreatments, currentTreatmentId]);
 
-  if (!!currentTreatmentId && !modalOpen) {
-    setModalOpen(true);
-  }
-
   return (
     <>
       <div className="tw-relative">
@@ -73,12 +69,12 @@ export const Treatments = ({ person }) => {
           </div>
         )}
       </div>
-      {modalOpen && (
+      {(Boolean(currentTreatment) || modalOpen) && (
         <TreatmentModal
           treatment={currentTreatment}
           person={person}
           onClose={() => {
-            history.push(`/person/${person._id}?tab=Dossier+Médical`);
+            history.goBack();
             setModalOpen(false);
           }}
         />

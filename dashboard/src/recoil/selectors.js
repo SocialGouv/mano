@@ -180,7 +180,6 @@ export const itemsGroupedByPersonSelector = selector({
       }
     }
     for (const comment of comments) {
-      if (comment._id === '9094ad26-e89d-41af-a6ea-8e9caeccd236') console.log(comment);
       if (comment.action) {
         const person = personPerAction[comment.action];
         if (!person) continue;
