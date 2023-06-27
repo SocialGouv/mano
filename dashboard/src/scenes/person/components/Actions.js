@@ -158,16 +158,18 @@ const ActionsTable = ({ filteredData }) => {
                     </div>
                   </div>
                   <div className="tw-mt-2 tw-flex">
-                    <div className="tw-flex tw-flex-1 tw-flex-row tw-items-center">
+                    <div className="tw-flex tw-flex-1 tw-flex-row tw-items-start">
                       {!!organisation.groupsEnabled && !!action.group && (
                         <span className="tw-mr-2 tw-text-xl" aria-label="Action familiale" title="Action familiale">
                           👪
                         </span>
                       )}
-                      <ActionOrConsultationName item={action} />
-                    </div>
-                    <div className="tw-flex tw-flex-col tw-gap-px">
-                      {Array.isArray(action?.teams) ? action.teams.map((e) => <TagTeam key={e} teamId={e} />) : <TagTeam teamId={action?.team} />}
+                      <div className="tw-flex tw-grow tw-flex-col tw-items-start">
+                        <ActionOrConsultationName item={action} />
+                      </div>
+                      <div className="tw-flex tw-h-full tw-shrink-0 tw-flex-col tw-justify-center tw-gap-px">
+                        {Array.isArray(action?.teams) ? action.teams.map((e) => <TagTeam key={e} teamId={e} />) : <TagTeam teamId={action?.team} />}
+                      </div>
                     </div>
                   </div>
                 </div>

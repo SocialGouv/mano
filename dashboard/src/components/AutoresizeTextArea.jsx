@@ -1,11 +1,37 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 export default function AutoResizeTextarea({ name, value, onChange, rows = 1, placeholder = 'Description' }) {
+  const [resizedHeight, setResizedHeight] = useState(null);
+  const textbox = useRef(null);
+  useEffect(() => {
+    const textarea = textbox.current;
+    function outputsize() {
+      setResizedHeight(textarea?.offsetHeight);
+    }
+    const heightObserver = new ResizeObserver(outputsize);
+    heightObserver.observe(textarea);
+    return () => {
+      try {
+        if (textarea && heightObserver?.unobserve) {
+          heightObserver?.unobserve?.(textarea);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+  }, []);
+
   const style = useMemo(() => {
+    if (resizedHeight) {
+      return {
+        height: resizedHeight,
+        minHeight: `${rows * 1.5}rem`,
+      };
+    }
     return {
       minHeight: `${rows * 1.5}rem`,
     };
-  }, [rows]);
+  }, [rows, resizedHeight]);
 
   return (
     <div className="tw-relative tw-h-min tw-w-full tw-grow">
@@ -18,6 +44,7 @@ export default function AutoResizeTextarea({ name, value, onChange, rows = 1, pl
         ))}
       </div>
       <textarea
+        ref={textbox}
         defaultValue={value}
         name={name}
         id={name}
