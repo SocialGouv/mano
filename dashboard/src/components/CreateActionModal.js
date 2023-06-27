@@ -65,7 +65,7 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
 
   const handleChange = (event) => {
     const target = event.currentTarget || event.target;
-    const { name, value, checked } = target;
+    const { name, value } = target;
     setData((data) => ({ ...data, [name]: value }));
   };
 
