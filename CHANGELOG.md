@@ -1,3 +1,10 @@
+## [1.272.2](https://github.com/SocialGouv/mano/compare/v1.272.1...v1.272.2) (2023-06-27)
+
+
+### Bug Fixes
+
+* autoresize textarea + create action modal ([#1564](https://github.com/SocialGouv/mano/issues/1564)) ([f32a735](https://github.com/SocialGouv/mano/commit/f32a73570c7a729f54b891ac9b495f6c77dda10d))
+
 ## [1.272.1](https://github.com/SocialGouv/mano/compare/v1.272.0...v1.272.1) (2023-06-26)
 
 
