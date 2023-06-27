@@ -257,8 +257,9 @@ const Reception = () => {
               padding={'8px 14px'}
               style={{ height: 'fit-content' }}
             />
-            {showConsultationModal && (
+            {!!showConsultationModal && (
               <ConsultationModal
+                open={showConsultationModal}
                 onClose={() => {
                   setShowConsultationModal(false);
                 }}
