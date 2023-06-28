@@ -450,7 +450,7 @@ export const onlyFilledObservationsTerritories = selector({
       for (let key of Object.keys(obs)) {
         if (obs[key]) obsWithOnlyFilledFields[observationsKeyLabels[key]] = obs[key];
       }
-      return { territory: obs.territory, ...obsWithOnlyFilledFields };
+      return { _id: obs._id, territory: obs.territory, ...obsWithOnlyFilledFields };
     });
   },
 });

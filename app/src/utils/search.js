@@ -31,25 +31,57 @@ const prepareItemForSearch = (item) => {
 };
 
 export const filterBySearch = (search, items = []) => {
-  const searchNormalized = search.toLocaleLowerCase();
-  const searchTerms = searchNormalized.split(' ');
-  // Add lowerCaseName once to items for faster search.
-  const itemsWithLowerCaseName = items.map((item) => ({ ...item, lowerCaseName: item?.name?.toLocaleLowerCase() || '' }));
-  // Items that have exact match in the beginning of the search string are first.
-  const firstItems = itemsWithLowerCaseName.filter((item) => item.lowerCaseName.startsWith(searchNormalized));
+  const searchLowercased = search.toLocaleLowerCase();
+  // replace all accents with normal letters
+  const searchNormalized = searchLowercased.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const searchTerms = searchLowercased.split(' ');
+  const searchNormalizedTerms = searchNormalized.split(' ');
 
-  const firstItemsIds = new Set(firstItems.map((item) => item._id));
-  // Items that have all words in search (the order does not matter) are second.
-  const secondItems = itemsWithLowerCaseName.filter(
-    (item) => !firstItemsIds.has(item._id) && searchTerms.every((e) => item.lowerCaseName.includes(e))
-  );
-  const secondItemsIds = new Set(secondItems.map((item) => item._id));
-  const lastItems = items.filter((item) => {
-    if (firstItemsIds.has(item._id) || secondItemsIds.has(item._id)) return false;
+  const itemsNameStartWithWord = [];
+  const itemsNameStartWithWordWithNoAccent = [];
+  const itemsNameContainsOneOfTheWords = [];
+  const itemsNameContainsOneOfTheWordsWithNoAccent = [];
+  const anyOtherPrropertyContainsOneOfTheWords = [];
+  const anyOtherPrropertyContainsOneOfTheWordsWithNoAccent = [];
+
+  for (const item of items) {
+    const lowerCaseName = item?.name?.toLocaleLowerCase() || '';
+    if (lowerCaseName.startsWith(searchLowercased)) {
+      itemsNameStartWithWord.push(item);
+      continue;
+    }
+    const normalizedName = lowerCaseName.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    if (normalizedName.startsWith(searchNormalized)) {
+      itemsNameStartWithWordWithNoAccent.push(item);
+      continue;
+    }
+
+    if (searchTerms.every((word) => lowerCaseName.includes(word))) {
+      itemsNameContainsOneOfTheWords.push(item);
+      continue;
+    }
+    if (searchNormalizedTerms.every((word) => normalizedName.includes(word))) {
+      itemsNameContainsOneOfTheWordsWithNoAccent.push(item);
+      continue;
+    }
     const stringifiedItem = JSON.stringify(prepareItemForSearch(item)).toLocaleLowerCase();
-    for (const term of searchTerms) if (!stringifiedItem.includes(term)) return false;
-    return true;
-  });
+    if (searchTerms.filter((word) => stringifiedItem.includes(word)).length === searchTerms.length) {
+      anyOtherPrropertyContainsOneOfTheWords.push(item);
+      continue;
+    }
+    const stringifiedItemWithNoAccent = stringifiedItem.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    if (searchNormalizedTerms.filter((word) => stringifiedItemWithNoAccent.includes(word)).length === searchNormalizedTerms.length) {
+      anyOtherPrropertyContainsOneOfTheWordsWithNoAccent.push(item);
+      continue;
+    }
+  }
 
-  return [...firstItems, ...secondItems, ...lastItems];
+  return [
+    ...itemsNameStartWithWord,
+    ...itemsNameStartWithWordWithNoAccent,
+    ...itemsNameContainsOneOfTheWords,
+    ...itemsNameContainsOneOfTheWordsWithNoAccent,
+    ...anyOtherPrropertyContainsOneOfTheWords,
+    ...anyOtherPrropertyContainsOneOfTheWordsWithNoAccent,
+  ];
 };

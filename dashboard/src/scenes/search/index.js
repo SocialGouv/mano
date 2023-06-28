@@ -27,6 +27,7 @@ import useTitle from '../../services/useTitle';
 import ExclamationMarkButton from '../../components/tailwind/ExclamationMarkButton';
 import ConsultationButton from '../../components/ConsultationButton';
 import { useLocalStorage } from '../../services/useLocalStorage';
+import { territoryObservationsState } from '../../recoil/territoryObservations';
 
 const personsWithFormattedBirthDateSelector = selector({
   key: 'personsWithFormattedBirthDateSelector',
@@ -119,25 +120,25 @@ const territoriesObjectSelector = selector({
 const populatedObservationsSelector = selector({
   key: 'populatedObservationsSelector',
   get: ({ get }) => {
-    const onlyFilledObservations = get(onlyFilledObservationsTerritories);
+    const observations = get(territoryObservationsState);
     const territory = get(territoriesObjectSelector);
     const populatedObservations = {};
-    for (const obs of onlyFilledObservations) {
+    for (const obs of observations) {
       populatedObservations[obs._id] = { ...obs, territory: territory[obs.territory] };
     }
     return populatedObservations;
   },
 });
 
-const observationsBySerachSelector = selectorFamily({
-  key: 'observationsBySerachSelector',
+const observationsBySearchSelector = selectorFamily({
+  key: 'observationsBySearchSelector',
   get:
     ({ search }) =>
     ({ get }) => {
       const populatedObservations = get(populatedObservationsSelector);
       const observations = get(onlyFilledObservationsTerritories);
       if (!search?.length) return [];
-      const observationsFilteredBySearch = filterBySearch(search, observations);
+      const observationsFilteredBySearch = filterBySearch(search, observations, true);
       return observationsFilteredBySearch.map((obs) => populatedObservations[obs._id]).filter(Boolean);
     },
 });
@@ -179,7 +180,7 @@ const View = () => {
     return filterBySearch(search, allTerritories);
   }, [search, allTerritories]);
 
-  const observations = useRecoilValue(observationsBySerachSelector({ search }));
+  const observations = useRecoilValue(observationsBySearchSelector({ search }));
 
   const renderContent = () => {
     if (!search) return 'Pas de recherche, pas de résultat !';
@@ -636,6 +637,8 @@ const TerritoryObservations = ({ observations }) => {
 
   if (!observations?.length) return <div />;
   const moreThanOne = observations.length > 1;
+
+  console.log({ observations });
 
   return (
     <Table
