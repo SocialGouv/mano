@@ -1,3 +1,10 @@
+## [1.272.3](https://github.com/SocialGouv/mano/compare/v1.272.2...v1.272.3) (2023-06-28)
+
+
+### Bug Fixes
+
+* **dashboard:** actions stats ([#1567](https://github.com/SocialGouv/mano/issues/1567)) ([f715fb1](https://github.com/SocialGouv/mano/commit/f715fb15ba486a0f95d947673bfb7f2128733fbf))
+
 ## [1.272.2](https://github.com/SocialGouv/mano/compare/v1.272.1...v1.272.2) (2023-06-27)
 
 
