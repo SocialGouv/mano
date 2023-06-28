@@ -1,3 +1,10 @@
+## [1.272.4](https://github.com/SocialGouv/mano/compare/v1.272.3...v1.272.4) (2023-06-28)
+
+
+### Bug Fixes
+
+* **dashboard:** dans les stats, filtrer les personnes par équipe ([#1569](https://github.com/SocialGouv/mano/issues/1569)) ([933b919](https://github.com/SocialGouv/mano/commit/933b91978bac4fcb3623689d6351ce3870f0ffc2))
+
 ## [1.272.3](https://github.com/SocialGouv/mano/compare/v1.272.2...v1.272.3) (2023-06-28)
 
 
