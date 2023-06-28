@@ -57,7 +57,7 @@ const ActionsStats = ({
       return Object.values(withCatSlice);
     }
     return [];
-  }, [actionsWithDetailedGroupAndCategories, actionsWithDetailedGroupAndCategories, groupSlice, categorySlice]);
+  }, [actionsWithDetailedGroupAndCategories, groupSlice, categorySlice]);
 
   const filterTitle = useMemo(() => {
     if (!filterPersons.length) return `Filtrer par personnes suivies :`;

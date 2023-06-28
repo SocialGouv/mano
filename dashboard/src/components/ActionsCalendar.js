@@ -67,7 +67,7 @@ const ActionsCalendar = ({ actions, isNightSession, columns = ['Heure', 'Nom', '
         })
         .sort(sortActionsOrConsultations(sortBy, sortOrder))
     );
-  }, [actions, currentDate, sortBy, sortOrder]);
+  }, [actions, currentDate, sortBy, sortOrder, isNightSession]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);

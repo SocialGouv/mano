@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { Button } from 'reactstrap';
 import { useRecoilValue } from 'recoil';
 import { CANCEL, DONE } from '../recoil/actions';
-import { dayjsInstance, formatTime, isOnSameDay } from '../services/date';
+import { dayjsInstance, formatTime } from '../services/date';
 import ActionOrConsultationName from './ActionOrConsultationName';
 import ActionStatus from './ActionStatus';
 import ExclamationMarkButton from './tailwind/ExclamationMarkButton';
