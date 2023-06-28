@@ -109,7 +109,7 @@ const itemsForStatsSelector = selectorFamily({
       const personsCreated = [];
       const personsUpdated = [];
       const personsWithActions = {};
-      const actionsFilteredByPersons = [];
+      const actionsFilteredByPersons = {};
       const consultationsFilteredByPersons = [];
       const personsWithConsultations = {};
       const passagesFilteredByPersons = [];
@@ -127,30 +127,32 @@ const itemsForStatsSelector = selectorFamily({
         // get persons for stats for period
         const createdDate = person.followedSince || person.createdAt;
 
-        if (noPeriodSelected) {
-          personsUpdated.push(person);
-          personsCreated.push(person);
-        } else {
-          if (createdDate >= isoStartDate && createdDate <= isoEndDate) personsCreated.push(person);
-          for (const date of person.interactions) {
-            if (date < isoStartDate) continue;
-            if (date > isoEndDate) continue;
+        if (filterItemByTeam(person, 'assignedTeams')) {
+          if (noPeriodSelected) {
             personsUpdated.push(person);
-            break;
+            personsCreated.push(person);
+          } else {
+            if (createdDate >= isoStartDate && createdDate <= isoEndDate) personsCreated.push(person);
+            for (const date of person.interactions) {
+              if (date < isoStartDate) continue;
+              if (date > isoEndDate) continue;
+              personsUpdated.push(person);
+              break;
+            }
           }
         }
         // get actions for stats for period
         for (const action of person.actions || []) {
           if (!filterItemByTeam(action, 'teams')) continue;
           if (noPeriodSelected) {
-            actionsFilteredByPersons.push(action);
+            actionsFilteredByPersons[action._id] = action;
             personsWithActions[person._id] = person;
             continue;
           }
           const date = action.completedAt || action.dueAt;
           if (date < isoStartDate) continue;
           if (date > isoEndDate) continue;
-          actionsFilteredByPersons.push(action);
+          actionsFilteredByPersons[action._id] = action;
           personsWithActions[person._id] = person;
         }
         for (const consultation of person.consultations || []) {
@@ -210,7 +212,7 @@ const itemsForStatsSelector = selectorFamily({
         personsCreated,
         personsUpdated,
         personsWithActions: Object.keys(personsWithActions).length,
-        actionsFilteredByPersons,
+        actionsFilteredByPersons: Object.values(actionsFilteredByPersons),
         personsWithConsultations: Object.keys(personsWithConsultations).length,
         consultationsFilteredByPersons,
         personsWithPassages: Object.values(personsWithPassages),
