@@ -15,7 +15,7 @@ import { disableConsultationRow } from '../recoil/consultations';
 
 // TODO: remove inline style when UI is stabilized.
 
-export default function ActionsWeekly({ actions, onCreateAction }) {
+export default function ActionsWeekly({ actions, isNightSession, onCreateAction }) {
   const [startOfWeek, setStartOfWeek] = useSearchParamState('startOfWeek', dayjsInstance().startOf('week').format('YYYY-MM-DD'));
 
   const actionsInWeek = useMemo(() => {
@@ -57,6 +57,10 @@ export default function ActionsWeekly({ actions, onCreateAction }) {
         {[...Array(7)].map((_, index) => {
           const day = dayjsInstance(startOfWeek).add(index, 'day');
           const isToday = day.isSame(dayjsInstance(), 'day');
+          const offsetHours = isNightSession ? 12 : 0;
+          const isoStartToday = dayjsInstance(day).startOf('day').add(offsetHours, 'hour').toISOString();
+          const isoEndToday = dayjsInstance(day).startOf('day').add(1, 'day').add(offsetHours, 'hour').toISOString();
+
           return (
             <div key={day.format('YYYY-MM-DD')}>
               <div className="tw-my-1.5 tw-text-center">
@@ -71,9 +75,10 @@ export default function ActionsWeekly({ actions, onCreateAction }) {
               </div>
               <div className="tw-mb-4 tw-flex tw-flex-col tw-gap-0.5">
                 <ActionsOfDay
-                  actions={actionsInWeek.filter((action) =>
-                    isOnSameDay([DONE, CANCEL].includes(action.status) ? action.completedAt : action.dueAt, day)
-                  )}
+                  actions={actionsInWeek.filter((a) => {
+                    const date = [DONE, CANCEL].includes(a.status) ? a.completedAt : a.dueAt;
+                    return date >= isoStartToday && date < isoEndToday;
+                  })}
                 />
                 <button
                   type="button"
