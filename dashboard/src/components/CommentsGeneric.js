@@ -247,10 +247,10 @@ export function CommentsTable({ comments, onDisplayComment, onAddComment, color,
                         history.push(`/person/${comment.person}?rencontreId=${comment.rencontre}`);
                         break;
                       case 'consultation':
-                        history.push(`/person/${comment.person}?tab=Dossier+Médical&consultationId=${comment.consultation}`);
+                        history.push(`/person/${comment.person}?tab=Dossier+Médical&consultationId=${comment.consultation._id}`);
                         break;
                       case 'treatment':
-                        history.push(`/person/${comment.person}?tab=Dossier+Médical&treatmentId=${comment.treatment}`);
+                        history.push(`/person/${comment.person}?tab=Dossier+Médical&treatmentId=${comment.treatment._id}`);
                         break;
                       default:
                         break;

@@ -28,8 +28,9 @@ export default function ConsultationModal({ open, onClose, personId, consultatio
   const setModalConfirmState = useSetRecoilState(modalConfirmState);
   const setAllConsultations = useSetRecoilState(consultationsState);
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
-
   const isNewConsultation = !consultation;
+  const [isEditing, setIsEditing] = useState(isNewConsultation);
+
   const initialState = useMemo(() => {
     if (consultation) {
       return {
@@ -264,18 +265,20 @@ export default function ConsultationModal({ open, onClose, personId, consultatio
                 .find((e) => e.name === data.type)
                 ?.fields.filter((f) => f.enabled || f.enabledTeams?.includes(currentTeam._id))
                 .map((field) => {
-                  return (
-                    <CustomFieldInput
-                      colWidth={field.type === 'textarea' ? 12 : 6}
-                      model="person"
-                      values={data}
-                      handleChange={(e) => {
-                        setData({ ...data, [(e.currentTarget || e.target).name]: (e.currentTarget || e.target).value });
-                      }}
-                      field={field}
-                      key={field.name}
-                    />
-                  );
+                  if (isEditing) {
+                    return (
+                      <CustomFieldInput
+                        colWidth={field.type === 'textarea' ? 12 : 6}
+                        model="person"
+                        values={data}
+                        handleChange={(e) => {
+                          setData({ ...data, [(e.currentTarget || e.target).name]: (e.currentTarget || e.target).value });
+                        }}
+                        field={field}
+                        key={field.name}
+                      />
+                    );
+                  }
                 })}
             </div>
             {data.user === user._id && (
@@ -410,7 +413,7 @@ export default function ConsultationModal({ open, onClose, personId, consultatio
         <button name="Annuler" type="button" className="button-cancel" onClick={() => onClose()}>
           Annuler
         </button>
-        {!isNewConsultation && (
+        {!isNewConsultation && !!isEditing && (
           <button
             type="button"
             name="cancel"
@@ -429,14 +432,25 @@ export default function ConsultationModal({ open, onClose, personId, consultatio
             Supprimer
           </button>
         )}
-        <button
-          title="MAJ cette consultation - seul le créateur peut supprimer une consultation"
-          type="submit"
-          className="button-submit !tw-bg-blue-900"
-          form="add-consultation-form"
-          disabled={!!consultation && consultation.user !== user._id}>
-          Sauvegarder
-        </button>
+        {isEditing ? (
+          <button
+            title="MAJ cette consultation - seul le créateur peut supprimer une consultation"
+            type="submit"
+            className="button-submit !tw-bg-blue-900"
+            form="add-consultation-form"
+            disabled={!!consultation && consultation.user !== user._id}>
+            Sauvegarder
+          </button>
+        ) : (
+          <button
+            title="MAJ cette consultation - seul le créateur peut supprimer une consultation"
+            type="button"
+            onClick={() => setIsEditing(true)}
+            className="button-submit !tw-bg-blue-900"
+            disabled={!!consultation && consultation.user !== user._id}>
+            Modifier
+          </button>
+        )}
       </ModalFooter>
     </ModalContainer>
   );
