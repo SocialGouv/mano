@@ -31,25 +31,95 @@ const prepareItemForSearch = (item) => {
 };
 
 export const filterBySearch = (search, items = []) => {
-  const searchNormalized = search.toLocaleLowerCase();
-  const searchTerms = searchNormalized.split(' ');
-  // Add lowerCaseName once to items for faster search.
-  const itemsWithLowerCaseName = items.map((item) => ({ ...item, lowerCaseName: item?.name?.toLocaleLowerCase() || '' }));
-  // Items that have exact match in the beginning of the search string are first.
-  const firstItems = itemsWithLowerCaseName.filter((item) => item.lowerCaseName.startsWith(searchNormalized));
+  const searchLowercased = search.toLocaleLowerCase();
+  // replace all accents with normal letters
+  const searchNormalized = searchLowercased.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const searchTerms = searchLowercased.split(' ');
+  const searchNormalizedTerms = searchNormalized.split(' ');
 
-  const firstItemsIds = new Set(firstItems.map((item) => item._id));
-  // Items that have all words in search (the order does not matter) are second.
-  const secondItems = itemsWithLowerCaseName.filter(
-    (item) => !firstItemsIds.has(item._id) && searchTerms.every((e) => item.lowerCaseName.includes(e))
-  );
-  const secondItemsIds = new Set(secondItems.map((item) => item._id));
-  const lastItems = items.filter((item) => {
-    if (firstItemsIds.has(item._id) || secondItemsIds.has(item._id)) return false;
+  const itemsNameStartWithWord = [];
+  const itemsNameStartWithWordWithNoAccent = [];
+  const itemsNameContainsOneOfTheWords = [];
+  const itemsNameContainsOneOfTheWordsWithNoAccent = [];
+  const anyOtherPrropertyContainsOneOfTheWords = [];
+  const anyOtherPrropertyContainsOneOfTheWordsWithNoAccent = [];
+
+  console.log('searchLowercased', searchLowercased);
+  console.log('searchNormalized', searchNormalized);
+  console.log('searchTerms', searchTerms);
+  console.log('searchNormalizedTerms', searchNormalizedTerms);
+
+  for (const item of items) {
+    if (item._id === '99b4a3f2-8d18-4ae0-88e7-9ba55cd74bda') console.log('item', item);
+    const lowerCaseName = item?.name?.toLocaleLowerCase() || '';
+    if (item._id === '99b4a3f2-8d18-4ae0-88e7-9ba55cd74bda') console.log('lowerCaseName', lowerCaseName);
+    if (lowerCaseName.startsWith(searchLowercased)) {
+      if (item._id === '99b4a3f2-8d18-4ae0-88e7-9ba55cd74bda') console.log('BOUM');
+      itemsNameStartWithWord.push(item);
+      continue;
+    }
+    const normalizedName = lowerCaseName.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    if (item._id === '99b4a3f2-8d18-4ae0-88e7-9ba55cd74bda') console.log('normalizedName', normalizedName);
+    if (normalizedName.startsWith(searchNormalized)) {
+      if (item._id === '99b4a3f2-8d18-4ae0-88e7-9ba55cd74bda') console.log('BOUM');
+      itemsNameStartWithWordWithNoAccent.push(item);
+      continue;
+    }
+    if (item._id === '99b4a3f2-8d18-4ae0-88e7-9ba55cd74bda') {
+      console.log(
+        'searchTerms.every((word) => lowerCaseName.includes(word))',
+        searchTerms.every((word) => lowerCaseName.includes(word))
+      );
+    }
+    if (searchTerms.every((word) => lowerCaseName.includes(word))) {
+      if (item._id === '99b4a3f2-8d18-4ae0-88e7-9ba55cd74bda') console.log('BOUM');
+      itemsNameContainsOneOfTheWords.push(item);
+      continue;
+    }
+    if (item._id === '99b4a3f2-8d18-4ae0-88e7-9ba55cd74bda') {
+      console.log(
+        'searchNormalizedTerms.every((word) => normalizedName.includes(word))',
+        searchNormalizedTerms.every((word) => normalizedName.includes(word))
+      );
+    }
+    if (searchNormalizedTerms.every((word) => normalizedName.includes(word))) {
+      if (item._id === '99b4a3f2-8d18-4ae0-88e7-9ba55cd74bda') console.log('BOUM');
+      itemsNameContainsOneOfTheWordsWithNoAccent.push(item);
+      continue;
+    }
+    if (item._id === '99b4a3f2-8d18-4ae0-88e7-9ba55cd74bda') {
+      console.log(
+        'searchTerms.filter((word) => stringifiedItem.includes(word)).length === searchTerms.length',
+        searchTerms.filter((word) => stringifiedItem.includes(word)).length === searchTerms.length
+      );
+    }
     const stringifiedItem = JSON.stringify(prepareItemForSearch(item)).toLocaleLowerCase();
-    for (const term of searchTerms) if (!stringifiedItem.includes(term)) return false;
-    return true;
-  });
+    if (searchTerms.filter((word) => stringifiedItem.includes(word)).length === searchTerms.length) {
+      if (item._id === '99b4a3f2-8d18-4ae0-88e7-9ba55cd74bda') console.log('BOUM');
+      anyOtherPrropertyContainsOneOfTheWords.push(item);
+      continue;
+    }
+    if (item._id === '99b4a3f2-8d18-4ae0-88e7-9ba55cd74bda') {
+      console.log(
+        'searchNormalizedTerms.filter((word) => stringifiedItemWithNoAccent.includes(word)).length === searchNormalizedTerms.length',
+        searchNormalizedTerms.filter((word) => stringifiedItemWithNoAccent.includes(word)).length === searchNormalizedTerms.length
+      );
+    }
+    const stringifiedItemWithNoAccent = stringifiedItem.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    if (searchNormalizedTerms.filter((word) => stringifiedItemWithNoAccent.includes(word)).length === searchNormalizedTerms.length) {
+      if (item._id === '99b4a3f2-8d18-4ae0-88e7-9ba55cd74bda') console.log('BOUM');
+      anyOtherPrropertyContainsOneOfTheWordsWithNoAccent.push(item);
+      continue;
+    }
+    if (item._id === '99b4a3f2-8d18-4ae0-88e7-9ba55cd74bda') console.log('PAS BOUM');
+  }
 
-  return [...firstItems, ...secondItems, ...lastItems];
+  return [
+    ...itemsNameStartWithWord,
+    ...itemsNameStartWithWordWithNoAccent,
+    ...itemsNameContainsOneOfTheWords,
+    ...itemsNameContainsOneOfTheWordsWithNoAccent,
+    ...anyOtherPrropertyContainsOneOfTheWords,
+    ...anyOtherPrropertyContainsOneOfTheWordsWithNoAccent,
+  ];
 };
