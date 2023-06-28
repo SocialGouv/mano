@@ -1,3 +1,10 @@
+# [1.273.0](https://github.com/SocialGouv/mano/compare/v1.272.4...v1.273.0) (2023-06-28)
+
+
+### Features
+
+* **dashboard,app:** recherche avec accent ([#1570](https://github.com/SocialGouv/mano/issues/1570)) ([f740ccc](https://github.com/SocialGouv/mano/commit/f740ccca13aed73234dc9fabc264ff47e8bd7f08))
+
 ## [1.272.4](https://github.com/SocialGouv/mano/compare/v1.272.3...v1.272.4) (2023-06-28)
 
 
