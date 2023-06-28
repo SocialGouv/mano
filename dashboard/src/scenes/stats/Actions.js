@@ -27,24 +27,14 @@ const ActionsStats = ({
   setFilterPersons,
   personsWithActions,
 }) => {
-  console.log({ actionsWithDetailedGroupAndCategories: actionsWithDetailedGroupAndCategories.map((a) => [a._id, a.categoryGroup, a.categories]) });
-
   const [actionsModalOpened, setActionsModalOpened] = useState(false);
   const [groupSlice, setGroupSlice] = useState(null);
   const [categorySlice, setCategorySlice] = useState(null);
 
-  const actionsDataForGroups = useMemo(() => {
-    const uniqueActionPerGroup = {};
-    for (const action of actionsWithDetailedGroupAndCategories) {
-      uniqueActionPerGroup[action._id] = action;
-    }
-    return Object.values(uniqueActionPerGroup);
-  }, [actionsWithDetailedGroupAndCategories]);
-
   const filteredActionsBySlice = useMemo(() => {
     if (groupSlice) {
       const withGroupSlice = {};
-      for (const action of actionsDataForGroups) {
+      for (const action of actionsWithDetailedGroupAndCategories) {
         if (groupSlice === 'Non renseigné' && !action.categoryGroup) {
           withGroupSlice[action._id] = action;
         }
@@ -67,7 +57,7 @@ const ActionsStats = ({
       return Object.values(withCatSlice);
     }
     return [];
-  }, [actionsDataForGroups, actionsWithDetailedGroupAndCategories, groupSlice, categorySlice]);
+  }, [actionsWithDetailedGroupAndCategories, actionsWithDetailedGroupAndCategories, groupSlice, categorySlice]);
 
   const filterTitle = useMemo(() => {
     if (!filterPersons.length) return `Filtrer par personnes suivies :`;
