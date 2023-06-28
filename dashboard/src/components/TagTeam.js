@@ -14,7 +14,8 @@ const TagTeam = ({ teamId }) => {
         backgroundColor: teamsColors[teamIndex % teamsColors?.length],
         borderColor: borderColors[teamIndex % borderColors?.length],
       }}
-      className="tw-rounded tw-border tw-py-0.5 tw-px-2.5 tw-text-center tw-text-xs tw-text-white">
+      className="tw-inline-flex tw-justify-center tw-gap-4 tw-rounded tw-border tw-py-0.5 tw-px-2.5 tw-text-center tw-text-xs tw-text-white">
+      {team?.nightSession && <span>🌒</span>}
       {team?.name}
     </div>
   );
