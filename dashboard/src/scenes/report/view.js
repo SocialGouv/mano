@@ -62,9 +62,18 @@ import { treatmentsState } from '../../recoil/treatments';
 import { medicalFileState } from '../../recoil/medicalFiles';
 
 const getPeriodTitle = (date, nightSession) => {
-  if (!nightSession) return `Journée du ${formatDateWithFullMonth(date)}`;
+  if (!nightSession) return `Journée du ${formatDateWithNameOfDay(date)}`;
   const nextDay = addOneDay(date);
-  return `Nuit du ${formatDateWithFullMonth(date)} au ${formatDateWithFullMonth(nextDay)}`;
+  return (
+    <>
+      <p className="tw-m-0 tw-text-center">
+        Nuit du {formatDateWithNameOfDay(date)} au {formatDateWithNameOfDay(nextDay)}
+      </p>
+      <p className="tw-m-0 tw-text-center tw-text-xs tw-opacity-50">
+        On affiche les actions faites/à faire entre midi de ce jour et 11h59 du jour suivant
+      </p>
+    </>
+  );
 };
 
 const commentsMedicalSelector = selector({
@@ -119,6 +128,15 @@ const View = () => {
     }
     return teamsObject;
   }, [selectedTeams]);
+
+  const allSelectedTeamsAreNightSession = useMemo(() => {
+    if (!selectedTeams.length) return false;
+    for (const team of selectedTeams) {
+      if (!team.nightSession) return false;
+    }
+    return true;
+  }, [selectedTeams]);
+
   const isReadOnly = selectedTeams.length > 1;
 
   const isSingleTeam = selectedTeams.length === 1;
@@ -396,7 +414,7 @@ const View = () => {
     return (
       <div className="printonly">
         <div className="tw-py-4 tw-px-8 tw-text-2xl tw-font-bold">
-          {selectedTeams.length === 1 ? getPeriodTitle(dateString, selectedTeams[0]?.nightSession) : formatDateWithNameOfDay(dateString).capitalize()}
+          {getPeriodTitle(dateString, allSelectedTeamsAreNightSession)}
           <br />
           Compte rendu {viewAllOrganisationData ? <>de toutes les équipes</> : <>{selectedTeamIds.length > 1 ? 'des équipes ' : "de l'équipe "}</>}
           {selectedTeams.map((t) => t.name).join(', ')}
@@ -508,11 +526,7 @@ const View = () => {
               <BackButtonWrapper caption="Imprimer" onClick={window.print} />
               {!['restricted-access'].includes(user.role) && <BackButtonWrapper disabled={isReadOnly} caption="Supprimer" onClick={deleteData} />}
             </div>
-            <p style={{ margin: 0 }}>
-              {selectedTeams.length === 1
-                ? getPeriodTitle(dateString, selectedTeams[0]?.nightSession)
-                : formatDateWithNameOfDay(dateString).capitalize()}
-            </p>
+            <p style={{ margin: 0 }}>{getPeriodTitle(dateString, allSelectedTeamsAreNightSession)}</p>
             <div style={{ display: 'flex' }}>
               <ButtonCustom color="link" className="noprint" title="Précédent" onClick={onPreviousReportRequest} />
               <ButtonCustom

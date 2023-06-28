@@ -31,6 +31,13 @@ export default function ActionsWeekly({ actions, isNightSession, onCreateAction 
 
   return (
     <div>
+      {!!isNightSession && (
+        <div className="-tw-mt-8 tw-mb-8">
+          <p className="tw-m-0 tw-text-center tw-text-xs tw-opacity-50">
+            On affiche les actions faites/à faire entre midi de ce jour et 11h59 du jour suivant
+          </p>
+        </div>
+      )}
       <div className="tw-mb-4 tw-flex tw-flex-row tw-items-center tw-gap-8">
         <Button color="secondary" outline={true} onClick={() => setStartOfWeek(dayjsInstance().startOf('week').format('YYYY-MM-DD'))}>
           Aujourd'hui
