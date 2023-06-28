@@ -30,7 +30,7 @@ const prepareItemForSearch = (item) => {
   return itemClean;
 };
 
-export const filterBySearch = (search, items = []) => {
+export const filterBySearch = (search, items = [], debug = false) => {
   const searchLowercased = search.toLocaleLowerCase();
   // replace all accents with normal letters
   const searchNormalized = searchLowercased.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
