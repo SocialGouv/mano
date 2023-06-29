@@ -266,7 +266,8 @@ const View = () => {
   const comments = useMemo(
     () =>
       allComments
-        ?.filter((c) => !!selectedTeamsObject[c.team])
+        ?.filter((c) => !c.comment.includes('a changé le status'))
+        .filter((c) => !!selectedTeamsObject[c.team])
         .filter((c) => {
           const currentTeam = selectedTeamsObject[c.team];
           return getIsDayWithinHoursOffsetOfPeriod(
