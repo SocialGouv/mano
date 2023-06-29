@@ -18,7 +18,6 @@ import BackButton, { BackButtonWrapper } from '../../components/backButton';
 import Box from '../../components/Box';
 import ActionStatus from '../../components/ActionStatus';
 import Table from '../../components/table';
-import CreateActionModal from '../../components/CreateActionModal';
 import Observation from '../territory-observations/view';
 import dayjs from 'dayjs';
 import { CANCEL, DONE, sortActionsOrConsultations } from '../../recoil/actions';
@@ -1051,8 +1050,6 @@ const ActionCompletedAt = ({ date, status, actions, setSortOrder, setSortBy, sor
   const history = useHistory();
   const organisation = useRecoilValue(organisationState);
 
-  const [modalOpen, setModalOpen] = useState(false);
-
   if (!data) return <div />;
 
   const moreThanOne = data.length > 1;
@@ -1062,11 +1059,15 @@ const ActionCompletedAt = ({ date, status, actions, setSortOrder, setSortBy, sor
       <StyledBox>
         {status === DONE && (
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <CreateActionModal open={modalOpen} setOpen={(value) => setModalOpen(value)} completedAt={dateForSelector} isMulti />
             <div className="noprint" style={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
               <ButtonCustom
                 icon={agendaIcon}
-                onClick={() => setModalOpen(true)}
+                onClick={() => {
+                  const searchParams = new URLSearchParams(history.location.search);
+                  searchParams.set('completedAt', dayjsInstance(dateForSelector).toISOString());
+                  searchParams.set('newAction', true);
+                  history.push(`?${searchParams.toString()}`); // Update the URL with the new search parameters.
+                }}
                 color="primary"
                 title={`Créer une nouvelle action faite le ${formatDateWithFullMonth(date)}`}
                 padding={'12px 24px'}
@@ -1081,7 +1082,7 @@ const ActionCompletedAt = ({ date, status, actions, setSortOrder, setSortBy, sor
           )}`}
           noData={`Pas d'action ${status === CANCEL ? 'annulée' : 'faite'} ce jour`}
           data={data.map((a) => (a.urgent ? { ...a, style: { backgroundColor: '#fecaca99' } } : a))}
-          onRowClick={(action) => history.push(`/action/${action._id}`)}
+          onRowClick={(action) => history.push(`?actionId=${action._id}`)}
           rowKey="_id"
           dataTestId="name"
           columns={[
@@ -1183,7 +1184,7 @@ const ActionCreatedAt = ({ date, actions, setSortOrder, setSortBy, sortBy, sortO
           title={`Action${moreThanOne ? 's' : ''} créée${moreThanOne ? 's' : ''} le ${formatDateWithFullMonth(date)}`}
           noData="Pas d'action créée ce jour"
           data={data.map((a) => (a.urgent ? { ...a, style: { backgroundColor: '#fecaca99' } } : a))}
-          onRowClick={(action) => history.push(`/action/${action._id}`)}
+          onRowClick={(action) => history.push(`?actionId=${action._id}`)}
           rowKey="_id"
           dataTestId="name"
           columns={[
@@ -1432,7 +1433,7 @@ const CommentCreatedAt = ({ date, comments, medical }) => {
               console.log('comment', comment);
               switch (comment.type) {
                 case 'action':
-                  history.push(`/action/${comment.action._id}`);
+                  history.push(`?actionId=${comment.action._id}`);
                   break;
                 case 'person':
                   history.push(`/person/${comment.person._id}`);

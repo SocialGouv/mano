@@ -52,7 +52,7 @@ const ActionsSortableList = ({ data, limit }) => {
           if (actionOrConsultation.isConsultation) {
             history.push(`/person/${actionOrConsultation.person}?tab=Dossier+Médical&consultationId=${actionOrConsultation._id}`);
           } else {
-            history.push(`/action/${actionOrConsultation._id}`);
+            history.push(`?actionId=${actionOrConsultation._id}`);
           }
         }}
         rowDisabled={(actionOrConsultation) => disableConsultationRow(actionOrConsultation, user)}

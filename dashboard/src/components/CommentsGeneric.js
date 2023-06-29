@@ -295,7 +295,7 @@ export function CommentsTable({ comments, onDisplayComment, onEditComment, onAdd
                             try {
                               switch (comment.type) {
                                 case 'action':
-                                  history.push(`/action/${comment.action}`);
+                                  history.push(`?actionId=${comment.action}`);
                                   break;
                                 case 'person':
                                   history.push(`/person/${comment.person}`);
@@ -464,7 +464,6 @@ function CommentModal({
         <Formik
           initialValues={{ urgent: false, group: false, ...comment, comment: comment.comment || window.sessionStorage.getItem('currentComment') }}
           onSubmit={async (body, actions) => {
-            console.log('body', body);
             if (!body.user && !isNewComment) return toast.error("L'utilisateur est obligatoire");
             if (!body.date && !isNewComment) return toast.error('La date est obligatoire');
             if (!body.comment) return toast.error('Le commentaire est obligatoire');

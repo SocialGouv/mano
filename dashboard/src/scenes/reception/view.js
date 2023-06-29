@@ -7,7 +7,6 @@ import { SmallHeader } from '../../components/header';
 import { formatDateWithNameOfDay, getIsDayWithinHoursOffsetOfPeriod, isToday, now, startOfToday } from '../../services/date';
 import { currentTeamReportsSelector } from '../../recoil/selectors';
 import { theme } from '../../config';
-import CreateActionModal from '../../components/CreateActionModal';
 import SelectAndCreatePerson from './SelectAndCreatePerson';
 import ButtonCustom from '../../components/ButtonCustom';
 import ActionsCalendar from '../../components/ActionsCalendar';
@@ -229,21 +228,22 @@ const Reception = () => {
         </div>
         <ButtonCustom
           icon={plusIcon}
-          onClick={() => setModalOpen(true)}
+          onClick={() => {
+            const searchParams = new URLSearchParams(history.location.search);
+            searchParams.set('newAction', true);
+            searchParams.set(
+              'personIds',
+              selectedPersons
+                .map((p) => p?._id)
+                .filter(Boolean)
+                .join(',')
+            );
+            history.push(`?${searchParams.toString()}`);
+          }}
           color="primary"
           title="Action"
           padding={'8px 14px'}
           style={{ height: 'fit-content' }}
-        />
-        <CreateActionModal
-          open={modalOpen}
-          setOpen={(value) => setModalOpen(value)}
-          smallButton
-          icon={plusIcon}
-          title="Action"
-          buttonOnly
-          isMulti
-          persons={selectedPersons.map((p) => p?._id).filter(Boolean)}
         />
 
         {Boolean(user.healthcareProfessional) && (

@@ -263,7 +263,7 @@ const Actions = ({ actions }) => {
       })}
       title={`Action${moreThanOne ? 's' : ''} (${data.length})`}
       noData="Pas d'action"
-      onRowClick={(action) => history.push(`/action/${action._id}`)}
+      onRowClick={(action) => history.push(`?actionId=${action._id}`)}
       rowKey="_id"
       columns={[
         {

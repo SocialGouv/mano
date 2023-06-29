@@ -24,6 +24,7 @@ import Report from './scenes/report';
 import Person from './scenes/person';
 import Drawer from './components/drawer';
 import Reception from './scenes/reception';
+import ActionModal from './components/ActionModal';
 import Charte from './scenes/auth/charte';
 import { userState } from './recoil/auth';
 import API, { recoilResetKeyState, authTokenState } from './services/api';
@@ -107,7 +108,6 @@ const App = ({ resetRecoil }) => {
     <div className="main-container">
       <ToastContainer transition={process.env.REACT_APP_TEST_PLAYWRIGHT !== 'true' ? Bounce : ToastifyFastTransition} />
       <VersionOutdatedAlert />
-      <VersionOutdatedAlert />
       {process.env.REACT_APP_TEST_PLAYWRIGHT === 'true' && <DuplicatedReportsTestChecker />}
       <Router history={history}>
         <ScrollToTop />
@@ -130,6 +130,7 @@ const App = ({ resetRecoil }) => {
           <RestrictedRoute path="*" component={() => <Redirect to={'stats'} />} />
         </Switch>
         <DataLoader />
+        <ActionModal />
         <ModalConfirm />
       </Router>
     </div>

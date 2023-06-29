@@ -126,7 +126,7 @@ const Actions = ({ setShowModal, actions, setSortOrder, setSortBy, sortBy, sortO
           dataTestId="name"
           onRowClick={(action) => {
             setShowModal(false);
-            history.push(`/action/${action._id}`);
+            history.push(`?actionId=${action._id}`);
           }}
           columns={[
             {

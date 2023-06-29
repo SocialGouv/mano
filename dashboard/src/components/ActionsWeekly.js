@@ -129,7 +129,7 @@ function ActionsOfDay({ actions }) {
               if (disableConsultationRow(action, user)) return;
               history.push(`/person/${action.person}?tab=Dossier+Médical&consultationId=${action._id}`);
             } else {
-              history.push(`/action/${action._id}`);
+              history.push(`?actionId=${action._id}`);
             }
           }}
           className={[

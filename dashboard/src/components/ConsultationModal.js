@@ -146,8 +146,10 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
       <ModalHeader
         title={
           <>
-            {consultation ? 'Modifier une consultation' : 'Ajouter une consultation'}
-            {!!consultation && consultation.user && (
+            {isNewConsultation && 'Ajouter une consultation'}
+            {!isNewConsultation && !isEditing && 'Consultation'}
+            {!isNewConsultation && isEditing && 'Modifier la consultation'}
+            {!isNewConsultation && consultation.user && (
               <UserName
                 className="tw-block tw-text-right tw-text-base tw-font-normal tw-italic"
                 id={consultation.user}
@@ -497,7 +499,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
         )}
         {isEditing || canSave ? (
           <button
-            title="MAJ cette consultation - seul le créateur peut supprimer une consultation"
+            title="Sauvegarder cette consultation"
             type="submit"
             className="button-submit !tw-bg-blue-900"
             form="add-consultation-form"
@@ -506,7 +508,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
           </button>
         ) : (
           <button
-            title="MAJ cette consultation - seul le créateur peut supprimer une consultation"
+            title="Modifier cette consultation - seul le créateur peut modifier une consultation"
             type="button"
             onClick={(e) => {
               e.preventDefault();

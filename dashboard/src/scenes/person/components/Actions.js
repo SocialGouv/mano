@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { organisationState, userState } from '../../../recoil/auth';
 import { CANCEL, DONE, flattenedActionsCategoriesSelector, mappedIdsToLabels } from '../../../recoil/actions';
 import { filteredPersonActionsSelector } from '../selectors/selectors';
 import { useHistory } from 'react-router-dom';
-import CreateActionModal from '../../../components/CreateActionModal';
 import SelectCustom from '../../../components/SelectCustom';
 import ExclamationMarkButton from '../../../components/tailwind/ExclamationMarkButton';
 import ActionStatus from '../../../components/ActionStatus';
@@ -22,63 +21,73 @@ export const Actions = ({ person }) => {
   const [filterCategories, setFilterCategories] = useState([]);
   const [filterStatus, setFilterStatus] = useState([]);
   const filteredData = useRecoilValue(filteredPersonActionsSelector({ personId: person._id, filterCategories, filterStatus }));
+  const history = useHistory();
 
   return (
-    <>
-      <div className="tw-relative">
-        <div className="tw-sticky tw-top-0 tw-flex tw-bg-white tw-p-3">
-          <h4 className="tw-flex-1 tw-text-xl">Actions {filteredData.length ? `(${filteredData.length})` : ''}</h4>
-          <div className="flex-col tw-flex tw-items-center tw-gap-2">
-            <button
-              aria-label="Ajouter une action"
-              className="tw-text-md tw-h-8 tw-w-8 tw-rounded-full tw-bg-main tw-font-bold tw-text-white tw-transition hover:tw-scale-125"
-              onClick={() => setModalOpen(true)}>
-              ＋
+    <div className="tw-relative">
+      <div className="tw-sticky tw-top-0 tw-flex tw-bg-white tw-p-3">
+        <h4 className="tw-flex-1 tw-text-xl">Actions {filteredData.length ? `(${filteredData.length})` : ''}</h4>
+        <div className="flex-col tw-flex tw-items-center tw-gap-2">
+          <button
+            aria-label="Ajouter une action"
+            className="tw-text-md tw-h-8 tw-w-8 tw-rounded-full tw-bg-main tw-font-bold tw-text-white tw-transition hover:tw-scale-125"
+            onClick={() => {
+              const searchParams = new URLSearchParams(history.location.search);
+              searchParams.set('newAction', true);
+              searchParams.set('personId', person._id);
+              history.push(`?${searchParams.toString()}`);
+            }}>
+            ＋
+          </button>
+          {Boolean(filteredData.length) && (
+            <button className="tw-h-6 tw-w-6 tw-rounded-full tw-text-main tw-transition hover:tw-scale-125" onClick={() => setFullScreen(true)}>
+              <FullScreenIcon />
             </button>
-            {Boolean(filteredData.length) && (
-              <button className="tw-h-6 tw-w-6 tw-rounded-full tw-text-main tw-transition hover:tw-scale-125" onClick={() => setFullScreen(true)}>
-                <FullScreenIcon />
-              </button>
-            )}
-          </div>
+          )}
         </div>
-        <ActionsFilters
-          data={data}
-          filteredData={filteredData}
-          filterCategories={filterCategories}
-          setFilterCategories={setFilterCategories}
-          setFilterStatus={setFilterStatus}
-          filterStatus={filterStatus}
-        />
-        <ModalContainer open={!!fullScreen} className="" size="full" onClose={() => setFullScreen(false)}>
-          <ModalHeader title={`Actions de  ${person?.name} (${filteredData.length})`}>
-            <div className="tw-mt-2 tw-w-full tw-max-w-2xl">
-              <ActionsFilters
-                data={data}
-                filteredData={filteredData}
-                filterCategories={filterCategories}
-                setFilterCategories={setFilterCategories}
-                setFilterStatus={setFilterStatus}
-                filterStatus={filterStatus}
-              />
-            </div>
-          </ModalHeader>
-          <ModalBody>
-            <ActionsTable filteredData={filteredData} />
-          </ModalBody>
-          <ModalFooter>
-            <button type="button" name="cancel" className="button-cancel" onClick={() => setFullScreen(false)}>
-              Fermer
-            </button>
-            <button type="button" className="button-submit" onClick={() => setModalOpen(true)}>
-              ＋ Ajouter une action
-            </button>
-          </ModalFooter>
-        </ModalContainer>
-        <ActionsTable filteredData={filteredData} />
       </div>
-      <CreateActionModal person={person._id} open={modalOpen} setOpen={(value) => setModalOpen(value)} />
-    </>
+      <ActionsFilters
+        data={data}
+        filteredData={filteredData}
+        filterCategories={filterCategories}
+        setFilterCategories={setFilterCategories}
+        setFilterStatus={setFilterStatus}
+        filterStatus={filterStatus}
+      />
+      <ModalContainer open={!!fullScreen} className="" size="full" onClose={() => setFullScreen(false)}>
+        <ModalHeader title={`Actions de  ${person?.name} (${filteredData.length})`}>
+          <div className="tw-mt-2 tw-w-full tw-max-w-2xl">
+            <ActionsFilters
+              data={data}
+              filteredData={filteredData}
+              filterCategories={filterCategories}
+              setFilterCategories={setFilterCategories}
+              setFilterStatus={setFilterStatus}
+              filterStatus={filterStatus}
+            />
+          </div>
+        </ModalHeader>
+        <ModalBody>
+          <ActionsTable filteredData={filteredData} />
+        </ModalBody>
+        <ModalFooter>
+          <button type="button" name="cancel" className="button-cancel" onClick={() => setFullScreen(false)}>
+            Fermer
+          </button>
+          <button
+            type="button"
+            className="button-submit"
+            onClick={() => {
+              const searchParams = new URLSearchParams(history.location.search);
+              searchParams.set('newAction', true);
+              history.push(`?${searchParams.toString()}`);
+            }}>
+            ＋ Ajouter une action
+          </button>
+        </ModalFooter>
+      </ModalContainer>
+      <ActionsTable filteredData={filteredData} />
+    </div>
   );
 };
 
@@ -147,7 +156,9 @@ const ActionsTable = ({ filteredData }) => {
                 <div
                   className={['restricted-access'].includes(user.role) ? 'tw-cursor-not-allowed tw-py-2' : 'tw-cursor-pointer tw-py-2'}
                   onClick={() => {
-                    history.push(`/action/${action._id}`);
+                    const searchParams = new URLSearchParams(history.location.search);
+                    searchParams.set('actionId', action._id);
+                    history.push(`?${searchParams.toString()}`);
                   }}>
                   <div className="tw-flex">
                     <div className="tw-flex-1">
