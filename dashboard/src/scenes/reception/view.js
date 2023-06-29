@@ -110,7 +110,6 @@ const Reception = () => {
   const consultationsByStatus = useRecoilValue(consultationsByStatusSelector({ status }));
   const [services, setServices] = useState(null);
   const [todaysPassagesOpen, setTodaysPassagesOpen] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const dataConsolidated = useMemo(

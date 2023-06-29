@@ -20,6 +20,9 @@ import { useDataLoader } from './DataLoader';
 import { CommentsModule } from './CommentsGeneric';
 import UserName from './UserName';
 import { itemsGroupedByActionSelector } from '../recoil/selectors';
+import CustomFieldDisplay from './CustomFieldDisplay';
+import PersonName from './PersonName';
+import TagTeam from './TagTeam';
 
 export default function ActionModal() {
   const actionsObjects = useRecoilValue(itemsGroupedByActionSelector);
@@ -54,10 +57,10 @@ export default function ActionModal() {
   return (
     <ModalContainer open={open} size="3xl" onAfterLeave={history.goBack}>
       <ActionContent
-        key={newAction || currentActionId}
+        key={open}
         personId={personId}
         personIds={personIds}
-        isMulti={!personId}
+        isMulti={!currentActionId && !personId}
         action={currentAction}
         completedAt={completedAt}
         dueAt={dueAt}
@@ -114,7 +117,7 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
   const onlyPerson = !isOnePerson ? null : typeof data?.person === 'string' ? data.person : data.person?.[0];
   const canToggleGroupCheck = !!organisation.groupsEnabled && !!onlyPerson && groups.find((group) => group.persons.includes(onlyPerson));
 
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(isNewAction);
 
   const handleChange = (event) => {
     const target = event.currentTarget || event.target;
@@ -137,6 +140,7 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
       return response;
     };
     const body = { ...data };
+    console.log('body', body);
     let actionsId = [];
     // What is this strange case?
     if (typeof data.person === 'string') {
@@ -382,33 +386,58 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
             <div className="tw-flex tw-flex-row">
               <div className="tw-flex tw-flex-[2] tw-basis-2/3 tw-flex-col">
                 <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col">
-                  <label htmlFor="name">Nom de l'action</label>
-                  <textarea
-                    name="name"
-                    id="name"
-                    value={data.name}
-                    onChange={handleChange}
-                    className="tw-w-full tw-rounded tw-border tw-border-gray-300 tw-py-1.5 tw-px-3 tw-text-base tw-transition-all"
-                  />
+                  <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="name">
+                    Nom de l'action
+                  </label>
+                  {isEditing ? (
+                    <textarea
+                      name="name"
+                      id="name"
+                      value={data.name}
+                      onChange={handleChange}
+                      className="tw-w-full tw-rounded tw-border tw-border-gray-300 tw-py-1.5 tw-px-3 tw-text-base tw-transition-all"
+                    />
+                  ) : (
+                    <CustomFieldDisplay value={data.name} type="textarea" />
+                  )}
                 </div>
                 <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col">
-                  <SelectPerson value={data.person} onChange={handleChange} isMulti={isMulti} inputId="create-action-person-select" />
+                  <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="person">
+                    {isMulti ? 'Personne(s) suivie(s)' : 'Personne suivie'}
+                  </label>
+                  {isEditing ? (
+                    <SelectPerson noLabel value={data.person} onChange={handleChange} isMulti={isMulti} inputId="create-action-person-select" />
+                  ) : (
+                    <PersonName item={data} />
+                  )}
                 </div>
                 <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col">
-                  <ActionsCategorySelect
-                    data={data.categories}
-                    id="categories"
-                    label="Catégories"
-                    onChange={(v) => handleChange({ currentTarget: { value: v, name: 'categories' } })}
-                    withMostUsed
-                  />
+                  <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="categories">
+                    Catégorie(s)
+                  </label>
+                  {isEditing ? (
+                    <ActionsCategorySelect
+                      values={data.categories}
+                      id="categories"
+                      onChange={(v) => handleChange({ currentTarget: { value: v, name: 'categories' } })}
+                      withMostUsed
+                    />
+                  ) : (
+                    <CustomFieldDisplay value={data.categories?.join(', ')} type="text" />
+                  )}
                 </div>
                 {!['restricted-access'].includes(user.role) && (
                   <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col">
-                    <label htmlFor="description">Description</label>
-                    <div className="tw-block tw-w-full tw-overflow-hidden tw-rounded tw-border tw-border-gray-300 tw-text-base tw-transition-all">
-                      <AutoResizeTextarea name="description" id="description" value={data.description} onChange={handleChange} rows={4} />
-                    </div>
+                    <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="description">
+                      Description
+                    </label>
+                    {isEditing ? (
+                      <div className="tw-block tw-w-full tw-overflow-hidden tw-rounded tw-border tw-border-gray-300 tw-text-base tw-transition-all">
+                        <AutoResizeTextarea name="description" id="description" value={data.description} onChange={handleChange} rows={4} />
+                      </div>
+                    ) : (
+                      <CustomFieldDisplay value={data.description} type="textarea" />
+                    )}
                   </div>
                 )}
                 {!!canToggleGroupCheck && (
@@ -416,6 +445,7 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
                     <label htmlFor="create-action-for-group">
                       <input
                         type="checkbox"
+                        disabled={!isEditing}
                         className="tw-mr-2"
                         id="create-action-for-group"
                         name="group"
@@ -435,38 +465,57 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
               </div>
               <div className="tw-flex tw-flex-[1] tw-basis-1/3 tw-flex-col">
                 <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col">
-                  <label htmlFor="dueAt">À faire le</label>
-                  <div>
-                    <DatePicker withTime={data.withTime} id="dueAt" defaultValue={data.dueAt ?? new Date()} onChange={handleChange} />
-                  </div>
-                  <div>
-                    <input
-                      type="checkbox"
-                      id="withTime"
-                      name="withTime"
-                      className="tw-mr-2"
-                      checked={data.withTime || false}
-                      onChange={() => {
-                        handleChange({ target: { name: 'withTime', checked: Boolean(!data.withTime), value: Boolean(!data.withTime) } });
-                      }}
-                    />
-                    <label htmlFor="withTime">Montrer l'heure</label>
-                  </div>
+                  <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="dueAt">
+                    À faire le
+                  </label>
+                  {isEditing ? (
+                    <>
+                      <div>
+                        <DatePicker withTime={data.withTime} id="dueAt" defaultValue={data.dueAt ?? new Date()} onChange={handleChange} />
+                      </div>
+                      <div>
+                        <input
+                          type="checkbox"
+                          id="withTime"
+                          name="withTime"
+                          className="tw-mr-2"
+                          checked={data.withTime || false}
+                          onChange={() => {
+                            handleChange({ target: { name: 'withTime', checked: Boolean(!data.withTime), value: Boolean(!data.withTime) } });
+                          }}
+                        />
+                        <label htmlFor="withTime">Montrer l'heure</label>
+                      </div>
+                    </>
+                  ) : (
+                    <CustomFieldDisplay value={data.dueAt} type={data.withTime ? 'date-with-time' : 'date'} />
+                  )}
                 </div>
                 <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col">
-                  <label htmlFor="team">Équipe(s) en charge</label>
-                  <SelectTeamMultiple
-                    onChange={(teamIds) => handleChange({ target: { value: teamIds, name: 'teams' } })}
-                    value={Array.isArray(data.teams) ? data.teams : [data.team]}
-                    colored
-                    inputId="create-action-team-select"
-                    classNamePrefix="create-action-team-select"
-                  />
+                  <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="team">
+                    Équipe(s) en charge
+                  </label>
+                  {isEditing ? (
+                    <SelectTeamMultiple
+                      onChange={(teamIds) => handleChange({ target: { value: teamIds, name: 'teams' } })}
+                      value={Array.isArray(data.teams) ? data.teams : [data.team]}
+                      colored
+                      inputId="create-action-team-select"
+                      classNamePrefix="create-action-team-select"
+                    />
+                  ) : (
+                    <div className="tw-flex tw-flex-col">
+                      {(Array.isArray(data.teams) ? data.teams : [data.team]).map((teamId) => (
+                        <TagTeam key={teamId} teamId={teamId} />
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col">
                   <label htmlFor="create-action-urgent">
                     <input
                       type="checkbox"
+                      disabled={!isEditing}
                       id="create-action-urgent"
                       className="tw-mr-2"
                       name="urgent"
@@ -489,15 +538,15 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
                     classNamePrefix="update-action-select-status"
                   />
                 </div>
-                {[DONE, CANCEL].includes(data.status) && (
-                  <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col">
-                    {data.status === DONE && <label htmlFor="completedAt">Faite le</label>}
-                    {data.status === CANCEL && <label htmlFor="completedAt">Annulée le</label>}
-                    <div>
-                      <DatePicker withTime id="completedAt" defaultValue={data.completedAt ?? new Date()} onChange={handleChange} />
-                    </div>
+                <div
+                  className={['tw-mb-4 tw-flex tw-flex-1 tw-flex-col', [DONE, CANCEL].includes(data.status) ? 'tw-visible' : 'tw-invisible'].join(
+                    ' '
+                  )}>
+                  <label htmlFor="completedAt">{data.status === DONE ? 'Faite le' : 'Annulée le'}</label>
+                  <div>
+                    <DatePicker withTime id="completedAt" defaultValue={data.completedAt ?? new Date()} onChange={handleChange} />
                   </div>
-                )}
+                </div>
               </div>
             </div>
             <div>
@@ -542,6 +591,7 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
                 comments={action?.comments.map((comment) => ({ ...comment, type: 'action', person: action.person }))}
                 color="main"
                 typeForNewComment="action"
+                actionId={action?._id}
                 onDeleteComment={async (comment) => {
                   const confirm = window.confirm('Voulez-vous vraiment supprimer ce commentaire ?');
                   if (!confirm) return false;

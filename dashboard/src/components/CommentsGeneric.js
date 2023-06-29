@@ -32,6 +32,8 @@ import CustomFieldDisplay from './CustomFieldDisplay';
  * @param {Array} props.comments
  * @param {String} props.title
  * @param {String} props.typeForNewComment (person|action|passage|rencontre|medical-file|consultation|treatment)
+ * @param {String} props.personId
+ * @param {String} props.actionId
  * @param {Boolean} props.showPanel
  * @param {Boolean} props.canToggleGroupCheck
  * @param {Boolean} props.canToggleUrgentCheck
@@ -44,8 +46,8 @@ export function CommentsModule({
   comments = [],
   title = 'Commentaires',
   typeForNewComment, // person|action|passage|rencontre|medical-file|consultation|treatment
-  person = null,
-  action = null,
+  personId = null,
+  actionId = null,
   showPanel = false,
   canToggleGroupCheck = false,
   canToggleUrgentCheck = false,
@@ -111,8 +113,8 @@ export function CommentsModule({
           typeForNewComment={typeForNewComment}
           canToggleGroupCheck={canToggleGroupCheck}
           canToggleUrgentCheck={canToggleUrgentCheck}
-          person={person}
-          action={action}
+          personId={personId}
+          actionId={actionId}
           color={color}
         />
       )}
@@ -126,8 +128,8 @@ export function CommentsModule({
           typeForNewComment={typeForNewComment}
           canToggleGroupCheck={canToggleGroupCheck}
           canToggleUrgentCheck={canToggleUrgentCheck}
-          person={person}
-          action={action}
+          personId={personId}
+          actionId={actionId}
           color={color}
         />
       )}
@@ -436,8 +438,8 @@ function CommentModal({
   canToggleGroupCheck,
   canToggleUrgentCheck,
   typeForNewComment,
-  action,
-  person,
+  actionId,
+  personId,
   color,
 }) {
   const user = useRecoilValue(userState);
@@ -479,8 +481,8 @@ function CommentModal({
               team: body.team || currentTeam._id,
               organisation: organisation._id,
               type: comment.type ?? typeForNewComment,
-              action: action ?? body.action,
-              person: person ?? body.person,
+              action: actionId ?? body.action,
+              person: personId ?? body.person,
             };
 
             if (comment._id) commentBody._id = comment._id;
