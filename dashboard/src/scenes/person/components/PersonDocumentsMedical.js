@@ -153,7 +153,7 @@ const PersonDocumentsMedical = ({ person }) => {
           ) : documentToEdit.type === 'consultation' ? (
             <button
               onClick={() => {
-                history.push(`/person/${person._id}?tab=Dossier+Médical&consultationId=${documentToEdit.consultation}`);
+                history.push(`?consultationId=${documentToEdit.consultation}`);
                 setDocumentToEdit(null);
               }}
               className="button-classic">

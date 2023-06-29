@@ -1299,10 +1299,8 @@ const Consultations = ({ date, status, consultations, setSortOrder, setSortBy, s
           } le ${formatDateWithFullMonth(date)}`}
           noData={`Pas de consultation ${status === DONE ? 'faite' : 'annulée'} ce jour`}
           data={data}
-          onRowClick={(actionOrConsultation) =>
-            history.push(`/person/${actionOrConsultation.person}?tab=Dossier+Médical&consultationId=${actionOrConsultation._id}`)
-          }
-          rowDisabled={(actionOrConsultation) => disableConsultationRow(actionOrConsultation, user)}
+          onRowClick={(consultation) => history.push(`?consultationId=${consultation._id}`)}
+          rowDisabled={(consultation) => disableConsultationRow(consultation, user)}
           rowKey="_id"
           dataTestId="name"
           columns={[
@@ -1379,10 +1377,8 @@ const ConsultationsCreatedAt = ({ date, consultations }) => {
           title={`Consultation${moreThanOne ? 's' : ''} créée${moreThanOne ? 's' : ''} le ${formatDateWithFullMonth(date)}`}
           noData="Pas de consultation créée ce jour"
           data={data}
-          onRowClick={(actionOrConsultation) =>
-            history.push(`/person/${actionOrConsultation.person}?tab=Dossier+Médical&consultationId=${actionOrConsultation._id}`)
-          }
-          rowDisabled={(actionOrConsultation) => disableConsultationRow(actionOrConsultation, user)}
+          onRowClick={(consultation) => history.push(`consultationId=${consultation._id}`)}
+          rowDisabled={(consultation) => disableConsultationRow(consultation, user)}
           rowKey="_id"
           dataTestId="name"
           columns={[
@@ -1444,7 +1440,7 @@ const CommentCreatedAt = ({ date, comments, medical }) => {
                   history.push(`/person/${comment.person._id}`);
                   break;
                 case 'consultation':
-                  history.push(`/person/${comment.person._id}?tab=Dossier+Médical&consultationId=${comment.consultation._id}`);
+                  history.push(`?consultationId=${comment.consultation._id}`);
                   break;
                 case 'treatment':
                   history.push(`/person/${comment.person._id}?tab=Dossier+Médical&treatmentId=${comment.treatment._id}`);

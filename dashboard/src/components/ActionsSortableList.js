@@ -50,7 +50,7 @@ const ActionsSortableList = ({ data, limit }) => {
         rowKey={'_id'}
         onRowClick={(actionOrConsultation) => {
           if (actionOrConsultation.isConsultation) {
-            history.push(`/person/${actionOrConsultation.person}?tab=Dossier+Médical&consultationId=${actionOrConsultation._id}`);
+            history.push(`?consultationId=${actionOrConsultation._id}`);
           } else {
             history.push(`?actionId=${actionOrConsultation._id}`);
           }

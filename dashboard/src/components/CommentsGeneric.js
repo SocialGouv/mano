@@ -257,7 +257,7 @@ export function CommentsTable({ comments, onDisplayComment, onEditComment, onAdd
                           onEditComment(comment);
                           break;
                         }
-                        history.push(`/person/${comment.person}?tab=Dossier+Médical&consultationId=${comment.consultation._id}`);
+                        history.push(`?consultationId=${comment.consultation._id}`);
                         break;
                       case 'treatment':
                         if (searchParams.get('treatmentId') === comment.treatment._id) {
@@ -309,7 +309,7 @@ export function CommentsTable({ comments, onDisplayComment, onEditComment, onAdd
                                   history.push(`/person/${comment.person}?rencontreId=${comment.rencontre}`);
                                   break;
                                 case 'consultation':
-                                  history.push(`/person/${comment.person}?tab=Dossier+Médical&consultationId=${comment.consultation._id}`);
+                                  history.push(`?consultationId=${comment.consultation._id}`);
                                   break;
                                 case 'treatment':
                                   history.push(`/person/${comment.person}?tab=Dossier+Médical&treatmentId=${comment.treatment._id}`);

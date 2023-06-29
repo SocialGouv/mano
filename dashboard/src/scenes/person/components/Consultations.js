@@ -176,7 +176,7 @@ const ConsultationsTable = ({ filteredData, person }) => {
                     }
                     onClick={() => {
                       if (disableConsultationRow(consultation, user)) return;
-                      history.push(`/person/${person._id}?tab=Dossier+Médical&consultationId=${consultation._id}`);
+                      history.push(`?consultationId=${consultation._id}`);
                     }}>
                     <div className="tw-flex">
                       <div className="tw-flex-1">{`${date}${time}`}</div>

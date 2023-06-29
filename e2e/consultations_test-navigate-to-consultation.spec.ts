@@ -99,9 +99,7 @@ test("test", async ({ page }) => {
   await expect(page).toHaveURL(`http://localhost:8090/action?calendarTab=2&calendarDate=${dayjs().add(-1, "day").format("YYYY-MM-DD")}`);
 
   await page.getByText("consult abc").click();
-  await expect(page).toHaveURL(
-    /http:\/\/localhost:8090\/person\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\?tab=Dossier\+M%C3%A9dical&consultationId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
-  );
+  await expect(page).toHaveURL(/http:\/\/localhost:8090\/action?consultationId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/);
 
   await page.getByRole("button", { name: "Annuler" }).click();
   await expect(page).toHaveURL(`http://localhost:8090/action?calendarTab=2&calendarDate=${dayjs().add(-1, "day").format("YYYY-MM-DD")}`);
@@ -116,9 +114,7 @@ test("test", async ({ page }) => {
   await clickOnEmptyReactSelect(page, "action-select-status-filter", "FAITE");
 
   await page.locator('[data-test-id="faite"]').getByText("faite").click();
-  await expect(page).toHaveURL(
-    /http:\/\/localhost:8090\/person\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\?tab=Dossier\+M%C3%A9dical&consultationId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
-  );
+  await expect(page).toHaveURL(/http:\/\/localhost:8090\/action?consultationId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/);
 
   await page.getByRole("button", { name: "Annuler" }).click();
   await expect(page).toHaveURL("http://localhost:8090/action?calendarTab=2");
@@ -135,7 +131,7 @@ test("test", async ({ page }) => {
 
   await page.locator('[data-test-id="faite"]').getByText("faite").click();
   await expect(page).toHaveURL(
-    /http:\/\/localhost:8090\/person\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\?tab=Dossier\+M%C3%A9dical&consultationId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
+    /http:\/\/localhost:8090\/report\/[0-9]{4}-[0-9]{2}-[0-9]{2}\?consultationId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
   );
 
   await page.getByRole("button", { name: "Annuler" }).click();
@@ -151,7 +147,7 @@ test("test", async ({ page }) => {
 
   await page.locator('[data-test-id="consult abc"]').getByText("consult abc").click();
   await expect(page).toHaveURL(
-    /http:\/\/localhost:8090\/person\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\?tab=Dossier\+M%C3%A9dical&consultationId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
+    /http:\/\/localhost:8090\/report\/[0-9]{4}-[0-9]{2}-[0-9]{2}\?consultationId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
   );
 
   await page.getByRole("button", { name: "Annuler" }).click();
@@ -162,7 +158,7 @@ test("test", async ({ page }) => {
 
   await page.locator('[data-test-id="faite"]').getByText("faite").click();
   await expect(page).toHaveURL(
-    /http:\/\/localhost:8090\/person\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\?tab=Dossier\+M%C3%A9dical&consultationId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
+    /http:\/\/localhost:8090\/report\/[0-9]{4}-[0-9]{2}-[0-9]{2}\?consultationId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
   );
 
   await page.getByRole("button", { name: "Annuler" }).click();

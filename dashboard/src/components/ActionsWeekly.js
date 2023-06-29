@@ -127,7 +127,7 @@ function ActionsOfDay({ actions }) {
           onClick={() => {
             if (action.isConsultation) {
               if (disableConsultationRow(action, user)) return;
-              history.push(`/person/${action.person}?tab=Dossier+Médical&consultationId=${action._id}`);
+              history.push(`?consultationId=${action._id}`);
             } else {
               history.push(`?actionId=${action._id}`);
             }
