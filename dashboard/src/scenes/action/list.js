@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { selectorFamily, useRecoilValue } from 'recoil';
 import { useHistory } from 'react-router-dom';
 import { SmallHeader } from '../../components/header';
@@ -17,7 +17,6 @@ import agendaIcon from '../../assets/icons/agenda-icon.svg';
 import ActionsCategorySelect from '../../components/tailwind/ActionsCategorySelect';
 import { useLocalStorage } from '../../services/useLocalStorage';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
-import ConsultationModal from '../../components/ConsultationModal';
 import ActionsSortableList from '../../components/ActionsSortableList';
 import { dayjsInstance } from '../../services/date';
 
@@ -116,8 +115,6 @@ const List = () => {
   const user = useRecoilValue(userState);
   const teams = useRecoilValue(teamsState);
 
-  const [newConsultationModalOpen, setNewConsultationModalOpen] = useState(false);
-
   const history = useHistory();
   const [search, setSearch] = useSearchParamState('search', '');
 
@@ -184,7 +181,7 @@ const List = () => {
               const searchParams = new URLSearchParams(history.location.search);
               searchParams.set('dueAt', dayjsInstance().toISOString());
               searchParams.set('newAction', true);
-              history.push(`?${searchParams.toString()}`); // Update the URL with the new search parameters.
+              history.push(`?${searchParams.toString()}`);
             }}
             color="primary"
             title="Créer une nouvelle action"
@@ -195,7 +192,10 @@ const List = () => {
               icon={agendaIcon}
               disabled={!currentTeam}
               onClick={() => {
-                setNewConsultationModalOpen(true);
+                const searchParams = new URLSearchParams(history.location.search);
+                searchParams.set('dueAt', dayjsInstance().toISOString());
+                searchParams.set('newConsultation', true);
+                history.push(`?${searchParams.toString()}`);
               }}
               color="primary"
               title="Créer une nouvelle consultation"
@@ -329,12 +329,6 @@ const List = () => {
           <ActionsSortableList data={dataConsolidated} limit={20} />
         </div>
       )}
-      <ConsultationModal
-        open={newConsultationModalOpen}
-        onClose={() => {
-          setNewConsultationModalOpen(false);
-        }}
-      />
     </>
   );
 };

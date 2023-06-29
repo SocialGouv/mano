@@ -28,7 +28,6 @@ import Passage from '../../components/Passage';
 import UserName from '../../components/UserName';
 import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
 import ReceptionService from '../../components/ReceptionService';
-import ConsultationModal from '../../components/ConsultationModal';
 
 export const actionsForCurrentTeamSelector = selector({
   key: 'actionsForCurrentTeamSelector',
@@ -148,8 +147,6 @@ const Reception = () => {
     history.replace({ pathname: location.pathname, search: searchParams.toString() });
   };
 
-  const [showConsultationModal, setShowConsultationModal] = useState(false);
-
   // for better UX when increase passage
   const [addingPassage, setAddingPassage] = useState(false);
 
@@ -249,22 +246,18 @@ const Reception = () => {
           <>
             <ButtonCustom
               icon={plusIcon}
-              onClick={() => setShowConsultationModal(true)}
+              onClick={() => {
+                const searchParams = new URLSearchParams(history.location.search);
+                searchParams.set('newConsultation', true);
+                if (selectedPersons?.[0]._id) searchParams.set('personId', selectedPersons?.[0]._id);
+                history.push(`?${searchParams.toString()}`);
+              }}
               color="primary"
               disabled={!selectedPersons.length || selectedPersons.length > 1}
               title="Consultation"
               padding={'8px 14px'}
               style={{ height: 'fit-content' }}
             />
-            {!!showConsultationModal && (
-              <ConsultationModal
-                open={showConsultationModal}
-                onClose={() => {
-                  setShowConsultationModal(false);
-                }}
-                personId={selectedPersons?.[0]._id}
-              />
-            )}
           </>
         )}
         {!!organisation.passagesEnabled && (

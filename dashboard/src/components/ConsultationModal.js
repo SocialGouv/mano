@@ -1,7 +1,9 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import ReactDatePicker from 'react-datepicker';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { v4 as uuidv4 } from 'uuid';
+import { toast } from 'react-toastify';
+import { useLocation, useHistory } from 'react-router-dom';
 import { CANCEL, DONE, TODO } from '../recoil/actions';
 import { currentTeamState, organisationState, teamsState, userState } from '../recoil/auth';
 import { consultationsState, defaultConsultationFields, prepareConsultationForEncryption } from '../recoil/consultations';
@@ -13,7 +15,6 @@ import Documents from './Documents';
 import { modalConfirmState } from './ModalConfirm';
 import SelectAsInput from './SelectAsInput';
 import SelectStatus from './SelectStatus';
-import { toast } from 'react-toastify';
 import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from './tailwind/Modal';
 import SelectPerson from './SelectPerson';
 import { CommentsModule } from './CommentsGeneric';
@@ -22,11 +23,38 @@ import UserName from './UserName';
 import PersonName from './PersonName';
 import TagTeam from './TagTeam';
 import CustomFieldDisplay from './CustomFieldDisplay';
+import { itemsGroupedByConsultationSelector } from '../recoil/selectors';
 
-export default function ConsultationModal({ open, onClose, personId, consultation, date }) {
+export default function ConsultationModal() {
+  const actionsObjects = useRecoilValue(itemsGroupedByConsultationSelector);
+  const history = useHistory();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const currentConsultationId = searchParams.get('consultationId');
+  const newConsultation = searchParams.get('newConsultation');
+  const currentConsultation = useMemo(() => {
+    if (!currentConsultationId) return null;
+    return actionsObjects[currentConsultationId];
+  }, [currentConsultationId, actionsObjects]);
+  const personId = searchParams.get('personId');
+  const date = searchParams.get('dueAt') || searchParams.get('completedAt');
+
+  const [open, setOpen] = useState(false);
+  const consultationIdRef = useRef(currentConsultationId);
+  const newConsultationRef = useRef(newConsultation);
+  useEffect(() => {
+    if (consultationIdRef.current !== currentConsultationId) {
+      consultationIdRef.current = currentConsultationId;
+      setOpen(!!currentConsultationId);
+    }
+    if (newConsultationRef.current !== newConsultation) {
+      newConsultationRef.current = newConsultation;
+      setOpen(!!newConsultation);
+    }
+  }, [newConsultation, currentConsultationId]);
   return (
-    <ModalContainer open={open} size="3xl">
-      <ConsultationContent key={open} personId={personId} consultation={consultation} date={date} onClose={onClose} />
+    <ModalContainer open={open} size="3xl" onAfterLeave={history.goBack}>
+      <ConsultationContent key={open} personId={personId} consultation={currentConsultation} date={date} onClose={() => setOpen(false)} />
     </ModalContainer>
   );
 }

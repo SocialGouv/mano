@@ -38,6 +38,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import SentryRoute from './components/Sentryroute';
 import { ENV, VERSION } from './config';
 import DuplicatedReportsTestChecker from './components/DuplicatedReportsTestChecker';
+import ConsultationModal from './components/ConsultationModal';
 
 RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = process.env.REACT_APP_DISABLE_RECOIL_DUPLICATE_ATOM_KEY_CHECKING ? false : true;
 
@@ -131,6 +132,7 @@ const App = ({ resetRecoil }) => {
         </Switch>
         <DataLoader />
         <ActionModal />
+        <ConsultationModal />
         <ModalConfirm />
       </Router>
     </div>

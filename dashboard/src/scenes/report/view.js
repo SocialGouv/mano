@@ -1278,14 +1278,19 @@ const Consultations = ({ date, status, consultations, setSortOrder, setSortBy, s
 
   if (!data) return <div />;
   const moreThanOne = data.length > 1;
-
+  const dateForSelector = dayjsInstance(date).add(12, 'hour');
   return (
     <>
       <StyledBox>
         <ButtonCustom
           title={`Ajouter une consultation faite le ${formatDateWithFullMonth(date)}`}
           className="tw-ml-auto tw-mb-10"
-          onClick={() => setShowModal(true)}
+          onClick={() => {
+            const searchParams = new URLSearchParams(history.location.search);
+            searchParams.set('completedAt', dayjsInstance(dateForSelector).toISOString());
+            searchParams.set('newConsultation', true);
+            history.push(`?${searchParams.toString()}`);
+          }}
         />
         <Table
           className="Table"

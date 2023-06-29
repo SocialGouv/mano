@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useRecoilValue } from 'recoil';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { organisationState, userState } from '../../../recoil/auth';
 import { CANCEL, DONE, mappedIdsToLabels } from '../../../recoil/actions';
 import SelectCustom from '../../../components/SelectCustom';
@@ -11,21 +11,14 @@ import { formatDateWithNameOfDay, formatTime } from '../../../services/date';
 import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from '../../../components/tailwind/Modal';
 import { arrayOfitemsGroupedByConsultationSelector } from '../../../recoil/selectors';
 import { useLocalStorage } from '../../../services/useLocalStorage';
-import ConsultationModal from '../../../components/ConsultationModal';
 import { AgendaMutedIcon } from './AgendaMutedIcon';
 import { disableConsultationRow } from '../../../recoil/consultations';
 import { FullScreenIcon } from './FullScreenIcon';
 import UserName from '../../../components/UserName';
 
 export const Consultations = ({ person }) => {
-  const [modalOpen, setModalOpen] = useState(false);
   const [fullScreen, setFullScreen] = useState(false);
   const history = useHistory();
-  const { search } = useLocation();
-  const currentConsultationId = useMemo(() => {
-    const searchParams = new URLSearchParams(search);
-    return searchParams.get('consultationId');
-  }, [search]);
 
   const allConsultations = useRecoilValue(arrayOfitemsGroupedByConsultationSelector);
   const [consultationTypes, setConsultationTypes] = useLocalStorage('consultation-types', []);
@@ -41,11 +34,6 @@ export const Consultations = ({ person }) => {
     [personConsultations, consultationStatuses, consultationTypes]
   );
 
-  const currentConsultation = useMemo(() => {
-    if (!currentConsultationId) return null;
-    return personConsultations.find((c) => c._id === currentConsultationId);
-  }, [personConsultations, currentConsultationId]);
-
   const data = personConsultations;
   const filteredData = personConsultationsFiltered;
 
@@ -58,7 +46,12 @@ export const Consultations = ({ person }) => {
             <button
               aria-label="Ajouter une consultation"
               className="tw-text-md tw-h-8 tw-w-8 tw-rounded-full tw-bg-blue-900 tw-font-bold tw-text-white tw-transition hover:tw-scale-125"
-              onClick={() => setModalOpen(true)}>
+              onClick={() => {
+                const searchParams = new URLSearchParams(history.location.search);
+                searchParams.set('newConsultation', true);
+                searchParams.set('personId', person._id);
+                history.push(`?${searchParams.toString()}`);
+              }}>
               ＋
             </button>
             {Boolean(filteredData.length) && (
@@ -96,22 +89,21 @@ export const Consultations = ({ person }) => {
             <button type="button" name="cancel" className="button-cancel" onClick={() => setFullScreen(false)}>
               Fermer
             </button>
-            <button type="button" className="button-submit !tw-bg-blue-900" onClick={() => setModalOpen(true)}>
+            <button
+              type="button"
+              className="button-submit !tw-bg-blue-900"
+              onClick={() => {
+                const searchParams = new URLSearchParams(history.location.search);
+                searchParams.set('newConsultation', true);
+                searchParams.set('personId', person._id);
+                history.push(`?${searchParams.toString()}`);
+              }}>
               ＋ Ajouter une consultation
             </button>
           </ModalFooter>
         </ModalContainer>
         <ConsultationsTable filteredData={filteredData} person={person} />
       </div>
-      <ConsultationModal
-        open={Boolean(currentConsultation) || modalOpen}
-        consultation={currentConsultation}
-        onClose={() => {
-          if (currentConsultation) history.goBack();
-          if (modalOpen) setModalOpen(false);
-        }}
-        personId={person._id}
-      />
     </>
   );
 };
