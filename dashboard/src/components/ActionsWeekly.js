@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { Button } from 'reactstrap';
 import { useRecoilValue } from 'recoil';
 import { CANCEL, DONE } from '../recoil/actions';
-import { dayjsInstance, formatTime, isOnSameDay } from '../services/date';
+import { dayjsInstance, formatTime } from '../services/date';
 import ActionOrConsultationName from './ActionOrConsultationName';
 import ActionStatus from './ActionStatus';
 import ExclamationMarkButton from './tailwind/ExclamationMarkButton';
@@ -15,7 +15,7 @@ import { disableConsultationRow } from '../recoil/consultations';
 
 // TODO: remove inline style when UI is stabilized.
 
-export default function ActionsWeekly({ actions, onCreateAction }) {
+export default function ActionsWeekly({ actions, isNightSession, onCreateAction }) {
   const [startOfWeek, setStartOfWeek] = useSearchParamState('startOfWeek', dayjsInstance().startOf('week').format('YYYY-MM-DD'));
 
   const actionsInWeek = useMemo(() => {
@@ -31,6 +31,13 @@ export default function ActionsWeekly({ actions, onCreateAction }) {
 
   return (
     <div>
+      {!!isNightSession && (
+        <div className="-tw-mt-8 tw-mb-8">
+          <p className="tw-m-0 tw-text-center tw-text-xs tw-opacity-50">
+            On affiche les actions faites/à faire entre midi de ce jour et 11h59 du jour suivant
+          </p>
+        </div>
+      )}
       <div className="tw-mb-4 tw-flex tw-flex-row tw-items-center tw-gap-8">
         <Button color="secondary" outline={true} onClick={() => setStartOfWeek(dayjsInstance().startOf('week').format('YYYY-MM-DD'))}>
           Aujourd'hui
@@ -57,6 +64,10 @@ export default function ActionsWeekly({ actions, onCreateAction }) {
         {[...Array(7)].map((_, index) => {
           const day = dayjsInstance(startOfWeek).add(index, 'day');
           const isToday = day.isSame(dayjsInstance(), 'day');
+          const offsetHours = isNightSession ? 12 : 0;
+          const isoStartToday = dayjsInstance(day).startOf('day').add(offsetHours, 'hour').toISOString();
+          const isoEndToday = dayjsInstance(day).startOf('day').add(1, 'day').add(offsetHours, 'hour').toISOString();
+
           return (
             <div key={day.format('YYYY-MM-DD')}>
               <div className="tw-my-1.5 tw-text-center">
@@ -71,9 +82,10 @@ export default function ActionsWeekly({ actions, onCreateAction }) {
               </div>
               <div className="tw-mb-4 tw-flex tw-flex-col tw-gap-0.5">
                 <ActionsOfDay
-                  actions={actionsInWeek.filter((action) =>
-                    isOnSameDay([DONE, CANCEL].includes(action.status) ? action.completedAt : action.dueAt, day)
-                  )}
+                  actions={actionsInWeek.filter((a) => {
+                    const date = [DONE, CANCEL].includes(a.status) ? a.completedAt : a.dueAt;
+                    return date >= isoStartToday && date < isoEndToday;
+                  })}
                 />
                 <button
                   type="button"

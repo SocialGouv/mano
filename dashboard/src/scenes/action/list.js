@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { selectorFamily, useRecoilValue } from 'recoil';
 import CreateActionModal from '../../components/CreateActionModal';
 import { SmallHeader } from '../../components/header';
@@ -141,6 +141,18 @@ const List = () => {
       actionsWithNoCategory,
     })
   );
+
+  const selectedTeams = useMemo(() => {
+    if (viewAllOrganisationData) return teams;
+    if (!selectedTeamIds.length) return teams;
+    return teams.filter((t) => selectedTeamIds.includes(t._id));
+  }, [selectedTeamIds, viewAllOrganisationData, teams]);
+  const allSelectedTeamsAreNightSession = useMemo(() => {
+    for (const team of selectedTeams) {
+      if (!team.nightSession) return false;
+    }
+    return true;
+  }, [selectedTeams]);
 
   return (
     <>
@@ -295,6 +307,7 @@ const List = () => {
       {showAs === showAsOptions[2] && (
         <div className="tw-min-h-screen [overflow-wrap:anywhere]">
           <ActionsWeekly
+            isNightSession={allSelectedTeamsAreNightSession}
             actions={dataConsolidated}
             onCreateAction={(date) => {
               setActionDate(date);
@@ -305,7 +318,7 @@ const List = () => {
       )}
       {showAs === showAsOptions[0] && (
         <div className="tw-min-h-screen">
-          <ActionsCalendar actions={dataConsolidated} />
+          <ActionsCalendar actions={dataConsolidated} isNightSession={allSelectedTeamsAreNightSession} />
         </div>
       )}
       {showAs === showAsOptions[1] && (

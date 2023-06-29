@@ -288,7 +288,11 @@ const Reception = () => {
               <SelectStatus onChange={(event) => setStatus(event.target.value)} value={status} />
             </div>
           </AgendaWrapper>
-          <ActionsCalendar actions={dataConsolidated} columns={['Heure', 'Nom', 'Personne suivie', 'Statut']} />
+          <ActionsCalendar
+            actions={dataConsolidated}
+            columns={['Heure', 'Nom', 'Personne suivie', 'Statut']}
+            isNightSession={currentTeam?.nightSession}
+          />
         </Col>
         <Col md={4}>
           {!!organisation.passagesEnabled && (

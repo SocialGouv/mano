@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
-import { addOneDay, dayjsInstance, formatCalendarDate, formatDateTimeWithNameOfDay, formatTime, isOnSameDay, subtractOneDay } from '../services/date';
+import { addOneDay, dayjsInstance, formatCalendarDate, formatDateTimeWithNameOfDay, formatTime, subtractOneDay } from '../services/date';
 import Table from './table';
 import ActionStatus from './ActionStatus';
 import ActionOrConsultationName from './ActionOrConsultationName';
@@ -15,7 +15,7 @@ import { CANCEL, DONE, sortActionsOrConsultations } from '../recoil/actions';
 import TagTeam from './TagTeam';
 import { useLocalStorage } from '../services/useLocalStorage';
 
-const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie', 'Créée le', 'Statut', 'Équipe(s) en charge'] }) => {
+const ActionsCalendar = ({ actions, isNightSession, columns = ['Heure', 'Nom', 'Personne suivie', 'Créée le', 'Statut', 'Équipe(s) en charge'] }) => {
   const history = useHistory();
   const location = useLocation();
   const user = useRecoilValue(userState);
@@ -36,22 +36,38 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
   useEffect(() => {
     if (!currentDate) return;
     const filteredActions = actions.filter((a) => a.completedAt || a.dueAt);
+
+    const offsetHours = isNightSession ? 12 : 0;
+    const isoStartYesterday = dayjsInstance(currentDate).startOf('day').add(-1, 'day').add(offsetHours, 'hour').toISOString();
+    const isoStartToday = dayjsInstance(currentDate).startOf('day').add(offsetHours, 'hour').toISOString();
+    const isoStartTomorrow = dayjsInstance(currentDate).startOf('day').add(1, 'day').add(offsetHours, 'hour').toISOString();
+    const isoEndTomorrow = dayjsInstance(currentDate).startOf('day').add(2, 'day').add(offsetHours, 'hour').toISOString();
+
     setTheDayBeforeActions(
       filteredActions
-        .filter((a) => isOnSameDay([DONE, CANCEL].includes(a.status) ? a.completedAt : a.dueAt, subtractOneDay(currentDate)))
+        .filter((a) => {
+          const date = [DONE, CANCEL].includes(a.status) ? a.completedAt : a.dueAt;
+          return date >= isoStartYesterday && date < isoStartToday;
+        })
         .sort(sortActionsOrConsultations(sortBy, sortOrder))
     );
     setTheDayAfterActions(
       filteredActions
-        .filter((a) => isOnSameDay([DONE, CANCEL].includes(a.status) ? a.completedAt : a.dueAt, addOneDay(currentDate)))
+        .filter((a) => {
+          const date = [DONE, CANCEL].includes(a.status) ? a.completedAt : a.dueAt;
+          return date >= isoStartTomorrow && date < isoEndTomorrow;
+        })
         .sort(sortActionsOrConsultations(sortBy, sortOrder))
     );
     setTheCurrentDayActions(
       filteredActions
-        .filter((a) => isOnSameDay([DONE, CANCEL].includes(a.status) ? a.completedAt : a.dueAt, currentDate))
+        .filter((a) => {
+          const date = [DONE, CANCEL].includes(a.status) ? a.completedAt : a.dueAt;
+          return date >= isoStartToday && date < isoStartTomorrow;
+        })
         .sort(sortActionsOrConsultations(sortBy, sortOrder))
     );
-  }, [actions, currentDate, sortBy, sortOrder]);
+  }, [actions, currentDate, sortBy, sortOrder, isNightSession]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -175,12 +191,23 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
   );
 
   const renderDate = (date) => {
-    return formatCalendarDate(date);
+    const dateString = formatCalendarDate(date);
+    if (!isNightSession) return dateString;
+    switch (dateString) {
+      case "Aujourd'hui":
+        return 'Ce soir';
+      case 'Demain':
+        return 'Demain soir';
+      case 'Hier':
+        return 'Hier soir';
+      default:
+        return `Nuit du ${dateString}`;
+    }
   };
 
   return (
     <>
-      <Nav fill tabs style={{ marginBottom: 20 }}>
+      <Nav fill tabs>
         {['<', subtractOneDay(currentDate), currentDate, addOneDay(currentDate), '>'].map((tabCaption, index) => (
           <NavItem key={index} style={{ cursor: 'pointer' }}>
             <NavLink
@@ -198,6 +225,13 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
           </NavItem>
         ))}
       </Nav>
+      <div className="tw-mb-5">
+        {!!isNightSession && (
+          <p className="tw-m-0 tw-text-center tw-text-xs tw-opacity-50">
+            On affiche les actions faites/à faire entre midi de ce jour et 11h59 du jour suivant
+          </p>
+        )}
+      </div>
       <TabContent activeTab={activeTab}>
         <TabPane tabId={1}>{renderActionsTable(theDayBeforeActions, subtractOneDay(currentDate))}</TabPane>
         <TabPane tabId={2}>{renderActionsTable(theCurrentDayActions, currentDate)}</TabPane>

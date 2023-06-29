@@ -132,11 +132,12 @@ const itemsForStatsSelector = selectorFamily({
             personsUpdated.push(person);
             personsCreated.push(person);
           } else {
-            if (createdDate >= isoStartDate && createdDate <= isoEndDate) personsCreated.push(person);
+            if (createdDate >= isoStartDate && createdDate < isoEndDate) personsCreated.push(person);
             for (const date of person.interactions) {
               if (date < isoStartDate) continue;
-              if (date > isoEndDate) continue;
+              if (date >= isoEndDate) continue;
               personsUpdated.push(person);
+              personsCreated.push(person);
               break;
             }
           }
@@ -151,7 +152,7 @@ const itemsForStatsSelector = selectorFamily({
           }
           const date = action.completedAt || action.dueAt;
           if (date < isoStartDate) continue;
-          if (date > isoEndDate) continue;
+          if (date >= isoEndDate) continue;
           actionsFilteredByPersons[action._id] = action;
           personsWithActions[person._id] = person;
         }
@@ -164,7 +165,7 @@ const itemsForStatsSelector = selectorFamily({
           }
           const date = consultation.completedAt || consultation.dueAt;
           if (date < isoStartDate) continue;
-          if (date > isoEndDate) continue;
+          if (date >= isoEndDate) continue;
           consultationsFilteredByPersons.push(consultation);
           personsWithConsultations[person._id] = person;
         }
@@ -178,7 +179,7 @@ const itemsForStatsSelector = selectorFamily({
             }
             const date = passage.date;
             if (date < isoStartDate) continue;
-            if (date > isoEndDate) continue;
+            if (date >= isoEndDate) continue;
             passagesFilteredByPersons.push(passage);
             personsWithPassages[person._id] = person;
             // if (person._id === 'ffd41d5a-c273-4548-b94b-750354ff3aff') {
@@ -200,7 +201,7 @@ const itemsForStatsSelector = selectorFamily({
             }
             const date = rencontre.date;
             if (date < isoStartDate) continue;
-            if (date > isoEndDate) continue;
+            if (date >= isoEndDate) continue;
             rencontresFilteredByPersons.push(rencontre);
             personsWithRencontres[person._id] = person;
             if (createdDate < isoStartDate) personsInRencontresBeforePeriod[person._id] = person;

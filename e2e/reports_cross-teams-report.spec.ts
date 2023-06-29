@@ -284,14 +284,14 @@ test("Cross teams report", async ({ page }) => {
 
     await page.getByRole("button", { name: dayjs().format("YYYY-MM-DD") }).click();
 
-    await expect(page.getByText(`${dayjs().format("dddd D MMMM YYYY")}`)).toBeVisible();
+    await expect(page.getByText(`${dayjs().format("dddd D MMMM YYYY")}`).first()).toBeVisible();
 
     await page.getByRole("button", { name: "Précédent" }).click();
 
-    await expect(page.getByText(`${dayjs().add(-1, "day").format("dddd D MMMM YYYY")}`)).toBeVisible();
+    await expect(page.getByText(`${dayjs().add(-1, "day").format("dddd D MMMM YYYY")}`).first()).toBeVisible();
 
     await page.getByRole("button", { name: "Suivant" }).click();
 
-    await expect(page.getByText(`${dayjs().format("dddd D MMMM YYYY")}`)).toBeVisible();
+    await expect(page.getByText(`${dayjs().format("dddd D MMMM YYYY")}`).first()).toBeVisible();
   });
 });
