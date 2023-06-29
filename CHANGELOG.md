@@ -1,3 +1,10 @@
+## [1.273.1](https://github.com/SocialGouv/mano/compare/v1.273.0...v1.273.1) (2023-06-29)
+
+
+### Bug Fixes
+
+* **dashboard:** night shift ([#1568](https://github.com/SocialGouv/mano/issues/1568)) ([4d30ef9](https://github.com/SocialGouv/mano/commit/4d30ef9eb4ca7d7393f6e02a86e0c386363f6ac9))
+
 # [1.273.0](https://github.com/SocialGouv/mano/compare/v1.272.4...v1.273.0) (2023-06-28)
 
 
