@@ -56,7 +56,6 @@ import ReceptionService from '../../components/ReceptionService';
 import { useLocalStorage } from '../../services/useLocalStorage';
 import useSearchParamState from '../../services/useSearchParamState';
 import { arrayOfitemsGroupedByActionSelector, arrayOfitemsGroupedByConsultationSelector, personsObjectSelector } from '../../recoil/selectors';
-import ConsultationModal from '../../components/ConsultationModal';
 import { treatmentsState } from '../../recoil/treatments';
 import { medicalFileState } from '../../recoil/medicalFiles';
 
@@ -1082,7 +1081,11 @@ const ActionCompletedAt = ({ date, status, actions, setSortOrder, setSortBy, sor
           )}`}
           noData={`Pas d'action ${status === CANCEL ? 'annulée' : 'faite'} ce jour`}
           data={data.map((a) => (a.urgent ? { ...a, style: { backgroundColor: '#fecaca99' } } : a))}
-          onRowClick={(action) => history.push(`?actionId=${action._id}`)}
+          onRowClick={(action) => {
+            const searchParams = new URLSearchParams(history.location.search);
+            searchParams.set('actionId', action._id);
+            history.push(`?${searchParams.toString()}`);
+          }}
           rowKey="_id"
           dataTestId="name"
           columns={[
@@ -1184,7 +1187,11 @@ const ActionCreatedAt = ({ date, actions, setSortOrder, setSortBy, sortBy, sortO
           title={`Action${moreThanOne ? 's' : ''} créée${moreThanOne ? 's' : ''} le ${formatDateWithFullMonth(date)}`}
           noData="Pas d'action créée ce jour"
           data={data.map((a) => (a.urgent ? { ...a, style: { backgroundColor: '#fecaca99' } } : a))}
-          onRowClick={(action) => history.push(`?actionId=${action._id}`)}
+          onRowClick={(action) => {
+            const searchParams = new URLSearchParams(history.location.search);
+            searchParams.set('actionId', action._id);
+            history.push(`?${searchParams.toString()}`);
+          }}
           rowKey="_id"
           dataTestId="name"
           columns={[
@@ -1274,7 +1281,6 @@ const Consultations = ({ date, status, consultations, setSortOrder, setSortBy, s
   const data = consultations;
   const user = useRecoilValue(userState);
   const history = useHistory();
-  const [showModal, setShowModal] = useState(false);
 
   if (!data) return <div />;
   const moreThanOne = data.length > 1;
@@ -1299,7 +1305,11 @@ const Consultations = ({ date, status, consultations, setSortOrder, setSortBy, s
           } le ${formatDateWithFullMonth(date)}`}
           noData={`Pas de consultation ${status === DONE ? 'faite' : 'annulée'} ce jour`}
           data={data}
-          onRowClick={(consultation) => history.push(`?consultationId=${consultation._id}`)}
+          onRowClick={(consultation) => {
+            const searchParams = new URLSearchParams(history.location.search);
+            searchParams.set('consultationId', consultation._id);
+            history.push(`?${searchParams.toString()}`);
+          }}
           rowDisabled={(consultation) => disableConsultationRow(consultation, user)}
           rowKey="_id"
           dataTestId="name"
@@ -1354,7 +1364,6 @@ const Consultations = ({ date, status, consultations, setSortOrder, setSortBy, s
             },
           ]}
         />
-        <ConsultationModal open={showModal} date={date} onClose={() => setShowModal(false)} />
       </StyledBox>
       <hr />
     </>
@@ -1377,7 +1386,11 @@ const ConsultationsCreatedAt = ({ date, consultations }) => {
           title={`Consultation${moreThanOne ? 's' : ''} créée${moreThanOne ? 's' : ''} le ${formatDateWithFullMonth(date)}`}
           noData="Pas de consultation créée ce jour"
           data={data}
-          onRowClick={(consultation) => history.push(`consultationId=${consultation._id}`)}
+          onRowClick={(consultation) => {
+            const searchParams = new URLSearchParams(history.location.search);
+            searchParams.set('consultationId', consultation._id);
+            history.push(`?${searchParams.toString()}`);
+          }}
           rowDisabled={(consultation) => disableConsultationRow(consultation, user)}
           rowKey="_id"
           dataTestId="name"
@@ -1431,16 +1444,18 @@ const CommentCreatedAt = ({ date, comments, medical }) => {
           noData="Pas de commentaire ajouté ce jour"
           onRowClick={(comment) => {
             try {
-              console.log('comment', comment);
+              const searchParams = new URLSearchParams(history.location.search);
               switch (comment.type) {
                 case 'action':
-                  history.push(`?actionId=${comment.action._id}`);
+                  searchParams.set('actionId', comment.action._id);
+                  history.push(`?${searchParams.toString()}`);
                   break;
                 case 'person':
                   history.push(`/person/${comment.person._id}`);
                   break;
                 case 'consultation':
-                  history.push(`?consultationId=${comment.consultation._id}`);
+                  searchParams.set('consultationId', comment.consultation._id);
+                  history.push(`?${searchParams.toString()}`);
                   break;
                 case 'treatment':
                   history.push(`/person/${comment.person._id}?tab=Dossier+Médical&treatmentId=${comment.treatment._id}`);

@@ -49,10 +49,13 @@ const ActionsSortableList = ({ data, limit }) => {
         data={dataConsolidatedPaginated}
         rowKey={'_id'}
         onRowClick={(actionOrConsultation) => {
+          const searchParams = new URLSearchParams(history.location.search);
           if (actionOrConsultation.isConsultation) {
-            history.push(`?consultationId=${actionOrConsultation._id}`);
+            searchParams.set('consultationId', actionOrConsultation._id);
+            history.push(`?${searchParams.toString()}`);
           } else {
-            history.push(`?actionId=${actionOrConsultation._id}`);
+            searchParams.set('actionId', actionOrConsultation._id);
+            history.push(`?${searchParams.toString()}`);
           }
         }}
         rowDisabled={(actionOrConsultation) => disableConsultationRow(actionOrConsultation, user)}

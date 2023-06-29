@@ -176,7 +176,9 @@ const ConsultationsTable = ({ filteredData, person }) => {
                     }
                     onClick={() => {
                       if (disableConsultationRow(consultation, user)) return;
-                      history.push(`?consultationId=${consultation._id}`);
+                      const searchParams = new URLSearchParams(history.location.search);
+                      searchParams.set('consultationId', consultation._id);
+                      history.push(`?${searchParams.toString()}`);
                     }}>
                     <div className="tw-flex">
                       <div className="tw-flex-1">{`${date}${time}`}</div>

@@ -53,7 +53,7 @@ test("Create action with comments", async ({ page }) => {
   await page.getByText(person1Name).last().click();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*/);
   await page.getByText("action avec commentaire").click();
-  await expect(page).toHaveURL(/http:\/\/localhost:8090\/action\/.*/);
+  await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*\?actionId=.*/);
   await page.getByText("Une personne avec un commentaire prioritaire").click();
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Commentaire mis à jour").click();
@@ -72,7 +72,7 @@ test("Create action with comments", async ({ page }) => {
   await page.getByText(person2Name).first().click();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*/);
   await page.getByText(actionFor2PersonName).click();
-  await expect(page).toHaveURL(/http:\/\/localhost:8090\/action\/.*/);
+  await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*\?actionId=.*/);
   await page.getByText("Un commentaire pour tout le monde").click();
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Commentaire mis à jour").click();
@@ -82,7 +82,7 @@ test("Create action with comments", async ({ page }) => {
   await page.locator(`data-test-id=${actionFor2PersonName}`).getByText(person1Name).click();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*/);
   await page.getByText(actionFor2PersonName).click();
-  await expect(page).toHaveURL(/http:\/\/localhost:8090\/action\/.*/);
+  await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*\?actionId=.*/);
   await page.getByText("Un commentaire pour tout le monde").click();
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Commentaire mis à jour").click();

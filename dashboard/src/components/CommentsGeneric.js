@@ -257,7 +257,8 @@ export function CommentsTable({ comments, onDisplayComment, onEditComment, onAdd
                           onEditComment(comment);
                           break;
                         }
-                        history.push(`?consultationId=${comment.consultation._id}`);
+                        searchParams.set('consultationId', comment.consultation._id);
+                        history.push(`?${searchParams.toString()}`);
                         break;
                       case 'treatment':
                         if (searchParams.get('treatmentId') === comment.treatment._id) {
@@ -295,9 +296,11 @@ export function CommentsTable({ comments, onDisplayComment, onEditComment, onAdd
                           onClick={(e) => {
                             e.stopPropagation();
                             try {
+                              const searchParams = new URLSearchParams(location.search);
                               switch (comment.type) {
                                 case 'action':
-                                  history.push(`?actionId=${comment.action}`);
+                                  searchParams.set('actionId', comment.action);
+                                  history.push(`?${searchParams.toString()}`);
                                   break;
                                 case 'person':
                                   history.push(`/person/${comment.person}`);
@@ -309,7 +312,8 @@ export function CommentsTable({ comments, onDisplayComment, onEditComment, onAdd
                                   history.push(`/person/${comment.person}?rencontreId=${comment.rencontre}`);
                                   break;
                                 case 'consultation':
-                                  history.push(`?consultationId=${comment.consultation._id}`);
+                                  searchParams.set('consultationId', comment.consultation._id);
+                                  history.push(`?${searchParams.toString()}`);
                                   break;
                                 case 'treatment':
                                   history.push(`/person/${comment.person}?tab=Dossier+Médical&treatmentId=${comment.treatment._id}`);

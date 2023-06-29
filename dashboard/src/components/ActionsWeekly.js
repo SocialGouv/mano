@@ -125,11 +125,14 @@ function ActionsOfDay({ actions }) {
         <div
           key={action._id}
           onClick={() => {
+            const searchParams = new URLSearchParams(history.location.search);
             if (action.isConsultation) {
               if (disableConsultationRow(action, user)) return;
-              history.push(`?consultationId=${action._id}`);
+              searchParams.set('consultationId', action._id);
+              history.push(`?${searchParams.toString()}`);
             } else {
-              history.push(`?actionId=${action._id}`);
+              searchParams.set('actionId', action._id);
+              history.push(`?${searchParams.toString()}`);
             }
           }}
           className={[
