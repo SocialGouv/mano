@@ -1,3 +1,10 @@
+## [1.273.2](https://github.com/SocialGouv/mano/compare/v1.273.1...v1.273.2) (2023-06-29)
+
+
+### Bug Fixes
+
+* **dahsboard:** cacher les commentaires de changement de status d'action dans les comptes-rendus et les dossier de personnes suivies ([#1572](https://github.com/SocialGouv/mano/issues/1572)) ([c455b43](https://github.com/SocialGouv/mano/commit/c455b43a4f4f9f1db5334aa7cc09d4e7f64a04b4))
+
 ## [1.273.1](https://github.com/SocialGouv/mano/compare/v1.273.0...v1.273.1) (2023-06-29)
 
 
