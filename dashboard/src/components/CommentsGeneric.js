@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useRecoilValue } from 'recoil';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Formik } from 'formik';
 import ExclamationMarkButton from './tailwind/ExclamationMarkButton';
@@ -88,6 +88,7 @@ export function CommentsModule({
             comments={comments}
             color={color}
             onDisplayComment={setCommentToDisplay}
+            onEditComment={setCommentToEdit}
             onAddComment={() => setModalCreateOpen(true)}
           />
         </div>
@@ -97,6 +98,7 @@ export function CommentsModule({
           comments={comments}
           color={color}
           onDisplayComment={setCommentToDisplay}
+          onEditComment={setCommentToEdit}
           onAddComment={() => setModalCreateOpen(true)}
         />
       )}
@@ -174,10 +176,11 @@ export function CommentsFullScreen({ open, comments, onClose, title, color, onDi
   );
 }
 
-export function CommentsTable({ comments, onDisplayComment, onAddComment, color, showAddCommentButton, withClickableLabel }) {
+export function CommentsTable({ comments, onDisplayComment, onEditComment, onAddComment, color, showAddCommentButton, withClickableLabel }) {
   const users = useRecoilValue(usersState);
   const organisation = useRecoilValue(organisationState);
   const history = useHistory();
+  const location = useLocation();
 
   if (!comments.length) {
     return (
@@ -234,6 +237,7 @@ export function CommentsTable({ comments, onDisplayComment, onAddComment, color,
               <tr key={comment._id} className={[`tw-bg-${color} tw-w-full`, i % 2 ? 'tw-bg-opacity-0' : 'tw-bg-opacity-5'].join(' ')}>
                 <td
                   onClick={() => {
+                    const searchParams = new URLSearchParams(location.search);
                     switch (comment.type) {
                       case 'action':
                       case 'person':
@@ -247,9 +251,17 @@ export function CommentsTable({ comments, onDisplayComment, onAddComment, color,
                         history.push(`/person/${comment.person}?rencontreId=${comment.rencontre}`);
                         break;
                       case 'consultation':
+                        if (searchParams.get('consultationId') === comment.consultation._id) {
+                          onEditComment(comment);
+                          break;
+                        }
                         history.push(`/person/${comment.person}?tab=Dossier+Médical&consultationId=${comment.consultation._id}`);
                         break;
                       case 'treatment':
+                        if (searchParams.get('treatmentId') === comment.treatment._id) {
+                          onEditComment(comment);
+                          break;
+                        }
                         history.push(`/person/${comment.person}?tab=Dossier+Médical&treatmentId=${comment.treatment._id}`);
                         break;
                       default:
@@ -339,8 +351,6 @@ export function CommentsTable({ comments, onDisplayComment, onAddComment, color,
 
 function CommentDisplay({ comment, onClose, onEditComment, canToggleUrgentCheck, canToggleGroupCheck, color = 'main' }) {
   const user = useRecoilValue(userState);
-
-  console.log('comment', comment);
 
   const isEditable = useMemo(() => {
     if (comment.user === user?._id) return true;

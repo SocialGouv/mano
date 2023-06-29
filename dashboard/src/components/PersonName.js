@@ -8,6 +8,8 @@ export default function PersonName({ item, onClick, redirectToTab = 'Résumé' }
   const history = useHistory();
   const persons = useRecoilValue(personsState);
   const personName = item?.personPopulated?.name || persons.find((p) => p._id === item.person)?.name;
+  console.log('item', item);
+  console.log('personName', personName);
   return (
     <BoldOnHover
       onClick={(e) => {

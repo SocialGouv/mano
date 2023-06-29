@@ -246,6 +246,7 @@ a {
 hr {
   margin-top: 1vw;
   margin-bottom: 1vw;
+  flex-shrink: 0;
 }
 
 .image-input {

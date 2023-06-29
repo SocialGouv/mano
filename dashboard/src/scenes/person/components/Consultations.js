@@ -15,6 +15,7 @@ import ConsultationModal from '../../../components/ConsultationModal';
 import { AgendaMutedIcon } from './AgendaMutedIcon';
 import { disableConsultationRow } from '../../../recoil/consultations';
 import { FullScreenIcon } from './FullScreenIcon';
+import UserName from '../../../components/UserName';
 
 export const Consultations = ({ person }) => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -178,8 +179,8 @@ const ConsultationsTable = ({ filteredData, person }) => {
                   <div
                     className={
                       ['restricted-access'].includes(user.role) || disableConsultationRow(consultation, user)
-                        ? 'tw-cursor-not-allowed tw-py-2'
-                        : 'tw-cursor-pointer tw-py-2'
+                        ? 'tw-cursor-not-allowed tw-pt-2'
+                        : 'tw-cursor-pointer tw-pt-2'
                     }
                     onClick={() => {
                       if (disableConsultationRow(consultation, user)) return;
@@ -209,6 +210,10 @@ const ConsultationsTable = ({ filteredData, person }) => {
                           <TagTeam teamId={consultation?.team} />
                         )}
                       </div>
+                    </div>
+                    <div className="tw-mt-2 -tw-mb-2 tw-flex tw-basis-full tw-gap-1 tw-text-xs tw-opacity-50 [overflow-wrap:anywhere]">
+                      <span>Créée par</span>
+                      <UserName id={consultation.user} />
                     </div>
                   </div>
                 </td>
