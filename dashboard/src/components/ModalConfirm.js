@@ -1,7 +1,5 @@
 import React from 'react';
 import { atom, useRecoilState } from 'recoil';
-
-import ButtonCustom from './ButtonCustom';
 import { ModalContainer, ModalFooter, ModalBody, ModalHeader } from './tailwind/Modal';
 
 const closedState = {
