@@ -102,7 +102,6 @@ function TreatmentContent({ onClose, treatment, personId }) {
   }, [treatment, user, personId, organisation]);
   const [activeTab, setActiveTab] = useState('Informations');
   const [data, setData] = useState(initialState);
-  console.log({ treatment, data, initialState });
   const isNewTreatment = !data?._id;
 
   useEffect(() => {
@@ -243,7 +242,10 @@ function TreatmentContent({ onClose, treatment, personId }) {
               </button>
             </li>
           </ul>
-          <div className={['tw-min-h-1/2 tw-w-full', activeTab !== 'Informations' ? 'tw-hidden' : ''].join(' ')}>
+          <div
+            className={['tw-flex tw-h-[50vh] tw-w-full tw-flex-wrap tw-overflow-y-auto tw-p-4', activeTab !== 'Informations' && 'tw-hidden']
+              .filter(Boolean)
+              .join(' ')}>
             <div className="tw-flex tw-w-full tw-flex-wrap">
               <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
                 <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-blue-900'} htmlFor="medicine-name">
@@ -321,11 +323,17 @@ function TreatmentContent({ onClose, treatment, personId }) {
               </div>
             </div>
           </div>
-          <div className={['tw-flex tw-min-h-1/2 tw-w-full tw-flex-col tw-gap-4', activeTab !== 'Documents' ? 'tw-hidden' : ''].join(' ')}>
+          <div
+            className={[
+              'tw-flex tw-h-[50vh] tw-w-full tw-flex-col tw-flex-wrap tw-gap-4 tw-overflow-y-auto',
+              activeTab !== 'Documents' && 'tw-hidden',
+            ]
+              .filter(Boolean)
+              .join(' ')}>
             <Documents
               title="Documents"
               color="blue-900"
-              personId={personId}
+              personId={data.person}
               documents={data.documents}
               onAdd={async (docResponse) => {
                 const { data: file, encryptedEntityKey } = docResponse;
@@ -356,7 +364,13 @@ function TreatmentContent({ onClose, treatment, personId }) {
               }}
             />
           </div>
-          <div className={['tw-flex tw-min-h-1/2 tw-w-full tw-flex-col tw-gap-4', activeTab !== 'Commentaires' ? 'tw-hidden' : ''].join(' ')}>
+          <div
+            className={[
+              'tw-flex tw-h-[50vh] tw-w-full tw-flex-col tw-flex-wrap tw-gap-4 tw-overflow-y-auto',
+              activeTab !== 'Commentaires' && 'tw-hidden',
+            ]
+              .filter(Boolean)
+              .join(' ')}>
             <CommentsModule
               comments={data.comments}
               color="blue-900"
@@ -401,7 +415,7 @@ function TreatmentContent({ onClose, treatment, personId }) {
           </button>
         )}
 
-        {isEditing ? (
+        {isEditing && (
           <button
             title="Sauvegarder ce traitement"
             type="submit"
@@ -410,7 +424,8 @@ function TreatmentContent({ onClose, treatment, personId }) {
             disabled={!canEdit}>
             Sauvegarder
           </button>
-        ) : (
+        )}
+        {!isEditing && (
           <button
             title="Modifier ce traitement - seul le créateur peut modifier un traitement"
             type="button"
@@ -418,7 +433,7 @@ function TreatmentContent({ onClose, treatment, personId }) {
               e.preventDefault();
               setIsEditing(true);
             }}
-            className="button-submit !tw-bg-blue-900"
+            className={['button-submit !tw-bg-blue-900', activeTab === 'Informations' ? 'tw-visible' : 'tw-invisible'].join(' ')}
             disabled={!canEdit}>
             Modifier
           </button>

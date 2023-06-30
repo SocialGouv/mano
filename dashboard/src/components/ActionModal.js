@@ -346,7 +346,7 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
         }
         onClose={onClose}
       />
-      <ModalBody className="tw-px-4 tw-py-2">
+      <ModalBody>
         <form
           id="add-action-form"
           onSubmit={async (e) => {
@@ -393,7 +393,10 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
               </li>
             </ul>
           )}
-          <div className={['tw-flex tw-w-full tw-flex-wrap tw-p-4', activeTab !== 'Informations' ? 'tw-hidden' : ''].join(' ')}>
+          <div
+            className={['tw-flex tw-h-[50vh] tw-w-full tw-flex-wrap tw-overflow-y-auto tw-p-4', activeTab !== 'Informations' && 'tw-hidden']
+              .filter(Boolean)
+              .join(' ')}>
             <div className="tw-flex tw-w-full tw-flex-row">
               <div className="tw-flex tw-flex-[2] tw-basis-2/3 tw-flex-col">
                 <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col">
@@ -596,7 +599,13 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
             </div>
           </div>
           {!['restricted-access'].includes(user.role) && (
-            <div className={['tw-flex tw-min-h-1/2 tw-w-full tw-flex-col tw-gap-4', activeTab !== 'Commentaires' ? 'tw-hidden' : ''].join(' ')}>
+            <div
+              className={[
+                'tw-flex tw-h-[50vh] tw-w-full tw-flex-col tw-flex-wrap tw-gap-4 tw-overflow-y-auto',
+                activeTab !== 'Commentaires' && 'tw-hidden',
+              ]
+                .filter(Boolean)
+                .join(' ')}>
               <CommentsModule
                 comments={action?.comments.map((comment) => ({ ...comment, type: 'action', person: action.person }))}
                 color="main"
@@ -650,18 +659,19 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
             Supprimer
           </button>
         )}
-        {isEditing || canSave ? (
+        {(isEditing || canSave) && (
           <button type="submit" className="button-submit" form="add-action-form" disabled={isSubmitting || !canEdit}>
             Sauvegarder
           </button>
-        ) : (
+        )}
+        {!isEditing && (
           <button
             type="button"
             onClick={(e) => {
               e.preventDefault();
               setIsEditing(true);
             }}
-            className="button-submit"
+            className={['button-submit', activeTab === 'Informations' ? 'tw-visible' : 'tw-invisible'].join(' ')}
             disabled={!canEdit}>
             Modifier
           </button>

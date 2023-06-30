@@ -131,7 +131,7 @@ const ModalHeader = ({ children, title, onClose }) => {
 
 const ModalBody = forwardRef(({ children, className = '', overflowY = true }, ref) => {
   return (
-    <div ref={ref} className={['tw-z-[99999] tw-order-2 tw-shrink tw-pb-4', overflowY ? 'tw-overflow-y-auto' : ''].join(' ')}>
+    <div ref={ref} className={['tw-z-[99999] tw-order-2 tw-shrink', overflowY ? 'tw-overflow-y-auto' : ''].join(' ')}>
       <div className="sm:tw-flex sm:tw-items-start">
         <div className={['tw-w-full tw-text-center sm:tw-mt-0 sm:tw-text-left', className].join(' ')}>{children}</div>
       </div>

@@ -151,7 +151,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
           path: `/consultation/${data._id}`,
           body: prepareConsultationForEncryption(organisation.consultations)(body),
         });
-    if (!consultationResponse.ok) return onClose();
+    if (!consultationResponse.ok) return false;
     setData(consultationResponse.decryptedData);
     const consult = { ...consultationResponse.decryptedData, ...defaultConsultationFields };
     if (isNewConsultation) {
@@ -173,7 +173,8 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
         await createReportAtDateIfNotExist(completedAt);
       }
     }
-    if (closeOnSubmit) return onClose();
+    if (closeOnSubmit) onClose();
+    return true;
   }
 
   const canSave = useMemo(() => {
@@ -276,7 +277,10 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
               </button>
             </li>
           </ul>
-          <div className={['tw-flex tw-w-full tw-flex-wrap tw-p-4', activeTab !== 'Informations' ? 'tw-hidden' : ''].join(' ')}>
+          <div
+            className={['tw-flex tw-h-[50vh] tw-w-full tw-flex-wrap tw-overflow-y-auto tw-p-4', activeTab !== 'Informations' && 'tw-hidden']
+              .filter(Boolean)
+              .join(' ')}>
             <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
               <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-blue-900'} htmlFor="create-consultation-team">
                 Personne suivie
@@ -427,7 +431,13 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
               </div>
             </div>
           </div>
-          <div className={['tw-flex tw-min-h-1/2 tw-w-full tw-flex-col tw-gap-4', activeTab !== 'Documents' ? 'tw-hidden' : ''].join(' ')}>
+          <div
+            className={[
+              'tw-flex tw-h-[50vh] tw-w-full tw-flex-col tw-flex-wrap tw-gap-4 tw-overflow-y-auto',
+              activeTab !== 'Documents' && 'tw-hidden',
+            ]
+              .filter(Boolean)
+              .join(' ')}>
             {data.person && (
               <Documents
                 personId={data.person}
@@ -463,7 +473,10 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
               />
             )}
           </div>
-          <div className={['tw-flex tw-min-h-1/2 tw-w-full tw-flex-col tw-gap-4', activeTab !== 'Commentaires' ? 'tw-hidden' : ''].join(' ')}>
+          <div
+            className={['tw-flex tw-h-[50vh] tw-w-full tw-flex-col tw-gap-4 tw-overflow-y-auto', activeTab !== 'Commentaires' && 'tw-hidden']
+              .filter(Boolean)
+              .join(' ')}>
             <CommentsModule
               comments={data.comments.map((c) => ({ ...c, type: 'consultation', consultation }))}
               color="blue-900"
@@ -509,7 +522,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
             Supprimer
           </button>
         )}
-        {isEditing || canSave ? (
+        {(isEditing || canSave) && (
           <button
             title="Sauvegarder cette consultation"
             type="submit"
@@ -518,7 +531,8 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
             disabled={!canEdit}>
             Sauvegarder
           </button>
-        ) : (
+        )}
+        {!isEditing && (
           <button
             title="Modifier cette consultation - seul le créateur peut modifier une consultation"
             type="button"
@@ -526,7 +540,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
               e.preventDefault();
               setIsEditing(true);
             }}
-            className="button-submit !tw-bg-blue-900"
+            className={['button-submit !tw-bg-blue-900', activeTab === 'Informations' ? 'tw-visible' : 'tw-invisible'].join(' ')}
             disabled={!canEdit}>
             Modifier
           </button>
