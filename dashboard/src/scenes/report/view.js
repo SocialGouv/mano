@@ -1458,7 +1458,8 @@ const CommentCreatedAt = ({ date, comments, medical }) => {
                   history.push(`?${searchParams.toString()}`);
                   break;
                 case 'treatment':
-                  history.push(`/person/${comment.person._id}?tab=Dossier+Médical&treatmentId=${comment.treatment._id}`);
+                  searchParams.set('treatmentId', comment.treatment._id);
+                  history.push(`?${searchParams.toString()}`);
                   break;
                 case 'medical-file':
                   history.push(`/person/${comment.person._id}?tab=Dossier+Médical`);

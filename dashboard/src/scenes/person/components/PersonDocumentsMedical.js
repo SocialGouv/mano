@@ -144,7 +144,9 @@ const PersonDocumentsMedical = ({ person }) => {
           {documentToEdit.type === 'treatment' ? (
             <button
               onClick={() => {
-                history.push(`/person/${person._id}?tab=Dossier+Médical&treatmentId=${documentToEdit.treatment}`);
+                const searchParams = new URLSearchParams(history.location.search);
+                searchParams.set('treatmentId', documentToEdit.treatment);
+                history.push(`?${searchParams.toString()}`);
                 setDocumentToEdit(null);
               }}
               className="button-classic">

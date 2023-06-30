@@ -1,31 +1,19 @@
 import React, { useMemo, useState } from 'react';
 import { useRecoilValue } from 'recoil';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { usersState, userState } from '../../../recoil/auth';
 import { formatDateWithFullMonth } from '../../../services/date';
 import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from '../../../components/tailwind/Modal';
-import TreatmentModal from './TreatmentModal';
 import { treatmentsState } from '../../../recoil/treatments';
 import { AgendaMutedIcon } from './AgendaMutedIcon';
 import { FullScreenIcon } from './FullScreenIcon';
 
 export const Treatments = ({ person }) => {
-  const [modalOpen, setModalOpen] = useState(false);
   const [fullScreen, setFullScreen] = useState(false);
   const allTreatments = useRecoilValue(treatmentsState);
   const treatments = useMemo(() => (allTreatments || []).filter((t) => t.person === person._id), [allTreatments, person._id]);
   const filteredData = treatments;
   const history = useHistory();
-  const { search } = useLocation();
-  const currentTreatmentId = useMemo(() => {
-    const searchParams = new URLSearchParams(search);
-    return searchParams.get('treatmentId');
-  }, [search]);
-
-  const currentTreatment = useMemo(() => {
-    if (!currentTreatmentId) return null;
-    return allTreatments.find((t) => t._id === currentTreatmentId);
-  }, [allTreatments, currentTreatmentId]);
 
   return (
     <>
@@ -36,7 +24,12 @@ export const Treatments = ({ person }) => {
             <button
               aria-label="Ajouter un traitement"
               className="tw-text-md tw-h-8 tw-w-8 tw-rounded-full tw-bg-blue-900 tw-font-bold tw-text-white tw-transition hover:tw-scale-125"
-              onClick={() => setModalOpen(true)}>
+              onClick={() => {
+                const searchParams = new URLSearchParams(history.location.search);
+                searchParams.set('newTreatment', true);
+                searchParams.set('personId', person._id);
+                history.push(`?${searchParams.toString()}`);
+              }}>
               ＋
             </button>
             {Boolean(filteredData.length) && (
@@ -55,7 +48,15 @@ export const Treatments = ({ person }) => {
             <button type="button" name="cancel" className="button-cancel" onClick={() => setFullScreen(false)}>
               Fermer
             </button>
-            <button type="button" className="button-submit !tw-bg-blue-900" onClick={() => setModalOpen(true)}>
+            <button
+              type="button"
+              className="button-submit !tw-bg-blue-900"
+              onClick={() => {
+                const searchParams = new URLSearchParams(history.location.search);
+                searchParams.set('newTreatment', true);
+                searchParams.set('personId', person._id);
+                history.push(`?${searchParams.toString()}`);
+              }}>
               ＋ Ajouter un traitement
             </button>
           </ModalFooter>
@@ -69,16 +70,6 @@ export const Treatments = ({ person }) => {
           </div>
         )}
       </div>
-      {(Boolean(currentTreatment) || modalOpen) && (
-        <TreatmentModal
-          treatment={currentTreatment}
-          person={person}
-          onClose={() => {
-            history.goBack();
-            setModalOpen(false);
-          }}
-        />
-      )}
     </>
   );
 };
@@ -116,7 +107,9 @@ const TreatmentsTable = ({ filteredData, person }) => {
                 <div
                   className={['restricted-access'].includes(user.role) ? 'tw-cursor-not-allowed tw-py-2' : 'tw-cursor-pointer tw-py-2'}
                   onClick={() => {
-                    history.push(`/person/${person._id}?tab=Dossier+Médical&treatmentId=${treatment._id}`);
+                    const searchParams = new URLSearchParams(history.location.search);
+                    searchParams.set('treatmentId', treatment._id);
+                    history.push(`?${searchParams.toString()}`);
                   }}>
                   <div className="tw-flex">
                     <div className="tw-flex tw-flex-1 tw-items-center">

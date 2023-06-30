@@ -265,7 +265,8 @@ export function CommentsTable({ comments, onDisplayComment, onEditComment, onAdd
                           onEditComment(comment);
                           break;
                         }
-                        history.push(`/person/${comment.person}?tab=Dossier+Médical&treatmentId=${comment.treatment._id}`);
+                        searchParams.set('treatmentId', comment.treatment._id);
+                        history.push(`?${searchParams.toString()}`);
                         break;
                       default:
                         break;
@@ -316,7 +317,8 @@ export function CommentsTable({ comments, onDisplayComment, onEditComment, onAdd
                                   history.push(`?${searchParams.toString()}`);
                                   break;
                                 case 'treatment':
-                                  history.push(`/person/${comment.person}?tab=Dossier+Médical&treatmentId=${comment.treatment._id}`);
+                                  searchParams.set('treatmentId', comment.treatment._id);
+                                  history.push(`?${searchParams.toString()}`);
                                   break;
                                 case 'medical-file':
                                   history.push(`/person/${comment.person}?tab=Dossier+Médical`);

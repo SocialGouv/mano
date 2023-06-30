@@ -39,6 +39,7 @@ import SentryRoute from './components/Sentryroute';
 import { ENV, VERSION } from './config';
 import DuplicatedReportsTestChecker from './components/DuplicatedReportsTestChecker';
 import ConsultationModal from './components/ConsultationModal';
+import TreatmentModal from './scenes/person/components/TreatmentModal';
 
 RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = process.env.REACT_APP_DISABLE_RECOIL_DUPLICATE_ATOM_KEY_CHECKING ? false : true;
 
@@ -133,6 +134,7 @@ const App = ({ resetRecoil }) => {
         <DataLoader />
         <ActionModal />
         <ConsultationModal />
+        <TreatmentModal />
         <ModalConfirm />
       </Router>
     </div>

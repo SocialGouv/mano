@@ -434,6 +434,34 @@ export const arrayOfitemsGroupedByConsultationSelector = selector({
   },
 });
 
+export const itemsGroupedByTreatmentSelector = selector({
+  key: 'itemsGroupedByTreatmentSelector',
+  get: ({ get }) => {
+    const treatments = get(treatmentsState);
+    const personsWithPlacesObject = get(personsWithPlacesSelector);
+    const usersObject = get(usersObjectSelector);
+
+    const treatmentsObject = {};
+    for (const treatment of treatments) {
+      treatmentsObject[treatment._id] = {
+        ...treatment,
+        personPopulated: personsWithPlacesObject[treatment.person],
+        userPopulated: treatment.user ? usersObject[treatment.user] : null,
+      };
+    }
+    return treatmentsObject;
+  },
+});
+
+export const arrayOfitemsGroupedByTreatmentSelector = selector({
+  key: 'arrayOfitemsGroupedByTreatmentSelector',
+  get: ({ get }) => {
+    const itemsGroupedByTreatment = get(itemsGroupedByTreatmentSelector);
+    const itemsGroupedByTreatmentArray = Object.values(itemsGroupedByTreatment);
+    return itemsGroupedByTreatmentArray;
+  },
+});
+
 export const onlyFilledObservationsTerritories = selector({
   key: 'onlyFilledObservationsTerritories',
   get: ({ get }) => {

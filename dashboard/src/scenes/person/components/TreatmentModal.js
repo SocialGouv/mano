@@ -1,8 +1,9 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { Input, Label } from 'reactstrap';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useHistory, useLocation } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { organisationState, userState } from '../../../recoil/auth';
 import { outOfBoundariesDate } from '../../../services/date';
@@ -12,6 +13,40 @@ import { prepareTreatmentForEncryption, treatmentsState } from '../../../recoil/
 import DatePicker from '../../../components/DatePicker';
 import { CommentsModule } from '../../../components/CommentsGeneric';
 import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from '../../../components/tailwind/Modal';
+import { itemsGroupedByTreatmentSelector } from '../../../recoil/selectors';
+
+export default function TreatmentModal() {
+  const treatmentsObjects = useRecoilValue(itemsGroupedByTreatmentSelector);
+  const history = useHistory();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const currentTreatmentId = searchParams.get('treatmentId');
+  const newTreatment = searchParams.get('newTreatment');
+  const currentTreatment = useMemo(() => {
+    if (!currentTreatmentId) return null;
+    return treatmentsObjects[currentTreatmentId];
+  }, [currentTreatmentId, treatmentsObjects]);
+  const personId = searchParams.get('personId');
+
+  const [open, setOpen] = useState(false);
+  const consultationIdRef = useRef(currentTreatmentId);
+  const newConsultationRef = useRef(newTreatment);
+  useEffect(() => {
+    if (consultationIdRef.current !== currentTreatmentId) {
+      consultationIdRef.current = currentTreatmentId;
+      setOpen(!!currentTreatmentId);
+    }
+    if (newConsultationRef.current !== newTreatment) {
+      newConsultationRef.current = newTreatment;
+      setOpen(!!newTreatment);
+    }
+  }, [newTreatment, currentTreatmentId]);
+  return (
+    <ModalContainer open={open} size="3xl" onAfterLeave={history.goBack}>
+      <TreatmentContent key={open} personId={personId} treatment={currentTreatment} onClose={() => setOpen(false)} />
+    </ModalContainer>
+  );
+}
 
 /**
  * @param {Object} props
@@ -20,7 +55,7 @@ import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from '../../../co
  * @param {Object} props.treatment
  * @param {Object} props.person
  */
-export default function TreatmentModal({ onClose, treatment, person }) {
+function TreatmentContent({ onClose, treatment, personId }) {
   const setAllTreatments = useSetRecoilState(treatmentsState);
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
@@ -37,7 +72,7 @@ export default function TreatmentModal({ onClose, treatment, person }) {
         frequency: '',
         indication: '',
         user: user._id,
-        person: person._id,
+        person: personId,
         organisation: organisation._id,
         documents: [],
         comments: [],
@@ -48,7 +83,7 @@ export default function TreatmentModal({ onClose, treatment, person }) {
       comments: [],
       ...treatment,
     };
-  }, [isNewTreatment, treatment, user, person, organisation]);
+  }, [isNewTreatment, treatment, user, personId, organisation]);
   const [activeTab, setActiveTab] = useState('Informations');
 
   return (
@@ -188,7 +223,7 @@ export default function TreatmentModal({ onClose, treatment, person }) {
                 <Documents
                   title="Documents"
                   color="blue-900"
-                  personId={person._id}
+                  personId={personId}
                   documents={values.documents}
                   onAdd={async (docResponse) => {
                     const { data: file, encryptedEntityKey } = docResponse;
@@ -202,7 +237,7 @@ export default function TreatmentModal({ onClose, treatment, person }) {
                             encryptedEntityKey,
                             createdAt: new Date(),
                             createdBy: user._id,
-                            downloadPath: `/person/${person._id}/document/${file.filename}`,
+                            downloadPath: `/person/${personId}/document/${file.filename}`,
                             file,
                           },
                         ],

@@ -26,7 +26,7 @@ import CustomFieldDisplay from './CustomFieldDisplay';
 import { itemsGroupedByConsultationSelector } from '../recoil/selectors';
 
 export default function ConsultationModal() {
-  const actionsObjects = useRecoilValue(itemsGroupedByConsultationSelector);
+  const consultationsObjects = useRecoilValue(itemsGroupedByConsultationSelector);
   const history = useHistory();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -34,8 +34,8 @@ export default function ConsultationModal() {
   const newConsultation = searchParams.get('newConsultation');
   const currentConsultation = useMemo(() => {
     if (!currentConsultationId) return null;
-    return actionsObjects[currentConsultationId];
-  }, [currentConsultationId, actionsObjects]);
+    return consultationsObjects[currentConsultationId];
+  }, [currentConsultationId, consultationsObjects]);
   const personId = searchParams.get('personId');
   const date = searchParams.get('dueAt') || searchParams.get('completedAt');
 
