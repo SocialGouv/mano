@@ -1,4 +1,4 @@
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { organisationState, userState } from '../../../recoil/auth';
 import { Consultations } from './Consultations';
 import { InfosMain } from './InfosMain';
@@ -30,20 +30,19 @@ export default function MedicalFile({ person }) {
     return c;
   }, [customFieldsMedicalFile, flattenedCustomFieldsPersons]);
 
-  const [allMedicalFiles, setAllMedicalFiles] = useRecoilState(medicalFileState);
-  const medicalFile = useMemo(() => (allMedicalFiles || []).find((m) => m.person === person._id), [allMedicalFiles, person._id]);
+  const setAllMedicalFiles = useSetRecoilState(medicalFileState);
+  const medicalFile = person.medicalFile;
 
   useEffect(() => {
     if (!medicalFile) {
-      (async () => {
-        console.log('CRETAE MEDICAL FILE AGAIN');
-        const response = await API.post({
-          path: '/medical-file',
-          body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({ person: person._id, documents: [], organisation: organisation._id }),
-        });
+      console.log('Creating medical file');
+      API.post({
+        path: '/medical-file',
+        body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({ person: person._id, documents: [], organisation: organisation._id }),
+      }).then((response) => {
         if (!response.ok) return;
         setAllMedicalFiles((medicalFiles) => [...medicalFiles, response.decryptedData]);
-      })();
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [medicalFile]);

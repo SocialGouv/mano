@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useSetRecoilState, useRecoilValue } from 'recoil';
 import { v4 as uuidv4 } from 'uuid';
 import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../../recoil/medicalFiles';
 import { CommentsModule } from '../../../components/CommentsGeneric';
@@ -7,14 +7,15 @@ import API from '../../../services/api';
 
 const CommentsMedical = ({ person }) => {
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
-  const [allMedicalFiles, setAllMedicalFiles] = useRecoilState(medicalFileState);
+  const setAllMedicalFiles = useSetRecoilState(medicalFileState);
 
-  const medicalFile = useMemo(() => (allMedicalFiles || []).find((m) => m.person === person._id), [allMedicalFiles, person._id]);
+  const medicalFile = person.medicalFile;
   const commentsMedical = useMemo(
     () => [...(person?.commentsMedical || [])].sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt)),
     [person]
   );
 
+  console.log('commentsMedical', commentsMedical);
   return (
     <div className="tw-relative">
       <CommentsModule
@@ -47,13 +48,22 @@ const CommentsMedical = ({ person }) => {
           });
         }}
         onSubmitComment={async (comment, isNewComment) => {
+          console.log('comment', comment, isNewComment);
+          console.log('medicalFile', medicalFile);
           const newMedicalFile = {
             ...medicalFile,
             comments: isNewComment
               ? [{ ...comment, _id: uuidv4() }, ...(medicalFile.comments || [])]
-              : medicalFile.comments.map((c) => (c._id === comment._id ? comment : c)),
+              : medicalFile.comments.map((c) => {
+                  if (c._id === comment._id) {
+                    console.log('FOUND IT', c._id);
+                    return comment;
+                  }
+                  return c;
+                }),
           };
           // optimistic UI
+          console.log('newMedicalFile', newMedicalFile);
           setAllMedicalFiles((medicalFiles) => {
             return medicalFiles.map((_medicalFile) => {
               if (_medicalFile._id !== medicalFile._id) return _medicalFile;
@@ -65,6 +75,7 @@ const CommentsMedical = ({ person }) => {
             body: prepareMedicalFileForEncryption(customFieldsMedicalFile)(newMedicalFile),
           });
           if (!response.ok) return;
+          console.log('response', response.decryptedData);
           setAllMedicalFiles((medicalFiles) => {
             return medicalFiles.map((_medicalFile) => {
               if (_medicalFile._id !== medicalFile._id) return _medicalFile;

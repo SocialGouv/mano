@@ -231,7 +231,6 @@ export const itemsGroupedByPersonSelector = selector({
             consultation,
             person: consultation.person,
             type: 'consultation',
-            _id: comment.date + consultation._id,
           });
         }
       }
@@ -248,14 +247,21 @@ export const itemsGroupedByPersonSelector = selector({
             treatment,
             person: treatment.person,
             type: 'treatment',
-            _id: comment.date + treatment._id,
           });
         }
       }
       for (const medicalFile of medicalFiles) {
         if (!personsObject[medicalFile.person]) continue;
-        if (personsObject[medicalFile.person].medicalFile) continue;
-        personsObject[medicalFile.person].medicalFile = medicalFile;
+        if (personsObject[medicalFile.person].medicalFile) {
+          personsObject[medicalFile.person].medicalFile = {
+            ...medicalFile,
+            ...personsObject[medicalFile.person].medicalFile,
+            documents: [...(medicalFile?.documents || []), ...(personsObject[medicalFile.person].medicalFile?.documents || [])],
+            comments: [...(medicalFile?.comments || []), ...(personsObject[medicalFile.person].medicalFile?.comments || [])],
+          };
+        } else {
+          personsObject[medicalFile.person].medicalFile = medicalFile;
+        }
         personsObject[medicalFile.person].interactions.push(medicalFile.createdAt);
         for (const comment of medicalFile.comments || []) {
           personsObject[medicalFile.person].interactions.push(comment.date);
@@ -264,7 +270,6 @@ export const itemsGroupedByPersonSelector = selector({
             ...comment,
             person: medicalFile.person,
             type: 'medical-file',
-            _id: comment.date + medicalFile._id,
           });
         }
       }
