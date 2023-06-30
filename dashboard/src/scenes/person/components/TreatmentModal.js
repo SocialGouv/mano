@@ -372,7 +372,7 @@ function TreatmentContent({ onClose, treatment, personId }) {
               .filter(Boolean)
               .join(' ')}>
             <CommentsModule
-              comments={data.comments}
+              comments={data.comments.map((c) => ({ ...c, type: 'treatment', treatment }))}
               color="blue-900"
               typeForNewComment="treatment"
               onDeleteComment={async (comment) => {

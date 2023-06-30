@@ -333,8 +333,8 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
         title={
           <>
             {isNewAction && 'Ajouter une action'}
-            {!isNewAction && !isEditing && `Action: ${action.name}`}
-            {!isNewAction && isEditing && `Modifier l'action: ${action.name}`}
+            {!isNewAction && !isEditing && `Action: ${action?.name}`}
+            {!isNewAction && isEditing && `Modifier l'action: ${action?.name}`}
             {!isNewAction && action?.user && (
               <UserName
                 className="tw-block tw-text-right tw-text-base tw-font-normal tw-italic"
