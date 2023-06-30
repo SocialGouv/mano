@@ -26,6 +26,7 @@ test("test", async ({ page }) => {
   await changeReactSelectValue(page, "consultation-modal-type", "Médicale");
 
   await page.getByRole("button", { name: "Sauvegarder" }).click();
+  await page.getByText("Création réussie !").click();
   await page.getByText("Consultation Médicale", { exact: true }).click();
-  await page.getByRole("button", { name: "Fermer" }).click();
+  await page.getByRole("button", { name: "Fermer" }).first().click();
 });

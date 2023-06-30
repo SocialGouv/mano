@@ -57,7 +57,7 @@ test("Actions", async ({ page }) => {
       dialog.accept();
     });
     await page.getByRole("button", { name: "Supprimer" }).click();
-    await expect(page).toHaveURL("http://localhost:8090/action?calendarTab=2");
+    await expect(page).toHaveURL("http://localhost:8090/action");
 
     await page.getByText("Suppression réussie").click();
   });

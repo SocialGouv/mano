@@ -70,6 +70,7 @@ test("test", async ({ page }) => {
   await page.getByLabel("Commentaire").click();
   await page.getByLabel("Commentaire").fill("ajout passage");
   await page.getByRole("button", { name: "Enregistrer" }).click();
+  await page.getByText("Passages enregistrés").click();
 
   await page.getByRole("cell", { name: "ajout passage" }).click();
   await page.getByLabel("Commentaire").click();
