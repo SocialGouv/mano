@@ -180,6 +180,7 @@ export function CommentsFullScreen({ open, comments, onClose, title, color, onDi
 
 export function CommentsTable({ comments, onDisplayComment, onEditComment, onAddComment, color, showAddCommentButton, withClickableLabel }) {
   const users = useRecoilValue(usersState);
+  const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
   const history = useHistory();
   const location = useLocation();
@@ -254,7 +255,7 @@ export function CommentsTable({ comments, onDisplayComment, onEditComment, onAdd
                         break;
                       case 'consultation':
                         if (searchParams.get('consultationId') === comment.consultation._id) {
-                          onEditComment(comment);
+                          if (comment.user === user._id) onEditComment(comment);
                           break;
                         }
                         searchParams.set('consultationId', comment.consultation._id);
@@ -262,7 +263,7 @@ export function CommentsTable({ comments, onDisplayComment, onEditComment, onAdd
                         break;
                       case 'treatment':
                         if (searchParams.get('treatmentId') === comment.treatment._id) {
-                          onEditComment(comment);
+                          if (comment.user === user._id) onEditComment(comment);
                           break;
                         }
                         searchParams.set('treatmentId', comment.treatment._id);
