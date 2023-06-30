@@ -40,7 +40,7 @@ const useSearchParamState = (param, defaultAndInitialValue, { resetToDefaultIfTh
         const [sideEffectParam, sideEffectValue] = sideEffect;
         searchParams.set(sideEffectParam, setDataAsSearchParam(sideEffectValue));
       }
-      history.replace({ pathname: location.pathname, search: searchParams.toString() });
+      history.push({ pathname: location.pathname, search: searchParams.toString() });
       // returns the existing query string: '?type=fiction&author=fahid'
     }
     setState(newState);

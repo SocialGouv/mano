@@ -213,7 +213,7 @@ const RelPersonPlaceModal = ({ open, setOpen, person, relPersonPlaceModal, setPl
       <ModalBody>
         <form id="new-rel-person-place" className="tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8 tw-py-4" onSubmit={onSaveRelPersonPlace}>
           <div>
-            <label htmlFor="place" className="form-text tailwindui">
+            <label htmlFor="place" className="tailwindui">
               Lieu
             </label>
             <SelectCustom
@@ -256,7 +256,7 @@ const RelPersonPlaceModal = ({ open, setOpen, person, relPersonPlaceModal, setPl
             />
           </div>
           <div>
-            <label htmlFor="user" className="form-text tailwindui">
+            <label htmlFor="user" className="tailwindui">
               Enregistré par
             </label>
             <SelectUser inputId="user" value={userId} onChange={setUserId} />
@@ -343,7 +343,7 @@ const EditRelPersonPlaceModal = ({ open, setOpen, placeToEdit }) => {
       <ModalBody>
         <form id="edit-place-name" className="tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8 tw-py-4" onSubmit={onEditPlace}>
           <div>
-            <label htmlFor="place" className="form-text tailwindui">
+            <label htmlFor="place" className="tailwindui">
               Nouveau nom
             </label>
             <input

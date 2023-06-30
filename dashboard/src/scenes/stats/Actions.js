@@ -31,6 +31,8 @@ const ActionsStats = ({
   const [groupSlice, setGroupSlice] = useState(null);
   const [categorySlice, setCategorySlice] = useState(null);
 
+  console.log('actionsModalOpened', actionsModalOpened);
+
   const filteredActionsBySlice = useMemo(() => {
     if (groupSlice) {
       const withGroupSlice = {};
@@ -58,6 +60,8 @@ const ActionsStats = ({
     }
     return [];
   }, [actionsWithDetailedGroupAndCategories, groupSlice, categorySlice]);
+
+  console.log('filteredActionsBySlice', filteredActionsBySlice);
 
   const filterTitle = useMemo(() => {
     if (!filterPersons.length) return `Filtrer par personnes suivies :`;
@@ -164,9 +168,11 @@ const ActionsStats = ({
       <SelectedActionsModal
         open={actionsModalOpened}
         onClose={() => {
+          console.log('close');
           setActionsModalOpened(false);
         }}
         onAfterLeave={() => {
+          console.log('after leave');
           setGroupSlice(null);
           setCategorySlice(null);
         }}

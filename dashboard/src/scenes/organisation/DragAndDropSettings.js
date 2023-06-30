@@ -122,10 +122,10 @@ const DragAndDropSettings = ({
         <ModalBody>
           <form id="add-items-group-form" className="tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8" onSubmit={onAddGroupRequest}>
             <div>
-              <label htmlFor="groupTitle" className="form-text tailwindui">
+              <label htmlFor="groupTitle" className="tailwindui">
                 Titre du groupe
               </label>
-              <input type="text" id="groupTitle" name="groupTitle" placeholder="Titre du groupe" className="form-text tailwindui" />
+              <input type="text" id="groupTitle" name="groupTitle" placeholder="Titre du groupe" className="tailwindui" />
             </div>
           </form>
         </ModalBody>
@@ -240,10 +240,10 @@ const Group = ({
           <ModalBody>
             <form id="edit-category-group-form" className="tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8" onSubmit={onEditGroupTitle}>
               <div>
-                <label htmlFor="newGroupTitle" className="form-text tailwindui">
+                <label htmlFor="newGroupTitle" className="tailwindui">
                   Nouveau nom du groupe
                 </label>
-                <input type="text" id="newGroupTitle" name="newGroupTitle" placeholder={groupTitle} className="form-text tailwindui" />
+                <input type="text" id="newGroupTitle" name="newGroupTitle" placeholder={groupTitle} className="tailwindui" />
               </div>
             </form>
           </ModalBody>

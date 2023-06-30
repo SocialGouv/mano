@@ -27,7 +27,7 @@ export default function CustomFieldEditable({ isEditing, field }) {
         Nom (facultatif)
       </label>
       <input
-        className="form-text tailwindui"
+        className="tailwindui"
         id="create-consultation-name"
         name="name"
         value={data.name}

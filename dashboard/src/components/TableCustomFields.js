@@ -306,11 +306,11 @@ export const EditCustomField = ({ open, onDelete, data, editingField, onClose, o
         <form id="custom-field-form" className="tw-flex tw-w-full tw-flex-wrap tw-px-4" onSubmit={onSubmit}>
           <div className="tw-basis-full tw-p-4">
             <input type="hidden" name="name" value={field.name} />
-            <label htmlFor="label" className="form-text tailwindui">
+            <label htmlFor="label" className="tailwindui">
               Nom
             </label>
             <input
-              className="form-text tailwindui"
+              className="tailwindui"
               type="text"
               id="label"
               name="label"
@@ -323,7 +323,7 @@ export const EditCustomField = ({ open, onDelete, data, editingField, onClose, o
             {onlyOptionsEditable && <input type="hidden" name="label" value={field.label} />}
           </div>
           <div className="tw-basis-1/2 tw-p-4">
-            <label htmlFor="type" className="form-text tailwindui">
+            <label htmlFor="type" className="tailwindui">
               Type
             </label>
             <SelectCustom
@@ -344,7 +344,7 @@ export const EditCustomField = ({ open, onDelete, data, editingField, onClose, o
           <div className="tw-basis-1/2 tw-p-4">
             {!!['enum', 'multi-choice'].includes(field.type) && (
               <>
-                <label htmlFor="options" className="form-text tailwindui">
+                <label htmlFor="options" className="tailwindui">
                   Choix
                 </label>
                 <SelectDraggableAndEditable
@@ -392,7 +392,7 @@ export const EditCustomField = ({ open, onDelete, data, editingField, onClose, o
             )}
           </div>
           <div className="tw-basis-full tw-p-4">
-            <label htmlFor="enabledTeams" className="form-text tailwindui">
+            <label htmlFor="enabledTeams" className="tailwindui">
               Activé pour
             </label>
             <SelectTeamMultiple

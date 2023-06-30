@@ -54,8 +54,14 @@ export default function ActionModal() {
     }
   }, [newAction, currentActionId]);
 
+  const manualCloseRef = useRef(false);
+  const onAfterLeave = () => {
+    if (manualCloseRef.current) history.goBack();
+    manualCloseRef.current = false;
+  };
+
   return (
-    <ModalContainer open={open} size="3xl" onAfterLeave={history.goBack}>
+    <ModalContainer open={open} size="3xl" onAfterLeave={onAfterLeave}>
       <ActionContent
         key={open}
         personId={personId}
@@ -64,7 +70,10 @@ export default function ActionModal() {
         action={currentAction}
         completedAt={completedAt}
         dueAt={dueAt}
-        onClose={() => setOpen(false)}
+        onClose={() => {
+          manualCloseRef.current = true;
+          setOpen(false);
+        }}
       />
     </ModalContainer>
   );
@@ -79,6 +88,7 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
   const groups = useRecoilValue(groupsState);
   const setComments = useSetRecoilState(commentsState);
   const history = useHistory();
+  const location = useLocation();
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { refresh } = useDataLoader();
@@ -140,7 +150,6 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
       return response;
     };
     const body = { ...data };
-    console.log('body', body);
     let actionsId = [];
     // What is this strange case?
     if (typeof data.person === 'string') {
@@ -229,7 +238,10 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
         setComments((comments) => [res.decryptedData, ...comments]);
       }
     }
-    history.replace(`/action/${response.decryptedData._id}`);
+    const searchParams = new URLSearchParams(history.location.search);
+    searchParams.set('actionId', response.decryptedData._id);
+    history.push(`?${searchParams.toString()}`);
+    refresh();
   };
 
   const handleDelete = async () => {
@@ -272,39 +284,38 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
       path: `/action/${action._id}`,
       body: prepareActionForEncryption({ ...body, user: data.user || user._id }),
     });
-    if (actionResponse.ok) {
-      const newAction = actionResponse.decryptedData;
-      setActions((actions) =>
-        actions.map((a) => {
-          if (a._id === newAction._id) return newAction;
-          return a;
-        })
-      );
-      await createReportAtDateIfNotExist(newAction.createdAt);
-      if (!!newAction.completedAt) {
-        if (dayjsInstance(newAction.completedAt).format('YYYY-MM-DD') !== dayjsInstance(newAction.createdAt).format('YYYY-MM-DD')) {
-          await createReportAtDateIfNotExist(newAction.completedAt);
-        }
+    if (!actionResponse.ok) return;
+    const newAction = actionResponse.decryptedData;
+    setActions((actions) =>
+      actions.map((a) => {
+        if (a._id === newAction._id) return newAction;
+        return a;
+      })
+    );
+    await createReportAtDateIfNotExist(newAction.createdAt);
+    if (!!newAction.completedAt) {
+      if (dayjsInstance(newAction.completedAt).format('YYYY-MM-DD') !== dayjsInstance(newAction.createdAt).format('YYYY-MM-DD')) {
+        await createReportAtDateIfNotExist(newAction.completedAt);
       }
-      if (statusChanged) {
-        const comment = {
-          comment: `${user.name} a changé le status de l'action: ${mappedIdsToLabels.find((status) => status._id === newAction.status)?.name}`,
-          action: action._id,
-          team: currentTeam._id,
-          user: user._id,
-          organisation: organisation._id,
-        };
-        const commentResponse = await API.post({ path: '/comment', body: prepareCommentForEncryption(comment) });
-        if (commentResponse.ok) setComments((comments) => [commentResponse.decryptedData, ...comments]);
-      }
-      toast.success('Mise à jour !');
-      refresh();
-      const actionCancelled = action.status !== CANCEL && body.status === CANCEL;
-      if (actionCancelled && window.confirm('Cette action est annulée, voulez-vous la dupliquer ? Avec une date ultérieure par exemple')) {
-        handleDuplicate();
-      } else {
-        onClose();
-      }
+    }
+    if (statusChanged) {
+      const comment = {
+        comment: `${user.name} a changé le status de l'action: ${mappedIdsToLabels.find((status) => status._id === newAction.status)?.name}`,
+        action: action._id,
+        team: currentTeam._id,
+        user: user._id,
+        organisation: organisation._id,
+      };
+      const commentResponse = await API.post({ path: '/comment', body: prepareCommentForEncryption(comment) });
+      if (commentResponse.ok) setComments((comments) => [commentResponse.decryptedData, ...comments]);
+    }
+    toast.success('Mise à jour !');
+    if (location.pathname !== '/stats') refresh(); // if we refresh when we're on stats page, it will remove the view we're on
+    const actionCancelled = action.status !== CANCEL && body.status === CANCEL;
+    if (actionCancelled && window.confirm('Cette action est annulée, voulez-vous la dupliquer ? Avec une date ultérieure par exemple')) {
+      handleDuplicate();
+    } else {
+      onClose();
     }
   };
   const canSave = useMemo(() => {
@@ -324,7 +335,7 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
             {isNewAction && 'Ajouter une action'}
             {!isNewAction && !isEditing && 'Action'}
             {!isNewAction && isEditing && "Modifier l'action"}
-            {!isNewAction && action.user && (
+            {!isNewAction && action?.user && (
               <UserName
                 className="tw-block tw-text-right tw-text-base tw-font-normal tw-italic"
                 id={action.user}
@@ -383,7 +394,7 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
             </ul>
           )}
           <div className={['tw-flex tw-w-full tw-flex-wrap tw-p-4', activeTab !== 'Informations' ? 'tw-hidden' : ''].join(' ')}>
-            <div className="tw-flex tw-flex-row">
+            <div className="tw-flex tw-w-full tw-flex-row">
               <div className="tw-flex tw-flex-[2] tw-basis-2/3 tw-flex-col">
                 <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col">
                   <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="name">
@@ -585,8 +596,7 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
             </div>
           </div>
           {!['restricted-access'].includes(user.role) && (
-            <div
-              className={['tw-flex tw-min-h-1/2 tw-w-full tw-flex-col tw-gap-4 tw-px-8', activeTab !== 'Commentaires' ? 'tw-hidden' : ''].join(' ')}>
+            <div className={['tw-flex tw-min-h-1/2 tw-w-full tw-flex-col tw-gap-4', activeTab !== 'Commentaires' ? 'tw-hidden' : ''].join(' ')}>
               <CommentsModule
                 comments={action?.comments.map((comment) => ({ ...comment, type: 'action', person: action.person }))}
                 color="main"

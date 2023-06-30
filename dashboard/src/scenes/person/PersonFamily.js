@@ -203,16 +203,16 @@ const NewRelation = ({ open, setOpen, onAddFamilyLink, person }) => {
       <ModalBody>
         <form id="new-family-relation" className="tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8" onSubmit={onAddFamilyLink}>
           <div>
-            <label htmlFor="personId" className="form-text tailwindui">
+            <label htmlFor="personId" className="tailwindui">
               Nouvelle relation entre {person.name} et...
             </label>
             <SelectPerson name="personId" noLabel disableAccessToPerson inputId="person-family-relation" />
           </div>
           <div>
-            <label htmlFor="description" className="form-text tailwindui">
+            <label htmlFor="description" className="tailwindui">
               Relation/commentaire
             </label>
-            <input className="form-text tailwindui" id="description" name="description" type="text" placeholder="Père/fille, mère/fils..." />
+            <input className="tailwindui" id="description" name="description" type="text" placeholder="Père/fille, mère/fils..." />
           </div>
         </form>
       </ModalBody>
@@ -248,11 +248,11 @@ const EditRelation = ({ open, setOpen, onEditRelation, onDeleteRelation, relatio
           <input type="hidden" name="personId1" defaultValue={relationToEdit?.persons[0]} />
           <input type="hidden" name="personId2" defaultValue={relationToEdit?.persons[1]} />
           <div>
-            <label htmlFor="description" className="form-text tailwindui">
+            <label htmlFor="description" className="tailwindui">
               Relation/commentaire
             </label>
             <input
-              className="form-text tailwindui"
+              className="tailwindui"
               id="description"
               name="description"
               type="text"

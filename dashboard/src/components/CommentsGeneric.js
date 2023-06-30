@@ -187,10 +187,10 @@ export function CommentsTable({ comments, onDisplayComment, onEditComment, onAdd
   if (!comments.length) {
     return (
       <div className="tw-flex tw-flex-col tw-items-center tw-gap-6">
-        <div className="tw-mt-8 tw-w-full tw-text-center tw-text-gray-300">
+        <div className="tw-mt-8 tw-mb-2 tw-w-full tw-text-center tw-text-gray-300">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="tw-mx-auto tw-mb-2 tw-h-16 tw-w-16 tw-text-gray-200"
+            className="tw-mx-auto tw-h-16 tw-w-16 tw-text-gray-200"
             width={24}
             height={24}
             viewBox="0 0 24 24"
@@ -272,7 +272,7 @@ export function CommentsTable({ comments, onDisplayComment, onEditComment, onAdd
                         break;
                     }
                   }}>
-                  <div className="tw-flex tw-w-full tw-flex-col tw-gap-2 tw-overflow-hidden">
+                  <div className="tw-mx-auto tw-flex tw-w-full tw-max-w-prose tw-flex-col tw-gap-2 tw-overflow-hidden">
                     <div className="tw-mb-4 tw-flex tw-items-center tw-align-middle">
                       {!!comment.urgent && <ExclamationMarkButton className="tw-mr-4" />}
                       <div className="tw-text-xs tw-opacity-50">{formatDateTimeWithNameOfDay(comment.date || comment.createdAt)}</div>

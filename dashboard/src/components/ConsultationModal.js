@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
-import ReactDatePicker from 'react-datepicker';
+import DatePicker from './DatePicker';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'react-toastify';
@@ -8,7 +8,7 @@ import { CANCEL, DONE, TODO } from '../recoil/actions';
 import { currentTeamState, organisationState, teamsState, userState } from '../recoil/auth';
 import { consultationsState, defaultConsultationFields, prepareConsultationForEncryption } from '../recoil/consultations';
 import API from '../services/api';
-import { dateForDatePicker, dayjsInstance } from '../services/date';
+import { dayjsInstance } from '../services/date';
 import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
 import CustomFieldInput from './CustomFieldInput';
 import Documents from './Documents';
@@ -52,9 +52,25 @@ export default function ConsultationModal() {
       setOpen(!!newConsultation);
     }
   }, [newConsultation, currentConsultationId]);
+
+  const manualCloseRef = useRef(false);
+  const onAfterLeave = () => {
+    if (manualCloseRef.current) history.goBack();
+    manualCloseRef.current = false;
+  };
+
   return (
-    <ModalContainer open={open} size="3xl" onAfterLeave={history.goBack}>
-      <ConsultationContent key={open} personId={personId} consultation={currentConsultation} date={date} onClose={() => setOpen(false)} />
+    <ModalContainer open={open} size="3xl" onAfterLeave={onAfterLeave}>
+      <ConsultationContent
+        key={open}
+        personId={personId}
+        consultation={currentConsultation}
+        date={date}
+        onClose={() => {
+          manualCloseRef.current = true;
+          setOpen(false);
+        }}
+      />
     </ModalContainer>
   );
 }
@@ -169,6 +185,12 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
 
   const canEdit = useMemo(() => !consultation || consultation.user === user._id, [consultation, user._id]);
 
+  const handleChange = (event) => {
+    const target = event.currentTarget || event.target;
+    const { name, value } = target;
+    setData((data) => ({ ...data, [name]: value }));
+  };
+
   return (
     <>
       <ModalHeader
@@ -177,7 +199,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
             {isNewConsultation && 'Ajouter une consultation'}
             {!isNewConsultation && !isEditing && 'Consultation'}
             {!isNewConsultation && isEditing && 'Modifier la consultation'}
-            {!isNewConsultation && consultation.user && (
+            {!isNewConsultation && consultation?.user && (
               <UserName
                 className="tw-block tw-text-right tw-text-base tw-font-normal tw-italic"
                 id={consultation.user}
@@ -260,15 +282,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                 Personne suivie
               </label>
               {isEditing ? (
-                <SelectPerson
-                  noLabel
-                  value={data.person}
-                  onChange={(e) => {
-                    setData({ ...data, person: e.currentTarget.value });
-                  }}
-                  isMulti={false}
-                  inputId="create-consultation-person-select"
-                />
+                <SelectPerson noLabel value={data.person} onChange={handleChange} isMulti={false} inputId="create-consultation-person-select" />
               ) : (
                 <PersonName item={data} />
               )}
@@ -299,13 +313,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                 Nom (facultatif)
               </label>
               {isEditing ? (
-                <input
-                  className="form-text tailwindui"
-                  id="create-consultation-name"
-                  name="name"
-                  value={data.name}
-                  onChange={(e) => setData({ ...data, name: e.currentTarget.value })}
-                />
+                <input className="tailwindui" id="create-consultation-name" name="name" value={data.name} onChange={handleChange} />
               ) : (
                 <CustomFieldDisplay type="text" value={data.name} />
               )}
@@ -322,9 +330,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                   inputId="consultation-modal-type"
                   classNamePrefix="consultation-modal-type"
                   value={data.type}
-                  onChange={(e) => {
-                    setData({ ...data, type: e.currentTarget.value });
-                  }}
+                  onChange={handleChange}
                   placeholder="-- Type de consultation --"
                   options={organisation.consultations.map((e) => e.name)}
                 />
@@ -338,7 +344,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
               .map((field) => {
                 if (!isEditing) {
                   return (
-                    <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
+                    <div key={field.name} className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
                       <label className="tw-text-sm tw-font-semibold tw-text-blue-900" htmlFor="type">
                         {field.label}
                       </label>
@@ -351,9 +357,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                     colWidth={field.type === 'textarea' ? 12 : 6}
                     model="person"
                     values={data}
-                    handleChange={(e) => {
-                      setData({ ...data, [(e.currentTarget || e.target).name]: (e.currentTarget || e.target).value });
-                    }}
+                    handleChange={handleChange}
                     field={field}
                     key={field.name}
                   />
@@ -388,9 +392,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                 <SelectStatus
                   name="status"
                   value={data.status || ''}
-                  onChange={(e) => {
-                    setData({ ...data, status: e.target.value });
-                  }}
+                  onChange={handleChange}
                   inputId="new-consultation-select-status"
                   classNamePrefix="new-consultation-select-status"
                 />
@@ -404,18 +406,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
               </label>
               <div>
                 {canEdit ? (
-                  <ReactDatePicker
-                    locale="fr"
-                    className="form-control"
-                    id="create-consultation-dueat"
-                    selected={dateForDatePicker(data.dueAt)}
-                    onChange={(dueAt) => {
-                      setData({ ...data, dueAt });
-                    }}
-                    timeInputLabel="Heure :"
-                    dateFormat={'dd/MM/yyyy HH:mm'}
-                    showTimeInput
-                  />
+                  <DatePicker withTime id="create-consultation-dueat" name="dueAt" defaultValue={data.dueAt ?? new Date()} onChange={handleChange} />
                 ) : (
                   <CustomFieldDisplay type="date-with-time" value={data.dueAt} />
                 )}
@@ -429,25 +420,14 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
               </label>
               <div>
                 {canEdit ? (
-                  <ReactDatePicker
-                    locale="fr"
-                    className="form-control"
-                    id="create-consultation-completedAt"
-                    selected={dateForDatePicker(data.completedAt || dayjsInstance())}
-                    onChange={(completedAt) => {
-                      setData({ ...data, completedAt });
-                    }}
-                    timeInputLabel="Heure :"
-                    dateFormat={'dd/MM/yyyy HH:mm'}
-                    showTimeInput
-                  />
+                  <DatePicker withTime id="create-consultation-completedAt" defaultValue={data.completedAt ?? new Date()} onChange={handleChange} />
                 ) : (
                   <CustomFieldDisplay type="date-with-time" value={data.completedAt} />
                 )}
               </div>
             </div>
           </div>
-          <div className={['tw-flex tw-min-h-1/2 tw-w-full tw-flex-col tw-gap-4 tw-px-8', activeTab !== 'Documents' ? 'tw-hidden' : ''].join(' ')}>
+          <div className={['tw-flex tw-min-h-1/2 tw-w-full tw-flex-col tw-gap-4', activeTab !== 'Documents' ? 'tw-hidden' : ''].join(' ')}>
             {data.person && (
               <Documents
                 personId={data.person}
@@ -471,32 +451,36 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                     ],
                   };
                   setData(newData);
-                  handleSubmit({ newData });
+                  const ok = await handleSubmit({ newData });
+                  if (ok) toast.success('Document ajouté');
                 }}
                 onDelete={async (document) => {
                   const newData = { ...data, documents: data.documents.filter((d) => d._id !== document._id) };
                   setData(newData);
-                  handleSubmit({ newData });
+                  const ok = await handleSubmit({ newData });
+                  if (ok) toast.success('Document supprimé');
                 }}
               />
             )}
           </div>
-          <div className={['tw-flex tw-min-h-1/2 tw-w-full tw-flex-col tw-gap-4 tw-px-8', activeTab !== 'Commentaires' ? 'tw-hidden' : ''].join(' ')}>
+          <div className={['tw-flex tw-min-h-1/2 tw-w-full tw-flex-col tw-gap-4', activeTab !== 'Commentaires' ? 'tw-hidden' : ''].join(' ')}>
             <CommentsModule
               comments={data.comments.map((c) => ({ ...c, type: 'consultation', consultation }))}
               color="blue-900"
               typeForNewComment="consultation"
-              onDeleteComment={(comment) => {
+              onDeleteComment={async (comment) => {
                 const newData = { ...data, comments: data.comments.filter((c) => c._id !== comment._id) };
                 setData(newData);
-                handleSubmit({ newData });
+                const ok = await handleSubmit({ newData });
+                if (ok) toast.success('Commentaire supprimé');
               }}
-              onSubmitComment={(comment, isNewComment) => {
+              onSubmitComment={async (comment, isNewComment) => {
                 const newData = isNewComment
                   ? { ...data, comments: [{ ...comment, _id: uuidv4() }, ...data.comments] }
                   : { ...data, comments: data.comments.map((c) => (c._id === comment._id ? comment : c)) };
                 setData(newData);
-                handleSubmit({ newData });
+                const ok = await handleSubmit({ newData });
+                if (ok) toast.success('Commentaire enregistré');
               }}
             />
           </div>

@@ -40,7 +40,7 @@ const Documents = ({
           Aucun document pour le moment
         </div>
       )}
-      <div className="tw-my-1.5 tw-flex tw-items-center tw-justify-between">
+      <div className="tw-my-2 tw-flex tw-items-center tw-justify-between">
         {!!onAdd && (
           <div className="tw-mx-auto tw-flex">
             <label className={`button-submit !tw-bg-${color}`}>

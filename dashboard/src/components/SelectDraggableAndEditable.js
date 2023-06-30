@@ -82,11 +82,11 @@ const SelectDraggableAndEditable = ({ onChange, classNamePrefix, value, onEditCh
         <ModalBody>
           <form id="edit-choice-form" className="tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8">
             <div>
-              <label htmlFor="newChoice" className="form-text tailwindui">
+              <label htmlFor="newChoice" className="tailwindui">
                 Nouveau nom du choix
               </label>
               <input
-                className="form-text tailwindui"
+                className="tailwindui"
                 id="newChoice"
                 name="newChoice"
                 type="text"

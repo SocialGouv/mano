@@ -1,6 +1,13 @@
 export function DocumentIcon() {
   return (
-    <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="tw-mx-auto tw-mb-2 tw-h-16 tw-w-16 tw-text-gray-200">
+    <svg
+      fill="none"
+      width={24}
+      height={24}
+      viewBox="0 0 24 24"
+      strokeWidth={1.5}
+      stroke="currentColor"
+      className="tw-mx-auto tw-mb-2 tw-h-16 tw-w-16 tw-text-gray-200">
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
