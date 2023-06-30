@@ -99,10 +99,10 @@ test("test", async ({ page }) => {
 
   await page.getByText("consult abc").click();
   await expect(page).toHaveURL(
-    /http:\/\/localhost:8090\/action?calendarTab=2&calendarDate=\/[0-9]{4}-[0-9]{2}-[0-9]{2}\&consultationId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
+    /http:\/\/localhost:8090\/action\?calendarTab=2&calendarDate=[0-9]{4}-[0-9]{2}-[0-9]{2}&consultationId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
   );
 
-  await page.getByRole("button", { name: "Annuler" }).click();
+  await page.getByRole("button", { name: "Fermer" }).first().click();
   await expect(page).toHaveURL(`http://localhost:8090/action?calendarTab=2&calendarDate=${dayjs().add(-1, "day").format("YYYY-MM-DD")}`);
 
   await page.getByRole("link", { name: "Personnes suivies" }).click();
@@ -116,10 +116,10 @@ test("test", async ({ page }) => {
 
   await page.locator('[data-test-id="faite"]').getByText("faite").click();
   await expect(page).toHaveURL(
-    /http:\/\/localhost:8090\/action?calendarTab=2&calendarDate=\/[0-9]{4}-[0-9]{2}-[0-9]{2}\&consultationId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
+    /http:\/\/localhost:8090\/action\?calendarTab=2&consultationId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
   );
 
-  await page.getByRole("button", { name: "Annuler" }).click();
+  await page.getByRole("button", { name: "Fermer" }).first().click();
   await expect(page).toHaveURL("http://localhost:8090/action?calendarTab=2");
 
   await page.getByRole("link", { name: "Comptes rendus" }).click();
@@ -134,10 +134,10 @@ test("test", async ({ page }) => {
 
   await page.locator('[data-test-id="faite"]').getByText("faite").click();
   await expect(page).toHaveURL(
-    /http:\/\/localhost:8090\/report\/[0-9]{4}-[0-9]{2}-[0-9]{2}\?reportsTeam=%5B%22[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}%22%5D&consultationId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
+    /http:\/\/localhost:8090\/report\/[0-9]{4}-[0-9]{2}-[0-9]{2}\?reportsTeam=%5B%22[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}%22%5D&tab=consultations-created&consultationId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
   );
 
-  await page.getByRole("button", { name: "Annuler" }).click();
+  await page.getByRole("button", { name: "Fermer" }).first().click();
   await expect(page).toHaveURL(
     /http:\/\/localhost:8090\/report\/[0-9]{4}-[0-9]{2}-[0-9]{2}\?reportsTeam=%5B%22[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}%22%5D/
   );
@@ -150,10 +150,10 @@ test("test", async ({ page }) => {
 
   await page.locator('[data-test-id="consult abc"]').getByText("consult abc").click();
   await expect(page).toHaveURL(
-    /http:\/\/localhost:8090\/report\/[0-9]{4}-[0-9]{2}-[0-9]{2}\?reportsTeam=%5B%22[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}%22%5D&consultationId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
+    /http:\/\/localhost:8090\/report\/[0-9]{4}-[0-9]{2}-[0-9]{2}\?reportsTeam=%5B%22[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}%22%5D&tab=consultations-created&consultationId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
   );
 
-  await page.getByRole("button", { name: "Annuler" }).click();
+  await page.getByRole("button", { name: "Fermer" }).first().click();
   await expect(page).toHaveURL(
     /http:\/\/localhost:8090\/report\/[0-9]{4}-[0-9]{2}-[0-9]{2}\?reportsTeam=%5B%22[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}%22%5D/
   );
@@ -161,11 +161,11 @@ test("test", async ({ page }) => {
 
   await page.locator('[data-test-id="faite"]').getByText("faite").click();
   await expect(page).toHaveURL(
-    /http:\/\/localhost:8090\/report\/[0-9]{4}-[0-9]{2}-[0-9]{2}\?reportsTeam=%5B%22[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}%22%5D&consultationId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
+    /http:\/\/localhost:8090\/report\/[0-9]{4}-[0-9]{2}-[0-9]{2}\?reportsTeam=%5B%22[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}%22%5D&tab=consultations&consultationId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
   );
 
-  await page.getByRole("button", { name: "Annuler" }).click();
+  await page.getByRole("button", { name: "Fermer" }).first().click();
   await expect(page).toHaveURL(
-    /http:\/\/localhost:8090\/report\/[0-9]{4}-[0-9]{2}-[0-9]{2}\?reportsTeam=%5B%22[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}%22%5D/
+    /http:\/\/localhost:8090\/report\/[0-9]{4}-[0-9]{2}-[0-9]{2}\?reportsTeam=%5B%22[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}%22%5D&tab=consultations/
   );
 });
