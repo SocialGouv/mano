@@ -333,8 +333,8 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
         title={
           <>
             {isNewAction && 'Ajouter une action'}
-            {!isNewAction && !isEditing && 'Action'}
-            {!isNewAction && isEditing && "Modifier l'action"}
+            {!isNewAction && !isEditing && `Action: ${action.name}`}
+            {!isNewAction && isEditing && `Modifier l'action: ${action.name}`}
             {!isNewAction && action?.user && (
               <UserName
                 className="tw-block tw-text-right tw-text-base tw-font-normal tw-italic"
@@ -365,7 +365,7 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
             if (!data._id) return handleCreateAction();
             return handleUpdateAction();
           }}>
-          {!['restricted-access'].includes(user.role) && (
+          {!['restricted-access'].includes(user.role) && data?._id && (
             <ul className="noprint tw-mb-5 tw-mt-4 tw-flex tw-list-none tw-flex-wrap tw-border-b tw-border-zinc-200 tw-px-2">
               <li className="tw-cursor-pointer">
                 <button

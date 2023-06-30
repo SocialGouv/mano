@@ -223,7 +223,13 @@ const Comments = ({ setShowModal, comments }) => {
           dataTestId="comment"
           onRowClick={(comment) => {
             setShowModal(false);
-            history.push(`/${comment.type}/${comment[comment.type]}`);
+            if (comment.type === 'action') {
+              const searchParams = new URLSearchParams(history.location.search);
+              searchParams.set('actionId', comment.action);
+              history.push(`?${searchParams.toString()}`);
+            } else {
+              history.push(`/person/${comment.person}`);
+            }
           }}
           columns={[
             {

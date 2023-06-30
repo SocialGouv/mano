@@ -142,7 +142,6 @@ function TreatmentContent({ onClose, treatment, personId }) {
     setData(treatmentResponse.decryptedData);
     if (isNewTreatment) {
       setAllTreatments((all) => [...all, treatmentResponse.decryptedData].sort((a, b) => new Date(b.startDate) - new Date(a.startDate)));
-      toast.success('Traitement créé !');
     } else {
       setAllTreatments((all) =>
         all
@@ -202,7 +201,8 @@ function TreatmentContent({ onClose, treatment, personId }) {
           onSubmit={async (e) => {
             e.preventDefault();
             const ok = handleSubmit({ closeOnSubmit: true });
-            if (ok) toast.success('Traitement mis à jour !');
+            if (ok && isNewTreatment) toast.success('Traitement créé !');
+            if (ok && !isNewTreatment) toast.success('Traitement mis à jour !');
           }}>
           <ul className="noprint tw-mb-5 tw-mt-4 tw-flex tw-list-none tw-flex-wrap tw-border-b tw-border-zinc-200 tw-px-2">
             <li className="tw-cursor-pointer">

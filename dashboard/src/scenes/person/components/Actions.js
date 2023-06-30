@@ -13,6 +13,7 @@ import { formatDateWithNameOfDay, formatTime } from '../../../services/date';
 import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from '../../../components/tailwind/Modal';
 import { AgendaMutedIcon } from './AgendaMutedIcon';
 import { FullScreenIcon } from './FullScreenIcon';
+import UserName from '../../../components/UserName';
 
 export const Actions = ({ person }) => {
   const data = person?.actions || [];
@@ -23,7 +24,7 @@ export const Actions = ({ person }) => {
   const history = useHistory();
 
   return (
-    <div className="tw-relative">
+    <section title="Actions de la personne suivie" className="tw-relative">
       <div className="tw-sticky tw-top-0 tw-flex tw-bg-white tw-p-3">
         <h4 className="tw-flex-1 tw-text-xl">Actions {filteredData.length ? `(${filteredData.length})` : ''}</h4>
         <div className="flex-col tw-flex tw-items-center tw-gap-2">
@@ -86,7 +87,7 @@ export const Actions = ({ person }) => {
         </ModalFooter>
       </ModalContainer>
       <ActionsTable filteredData={filteredData} />
-    </div>
+    </section>
   );
 };
 
@@ -181,6 +182,10 @@ const ActionsTable = ({ filteredData }) => {
                         {Array.isArray(action?.teams) ? action.teams.map((e) => <TagTeam key={e} teamId={e} />) : <TagTeam teamId={action?.team} />}
                       </div>
                     </div>
+                  </div>
+                  <div className="tw-mt-2 -tw-mb-2 tw-flex tw-basis-full tw-gap-1 tw-text-xs tw-opacity-50 [overflow-wrap:anywhere]">
+                    <span>Créée par</span>
+                    <UserName id={action.user} />
                   </div>
                 </div>
               </td>

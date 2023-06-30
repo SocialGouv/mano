@@ -1,18 +1,12 @@
 import { test, expect, Page } from "@playwright/test";
 import { nanoid } from "nanoid";
 import { populate } from "./scripts/populate-db";
-import { changeReactSelectValue, clickOnEmptyReactSelect, createAction, loginWith } from "./utils";
+import { changeReactSelectValue, createAction, loginWith } from "./utils";
 
 test.beforeAll(async () => {
   await populate();
 });
 test.setTimeout(120000);
-const createGroup = async (page: Page, groupName: string) => {
-  await page.getByRole("button", { name: "Ajouter un groupe" }).click();
-  await page.getByLabel("Titre du groupe").fill(groupName);
-  await page.getByRole("dialog", { name: "Ajouter un groupe de catégories" }).getByRole("button", { name: "Ajouter" }).click();
-  await page.getByText("Groupe ajouté").click();
-};
 
 test("Actions", async ({ page }) => {
   const personName = nanoid();
@@ -38,7 +32,7 @@ test("Actions", async ({ page }) => {
   await test.step("Update action", async () => {
     await page.getByRole("link", { name: "Agenda" }).click();
     await page.getByText(action1Name).click();
-
+    await page.getByRole("button", { name: "Modifier" }).click();
     await page.getByLabel("Nom").fill(action2Name);
     await page.getByLabel("Description").fill("plouf");
 
@@ -46,17 +40,17 @@ test("Actions", async ({ page }) => {
     await page.getByLabel("Montrer l'heure").check();
     await page.getByLabel("À faire le").fill("2002-12-11T11:11");
 
-    await page.getByRole("button", { name: "Mettre à jour" }).click();
+    await page.getByRole("button", { name: "Sauvegarder" }).click();
     await page.getByText("Mise à jour !").click();
 
+    await page.getByText(action2Name).click();
     await changeReactSelectValue(page, "update-action-select-status", "FAITE");
-
-    await page.getByRole("button", { name: "Mettre à jour" }).click();
+    await page.getByRole("button", { name: "Sauvegarder" }).click();
     await page.getByText("Mise à jour !").click();
 
+    await page.getByText(action1Name).click();
     await page.getByLabel("À faire le").fill("2002-12-12T11:11");
-
-    await page.getByRole("button", { name: "Mettre à jour" }).click();
+    await page.getByRole("button", { name: "Sauvegarder" }).click();
     await page.getByText("Mise à jour !").click();
 
     page.once("dialog", (dialog) => {
