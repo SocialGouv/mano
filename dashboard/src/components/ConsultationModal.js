@@ -348,7 +348,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
               .map((field) => {
                 if (!isEditing) {
                   return (
-                    <div key={field.name} className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
+                    <div data-test-id={field.label} key={field.name} className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
                       <label className="tw-text-sm tw-font-semibold tw-text-blue-900" htmlFor="type">
                         {field.label}
                       </label>

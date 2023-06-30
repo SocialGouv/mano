@@ -236,10 +236,10 @@ test("Create custom fields filtered by team", async ({ page }) => {
 
   await page.getByRole("button", { name: "Dossier Médical" }).click();
   await page.getByText(testMedicalFileField).click();
-  await page.getByText("- Médicale").click();
+  await page.getByText("Consult- Médicale").click();
   await page.locator(`data-test-id=${testConsultationField}`).click();
 
-  await page.getByRole("button", { name: "Annuler" }).click();
+  await page.getByRole("button", { name: "Fermer" }).first().click();
 
   await page.getByRole("link", { name: "Territoires" }).click();
   await expect(page).toHaveURL("http://localhost:8090/territory");
@@ -274,9 +274,9 @@ test("Create custom fields filtered by team", async ({ page }) => {
 
   await page.getByRole("button", { name: "Dossier Médical" }).click();
   await expect(page.getByText(testMedicalFileField)).toBeHidden();
-  await page.getByText("- Médicale").click();
+  await page.getByText("Consult- Médicale").click();
   await expect(page.locator(`data-test-id=${testConsultationField}`)).toBeHidden();
-  await page.getByRole("button", { name: "Annuler" }).click();
+  await page.getByRole("button", { name: "Fermer" }).first().click();
 
   await page.getByRole("link", { name: "Territoires" }).click();
   await expect(page).toHaveURL("http://localhost:8090/territory");
