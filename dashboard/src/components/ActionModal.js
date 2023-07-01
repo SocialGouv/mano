@@ -654,7 +654,7 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
         <button name="Fermer" type="button" className="button-cancel" onClick={() => onClose()}>
           Fermer
         </button>
-        {!isNewAction && !!isEditing && (
+        {!['restricted-access'].includes(user.role) && !isNewAction && !!isEditing && (
           <button type="button" name="cancel" disabled={!canEdit} className="button-destructive" onClick={handleDelete}>
             Supprimer
           </button>

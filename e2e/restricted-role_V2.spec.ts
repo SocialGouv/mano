@@ -7,7 +7,6 @@ test.beforeAll(async () => {
   await populate();
 });
 
-await page.getByText("descriptionanepasvoir").click();
 test("test", async ({ page }) => {
   await loginWith(page, "admin8@example.org");
 
@@ -23,7 +22,6 @@ test("test", async ({ page }) => {
 
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
-  await page.getByLabel("Nom").click();
   await page.getByLabel("Nom").fill("testrestrict");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
@@ -32,11 +30,8 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
   await page.getByRole("button", { name: "Ajouter une action" }).click();
-  await page.getByLabel("Description").click();
   await page.getByLabel("Description").fill("descriptionanepasvoir");
-  await page.getByLabel("Nom de l'action").click();
   await page.getByLabel("Nom de l'action").fill("Action2");
-  await page.getByLabel("Commentaire (optionnel)").click();
   await page.getByLabel("Commentaire (optionnel)").fill("commentaireanepasvoir");
   await page.getByLabel("Commentaire (optionnel)").click();
   await page.getByLabel("Commentaire (optionnel)").fill("commentaireanepasvoir ");
@@ -54,14 +49,12 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Commentaire enregistré").click();
   await page.getByRole("button", { name: "Ajouter un passage" }).click();
-  await page.getByLabel("Commentaire").click();
-  await page.getByLabel("Commentaire").fill("passage a voir par restricted");
+  await page.getByRole("dialog").getByLabel("Commentaire", { exact: true }).fill("passage a voir par restricted");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Passage enregistré").click();
   await page.getByRole("button", { name: "Rencontres (0)" }).click();
   await page.getByRole("button", { name: "Ajouter une rencontre" }).click();
-  await page.getByLabel("Commentaire").click();
-  await page.getByLabel("Commentaire").fill("idem");
+  await page.getByRole("dialog").getByLabel("Commentaire", { exact: true }).fill("idem");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Rencontre enregistrée").click();
 
@@ -92,7 +85,6 @@ test("test", async ({ page }) => {
   await page.getByRole("link", { name: "Accueil" }).click();
   await page.getByRole("link", { name: "Territoires" }).click();
   await page.getByRole("button", { name: "Créer un nouveau territoire" }).click();
-  await page.getByLabel("Nom").click();
   await page.getByLabel("Nom").fill("nouveauterritoire");
   await page.getByLabel("Périmètre").click();
   await clickOnEmptyReactSelect(page, "territory-select-types", "Lieu de deal");
@@ -103,13 +95,11 @@ test("test", async ({ page }) => {
   await page.getByLabel("Nombre de personnes non connues hommes rencontrées").fill("3");
   await page.getByLabel("Nombre de personnes non connues femmes rencontrées").click();
   await page.getByLabel("Nombre de personnes non connues femmes rencontrées").fill("4");
-  await page.getByLabel("Commentaire").click();
-  await page.getByLabel("Commentaire").fill("commentaire");
+  await page.getByRole("dialog").getByLabel("Commentaire", { exact: true }).fill("commentaire");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
   await page.getByRole("button", { name: "Nouvelle observation" }).click();
-  await page.getByLabel("Commentaire").click();
-  await page.getByLabel("Commentaire").fill("pouvoir supprimer");
+  await page.getByRole("dialog").getByLabel("Commentaire", { exact: true }).fill("pouvoir supprimer");
   await page.locator(".observation-custom-select-présence-policière__input-container").click();
   await page.locator(".observation-custom-select-présence-policière__input-container").click();
   await page.getByRole("button", { name: "Sauvegarder" }).click();
@@ -151,32 +141,31 @@ test("test", async ({ page }) => {
   // test sur les actions restricted
   await page.getByRole("link", { name: "Accueil" }).click();
   await page.getByText("Action2").click();
-  await page.getByLabel("Nom").click();
-  await page.getByLabel("Nom").fill("Action");
+  await page.getByRole("button", { name: "Modifier", exact: true }).click();
+  await page.getByLabel("Nom de l'action").fill("Action");
 
   // à ne pas voir concernant les actions
   await expect(page.getByLabel("Description")).not.toBeVisible();
   await expect(page.getByRole("heading", { name: "Commentaires" })).not.toBeVisible();
-  await expect(page.getByRole("button", { name: "supprimer" })).not.toBeVisible();
-  await page.getByRole("button", { name: "Mettre à jour" }).click();
+  await expect(page.getByRole("button", { name: "Supprimer" })).not.toBeVisible();
+  await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Mise à jour !").click();
   await page.getByText("Retour").click();
-  await page.getByText("Loading...Action").click();
   await page.getByLabel("Nom de l'action").fill("pouvoirajouteruneaction");
   await clickOnEmptyReactSelect(page, "create-action-person-select", "testrestrict");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await page.getByText("testrestrict").click();
-  await page.getByRole("button", { name: "Modifier" }).click();
+  await page.getByRole("button", { name: "Modifier", exact: true }).click();
   await page.getByLabel("Autres pseudos").click();
   await page.getByLabel("Autres pseudos").fill("ajouterdesinfos");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Mis à jour !").click();
   await page.getByText("pouvoirajouteruneaction").click();
-  await page.getByLabel("Nom").click();
-  await page.getByLabel("Nom").fill("pouvoirajouteruneactio");
-  await page.getByRole("button", { name: "Mettre à jour" }).click();
+  await page.getByRole("button", { name: "Modifier", exact: true }).click();
+  await page.getByLabel("Nom de l'action").fill("pouvoirajouteruneactio");
+  await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Mise à jour !").click();
 
   await page.getByText("Retour").click();
@@ -190,7 +179,7 @@ test("test", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Informations administratives" })).not.toBeVisible();
   await expect(page.getByRole("heading", { name: "Commentaires (2)" })).not.toBeVisible();
 
-  await page.getByRole("button", { name: "Modifier" }).click();
+  await page.getByRole("button", { name: "Modifier", exact: true }).click();
   await page.getByLabel("Autres pseudos").click();
   await page.getByLabel("Autres pseudos").fill("modifier");
   await page.getByRole("button", { name: "Enregistrer" }).click();
@@ -198,13 +187,11 @@ test("test", async ({ page }) => {
 
   //test sur les passages
   await page.getByRole("button", { name: "Ajouter un passage" }).click();
-  await page.getByLabel("Commentaire").click();
-  await page.getByLabel("Commentaire").fill("pouvoir ajouter des passage avec commentaires");
+  await page.getByRole("dialog").getByLabel("Commentaire", { exact: true }).fill("pouvoir ajouter des passage avec commentaires");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Passage enregistré").click();
   await page.getByText("passage a voir par restricted").click();
-  await page.getByLabel("Commentaire").click();
-  await page.getByLabel("Commentaire").fill("peut modifier le passage");
+  await page.getByRole("dialog").getByLabel("Commentaire", { exact: true }).fill("peut modifier le passage");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Passage mis à jour").click();
 
@@ -221,16 +208,14 @@ test("test", async ({ page }) => {
   });
   await page.getByRole("button", { name: "Supprimer l'observation" }).nth(1).click();
   await page.getByRole("button", { name: "Nouvelle observation" }).click();
-  await page.getByLabel("Commentaire").click();
-  await page.getByLabel("Commentaire").fill("ajout d'une observation");
+  await page.getByRole("dialog").getByLabel("Commentaire", { exact: true }).fill("ajout d'une observation");
   await page.getByLabel("Nombre de personnes non connues femmes rencontrées").click();
   await page.getByLabel("Nombre de personnes non connues femmes rencontrées").fill("4");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
   await page.getByText("Nombre de personnes non connues hommes rencontrées: 3Nombre de personnes non con").click();
   await page.getByRole("dialog").click();
-  await page.getByLabel("Commentaire").click();
-  await page.getByLabel("Commentaire").fill("modifier une observation");
+  await page.getByRole("dialog").getByLabel("Commentaire", { exact: true }).fill("modifier une observation");
   await page.getByLabel("Nombre de personnes non connues hommes rencontrées").click();
   await page.getByLabel("Nombre de personnes non connues hommes rencontrées").fill("2");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
@@ -241,8 +226,7 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: today }).click();
   await page.getByText("Observations (4)").click();
   await page.getByRole("button", { name: "Ajouter une observation" }).click();
-  await page.getByLabel("Commentaire").click();
-  await page.getByLabel("Commentaire").fill("test");
+  await page.getByRole("dialog").getByLabel("Commentaire", { exact: true }).fill("test");
   await page.getByLabel("Nombre de personnes non connues femmes rencontrées").click();
   await page.getByLabel("Nombre de personnes non connues femmes rencontrées").fill("3");
   await page.locator(".observation-select-territory__input-container").click();
