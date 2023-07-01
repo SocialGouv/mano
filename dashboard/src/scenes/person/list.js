@@ -142,48 +142,50 @@ const List = () => {
         </div>
       </div>
       <div className="tw-mb-5 tw-flex tw-flex-wrap">
-        <div className="tw-mb-5 tw-flex tw-w-full tw-items-center">
-          <label htmlFor="search" className="tw-mr-5 tw-w-64 tw-shrink-0">
+        <div className="tw-mb-5 tw-flex tw-w-full tw-items-start tw-justify-start">
+          <label htmlFor="search" className="tw-mr-5 tw-shrink-0 tw-basis-40">
             Recherche :{' '}
           </label>
-          <Search
-            placeholder="Par mot clé, présent dans le nom, la description, un commentaire, une action, ..."
-            value={search}
-            onChange={(value) => {
-              if (page) {
-                setPage(0);
-                setSearch(value, { sideEffect: ['page', 0] });
-              } else {
-                setSearch(value);
-              }
-            }}
-          />
-        </div>
-        <div className="tw-flex tw-w-full tw-items-center">
-          <label htmlFor="viewAllOrganisationData" className="tw-ml-72">
-            <input
-              type="checkbox"
-              id="viewAllOrganisationData"
-              className="tw-mr-2.5"
-              checked={viewAllOrganisationData}
-              value={viewAllOrganisationData}
-              onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
+          <div className="tw-flex-grow-1 tw-flex-col tw-items-stretch tw-gap-2">
+            <Search
+              placeholder="Par mot clé, présent dans le nom, la description, un commentaire, une action, ..."
+              value={search}
+              onChange={(value) => {
+                if (page) {
+                  setPage(0);
+                  setSearch(value, { sideEffect: ['page', 0] });
+                } else {
+                  setSearch(value);
+                }
+              }}
             />
-            Afficher les personnes de toute l'organisation
-          </label>
-        </div>
-        <div className="tw-flex tw-w-full tw-items-center">
-          <label htmlFor="alertness" className="tw-ml-72">
-            <input
-              type="checkbox"
-              className="tw-mr-2.5"
-              id="alertness"
-              checked={alertness}
-              value={alertness}
-              onChange={() => setFilterAlertness(!alertness)}
-            />
-            N'afficher que les personnes vulnérables où ayant besoin d'une attention particulière
-          </label>
+            <div className="tw-flex tw-w-full tw-items-center">
+              <label htmlFor="viewAllOrganisationData">
+                <input
+                  type="checkbox"
+                  id="viewAllOrganisationData"
+                  className="tw-mr-2.5"
+                  checked={viewAllOrganisationData}
+                  value={viewAllOrganisationData}
+                  onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
+                />
+                Afficher les personnes de toute l'organisation
+              </label>
+            </div>
+            <div className="tw-flex tw-w-full tw-items-center">
+              <label htmlFor="alertness">
+                <input
+                  type="checkbox"
+                  className="tw-mr-2.5"
+                  id="alertness"
+                  checked={alertness}
+                  value={alertness}
+                  onChange={() => setFilterAlertness(!alertness)}
+                />
+                N'afficher que les personnes vulnérables où ayant besoin d'une attention particulière
+              </label>
+            </div>
+          </div>
         </div>
       </div>
       <Filters base={filterPersonsWithAllFields} filters={filters} onChange={setFilters} title="Autres filtres : " saveInURLParams />

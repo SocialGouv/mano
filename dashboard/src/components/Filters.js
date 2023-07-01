@@ -1,5 +1,6 @@
 import React from 'react';
 import SelectCustom from './SelectCustom';
+import { components } from 'react-select';
 import { dayjsInstance, isOnSameDay } from '../services/date';
 import DatePicker from './DatePicker';
 
@@ -177,24 +178,13 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :', saveInURLParams
           })}
         </ul>
       </div>
-      <div className="border-b noprint tw-z-50 tw-mb-8 tw-flex tw-w-full tw-justify-center tw-self-center tw-border-gray-300 tw-pb-4">
-        <div className="tw-w-full">
-          <div className="tw-flex tw-flex-wrap">
-            <div className="tw-basis-5/6">
-              <p className="tw-m-0">{title}</p>
-            </div>
-            <div className="tw-basis-1/6 tw-pl-8">
-              <button
-                type="button"
-                className="tw-h-full tw-w-full tw-rounded tw-border tw-border-gray-300 tw-bg-white tw-text-main disabled:tw-opacity-20"
-                onClick={onAddFilter}
-                disabled={filters.find((f) => !f.field)}>
-                + Ajouter
-                <br />
-                un filtre
-              </button>
-            </div>
+      <div className="border-b noprint tw-z-50 tw-mb-8 tw-flex tw-w-full tw-flex-col tw-justify-center tw-gap-2 tw-self-center tw-border-gray-300 tw-pb-4">
+        <div className="tw-flex tw-flex-wrap">
+          <div className="tw-basis-5/6">
+            <p className="tw-m-0">{title}</p>
           </div>
+        </div>
+        <div className="tw-w-full">
           {filters.map((filter, index) => {
             // filter: field, value, type
             const filterValues = getFilterOptionsByField(filter.field, base, index);
@@ -218,8 +208,11 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :', saveInURLParams
             };
 
             return (
-              <div className="-tw-mx-4 tw-mb-2.5 tw-flex tw-flex-wrap" key={`${filter.field || 'empty'}${index}`}>
-                <div className="tw-basis-1/3 tw-px-4">
+              <div className="tw-mx-auto tw-mb-2.5 tw-flex tw-items-center tw-gap-2" key={`${filter.field || 'empty'}${index}`}>
+                <div className="tw-grow tw-basis-2/12">
+                  <p className="tw-m-0 tw-w-full tw-pr-4 tw-text-right">{index === 0 ? 'Filtrer par' : 'ET'}</p>
+                </div>
+                <div className="tw-basis-4/12">
                   <SelectCustom
                     options={filterFields}
                     value={filter.field ? filter : null}
@@ -230,10 +223,10 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :', saveInURLParams
                     isMulti={false}
                   />
                 </div>
-                <div className="tw-basis-1/3 tw-px-4">
+                <div className="tw-basis-4/12">
                   <ValueSelector field={filter.field} filterValues={filterValues} value={filter.value} base={base} onChangeValue={onChangeValue} />
                 </div>
-                <div className="tw-basis-1/6 tw-pl-4">
+                <div className="tw-basis-2/12">
                   {!!filters.filter((_filter) => Boolean(_filter.field)).length && (
                     <button
                       type="button"
@@ -246,6 +239,16 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :', saveInURLParams
               </div>
             );
           })}
+        </div>
+        <div className="tw-flex tw-w-full">
+          <div className="tw-basis-1/12" />
+          <button
+            type="button"
+            className="tw-h-full tw-rounded tw-text-main disabled:tw-opacity-20"
+            onClick={onAddFilter}
+            disabled={filters.find((f) => !f.field)}>
+            + Ajouter un filtre
+          </button>
         </div>
       </div>
     </>
@@ -411,6 +414,21 @@ const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
           onChange={(newValue) => onChangeValue(newValue?.map((option) => option.value))}
           isClearable={!value?.length}
           isMulti
+          components={{
+            MultiValueContainer: (props) => {
+              if (props.selectProps?.values?.length <= 1) {
+                return <components.MultiValueContainer {...props} />;
+              }
+              const lastValue = props.selectProps?.value?.[props.selectProps?.value?.length - 1]?.value;
+              const isLastValue = props?.data?.value === lastValue;
+              return (
+                <>
+                  <components.MultiValueLabel {...props} />
+                  {!isLastValue && <span className="tw-mr-2 tw-ml-1 tw-inline-block">OU</span>}
+                </>
+              );
+            },
+          }}
         />
       );
     } catch (e) {

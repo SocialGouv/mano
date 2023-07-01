@@ -50,7 +50,6 @@ const PersonStats = ({
     const newSlicefield = filterBase.find((f) => f.field === fieldName);
     setSliceField(newSlicefield);
     setSliceValue(newSlice);
-    console.log({ personConcerned });
     const slicedData =
       newSlicefield.type === 'boolean'
         ? personConcerned.filter((p) => (newSlice === 'Non' ? !p[newSlicefield.field] : !!p[newSlicefield.field]))
