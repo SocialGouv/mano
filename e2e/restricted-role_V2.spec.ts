@@ -7,6 +7,7 @@ test.beforeAll(async () => {
   await populate();
 });
 
+await page.getByText("descriptionanepasvoir").click();
 test("test", async ({ page }) => {
   await loginWith(page, "admin8@example.org");
 
@@ -79,12 +80,13 @@ test("test", async ({ page }) => {
 
   await page.getByRole("link", { name: "Agenda" }).click();
   await page.getByText("Action2").click();
-  await page.getByLabel("Description").click();
+  await page.getByText("descriptionanepasvoir").click();
+  await page.getByRole("button", { name: "Commentaires (1)" }).click();
   await page.getByRole("button", { name: "Ajouter un commentaire" }).first().click();
   await page.getByRole("textbox", { name: "Commentaire" }).fill("commentaire a ne pas voir");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Commentaire ajouté !").click();
-  await page.getByText("Retour").click();
+  await page.getByText("Fermer").first().click();
 
   // création des territoires
   await page.getByRole("link", { name: "Accueil" }).click();

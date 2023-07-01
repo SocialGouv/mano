@@ -172,7 +172,7 @@ test("Create action with comments", async ({ page }) => {
     .getByText("Une personne avec un commentaire prioritaire modifié")
     .click();
   await expect(page.getByRole("dialog", { name: "Commentaires urgents et vigilance" })).not.toBeVisible();
-  await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*\?tab=R%C3%A9sum%C3%A9&actionId=.*/);
+  await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*\?actionId=.*/);
   await page.getByRole("button", { name: "Commentaires (1)" }).click();
   await page.getByRole("heading", { name: "action avec commentaire (créée par User Admin Test - 7)" }).click();
   await expect(

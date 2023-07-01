@@ -61,7 +61,7 @@ test("Create action with comments", async ({ page }) => {
     .click();
   await page
     .getByRole("dialog", { name: "Commentaire" })
-    .filter({ hasText: "CommentaireCréé parUser Admin Test - 7Créé le / Concerne levendredi 30 juin 2023" })
+    .filter({ hasText: `CommentaireCréé parUser Admin Test - 7Créé le / Concerne le${dayjs().format("dddd D MMMM YYYY")}` })
     .getByRole("button", { name: "Fermer" })
     .click();
   await page.getByRole("button", { name: "Fermer" }).first().click();
@@ -88,7 +88,8 @@ test("Create action with comments", async ({ page }) => {
     .click();
   await page
     .getByRole("dialog", { name: "Commentaire" })
-    .filter({ hasText: "CommentaireCréé parUser Admin Test - 7Créé le / Concerne levendredi 30 juin 2023" })
+    // .filter({ hasText: "CommentaireCréé parUser Admin Test - 7Créé le / Concerne levendredi 30 juin 2023" })
+    .filter({ hasText: `CommentaireCréé parUser Admin Test - 7Créé le / Concerne le${dayjs().format("dddd D MMMM YYYY")}` })
     .getByRole("button", { name: "Fermer" })
     .click();
   await page.getByRole("button", { name: "Fermer" }).first().click();
@@ -106,7 +107,7 @@ test("Create action with comments", async ({ page }) => {
     .click();
   await page
     .getByRole("dialog", { name: "Commentaire" })
-    .filter({ hasText: "CommentaireCréé parUser Admin Test - 7Créé le / Concerne levendredi 30 juin 2023" })
+    .filter({ hasText: `CommentaireCréé parUser Admin Test - 7Créé le / Concerne le${dayjs().format("dddd D MMMM YYYY")}` })
     .getByRole("button", { name: "Fermer" })
     .click();
   await page.getByRole("button", { name: "Fermer" }).first().click();

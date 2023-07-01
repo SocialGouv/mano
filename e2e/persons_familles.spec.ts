@@ -238,7 +238,7 @@ test("Familles", async ({ page }) => {
 
     await page.getByLabel("Document familialCe document sera visible pour toute la famille").check();
     await page.getByText("Document mis à jour !").click();
-    await page.getByRole("button", { name: "Fermer" }).click();
+    await page.getByRole("button", { name: "Fermer" }).first().click();
     await expect(page.locator("tr", { has: page.getByText("image-1.jpg") }).getByText("👪")).toBeVisible();
 
     await page.getByRole("link", { name: "Personnes suivies" }).click();

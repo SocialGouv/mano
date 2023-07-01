@@ -120,11 +120,21 @@ function TreatmentContent({ onClose, treatment, personId }) {
 
   async function handleSubmit({ newData = {}, closeOnSubmit = false } = {}) {
     const body = { ...data, ...newData };
-    if (!body.name) return toast.error('Le nom est obligatoire');
-    if (!body.startDate) return toast.error('La date de début est obligatoire');
-    if (outOfBoundariesDate(body.startDate)) return toast.error('La date de début de traitement est hors limites (entre 1900 et 2100)');
+    if (!body.name) {
+      toast.error('Le nom est obligatoire');
+      return false;
+    }
+    if (!body.startDate) {
+      toast.error('La date de début est obligatoire');
+      return false;
+    }
+    if (outOfBoundariesDate(body.startDate)) {
+      toast.error('La date de début de traitement est hors limites (entre 1900 et 2100)');
+      return false;
+    }
     if (body.endDate && outOfBoundariesDate(body.endDate)) {
-      return toast.error('La date de fin de traitement est hors limites (entre 1900 et 2100)');
+      toast.error('La date de fin de traitement est hors limites (entre 1900 et 2100)');
+      return false;
     }
     const treatmentResponse = isNewTreatment
       ? await API.post({
