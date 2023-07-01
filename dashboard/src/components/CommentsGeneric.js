@@ -7,7 +7,7 @@ import ExclamationMarkButton from './tailwind/ExclamationMarkButton';
 import TagTeam from './TagTeam';
 import { currentTeamState, organisationState, userState, usersState } from '../recoil/auth';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from './tailwind/Modal';
-import { formatDateTimeWithNameOfDay } from '../services/date';
+import { dayjsInstance, formatDateTimeWithNameOfDay } from '../services/date';
 import SelectUser from './SelectUser';
 import { FullScreenIcon } from '../scenes/person/components/FullScreenIcon';
 import DatePicker from './DatePicker';
@@ -372,6 +372,9 @@ function CommentModal({
             if (comment._id) commentBody._id = comment._id;
             if (commentBody.type === 'action' && !commentBody.action) throw new Error('action is required');
             if (commentBody.type === 'person' && !commentBody.person) throw new Error('person is required');
+            if (!isNewComment && comment.user !== user._id) {
+              commentBody.comment = `${commentBody.comment}\n\nModifié par ${user.name} le ${dayjsInstance().format('DD/MM/YYYY à HH:mm')}`;
+            }
 
             await onSubmit(commentBody, isNewComment);
 
