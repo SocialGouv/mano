@@ -59,14 +59,12 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Mis à jour !").click();
   await page.getByRole("button", { name: "Ajouter un passage" }).click();
-  await page.getByLabel("Commentaire").click();
-  await page.getByLabel("Commentaire").fill("le passage");
+  await page.getByRole("dialog").getByLabel("Commentaire").fill("le passage");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Passage enregistré").click();
   await page.getByRole("button", { name: "Rencontres (0)" }).click();
   await page.getByRole("button", { name: "Ajouter une rencontre" }).click();
-  await page.getByLabel("Commentaire").click();
-  await page.getByLabel("Commentaire").fill("La rencontre");
+  await page.getByRole("dialog").getByLabel("Commentaire").fill("La rencontre");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Rencontre enregistrée").click();
   await page.getByRole("button", { name: "Dossier Médical" }).click();
@@ -113,8 +111,7 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
   await page.getByRole("button", { name: "Nouvelle observation" }).click();
-  await page.getByLabel("Commentaire").click();
-  await page.getByLabel("Commentaire").fill("Un commentaire");
+  await page.getByRole("dialog").getByLabel("Commentaire").fill("Un commentaire");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
   await page.getByRole("link", { name: "Structures" }).click();

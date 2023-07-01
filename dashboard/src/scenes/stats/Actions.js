@@ -31,8 +31,6 @@ const ActionsStats = ({
   const [groupSlice, setGroupSlice] = useState(null);
   const [categorySlice, setCategorySlice] = useState(null);
 
-  console.log('actionsModalOpened', actionsModalOpened);
-
   const filteredActionsBySlice = useMemo(() => {
     if (groupSlice) {
       const withGroupSlice = {};
@@ -168,11 +166,9 @@ const ActionsStats = ({
       <SelectedActionsModal
         open={actionsModalOpened}
         onClose={() => {
-          console.log('close');
           setActionsModalOpened(false);
         }}
         onAfterLeave={() => {
-          console.log('after leave');
           setGroupSlice(null);
           setCategorySlice(null);
         }}

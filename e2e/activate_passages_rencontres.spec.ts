@@ -36,6 +36,7 @@ test("test", async ({ page }) => {
   await page.getByText("Nouvelle personne ajoutée !").click();
   await page.getByRole("button", { name: "Passage" }).first().click();
   await page.getByRole("button", { name: "Passage anonyme" }).click();
+  // await page.getByText("Passages enregistrés").click();
 
   /* ***** personnes suvies ***** */
 
@@ -46,8 +47,7 @@ test("test", async ({ page }) => {
   await expect(page.getByRole("link", { name: "Rencontres (0)" })).not.toBeVisible();
 
   await page.getByRole("button", { name: "Ajouter un passage" }).click();
-  await page.getByLabel("Commentaire").click();
-  await page.getByLabel("Commentaire").fill("test passage");
+  await page.getByRole("dialog").getByLabel("Commentaire").fill("test passage");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Passage enregistré").click();
 
@@ -60,21 +60,17 @@ test("test", async ({ page }) => {
   await expect(page.getByText("Rencontres (0)")).not.toBeVisible();
 
   await page.getByText("Passages (3)").click();
-
-  await page.getByText("Passages (3)").click();
   await expect(page.getByText("Nombre de passages anonymes 1passage")).toBeVisible();
   await expect(page.getByText("Nombre de passages non-anonymes 2passages")).toBeVisible();
   await page.getByRole("button", { name: "Ajouter un passage ce jour" }).click();
   await page.locator(".person__input-container").click();
   await page.locator("#react-select-persons-option-0").click();
-  await page.getByLabel("Commentaire").click();
-  await page.getByLabel("Commentaire").fill("ajout passage");
+  await page.getByRole("dialog").getByLabel("Commentaire").fill("ajout passage");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Passages enregistrés").click();
 
   await page.getByRole("cell", { name: "ajout passage" }).click();
-  await page.getByLabel("Commentaire").click();
-  await page.getByLabel("Commentaire").fill("ajout passage modification");
+  await page.getByRole("dialog").getByLabel("Commentaire").fill("ajout passage modification");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Passage mis à jour").click();
 
@@ -128,13 +124,11 @@ test("test", async ({ page }) => {
   await expect(page.getByRole("link", { name: "Passages (0)" })).not.toBeVisible();
 
   await page.getByRole("button", { name: "Ajouter une rencontre" }).click();
-  await page.getByLabel("Commentaire").click();
-  await page.getByLabel("Commentaire").fill("je viens de créer une rencontre");
+  await page.getByRole("dialog").getByLabel("Commentaire").fill("je viens de créer une rencontre");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Rencontre enregistrée").click();
   await page.getByText("je viens de créer une rencontre").first().click();
-  await page.getByLabel("Commentaire").click();
-  await page.getByLabel("Commentaire").fill("je viens de modifier une rencontre");
+  await page.getByRole("dialog").getByLabel("Commentaire").fill("je viens de modifier une rencontre");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Rencontre mise à jour").click();
   /* ***** comptes rendus ***** */
@@ -145,8 +139,7 @@ test("test", async ({ page }) => {
   await expect(page.getByText("Passages (0)")).not.toBeVisible();
 
   await page.getByRole("button", { name: "Ajouter une rencontre ce jour" }).click();
-  await page.getByLabel("Commentaire").click();
-  await page.getByLabel("Commentaire").fill("test ajoute nouvelle rencontre");
+  await page.getByRole("dialog").getByLabel("Commentaire").fill("test ajoute nouvelle rencontre");
   await page.locator(".person__input-container").click();
   await page.locator("#react-select-persons-option-0").click();
   await page.getByRole("button", { name: "Enregistrer" }).click();

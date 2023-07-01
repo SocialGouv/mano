@@ -7,12 +7,12 @@ test.beforeAll(async () => {
 });
 
 const addCustomField = async (page: Page, name: string, type: string, options: string[]) => {
-  await page.getByLabel("Nom").fill(name);
+  await page.getByRole("dialog").getByLabel("Nom").fill(name);
   await clickOnEmptyReactSelect(page, "type", type);
   await page.locator(".options__input-container").click();
   for (const option of options) {
-    await page.getByLabel("Choix").fill(option);
-    await page.getByLabel("Choix").press("Enter");
+    await page.getByLabel("Choix", { exact: true }).fill(option);
+    await page.keyboard.press("Enter");
   }
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Mise à jour !").click();
@@ -57,7 +57,7 @@ test("test", async ({ page }) => {
     await expect(page).toHaveURL("http://localhost:8090/person");
 
     await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
-    await page.getByLabel("Nom").fill("personne1");
+    await page.getByRole("dialog").getByLabel("Nom").fill("personne1");
     await page.getByRole("button", { name: "Sauvegarder" }).click();
     await page.getByText("Création réussie !").click();
     await page.getByRole("button", { name: "Modifier" }).click();
@@ -115,7 +115,7 @@ test("test", async ({ page }) => {
     await page.getByRole("link", { name: "Territoires" }).click();
     await expect(page).toHaveURL("http://localhost:8090/territory");
     await page.getByRole("button", { name: "Créer un nouveau territoire" }).click();
-    await page.getByLabel("Nom").fill("territoire1");
+    await page.getByRole("dialog").getByLabel("Nom").fill("territoire1");
     await page.getByRole("button", { name: "Sauvegarder" }).click();
     await page.getByText("Création réussie !").click();
 

@@ -6,7 +6,7 @@ import SelectCustom from './SelectCustom';
 import { capture } from '../services/sentry';
 import DatePicker from './DatePicker';
 
-const CustomFieldInput = ({ field, values, handleChange, model, colWidth = null, disabled, hideLabel = false, isEditing = false }) => {
+const CustomFieldInput = ({ field, values, handleChange, model, colWidth = null, disabled, hideLabel = false }) => {
   const id = useMemo(() => {
     const slugifiedLabel =
       field.label
@@ -30,7 +30,7 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = null,
       <Col md={colWidth} key={field.name}>
         <FormGroup>
           {!hideLabel && (
-            <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-gray-600'} data-test-id={field.label} htmlFor={id}>
+            <label className="tw-text-sm tw-font-semibold tw-text-gray-600" data-test-id={field.label} htmlFor={id}>
               {field.type !== 'boolean' ? field.label : ''}
             </label>
           )}
@@ -155,7 +155,7 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = null,
     <Col md={colWidth} key={field.name}>
       <FormGroup>
         {!hideLabel && (
-          <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-gray-600'} data-test-id={field.label} htmlFor={id}>
+          <label className="tw-text-sm tw-font-semibold tw-text-gray-600" data-test-id={field.label} htmlFor={id}>
             {field.type !== 'boolean' ? field.label : ''}
           </label>
         )}

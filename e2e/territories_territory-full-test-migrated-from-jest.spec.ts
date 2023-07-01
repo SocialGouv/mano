@@ -16,8 +16,7 @@ test("test territories", async ({ page }) => {
   await page.getByRole("button", { name: "Créer un nouveau territoire" }).click();
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Le nom est obligatoire").click();
-  await page.getByLabel("Nom").click();
-  await page.getByLabel("Nom").fill("test de territoire new");
+  await page.getByRole("dialog").getByLabel("Nom").fill("test de territoire new");
   await page.getByLabel("Périmètre").click();
   await page.getByLabel("Périmètre").fill("mon périmètre");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
@@ -32,8 +31,7 @@ test("test territories", async ({ page }) => {
   await page.getByLabel("Nombre de personnes non connues hommes rencontrées").fill("1");
   await page.getByLabel("Nombre de personnes non connues femmes rencontrées").click();
   await page.getByLabel("Nombre de personnes non connues femmes rencontrées").fill("1");
-  await page.getByLabel("Commentaire").click();
-  await page.getByLabel("Commentaire").fill("HELLO COMMENTAIRE");
+  await page.getByRole("dialog").getByLabel("Commentaire").fill("HELLO COMMENTAIRE");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
   await page.locator('span:has-text("HELLO COMMENTAIRE")').click();
@@ -48,8 +46,7 @@ test("test territories", async ({ page }) => {
   await page.getByRole("link", { name: "Organisation" }).click();
   await page.getByRole("button", { name: "Territoires" }).click();
   await page.getByRole("button", { name: "Ajouter un champ" }).click();
-  await page.getByLabel("Nom").click();
-  await page.getByLabel("Nom").fill("Mon nouveau champ de territoire");
+  await page.getByRole("dialog").getByLabel("Nom").fill("Mon nouveau champ de territoire");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Mise à jour !").click();
   await page.getByRole("link", { name: "Territoires" }).click();

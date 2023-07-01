@@ -118,8 +118,7 @@ test("test", async ({ page }) => {
   await page.getByLabel("Date").click();
   await page.getByLabel("Date").fill("2004-10-10T10:10");
   await page.getByLabel("Date").press("Enter");
-  await page.getByLabel("Commentaire").click();
-  await page.getByLabel("Commentaire").fill("hello commentaire passage je veux dire");
+  await page.getByRole("dialog").getByLabel("Commentaire").fill("hello commentaire passage je veux dire");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Passage enregistré").click();
 
@@ -129,8 +128,7 @@ test("test", async ({ page }) => {
   await page.getByLabel("Date").press("Meta+a");
   await page.getByLabel("Date").fill("2006-09-09T10:10");
   await page.getByLabel("Date").press("Enter");
-  await page.getByLabel("Commentaire").click();
-  await page.getByLabel("Commentaire").fill("BOUM");
+  await page.getByRole("dialog").getByLabel("Commentaire").fill("BOUM");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Rencontre enregistrée").click();
 

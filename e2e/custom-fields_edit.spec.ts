@@ -23,12 +23,12 @@ test("test", async ({ page }) => {
   await page.locator(".type__input-container").click();
   await page.locator("#react-select-type-option-7").click();
   await page.locator(".options__input-container").click();
-  await page.getByLabel("Choix").fill("choix 1");
-  await page.getByLabel("Choix").press("Enter");
-  await page.getByLabel("Choix").fill("choix 2");
-  await page.getByLabel("Choix").press("Enter");
-  await page.getByLabel("Choix").fill("choix 3");
-  await page.getByLabel("Choix").press("Enter");
+  await page.getByLabel("Choix", { exact: true }).fill("choix 1");
+  await page.keyboard.press("Enter");
+  await page.getByLabel("Choix", { exact: true }).fill("choix 2");
+  await page.keyboard.press("Enter");
+  await page.getByLabel("Choix", { exact: true }).fill("choix 3");
+  await page.keyboard.press("Enter");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Mise à jour !").click();
 
