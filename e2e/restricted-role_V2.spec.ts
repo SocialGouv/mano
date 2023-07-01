@@ -150,7 +150,7 @@ test("test", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Supprimer" })).not.toBeVisible();
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Mise à jour !").click();
-  await page.getByText("Retour").click();
+  await page.getByRole("button", { name: "Action", exact: true }).click();
   await page.getByLabel("Nom de l'action").fill("pouvoirajouteruneaction");
   await clickOnEmptyReactSelect(page, "create-action-person-select", "testrestrict");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
@@ -163,7 +163,7 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Mis à jour !").click();
   await page.getByText("pouvoirajouteruneaction").click();
-  await page.getByRole("button", { name: "Modifier", exact: true }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Modifier", exact: true }).click();
   await page.getByLabel("Nom de l'action").fill("pouvoirajouteruneactio");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Mise à jour !").click();
