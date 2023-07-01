@@ -26,8 +26,7 @@ const PersonFamily = ({ person }) => {
 
   const onAddFamilyLink = async (e) => {
     e.preventDefault();
-    const { personId, description, ...otherNewRelations } = Object.fromEntries(new FormData(e.target));
-    console.log({ personId, description, otherNewRelations });
+    const { personId, description } = Object.fromEntries(new FormData(e.target));
     if (person._id === personId) {
       return toast.error("Le lien avec cette personne est vite vu : c'est elle !");
     }
@@ -43,37 +42,20 @@ const PersonFamily = ({ person }) => {
       );
     }
     const groupToEdit = otherPersonAlreadyBelongToAGroup || personGroup;
-    const nextRelations = [
-      {
-        _id: uuidv4(),
-        persons: [person._id, personId],
-        description,
-        createdAt: dayjs(),
-        updatedAt: dayjs(),
-        user: user._id,
-      },
-    ];
-    for (const otherNewRelation of Object.keys(otherNewRelations) || []) {
-      const otherPersonId = otherNewRelation.replace('description-', '');
-      const description = otherNewRelations[otherNewRelation];
-      console.log({ otherPersonId, description });
-      if (person._id === otherPersonId) {
-        continue;
-      }
-      nextRelations.push({
-        _id: uuidv4(),
-        persons: [person._id, otherPersonId],
-        description,
-        createdAt: dayjs(),
-        updatedAt: dayjs(),
-        user: user._id,
-      });
-    }
-
     const nextGroup = {
       ...groupToEdit,
       persons: [...new Set([...groupToEdit.persons, person._id, personId])],
-      relations: [...groupToEdit.relations, ...nextRelations],
+      relations: [
+        ...groupToEdit.relations,
+        {
+          _id: uuidv4(),
+          persons: [person._id, personId],
+          description,
+          createdAt: dayjs(),
+          updatedAt: dayjs(),
+          user: user._id,
+        },
+      ],
     };
     const isNew = !groupToEdit?._id;
     const response = isNew
@@ -215,78 +197,23 @@ const PersonFamily = ({ person }) => {
 };
 
 const NewRelation = ({ open, setOpen, onAddFamilyLink, person }) => {
-  const [rootPersonId, setRootPersonId] = useState(null);
-  const persons = useRecoilValue(itemsGroupedByPersonSelector);
-  const group = persons[rootPersonId]?.group;
-
   return (
-    <ModalContainer open={open} size="3xl">
-      <ModalHeader
-        title={
-          group?.persons?.length > 0 ? `Nouveaux liens familiaux entre ${person.name} et...` : `Nouveau lien familial entre ${person.name} et...`
-        }
-        setOpen={setOpen}
-      />
+    <ModalContainer open={open}>
+      <ModalHeader title="Nouveau lien familial" />
       <ModalBody>
-        <form id="new-family-relation" className="tw-flex tw-min-h-[50vh] tw-w-full tw-flex-col tw-gap-4 tw-px-8" onSubmit={onAddFamilyLink}>
-          <div className="tw-flex tw-w-full tw-flex-wrap">
-            <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
-              <label htmlFor="personId" className="form-text tailwindui">
-                Personne suivie
-              </label>
-              <SelectPerson
-                name="personId"
-                noLabel
-                disableAccessToPerson
-                inputId="person-family-relation"
-                value={rootPersonId}
-                onChange={(e) => setRootPersonId(e.currentTarget.value)}
-              />
-            </div>
-            <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
-              <label htmlFor="description" className="form-text tailwindui">
-                Relation/commentaire
-              </label>
-              <input
-                className="form-text tailwindui"
-                id="description"
-                name="description"
-                type="text"
-                placeholder="Père/fille, mère/fils..."
-                required
-              />
-            </div>
+        <form id="new-family-relation" className="tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8" onSubmit={onAddFamilyLink}>
+          <div>
+            <label htmlFor="personId" className="form-text tailwindui">
+              Nouvelle relation entre {person.name} et...
+            </label>
+            <SelectPerson name="personId" noLabel disableAccessToPerson inputId="person-family-relation" />
           </div>
-          {group?.persons
-            ?.filter((personId) => personId !== rootPersonId)
-            .filter((personId) => !!persons[personId])
-            .map((personId) => {
-              return (
-                <div key={personId} className="tw-flex tw-w-full tw-flex-wrap">
-                  <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
-                    <label htmlFor="personId" className="form-text tailwindui">
-                      Personne suivie
-                    </label>
-                    <div className="tailwindui">
-                      <PersonName item={{ person: personId }} />
-                    </div>
-                  </div>
-                  <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
-                    <label htmlFor="description" className="form-text tailwindui">
-                      Relation/commentaire
-                    </label>
-                    <input
-                      className="form-text tailwindui"
-                      id="description"
-                      name={`description-${personId}`}
-                      required
-                      type="text"
-                      placeholder="Père/fille, mère/fils..."
-                    />
-                  </div>
-                </div>
-              );
-            })}
+          <div>
+            <label htmlFor="description" className="form-text tailwindui">
+              Relation/commentaire
+            </label>
+            <input className="form-text tailwindui" id="description" name="description" type="text" placeholder="Père/fille, mère/fils..." />
+          </div>
         </form>
       </ModalBody>
       <ModalFooter>
