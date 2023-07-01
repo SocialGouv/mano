@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { utils, writeFile } from 'xlsx';
 
 import ButtonCustom from '../../components/ButtonCustom';
-import { personsState } from '../../recoil/persons';
-import { territoryObservationsState } from '../../recoil/territoryObservations';
+import { flattenedCustomFieldsPersonsSelector, personsState } from '../../recoil/persons';
+import { customFieldsObsSelector, territoryObservationsState } from '../../recoil/territoryObservations';
 import { organisationState, teamsState, usersState, userState } from '../../recoil/auth';
 import { commentsState } from '../../recoil/comments';
 import { actionsState } from '../../recoil/actions';
@@ -14,7 +14,7 @@ import { useRecoilValue } from 'recoil';
 import { passagesState } from '../../recoil/passages';
 import { rencontresState } from '../../recoil/rencontres';
 import { consultationsState } from '../../recoil/consultations';
-import { medicalFileState } from '../../recoil/medicalFiles';
+import { customFieldsMedicalFileSelector, medicalFileState } from '../../recoil/medicalFiles';
 import { treatmentsState } from '../../recoil/treatments';
 import API from '../../services/api';
 import { toast } from 'react-toastify';
@@ -88,6 +88,11 @@ const ExportData = () => {
   const allTreatments = useRecoilValue(treatmentsState);
   const allRencontres = useRecoilValue(rencontresState);
 
+  const personsFields = useRecoilValue(flattenedCustomFieldsPersonsSelector);
+  const observationsFields = useRecoilValue(customFieldsObsSelector);
+  const medicalFields = useRecoilValue(customFieldsMedicalFileSelector);
+  const consultationFields = organisation.consultations.map(({ fields }) => fields).flat();
+
   const onExportToCSV = async () => {
     setIsExporting(true);
     // just to trigger the loading state, sorry Raph :)
@@ -103,7 +108,44 @@ const ExportData = () => {
 
     const workbook = utils.book_new();
 
-    const persons = allPersons.map((p) => ({ ...p, followedSince: p.followedSince || p.createdAt }));
+    const customFields = {};
+    for (const field of [...personsFields, ...observationsFields, ...medicalFields, ...consultationFields]) {
+      customFields[field.name] = field.label;
+    }
+
+    const persons = allPersons.map((p) => {
+      const personWithLabelledCustomFields = {
+        followedSince: p.followedSince || p.createdAt,
+      };
+      for (const key of Object.keys(p)) {
+        personWithLabelledCustomFields[customFields[key] || key] = p[key];
+      }
+      return personWithLabelledCustomFields;
+    });
+
+    const observations = allObservations.map((p) => {
+      const obsWithLabelledCustomFields = {};
+      for (const key of Object.keys(p)) {
+        obsWithLabelledCustomFields[customFields[key] || key] = p[key];
+      }
+      return obsWithLabelledCustomFields;
+    });
+
+    const consultations = allConsultations.map((p) => {
+      const consultWithLabelledCustomFields = {};
+      for (const key of Object.keys(p)) {
+        consultWithLabelledCustomFields[customFields[key] || key] = p[key];
+      }
+      return consultWithLabelledCustomFields;
+    });
+    const medicalFiles = allMedicalFiles.map((p) => {
+      const filesWithLabelledCustomFields = {};
+      for (const key of Object.keys(p)) {
+        filesWithLabelledCustomFields[customFields[key] || key] = p[key];
+      }
+      return filesWithLabelledCustomFields;
+    });
+
     const reports = allReports.map((r) => {
       const report = {};
       for (const key of Object.keys(r)) {
@@ -121,7 +163,7 @@ const ExportData = () => {
     utils.book_append_sheet(workbook, createSheet(persons), 'personnes suivies');
     utils.book_append_sheet(workbook, createSheet(allComments), 'comments');
     utils.book_append_sheet(workbook, createSheet(allTerritories), 'territoires');
-    utils.book_append_sheet(workbook, createSheet(allObservations), 'observations de territoires');
+    utils.book_append_sheet(workbook, createSheet(observations), 'observations de territoires');
     utils.book_append_sheet(workbook, createSheet(allPlaces), 'lieux fréquentés');
     utils.book_append_sheet(workbook, createSheet(teams), 'équipes');
     utils.book_append_sheet(workbook, createSheet(users), 'utilisateurs');
@@ -130,9 +172,9 @@ const ExportData = () => {
     utils.book_append_sheet(workbook, createSheet(allServices), 'services');
     utils.book_append_sheet(workbook, createSheet(allRencontres), 'rencontres');
     if (user.healthcareProfessional) {
-      utils.book_append_sheet(workbook, createSheet(allConsultations), 'consultations');
+      utils.book_append_sheet(workbook, createSheet(consultations), 'consultations');
       utils.book_append_sheet(workbook, createSheet(allTreatments), 'treatments');
-      utils.book_append_sheet(workbook, createSheet(allMedicalFiles), 'medical-files');
+      utils.book_append_sheet(workbook, createSheet(medicalFiles), 'medical-files');
     }
     writeFile(workbook, 'data.xlsx');
     setIsExporting(false);
