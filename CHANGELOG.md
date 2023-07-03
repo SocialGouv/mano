@@ -1,3 +1,16 @@
+# [1.274.0](https://github.com/SocialGouv/mano/compare/v1.273.2...v1.274.0) (2023-07-03)
+
+
+### Bug Fixes
+
+* **dashboard:** export de données avec nom de champs custo intelligible au lieu d'un id technique ([#1581](https://github.com/SocialGouv/mano/issues/1581)) ([72fd812](https://github.com/SocialGouv/mano/commit/72fd8129c008a0417dacb166360ab293d3f340e4))
+
+
+### Features
+
+* **dashboard:** ajouter ET et OU aux filtres pour mieux comprendre ([#1580](https://github.com/SocialGouv/mano/issues/1580)) ([0ff9914](https://github.com/SocialGouv/mano/commit/0ff9914255afccff511cad491413a9f0353ac219))
+* **dashboard:** traçabilité des commentaires et actions en imposant "Modifié par machin" ([#1576](https://github.com/SocialGouv/mano/issues/1576)) ([8bfb794](https://github.com/SocialGouv/mano/commit/8bfb794d04004a09c1c42aee574bc20e09bd3652))
+
 ## [1.273.2](https://github.com/SocialGouv/mano/compare/v1.273.1...v1.273.2) (2023-06-29)
 
 
