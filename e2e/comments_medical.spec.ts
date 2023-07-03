@@ -15,7 +15,6 @@ test.beforeAll(async () => {
 
 test("test", async ({ page }) => {
   const personName = "Manu Chao";
-  const actionName = "Nouvelle action";
 
   await loginWith(page, "admin1@example.org");
   await page.getByRole("link", { name: "Personnes suivies" }).click();
