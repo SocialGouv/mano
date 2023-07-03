@@ -78,6 +78,7 @@ export function CommentsModule({
               </button>
               {Boolean(comments.length) && (
                 <button
+                  title="Passer les commentaires en plein écran"
                   className={`tw-h-6 tw-w-6 tw-rounded-full tw-text-${color} tw-transition hover:tw-scale-125`}
                   onClick={() => setFullScreen(true)}>
                   <FullScreenIcon />

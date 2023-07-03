@@ -14,6 +14,7 @@ import { consultationsState } from '../../../recoil/consultations';
 import { treatmentsState } from '../../../recoil/treatments';
 import { userState } from '../../../recoil/auth';
 import { useDataLoader } from '../../../components/DataLoader';
+import { prepareGroupForEncryption } from '../../../recoil/groups';
 
 const DeletePersonButton = ({ person }) => {
   const actions = useRecoilValue(actionsState);
@@ -74,7 +75,7 @@ const DeletePersonButton = ({ person }) => {
           if (updatedGroup.relations.length === 0) {
             body.groupIdToDelete = person.group._id;
           } else {
-            body.groupToUpdate = updatedGroup;
+            body.groupToUpdate = await encryptItem(prepareGroupForEncryption(updatedGroup));
           }
           if (personTransferId) {
             body.actionsToTransfer = await Promise.all(

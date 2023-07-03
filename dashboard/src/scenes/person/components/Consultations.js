@@ -55,7 +55,10 @@ export const Consultations = ({ person }) => {
               ＋
             </button>
             {Boolean(filteredData.length) && (
-              <button className="tw-h-6 tw-w-6 tw-rounded-full tw-text-blue-900 tw-transition hover:tw-scale-125" onClick={() => setFullScreen(true)}>
+              <button
+                title="Passer les consultations en plein écran"
+                className="tw-h-6 tw-w-6 tw-rounded-full tw-text-blue-900 tw-transition hover:tw-scale-125"
+                onClick={() => setFullScreen(true)}>
                 <FullScreenIcon />
               </button>
             )}

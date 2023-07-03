@@ -40,7 +40,10 @@ export const Actions = ({ person }) => {
             ＋
           </button>
           {Boolean(filteredData.length) && (
-            <button className="tw-h-6 tw-w-6 tw-rounded-full tw-text-main tw-transition hover:tw-scale-125" onClick={() => setFullScreen(true)}>
+            <button
+              title="Passer les actions en plein écran"
+              className="tw-h-6 tw-w-6 tw-rounded-full tw-text-main tw-transition hover:tw-scale-125"
+              onClick={() => setFullScreen(true)}>
               <FullScreenIcon />
             </button>
           )}

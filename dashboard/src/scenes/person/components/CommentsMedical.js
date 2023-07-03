@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../../recoil/medicalFiles';
 import { CommentsModule } from '../../../components/CommentsGeneric';
 import API from '../../../services/api';
+import { toast } from 'react-toastify';
 
 const CommentsMedical = ({ person }) => {
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
@@ -40,6 +41,7 @@ const CommentsMedical = ({ person }) => {
             body: prepareMedicalFileForEncryption(customFieldsMedicalFile)(newMedicalFile),
           });
           if (!response.ok) return;
+          toast.success('Commentaire supprimé');
           setAllMedicalFiles((medicalFiles) => {
             return medicalFiles.map((_medicalFile) => {
               if (_medicalFile._id !== medicalFile._id) return _medicalFile;
@@ -48,22 +50,18 @@ const CommentsMedical = ({ person }) => {
           });
         }}
         onSubmitComment={async (comment, isNewComment) => {
-          console.log('comment', comment, isNewComment);
-          console.log('medicalFile', medicalFile);
           const newMedicalFile = {
             ...medicalFile,
             comments: isNewComment
               ? [{ ...comment, _id: uuidv4() }, ...(medicalFile.comments || [])]
               : medicalFile.comments.map((c) => {
                   if (c._id === comment._id) {
-                    console.log('FOUND IT', c._id);
                     return comment;
                   }
                   return c;
                 }),
           };
           // optimistic UI
-          console.log('newMedicalFile', newMedicalFile);
           setAllMedicalFiles((medicalFiles) => {
             return medicalFiles.map((_medicalFile) => {
               if (_medicalFile._id !== medicalFile._id) return _medicalFile;
@@ -75,7 +73,7 @@ const CommentsMedical = ({ person }) => {
             body: prepareMedicalFileForEncryption(customFieldsMedicalFile)(newMedicalFile),
           });
           if (!response.ok) return;
-          console.log('response', response.decryptedData);
+          toast.success('Commentaire enregistré');
           setAllMedicalFiles((medicalFiles) => {
             return medicalFiles.map((_medicalFile) => {
               if (_medicalFile._id !== medicalFile._id) return _medicalFile;

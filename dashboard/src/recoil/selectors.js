@@ -186,6 +186,7 @@ export const itemsGroupedByPersonSelector = selector({
         if (!personsObject[person]) continue;
         personsObject[person].comments = personsObject[person].comments || [];
         personsObject[person].comments.push({ ...comment, type: 'action', date: comment.date || comment.createdAt });
+        continue;
       }
       if (!personsObject[comment.person]) continue;
       personsObject[comment.person].comments = personsObject[comment.person].comments || [];
