@@ -29,7 +29,11 @@ export const CustomResponsivePie = ({ data = [], title, onItemClick, help }) => 
           )}>
           <tbody>
             {[...data]
-              .sort((a, b) => (a.value < b.value ? 1 : -1))
+              .sort((a, b) => {
+                if (a.value === b.value) return 0;
+                if (a.value < b.value) return 1;
+                return -1;
+              })
               .map(({ key, label, value }) => (
                 <tr key={key + label + value} onClick={() => onClick({ id: label })}>
                   <td className="tw-border tw-border-zinc-400 [overflow-wrap:anywhere]">{label}</td>

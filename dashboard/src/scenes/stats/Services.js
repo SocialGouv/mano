@@ -28,7 +28,11 @@ const ServicesStats = ({ period, teamIds }) => {
       API.get({ path: `/service/team/${teamIds.join(',')}/stats`, query: startDate ? { from: startDate, to: endDate || startDate } : {} }).then(
         (res) => {
           if (!res.ok) return toast.error("Erreur lors du chargement des statistiques des services de l'accueil");
-          setServicesFromDatabase(res.data.reduce((acc, service) => ({ ...acc, [service.service]: Number(service.count) }), {}));
+          const servicesObj = {};
+          for (const service of allServices) {
+            servicesObj[service] = Number(res.data.find((s) => s.service === service)?.count || 0);
+          }
+          setServicesFromDatabase(servicesObj);
         }
       );
     },
@@ -74,7 +78,6 @@ const ServicesStats = ({ period, teamIds }) => {
       });
   }, [groupedServices, servicesGroupFilter, servicesFiltered, servicesFromDatabase]);
 
-  console.log({ groupsData });
   return (
     <>
       <h3 className="tw-my-5 tw-text-xl">Statistiques des services</h3>
