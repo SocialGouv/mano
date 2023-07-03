@@ -1,3 +1,10 @@
+## [1.276.1](https://github.com/SocialGouv/mano/compare/v1.276.0...v1.276.1) (2023-07-03)
+
+
+### Bug Fixes
+
+* **dashboard:** statistiques personnes suivies vs personnes créées ([df4e496](https://github.com/SocialGouv/mano/commit/df4e4965eb9cabe51f2d8e0a90bec808f84214ca))
+
 # [1.276.0](https://github.com/SocialGouv/mano/compare/v1.275.0...v1.276.0) (2023-07-03)
 
 
