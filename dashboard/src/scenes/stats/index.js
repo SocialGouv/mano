@@ -129,15 +129,17 @@ const itemsForStatsSelector = selectorFamily({
 
         if (filterItemByTeam(person, 'assignedTeams')) {
           if (noPeriodSelected) {
-            personsUpdated.push(person);
-            personsCreated.push(person);
+            personsUpdated[person._id] = person;
+            personsCreated[person._id] = person;
           } else {
-            if (createdDate >= isoStartDate && createdDate < isoEndDate) personsCreated.push(person);
+            if (createdDate >= isoStartDate && createdDate < isoEndDate) {
+              personsCreated[person._id] = person;
+              personsUpdated[person._id] = person;
+            }
             for (const date of person.interactions) {
               if (date < isoStartDate) continue;
               if (date >= isoEndDate) continue;
-              personsUpdated.push(person);
-              personsCreated.push(person);
+              personsUpdated[person._id] = person;
               break;
             }
           }
@@ -210,8 +212,8 @@ const itemsForStatsSelector = selectorFamily({
       }
 
       return {
-        personsCreated,
-        personsUpdated,
+        personsCreated: Object.values(personsCreated),
+        personsUpdated: Object.values(personsUpdated),
         personsWithActions: Object.keys(personsWithActions).length,
         actionsFilteredByPersons: Object.values(actionsFilteredByPersons),
         personsWithConsultations: Object.keys(personsWithConsultations).length,
