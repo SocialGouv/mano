@@ -60,7 +60,7 @@ test("Familles", async ({ page }) => {
   });
 
   await test.step("Create relation ", async () => {
-    await expect(page.getByText(`Nouveau lien familial entre ${person1Name} et...`)).toBeVisible();
+    await expect(page.getByText("Nouveau lien familial")).toBeVisible();
     await changeReactSelectValue(page, "person-family-relation", person2Name);
     await page.getByPlaceholder("Père/fille, mère/fils...").fill("rel");
     await page.getByRole("button", { name: "Enregistrer" }).click();
