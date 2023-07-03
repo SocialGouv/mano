@@ -1,3 +1,10 @@
+# [1.276.0](https://github.com/SocialGouv/mano/compare/v1.275.0...v1.276.0) (2023-07-03)
+
+
+### Features
+
+* **dashboard:** lorsqu'on ajoute un membre d'une famille, on doit préciser le lien avec tous les membres existants ([#1584](https://github.com/SocialGouv/mano/issues/1584)) ([7b7f48c](https://github.com/SocialGouv/mano/commit/7b7f48c1c22b8bc7814a81035e7c912e3dcbffa4))
+
 # [1.275.0](https://github.com/SocialGouv/mano/compare/v1.274.0...v1.275.0) (2023-07-03)
 
 
