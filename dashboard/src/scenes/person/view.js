@@ -1,4 +1,4 @@
-import { useLocation, useParams } from 'react-router-dom';
+import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { Alert } from 'reactstrap';
 import { selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
 import Places from './Places';
@@ -15,7 +15,6 @@ import { toast } from 'react-toastify';
 import { organisationState, userState } from '../../recoil/auth';
 import PersonFamily from './PersonFamily';
 import { groupSelector } from '../../recoil/groups';
-import useSearchParamState from '../../services/useSearchParamState';
 
 const populatedPersonSelector = selectorFamily({
   key: 'populatedPersonSelector',
@@ -29,6 +28,7 @@ const populatedPersonSelector = selectorFamily({
 
 export default function View() {
   const { personId } = useParams();
+  const history = useHistory();
   const location = useLocation();
 
   const organisation = useRecoilValue(organisationState);
@@ -36,9 +36,13 @@ export default function View() {
   const personGroup = useRecoilValue(groupSelector({ personId }));
   const setPersons = useSetRecoilState(personsState);
   const user = useRecoilValue(userState);
-  const [currentTab, setCurrentTab] = useSearchParamState('tab', new URLSearchParams(location.search)?.get('tab') || 'Résumé', {
-    resetToDefaultIfTheFollowingValueChange: personId,
-  });
+  const searchParams = new URLSearchParams(location.search);
+  const currentTab = searchParams.get('tab') || 'Résumé';
+  const setCurrentTab = (tab) => {
+    searchParams.set('tab', tab);
+    history.push(`?${searchParams.toString()}`);
+  };
+
   const preparePersonForEncryption = usePreparePersonForEncryption();
 
   return (

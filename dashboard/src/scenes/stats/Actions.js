@@ -59,6 +59,8 @@ const ActionsStats = ({
     return [];
   }, [actionsWithDetailedGroupAndCategories, groupSlice, categorySlice]);
 
+  console.log('filteredActionsBySlice', filteredActionsBySlice);
+
   const filterTitle = useMemo(() => {
     if (!filterPersons.length) return `Filtrer par personnes suivies :`;
     if (personsWithActions === 1) return `Filtrer par personnes suivies (${personsWithActions} personne concernée par le filtre actuel) :`;

@@ -35,22 +35,41 @@ const PersonDocumentsMedical = ({ person }) => {
   const medicalFile = useMemo(() => (allMedicalFiles || []).find((m) => m.person === person._id), [allMedicalFiles, person._id]);
 
   const allMedicalDocuments = useMemo(() => {
-    const ordonnances =
-      treatments
-        ?.map((treatment) => treatment.documents?.map((doc) => ({ ...doc, type: 'treatment', treatment })))
-        .filter(Boolean)
-        .flat() || [];
-    const consultationsDocs =
-      personConsultations
-        ?.filter((consultation) => {
-          if (!consultation?.onlyVisibleBy?.length) return true;
-          return consultation.onlyVisibleBy.includes(user._id);
-        })
-        .map((consultation) => consultation.documents?.map((doc) => ({ ...doc, type: 'consultation', consultation })))
-        .filter(Boolean)
-        .flat() || [];
-    const otherDocs = medicalFile?.documents || [];
-    return [...ordonnances, ...consultationsDocs, ...otherDocs].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    const ordonnances = {};
+    for (const treatment of treatments) {
+      for (const document of treatment.documents || []) {
+        ordonnances[document._id] = {
+          ...document,
+          type: 'treatment',
+          treatment,
+        };
+      }
+    }
+
+    const consultationsDocs = {};
+    for (const consultation of personConsultations) {
+      if (!!consultation?.onlyVisibleBy?.length) {
+        if (!consultation.onlyVisibleBy.includes(user._id)) continue;
+      }
+      for (const document of consultation.documents || []) {
+        consultationsDocs[document._id] = {
+          ...document,
+          type: 'consultation',
+          consultation,
+        };
+      }
+    }
+
+    const otherDocs = {};
+    for (const document of medicalFile?.documents || []) {
+      otherDocs[document._id] = {
+        ...document,
+        type: 'medical-file',
+      };
+    }
+    return [...Object.values(ordonnances), ...Object.values(consultationsDocs), ...Object.values(otherDocs)].sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
   }, [personConsultations, medicalFile?.documents, treatments, user._id]);
 
   const documents = allMedicalDocuments;
@@ -144,7 +163,9 @@ const PersonDocumentsMedical = ({ person }) => {
           {documentToEdit.type === 'treatment' ? (
             <button
               onClick={() => {
-                history.push(`/person/${person._id}?tab=Dossier+Médical&treatmentId=${documentToEdit.treatment}`);
+                const searchParams = new URLSearchParams(history.location.search);
+                searchParams.set('treatmentId', documentToEdit.treatment);
+                history.push(`?${searchParams.toString()}`);
                 setDocumentToEdit(null);
               }}
               className="button-classic">
@@ -153,7 +174,7 @@ const PersonDocumentsMedical = ({ person }) => {
           ) : documentToEdit.type === 'consultation' ? (
             <button
               onClick={() => {
-                history.push(`/person/${person._id}?tab=Dossier+Médical&consultationId=${documentToEdit.consultation}`);
+                history.push(`?consultationId=${documentToEdit.consultation}`);
                 setDocumentToEdit(null);
               }}
               className="button-classic">

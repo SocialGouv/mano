@@ -28,10 +28,10 @@ test("merging normal user with health data", async ({ page }) => {
     await page.getByRole("button", { name: "Ajouter un champ" }).click();
     await page.getByLabel("Nom").fill("Multi-champ");
     await changeReactSelectValue(page, "type", "Choix multiple dans une liste");
-    await page.getByLabel("Choix").fill("choix 1");
-    await page.getByLabel("Choix").press("Enter");
-    await page.getByLabel("Choix").fill("choix 2");
-    await page.getByLabel("Choix").press("Enter");
+    await page.getByLabel("Choix", { exact: true }).fill("choix 1");
+    await page.keyboard.press("Enter");
+    await page.getByLabel("Choix", { exact: true }).fill("choix 2");
+    await page.keyboard.press("Enter");
     await page.getByRole("button", { name: "Enregistrer" }).click();
     await page.getByText("Mise à jour !").click();
 

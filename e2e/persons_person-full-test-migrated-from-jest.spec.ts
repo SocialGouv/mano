@@ -112,15 +112,13 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Commentaire enregistré").click();
   await page.getByText("Premier commentaire").click();
-  await page.getByRole("button", { name: "Enregistrer" }).click();
-  await page.getByText("Commentaire enregistré").click();
+  await page.getByRole("button", { name: "Fermer" }).first().click();
 
   await page.locator("button[aria-label='Ajouter un passage']").click();
   await page.getByLabel("Date").click();
   await page.getByLabel("Date").fill("2004-10-10T10:10");
   await page.getByLabel("Date").press("Enter");
-  await page.getByLabel("Commentaire").click();
-  await page.getByLabel("Commentaire").fill("hello commentaire passage je veux dire");
+  await page.getByRole("dialog").getByLabel("Commentaire").fill("hello commentaire passage je veux dire");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Passage enregistré").click();
 
@@ -130,8 +128,7 @@ test("test", async ({ page }) => {
   await page.getByLabel("Date").press("Meta+a");
   await page.getByLabel("Date").fill("2006-09-09T10:10");
   await page.getByLabel("Date").press("Enter");
-  await page.getByLabel("Commentaire").click();
-  await page.getByLabel("Commentaire").fill("BOUM");
+  await page.getByRole("dialog").getByLabel("Commentaire").fill("BOUM");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Rencontre enregistrée").click();
 
@@ -148,23 +145,16 @@ test("test", async ({ page }) => {
   await page.getByText("Mis à jour !").click();
 
   await page.getByRole("button", { name: "Ajouter un traitement" }).click();
-  await page.getByPlaceholder("1 fois par jour").click();
   await page.getByPlaceholder("1 fois par jour").fill("dedede");
-  await page.getByPlaceholder("Angine").click();
   await page.getByPlaceholder("Angine").fill("dedededed");
-  await page.getByLabel("Date de fin").click();
   await page.getByLabel("Date de fin").fill("2000-11-11");
-  await page.getByLabel("Date de fin").press("Enter");
-  await page.getByLabel("Date de début").click();
-  await page.getByLabel("Date de début").press("Meta+a");
   await page.getByLabel("Date de début").fill("2009-11-11");
-  await page.getByLabel("Date de début").press("Enter");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
-  await page.getByText("Le nom est obligatoire").click();
+  await page.getByText("Le nom est obligatoire").first().click();
   await page.getByPlaceholder("Amoxicilline").click();
   await page.getByPlaceholder("Amoxicilline").fill("hdeyygdeygde");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
-  await page.getByText("Traitement créé !").click();
+  await page.getByText("Traitement créé !").first().click();
 
   await expect(page.getByText("dedede").first()).toBeVisible();
   await page.getByRole("button", { name: "Ajouter une consultation" }).click();
@@ -176,9 +166,9 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Sauvegarder" }).click();
 
   await page.getByText("AZAZAZAZAZAZAZAZA").click();
-  await page.getByRole("button", { name: "Annuler" }).click();
+  await page.getByRole("button", { name: "Fermer" }).first().click();
   await page.getByRole("button", { name: "Lieux fréquentés (0)" }).click();
-  await page.getByRole("button", { name: "Fermer" }).click();
+  await page.getByRole("button", { name: "Fermer" }).first().click();
 
   await page.getByRole("button", { name: "Historique" }).click();
   await page.locator('[data-test-id="Autres pseudos\\: \\"\\" ➔ \\"test pseudo\\""]').click();
@@ -187,6 +177,7 @@ test("test", async ({ page }) => {
   await expect(page).toHaveURL("http://localhost:8090/person");
   await page.getByText(personName).click();
   await page.getByText("hello action").click();
+  await page.getByRole("button", { name: "Fermer" }).first().click();
 
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await expect(page).toHaveURL("http://localhost:8090/person");

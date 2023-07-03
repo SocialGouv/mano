@@ -263,7 +263,11 @@ const Actions = ({ actions }) => {
       })}
       title={`Action${moreThanOne ? 's' : ''} (${data.length})`}
       noData="Pas d'action"
-      onRowClick={(action) => history.push(`/action/${action._id}`)}
+      onRowClick={(action) => {
+        const searchParams = new URLSearchParams(history.location.search);
+        searchParams.set('actionId', action._id);
+        history.push(`?${searchParams.toString()}`);
+      }}
       rowKey="_id"
       columns={[
         {

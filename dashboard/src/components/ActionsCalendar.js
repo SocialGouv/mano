@@ -93,10 +93,13 @@ const ActionsCalendar = ({ actions, isNightSession, columns = ['Heure', 'Nom', '
         return a;
       })}
       onRowClick={(actionOrConsultation) => {
+        const searchParams = new URLSearchParams(history.location.search);
         if (actionOrConsultation.isConsultation) {
-          history.push(`/person/${actionOrConsultation.person}?tab=Dossier+Médical&consultationId=${actionOrConsultation._id}`);
+          searchParams.set('consultationId', actionOrConsultation._id);
+          history.push(`?${searchParams.toString()}`);
         } else {
-          history.push(`/action/${actionOrConsultation._id}`);
+          searchParams.set('actionId', actionOrConsultation._id);
+          history.push(`?${searchParams.toString()}`);
         }
       }}
       rowDisabled={(actionOrConsultation) => disableConsultationRow(actionOrConsultation, user)}

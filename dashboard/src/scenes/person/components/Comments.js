@@ -24,7 +24,7 @@ export default function Comments({ person }) {
     <div className="tw-relative">
       <CommentsModule
         comments={comments}
-        person={person._id}
+        personId={person._id}
         typeForNewComment="person"
         canToggleGroupCheck={canToggleGroupCheck}
         canToggleUrgentCheck
@@ -36,6 +36,8 @@ export default function Comments({ person }) {
           toast.success('Commentaire supprimé !');
         }}
         onSubmitComment={async (comment, isNewComment) => {
+          console.log('comment', comment);
+          console.log('isNewComment', isNewComment);
           if (isNewComment) {
             const response = await API.post({
               path: '/comment',

@@ -21,18 +21,18 @@ const encryptedFields = ['persons', 'relations'];
 
 // @type Relation: { persons: uuid[], description: string, createdAt: Date, updatedAt: Date, user: uuid };
 
-export const prepareGroupForEncryption = (report) => {
+export const prepareGroupForEncryption = (group) => {
   const decrypted = {};
   for (let field of encryptedFields) {
-    decrypted[field] = report[field];
+    decrypted[field] = group[field];
   }
   return {
-    _id: report._id,
-    createdAt: report.createdAt,
-    updatedAt: report.updatedAt,
-    organisation: report.organisation,
+    _id: group._id,
+    createdAt: group.createdAt,
+    updatedAt: group.updatedAt,
+    organisation: group.organisation,
 
     decrypted,
-    entityKey: report.entityKey,
+    entityKey: group.entityKey,
   };
 };

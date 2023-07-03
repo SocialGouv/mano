@@ -204,10 +204,10 @@ const Category = ({ item: category, groupTitle }) => {
         <ModalBody>
           <form id="edit-category-form" className="tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8" onSubmit={onEditCategory}>
             <div>
-              <label htmlFor="newCategory" className="form-text tailwindui">
+              <label htmlFor="newCategory" className="tailwindui">
                 Nouveau nom de la catégorie
               </label>
-              <input className="form-text tailwindui" id="newCategory" name="newCategory" type="text" placeholder={category} />
+              <input className="tailwindui" id="newCategory" name="newCategory" type="text" placeholder={category} />
             </div>
           </form>
         </ModalBody>

@@ -531,7 +531,6 @@ const SelectedPersonsModal = ({ open, onClose, persons, title, onAfterLeave, sli
                 title: sliceField.label,
                 dataKey: sliceField,
                 render: (person) => {
-                  console.log('person', person, sliceField.field, person[sliceField.field]);
                   return <CustomFieldDisplay type={sliceField.type} value={person[sliceField.field]} />;
                 },
               },

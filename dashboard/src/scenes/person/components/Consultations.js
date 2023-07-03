@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useRecoilValue } from 'recoil';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { organisationState, userState } from '../../../recoil/auth';
 import { CANCEL, DONE, mappedIdsToLabels } from '../../../recoil/actions';
 import SelectCustom from '../../../components/SelectCustom';
@@ -11,20 +11,14 @@ import { formatDateWithNameOfDay, formatTime } from '../../../services/date';
 import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from '../../../components/tailwind/Modal';
 import { arrayOfitemsGroupedByConsultationSelector } from '../../../recoil/selectors';
 import { useLocalStorage } from '../../../services/useLocalStorage';
-import ConsultationModal from '../../../components/ConsultationModal';
 import { AgendaMutedIcon } from './AgendaMutedIcon';
 import { disableConsultationRow } from '../../../recoil/consultations';
 import { FullScreenIcon } from './FullScreenIcon';
+import UserName from '../../../components/UserName';
 
 export const Consultations = ({ person }) => {
-  const [modalOpen, setModalOpen] = useState(false);
   const [fullScreen, setFullScreen] = useState(false);
   const history = useHistory();
-  const { search } = useLocation();
-  const currentConsultationId = useMemo(() => {
-    const searchParams = new URLSearchParams(search);
-    return searchParams.get('consultationId');
-  }, [search]);
 
   const allConsultations = useRecoilValue(arrayOfitemsGroupedByConsultationSelector);
   const [consultationTypes, setConsultationTypes] = useLocalStorage('consultation-types', []);
@@ -40,11 +34,6 @@ export const Consultations = ({ person }) => {
     [personConsultations, consultationStatuses, consultationTypes]
   );
 
-  const currentConsultation = useMemo(() => {
-    if (!currentConsultationId) return null;
-    return personConsultations.find((c) => c._id === currentConsultationId);
-  }, [personConsultations, currentConsultationId]);
-
   const data = personConsultations;
   const filteredData = personConsultationsFiltered;
 
@@ -57,11 +46,19 @@ export const Consultations = ({ person }) => {
             <button
               aria-label="Ajouter une consultation"
               className="tw-text-md tw-h-8 tw-w-8 tw-rounded-full tw-bg-blue-900 tw-font-bold tw-text-white tw-transition hover:tw-scale-125"
-              onClick={() => setModalOpen(true)}>
+              onClick={() => {
+                const searchParams = new URLSearchParams(history.location.search);
+                searchParams.set('newConsultation', true);
+                searchParams.set('personId', person._id);
+                history.push(`?${searchParams.toString()}`);
+              }}>
               ＋
             </button>
             {Boolean(filteredData.length) && (
-              <button className="tw-h-6 tw-w-6 tw-rounded-full tw-text-blue-900 tw-transition hover:tw-scale-125" onClick={() => setFullScreen(true)}>
+              <button
+                title="Passer les consultations en plein écran"
+                className="tw-h-6 tw-w-6 tw-rounded-full tw-text-blue-900 tw-transition hover:tw-scale-125"
+                onClick={() => setFullScreen(true)}>
                 <FullScreenIcon />
               </button>
             )}
@@ -95,22 +92,21 @@ export const Consultations = ({ person }) => {
             <button type="button" name="cancel" className="button-cancel" onClick={() => setFullScreen(false)}>
               Fermer
             </button>
-            <button type="button" className="button-submit !tw-bg-blue-900" onClick={() => setModalOpen(true)}>
+            <button
+              type="button"
+              className="button-submit !tw-bg-blue-900"
+              onClick={() => {
+                const searchParams = new URLSearchParams(history.location.search);
+                searchParams.set('newConsultation', true);
+                searchParams.set('personId', person._id);
+                history.push(`?${searchParams.toString()}`);
+              }}>
               ＋ Ajouter une consultation
             </button>
           </ModalFooter>
         </ModalContainer>
         <ConsultationsTable filteredData={filteredData} person={person} />
       </div>
-      <ConsultationModal
-        open={Boolean(currentConsultation) || modalOpen}
-        consultation={currentConsultation}
-        onClose={() => {
-          if (currentConsultation) history.goBack();
-          if (modalOpen) setModalOpen(false);
-        }}
-        personId={person._id}
-      />
     </>
   );
 };
@@ -178,12 +174,14 @@ const ConsultationsTable = ({ filteredData, person }) => {
                   <div
                     className={
                       ['restricted-access'].includes(user.role) || disableConsultationRow(consultation, user)
-                        ? 'tw-cursor-not-allowed tw-py-2'
-                        : 'tw-cursor-pointer tw-py-2'
+                        ? 'tw-cursor-not-allowed tw-pt-2'
+                        : 'tw-cursor-pointer tw-pt-2'
                     }
                     onClick={() => {
                       if (disableConsultationRow(consultation, user)) return;
-                      history.push(`/person/${person._id}?tab=Dossier+Médical&consultationId=${consultation._id}`);
+                      const searchParams = new URLSearchParams(history.location.search);
+                      searchParams.set('consultationId', consultation._id);
+                      history.push(`?${searchParams.toString()}`);
                     }}>
                     <div className="tw-flex">
                       <div className="tw-flex-1">{`${date}${time}`}</div>
@@ -209,6 +207,10 @@ const ConsultationsTable = ({ filteredData, person }) => {
                           <TagTeam teamId={consultation?.team} />
                         )}
                       </div>
+                    </div>
+                    <div className="tw-mt-2 -tw-mb-2 tw-flex tw-basis-full tw-gap-1 tw-text-xs tw-opacity-50 [overflow-wrap:anywhere]">
+                      <span>Créée par</span>
+                      <UserName id={consultation.user} />
                     </div>
                   </div>
                 </td>

@@ -162,7 +162,7 @@ test("Actions", async ({ page }) => {
   await test.step("Search for category", async () => {
     await page.getByRole("link", { name: "Agenda" }).click();
     await page.getByText(action3Name).click();
-
+    await page.getByRole("button", { name: "Modifier" }).click();
     await page.locator("#categories").getByRole("button").last().click();
 
     await page.getByPlaceholder("Recherchez...").fill(groupe2cat2.slice(0, 5));
@@ -170,11 +170,8 @@ test("Actions", async ({ page }) => {
     await page.getByRole("button", { name: `${group2Name} (1)` }).click();
 
     await page.getByRole("dialog", { name: "Sélectionner des catégories" }).getByRole("button", { name: groupe2cat2 }).click();
-
-    await page.getByRole("button", { name: "Fermer" }).click();
-
-    await page.getByRole("button", { name: "Mettre à jour" }).click();
-
+    await page.getByRole("dialog", { name: "Sélectionner des catégories" }).getByRole("button", { name: "Fermer" }).click();
+    await page.getByRole("button", { name: "Sauvegarder" }).click();
     await page.getByText("Mise à jour !").click();
   });
 

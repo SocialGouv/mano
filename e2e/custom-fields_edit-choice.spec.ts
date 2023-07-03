@@ -7,12 +7,12 @@ test.beforeAll(async () => {
 });
 
 const addCustomField = async (page: Page, name: string, type: string, options: string[]) => {
-  await page.getByLabel("Nom").fill(name);
+  await page.getByRole("dialog").getByLabel("Nom").fill(name);
   await clickOnEmptyReactSelect(page, "type", type);
   await page.locator(".options__input-container").click();
   for (const option of options) {
-    await page.getByLabel("Choix").fill(option);
-    await page.getByLabel("Choix").press("Enter");
+    await page.getByLabel("Choix", { exact: true }).fill(option);
+    await page.keyboard.press("Enter");
   }
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Mise à jour !").click();
@@ -57,7 +57,7 @@ test("test", async ({ page }) => {
     await expect(page).toHaveURL("http://localhost:8090/person");
 
     await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
-    await page.getByLabel("Nom").fill("personne1");
+    await page.getByRole("dialog").getByLabel("Nom").fill("personne1");
     await page.getByRole("button", { name: "Sauvegarder" }).click();
     await page.getByText("Création réussie !").click();
     await page.getByRole("button", { name: "Modifier" }).click();
@@ -104,18 +104,18 @@ test("test", async ({ page }) => {
     await page.getByRole("button", { name: "Sauvegarder" }).click();
 
     await page.getByText("Consultation Médicale").click();
-    await expect(page.locator(".person-custom-select-poils-au-nez__single-value")).toHaveText("un peu");
-    await page.getByRole("button", { name: "Fermer" }).click();
+    await page.getByText("Poils au nezun peu").click();
+    await page.getByRole("button", { name: "Fermer" }).first().click();
     await page.getByText("Consultation Infirmier").click();
-    await expect(page.locator(".person-custom-select-pansements__multi-value__label").first()).toHaveText("Gros");
-    await page.getByRole("button", { name: "Fermer" }).click();
+    await page.getByText("PansementsGrosTrès grosTrès très gros").click();
+    await page.getByRole("button", { name: "Fermer" }).first().click();
   });
 
   await test.step("create observation", async () => {
     await page.getByRole("link", { name: "Territoires" }).click();
     await expect(page).toHaveURL("http://localhost:8090/territory");
     await page.getByRole("button", { name: "Créer un nouveau territoire" }).click();
-    await page.getByLabel("Nom").fill("territoire1");
+    await page.getByRole("dialog").getByLabel("Nom").fill("territoire1");
     await page.getByRole("button", { name: "Sauvegarder" }).click();
     await page.getByText("Création réussie !").click();
 
@@ -280,14 +280,12 @@ test("test", async ({ page }) => {
     await expect(page.getByText("Colonne vertébrale seulement")).toBeVisible();
 
     await page.getByText("Consultation Médicale").click();
-    await expect(page.locator(".person-custom-select-poils-au-nez__single-value")).toHaveText("Un peu");
-
-    await page.getByRole("button", { name: "Fermer" }).click();
+    await page.getByText("Poils au nezun peu").click();
+    await page.getByRole("button", { name: "Fermer" }).first().click();
 
     await page.getByText("Consultation Infirmier").click();
-    await expect(page.locator(".person-custom-select-pansements__multi-value__label").first()).toHaveText("Petit");
-
-    await page.getByRole("button", { name: "Fermer" }).click();
+    await page.getByText("PansementsPetitTrès grosTrès très gros").click();
+    await page.getByRole("button", { name: "Fermer" }).first().click();
 
     await page.getByRole("link", { name: "Territoires" }).click();
     await page.getByRole("cell", { name: "territoire1" }).click();

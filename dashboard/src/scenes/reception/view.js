@@ -7,7 +7,6 @@ import { SmallHeader } from '../../components/header';
 import { formatDateWithNameOfDay, getIsDayWithinHoursOffsetOfPeriod, isToday, now, startOfToday } from '../../services/date';
 import { currentTeamReportsSelector } from '../../recoil/selectors';
 import { theme } from '../../config';
-import CreateActionModal from '../../components/CreateActionModal';
 import SelectAndCreatePerson from './SelectAndCreatePerson';
 import ButtonCustom from '../../components/ButtonCustom';
 import ActionsCalendar from '../../components/ActionsCalendar';
@@ -29,7 +28,6 @@ import Passage from '../../components/Passage';
 import UserName from '../../components/UserName';
 import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
 import ReceptionService from '../../components/ReceptionService';
-import ConsultationModal from '../../components/ConsultationModal';
 
 export const actionsForCurrentTeamSelector = selector({
   key: 'actionsForCurrentTeamSelector',
@@ -111,7 +109,6 @@ const Reception = () => {
   const consultationsByStatus = useRecoilValue(consultationsByStatusSelector({ status }));
   const [services, setServices] = useState(null);
   const [todaysPassagesOpen, setTodaysPassagesOpen] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const dataConsolidated = useMemo(
@@ -149,8 +146,6 @@ const Reception = () => {
     setSelectedPersons(persons);
     history.replace({ pathname: location.pathname, search: searchParams.toString() });
   };
-
-  const [showConsultationModal, setShowConsultationModal] = useState(false);
 
   // for better UX when increase passage
   const [addingPassage, setAddingPassage] = useState(false);
@@ -229,43 +224,40 @@ const Reception = () => {
         </div>
         <ButtonCustom
           icon={plusIcon}
-          onClick={() => setModalOpen(true)}
+          onClick={() => {
+            const searchParams = new URLSearchParams(history.location.search);
+            searchParams.set('newAction', true);
+            searchParams.set(
+              'personIds',
+              selectedPersons
+                .map((p) => p?._id)
+                .filter(Boolean)
+                .join(',')
+            );
+            history.push(`?${searchParams.toString()}`);
+          }}
           color="primary"
           title="Action"
           padding={'8px 14px'}
           style={{ height: 'fit-content' }}
-        />
-        <CreateActionModal
-          open={modalOpen}
-          setOpen={(value) => setModalOpen(value)}
-          smallButton
-          icon={plusIcon}
-          title="Action"
-          buttonOnly
-          isMulti
-          persons={selectedPersons.map((p) => p?._id).filter(Boolean)}
         />
 
         {Boolean(user.healthcareProfessional) && (
           <>
             <ButtonCustom
               icon={plusIcon}
-              onClick={() => setShowConsultationModal(true)}
+              onClick={() => {
+                const searchParams = new URLSearchParams(history.location.search);
+                searchParams.set('newConsultation', true);
+                if (selectedPersons?.[0]._id) searchParams.set('personId', selectedPersons?.[0]._id);
+                history.push(`?${searchParams.toString()}`);
+              }}
               color="primary"
               disabled={!selectedPersons.length || selectedPersons.length > 1}
               title="Consultation"
               padding={'8px 14px'}
               style={{ height: 'fit-content' }}
             />
-            {!!showConsultationModal && (
-              <ConsultationModal
-                open={showConsultationModal}
-                onClose={() => {
-                  setShowConsultationModal(false);
-                }}
-                personId={selectedPersons?.[0]._id}
-              />
-            )}
           </>
         )}
         {!!organisation.passagesEnabled && (

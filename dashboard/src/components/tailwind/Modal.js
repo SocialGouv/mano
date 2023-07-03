@@ -101,7 +101,7 @@ const ModalContainer = ({
 
 const nullFunction = () => null;
 
-const ModalHeader = ({ children, title }) => {
+const ModalHeader = ({ children, title, onClose }) => {
   return (
     <div className="tw-order-1 tw-flex tw-w-full tw-shrink-0 tw-items-center tw-justify-between tw-rounded-t-lg tw-border-b tw-border-gray-200 tw-bg-white">
       <div className="tw-w-full tw-py-4 sm:tw-flex sm:tw-items-start">
@@ -112,6 +112,17 @@ const ModalHeader = ({ children, title }) => {
             </Dialog.Title>
           )}
           {children}
+          {!!onClose && (
+            <button type="button" aria-label="Fermer" className="tw-absolute tw-top-4 tw-right-0 tw-text-gray-900 sm:tw-px-6" onClick={onClose}>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="tw-h-6 tw-w-6">
+                <path
+                  fillRule="evenodd"
+                  d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -120,7 +131,7 @@ const ModalHeader = ({ children, title }) => {
 
 const ModalBody = forwardRef(({ children, className = '', overflowY = true }, ref) => {
   return (
-    <div ref={ref} className={['tw-z-[99999] tw-order-2 tw-shrink tw-pb-4', overflowY ? 'tw-overflow-y-auto' : ''].join(' ')}>
+    <div ref={ref} className={['tw-z-[99999] tw-order-2 tw-shrink', overflowY ? 'tw-overflow-y-auto' : ''].join(' ')}>
       <div className="sm:tw-flex sm:tw-items-start">
         <div className={['tw-w-full tw-text-center sm:tw-mt-0 sm:tw-text-left', className].join(' ')}>{children}</div>
       </div>

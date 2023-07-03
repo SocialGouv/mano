@@ -27,7 +27,7 @@ import { consultationsState } from '../../recoil/consultations';
 import { treatmentsState } from '../../recoil/treatments';
 import { medicalFileState } from '../../recoil/medicalFiles';
 import { refreshTriggerState } from '../../components/Loader';
-import { groupsState } from '../../recoil/groups';
+import { groupsState, prepareGroupForEncryption } from '../../recoil/groups';
 
 const TabNavigator = createMaterialTopTabNavigator();
 
@@ -213,7 +213,7 @@ const Person = ({ route, navigation }) => {
       if (updatedGroup.relations.length === 0) {
         body.groupIdToDelete = group._id;
       } else {
-        body.groupToUpdate = updatedGroup;
+        body.groupToUpdate = await encryptItem(prepareGroupForEncryption(updatedGroup));
       }
 
       if (personTransferId) {
@@ -221,11 +221,6 @@ const Person = ({ route, navigation }) => {
           actions
             .filter((a) => a.person === personDB._id && a.group === true)
             .map((action) => {
-              console.log({
-                ...action,
-                person: personTransferId,
-                user: action.user || user._id,
-              });
               return prepareActionForEncryption({
                 ...action,
                 person: personTransferId,

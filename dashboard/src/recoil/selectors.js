@@ -186,6 +186,7 @@ export const itemsGroupedByPersonSelector = selector({
         if (!personsObject[person]) continue;
         personsObject[person].comments = personsObject[person].comments || [];
         personsObject[person].comments.push({ ...comment, type: 'action', date: comment.date || comment.createdAt });
+        continue;
       }
       if (!personsObject[comment.person]) continue;
       personsObject[comment.person].comments = personsObject[comment.person].comments || [];
@@ -231,7 +232,6 @@ export const itemsGroupedByPersonSelector = selector({
             consultation,
             person: consultation.person,
             type: 'consultation',
-            _id: comment.date + consultation._id,
           });
         }
       }
@@ -248,14 +248,21 @@ export const itemsGroupedByPersonSelector = selector({
             treatment,
             person: treatment.person,
             type: 'treatment',
-            _id: comment.date + treatment._id,
           });
         }
       }
       for (const medicalFile of medicalFiles) {
         if (!personsObject[medicalFile.person]) continue;
-        if (personsObject[medicalFile.person].medicalFile) continue;
-        personsObject[medicalFile.person].medicalFile = medicalFile;
+        if (personsObject[medicalFile.person].medicalFile) {
+          personsObject[medicalFile.person].medicalFile = {
+            ...medicalFile,
+            ...personsObject[medicalFile.person].medicalFile,
+            documents: [...(medicalFile?.documents || []), ...(personsObject[medicalFile.person].medicalFile?.documents || [])],
+            comments: [...(medicalFile?.comments || []), ...(personsObject[medicalFile.person].medicalFile?.comments || [])],
+          };
+        } else {
+          personsObject[medicalFile.person].medicalFile = medicalFile;
+        }
         personsObject[medicalFile.person].interactions.push(medicalFile.createdAt);
         for (const comment of medicalFile.comments || []) {
           personsObject[medicalFile.person].interactions.push(comment.date);
@@ -264,7 +271,6 @@ export const itemsGroupedByPersonSelector = selector({
             ...comment,
             person: medicalFile.person,
             type: 'medical-file',
-            _id: comment.date + medicalFile._id,
           });
         }
       }
@@ -431,6 +437,34 @@ export const arrayOfitemsGroupedByConsultationSelector = selector({
     const itemsGroupedByConsultation = get(itemsGroupedByConsultationSelector);
     const itemsGroupedByConsultationArray = Object.values(itemsGroupedByConsultation);
     return itemsGroupedByConsultationArray;
+  },
+});
+
+export const itemsGroupedByTreatmentSelector = selector({
+  key: 'itemsGroupedByTreatmentSelector',
+  get: ({ get }) => {
+    const treatments = get(treatmentsState);
+    const personsWithPlacesObject = get(personsWithPlacesSelector);
+    const usersObject = get(usersObjectSelector);
+
+    const treatmentsObject = {};
+    for (const treatment of treatments) {
+      treatmentsObject[treatment._id] = {
+        ...treatment,
+        personPopulated: personsWithPlacesObject[treatment.person],
+        userPopulated: treatment.user ? usersObject[treatment.user] : null,
+      };
+    }
+    return treatmentsObject;
+  },
+});
+
+export const arrayOfitemsGroupedByTreatmentSelector = selector({
+  key: 'arrayOfitemsGroupedByTreatmentSelector',
+  get: ({ get }) => {
+    const itemsGroupedByTreatment = get(itemsGroupedByTreatmentSelector);
+    const itemsGroupedByTreatmentArray = Object.values(itemsGroupedByTreatment);
+    return itemsGroupedByTreatmentArray;
   },
 });
 

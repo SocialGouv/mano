@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Col, FormGroup, Input, Label } from 'reactstrap';
+import { Col, FormGroup } from 'reactstrap';
 import styled from 'styled-components';
 import SelectAsInput from './SelectAsInput';
 import SelectCustom from './SelectCustom';
@@ -30,14 +30,15 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = null,
       <Col md={colWidth} key={field.name}>
         <FormGroup>
           {!hideLabel && (
-            <Label data-test-id={field.label} htmlFor={id}>
+            <label className="tw-text-sm tw-font-semibold tw-text-gray-600" data-test-id={field.label} htmlFor={id}>
               {field.type !== 'boolean' ? field.label : ''}
-            </Label>
+            </label>
           )}
           {!!['text', 'number'].includes(field.type) && (
-            <Input
+            <input
               disabled={disabled}
               name={field.name}
+              className="tailwindui"
               required={field.required}
               value={values[field.name] || ''}
               onChange={(e) => {
@@ -62,10 +63,10 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = null,
             />
           )}
           {!!['textarea'].includes(field.type) && (
-            <Input
+            <textarea
               disabled={disabled}
+              className="tailwindui"
               name={field.name}
-              type="textarea"
               rows={5}
               required={field.required}
               value={values[field.name]}
@@ -89,7 +90,7 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = null,
           {!!['boolean'].includes(field.type) && (
             <CheckboxContainer>
               <label htmlFor={id}>{field.label}</label>
-              <Input
+              <input
                 type="checkbox"
                 id={id}
                 required={field.required}
@@ -154,9 +155,9 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = null,
     <Col md={colWidth} key={field.name}>
       <FormGroup>
         {!hideLabel && (
-          <Label data-test-id={field.label} htmlFor={id}>
+          <label className="tw-text-sm tw-font-semibold tw-text-gray-600" data-test-id={field.label} htmlFor={id}>
             {field.type !== 'boolean' ? field.label : ''}
-          </Label>
+          </label>
         )}
         {JSON.stringify(values[field.name])}
       </FormGroup>

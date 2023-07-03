@@ -126,7 +126,9 @@ const Actions = ({ setShowModal, actions, setSortOrder, setSortBy, sortBy, sortO
           dataTestId="name"
           onRowClick={(action) => {
             setShowModal(false);
-            history.push(`/action/${action._id}`);
+            const searchParams = new URLSearchParams(history.location.search);
+            searchParams.set('actionId', action._id);
+            history.push(`?${searchParams.toString()}`);
           }}
           columns={[
             {
@@ -221,7 +223,13 @@ const Comments = ({ setShowModal, comments }) => {
           dataTestId="comment"
           onRowClick={(comment) => {
             setShowModal(false);
-            history.push(`/${comment.type}/${comment[comment.type]}`);
+            if (comment.type === 'action') {
+              const searchParams = new URLSearchParams(history.location.search);
+              searchParams.set('actionId', comment.action);
+              history.push(`?${searchParams.toString()}`);
+            } else {
+              history.push(`/person/${comment.person}`);
+            }
           }}
           columns={[
             {

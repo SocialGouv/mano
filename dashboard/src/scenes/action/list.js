@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { selectorFamily, useRecoilValue } from 'recoil';
-import CreateActionModal from '../../components/CreateActionModal';
+import { useHistory } from 'react-router-dom';
 import { SmallHeader } from '../../components/header';
 import Search from '../../components/search';
 import ActionsCalendar from '../../components/ActionsCalendar';
@@ -17,8 +17,8 @@ import agendaIcon from '../../assets/icons/agenda-icon.svg';
 import ActionsCategorySelect from '../../components/tailwind/ActionsCategorySelect';
 import { useLocalStorage } from '../../services/useLocalStorage';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
-import ConsultationModal from '../../components/ConsultationModal';
 import ActionsSortableList from '../../components/ActionsSortableList';
+import { dayjsInstance } from '../../services/date';
 
 const showAsOptions = ['Calendrier', 'Liste', 'Hebdomadaire'];
 
@@ -115,10 +115,7 @@ const List = () => {
   const user = useRecoilValue(userState);
   const teams = useRecoilValue(teamsState);
 
-  const [modalOpen, setModalOpen] = useState(false);
-
-  const [showConsultationModal, setShowConsultationModal] = useState(false);
-
+  const history = useHistory();
   const [search, setSearch] = useSearchParamState('search', '');
 
   const [categories, setCategories] = useLocalStorage('action-categories', []);
@@ -128,7 +125,6 @@ const List = () => {
   const [viewNoTeamData, setViewNoTeamData] = useLocalStorage('action-noTeam', false);
   const [actionsWithNoCategory, setActionsWithNoCategory] = useLocalStorage('action-noCategory', false);
 
-  const [actionDate, setActionDate] = useState(new Date());
   const [showAs, setShowAs] = useLocalStorage('action-showAs', showAsOptions[0]); // calendar, list
   const dataConsolidated = useRecoilValue(
     dataFilteredBySearchSelector({
@@ -182,8 +178,10 @@ const List = () => {
             icon={agendaIcon}
             disabled={!currentTeam}
             onClick={() => {
-              setActionDate(new Date());
-              setModalOpen(true);
+              const searchParams = new URLSearchParams(history.location.search);
+              searchParams.set('dueAt', dayjsInstance().toISOString());
+              searchParams.set('newAction', true);
+              history.push(`?${searchParams.toString()}`);
             }}
             color="primary"
             title="Créer une nouvelle action"
@@ -194,7 +192,10 @@ const List = () => {
               icon={agendaIcon}
               disabled={!currentTeam}
               onClick={() => {
-                setShowConsultationModal(true);
+                const searchParams = new URLSearchParams(history.location.search);
+                searchParams.set('dueAt', dayjsInstance().toISOString());
+                searchParams.set('newConsultation', true);
+                history.push(`?${searchParams.toString()}`);
               }}
               color="primary"
               title="Créer une nouvelle consultation"
@@ -310,8 +311,10 @@ const List = () => {
             isNightSession={allSelectedTeamsAreNightSession}
             actions={dataConsolidated}
             onCreateAction={(date) => {
-              setActionDate(date);
-              setModalOpen(true);
+              const searchParams = new URLSearchParams(history.location.search);
+              searchParams.set('dueAt', dayjsInstance(date).toISOString());
+              searchParams.set('newAction', true);
+              history.push(`?${searchParams.toString()}`); // Update the URL with the new search parameters.
             }}
           />
         </div>
@@ -326,13 +329,6 @@ const List = () => {
           <ActionsSortableList data={dataConsolidated} limit={20} />
         </div>
       )}
-      <CreateActionModal dueAt={actionDate} open={modalOpen} setOpen={(value) => setModalOpen(value)} disabled={!currentTeam} isMulti refreshable />
-      <ConsultationModal
-        open={showConsultationModal}
-        onClose={() => {
-          setShowConsultationModal(false);
-        }}
-      />
     </>
   );
 };

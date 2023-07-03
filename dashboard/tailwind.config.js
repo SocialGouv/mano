@@ -42,6 +42,9 @@ module.exports = {
           DEFAULT: theme('colors.white'),
         },
       }),
+      minHeight: {
+        '1/2': '50vh',
+      },
     },
   },
   plugins: [

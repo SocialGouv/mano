@@ -53,10 +53,18 @@ test("Create action with comments", async ({ page }) => {
   await page.getByText(person1Name).last().click();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*/);
   await page.getByText("action avec commentaire").click();
-  await expect(page).toHaveURL(/http:\/\/localhost:8090\/action\/.*/);
-  await page.getByText("Une personne avec un commentaire prioritaire").click();
-  await page.getByRole("button", { name: "Enregistrer" }).click();
-  await page.getByText("Commentaire mis à jour").click();
+  await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*\?tab=R%C3%A9sum%C3%A9&actionId=.*/);
+  await page.getByRole("button", { name: "Commentaires (1)" }).click();
+  await page
+    .getByRole("dialog", { name: "Action: action avec commentaire (créée par User Admin Test - 7)" })
+    .getByText("Une personne avec un commentaire prioritaire")
+    .click();
+  await page
+    .getByRole("dialog", { name: "Commentaire" })
+    .filter({ hasText: `CommentaireCréé parUser Admin Test - 7Créé le / Concerne le${dayjs().format("dddd D MMMM YYYY")}` })
+    .getByRole("button", { name: "Fermer" })
+    .click();
+  await page.getByRole("button", { name: "Fermer" }).first().click();
 
   await page.getByRole("link", { name: "Agenda" }).click();
   await expect(page).toHaveURL("http://localhost:8090/action?calendarTab=2");
@@ -72,20 +80,37 @@ test("Create action with comments", async ({ page }) => {
   await page.getByText(person2Name).first().click();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*/);
   await page.getByText(actionFor2PersonName).click();
-  await expect(page).toHaveURL(/http:\/\/localhost:8090\/action\/.*/);
-  await page.getByText("Un commentaire pour tout le monde").click();
-  await page.getByRole("button", { name: "Enregistrer" }).click();
-  await page.getByText("Commentaire mis à jour").click();
+  await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*\?tab=R%C3%A9sum%C3%A9&actionId=.*/);
+  await page.getByRole("button", { name: "Commentaires (1)" }).click();
+  await page
+    .getByRole("dialog", { name: `Action: ${actionFor2PersonName} (créée par User Admin Test - 7)` })
+    .getByText("Un commentaire pour tout le monde")
+    .click();
+  await page
+    .getByRole("dialog", { name: "Commentaire" })
+    // .filter({ hasText: "CommentaireCréé parUser Admin Test - 7Créé le / Concerne levendredi 30 juin 2023" })
+    .filter({ hasText: `CommentaireCréé parUser Admin Test - 7Créé le / Concerne le${dayjs().format("dddd D MMMM YYYY")}` })
+    .getByRole("button", { name: "Fermer" })
+    .click();
+  await page.getByRole("button", { name: "Fermer" }).first().click();
 
   await page.getByRole("link", { name: "Agenda" }).click();
   await expect(page).toHaveURL("http://localhost:8090/action?calendarTab=2");
   await page.locator(`data-test-id=${actionFor2PersonName}`).getByText(person1Name).click();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*/);
   await page.getByText(actionFor2PersonName).click();
-  await expect(page).toHaveURL(/http:\/\/localhost:8090\/action\/.*/);
-  await page.getByText("Un commentaire pour tout le monde").click();
-  await page.getByRole("button", { name: "Enregistrer" }).click();
-  await page.getByText("Commentaire mis à jour").click();
+  await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*\?tab=R%C3%A9sum%C3%A9&actionId=.*/);
+  await page.getByRole("button", { name: "Commentaires (1)" }).click();
+  await page
+    .getByRole("dialog", { name: `Action: ${actionFor2PersonName} (créée par User Admin Test - 7)` })
+    .getByText("Un commentaire pour tout le monde")
+    .click();
+  await page
+    .getByRole("dialog", { name: "Commentaire" })
+    .filter({ hasText: `CommentaireCréé parUser Admin Test - 7Créé le / Concerne le${dayjs().format("dddd D MMMM YYYY")}` })
+    .getByRole("button", { name: "Fermer" })
+    .click();
+  await page.getByRole("button", { name: "Fermer" }).first().click();
 
   await page.getByRole("link", { name: "Comptes rendus" }).click();
   await page.getByRole("button", { name: dayjs().format("YYYY-MM-DD") }).click();

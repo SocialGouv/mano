@@ -1,25 +1,81 @@
-import { useState, useMemo, useEffect } from 'react';
-import ReactDatePicker from 'react-datepicker';
+import { useState, useMemo, useEffect, useRef } from 'react';
+import DatePicker from './DatePicker';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { v4 as uuidv4 } from 'uuid';
+import { toast } from 'react-toastify';
+import { useLocation, useHistory } from 'react-router-dom';
 import { CANCEL, DONE, TODO } from '../recoil/actions';
 import { currentTeamState, organisationState, teamsState, userState } from '../recoil/auth';
 import { consultationsState, defaultConsultationFields, prepareConsultationForEncryption } from '../recoil/consultations';
 import API from '../services/api';
-import { dateForDatePicker, dayjsInstance } from '../services/date';
+import { dayjsInstance } from '../services/date';
 import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
 import CustomFieldInput from './CustomFieldInput';
 import Documents from './Documents';
 import { modalConfirmState } from './ModalConfirm';
 import SelectAsInput from './SelectAsInput';
 import SelectStatus from './SelectStatus';
-import { toast } from 'react-toastify';
 import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from './tailwind/Modal';
 import SelectPerson from './SelectPerson';
 import { CommentsModule } from './CommentsGeneric';
 import SelectTeamMultiple from './SelectTeamMultiple';
+import UserName from './UserName';
+import PersonName from './PersonName';
+import TagTeam from './TagTeam';
+import CustomFieldDisplay from './CustomFieldDisplay';
+import { itemsGroupedByConsultationSelector } from '../recoil/selectors';
 
-export default function ConsultationModal({ open, onClose, personId, consultation, date }) {
+export default function ConsultationModal() {
+  const consultationsObjects = useRecoilValue(itemsGroupedByConsultationSelector);
+  const history = useHistory();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const currentConsultationId = searchParams.get('consultationId');
+  const newConsultation = searchParams.get('newConsultation');
+  const currentConsultation = useMemo(() => {
+    if (!currentConsultationId) return null;
+    return consultationsObjects[currentConsultationId];
+  }, [currentConsultationId, consultationsObjects]);
+  const personId = searchParams.get('personId');
+  const date = searchParams.get('dueAt') || searchParams.get('completedAt');
+
+  const [open, setOpen] = useState(false);
+  const consultationIdRef = useRef(currentConsultationId);
+  const newConsultationRef = useRef(newConsultation);
+  useEffect(() => {
+    if (consultationIdRef.current !== currentConsultationId) {
+      consultationIdRef.current = currentConsultationId;
+      setOpen(!!currentConsultationId);
+    }
+    if (newConsultationRef.current !== newConsultation) {
+      newConsultationRef.current = newConsultation;
+      setOpen(!!newConsultation);
+    }
+  }, [newConsultation, currentConsultationId]);
+
+  const manualCloseRef = useRef(false);
+  const onAfterLeave = () => {
+    if (manualCloseRef.current) history.goBack();
+    manualCloseRef.current = false;
+  };
+
+  return (
+    <ModalContainer open={open} size="3xl" onAfterLeave={onAfterLeave}>
+      <ConsultationContent
+        key={open}
+        personId={personId}
+        consultation={currentConsultation}
+        date={date}
+        onClose={() => {
+          manualCloseRef.current = true;
+          setOpen(false);
+        }}
+      />
+    </ModalContainer>
+  );
+}
+
+function ConsultationContent({ personId, consultation, date, onClose }) {
   const organisation = useRecoilValue(organisationState);
   const teams = useRecoilValue(teamsState);
   const currentTeam = useRecoilValue(currentTeamState);
@@ -28,7 +84,8 @@ export default function ConsultationModal({ open, onClose, personId, consultatio
   const setAllConsultations = useSetRecoilState(consultationsState);
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
-  const isNewConsultation = !consultation;
+  const [isEditing, setIsEditing] = useState(!consultation);
+
   const initialState = useMemo(() => {
     if (consultation) {
       return {
@@ -39,7 +96,7 @@ export default function ConsultationModal({ open, onClose, personId, consultatio
       };
     }
     return {
-      _id: uuidv4(),
+      _id: null,
       dueAt: date ? new Date(date) : new Date(),
       completedAt: new Date(),
       name: '',
@@ -57,14 +114,17 @@ export default function ConsultationModal({ open, onClose, personId, consultatio
   }, [organisation._id, personId, user._id, consultation, date, teams]);
 
   const [data, setData] = useState(initialState);
+
+  const isNewConsultation = !data._id;
+
   useEffect(() => {
     setData(initialState);
   }, [initialState]);
 
   const [activeTab, setActiveTab] = useState('Informations');
 
-  async function handleSubmit() {
-    const body = { ...data };
+  async function handleSubmit({ newData = {}, closeOnSubmit = false } = {}) {
+    const body = { ...data, ...newData };
     if (!body.type) {
       return toast.error('Veuillez choisir un type de consultation');
     }
@@ -88,10 +148,11 @@ export default function ConsultationModal({ open, onClose, personId, consultatio
           body: prepareConsultationForEncryption(organisation.consultations)(body),
         })
       : await API.put({
-          path: `/consultation/${initialState._id}`,
+          path: `/consultation/${data._id}`,
           body: prepareConsultationForEncryption(organisation.consultations)(body),
         });
-    if (!consultationResponse.ok) return onClose();
+    if (!consultationResponse.ok) return false;
+    setData(consultationResponse.decryptedData);
     const consult = { ...consultationResponse.decryptedData, ...defaultConsultationFields };
     if (isNewConsultation) {
       setAllConsultations((all) => [...all, consult].sort((a, b) => new Date(b.dueAt) - new Date(a.dueAt)));
@@ -112,49 +173,71 @@ export default function ConsultationModal({ open, onClose, personId, consultatio
         await createReportAtDateIfNotExist(completedAt);
       }
     }
-    return onClose();
+    if (closeOnSubmit) onClose();
+    return true;
   }
 
+  const canSave = useMemo(() => {
+    if (data.status !== initialState.status) return true;
+    if (JSON.stringify(data.onlyVisibleBy) !== JSON.stringify(initialState.onlyVisibleBy)) return true;
+    if (JSON.stringify(data.completedAt) !== JSON.stringify(initialState.completedAt)) return true;
+    return false;
+  }, [data, initialState]);
+
+  const canEdit = useMemo(() => !consultation || consultation.user === user._id, [consultation, user._id]);
+
+  const handleChange = (event) => {
+    const target = event.currentTarget || event.target;
+    const { name, value } = target;
+    setData((data) => ({ ...data, [name]: value }));
+  };
+
   return (
-    <ModalContainer
-      open={open}
-      size="3xl"
-      onClose={() => {
-        if (JSON.stringify(data) === JSON.stringify(initialState)) return onClose();
-        console.log('data', data);
-        console.log('initialState', initialState);
-        setModalConfirmState({
-          open: true,
-          options: {
-            title: 'Voulez-vous enregistrer vos modifications ?',
-            buttons: [
-              {
-                text: 'Annuler',
-                style: 'cancel',
-              },
-              {
-                text: 'Non',
-                style: 'danger',
-                onClick: () => onClose(),
-              },
-              {
-                text: 'Oui',
-                onClick: () => {
-                  handleSubmit();
+    <>
+      <ModalHeader
+        title={
+          <>
+            {isNewConsultation && 'Ajouter une consultation'}
+            {!isNewConsultation && !isEditing && 'Consultation'}
+            {!isNewConsultation && isEditing && 'Modifier la consultation'}
+            {!isNewConsultation && consultation?.user && (
+              <UserName
+                className="tw-block tw-text-right tw-text-base tw-font-normal tw-italic"
+                id={consultation.user}
+                wrapper={(name) => ` (créée par ${name})`}
+              />
+            )}
+          </>
+        }
+        onClose={() => {
+          if (JSON.stringify(data) === JSON.stringify(initialState)) return onClose();
+          setModalConfirmState({
+            open: true,
+            options: {
+              title: 'Quitter la consultation sans enregistrer ?',
+              subTitle: 'Toutes les modifications seront perdues.',
+              buttons: [
+                {
+                  text: 'Annuler',
+                  className: 'button-cancel',
                 },
-              },
-            ],
-          },
-        });
-      }}>
-      <ModalHeader title={consultation ? 'Modifier une consultation' : 'Ajouter une consultation'} />
+                {
+                  text: 'Oui',
+                  className: 'button-destructive',
+                  onClick: () => onClose(),
+                },
+              ],
+            },
+          });
+        }}
+      />
       <ModalBody>
         <form
           id="add-consultation-form"
           className="tw-flex tw-h-full tw-w-full tw-flex-col"
           onSubmit={(e) => {
             e.preventDefault();
-            handleSubmit();
+            handleSubmit({ closeOnSubmit: true });
           }}>
           <ul className="noprint tw-mb-5 tw-mt-4 tw-flex tw-list-none tw-flex-wrap tw-border-b tw-border-zinc-200 tw-px-2">
             <li className="tw-cursor-pointer">
@@ -195,20 +278,24 @@ export default function ConsultationModal({ open, onClose, personId, consultatio
             </li>
           </ul>
           <div
-            className={['tw-flex tw-min-h-screen tw-w-full tw-flex-col tw-gap-4 tw-px-8', activeTab !== 'Informations' ? 'tw-hidden' : ''].join(' ')}>
-            <div className="-tw-mx-4 tw-flex tw-flex-wrap">
-              <div className="tw-flex tw-basis-1/2 tw-flex-col tw-p-4">
-                <SelectPerson
-                  value={data.person}
-                  onChange={(e) => {
-                    setData({ ...data, person: e.currentTarget.value });
-                  }}
-                  isMulti={false}
-                  inputId="create-consultation-person-select"
-                />
-              </div>
-              <div className="tw-flex tw-basis-1/2 tw-flex-col tw-p-4">
-                <label htmlFor="create-consultation-team">Équipe(s) en charge</label>
+            className={['tw-flex tw-h-[50vh] tw-w-full tw-flex-wrap tw-overflow-y-auto tw-p-4', activeTab !== 'Informations' && 'tw-hidden']
+              .filter(Boolean)
+              .join(' ')}>
+            <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
+              <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-blue-900'} htmlFor="create-consultation-team">
+                Personne suivie
+              </label>
+              {isEditing ? (
+                <SelectPerson noLabel value={data.person} onChange={handleChange} isMulti={false} inputId="create-consultation-person-select" />
+              ) : (
+                <PersonName item={data} />
+              )}
+            </div>
+            <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
+              <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-blue-900'} htmlFor="create-consultation-team">
+                Équipe(s) en charge
+              </label>
+              {isEditing ? (
                 <SelectTeamMultiple
                   onChange={(teamIds) => setData({ ...data, teams: teamIds })}
                   value={data.teams}
@@ -216,135 +303,141 @@ export default function ConsultationModal({ open, onClose, personId, consultatio
                   inputId="create-consultation-team-select"
                   classNamePrefix="create-consultation-team-select"
                 />
-              </div>
+              ) : (
+                <div className="tw-flex tw-flex-col">
+                  {data.teams.map((teamId) => (
+                    <TagTeam key={teamId} teamId={teamId} />
+                  ))}
+                </div>
+              )}
             </div>
 
-            <div className="-tw-mx-4 tw-flex tw-flex-wrap">
-              <div className="tw-flex tw-basis-1/2 tw-flex-col tw-p-4">
-                <label htmlFor="create-consultation-name">Nom (facultatif)</label>
-                <input
-                  className="form-text tailwindui"
-                  id="create-consultation-name"
-                  name="name"
-                  value={data.name}
-                  onChange={(e) => setData({ ...data, name: e.currentTarget.value })}
-                />
-              </div>
+            <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
+              <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-blue-900'} htmlFor="create-consultation-name">
+                Nom (facultatif)
+              </label>
+              {isEditing ? (
+                <input className="tailwindui" id="create-consultation-name" name="name" value={data.name} onChange={handleChange} />
+              ) : (
+                <CustomFieldDisplay type="text" value={data.name} />
+              )}
+            </div>
 
-              <div className="tw-basis-1/2 tw-p-4">
-                <label htmlFor="type" className="form-text tailwindui">
-                  Type
-                </label>
+            <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
+              <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-blue-900'} htmlFor="type">
+                Type
+              </label>
+              {isEditing ? (
                 <SelectAsInput
                   id="type"
                   name="type"
                   inputId="consultation-modal-type"
                   classNamePrefix="consultation-modal-type"
                   value={data.type}
-                  onChange={(e) => {
-                    setData({ ...data, type: e.currentTarget.value });
-                  }}
+                  onChange={handleChange}
                   placeholder="-- Type de consultation --"
                   options={organisation.consultations.map((e) => e.name)}
                 />
-              </div>
-              {organisation.consultations
-                .find((e) => e.name === data.type)
-                ?.fields.filter((f) => f.enabled || f.enabledTeams?.includes(currentTeam._id))
-                .map((field) => {
-                  return (
-                    <CustomFieldInput
-                      colWidth={field.type === 'textarea' ? 12 : 6}
-                      model="person"
-                      values={data}
-                      handleChange={(e) => {
-                        setData({ ...data, [(e.currentTarget || e.target).name]: (e.currentTarget || e.target).value });
-                      }}
-                      field={field}
-                      key={field.name}
-                    />
-                  );
-                })}
+              ) : (
+                <CustomFieldDisplay type="text" value={data.type} />
+              )}
             </div>
+            {organisation.consultations
+              .find((e) => e.name === data.type)
+              ?.fields.filter((f) => f.enabled || f.enabledTeams?.includes(currentTeam._id))
+              .map((field) => {
+                if (!isEditing) {
+                  return (
+                    <div data-test-id={field.label} key={field.name} className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
+                      <label className="tw-text-sm tw-font-semibold tw-text-blue-900" htmlFor="type">
+                        {field.label}
+                      </label>
+                      <CustomFieldDisplay key={field.name} type={field.type} value={data[field.name]} />
+                    </div>
+                  );
+                }
+                return (
+                  <CustomFieldInput
+                    colWidth={field.type === 'textarea' ? 12 : 6}
+                    model="person"
+                    values={data}
+                    handleChange={handleChange}
+                    field={field}
+                    key={field.name}
+                  />
+                );
+              })}
             {data.user === user._id && (
               <>
-                <hr />
-                <div>
-                  <div>
-                    <label htmlFor="create-consultation-onlyme">
-                      <input
-                        type="checkbox"
-                        id="create-consultation-onlyme"
-                        style={{ marginRight: '0.5rem' }}
-                        name="onlyVisibleByCreator"
-                        checked={data.onlyVisibleBy?.includes(user._id)}
-                        onChange={() => {
-                          setData({ ...data, onlyVisibleBy: data.onlyVisibleBy?.includes(user._id) ? [] : [user._id] });
-                        }}
-                      />
-                      Seulement visible par moi
-                    </label>
-                  </div>
+                <hr className="tw-basis-full" />
+                <div className="tw-basis-full tw-p-4">
+                  <label htmlFor="create-consultation-onlyme">
+                    <input
+                      type="checkbox"
+                      id="create-consultation-onlyme"
+                      style={{ marginRight: '0.5rem' }}
+                      name="onlyVisibleByCreator"
+                      checked={data.onlyVisibleBy?.includes(user._id)}
+                      onChange={() => {
+                        setData({ ...data, onlyVisibleBy: data.onlyVisibleBy?.includes(user._id) ? [] : [user._id] });
+                      }}
+                    />
+                    Seulement visible par moi
+                  </label>
                 </div>
               </>
             )}
-            <hr />
-            <div className="-tw-mx-4 tw-flex tw-flex-wrap">
-              <div className="tw-basis-1/2 tw-p-4">
-                <label htmlFor="new-consultation-select-status">Statut</label>
+            <hr className="tw-basis-full" />
+            <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
+              <label className={canEdit ? '' : 'tw-text-sm tw-font-semibold tw-text-blue-900'} htmlFor="new-consultation-select-status">
+                Statut
+              </label>
+              {canEdit ? (
                 <SelectStatus
                   name="status"
                   value={data.status || ''}
-                  onChange={(e) => {
-                    setData({ ...data, status: e.target.value });
-                  }}
+                  onChange={handleChange}
                   inputId="new-consultation-select-status"
                   classNamePrefix="new-consultation-select-status"
                 />
-              </div>
-              <div className="tw-basis-1/2 tw-p-4">
-                <label htmlFor="create-consultation-dueat">Date prévue</label>
-                <div>
-                  <ReactDatePicker
-                    locale="fr"
-                    className="form-control"
-                    id="create-consultation-dueat"
-                    selected={dateForDatePicker(data.dueAt)}
-                    onChange={(dueAt) => {
-                      setData({ ...data, dueAt });
-                    }}
-                    timeInputLabel="Heure :"
-                    dateFormat={'dd/MM/yyyy HH:mm'}
-                    showTimeInput
-                  />
-                </div>
-              </div>
-
-              {[DONE, CANCEL].includes(data.status) && (
-                <>
-                  <div className="tw-basis-1/2 tw-p-4" />
-                  <div className="tw-basis-1/2 tw-p-4">
-                    <label htmlFor="create-consultation-completedAt">Date réalisée</label>
-                    <div>
-                      <ReactDatePicker
-                        locale="fr"
-                        className="form-control"
-                        id="create-consultation-completedAt"
-                        selected={dateForDatePicker(data.completedAt || dayjsInstance())}
-                        onChange={(completedAt) => {
-                          setData({ ...data, completedAt });
-                        }}
-                        timeInputLabel="Heure :"
-                        dateFormat={'dd/MM/yyyy HH:mm'}
-                        showTimeInput
-                      />
-                    </div>
-                  </div>
-                </>
+              ) : (
+                <CustomFieldDisplay type="text" value={data.status} />
               )}
             </div>
+            <div className="tw-basis-1/2 tw-p-4">
+              <label className={canEdit ? '' : 'tw-text-sm tw-font-semibold tw-text-blue-900'} htmlFor="create-consultation-dueat">
+                Date prévue
+              </label>
+              <div>
+                {canEdit ? (
+                  <DatePicker withTime id="create-consultation-dueat" name="dueAt" defaultValue={data.dueAt ?? new Date()} onChange={handleChange} />
+                ) : (
+                  <CustomFieldDisplay type="date-with-time" value={data.dueAt} />
+                )}
+              </div>
+            </div>
+
+            <div className={['tw-basis-1/2 tw-p-4', [DONE, CANCEL].includes(data.status) ? 'tw-visible' : 'tw-invisible'].join(' ')} />
+            <div className={['tw-basis-1/2 tw-p-4', [DONE, CANCEL].includes(data.status) ? 'tw-visible' : 'tw-invisible'].join(' ')}>
+              <label className={canEdit ? '' : 'tw-text-sm tw-font-semibold tw-text-blue-900'} htmlFor="create-consultation-completedAt">
+                Date réalisée
+              </label>
+              <div>
+                {canEdit ? (
+                  <DatePicker withTime id="create-consultation-completedAt" defaultValue={data.completedAt ?? new Date()} onChange={handleChange} />
+                ) : (
+                  <CustomFieldDisplay type="date-with-time" value={data.completedAt} />
+                )}
+              </div>
+            </div>
           </div>
-          <div className={['tw-flex tw-min-h-screen tw-w-full tw-flex-col tw-gap-4 tw-px-8', activeTab !== 'Documents' ? 'tw-hidden' : ''].join(' ')}>
+          <div
+            className={[
+              'tw-flex tw-h-[50vh] tw-w-full tw-flex-col tw-flex-wrap tw-gap-4 tw-overflow-y-auto',
+              activeTab !== 'Documents' && 'tw-hidden',
+            ]
+              .filter(Boolean)
+              .join(' ')}>
             {data.person && (
               <Documents
                 personId={data.person}
@@ -352,7 +445,7 @@ export default function ConsultationModal({ open, onClose, personId, consultatio
                 documents={data.documents}
                 onAdd={async (docResponse) => {
                   const { data: file, encryptedEntityKey } = docResponse;
-                  setData({
+                  const newData = {
                     ...data,
                     documents: [
                       ...data.documents,
@@ -366,42 +459,56 @@ export default function ConsultationModal({ open, onClose, personId, consultatio
                         file,
                       },
                     ],
-                  });
+                  };
+                  setData(newData);
+                  const ok = await handleSubmit({ newData });
+                  if (ok) toast.success('Document ajouté');
                 }}
                 onDelete={async (document) => {
-                  setData({ ...data, documents: data.documents.filter((d) => d._id !== document._id) });
+                  const newData = { ...data, documents: data.documents.filter((d) => d._id !== document._id) };
+                  setData(newData);
+                  const ok = await handleSubmit({ newData });
+                  if (ok) toast.success('Document supprimé');
                 }}
               />
             )}
           </div>
           <div
-            className={['tw-flex tw-min-h-screen tw-w-full tw-flex-col tw-gap-4 tw-px-8', activeTab !== 'Commentaires' ? 'tw-hidden' : ''].join(' ')}>
+            className={['tw-flex tw-h-[50vh] tw-w-full tw-flex-col tw-gap-4 tw-overflow-y-auto', activeTab !== 'Commentaires' && 'tw-hidden']
+              .filter(Boolean)
+              .join(' ')}>
             <CommentsModule
-              comments={data.comments}
+              comments={data.comments.map((c) => ({ ...c, type: 'consultation', consultation }))}
               color="blue-900"
               typeForNewComment="consultation"
-              onDeleteComment={(comment) => {
-                setData({ ...data, comments: data.comments.filter((c) => c._id !== comment._id) });
+              onDeleteComment={async (comment) => {
+                const newData = { ...data, comments: data.comments.filter((c) => c._id !== comment._id) };
+                setData(newData);
+                const ok = await handleSubmit({ newData });
+                if (ok) toast.success('Commentaire supprimé');
               }}
-              onSubmitComment={(comment, isNewComment) => {
-                if (isNewComment) {
-                  setData({ ...data, comments: [{ ...comment, _id: uuidv4() }, ...data.comments] });
-                } else {
-                  setData({ ...data, comments: data.comments.map((c) => (c._id === comment._id ? comment : c)) });
-                }
+              onSubmitComment={async (comment, isNewComment) => {
+                const newData = isNewComment
+                  ? { ...data, comments: [{ ...comment, _id: uuidv4() }, ...data.comments] }
+                  : { ...data, comments: data.comments.map((c) => (c._id === comment._id ? comment : c)) };
+                setData(newData);
+                const ok = await handleSubmit({ newData });
+                if (ok) toast.success('Commentaire enregistré');
               }}
             />
           </div>
         </form>
       </ModalBody>
       <ModalFooter>
-        <button name="Annuler" type="button" className="button-cancel" onClick={() => onClose()}>
-          Annuler
+        <button name="Fermer" type="button" className="button-cancel" onClick={() => onClose()}>
+          Fermer
         </button>
-        {!isNewConsultation && (
+        {!isNewConsultation && !!isEditing && (
           <button
             type="button"
             name="cancel"
+            disabled={!canEdit}
+            title="Supprimer cette consultation - seul le créateur peut supprimer une consultation"
             className="button-destructive"
             onClick={async (e) => {
               e.stopPropagation();
@@ -415,10 +522,30 @@ export default function ConsultationModal({ open, onClose, personId, consultatio
             Supprimer
           </button>
         )}
-        <button type="submit" className="button-submit !tw-bg-blue-900" form="add-consultation-form">
-          Sauvegarder
-        </button>
+        {(isEditing || canSave) && (
+          <button
+            title="Sauvegarder cette consultation"
+            type="submit"
+            className="button-submit !tw-bg-blue-900"
+            form="add-consultation-form"
+            disabled={!canEdit}>
+            Sauvegarder
+          </button>
+        )}
+        {!isEditing && (
+          <button
+            title="Modifier cette consultation - seul le créateur peut modifier une consultation"
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              setIsEditing(true);
+            }}
+            className={['button-submit !tw-bg-blue-900', activeTab === 'Informations' ? 'tw-visible' : 'tw-invisible'].join(' ')}
+            disabled={!canEdit}>
+            Modifier
+          </button>
+        )}
       </ModalFooter>
-    </ModalContainer>
+    </>
   );
 }

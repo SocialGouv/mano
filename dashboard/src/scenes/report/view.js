@@ -18,7 +18,6 @@ import BackButton, { BackButtonWrapper } from '../../components/backButton';
 import Box from '../../components/Box';
 import ActionStatus from '../../components/ActionStatus';
 import Table from '../../components/table';
-import CreateActionModal from '../../components/CreateActionModal';
 import Observation from '../territory-observations/view';
 import dayjs from 'dayjs';
 import { CANCEL, DONE, sortActionsOrConsultations } from '../../recoil/actions';
@@ -57,7 +56,6 @@ import ReceptionService from '../../components/ReceptionService';
 import { useLocalStorage } from '../../services/useLocalStorage';
 import useSearchParamState from '../../services/useSearchParamState';
 import { arrayOfitemsGroupedByActionSelector, arrayOfitemsGroupedByConsultationSelector, personsObjectSelector } from '../../recoil/selectors';
-import ConsultationModal from '../../components/ConsultationModal';
 import { treatmentsState } from '../../recoil/treatments';
 import { medicalFileState } from '../../recoil/medicalFiles';
 
@@ -1051,8 +1049,6 @@ const ActionCompletedAt = ({ date, status, actions, setSortOrder, setSortBy, sor
   const history = useHistory();
   const organisation = useRecoilValue(organisationState);
 
-  const [modalOpen, setModalOpen] = useState(false);
-
   if (!data) return <div />;
 
   const moreThanOne = data.length > 1;
@@ -1062,11 +1058,15 @@ const ActionCompletedAt = ({ date, status, actions, setSortOrder, setSortBy, sor
       <StyledBox>
         {status === DONE && (
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <CreateActionModal open={modalOpen} setOpen={(value) => setModalOpen(value)} completedAt={dateForSelector} isMulti />
             <div className="noprint" style={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
               <ButtonCustom
                 icon={agendaIcon}
-                onClick={() => setModalOpen(true)}
+                onClick={() => {
+                  const searchParams = new URLSearchParams(history.location.search);
+                  searchParams.set('completedAt', dayjsInstance(dateForSelector).toISOString());
+                  searchParams.set('newAction', true);
+                  history.push(`?${searchParams.toString()}`); // Update the URL with the new search parameters.
+                }}
                 color="primary"
                 title={`Créer une nouvelle action faite le ${formatDateWithFullMonth(date)}`}
                 padding={'12px 24px'}
@@ -1081,7 +1081,11 @@ const ActionCompletedAt = ({ date, status, actions, setSortOrder, setSortBy, sor
           )}`}
           noData={`Pas d'action ${status === CANCEL ? 'annulée' : 'faite'} ce jour`}
           data={data.map((a) => (a.urgent ? { ...a, style: { backgroundColor: '#fecaca99' } } : a))}
-          onRowClick={(action) => history.push(`/action/${action._id}`)}
+          onRowClick={(action) => {
+            const searchParams = new URLSearchParams(history.location.search);
+            searchParams.set('actionId', action._id);
+            history.push(`?${searchParams.toString()}`);
+          }}
           rowKey="_id"
           dataTestId="name"
           columns={[
@@ -1183,7 +1187,11 @@ const ActionCreatedAt = ({ date, actions, setSortOrder, setSortBy, sortBy, sortO
           title={`Action${moreThanOne ? 's' : ''} créée${moreThanOne ? 's' : ''} le ${formatDateWithFullMonth(date)}`}
           noData="Pas d'action créée ce jour"
           data={data.map((a) => (a.urgent ? { ...a, style: { backgroundColor: '#fecaca99' } } : a))}
-          onRowClick={(action) => history.push(`/action/${action._id}`)}
+          onRowClick={(action) => {
+            const searchParams = new URLSearchParams(history.location.search);
+            searchParams.set('actionId', action._id);
+            history.push(`?${searchParams.toString()}`);
+          }}
           rowKey="_id"
           dataTestId="name"
           columns={[
@@ -1273,18 +1281,22 @@ const Consultations = ({ date, status, consultations, setSortOrder, setSortBy, s
   const data = consultations;
   const user = useRecoilValue(userState);
   const history = useHistory();
-  const [showModal, setShowModal] = useState(false);
 
   if (!data) return <div />;
   const moreThanOne = data.length > 1;
-
+  const dateForSelector = dayjsInstance(date).add(12, 'hour');
   return (
     <>
       <StyledBox>
         <ButtonCustom
           title={`Ajouter une consultation faite le ${formatDateWithFullMonth(date)}`}
           className="tw-ml-auto tw-mb-10"
-          onClick={() => setShowModal(true)}
+          onClick={() => {
+            const searchParams = new URLSearchParams(history.location.search);
+            searchParams.set('completedAt', dayjsInstance(dateForSelector).toISOString());
+            searchParams.set('newConsultation', true);
+            history.push(`?${searchParams.toString()}`);
+          }}
         />
         <Table
           className="Table"
@@ -1293,10 +1305,12 @@ const Consultations = ({ date, status, consultations, setSortOrder, setSortBy, s
           } le ${formatDateWithFullMonth(date)}`}
           noData={`Pas de consultation ${status === DONE ? 'faite' : 'annulée'} ce jour`}
           data={data}
-          onRowClick={(actionOrConsultation) =>
-            history.push(`/person/${actionOrConsultation.person}?tab=Dossier+Médical&consultationId=${actionOrConsultation._id}`)
-          }
-          rowDisabled={(actionOrConsultation) => disableConsultationRow(actionOrConsultation, user)}
+          onRowClick={(consultation) => {
+            const searchParams = new URLSearchParams(history.location.search);
+            searchParams.set('consultationId', consultation._id);
+            history.push(`?${searchParams.toString()}`);
+          }}
+          rowDisabled={(consultation) => disableConsultationRow(consultation, user)}
           rowKey="_id"
           dataTestId="name"
           columns={[
@@ -1350,7 +1364,6 @@ const Consultations = ({ date, status, consultations, setSortOrder, setSortBy, s
             },
           ]}
         />
-        <ConsultationModal open={showModal} date={date} onClose={() => setShowModal(false)} />
       </StyledBox>
       <hr />
     </>
@@ -1373,10 +1386,12 @@ const ConsultationsCreatedAt = ({ date, consultations }) => {
           title={`Consultation${moreThanOne ? 's' : ''} créée${moreThanOne ? 's' : ''} le ${formatDateWithFullMonth(date)}`}
           noData="Pas de consultation créée ce jour"
           data={data}
-          onRowClick={(actionOrConsultation) =>
-            history.push(`/person/${actionOrConsultation.person}?tab=Dossier+Médical&consultationId=${actionOrConsultation._id}`)
-          }
-          rowDisabled={(actionOrConsultation) => disableConsultationRow(actionOrConsultation, user)}
+          onRowClick={(consultation) => {
+            const searchParams = new URLSearchParams(history.location.search);
+            searchParams.set('consultationId', consultation._id);
+            history.push(`?${searchParams.toString()}`);
+          }}
+          rowDisabled={(consultation) => disableConsultationRow(consultation, user)}
           rowKey="_id"
           dataTestId="name"
           columns={[
@@ -1429,19 +1444,22 @@ const CommentCreatedAt = ({ date, comments, medical }) => {
           noData="Pas de commentaire ajouté ce jour"
           onRowClick={(comment) => {
             try {
-              console.log('comment', comment);
+              const searchParams = new URLSearchParams(history.location.search);
               switch (comment.type) {
                 case 'action':
-                  history.push(`/action/${comment.action._id}`);
+                  searchParams.set('actionId', comment.action._id);
+                  history.push(`?${searchParams.toString()}`);
                   break;
                 case 'person':
                   history.push(`/person/${comment.person._id}`);
                   break;
                 case 'consultation':
-                  history.push(`/person/${comment.person._id}?tab=Dossier+Médical&consultationId=${comment.consultation._id}`);
+                  searchParams.set('consultationId', comment.consultation._id);
+                  history.push(`?${searchParams.toString()}`);
                   break;
                 case 'treatment':
-                  history.push(`/person/${comment.person._id}?tab=Dossier+Médical&treatmentId=${comment.treatment._id}`);
+                  searchParams.set('treatmentId', comment.treatment._id);
+                  history.push(`?${searchParams.toString()}`);
                   break;
                 case 'medical-file':
                   history.push(`/person/${comment.person._id}?tab=Dossier+Médical`);

@@ -1,8 +1,6 @@
 import React from 'react';
-import { Col, Row, Modal, ModalBody } from 'reactstrap';
 import { atom, useRecoilState } from 'recoil';
-
-import ButtonCustom from './ButtonCustom';
+import { ModalContainer, ModalFooter, ModalBody, ModalHeader } from './tailwind/Modal';
 
 const closedState = {
   open: false,
@@ -45,29 +43,35 @@ const ModalConfirm = () => {
   const close = () => setModalConfirmState((prevState) => ({ ...prevState, open: false }));
 
   return (
-    <Modal zIndex={4000} isOpen={open} toggle={close} size="sm" centered onClosed={() => setModalConfirmState(closedState)} backdrop="static">
-      <ModalBody>
-        <Row>
-          <Col md={12}>{title}</Col>
-          {!!subTitle && <Col md={12}>{subTitle}</Col>}
-        </Row>
-        <br />
-        <Row>
-          {buttons.map(({ text, onClick, style }, index) => (
-            <Col md={12 / buttons.length} key={index + text + style + open}>
-              <ButtonCustom
-                color={style}
-                onClick={async () => {
-                  onClick?.();
-                  close();
-                }}
-                title={text}
-              />
-            </Col>
-          ))}
-        </Row>
-      </ModalBody>
-    </Modal>
+    <ModalContainer
+      open={open}
+      onClose={close}
+      size="lg"
+      onAfterLeave={() => {
+        setModalConfirmState(closedState);
+      }}>
+      <ModalHeader title={title} />
+      {!!subTitle && (
+        <ModalBody>
+          <div className="flex tw-p-4">{subTitle}</div>
+        </ModalBody>
+      )}
+      <ModalFooter>
+        {buttons.map(({ text, onClick, className }, index) => (
+          <button
+            name={text}
+            key={text}
+            type="button"
+            className={className}
+            onClick={async () => {
+              onClick?.();
+              close();
+            }}>
+            {text}
+          </button>
+        ))}
+      </ModalFooter>
+    </ModalContainer>
   );
 };
 
