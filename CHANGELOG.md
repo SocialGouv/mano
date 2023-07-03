@@ -1,3 +1,10 @@
+## [1.276.3](https://github.com/SocialGouv/mano/compare/v1.276.2...v1.276.3) (2023-07-03)
+
+
+### Bug Fixes
+
+* **dashboard:** données ordonnées dans les services ([#1585](https://github.com/SocialGouv/mano/issues/1585)) ([4492ae7](https://github.com/SocialGouv/mano/commit/4492ae7d89c1b214d348571717e3a8e1690fad21))
+
 ## [1.276.2](https://github.com/SocialGouv/mano/compare/v1.276.1...v1.276.2) (2023-07-03)
 
 
