@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
+import { useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import { addOneDay, dayjsInstance, formatCalendarDate, formatDateTimeWithNameOfDay, formatTime, subtractOneDay } from '../services/date';
@@ -14,6 +13,7 @@ import ExclamationMarkButton from './tailwind/ExclamationMarkButton';
 import { CANCEL, DONE, sortActionsOrConsultations } from '../recoil/actions';
 import TagTeam from './TagTeam';
 import { useLocalStorage } from '../services/useLocalStorage';
+import TabsNav from './tailwind/TabsNav';
 
 const ActionsCalendar = ({ actions, isNightSession, columns = ['Heure', 'Nom', 'Personne suivie', 'Créée le', 'Statut', 'Équipe(s) en charge'] }) => {
   const history = useHistory();
@@ -31,7 +31,7 @@ const ActionsCalendar = ({ actions, isNightSession, columns = ['Heure', 'Nom', '
     if (savedDate) return new Date(savedDate);
     return new Date();
   });
-  const [activeTab, setActiveTab] = useState(Number(new URLSearchParams(location.search)?.get('calendarTab') || 2));
+  const [activeTabIndex, setActiveTabIndex] = useState(Number(new URLSearchParams(location.search)?.get('calendarTab') || 2));
 
   useEffect(() => {
     if (!currentDate) return;
@@ -78,10 +78,10 @@ const ActionsCalendar = ({ actions, isNightSession, columns = ['Heure', 'Nom', '
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
-    searchParams.set('calendarTab', activeTab);
+    searchParams.set('calendarTab', activeTabIndex);
     history.replace({ pathname: location.pathname, search: searchParams.toString() });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab]);
+  }, [activeTabIndex]);
 
   const renderActionsTable = (actions, date) => (
     <Table
@@ -210,24 +210,23 @@ const ActionsCalendar = ({ actions, isNightSession, columns = ['Heure', 'Nom', '
 
   return (
     <>
-      <Nav fill tabs>
-        {['<', subtractOneDay(currentDate), currentDate, addOneDay(currentDate), '>'].map((tabCaption, index) => (
-          <NavItem key={index} style={{ cursor: 'pointer' }}>
-            <NavLink
-              key={index}
-              className={`${activeTab === index && 'active'}`}
-              onClick={() => {
-                if (index === 0) return setCurrentDate(subtractOneDay(currentDate));
-                if (index === 4) return setCurrentDate(addOneDay(currentDate));
-                setActiveTab(index);
-              }}>
-              {['<', '>'].includes(tabCaption)
-                ? tabCaption
-                : `${renderDate(tabCaption)} (${[theDayBeforeActions.length, theCurrentDayActions.length, theDayAfterActions.length][index - 1]})`}
-            </NavLink>
-          </NavItem>
-        ))}
-      </Nav>
+      <TabsNav
+        className="tw-justify-center"
+        tabs={[
+          '<',
+          `${renderDate(subtractOneDay(currentDate))} (${theDayBeforeActions.length})`,
+          `${renderDate(currentDate)} (${theCurrentDayActions.length})`,
+          `${renderDate(addOneDay(currentDate))} (${theDayAfterActions.length})`,
+          '>',
+        ]}
+        onClick={(tab, index) => {
+          if (index === 0) return setCurrentDate(subtractOneDay(currentDate));
+          if (index === 4) return setCurrentDate(addOneDay(currentDate));
+          setActiveTabIndex(index);
+        }}
+        activeTabIndex={activeTabIndex}
+      />
+
       <div className="tw-mb-5">
         {!!isNightSession && (
           <p className="tw-m-0 tw-text-center tw-text-xs tw-opacity-50">
@@ -235,11 +234,11 @@ const ActionsCalendar = ({ actions, isNightSession, columns = ['Heure', 'Nom', '
           </p>
         )}
       </div>
-      <TabContent activeTab={activeTab}>
-        <TabPane tabId={1}>{renderActionsTable(theDayBeforeActions, subtractOneDay(currentDate))}</TabPane>
-        <TabPane tabId={2}>{renderActionsTable(theCurrentDayActions, currentDate)}</TabPane>
-        <TabPane tabId={3}>{renderActionsTable(theDayAfterActions, addOneDay(currentDate))}</TabPane>
-      </TabContent>
+      <div>
+        {activeTabIndex === 1 && <div>{renderActionsTable(theDayBeforeActions, subtractOneDay(currentDate))}</div>}
+        {activeTabIndex === 2 && <div>{renderActionsTable(theCurrentDayActions, currentDate)}</div>}
+        {activeTabIndex === 3 && <div>{renderActionsTable(theDayAfterActions, addOneDay(currentDate))}</div>}
+      </div>
     </>
   );
 };

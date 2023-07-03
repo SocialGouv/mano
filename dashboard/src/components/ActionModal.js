@@ -23,6 +23,7 @@ import { itemsGroupedByActionSelector } from '../recoil/selectors';
 import CustomFieldDisplay from './CustomFieldDisplay';
 import PersonName from './PersonName';
 import TagTeam from './TagTeam';
+import TabsNav from './tailwind/TabsNav';
 
 export default function ActionModal() {
   const actionsObjects = useRecoilValue(itemsGroupedByActionSelector);
@@ -367,40 +368,23 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
             return handleUpdateAction();
           }}>
           {!['restricted-access'].includes(user.role) && data?._id && (
-            <ul className="noprint tw-mb-5 tw-mt-4 tw-flex tw-list-none tw-flex-wrap tw-border-b tw-border-zinc-200 tw-px-2">
-              <li className="tw-cursor-pointer">
-                <button
-                  type="button"
-                  className={[
-                    '-tw-mb-px tw-block tw-rounded-t-md tw-border tw-border-transparent tw-py-2 tw-px-4',
-                    activeTab !== 'Informations' && 'tw-text-main75',
-                    activeTab === 'Informations' && 'tw-border-x-zinc-200 tw-border-t-zinc-200 tw-bg-white',
-                  ].join(' ')}
-                  onClick={() => setActiveTab('Informations')}>
-                  Informations
-                </button>
-              </li>
-              <li className="tw-cursor-pointer">
-                <button
-                  type="button"
-                  className={[
-                    '-tw-mb-px tw-block tw-rounded-t-md tw-border tw-border-transparent tw-py-2 tw-px-4',
-                    activeTab !== 'Commentaires' && 'tw-text-main75',
-                    activeTab === 'Commentaires' && 'tw-border-x-zinc-200 tw-border-t-zinc-200 tw-bg-white',
-                  ].join(' ')}
-                  onClick={() => setActiveTab('Commentaires')}>
-                  Commentaires {data?.comments?.length ? `(${data.comments.length})` : ''}
-                </button>
-              </li>
-            </ul>
+            <TabsNav
+              className="tw-px-3 tw-py-2"
+              tabs={['Informations', `Commentaires ${data?.comments?.length ? `(${data.comments.length})` : ''}`]}
+              onClick={(tab, index) => {
+                if (index === 0) setActiveTab('Informations');
+                if (index === 1) setActiveTab('Commentaires');
+              }}
+              activeTabIndex={activeTab === 'Informations' ? 0 : 1}
+            />
           )}
           <div
-            className={['tw-flex tw-h-[50vh] tw-w-full tw-flex-wrap tw-overflow-y-auto tw-p-4', activeTab !== 'Informations' && 'tw-hidden']
+            className={['tw-flex tw-w-full tw-flex-wrap tw-overflow-y-auto tw-p-4 sm:tw-h-[50vh]', activeTab !== 'Informations' && 'tw-hidden']
               .filter(Boolean)
               .join(' ')}>
-            <div className="tw-flex tw-w-full tw-flex-row">
+            <div className="tw-flex tw-w-full tw-flex-col tw-text-left sm:tw-flex-row">
               <div className="tw-flex tw-flex-[2] tw-basis-2/3 tw-flex-col">
-                <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col">
+                <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
                   <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="name">
                     Nom de l'action
                   </label>
@@ -416,7 +400,7 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
                     <CustomFieldDisplay value={data.name} type="textarea" />
                   )}
                 </div>
-                <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col">
+                <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
                   <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="person">
                     {isMulti ? 'Personne(s) suivie(s)' : 'Personne suivie'}
                   </label>
@@ -426,7 +410,7 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
                     <PersonName item={data} />
                   )}
                 </div>
-                <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col">
+                <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
                   <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="categories">
                     Catégorie(s)
                   </label>
@@ -442,7 +426,7 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
                   )}
                 </div>
                 {!['restricted-access'].includes(user.role) && (
-                  <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col">
+                  <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
                     <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="description">
                       Description
                     </label>
@@ -456,7 +440,7 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
                   </div>
                 )}
                 {!!canToggleGroupCheck && (
-                  <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col">
+                  <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
                     <label htmlFor="create-action-for-group">
                       <input
                         type="checkbox"
@@ -479,7 +463,7 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
                 <hr className="tw-m-0 tw-w-px tw-shrink-0 tw-basis-full tw-border tw-bg-gray-300" />
               </div>
               <div className="tw-flex tw-flex-[1] tw-basis-1/3 tw-flex-col">
-                <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col">
+                <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
                   <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="dueAt">
                     À faire le
                   </label>
@@ -512,7 +496,7 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
                     <CustomFieldDisplay value={data.dueAt} type={data.withTime ? 'date-with-time' : 'date'} />
                   )}
                 </div>
-                <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col">
+                <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
                   <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="team">
                     Équipe(s) en charge
                   </label>
@@ -532,7 +516,7 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
                     </div>
                   )}
                 </div>
-                <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col">
+                <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
                   <label htmlFor="create-action-urgent">
                     <input
                       type="checkbox"
@@ -549,7 +533,7 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
                     <small className="text-muted">Cette action sera mise en avant par rapport aux autres</small>
                   </label>
                 </div>
-                <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col">
+                <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
                   <label htmlFor="update-action-select-status">Statut</label>
                   <SelectStatus
                     name="status"
@@ -573,7 +557,7 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
             <div>
               {!!isNewAction && !['restricted-access'].includes(user.role) && (
                 <>
-                  <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col">
+                  <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
                     <label htmlFor="create-comment-description">Commentaire (optionnel)</label>
                     <textarea
                       id="create-comment-description"
@@ -583,7 +567,7 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
                       className="tw-w-full tw-rounded tw-border tw-border-gray-300 tw-py-1.5 tw-px-3 tw-text-base tw-transition-all"
                     />
                   </div>
-                  <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col">
+                  <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
                     <label htmlFor="create-comment-urgent">
                       <input
                         type="checkbox"
@@ -608,7 +592,7 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
           {!['restricted-access'].includes(user.role) && (
             <div
               className={[
-                'tw-flex tw-h-[50vh] tw-w-full tw-flex-col tw-flex-wrap tw-gap-4 tw-overflow-y-auto',
+                'tw-flex tw-w-full tw-flex-col tw-flex-wrap tw-gap-4 tw-overflow-y-auto sm:tw-h-[50vh]',
                 activeTab !== 'Commentaires' && 'tw-hidden',
               ]
                 .filter(Boolean)

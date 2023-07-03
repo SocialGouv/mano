@@ -3,7 +3,6 @@ import React, { useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { useLocalStorage } from '../services/useLocalStorage';
-import { theme } from '../config';
 import { actionsState, CANCEL, DONE, prepareActionForEncryption, sortActionsOrConsultations, TODO } from '../recoil/actions';
 import { currentTeamState, userState } from '../recoil/auth';
 import { commentsState, prepareCommentForEncryption } from '../recoil/comments';
@@ -16,6 +15,7 @@ import UserName from './UserName';
 import API from '../services/api';
 import { ModalContainer, ModalBody, ModalHeader, ModalFooter } from './tailwind/Modal';
 import PersonName from './PersonName';
+import BellIconWithNotifications from '../assets/icons/BellIconWithNotifications';
 
 export default function Notification() {
   const [showModal, setShowModal] = useState(false);
@@ -74,22 +74,7 @@ export default function Notification() {
         aria-label="Actions et commentaires urgents et vigilance"
         className="tw-flex tw-self-center"
         onClick={() => setShowModal(true)}>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          style={{ width: '1.5rem', height: '1.5rem' }}
-          stroke={theme.main}
-          strokeWidth={2}>
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-          />
-        </svg>
-        <div style={{ marginTop: '-0.75rem', marginLeft: '-0.75rem' }}>
-          <span className="badge badge-pill badge-danger">{actionsFiltered.length + commentsFiltered.length}</span>
-        </div>
+        <BellIconWithNotifications size={24} notificationsNumber={actionsFiltered.length + commentsFiltered.length} />
       </button>
       <ModalContainer open={showModal} onClose={() => setShowModal(false)} size="full">
         <Actions
