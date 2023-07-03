@@ -1,3 +1,11 @@
+# [1.275.0](https://github.com/SocialGouv/mano/compare/v1.274.0...v1.275.0) (2023-07-03)
+
+
+### Features
+
+* **dashboard:** lorsqu'on ajoute un membre d'une famille, on peut préciser le lien avec tous les membres existants ([#1577](https://github.com/SocialGouv/mano/issues/1577)) ([683bfce](https://github.com/SocialGouv/mano/commit/683bfcec589b14dbf4f9b831a16c01c8ea7e0482))
+* **dashboard:** mode lecture / mode écriture pour consultations / actions etc. ([#1562](https://github.com/SocialGouv/mano/issues/1562)) ([0c29d1f](https://github.com/SocialGouv/mano/commit/0c29d1fa94cc885f463e384ba34e03f3b65b7b94))
+
 # [1.274.0](https://github.com/SocialGouv/mano/compare/v1.273.2...v1.274.0) (2023-07-03)
 
 
