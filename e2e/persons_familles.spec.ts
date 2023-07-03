@@ -60,7 +60,7 @@ test("Familles", async ({ page }) => {
   });
 
   await test.step("Create relation ", async () => {
-    await expect(page.getByText("Nouveau lien familial")).toBeVisible();
+    await expect(page.getByText(`Nouveau lien familial entre ${person1Name} et...`)).toBeVisible();
     await changeReactSelectValue(page, "person-family-relation", person2Name);
     await page.getByPlaceholder("Père/fille, mère/fils...").fill("rel");
     await page.getByRole("button", { name: "Enregistrer" }).click();
@@ -78,7 +78,7 @@ test("Familles", async ({ page }) => {
       .click();
 
     // cannot update the persons
-    await expect(page.getByText(`Nouvelle relation entre ${person1Name} et...`)).not.toBeVisible();
+    await expect(page.getByText(`Nouveaux liens familiaux entre ${person1Name} et...`)).not.toBeVisible();
     await page.getByPlaceholder("Père/fille, mère/fils...").fill("je suis ton père");
     await page.getByRole("button", { name: "Enregistrer" }).click();
     await page.getByText("Le lien familial a été modifié").click();
@@ -141,6 +141,9 @@ test("Familles", async ({ page }) => {
   await test.step("Cant add a relation between two persons with already a relation between them", async () => {
     await page.getByRole("button", { name: "Ajouter un lien" }).click();
     await clickOnEmptyReactSelect(page, "person-family-relation", person1Name);
+    await page.getByLabel("Relation/commentaire").fill("fiston");
+    await page.getByRole("button", { name: "Enregistrer" }).click();
+    await page.getByRole("textbox", { name: "Père/fille, mère/fils..." }).fill("nada");
     await page.getByRole("button", { name: "Enregistrer" }).click();
     await page.getByText("Il y a déjà un lien entre ces deux personnes").click();
     await page.getByRole("button", { name: "Annuler" }).click();
@@ -152,6 +155,7 @@ test("Familles", async ({ page }) => {
     await page.getByRole("button", { name: "Liens familiaux (0)" }).click();
     await page.getByRole("button", { name: "Ajouter un lien" }).click();
     await clickOnEmptyReactSelect(page, "person-family-relation", person4Name);
+    await page.getByLabel("Relation/commentaire").fill("fistone");
     await page.getByRole("button", { name: "Enregistrer" }).click();
     await page.getByText("Le lien familial a été ajouté").click();
 
@@ -160,6 +164,8 @@ test("Familles", async ({ page }) => {
     await page.getByRole("button", { name: "Liens familiaux (1)" }).click();
     await page.getByRole("button", { name: "Ajouter un lien" }).click();
     await clickOnEmptyReactSelect(page, "person-family-relation", person2Name);
+    await page.getByLabel("Relation/commentaire").fill("random");
+    await page.getByRole("textbox", { name: "Père/fille, mère/fils..." }).fill("we dont care");
     await page.getByRole("button", { name: "Enregistrer" }).click();
     await page
       .getByText(
