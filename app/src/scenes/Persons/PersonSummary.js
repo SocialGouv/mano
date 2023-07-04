@@ -139,12 +139,7 @@ const PersonSummary = ({
           showYear
         />
       ) : (
-        <InputLabelled
-          label="Âge"
-          value={person.birthdate ? `${dayjs().from(dayjs(person.birthdate), true)} (${dayjs(person.birthdate).format('DD/MM/YYYY')})` : null}
-          placeholder="JJ-MM-AAAA"
-          editable={false}
-        />
+        <InputLabelled label="Âge" value={populatedPerson.formattedBirthDate} placeholder="JJ-MM-AAAA" editable={false} />
       )}
       {editable ? (
         <DateAndTimeInput

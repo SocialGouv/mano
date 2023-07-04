@@ -85,11 +85,13 @@ export const itemsGroupedByPersonSelector = selector({
   get: ({ get }) => {
     const persons = get(personsState);
     const personsObject = {};
-    for (const person of persons) {
+    for (const [index, person] of Object.entries(persons)) {
+      // console.log(`itemsGroupedByPersonSelector 0.${index}`, Date.now() - now);
+      const age = person.birthdate ? formatAge(person.birthdate) : 0;
       personsObject[person._id] = {
         ...person,
-        formattedBirthDate: formatBirthDate(person.birthdate),
-        age: formatAge(person.birthdate),
+        formattedBirthDate: person.birthdate ? `${age} an${age > 1 ? 's' : ''} (${formatBirthDate(person.birthdate)})` : null,
+        age,
         // remove anything that is not a number
         formattedPhoneNumber: person.phone?.replace(/\D/g, ''),
       };
@@ -215,6 +217,7 @@ export const itemsGroupedByActionSelector = selector({
 export const personsWithPlacesSelector = selector({
   key: 'personsWithPlacesSelector',
   get: ({ get }) => {
+    const now = Date.now();
     const persons = get(personsState);
     const personsObject = {};
     for (const person of persons) {

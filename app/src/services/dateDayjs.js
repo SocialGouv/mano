@@ -18,15 +18,45 @@ export function formatDateTimeWithNameOfDay(date) {
   return dayjs(date).format('dddd D MMMM YYYY HH:mm');
 }
 
+// dayjs is very slow, so we use native Date for this function
+
+// export function formatBirthDate(date) {
+//   const birthDate = dayjs(date);
+//   return `${birthDate.format('DD/MM/YYYY')} (${formatAge(date)})`;
+// }
+
+// export function formatAge(date) {
+//   const birthDate = dayjs(date);
+//   return birthDate.fromNow(true);
+// }
+
 export function formatBirthDate(date) {
-  const birthDate = dayjs(date);
-  return `${birthDate.format('DD/MM/YYYY')} (${formatAge(date)})`;
+  let birthDate = new Date(date);
+  let day = String(birthDate.getDate()).padStart(2, '0');
+  let month = String(birthDate.getMonth() + 1).padStart(2, '0'); // January is 0!
+  let year = birthDate.getFullYear();
+  return `${day}/${month}/${year}`;
 }
 
 export function formatAge(date) {
-  const birthDate = dayjs(date);
-  return birthDate.fromNow(true);
+  let birthDate = new Date(date);
+  let currentDate = new Date();
+
+  let years = currentDate.getFullYear() - birthDate.getFullYear();
+  let m = currentDate.getMonth() - birthDate.getMonth();
+
+  if (m < 0 || (m === 0 && currentDate.getDate() < birthDate.getDate())) {
+    years--;
+  }
+
+  return `${years}`;
 }
+
+export function formatBirthDateAndAge(date) {
+  return `${formatAge(date)} ans (${formatBirthDate(date)})`;
+}
+
+console.log(formatAge(new Date('1995-01-01')));
 
 export function formatCalendarDate(date) {
   if (dayjs(date).isSame(dayjs(), 'day')) {

@@ -26,7 +26,7 @@ export const PersonName = ({ person: { name, outOfActiveList, outOfActiveListRea
 };
 
 const PersonRow = ({ onPress, person, isPersonsSearchRow = false, showActionSheetWithOptions, children }) => {
-  const { outOfActiveList, birthdate, alertness } = person;
+  const { outOfActiveList, birthdate, formattedBirthDate, alertness } = person;
   const navigation = useNavigation();
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
@@ -87,12 +87,8 @@ const PersonRow = ({ onPress, person, isPersonsSearchRow = false, showActionShee
           <PersonName person={person} />
           {!isPersonsSearchRow && <ButtonTopPlus onPress={onMorePress} />}
         </CaptionsFirstLine>
-        {birthdate && !outOfActiveList && (
-          <Birthdate>{`${dayjs().from(dayjs(person.birthdate), true)} (${dayjs(person.birthdate).format('DD/MM/YYYY')})`}</Birthdate>
-        )}
-        {birthdate && outOfActiveList && (
-          <BirthdateMuted>{`${dayjs().from(dayjs(person.birthdate), true)} (${dayjs(person.birthdate).format('DD/MM/YYYY')})`}</BirthdateMuted>
-        )}
+        {formattedBirthDate && !outOfActiveList && <Birthdate>{formattedBirthDate}</Birthdate>}
+        {formattedBirthDate && outOfActiveList && <BirthdateMuted>{formattedBirthDate}</BirthdateMuted>}
         {children}
         <TeamsTags teams={person.assignedTeams} />
       </CaptionsContainer>
