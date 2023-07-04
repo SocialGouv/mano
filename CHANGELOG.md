@@ -1,3 +1,10 @@
+## [1.276.5](https://github.com/SocialGouv/mano/compare/v1.276.4...v1.276.5) (2023-07-04)
+
+
+### Bug Fixes
+
+* **app:** amélioration du calcul des anniversaires dans l'app qui prenait plusieurs secondes ([#1587](https://github.com/SocialGouv/mano/issues/1587)) ([6a64308](https://github.com/SocialGouv/mano/commit/6a64308203c9ec160f06e218db274ecaaa81dd8d))
+
 ## [1.276.4](https://github.com/SocialGouv/mano/compare/v1.276.3...v1.276.4) (2023-07-04)
 
 
