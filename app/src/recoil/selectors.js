@@ -16,31 +16,26 @@ import dayjs from 'dayjs';
 import { groupsState } from './groups';
 import { formatAge, formatBirthDate } from '../services/dateDayjs';
 
-export const personsSearchSelector = selectorFamily({
-  key: 'personsSearchSelector',
-  get:
-    ({ search = '' }) =>
-    ({ get }) => {
-      const persons = get(personsState);
-      if (!search?.length) return persons;
-      return filterBySearch(search, persons);
-    },
-});
-
 export const actionsObjectSelector = selector({
   key: 'actionsObjectSelector',
   get: ({ get }) => {
+    // const now = Date.now();
+    // console.log('actionsObjectSelector start');
     const actions = get(actionsState);
     const actionsObject = {};
     for (const action of actions) {
       actionsObject[action._id] = { ...action };
     }
+    // console.log('actionsObjectSelector', Date.now() - now);
     return actionsObject;
   },
 });
+
 const actionsWithCommentsSelector = selector({
   key: 'actionsWithCommentsSelector',
   get: ({ get }) => {
+    // const now = Date.now();
+    // console.log('actionsWithCommentsSelector start');
     const actions = get(actionsState);
     const comments = get(commentsState);
     const actionsObject = {};
@@ -51,6 +46,7 @@ const actionsWithCommentsSelector = selector({
       if (!actionsObject[comment.action]) continue;
       actionsObject[comment.action].comments.push(comment);
     }
+    // console.log('actionsWithCommentsSelector', Date.now() - now);
     return actionsObject;
   },
 });
@@ -58,38 +54,35 @@ const actionsWithCommentsSelector = selector({
 const placesObjectSelector = selector({
   key: 'placesObjectSelector',
   get: ({ get }) => {
+    // const now = Date.now();
+    // console.log('placesObjectSelector start');
     const places = get(placesState);
     const placesObject = {};
     for (const place of places) {
       if (!place?.name) continue;
       placesObject[place._id] = place;
     }
+    // console.log('placesObjectSelector', Date.now() - now);
     return placesObject;
-  },
-});
-
-export const personsObjectSelector = selector({
-  key: 'personsObjectSelector',
-  get: ({ get }) => {
-    const persons = get(personsState);
-    const personsObject = {};
-    for (const person of persons) {
-      personsObject[person._id] = { ...person };
-    }
-    return personsObject;
   },
 });
 
 export const itemsGroupedByPersonSelector = selector({
   key: 'itemsGroupedByPersonSelector',
   get: ({ get }) => {
+    // const now = Date.now();
+    // console.log('itemsGroupedByPersonSelector start');
     const persons = get(personsState);
     const personsObject = {};
-    for (const [index, person] of Object.entries(persons)) {
+    for (const person of persons) {
       // console.log(`itemsGroupedByPersonSelector 0.${index}`, Date.now() - now);
       const age = person.birthdate ? formatAge(person.birthdate) : 0;
+      const nameLowercased = person.name.toLocaleLowerCase();
+      // replace all accents with normal letters
+      const nameNormalized = nameLowercased.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
       personsObject[person._id] = {
         ...person,
+        nameNormalized,
         formattedBirthDate: person.birthdate ? `${age} an${age > 1 ? 's' : ''} (${formatBirthDate(person.birthdate)})` : null,
         age,
         // remove anything that is not a number
@@ -195,54 +188,62 @@ export const itemsGroupedByPersonSelector = selector({
       personsObject[rencontre.person].rencontres = personsObject[rencontre.person].rencontres || [];
       personsObject[rencontre.person].rencontres.push(rencontre);
     }
+    // console.log('itemsGroupedByPersonSelector 1', Date.now() - now);
     return personsObject;
   },
+});
+
+export const arrayOfitemsGroupedByPersonSelector = selector({
+  key: 'arrayOfitemsGroupedByPersonSelector',
+  get: ({ get }) => {
+    const itemsGroupedByPerson = get(itemsGroupedByPersonSelector);
+    return Object.values(itemsGroupedByPerson).sort((a, b) => (a.nameNormalized > b.nameNormalized ? 1 : -1));
+  },
+});
+
+export const personsSearchSelector = selectorFamily({
+  key: 'personsSearchSelector',
+  get:
+    ({ search = '' }) =>
+    ({ get }) => {
+      // const now = Date.now();
+      // console.log('personsSearchSelector start');
+      const persons = get(arrayOfitemsGroupedByPersonSelector);
+      if (!search?.length) return persons;
+      const filteredPersons = filterBySearch(search, persons);
+      // console.log('personsSearchSelector', Date.now() - now);
+      return filteredPersons;
+    },
 });
 
 export const itemsGroupedByActionSelector = selector({
   key: 'itemsGroupedByActionSelector',
   get: ({ get }) => {
+    // const now = Date.now();
+    // console.log('itemsGroupedByActionSelector start');
     const actionsWithCommentsObject = get(actionsWithCommentsSelector);
-    const personsWithPlacesObject = get(personsWithPlacesSelector);
+    const personsObject = get(itemsGroupedByPersonSelector);
 
     const actionsObject = {};
     for (const actionId of Object.keys(actionsWithCommentsObject)) {
       const action = actionsWithCommentsObject[actionId];
-      actionsObject[actionId] = { ...action, personPopulated: personsWithPlacesObject[action.person] };
+      actionsObject[actionId] = { ...action, personPopulated: personsObject[action.person] };
     }
+    // console.log('itemsGroupedByActionSelector', Date.now() - now);
     return actionsObject;
-  },
-});
-
-export const personsWithPlacesSelector = selector({
-  key: 'personsWithPlacesSelector',
-  get: ({ get }) => {
-    const now = Date.now();
-    const persons = get(personsState);
-    const personsObject = {};
-    for (const person of persons) {
-      personsObject[person._id] = { ...person };
-    }
-    const relsPersonPlace = get(relsPersonPlaceState);
-    const places = get(placesObjectSelector);
-
-    for (const relPersonPlace of relsPersonPlace) {
-      if (!personsObject[relPersonPlace.person]) continue;
-      const place = places[relPersonPlace.place];
-      if (!place) continue;
-      personsObject[relPersonPlace.person].places = personsObject[relPersonPlace.person].places || {};
-      personsObject[relPersonPlace.person].places[place._id] = place.name;
-    }
-    return personsObject;
   },
 });
 
 export const actionsForCurrentTeamSelector = selector({
   key: 'actionsForCurrentTeamSelector',
   get: ({ get }) => {
+    // const now = Date.now();
+    // console.log('actionsForCurrentTeamSelector start');
     const actions = get(actionsState);
     const currentTeam = get(currentTeamState);
-    return actions.filter((a) => (Array.isArray(a.teams) ? a.teams.includes(currentTeam?._id) : a.team === currentTeam?._id));
+    const filteredActions = actions.filter((a) => (Array.isArray(a.teams) ? a.teams.includes(currentTeam?._id) : a.team === currentTeam?._id));
+    // console.log('actionsForCurrentTeamSelector', Date.now() - now);
+    return filteredActions;
   },
 });
 
@@ -312,31 +313,43 @@ Actions and Consultations
 const consultationsForCurrentTeamSelector = selector({
   key: 'consultationsForCurrentTeamSelector',
   get: ({ get }) => {
+    // const now = Date.now();
+    // console.log('consultationsForCurrentTeamSelector start');
     const consultations = get(consultationsState);
     const currentTeam = get(currentTeamState);
-    return consultations
+    const filteredConsultations = consultations
       .filter((consultation) => {
         if (!consultation.teams?.length) return true;
         return consultation.teams.includes(currentTeam._id);
       })
       .map((c) => ({ ...c, isConsultation: true }));
+    // console.log('consultationsForCurrentTeamSelector', Date.now() - now);
+    return filteredConsultations;
   },
 });
 
 const actionsAndConsultationsSelector = selector({
   key: 'actionsAndConsultationsSelector',
   get: ({ get }) => {
+    // const now = Date.now();
+    // console.log('actionsAndConsultationsSelector start');
     const actions = get(actionsForCurrentTeamSelector);
     const consultations = get(consultationsForCurrentTeamSelector);
-    return [...actions, ...consultations];
+    const merged = [...actions, ...consultations];
+    // console.log('actionsAndConsultationsSelector', merged.length);
+    return merged;
   },
 });
 
 export const actionsDoneSelector = selector({
   key: 'actionsDoneSelector',
   get: ({ get }) => {
+    // const now = Date.now();
+    // console.log('actionsDoneSelector start');
     const actions = get(actionsAndConsultationsSelector);
-    return actions.filter((a) => a.status === DONE).sort(sortDoneOrCancel);
+    const filteredActions = actions.filter((a) => a.status === DONE).sort(sortDoneOrCancel);
+    // console.log('actionsDoneSelector', Date.now() - now);
+    return filteredActions;
   },
 });
 
@@ -345,24 +358,36 @@ export const actionsDoneSelectorSliced = selectorFamily({
   get:
     ({ limit }) =>
     ({ get }) => {
+      // const now = Date.now();
+      // console.log('actionsDoneSelectorSliced start');
       const actionsDone = get(actionsDoneSelector);
-      return actionsDone.filter((_, index) => index < limit);
+      const filteredActions = actionsDone.filter((_, index) => index < limit);
+      // console.log('actionsDoneSelectorSliced', Date.now() - now);
+      return filteredActions;
     },
 });
 
 export const actionsTodoSelector = selector({
   key: 'actionsTodoSelector',
   get: ({ get }) => {
+    // const now = Date.now();
+    // console.log('actionsTodoSelector start');
     const actions = get(actionsAndConsultationsSelector);
-    return formatData(actions.filter((a) => a.status === TODO));
+    const filteredActions = formatData(actions.filter((a) => a.status === TODO));
+    // console.log('actionsTodoSelector', Date.now() - now);
+    return filteredActions;
   },
 });
 
 export const actionsCanceledSelector = selector({
   key: 'actionsCanceledSelector',
   get: ({ get }) => {
+    // const now = Date.now();
+    // console.log('actionsCanceledSelector start');
     const actions = get(actionsAndConsultationsSelector);
-    return actions.filter((a) => a.status === CANCEL).sort(sortDoneOrCancel);
+    const filteredActions = actions.filter((a) => a.status === CANCEL).sort(sortDoneOrCancel);
+    // console.log('actionsCanceledSelector', Date.now() - now);
+    return filteredActions;
   },
 });
 
@@ -371,8 +396,12 @@ export const actionsCanceledSelectorSliced = selectorFamily({
   get:
     ({ limit }) =>
     ({ get }) => {
+      // const now = Date.now();
+      // console.log('actionsCanceledSelectorSliced start');
       const actionsCanceled = get(actionsCanceledSelector);
-      return actionsCanceled.filter((_, index) => index < limit);
+      const filteredActions = actionsCanceled.filter((_, index) => index < limit);
+      // console.log('actionsCanceledSelectorSliced', Date.now() - now);
+      return filteredActions;
     },
 });
 
@@ -381,16 +410,21 @@ export const actionsByStatusSelector = selectorFamily({
   get:
     ({ status, limit }) =>
     ({ get }) => {
+      // const now = Date.now();
+      // console.log('actionsByStatusSelector start');
       if (status === DONE) {
         const actions = get(actionsDoneSelectorSliced({ limit }));
+        // console.log('actionsByStatusSelector', Date.now() - now);
         return actions;
       }
       if (status === TODO) {
         const actions = get(actionsTodoSelector);
+        // console.log('actionsByStatusSelector', Date.now() - now);
         return actions;
       }
       if (status === CANCEL) {
         const actions = get(actionsCanceledSelectorSliced({ limit }));
+        // console.log('actionsByStatusSelector', Date.now() - now);
         return actions;
       }
     },

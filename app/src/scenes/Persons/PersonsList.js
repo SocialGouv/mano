@@ -9,18 +9,10 @@ import { ListEmptyPersons, ListNoMorePersons } from '../../components/ListEmptyC
 import FloatAddButton from '../../components/FloatAddButton';
 import { FlashListStyled } from '../../components/Lists';
 import Search from '../../components/Search';
-import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
+import { arrayOfitemsGroupedByPersonSelector, itemsGroupedByPersonSelector } from '../../recoil/selectors';
 import { selector, selectorFamily, useRecoilState, useRecoilValue } from 'recoil';
 import { loadingState, refreshTriggerState } from '../../components/Loader';
 import { filterBySearch } from '../../utils/search';
-
-const arrayOfitemsGroupedByPersonSelector = selector({
-  key: 'arrayOfitemsGroupedByPersonSelector',
-  get: ({ get }) => {
-    const itemsGroupedByPerson = get(itemsGroupedByPersonSelector);
-    return Object.values(itemsGroupedByPerson);
-  },
-});
 
 const personsFilteredSelector = selectorFamily({
   key: 'personsFilteredSelector',

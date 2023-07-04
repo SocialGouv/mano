@@ -170,7 +170,7 @@ export const DataLoader = () => {
       });
       if (refreshedPersons) {
         const newPersons = refreshedPersons.map((p) => ({ ...p, followedSince: p.followedSince || p.createdAt }));
-        setPersons((oldPersons) => mergeItems(oldPersons, newPersons).sort(sortByName));
+        setPersons((oldPersons) => mergeItems(oldPersons, newPersons));
       }
     }
     /*
