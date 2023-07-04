@@ -1,3 +1,10 @@
+## [1.276.6](https://github.com/SocialGouv/mano/compare/v1.276.5...v1.276.6) (2023-07-04)
+
+
+### Bug Fixes
+
+* **app:** meilleure gestion du tri par ordre alphabétique des personnnes pour meilleure perf ([#1588](https://github.com/SocialGouv/mano/issues/1588)) ([0ba45be](https://github.com/SocialGouv/mano/commit/0ba45be88964a4df0db86abfd8426619f7594afc))
+
 ## [1.276.5](https://github.com/SocialGouv/mano/compare/v1.276.4...v1.276.5) (2023-07-04)
 
 
