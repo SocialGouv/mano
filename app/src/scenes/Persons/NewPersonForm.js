@@ -56,6 +56,7 @@ const NewPersonForm = ({ navigation, route }) => {
   };
 
   const onCreateUser = async () => {
+    const now = Date.now();
     setPosting(true);
     const existingPerson = persons.find((p) => p.name === name);
     if (existingPerson) {
@@ -63,15 +64,18 @@ const NewPersonForm = ({ navigation, route }) => {
       setPosting(false);
       return false;
     }
+    console.log('1', Date.now() - now);
     const response = await API.post({
       path: '/person',
       body: preparePersonForEncryption({ name, followedSince: dayjs(), assignedTeams, user: user._id }),
     });
+    console.log('2', Date.now() - now);
     if (response.ok) {
       setPersons((persons) =>
         [response.decryptedData, ...persons].map((p) => ({ ...p, followedSince: p.followedSince || p.createdAt })).sort(sortByName)
       );
     }
+    console.log('3', Date.now() - now);
     if (!response.ok) {
       setPosting(false);
       if (response.code === 'USER_ALREADY_EXIST') {
@@ -81,6 +85,7 @@ const NewPersonForm = ({ navigation, route }) => {
       }
       return false;
     }
+    console.log('4', Date.now() - now);
     return response;
   };
 

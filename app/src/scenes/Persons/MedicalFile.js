@@ -27,6 +27,7 @@ import { flattenedCustomFieldsPersonsSelector } from '../../recoil/persons';
 import CommentRow from '../Comments/CommentRow';
 import NewCommentInput from '../Comments/NewCommentInput';
 import { Alert } from 'react-native';
+import { formatBirthDateAndAge } from '../../services/dateDayjs';
 
 const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, editable, onEdit, isUpdateDisabled, backgroundColor, onChange }) => {
   const organisation = useRecoilValue(organisationState);
@@ -267,12 +268,7 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
           showYear
         />
       ) : (
-        <InputLabelled
-          label="Âge"
-          value={`${dayjs().from(dayjs(person.birthdate), true)} (${dayjs(person.birthdate).format('DD/MM/YYYY')})`}
-          placeholder="JJ-MM-AAAA"
-          editable={false}
-        />
+        <InputLabelled label="Âge" value={formatBirthDateAndAge(person.birthdate)} placeholder="JJ-MM-AAAA" editable={false} />
       )}
       {/* These custom fields are displayed by default, because they where displayed before they became custom fields */}
       {Boolean(flattenedCustomFieldsPersons.find((e) => e.name === 'healthInsurances')) && (
