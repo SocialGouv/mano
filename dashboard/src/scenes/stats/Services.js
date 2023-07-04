@@ -36,7 +36,7 @@ const ServicesStats = ({ period, teamIds }) => {
         }
       );
     },
-    [teamIds, startDate, endDate]
+    [teamIds, startDate, endDate, allServices]
   );
 
   const servicesFiltered = useMemo(() => {
