@@ -47,7 +47,6 @@
     "sass": "^1.48.0",
     "sortablejs": "^1.14.0",
     "styled-components": "^5.2.1",
-    "typescript": "^5.1.6",
     "urijs": "^1.19.11",
     "uuid": "^9.0.0",
     "validator": "^13.7.0",
@@ -57,16 +56,19 @@
   "devDependencies": {
     "@sentry/cli": "^2.6.0",
     "@tailwindcss/forms": "^0.5.3",
+    "@typescript-eslint/typescript-estree": "^5.57.1",
     "autoprefixer": "^10.4.13",
     "buffer": "^6.0.3",
     "crypto": "npm:crypto-browserify",
+    "fork-ts-checker-webpack-plugin": "^6.5.3",
     "path": "npm:path-browserify",
     "postcss": "^8.4.18",
     "prettier": "^2.7.1",
     "prettier-plugin-tailwindcss": "^0.2.0",
     "react-scripts": "5.0.1",
     "stream": "npm:stream-browserify",
-    "tailwindcss": "^3.2.4"
+    "tailwindcss": "^3.2.4",
+    "typescript": "^5.0.3"
   },
   "scripts": {
     "dev": "react-scripts start -FAST_REFRESH=true",
@@ -79,6 +81,11 @@
     "extends": [
       "react-app"
     ]
+  },
+  "resolutions": {
+    "@typescript-eslint/typescript-estree": "^5.57.1",
+    "fork-ts-checker-webpack-plugin": "^6.5.3",
+    "typescript": "^5.0.3"
   },
   "prettier": {
     "bracketSpacing": true,
