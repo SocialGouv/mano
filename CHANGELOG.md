@@ -1,3 +1,10 @@
+## [1.276.4](https://github.com/SocialGouv/mano/compare/v1.276.3...v1.276.4) (2023-07-04)
+
+
+### Bug Fixes
+
+* **dashboard:** effect dep ([2a8928d](https://github.com/SocialGouv/mano/commit/2a8928d19fba2fa820c7753724340ad8e676760f))
+
 ## [1.276.3](https://github.com/SocialGouv/mano/compare/v1.276.2...v1.276.3) (2023-07-03)
 
 
