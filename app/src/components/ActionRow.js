@@ -7,20 +7,20 @@ import RowContainer from './RowContainer';
 import { MyText } from './MyText';
 import colors from '../utils/colors';
 import TeamsTags from './TeamsTags';
-import { personsState } from '../recoil/persons';
 import { DONE } from '../recoil/actions';
 import DateAndTimeCalendarDisplay from './DateAndTimeCalendarDisplay';
 import { organisationState } from '../recoil/auth';
+import { itemsGroupedByPersonSelector } from '../recoil/selectors';
 
 const ActionRow = ({ onActionPress, onPseudoPress, showStatus, action, withTeamName, testID = 'action' }) => {
-  const persons = useRecoilValue(personsState);
+  const personsObject = useRecoilValue(itemsGroupedByPersonSelector);
   const organisation = useRecoilValue(organisationState);
 
   const name = action?.name;
   const status = action?.status;
   const withTime = action?.withTime;
   const urgent = action?.urgent;
-  const person = useMemo(() => (action?.person ? persons?.find((p) => p._id === action.person) : null), [persons, action.person]);
+  const person = useMemo(() => (action?.person ? personsObject[action.person] : null), [personsObject, action.person]);
   const pseudo = useMemo(() => action?.personName || person?.name, [action, person?.name]);
   const dueAt = action?.dueAt ? new Date(action?.dueAt) : null;
 

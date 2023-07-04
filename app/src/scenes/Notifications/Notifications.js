@@ -13,7 +13,7 @@ import CommentRow from '../Comments/CommentRow';
 import styled from 'styled-components';
 import { MyText } from '../../components/MyText';
 import { ListEmptyUrgent, ListEmptyUrgentAction, ListEmptyUrgentComment } from '../../components/ListEmptyContainer';
-import { actionsObjectSelector, personsObjectSelector } from '../../recoil/selectors';
+import { actionsObjectSelector, itemsGroupedByPersonSelector } from '../../recoil/selectors';
 import API from '../../services/api';
 import { Alert } from 'react-native';
 
@@ -21,7 +21,7 @@ export const urgentItemsSelector = selector({
   key: 'urgentItemsSelector',
   get: ({ get }) => {
     const currentTeam = get(currentTeamState);
-    const persons = get(personsObjectSelector);
+    const persons = get(itemsGroupedByPersonSelector);
     const actions = get(actionsState);
     const actionsObject = get(actionsObjectSelector);
     const comments = get(commentsState);

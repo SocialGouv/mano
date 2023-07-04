@@ -23,7 +23,6 @@ import Tags from '../../components/Tags';
 import { MyText } from '../../components/MyText';
 import { actionsState, DONE, CANCEL, TODO, prepareActionForEncryption, mappedIdsToLabels } from '../../recoil/actions';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { personsState } from '../../recoil/persons';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import API from '../../services/api';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
@@ -32,6 +31,7 @@ import CheckboxLabelled from '../../components/CheckboxLabelled';
 import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
 import { groupsState } from '../../recoil/groups';
 import { useFocusEffect } from '@react-navigation/native';
+import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
 
 const castToAction = (action) => {
   if (!action) action = {};
@@ -57,7 +57,7 @@ const Action = ({ navigation, route }) => {
   const [actions, setActions] = useRecoilState(actionsState);
   const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
-  const allPersons = useRecoilValue(personsState);
+  const allPersonsObject = useRecoilValue(itemsGroupedByPersonSelector);
   const groups = useRecoilValue(groupsState);
   const [comments, setComments] = useRecoilState(commentsState);
   const currentTeam = useRecoilValue(currentTeamState);
@@ -76,12 +76,12 @@ const Action = ({ navigation, route }) => {
 
   const persons = useMemo(() => {
     if (isMultipleActions) {
-      return multipleActions?.map((a) => allPersons.find((p) => p._id === a.person));
+      return multipleActions?.map((a) => allPersonsObject[a.person]);
     } else if (action.person) {
-      return [allPersons.find((p) => p._id === action.person)];
+      return [allPersonsObject[action.person]];
     }
     return [];
-  }, [isMultipleActions, multipleActions, allPersons, action?.person]);
+  }, [isMultipleActions, multipleActions, allPersonsObject, action?.person]);
 
   const [updating, setUpdating] = useState(false);
   const [writingComment, setWritingComment] = useState('');

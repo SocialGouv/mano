@@ -3,7 +3,7 @@ import { actionsState } from '../../recoil/actions';
 import { currentTeamState } from '../../recoil/auth';
 import { commentsState } from '../../recoil/comments';
 import { reportsState } from '../../recoil/reports';
-import { actionsObjectSelector, personsObjectSelector } from '../../recoil/selectors';
+import { actionsObjectSelector, itemsGroupedByPersonSelector } from '../../recoil/selectors';
 import { territoryObservationsState } from '../../recoil/territoryObservations';
 import { getIsDayWithinHoursOffsetOfDay } from '../../services/dateDayjs';
 
@@ -21,13 +21,16 @@ export const actionsCreatedForReport = selectorFamily({
   get:
     ({ date }) =>
     ({ get }) => {
+      const now = Date.now();
+      console.log('actionsCreatedForReport start');
       const actions = get(actionsState);
       const currentTeam = get(currentTeamState);
-      return actions
-
+      const filteredActions = actions
         ?.filter((a) => (Array.isArray(a.teams) ? a.teams.includes(currentTeam?._id) : a.team === currentTeam?._id))
         .filter((a) => getIsDayWithinHoursOffsetOfDay(a.createdAt, date, currentTeam?.nightSession ? 12 : 0))
         .filter((a) => !getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam?.nightSession ? 12 : 0));
+      console.log('actionsCreatedForReport', Date.now() - now);
+      return filteredActions;
     },
 });
 
@@ -36,12 +39,16 @@ export const actionsCompletedOrCanceledForReport = selectorFamily({
   get:
     ({ date, status }) =>
     ({ get }) => {
+      const now = Date.now();
+      console.log('actionsCompletedOrCanceledForReport start');
       const actions = get(actionsState);
       const currentTeam = get(currentTeamState);
-      return actions
+      const filteredActions = actions
         ?.filter((a) => (Array.isArray(a.teams) ? a.teams.includes(currentTeam?._id) : a.team === currentTeam?._id))
         .filter((a) => a.status === status)
         .filter((a) => getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam?.nightSession ? 12 : 0));
+      console.log('actionsCompletedOrCanceledForReport', Date.now() - now);
+      return filteredActions;
     },
 });
 
@@ -50,11 +57,13 @@ export const commentsForReport = selectorFamily({
   get:
     ({ date }) =>
     ({ get }) => {
+      const now = Date.now();
+      console.log('commentsForReport start');
       const actions = get(actionsObjectSelector);
-      const persons = get(personsObjectSelector);
+      const persons = get(itemsGroupedByPersonSelector);
       const comments = get(commentsState);
       const currentTeam = get(currentTeamState);
-      return comments
+      const filteredComments = comments
         .filter((c) => c.team === currentTeam._id)
         .filter((c) => getIsDayWithinHoursOffsetOfDay(c.date || c.createdAt, date, currentTeam?.nightSession ? 12 : 0))
         .map((comment) => {
@@ -74,6 +83,8 @@ export const commentsForReport = selectorFamily({
           return commentPopulated;
         })
         .filter((c) => c.action || c.person);
+      console.log('commentsForReport', Date.now() - now);
+      return filteredComments;
     },
 });
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import Button from '../../components/Button';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
@@ -9,11 +9,13 @@ import OutOfActiveListReasonMultiCheckBox from '../../components/Selects/OutOfAc
 import { userState } from '../../recoil/auth';
 import { allowedFieldsInHistorySelector, personsState, usePreparePersonForEncryption } from '../../recoil/persons';
 import API from '../../services/api';
+import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
 
 const PersonsOutOfActiveListReason = ({ navigation, route }) => {
   const [reasons, setReasons] = useState([]);
   const [submitting, setSubmitting] = useState(false);
-  const [persons, setPersons] = useRecoilState(personsState);
+  const setPersons = useSetRecoilState(personsState);
+  const personsObject = useRecoilValue(itemsGroupedByPersonSelector);
   const allowedFieldsInHistory = useRecoilValue(allowedFieldsInHistorySelector);
   const preparePersonForEncryption = usePreparePersonForEncryption();
 
@@ -21,7 +23,7 @@ const PersonsOutOfActiveListReason = ({ navigation, route }) => {
 
   const updatePerson = async () => {
     const person = { ...route.params.person, outOfActiveListReasons: reasons, outOfActiveList: true };
-    const oldPerson = persons.find((a) => a._id === person._id);
+    const oldPerson = personsObject[person._id];
 
     const historyEntry = {
       date: new Date(),

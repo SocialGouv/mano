@@ -12,7 +12,6 @@ import { personsState, usePreparePersonForEncryption } from '../../recoil/person
 import API from '../../services/api';
 import TeamsMultiCheckBoxes from '../../components/MultiCheckBoxes/TeamsMultiCheckBoxes';
 import { currentTeamState, teamsState, userState } from '../../recoil/auth';
-import { sortByName } from '../../utils/sortByName';
 
 const NewPersonForm = ({ navigation, route }) => {
   const [persons, setPersons] = useRecoilState(personsState);
@@ -64,18 +63,20 @@ const NewPersonForm = ({ navigation, route }) => {
       setPosting(false);
       return false;
     }
-    console.log('1', Date.now() - now);
+    // console.log('1', Date.now() - now);
     const response = await API.post({
       path: '/person',
       body: preparePersonForEncryption({ name, followedSince: dayjs(), assignedTeams, user: user._id }),
     });
-    console.log('2', Date.now() - now);
+    // console.log('2', Date.now() - now);
     if (response.ok) {
-      setPersons((persons) =>
-        [response.decryptedData, ...persons].map((p) => ({ ...p, followedSince: p.followedSince || p.createdAt })).sort(sortByName)
-      );
+      setPersons((persons) => {
+        const nextPersons = [response.decryptedData, ...persons].map((p) => ({ ...p, followedSince: p.followedSince || p.createdAt }));
+        // console.log('3', Date.now() - now);
+        return nextPersons;
+      });
     }
-    console.log('3', Date.now() - now);
+    // console.log('4', Date.now() - now);
     if (!response.ok) {
       setPosting(false);
       if (response.code === 'USER_ALREADY_EXIST') {
@@ -85,7 +86,7 @@ const NewPersonForm = ({ navigation, route }) => {
       }
       return false;
     }
-    console.log('4', Date.now() - now);
+    // console.log('5', Date.now() - now);
     return response;
   };
 
