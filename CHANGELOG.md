@@ -1,3 +1,10 @@
+## [1.276.10](https://github.com/SocialGouv/mano/compare/v1.276.9...v1.276.10) (2023-07-06)
+
+
+### Bug Fixes
+
+* **dashboard:** redeploy ([412124a](https://github.com/SocialGouv/mano/commit/412124afc74315d2c942b23868a01eb177d52b22))
+
 ## [1.276.9](https://github.com/SocialGouv/mano/compare/v1.276.8...v1.276.9) (2023-07-06)
 
 
