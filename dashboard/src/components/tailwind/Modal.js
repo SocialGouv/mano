@@ -24,7 +24,7 @@ const ModalContainer = ({
   onAfterEnter = () => null,
   onAfterLeave = () => null,
   onBeforeLeave = () => null,
-  size = 'lg', // lg, xl, 3xl, full
+  size = 'lg', // lg, xl, 3xl, full, prose
   blurryBackground = false,
 }) => {
   const backgroundRef = useRef(null);
@@ -72,6 +72,7 @@ const ModalContainer = ({
                     size === 'xl' ? 'sm:tw-max-w-xl' : '',
                     size === '3xl' ? 'sm:tw-max-w-3xl' : '',
                     size === 'full' ? 'sm:tw-max-w-[90vw]' : '',
+                    size === 'prose' ? 'sm:tw-max-w-prose' : '',
                   ].join(' ')}>
                   {children}
                   {!!onClose && (
@@ -103,7 +104,7 @@ const nullFunction = () => null;
 
 const ModalHeader = ({ children, title, onClose }) => {
   return (
-    <div className="tw-order-1 tw-flex tw-w-full tw-shrink-0 tw-items-center tw-justify-between tw-rounded-t-lg tw-border-b tw-border-gray-200 tw-bg-white">
+    <div className="tw-z-[10001] tw-order-1 tw-flex tw-w-full tw-shrink-0 tw-items-center tw-justify-between tw-rounded-t-lg tw-border-b tw-border-gray-200 tw-bg-white ">
       <div className="tw-w-full tw-py-4 sm:tw-flex sm:tw-items-start">
         <div className="tw-mt-3 tw-w-full tw-text-center sm:tw-mt-0 sm:tw-text-left">
           {!!title && (
@@ -131,7 +132,7 @@ const ModalHeader = ({ children, title, onClose }) => {
 
 const ModalBody = forwardRef(({ children, className = '', overflowY = true }, ref) => {
   return (
-    <div ref={ref} className={['tw-z-[99999] tw-order-2 tw-shrink', overflowY ? 'tw-overflow-y-auto' : ''].join(' ')}>
+    <div ref={ref} className={['tw-z-[10000] tw-order-2 tw-shrink', overflowY ? 'tw-overflow-y-auto' : ''].join(' ')}>
       <div className="sm:tw-flex sm:tw-items-start">
         <div className={['tw-w-full tw-text-center sm:tw-mt-0 sm:tw-text-left', className].join(' ')}>{children}</div>
       </div>

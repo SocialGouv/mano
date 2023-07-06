@@ -42,7 +42,7 @@ export const Treatments = ({ person }) => {
             )}
           </div>
         </div>
-        <ModalContainer open={!!fullScreen} className="" size="full" onClose={() => setFullScreen(false)}>
+        <ModalContainer open={!!fullScreen} className="" size="prose" onClose={() => setFullScreen(false)}>
           <ModalHeader title={`Traitements de  ${person?.name} (${filteredData.length})`}></ModalHeader>
           <ModalBody>
             <TreatmentsTable filteredData={filteredData} person={person} />
@@ -108,7 +108,11 @@ const TreatmentsTable = ({ filteredData, person }) => {
               )}>
               <td>
                 <div
-                  className={['restricted-access'].includes(user.role) ? 'tw-cursor-not-allowed tw-py-2' : 'tw-cursor-pointer tw-py-2'}
+                  className={
+                    ['restricted-access'].includes(user.role)
+                      ? 'tw-mx-auto tw-max-w-prose tw-cursor-not-allowed tw-py-2'
+                      : ' tw-mx-auto tw-max-w-prose tw-cursor-pointer tw-py-2'
+                  }
                   onClick={() => {
                     const searchParams = new URLSearchParams(history.location.search);
                     searchParams.set('treatmentId', treatment._id);

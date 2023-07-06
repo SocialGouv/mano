@@ -105,7 +105,7 @@ export default function PassagesRencontres({ person }) {
           )}
         </div>
       </div>
-      <ModalContainer open={!!fullScreen} size="full" onClose={() => setFullScreen(false)}>
+      <ModalContainer open={!!fullScreen} size="prose" onClose={() => setFullScreen(false)}>
         <ModalHeader title={`${selected.capitalize()} de  ${person?.name} (${personPassages.length})`}></ModalHeader>
         <ModalBody>
           {selected === 'passages' ? (

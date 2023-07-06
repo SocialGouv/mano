@@ -85,6 +85,7 @@ const PersonDocumentsMedical = ({ person }) => {
       {documentToEdit && (
         <DocumentModal
           groupsDisabled
+          color="blue-900"
           onDelete={async (document) => {
             if (!window.confirm('Voulez-vous vraiment supprimer ce document ?')) return;
             await API.delete({ path: document.downloadPath ?? `/person/${document.person ?? person._id}/document/${document.file.filename}` });
