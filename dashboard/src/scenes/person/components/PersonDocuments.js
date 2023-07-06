@@ -65,55 +65,60 @@ const PersonDocuments = ({ person }) => {
       <div className="tw-sticky tw-top-0 tw-z-50 tw-flex tw-bg-white tw-p-3">
         <h4 className="tw-flex-1 tw-text-xl">Documents {person?.documents?.length ? `(${person?.documents?.length})` : ''}</h4>
         <label
-          aria-label="Ajouter un document"
+          aria-label="Ajouter des documents"
           className="tw-text-md tw-h-8 tw-w-8 tw-cursor-pointer tw-rounded-full tw-bg-main tw-text-center tw-font-bold tw-leading-8 tw-text-white tw-transition hover:tw-scale-125">
           ＋
           <input
             type="file"
             key={resetFileInputKey}
             name="file"
+            multiple
             className="tw-hidden"
             onChange={async (e) => {
-              const docResponse = await API.upload({
-                path: `/person/${person._id}/document`,
-                file: e.target.files[0],
-              });
-              console.log('uploaded file', docResponse);
-              if (!docResponse.ok || !docResponse.data) {
-                capture('Error uploading document', { extra: { docResponse } });
-                toast.error("Une erreur est survenue lors de l'envoi du document");
-                return;
+              if (!e.target.files?.length) return;
+              let personToUpdate = person;
+              for (let i = 0; i < e.target.files.length; i++) {
+                const fileToUpload = e.target.files[i];
+                const docResponse = await API.upload({
+                  path: `/person/${personToUpdate._id}/document`,
+                  file: fileToUpload,
+                });
+                if (!docResponse.ok || !docResponse.data) {
+                  capture('Error uploading document', { extra: { docResponse } });
+                  toast.error(`Une erreur est survenue lors de l'envoi du document ${fileToUpload?.filename}`);
+                  return;
+                }
+                setResetFileInputKey((k) => k + 1);
+                const { data: fileUploaded, encryptedEntityKey } = docResponse;
+                const personResponse = await API.put({
+                  path: `/person/${personToUpdate._id}`,
+                  body: preparePersonForEncryption({
+                    ...personToUpdate,
+                    documents: [
+                      ...(personToUpdate.documents || []),
+                      {
+                        _id: fileUploaded.filename,
+                        name: fileUploaded.originalname,
+                        encryptedEntityKey,
+                        createdAt: new Date(),
+                        createdBy: user._id,
+                        downloadPath: `/person/${personToUpdate._id}/document/${fileUploaded.filename}`,
+                        file: fileUploaded,
+                      },
+                    ],
+                  }),
+                });
+                if (personResponse.ok) {
+                  personToUpdate = personResponse.decryptedData;
+                  toast.success(`Document ${fileUploaded.originalname} ajouté !`);
+                }
               }
-              setResetFileInputKey((k) => k + 1);
-              const { data: file, encryptedEntityKey } = docResponse;
-              const personResponse = await API.put({
-                path: `/person/${person._id}`,
-                body: preparePersonForEncryption({
-                  ...person,
-                  documents: [
-                    ...(person.documents || []),
-                    {
-                      _id: file.filename,
-                      name: file.originalname,
-                      encryptedEntityKey,
-                      createdAt: new Date(),
-                      createdBy: user._id,
-                      downloadPath: `/person/${person._id}/document/${file.filename}`,
-                      file,
-                    },
-                  ],
-                }),
-              });
-              if (personResponse.ok) {
-                const newPerson = personResponse.decryptedData;
-                setPersons((persons) =>
-                  persons.map((p) => {
-                    if (p._id === person._id) return newPerson;
-                    return p;
-                  })
-                );
-                toast.success('Document ajouté !');
-              }
+              setPersons((persons) =>
+                persons.map((p) => {
+                  if (p._id === personToUpdate._id) return personToUpdate;
+                  return p;
+                })
+              );
             }}
           />
         </label>

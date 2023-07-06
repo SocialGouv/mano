@@ -187,55 +187,60 @@ const PersonDocumentsMedical = ({ person }) => {
       <div className="tw-sticky tw-top-0 tw-z-50 tw-flex tw-bg-white tw-p-3">
         <h4 className="tw-flex-1 tw-text-xl">Documents {documents?.length ? `(${documents?.length})` : ''}</h4>
         <label
-          aria-label="Ajouter un document"
+          aria-label="Ajouter des documents"
           className="tw-text-md tw-h-8 tw-w-8 tw-cursor-pointer tw-rounded-full tw-bg-blue-900 tw-text-center tw-font-bold tw-leading-8 tw-text-white tw-transition hover:tw-scale-125">
           ＋
           <input
             type="file"
+            multiple
             key={resetFileInputKey}
             name="file"
             className="tw-hidden"
             onChange={async (e) => {
-              const docResponse = await API.upload({
-                path: `/person/${person._id}/document`,
-                file: e.target.files[0],
-              });
-              console.log('uploaded file', docResponse);
-              if (!docResponse.ok || !docResponse.data) {
-                capture('Error uploading document', { extra: { docResponse } });
-                toast.error("Une erreur est survenue lors de l'envoi du document");
-                return;
+              if (!e.target.files?.length) return;
+              let medicalFileToUpdate = medicalFile;
+              for (let i = 0; i < e.target.files.length; i++) {
+                const fileToUpload = e.target.files[i];
+                const docResponse = await API.upload({
+                  path: `/person/${person._id}/document`,
+                  file: fileToUpload,
+                });
+                if (!docResponse.ok || !docResponse.data) {
+                  capture('Error uploading document', { extra: { docResponse } });
+                  toast.error(`Une erreur est survenue lors de l'envoi du document ${fileToUpload?.filename}`);
+                  return;
+                }
+                setResetFileInputKey((k) => k + 1);
+                const { data: fileUploaded, encryptedEntityKey } = docResponse;
+                const medicalFileResponse = await API.put({
+                  path: `/medical-file/${medicalFileToUpdate._id}`,
+                  body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({
+                    ...medicalFileToUpdate,
+                    documents: [
+                      ...(medicalFileToUpdate.documents || []),
+                      {
+                        _id: fileUploaded.filename,
+                        name: fileUploaded.originalname,
+                        encryptedEntityKey,
+                        createdAt: new Date(),
+                        createdBy: user._id,
+                        downloadPath: `/person/${person._id}/document/${fileUploaded.filename}`,
+                        file: fileUploaded,
+                      },
+                    ],
+                  }),
+                });
+                if (medicalFileResponse.ok) {
+                  medicalFileToUpdate = medicalFileResponse.decryptedData;
+                  toast.success(`Document ${fileUploaded.originalname} ajouté !`);
+                }
               }
-              setResetFileInputKey((k) => k + 1);
-              const { data: file, encryptedEntityKey } = docResponse;
-              const medicalFileResponse = await API.put({
-                path: `/medical-file/${medicalFile._id}`,
-                body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({
-                  ...medicalFile,
-                  documents: [
-                    ...(medicalFile.documents || []),
-                    {
-                      _id: file.filename,
-                      name: file.originalname,
-                      encryptedEntityKey,
-                      createdAt: new Date(),
-                      createdBy: user._id,
-                      downloadPath: `/person/${person._id}/document/${file.filename}`,
-                      file,
-                    },
-                  ],
-                }),
-              });
-              if (medicalFileResponse.ok) {
-                const newMedicalFile = medicalFileResponse.decryptedData;
-                setAllMedicalFiles((allMedicalFiles) =>
-                  allMedicalFiles.map((m) => {
-                    if (m._id === medicalFile._id) return newMedicalFile;
-                    return m;
-                  })
-                );
-                toast.success('Document ajouté !');
-              }
+              setAllMedicalFiles((allMedicalFiles) =>
+                allMedicalFiles.map((m) => {
+                  if (m._id === medicalFileToUpdate._id) return medicalFileToUpdate;
+                  return m;
+                })
+              );
             }}
           />
         </label>
