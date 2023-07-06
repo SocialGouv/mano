@@ -49,7 +49,7 @@ export const prepareMedicalFileForEncryption = (customFieldsMedicalFile) => (med
   };
 };
 
-export const defaultMedicalFileCustomFields = [
+const defaultMedicalFileCustomFields = [
   {
     name: 'numeroSecuriteSociale',
     label: 'Numéro de sécurité sociale',

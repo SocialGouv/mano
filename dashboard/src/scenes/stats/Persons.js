@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { useHistory } from 'react-router';
+import { useHistory } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import { utils, writeFile } from 'xlsx';
 import { useLocalStorage } from '../../services/useLocalStorage';
@@ -172,7 +172,7 @@ const PersonStats = ({
   );
 };
 
-export const BlockWanderingAt = ({ persons }) => {
+const BlockWanderingAt = ({ persons }) => {
   persons = persons.filter((p) => Boolean(p.wanderingAt));
   if (!persons.length) {
     return (
@@ -197,7 +197,7 @@ export const BlockWanderingAt = ({ persons }) => {
   );
 };
 
-export const BlockGroup = ({ title, groups }) => {
+const BlockGroup = ({ title, groups }) => {
   try {
     if (!groups.length) {
       return (
@@ -232,7 +232,7 @@ export const BlockGroup = ({ title, groups }) => {
   return null;
 };
 
-export const BlockCreatedAt = ({ persons }) => {
+const BlockCreatedAt = ({ persons }) => {
   if (persons.length === 0) {
     return (
       <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">

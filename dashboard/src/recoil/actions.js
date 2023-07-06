@@ -86,7 +86,6 @@ export const prepareActionForEncryption = (action, { checkRequiredFields = true 
   };
 };
 
-export const CHOOSE = 'CHOOSE';
 export const TODO = 'A FAIRE';
 export const DONE = 'FAIT';
 export const CANCEL = 'ANNULEE';
