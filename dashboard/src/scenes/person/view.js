@@ -1,6 +1,6 @@
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { Alert } from 'reactstrap';
-import { selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import Places from './Places';
 import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
 import API from '../../services/api';
@@ -16,23 +16,13 @@ import { organisationState, userState } from '../../recoil/auth';
 import PersonFamily from './PersonFamily';
 import { groupSelector } from '../../recoil/groups';
 
-const populatedPersonSelector = selectorFamily({
-  key: 'populatedPersonSelector',
-  get:
-    ({ personId }) =>
-    ({ get }) => {
-      const persons = get(itemsGroupedByPersonSelector);
-      return persons[personId] || {};
-    },
-});
-
 export default function View() {
   const { personId } = useParams();
   const history = useHistory();
   const location = useLocation();
 
   const organisation = useRecoilValue(organisationState);
-  const person = useRecoilValue(populatedPersonSelector({ personId }));
+  const person = useRecoilValue(itemsGroupedByPersonSelector)[personId];
   const personGroup = useRecoilValue(groupSelector({ personId }));
   const setPersons = useSetRecoilState(personsState);
   const user = useRecoilValue(userState);

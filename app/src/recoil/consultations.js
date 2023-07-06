@@ -65,5 +65,3 @@ export const disableConsultationRow = (actionOrConsultation, user) => {
   if (!actionOrConsultation.onlyVisibleBy?.length) return false;
   return !actionOrConsultation.onlyVisibleBy.includes(user._id);
 };
-
-export const consultationTypes = ['Psychologique', 'Infirmier', 'Médicale'];

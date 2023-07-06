@@ -143,7 +143,7 @@ const logout = async () => {
 };
 
 // Upload a file to a path.
-export const upload = async ({ file, path }, forceKey) => {
+const upload = async ({ file, path }, forceKey) => {
   // Prepare file.
   const tokenCached = getRecoil(authTokenState);
   const { encryptedEntityKey, encryptedFile } = await encryptFile(file, forceKey || hashedOrgEncryptionKey);
@@ -164,7 +164,7 @@ export const upload = async ({ file, path }, forceKey) => {
 };
 
 // Download a file from a path.
-export const download = async ({ path, encryptedEntityKey }, forceKey) => {
+const download = async ({ path, encryptedEntityKey }, forceKey) => {
   const tokenCached = getRecoil(authTokenState);
   const options = {
     method: 'GET',
@@ -179,7 +179,7 @@ export const download = async ({ path, encryptedEntityKey }, forceKey) => {
   return decrypted;
 };
 
-export const deleteFile = async ({ path }) => {
+const deleteFile = async ({ path }) => {
   const tokenCached = getRecoil(authTokenState);
   const options = {
     method: 'DELETE',
@@ -312,6 +312,7 @@ const API = {
   put,
   delete: executeDelete,
   download,
+  deleteFile,
   upload,
   logout,
 };

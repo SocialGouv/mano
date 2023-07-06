@@ -160,7 +160,7 @@ export function CommentsModule({
   );
 }
 
-export function CommentsFullScreen({ open, comments, onClose, title, color, onDisplayComment, onAddComment }) {
+function CommentsFullScreen({ open, comments, onClose, title, color, onDisplayComment, onAddComment }) {
   return (
     <ModalContainer open={open} size="prose" onClose={onClose}>
       <ModalHeader title={title} />
@@ -179,7 +179,7 @@ export function CommentsFullScreen({ open, comments, onClose, title, color, onDi
   );
 }
 
-export function CommentsTable({ comments, onDisplayComment, onEditComment, onAddComment, color, showAddCommentButton, withClickableLabel }) {
+function CommentsTable({ comments, onDisplayComment, onEditComment, onAddComment, color, showAddCommentButton, withClickableLabel }) {
   const users = useRecoilValue(usersState);
   const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);

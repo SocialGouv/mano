@@ -3,7 +3,7 @@ import BackButton from '../backButton';
 import { useDataLoader } from '../DataLoader';
 import ButtonCustom from '../ButtonCustom';
 
-export const Header = ({ title, refreshButton = false, style = {}, titleStyle = {}, className = '' }) => {
+const Header = ({ title, refreshButton = false, style = {}, titleStyle = {}, className = '' }) => {
   return (
     <HeaderStyled style={style} className={className}>
       <Title style={titleStyle}>{title}</Title>

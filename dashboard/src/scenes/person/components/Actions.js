@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, selectorFamily } from 'recoil';
 import { organisationState, userState } from '../../../recoil/auth';
 import { CANCEL, DONE, flattenedActionsCategoriesSelector, mappedIdsToLabels } from '../../../recoil/actions';
-import { filteredPersonActionsSelector } from '../selectors/selectors';
 import { useHistory } from 'react-router-dom';
 import SelectCustom from '../../../components/SelectCustom';
 import ExclamationMarkButton from '../../../components/tailwind/ExclamationMarkButton';
@@ -14,6 +13,28 @@ import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from '../../../co
 import { AgendaMutedIcon } from './AgendaMutedIcon';
 import { FullScreenIcon } from './FullScreenIcon';
 import UserName from '../../../components/UserName';
+import { itemsGroupedByPersonSelector } from '../../../recoil/selectors';
+
+const filteredPersonActionsSelector = selectorFamily({
+  key: 'filteredPersonActionsSelector',
+  get:
+    ({ personId, filterCategories, filterStatus }) =>
+    ({ get }) => {
+      const person = get(itemsGroupedByPersonSelector)[personId];
+      let actionsToSet = person?.actions || [];
+      if (filterCategories.length) {
+        actionsToSet = actionsToSet.filter((a) =>
+          filterCategories.some((c) => (c === '-- Aucune --' ? a.categories?.length === 0 : a.categories?.includes(c)))
+        );
+      }
+      if (filterStatus.length) {
+        actionsToSet = actionsToSet.filter((a) => filterStatus.some((s) => a.status === s));
+      }
+      return [...actionsToSet]
+        .sort((p1, p2) => ((p1.completedAt || p1.dueAt) > (p2.completedAt || p2.dueAt) ? -1 : 1))
+        .map((a) => (a.urgent ? { ...a, style: { backgroundColor: '#fecaca99' } } : a));
+    },
+});
 
 export const Actions = ({ person }) => {
   const data = person?.actions || [];

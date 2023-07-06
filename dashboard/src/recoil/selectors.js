@@ -3,7 +3,7 @@ import { personsState } from './persons';
 import { placesState } from './places';
 import { relsPersonPlaceState } from './relPersonPlace';
 import { reportsState } from './reports';
-import { dayjsInstance, formatAge, formatBirthDate, isOnSameDay } from '../services/date';
+import { dayjsInstance, formatAge, formatBirthDate } from '../services/date';
 import { customFieldsObsSelector, territoryObservationsState } from './territoryObservations';
 import { selector, selectorFamily } from 'recoil';
 import { actionsState } from './actions';
@@ -45,16 +45,6 @@ export const selectedTeamsReportsSelector = selectorFamily({
     ({ get }) => {
       const reports = get(reportsState);
       return reports.filter((a) => teamIds.includes(a.team));
-    },
-});
-
-export const reportPerDateSelector = selectorFamily({
-  key: 'reportPerDateSelector',
-  get:
-    ({ date }) =>
-    ({ get }) => {
-      const teamsReports = get(currentTeamReportsSelector);
-      return teamsReports.find((rep) => isOnSameDay(rep.date, date));
     },
 });
 
@@ -340,7 +330,7 @@ export const itemsGroupedByPersonSelector = selector({
   },
 });
 
-export const arrayOfitemsGroupedByPersonSelector = selector({
+const arrayOfitemsGroupedByPersonSelector = selector({
   key: 'arrayOfitemsGroupedByPersonSelector',
   get: ({ get }) => {
     const itemsGroupedByPerson = get(itemsGroupedByPersonSelector);
@@ -361,7 +351,7 @@ export const personsWithMedicalFileMergedSelector = selector({
   },
 });
 
-export const personsWithPlacesSelector = selector({
+const personsWithPlacesSelector = selector({
   key: 'personsWithPlacesSelector',
   get: ({ get }) => {
     const persons = get(personsState);
@@ -459,15 +449,6 @@ export const itemsGroupedByTreatmentSelector = selector({
   },
 });
 
-export const arrayOfitemsGroupedByTreatmentSelector = selector({
-  key: 'arrayOfitemsGroupedByTreatmentSelector',
-  get: ({ get }) => {
-    const itemsGroupedByTreatment = get(itemsGroupedByTreatmentSelector);
-    const itemsGroupedByTreatmentArray = Object.values(itemsGroupedByTreatment);
-    return itemsGroupedByTreatmentArray;
-  },
-});
-
 export const onlyFilledObservationsTerritories = selector({
   key: 'onlyFilledObservationsTerritories',
   get: ({ get }) => {
@@ -504,18 +485,5 @@ export const populatedPassagesSelector = selector({
         };
       })
       .filter(Boolean);
-  },
-});
-
-export const populatedRencontresSelector = selector({
-  key: 'populatedRencontresSelector',
-  get: ({ get }) => {
-    const rencontres = get(rencontresState);
-    const allPersonsAsObject = get(itemsGroupedByPersonSelector);
-    return rencontres.map((rencontre) => ({
-      ...rencontre,
-      type: 'Rencontres',
-      gender: !rencontre.person ? null : allPersonsAsObject[rencontre.person]?.gender || 'Non renseigné',
-    }));
   },
 });

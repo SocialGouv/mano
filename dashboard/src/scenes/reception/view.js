@@ -29,7 +29,7 @@ import UserName from '../../components/UserName';
 import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
 import ReceptionService from '../../components/ReceptionService';
 
-export const actionsForCurrentTeamSelector = selector({
+const actionsForCurrentTeamSelector = selector({
   key: 'actionsForCurrentTeamSelector',
   get: ({ get }) => {
     const actions = get(actionsState);
@@ -38,7 +38,7 @@ export const actionsForCurrentTeamSelector = selector({
   },
 });
 
-export const consultationsByAuthorizationSelector = selector({
+const consultationsByAuthorizationSelector = selector({
   key: 'consultationsByAuthorizationSelector',
   get: ({ get }) => {
     const user = get(userState);
@@ -49,7 +49,7 @@ export const consultationsByAuthorizationSelector = selector({
   },
 });
 
-export const actionsByStatusSelector = selectorFamily({
+const actionsByStatusSelector = selectorFamily({
   key: 'actionsByStatusSelector',
   get:
     ({ status }) =>
@@ -59,7 +59,7 @@ export const actionsByStatusSelector = selectorFamily({
     },
 });
 
-export const consultationsByStatusSelector = selectorFamily({
+const consultationsByStatusSelector = selectorFamily({
   key: 'consultationsByStatusSelector',
   get:
     ({ status }) =>

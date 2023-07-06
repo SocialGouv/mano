@@ -16,8 +16,6 @@ import { dayjsInstance, outOfBoundariesDate } from '../services/date';
 import API from '../services/api';
 import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
 import DatePicker from './DatePicker';
-export const policeSelect = ['Oui', 'Non'];
-export const atmosphereSelect = ['Violences', 'Tensions', 'RAS'];
 
 const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
   const [open, setOpen] = useState(false);

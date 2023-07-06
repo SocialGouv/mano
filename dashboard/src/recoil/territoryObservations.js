@@ -21,7 +21,7 @@ export const customFieldsObsSelector = selector({
   },
 });
 
-export const defaultCustomFields = [
+const defaultCustomFields = [
   {
     name: 'personsMale',
     label: 'Nombre de personnes non connues hommes rencontrées',
@@ -123,5 +123,3 @@ export const prepareObsForEncryption =
       entityKey: obs.entityKey,
     };
   };
-
-export const observationsKeyLabels = defaultCustomFields.map((f) => f.name);

@@ -123,26 +123,8 @@ export function now() {
   return dayjs();
 }
 
-export function isAfterToday(date) {
-  return dayjs(date).isAfter(dayjs());
-}
-
 export function dateForDatePicker(date) {
   return date && dayjs(date).isValid() ? dayjs(date).toDate() : null;
-}
-
-export function getMonths() {
-  const startOfThisMonth = dayjs().startOf('month');
-  return Array.from({ length: 12 }, (_, index) => startOfThisMonth.subtract(index, 'month'));
-}
-
-export function getDaysOfMonth(date) {
-  const days = [];
-  const firstDayOfTheMonth = dayjs(date).startOf('month');
-  for (let i = 0; i < dayjs(date).daysInMonth(); i++) {
-    days.push(firstDayOfTheMonth.add(i, 'day'));
-  }
-  return days;
 }
 
 export const getIsDayWithinHoursOffsetOfDay = (dayToTest, referenceDay, offsetHours = -12) => {
