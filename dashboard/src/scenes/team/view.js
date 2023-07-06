@@ -85,6 +85,8 @@ const View = () => {
               <DeleteButtonAndConfirmModal
                 title={`Voulez-vous vraiment supprimer l'équipe ${team.name}`}
                 textToConfirm={team.name}
+                // disabled={teams.length === 1}
+                // disabledTitle="Vous ne pouvez pas supprimer la dernière équipe"
                 onConfirm={async () => {
                   const res = await API.delete({ path: `/team/${id}` });
                   if (!res.ok) return;

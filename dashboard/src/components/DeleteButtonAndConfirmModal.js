@@ -13,6 +13,8 @@ const DeleteButtonAndConfirmModal = ({
   buttonWidth = null,
   roles = ['admin', 'superadmin'],
   roleErrorMessage = "Désolé, seul un admin peut supprimer ce type d'élément",
+  disabled = false,
+  disabledTitle = "Vous n'avez pas le droit de supprimer cet élément",
 }) => {
   const user = useRecoilValue(userState);
   const [open, setOpen] = useState(false);
@@ -20,11 +22,14 @@ const DeleteButtonAndConfirmModal = ({
     <>
       <button
         type="button"
-        className="button-destructive"
+        title={disabled ? disabledTitle : title}
+        className={['button-destructive', disabled ? 'tw-cursor-not-allowed' : ''].join(' ')}
         onClick={() => {
           if (!roles.includes(user.role)) return toast.error(roleErrorMessage);
           setOpen(true);
         }}
+        disabled={disabled}
+        aria-disabled={disabled}
         style={buttonWidth ? { width: buttonWidth } : {}}>
         Supprimer
       </button>
@@ -34,7 +39,7 @@ const DeleteButtonAndConfirmModal = ({
             <p className="tw-block tw-text-center tw-text-xl tw-text-red-500">{title}</p>
           </div>
         </ModalHeader>
-        <ModalBody>
+        <ModalBody className="tw-py-4">
           {children}
           <p className="tw-mb-8 tw-block tw-w-full tw-text-center">
             Veuillez taper le texte ci-dessous pour confirmer

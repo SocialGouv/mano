@@ -162,10 +162,10 @@ export function CommentsModule({
 
 export function CommentsFullScreen({ open, comments, onClose, title, color, onDisplayComment, onAddComment }) {
   return (
-    <ModalContainer open={open} size="full" onClose={onClose}>
+    <ModalContainer open={open} size="prose" onClose={onClose}>
       <ModalHeader title={title} />
       <ModalBody>
-        <CommentsTable comments={comments} onDisplayComment={onDisplayComment} onAddComment={onAddComment} withClickableLabel />
+        <CommentsTable comments={comments} onDisplayComment={onDisplayComment} onAddComment={onAddComment} withClickableLabel color={color} />
       </ModalBody>
       <ModalFooter>
         <button type="button" name="cancel" className="button-cancel" onClick={onClose}>

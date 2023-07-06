@@ -72,7 +72,10 @@ export const Consultations = ({ person }) => {
           setConsultationStatuses={setConsultationStatuses}
           consultationStatuses={consultationStatuses}
         />
-        <ModalContainer open={!!fullScreen} size="full" onClose={() => setFullScreen(false)}>
+        <ModalContainer open={!!fullScreen} size="prose" onClose={() => setFullScreen(false)}>
+          <ModalBody>
+            <ConsultationsTable filteredData={filteredData} person={person} />
+          </ModalBody>
           <ModalHeader title={`Consultations de  ${person?.name} (${filteredData.length})`}>
             <div className="tw-mt-2 tw-w-full tw-max-w-2xl">
               <ConsultationsFilters
@@ -85,9 +88,6 @@ export const Consultations = ({ person }) => {
               />
             </div>
           </ModalHeader>
-          <ModalBody>
-            <ConsultationsTable filteredData={filteredData} person={person} />
-          </ModalBody>
           <ModalFooter>
             <button type="button" name="cancel" className="button-cancel" onClick={() => setFullScreen(false)}>
               Fermer
@@ -174,8 +174,8 @@ const ConsultationsTable = ({ filteredData, person }) => {
                   <div
                     className={
                       ['restricted-access'].includes(user.role) || disableConsultationRow(consultation, user)
-                        ? 'tw-cursor-not-allowed tw-pt-2'
-                        : 'tw-cursor-pointer tw-pt-2'
+                        ? 'tw-cursor-not-allowed tw-py-2'
+                        : 'tw-cursor-pointer tw-py-2'
                     }
                     onClick={() => {
                       if (disableConsultationRow(consultation, user)) return;

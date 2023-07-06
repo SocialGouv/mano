@@ -119,7 +119,7 @@ const DragAndDropSettings = ({
       </div>
       <ModalContainer open={addGroupModalVisible}>
         <ModalHeader title="Ajouter un groupe" />
-        <ModalBody>
+        <ModalBody className="tw-py-4">
           <form id="add-items-group-form" className="tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8" onSubmit={onAddGroupRequest}>
             <div>
               <label htmlFor="groupTitle" className="tailwindui">
@@ -237,7 +237,7 @@ const Group = ({
       {!!onGroupTitleChange && (
         <ModalContainer open={isEditingGroupTitle}>
           <ModalHeader title={`Éditer le groupe: ${groupTitle}`} />
-          <ModalBody>
+          <ModalBody className="tw-py-4">
             <form id="edit-category-group-form" className="tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8" onSubmit={onEditGroupTitle}>
               <div>
                 <label htmlFor="newGroupTitle" className="tailwindui">

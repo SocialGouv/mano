@@ -57,7 +57,7 @@ export const Actions = ({ person }) => {
         setFilterStatus={setFilterStatus}
         filterStatus={filterStatus}
       />
-      <ModalContainer open={!!fullScreen} className="" size="full" onClose={() => setFullScreen(false)}>
+      <ModalContainer open={!!fullScreen} className="" size="prose" onClose={() => setFullScreen(false)}>
         <ModalHeader title={`Actions de  ${person?.name} (${filteredData.length})`}>
           <div className="tw-mt-2 tw-w-full tw-max-w-2xl">
             <ActionsFilters

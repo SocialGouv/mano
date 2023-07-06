@@ -308,7 +308,7 @@ const Service = ({ item: service, groupTitle }) => {
       </div>
       <ModalContainer open={isEditingService}>
         <ModalHeader title={`Modifier le service: ${service}`} />
-        <ModalBody>
+        <ModalBody className="tw-py-4">
           <form id="edit-service-form" className="tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8" onSubmit={onEditService}>
             <div>
               <label htmlFor="newService" className="tailwindui">

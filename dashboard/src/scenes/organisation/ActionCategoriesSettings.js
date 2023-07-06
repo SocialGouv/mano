@@ -275,7 +275,7 @@ const Category = ({ item: category, groupTitle }) => {
       </div>
       <ModalContainer open={isEditingCategory}>
         <ModalHeader title={`Éditer la catégorie: ${category}`} />
-        <ModalBody>
+        <ModalBody className="tw-py-4">
           <form id="edit-category-form" className="tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8" onSubmit={onEditCategory}>
             <div>
               <label htmlFor="newCategory" className="tailwindui">

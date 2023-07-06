@@ -10,7 +10,7 @@ import API from '../../../services/api';
 import { formatDateTimeWithNameOfDay } from '../../../services/date';
 import { download } from '../../../utils';
 
-export default function DocumentModal({ document, onClose, person, children, onDelete, groupsDisabled = false }) {
+export default function DocumentModal({ document, onClose, person, children, onDelete, groupsDisabled = false, color = 'main' }) {
   const users = useRecoilValue(usersState);
   const preparePersonForEncryption = usePreparePersonForEncryption();
   const setPersons = useSetRecoilState(personsState);
@@ -26,8 +26,8 @@ export default function DocumentModal({ document, onClose, person, children, onD
   return (
     <ModalContainer open className="[overflow-wrap:anywhere]">
       <ModalHeader title={document.name} />
-      <ModalBody>
-        <div className="tw-flex tw-w-full tw-flex-col tw-justify-between tw-gap-4 tw-px-8">
+      <ModalBody className="tw-pb-4">
+        <div className="tw-flex tw-w-full tw-flex-col tw-justify-between tw-gap-4 tw-px-8 tw-py-4">
           <small className="tw-pt-4 tw-opacity-60">
             Créé par {users.find((e) => e._id === document.createdBy)?.name} le {formatDateTimeWithNameOfDay(document.createdAt)}
           </small>
@@ -100,7 +100,7 @@ export default function DocumentModal({ document, onClose, person, children, onD
         </button>
         <button
           type="button"
-          className="button-submit"
+          className={`button-submit !tw-bg-${color}`}
           onClick={async () => {
             const file = await API.download({
               path: document.downloadPath ?? `/person/${document.person ?? person._id}/document/${document.file.filename}`,
