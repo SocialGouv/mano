@@ -1,3 +1,10 @@
+## [1.276.7](https://github.com/SocialGouv/mano/compare/v1.276.6...v1.276.7) (2023-07-06)
+
+
+### Bug Fixes
+
+* **dashboard:** can edit consultation ([#1590](https://github.com/SocialGouv/mano/issues/1590)) ([8f78f8e](https://github.com/SocialGouv/mano/commit/8f78f8e2a69a55254720c3fd4223f5e3b430bea6))
+
 ## [1.276.6](https://github.com/SocialGouv/mano/compare/v1.276.5...v1.276.6) (2023-07-04)
 
 
