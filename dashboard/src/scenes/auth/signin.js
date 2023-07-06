@@ -128,7 +128,6 @@ const SignIn = () => {
       }
       const teamResponse = await API.get({ path: '/team' });
       const teams = teamResponse.data;
-      console.log('teams', teams);
       const usersResponse = await API.get({ path: '/user', query: { minimal: true } });
       const users = usersResponse.data;
       setTeams(teams);

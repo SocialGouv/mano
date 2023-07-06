@@ -177,6 +177,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
     return true;
   }
 
+  console.log(data.completedAt, initialState.completedAt);
   const canSave = useMemo(() => {
     if (data.status !== initialState.status) return true;
     if (JSON.stringify(data.onlyVisibleBy) !== JSON.stringify(initialState.onlyVisibleBy)) return true;
@@ -191,6 +192,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
     const target = event.currentTarget || event.target;
     const { name, value } = target;
     setData((data) => ({ ...data, [name]: value }));
+    setIsEditing(true);
   };
 
   return (
@@ -405,7 +407,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                 <CustomFieldDisplay type="text" value={data.status} />
               )}
             </div>
-            <div className="tw-basis-1/2 tw-p-4">
+            <div className="tw-basis-1/2 tw-px-4 tw-py-2">
               <label className={canEdit ? '' : 'tw-text-sm tw-font-semibold tw-text-blue-900'} htmlFor="create-consultation-dueat">
                 Date prévue
               </label>
@@ -418,14 +420,20 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
               </div>
             </div>
 
-            <div className={['tw-basis-1/2 tw-p-4', [DONE, CANCEL].includes(data.status) ? 'tw-visible' : 'tw-invisible'].join(' ')} />
-            <div className={['tw-basis-1/2 tw-p-4', [DONE, CANCEL].includes(data.status) ? 'tw-visible' : 'tw-invisible'].join(' ')}>
+            <div className={['tw-basis-1/2 tw-px-4 tw-py-2', [DONE, CANCEL].includes(data.status) ? 'tw-visible' : 'tw-invisible'].join(' ')} />
+            <div className={['tw-basis-1/2 tw-px-4 tw-py-2', [DONE, CANCEL].includes(data.status) ? 'tw-visible' : 'tw-invisible'].join(' ')}>
               <label className={canEdit ? '' : 'tw-text-sm tw-font-semibold tw-text-blue-900'} htmlFor="create-consultation-completedAt">
                 Date réalisée
               </label>
               <div>
                 {canEdit ? (
-                  <DatePicker withTime id="create-consultation-completedAt" defaultValue={data.completedAt ?? new Date()} onChange={handleChange} />
+                  <DatePicker
+                    withTime
+                    id="create-consultation-completedAt"
+                    name="completedAt"
+                    defaultValue={data.completedAt ?? new Date()}
+                    onChange={handleChange}
+                  />
                 ) : (
                   <CustomFieldDisplay type="date-with-time" value={data.completedAt} />
                 )}

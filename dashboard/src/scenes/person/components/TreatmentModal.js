@@ -316,7 +316,7 @@ function TreatmentContent({ onClose, treatment, personId }) {
                   Date de début
                 </label>
                 {isEditing ? (
-                  <DatePicker id="startDate" defaultValue={data.startDate} onChange={handleChange} />
+                  <DatePicker id="startDate" name="startDate" defaultValue={data.startDate} onChange={handleChange} />
                 ) : (
                   <CustomFieldDisplay value={data.startDate} type="date" />
                 )}
@@ -326,7 +326,7 @@ function TreatmentContent({ onClose, treatment, personId }) {
                   Date de fin
                 </label>
                 {isEditing ? (
-                  <DatePicker id="endDate" defaultValue={data.endDate} onChange={handleChange} />
+                  <DatePicker id="endDate" name="endDate" defaultValue={data.endDate} onChange={handleChange} />
                 ) : (
                   <CustomFieldDisplay value={data.endDate} type="date" />
                 )}

@@ -133,6 +133,7 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
     const target = event.currentTarget || event.target;
     const { name, value } = target;
     setData((data) => ({ ...data, [name]: value }));
+    setIsEditing(true);
   };
 
   const handleCreateAction = async () => {
@@ -485,7 +486,13 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
                   {isEditing ? (
                     <>
                       <div>
-                        <DatePicker withTime={data.withTime} id="dueAt" defaultValue={data.dueAt ?? new Date()} onChange={handleChange} />
+                        <DatePicker
+                          withTime={data.withTime}
+                          id="dueAt"
+                          name="dueAt"
+                          defaultValue={data.dueAt ?? new Date()}
+                          onChange={handleChange}
+                        />
                       </div>
                       <div>
                         <input
@@ -558,7 +565,7 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
                   )}>
                   <label htmlFor="completedAt">{data.status === DONE ? 'Faite le' : 'Annulée le'}</label>
                   <div>
-                    <DatePicker withTime id="completedAt" defaultValue={data.completedAt ?? new Date()} onChange={handleChange} />
+                    <DatePicker withTime id="completedAt" name="completedAt" defaultValue={data.completedAt ?? new Date()} onChange={handleChange} />
                   </div>
                 </div>
               </div>
