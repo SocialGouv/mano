@@ -49,7 +49,7 @@ const ModalContainer = ({
             <div className={['tw-fixed tw-inset-0 tw-bg-black/70 tw-transition-opacity ', blurryBackground ? 'tw-backdrop-blur-xl' : ''].join(' ')} />
           </Transition.Child>
 
-          <div className="tw-fixed tw-inset-0 tw-z-10 tw-overflow-y-auto" ref={backgroundRef}>
+          <div className="tw-fixed tw-inset-0 tw-z-[3001] tw-overflow-y-auto" ref={backgroundRef}>
             <div className="tw-flex tw-min-h-full tw-items-end tw-justify-center tw-p-4 tw-text-center sm:tw-items-center sm:tw-p-0">
               <Transition.Child
                 as={Fragment}
