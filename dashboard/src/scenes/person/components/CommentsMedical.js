@@ -16,7 +16,6 @@ const CommentsMedical = ({ person }) => {
     [person]
   );
 
-  console.log('commentsMedical', commentsMedical);
   return (
     <div className="tw-relative">
       <CommentsModule
