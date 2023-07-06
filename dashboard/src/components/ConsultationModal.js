@@ -184,7 +184,8 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
     return false;
   }, [data, initialState]);
 
-  const canEdit = useMemo(() => !consultation || consultation.user === user._id, [consultation, user._id]);
+  // const canEdit = useMemo(() => !consultation || consultation.user === user._id, [consultation, user._id]);
+  const canEdit = true;
 
   const handleChange = (event) => {
     const target = event.currentTarget || event.target;
