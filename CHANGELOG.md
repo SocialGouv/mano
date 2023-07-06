@@ -1,3 +1,10 @@
+## [1.276.8](https://github.com/SocialGouv/mano/compare/v1.276.7...v1.276.8) (2023-07-06)
+
+
+### Bug Fixes
+
+* **dashboard:** pas possible de supprimer toutes les équipes + les créateur d'une équipe est automatiquement dedans ([#1592](https://github.com/SocialGouv/mano/issues/1592)) ([9d9b3aa](https://github.com/SocialGouv/mano/commit/9d9b3aaa278e306adecaceb688708418b8cc5c21))
+
 ## [1.276.7](https://github.com/SocialGouv/mano/compare/v1.276.6...v1.276.7) (2023-07-06)
 
 
