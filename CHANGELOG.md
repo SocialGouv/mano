@@ -1,3 +1,10 @@
+## [1.276.9](https://github.com/SocialGouv/mano/compare/v1.276.8...v1.276.9) (2023-07-06)
+
+
+### Bug Fixes
+
+* **dashboard:** date de réalisation de consultation ([#1594](https://github.com/SocialGouv/mano/issues/1594)) ([b53375a](https://github.com/SocialGouv/mano/commit/b53375a6d1fd7eeacc309e08007b8d7c8d831b10))
+
 ## [1.276.8](https://github.com/SocialGouv/mano/compare/v1.276.7...v1.276.8) (2023-07-06)
 
 
