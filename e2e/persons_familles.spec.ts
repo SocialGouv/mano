@@ -239,8 +239,8 @@ test("Familles", async ({ page }) => {
     await page.getByRole("link", { name: "Personnes suivies" }).click();
     await page.getByRole("cell", { name: person1Name }).click();
     await page.locator("label[aria-label='Ajouter des documents']").setInputFiles("e2e/files-to-upload/image-1.jpg");
-    await page.getByText("Documents ajoutés !").click();
-    await page.getByText("image-1.jpg").click();
+    await page.getByText("Document image-1.jpg ajouté !").click();
+    await page.getByRole("cell", { name: `image-1.jpg ${dayjs().format("dddd D MMMM YYYY HH:mm")} Créé par User Admin Test - 1` }).click();
 
     await page.getByLabel("Document familialCe document sera visible pour toute la famille").check();
     await page.getByText("Document mis à jour !").click();
