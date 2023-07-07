@@ -177,7 +177,6 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
     return true;
   }
 
-  console.log(data.completedAt, initialState.completedAt);
   const canSave = useMemo(() => {
     if (data.status !== initialState.status) return true;
     if (JSON.stringify(data.onlyVisibleBy) !== JSON.stringify(initialState.onlyVisibleBy)) return true;
@@ -452,26 +451,14 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                 personId={data.person}
                 color="blue-900"
                 documents={data.documents}
-                onAdd={async (docResponse) => {
-                  const { data: file, encryptedEntityKey } = docResponse;
+                onAdd={async (nextDocuments) => {
                   const newData = {
                     ...data,
-                    documents: [
-                      ...data.documents,
-                      {
-                        _id: file.filename,
-                        name: file.originalname,
-                        encryptedEntityKey,
-                        createdAt: new Date(),
-                        createdBy: user._id,
-                        downloadPath: `/person/${data.person}/document/${file.filename}`,
-                        file,
-                      },
-                    ],
+                    documents: nextDocuments,
                   };
                   setData(newData);
                   const ok = await handleSubmit({ newData });
-                  if (ok) toast.success('Document ajouté');
+                  if (ok) toast.success('Documents ajoutés');
                 }}
                 onDelete={async (document) => {
                   const newData = { ...data, documents: data.documents.filter((d) => d._id !== document._id) };

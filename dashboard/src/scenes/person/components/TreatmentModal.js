@@ -345,26 +345,14 @@ function TreatmentContent({ onClose, treatment, personId }) {
               color="blue-900"
               personId={data.person}
               documents={data.documents}
-              onAdd={async (docResponse) => {
-                const { data: file, encryptedEntityKey } = docResponse;
+              onAdd={async (nextDocuments) => {
                 const newData = {
                   ...data,
-                  documents: [
-                    ...data.documents,
-                    {
-                      _id: file.filename,
-                      name: file.originalname,
-                      encryptedEntityKey,
-                      createdAt: new Date(),
-                      createdBy: user._id,
-                      downloadPath: `/person/${personId}/document/${file.filename}`,
-                      file,
-                    },
-                  ],
+                  documents: nextDocuments,
                 };
                 setData(newData);
                 const ok = await handleSubmit({ newData });
-                if (ok) toast.success('Document ajouté');
+                if (ok) toast.success('Documents ajoutés');
               }}
               onDelete={async (document) => {
                 const newData = { ...data, documents: data.documents.filter((d) => d._id !== document._id) };

@@ -2,7 +2,6 @@ import React, { useMemo, useState } from 'react';
 import Table from './table';
 import UserName from './UserName';
 import { download } from '../utils';
-import ButtonCustom from './ButtonCustom';
 import { formatDateWithFullMonth } from '../services/date';
 import { capture } from '../services/sentry';
 import { toast } from 'react-toastify';
@@ -44,23 +43,39 @@ const Documents = ({
         {!!onAdd && (
           <div className="tw-mx-auto tw-flex">
             <label className={`button-submit !tw-bg-${color}`}>
-              ＋ Ajouter un document
+              ＋ Ajouter des documents
               <input
                 key={resetFileInputKey}
                 type="file"
                 name="file"
+                multiple
                 hidden
                 onChange={async (e) => {
-                  const docResponse = await API.upload({
-                    path: `/person/${personId}/document`,
-                    file: e.target.files[0],
-                  });
-                  if (!docResponse.ok || !docResponse.data) {
-                    capture('Error uploading document', { extra: { docResponse } });
-                    toast.error("Une erreur est survenue lors de l'envoi du document");
-                    return;
+                  let nextDocuments = [...(documents || [])];
+                  if (!e.target.files?.length) return;
+                  for (let i = 0; i < e.target.files.length; i++) {
+                    const fileToUpload = e.target.files[i];
+                    const docResponse = await API.upload({
+                      path: `/person/${personId}/document`,
+                      file: fileToUpload,
+                    });
+                    if (!docResponse.ok || !docResponse.data) {
+                      capture('Error uploading document', { extra: { docResponse } });
+                      toast.error(`Une erreur est survenue lors de l'envoi du document ${fileToUpload?.filename}`);
+                      return;
+                    }
+                    const { data: file, encryptedEntityKey } = docResponse;
+                    nextDocuments.push({
+                      _id: file.filename,
+                      name: file.originalname,
+                      encryptedEntityKey,
+                      createdAt: new Date(),
+                      createdBy: user._id,
+                      downloadPath: `/person/${personId}/document/${file.filename}`,
+                      file,
+                    });
                   }
-                  onAdd(docResponse);
+                  onAdd(nextDocuments);
                   setResetFileInputKey((k) => k + 1);
                 }}
               />
@@ -101,12 +116,12 @@ const Documents = ({
               render: (document) => {
                 const canDelete = conditionForDelete(document);
                 return (
-                  <>
-                    <ButtonCustom
+                  <div className="tw-flex tw-flex-col tw-gap-1">
+                    <button
                       type="button"
-                      color="primary"
                       title="Télécharger"
-                      style={{ margin: '0 auto' }}
+                      className={`tw-underline tw-text-${color} tw-underline-${color}`}
+                      // className={`button-submit !tw-bg-${color}`}
                       onClick={async (e) => {
                         e.stopPropagation();
                         try {
@@ -126,22 +141,22 @@ const Documents = ({
                             toast.error('Une erreur est survenue lors du téléchargement du document', "L'équipe technique a été prévenue");
                           }
                         }
-                      }}
-                    />
+                      }}>
+                      Télécharger
+                    </button>
                     {!!canDelete && (
-                      <ButtonCustom
+                      <button
                         type="button"
-                        color="danger"
-                        title="Supprimer"
-                        style={{ margin: '0.5rem auto 0' }}
+                        className="tw-underline-red-500 tw-text-red-500 tw-underline"
                         onClick={async () => {
                           if (!window.confirm('Voulez-vous vraiment supprimer ce document ?')) return;
                           await API.delete({ path: document.downloadPath ?? `/person/${personId}/document/${document.file.filename}` });
                           onDelete(document);
-                        }}
-                      />
+                        }}>
+                        Supprimer
+                      </button>
                     )}
-                  </>
+                  </div>
                 );
               },
             },

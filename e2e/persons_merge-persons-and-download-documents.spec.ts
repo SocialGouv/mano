@@ -30,8 +30,8 @@ test("Merge persons", async ({ page }) => {
     await page.getByLabel("Nom").fill(person1Name);
     await page.getByRole("button", { name: "Sauvegarder" }).click();
     await page.getByText("Création réussie !").click();
-    await page.locator("label[aria-label='Ajouter un document']").setInputFiles("e2e/files-to-upload/image-1.jpg");
-    await page.getByText("Document ajouté !").click();
+    await page.locator("label[aria-label='Ajouter des documents']").setInputFiles("e2e/files-to-upload/image-1.jpg");
+    await page.getByText("Document image-1.jpg ajouté !").click();
     person1DocumentLink = await page.locator("tr[aria-label='Document image-1.jpg']").getAttribute("data-test-id");
 
     await page.getByRole("link", { name: "Personnes suivies" }).click();
@@ -40,8 +40,8 @@ test("Merge persons", async ({ page }) => {
     await page.getByLabel("Nom").fill(person2Name);
     await page.getByRole("button", { name: "Sauvegarder" }).click();
     await page.getByText("Création réussie !").click();
-    await page.locator("label[aria-label='Ajouter un document']").setInputFiles("e2e/files-to-upload/image-2.jpg");
-    await page.getByText("Document ajouté !").click();
+    await page.locator("label[aria-label='Ajouter des documents']").setInputFiles("e2e/files-to-upload/image-2.jpg");
+    await page.getByText("Document image-2.jpg ajouté !").click();
     person2DocumentLink = await page.locator("tr[aria-label='Document image-2.jpg']").getAttribute("data-test-id");
   });
 
