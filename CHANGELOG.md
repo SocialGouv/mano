@@ -1,3 +1,10 @@
+# [1.277.0](https://github.com/SocialGouv/mano/compare/v1.276.10...v1.277.0) (2023-07-07)
+
+
+### Features
+
+* first responsive ([#1583](https://github.com/SocialGouv/mano/issues/1583)) ([ee307b3](https://github.com/SocialGouv/mano/commit/ee307b3cd20a1a42c38ee6bac520294223fcb41e))
+
 ## [1.276.10](https://github.com/SocialGouv/mano/compare/v1.276.9...v1.276.10) (2023-07-06)
 
 
