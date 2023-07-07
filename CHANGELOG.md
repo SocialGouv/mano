@@ -1,3 +1,10 @@
+## [1.278.2](https://github.com/SocialGouv/mano/compare/v1.278.1...v1.278.2) (2023-07-07)
+
+
+### Bug Fixes
+
+* **dashboard:** filtres les consultations par status ([4430ebe](https://github.com/SocialGouv/mano/commit/4430ebeabba90d5a45ae0587ae37bef5f7bfad99))
+
 ## [1.278.1](https://github.com/SocialGouv/mano/compare/v1.278.0...v1.278.1) (2023-07-07)
 
 
