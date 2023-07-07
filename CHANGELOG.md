@@ -1,3 +1,10 @@
+# [1.278.0](https://github.com/SocialGouv/mano/compare/v1.277.0...v1.278.0) (2023-07-07)
+
+
+### Features
+
+* **dashboard:** possibilité d'ajouter plusieurs documents en même temps ([#1596](https://github.com/SocialGouv/mano/issues/1596)) ([91c39c7](https://github.com/SocialGouv/mano/commit/91c39c737ee0468542d0959f14d9432508bfd652))
+
 # [1.277.0](https://github.com/SocialGouv/mano/compare/v1.276.10...v1.277.0) (2023-07-07)
 
 
