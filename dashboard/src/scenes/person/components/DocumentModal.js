@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import PersonName from '../../../components/PersonName';
@@ -8,9 +8,9 @@ import { groupsState } from '../../../recoil/groups';
 import { personsState, usePreparePersonForEncryption } from '../../../recoil/persons';
 import API from '../../../services/api';
 import { formatDateTimeWithNameOfDay } from '../../../services/date';
-import { download } from '../../../utils';
+import { download, viewBlobInNewWindow } from '../../../utils';
 
-export default function DocumentModal({ document, onClose, person, children, onDelete, groupsDisabled = false, color = 'main' }) {
+export default function DocumentModal({ document, onClose, person, children, onDelete, onChangeName, groupsDisabled = false, color = 'main' }) {
   const users = useRecoilValue(usersState);
   const preparePersonForEncryption = usePreparePersonForEncryption();
   const setPersons = useSetRecoilState(personsState);
@@ -23,11 +23,73 @@ export default function DocumentModal({ document, onClose, person, children, onD
     [groups, person._id, organisation.groupsEnabled, groupsDisabled]
   );
 
+  const initialName = useMemo(() => document.name, [document.name]);
+  const [name, setName] = useState(initialName);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const canSave = useMemo(() => name !== initialName, [name, initialName]);
+  const [isEditing, setIsEditing] = useState(false);
+
   return (
-    <ModalContainer open className="[overflow-wrap:anywhere]">
-      <ModalHeader title={document.name} />
+    <ModalContainer open className="[overflow-wrap:anywhere]" size="prose">
+      <ModalHeader title={name} />
       <ModalBody className="tw-pb-4">
         <div className="tw-flex tw-w-full tw-flex-col tw-justify-between tw-gap-4 tw-px-8 tw-py-4">
+          {isEditing ? (
+            <form
+              id="edit-document-form"
+              className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2"
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setIsUpdating(true);
+                await onChangeName(name);
+                setIsUpdating(false);
+                setIsEditing(false);
+              }}>
+              <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-blue-900'} htmlFor="create-consultation-name">
+                Nom (facultatif)
+              </label>
+              <input className="tailwindui" id="create-consultation-name" name="name" value={name} onChange={(e) => setName(e.target.value)} />
+            </form>
+          ) : (
+            <div className="tw-flex tw-w-full tw-flex-col tw-items-center tw-gap-2">
+              <button
+                type="button"
+                className={`button-submit !tw-bg-${color}`}
+                onClick={async () => {
+                  const file = await API.download({
+                    path: document.downloadPath ?? `/person/${document.person ?? person._id}/document/${document.file.filename}`,
+                    encryptedEntityKey: document.encryptedEntityKey,
+                  });
+                  download(file, name);
+                  onClose();
+                }}>
+                Télécharger
+              </button>
+              <button
+                type="button"
+                className={`button-submit !tw-bg-${color}`}
+                onClick={async () => {
+                  // Open a new window or tab immediately
+
+                  const file = await API.download({
+                    path: document.downloadPath ?? `/person/${document.person ?? person._id}/document/${document.file.filename}`,
+                    encryptedEntityKey: document.encryptedEntityKey,
+                  });
+                  const url = URL.createObjectURL(file);
+
+                  try {
+                    const fileURL = await viewBlobInNewWindow(url);
+                    window.open(fileURL, '_blank');
+                  } catch (error) {
+                    alert('Notice', error);
+                  }
+                  // Create a blob URL from the File object
+                }}>
+                Ouvrir dans une nouvelle fenêtre
+              </button>
+            </div>
+          )}
+
           <small className="tw-pt-4 tw-opacity-60">
             Créé par {users.find((e) => e._id === document.createdBy)?.name} le {formatDateTimeWithNameOfDay(document.createdAt)}
           </small>
@@ -85,6 +147,7 @@ export default function DocumentModal({ document, onClose, person, children, onD
           type="button"
           name="cancel"
           className="button-cancel"
+          disabled={isUpdating}
           onClick={() => {
             onClose();
           }}>
@@ -93,24 +156,30 @@ export default function DocumentModal({ document, onClose, person, children, onD
         <button
           type="button"
           className="button-destructive"
+          disabled={isUpdating}
           onClick={async () => {
             onDelete(document);
           }}>
           Supprimer
         </button>
-        <button
-          type="button"
-          className={`button-submit !tw-bg-${color}`}
-          onClick={async () => {
-            const file = await API.download({
-              path: document.downloadPath ?? `/person/${document.person ?? person._id}/document/${document.file.filename}`,
-              encryptedEntityKey: document.encryptedEntityKey,
-            });
-            download(file, document.name);
-            onClose();
-          }}>
-          Télécharger
-        </button>
+        {(isEditing || canSave) && (
+          <button title="Sauvegarder ce document" type="submit" className="button-submit !tw-bg-blue-900" form="edit-document-form">
+            Sauvegarder
+          </button>
+        )}
+        {!isEditing && (
+          <button
+            title="Modifier le nom de ce document"
+            type="button"
+            className={`button-submit !tw-bg-${color}`}
+            disabled={isUpdating}
+            onClick={(e) => {
+              e.preventDefault();
+              setIsEditing(true);
+            }}>
+            Modifier le nom
+          </button>
+        )}
       </ModalFooter>
     </ModalContainer>
   );

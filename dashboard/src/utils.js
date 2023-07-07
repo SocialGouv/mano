@@ -45,4 +45,24 @@ function download(file, fileName) {
   }
 }
 
-export { download, isNullOrUndefined };
+// https://gist.github.com/abbotto/1e9f275877cef9408e60
+async function viewBlobInNewWindow(url) {
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+
+  const blob = await response.blob();
+  const file = new Blob([blob]);
+
+  // Handle the Blob viewing based on the browser type
+  if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+    window.navigator.msSaveOrOpenBlob(file);
+  } else {
+    const fileURL = URL.createObjectURL(file);
+    return fileURL;
+  }
+}
+
+export { download, isNullOrUndefined, viewBlobInNewWindow };

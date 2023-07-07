@@ -10,7 +10,7 @@ import { prepareTreatmentForEncryption, treatmentsState } from '../../../recoil/
 import API from '../../../services/api';
 import { formatDateTimeWithNameOfDay } from '../../../services/date';
 import { capture } from '../../../services/sentry';
-import DocumentModal from './PersonDocumentModal';
+import DocumentModal from './DocumentModal';
 
 const PersonDocumentsMedical = ({ person }) => {
   const [documentToEdit, setDocumentToEdit] = useState(null);
@@ -86,6 +86,10 @@ const PersonDocumentsMedical = ({ person }) => {
         <DocumentModal
           groupsDisabled
           color="blue-900"
+          document={documentToEdit}
+          person={person}
+          onClose={() => setDocumentToEdit(null)}
+          key={documentToEdit._id}
           onDelete={async (document) => {
             if (!window.confirm('Voulez-vous vraiment supprimer ce document ?')) return;
             await API.delete({ path: document.downloadPath ?? `/person/${document.person ?? person._id}/document/${document.file.filename}` });
@@ -157,10 +161,33 @@ const PersonDocumentsMedical = ({ person }) => {
             }
             setDocumentToEdit(null);
           }}
-          document={documentToEdit}
-          person={person}
-          onClose={() => setDocumentToEdit(null)}
-          key={documentToEdit._id}>
+          onChangeName={async (newName) => {
+            const medicalFileResponse = await API.put({
+              path: `/medical-file/${medicalFile._id}`,
+              body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({
+                ...medicalFile,
+                documents: medicalFile.documents.map((doc) => {
+                  if (doc._id === documentToEdit._id) {
+                    return {
+                      ...doc,
+                      name: newName,
+                    };
+                  }
+                  return doc;
+                }),
+              }),
+            });
+            if (medicalFileResponse.ok) {
+              const newMedicalFile = medicalFileResponse.decryptedData;
+              setAllMedicalFiles((allMedicalFiles) =>
+                allMedicalFiles.map((m) => {
+                  if (m._id === medicalFile._id) return newMedicalFile;
+                  return m;
+                })
+              );
+              toast.success('Document mis à jour !');
+            }
+          }}>
           {documentToEdit.type === 'treatment' ? (
             <button
               onClick={() => {

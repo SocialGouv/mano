@@ -7,7 +7,7 @@ import { personsState, usePreparePersonForEncryption } from '../../../recoil/per
 import API from '../../../services/api';
 import { formatDateTimeWithNameOfDay } from '../../../services/date';
 import { capture } from '../../../services/sentry';
-import DocumentModal from './PersonDocumentModal';
+import DocumentModal from './DocumentModal';
 
 const PersonDocuments = ({ person }) => {
   const [documentToEdit, setDocumentToEdit] = useState(null);
@@ -31,6 +31,38 @@ const PersonDocuments = ({ person }) => {
     <div className="tw-relative">
       {documentToEdit && (
         <DocumentModal
+          key={documentToEdit._id}
+          document={documentToEdit}
+          person={person}
+          onClose={() => setDocumentToEdit(null)}
+          onChangeName={async (newName) => {
+            const _person = !document.person ? person : document.personPopulated;
+            const personResponse = await API.put({
+              path: `/person/${_person._id}`,
+              body: preparePersonForEncryption({
+                ...person,
+                documents: _person.documents.map((doc) => {
+                  if (doc._id === documentToEdit._id) {
+                    return {
+                      ...doc,
+                      name: newName,
+                    };
+                  }
+                  return doc;
+                }),
+              }),
+            });
+            if (personResponse.ok) {
+              const newPerson = personResponse.decryptedData;
+              setPersons((persons) =>
+                persons.map((p) => {
+                  if (p._id === _person._id) return newPerson;
+                  return p;
+                })
+              );
+              toast.success('Document mis à jour !');
+            }
+          }}
           onDelete={async (document) => {
             if (!window.confirm('Voulez-vous vraiment supprimer ce document ?')) return;
             const _person = !document.person ? person : document.personPopulated;
@@ -56,10 +88,6 @@ const PersonDocuments = ({ person }) => {
             }
             setDocumentToEdit(null);
           }}
-          document={documentToEdit}
-          person={person}
-          onClose={() => setDocumentToEdit(null)}
-          key={documentToEdit._id}
         />
       )}
       <div className="tw-sticky tw-top-0 tw-z-50 tw-flex tw-bg-white tw-p-3">
