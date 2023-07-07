@@ -74,8 +74,7 @@ const consultationsByStatusSelector = selectorFamily({
       const consultationsByStatus = consultations.filter((consultation) => {
         if (!viewAllOrganisationData) {
           if (teamIds.length) {
-            if (!consultation.teams?.length) return true;
-            return teamIds.some((t) => consultation.teams.includes(t));
+            if (consultation.teams?.length && !teamIds.some((t) => consultation.teams.includes(t))) return false;
           }
         }
         if (viewNoTeamData) {
@@ -102,6 +101,7 @@ const dataFilteredBySearchSelector = selectorFamily({
       const consultations = categories?.length
         ? []
         : get(consultationsByStatusSelector({ statuses, teamIds, viewNoTeamData, viewAllOrganisationData }));
+
       if (!search) {
         return [...actions, ...consultations];
       }
