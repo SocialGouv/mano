@@ -26,11 +26,11 @@ export const SmallHeaderWithBackButton = ({ className, ...props }) => {
 };
 
 export const SmallHeader = ({ className, ...props }) => {
-  return <Header className={[className, 'tw-py-4 tw-px-0'].join(' ')} titleStyle={{ fontWeight: '400' }} {...props} />;
+  return <Header className={className} titleStyle={{ fontWeight: '400' }} {...props} />;
 };
 
 export const HeaderStyled = ({ children, className = '', style = {} }) => (
-  <div style={style} className={[className, 'tw-flex tw-items-center tw-justify-between tw-py-12 tw-px-0'].join(' ')}>
+  <div style={style} className={[className, 'tw-flex tw-items-center tw-justify-between tw-px-0 tw-py-3 sm:tw-py-12'].join(' ')}>
     {children}
   </div>
 );

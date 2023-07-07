@@ -49,7 +49,7 @@ const ModalContainer = ({
             <div className={['tw-fixed tw-inset-0 tw-bg-black/70 tw-transition-opacity ', blurryBackground ? 'tw-backdrop-blur-xl' : ''].join(' ')} />
           </Transition.Child>
 
-          <div className="tw-fixed tw-inset-0 tw-z-10 tw-overflow-y-auto" ref={backgroundRef}>
+          <div className="tw-fixed tw-inset-0 tw-z-[3001] tw-overflow-y-auto" ref={backgroundRef}>
             <div className="tw-flex tw-min-h-full tw-items-end tw-justify-center tw-p-4 tw-text-center sm:tw-items-center sm:tw-p-0">
               <Transition.Child
                 as={Fragment}
@@ -67,7 +67,7 @@ const ModalContainer = ({
                 afterLeave={onAfterLeave}>
                 <Dialog.Panel
                   className={[
-                    'tw-relative tw-flex tw-max-h-[90vh] tw-transform tw-flex-col tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all sm:tw-my-8 sm:tw-w-full ',
+                    'tw-relative tw-flex tw-max-h-[90vh] tw-transform tw-flex-col tw-overflow-hidden tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all sm:tw-my-8 sm:tw-w-full',
                     size === 'lg' ? 'sm:tw-max-w-lg' : '',
                     size === 'xl' ? 'sm:tw-max-w-xl' : '',
                     size === '3xl' ? 'sm:tw-max-w-3xl' : '',
@@ -104,7 +104,7 @@ const nullFunction = () => null;
 
 const ModalHeader = ({ children, title, onClose }) => {
   return (
-    <div className="tw-z-[10001] tw-order-1 tw-flex tw-w-full tw-shrink-0 tw-items-center tw-justify-between tw-rounded-t-lg tw-border-b tw-border-gray-200 tw-bg-white ">
+    <div className="tw-z-[10001] tw-order-1 tw-flex tw-w-full tw-max-w-full tw-shrink-0 tw-items-center tw-justify-between tw-rounded-t-lg tw-border-b tw-border-gray-200 tw-bg-white">
       <div className="tw-w-full tw-py-4 sm:tw-flex sm:tw-items-start">
         <div className="tw-mt-3 tw-w-full tw-text-center sm:tw-mt-0 sm:tw-text-left">
           {!!title && (
@@ -142,7 +142,7 @@ const ModalBody = forwardRef(({ children, className = '', overflowY = true }, re
 
 const ModalFooter = ({ children }) => {
   return (
-    <div className="tw-order-3 tw-shrink-0 tw-rounded-b-lg tw-border-t tw-border-gray-200 tw-bg-gray-50 tw-px-4 tw-py-3 sm:tw-flex sm:tw-justify-end sm:tw-px-6">
+    <div className="tw-order-3 tw-flex tw-shrink-0 tw-justify-end tw-gap-3 tw-rounded-b-lg tw-border-t tw-border-gray-200 tw-bg-gray-50 tw-px-4 tw-py-3 sm:tw-px-6">
       {children}
     </div>
   );

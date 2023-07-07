@@ -14,6 +14,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import Notification from './Notification';
 import { useDataLoader } from './DataLoader';
 import OpenNewWindowIcon from './OpenNewWindowIcon';
+import ColorHeaderBand from './ColorHeaderBand';
 
 const TopBar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -25,7 +26,7 @@ const TopBar = () => {
   const { resetCache } = useDataLoader();
 
   return (
-    <div className="tw-w-full">
+    <div className="tw-hidden tw-w-full sm:tw-block">
       <aside
         className="noprint tw-flex tw-w-full tw-shrink-0 tw-items-center tw-justify-between tw-bg-white tw-py-3 tw-px-5 print:tw-relative print:tw-hidden"
         title="Choix de l'équipe et menu déroulant pour le Profil">
@@ -111,62 +112,11 @@ const TopBar = () => {
         </div>
       </aside>
       <div className="tw-w-full">
-        {Array.isArray(currentTeam?._id) ? teams.map((e) => <ColorHeadband key={e} teamId={e} />) : <ColorHeadband teamId={currentTeam?._id} />}
+        <ColorHeaderBand teamId={currentTeam?._id} />
       </div>
     </div>
   );
 };
-
-const ColorHeadband = ({ teamId }) => {
-  const teams = useRecoilValue(teamsState);
-  const teamIndex = teams?.findIndex((t) => t._id === teamId);
-  const team = teams[teamIndex];
-  if (!team) return null;
-  return (
-    <div
-      key={team?._id}
-      style={{
-        backgroundColor: teamsColors[teamIndex % teamsColors?.length],
-        borderColor: borderColors[teamIndex % borderColors?.length],
-      }}
-      className="tw-border tw-py-0.5"></div>
-  );
-};
-
-const teamsColors = [
-  '#255c99cc',
-  '#74776bcc',
-  '#00c6a5cc',
-  '#ff4b64cc',
-  '#ef798acc',
-  '#a066ffcc',
-  '#00e6d6cc',
-  '#124660cc',
-  '#ff4f38cc',
-  '#1b9476cc',
-  '#4dbac7cc',
-  '#ffa500cc',
-  '#e392dbcc',
-  '#28A428cc',
-  '#f5c000cc',
-];
-const borderColors = [
-  '#255c99',
-  '#74776b',
-  '#00c6a5',
-  '#ff4b64',
-  '#ef798a',
-  '#a066ff',
-  '#00e6d6',
-  '#124660',
-  '#ff4f38',
-  '#1b9476',
-  '#4dbac7',
-  '#ffa500',
-  '#e392db',
-  '#28a428',
-  '#f5d000',
-];
 
 const DropdownToggleStyled = styled(DropdownToggle)`
   border-radius: 40px !important;

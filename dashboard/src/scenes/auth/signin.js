@@ -11,6 +11,7 @@ import PasswordInput from '../../components/PasswordInput';
 import { currentTeamState, organisationState, sessionInitialDateTimestamp, teamsState, usersState, userState } from '../../recoil/auth';
 import API, { setOrgEncryptionKey, authTokenState } from '../../services/api';
 import { useDataLoader } from '../../components/DataLoader';
+import useMinimumWidth from '../../services/useMinimumWidth';
 
 const SignIn = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
@@ -33,15 +34,16 @@ const SignIn = () => {
   const [signinForm, setSigninForm] = useState({ email: '', password: '', orgEncryptionKey: DEFAULT_ORGANISATION_KEY || '' });
   const [signinFormErrors, setSigninFormErrors] = useState({ email: '', password: '', orgEncryptionKey: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isDesktop = useMinimumWidth('sm');
 
   useEffect(() => {
     if (isLoading !== true) return;
-    if (!!organisation?.receptionEnabled) {
+    if (isDesktop && !!organisation?.receptionEnabled) {
       history.push('/reception');
     } else {
       history.push('/action');
     }
-  }, [history, organisation, isLoading]);
+  }, [history, organisation, isLoading, isDesktop]);
 
   const onSigninValidated = async () => runDataLoader();
 
@@ -181,8 +183,10 @@ const SignIn = () => {
   }
 
   return (
-    <div className="tw-mx-10 tw-my-0 tw-w-full tw-max-w-lg tw-overflow-y-auto tw-overflow-x-hidden tw-rounded-lg tw-bg-white tw-px-7 tw-pt-10 tw-pb-2 tw-text-black tw-shadow-[0_0_20px_0_rgba(0,0,0,0.2)]">
-      <h1 className="tw-mb-6 tw-text-center tw-text-3xl tw-font-bold">{userName ? `Bienvenue ${userName?.split(' ')?.[0]} !` : 'Bienvenue !'}</h1>
+    <div className="tw-mx-10 tw-my-0 tw-w-full tw-max-w-lg tw-overflow-y-auto tw-overflow-x-hidden tw-rounded-lg tw-bg-white tw-px-7 tw-pt-10 tw-pb-2 tw-text-black sm:tw-drop-shadow-2xl">
+      <h1 className="tw-mb-6 tw-text-center tw-text-3xl tw-font-bold">
+        {userName ? `Bienvenue ${userName?.split(' ')?.[0]}\u00a0!` : 'Bienvenue\u00a0!'}
+      </h1>
       <form onSubmit={handleSubmit} method="POST">
         {!authViaCookie && (
           <>

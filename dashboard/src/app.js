@@ -8,6 +8,7 @@ import { BrowserTracing } from '@sentry/tracing';
 import { fr } from 'date-fns/esm/locale';
 import { registerLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import 'react-spring-bottom-sheet/dist/style.css';
 import lifecycle from 'page-lifecycle';
 import Account from './scenes/account';
 import Auth from './scenes/auth';
@@ -40,6 +41,7 @@ import { ENV, VERSION } from './config';
 import DuplicatedReportsTestChecker from './components/DuplicatedReportsTestChecker';
 import ConsultationModal from './components/ConsultationModal';
 import TreatmentModal from './scenes/person/components/TreatmentModal';
+import BottomBar from './components/BottomBar';
 
 RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = process.env.REACT_APP_DISABLE_RECOIL_DUPLICATE_ATOM_KEY_CHECKING ? false : true;
 
@@ -158,10 +160,18 @@ const RestrictedRoute = ({ component: Component, _isLoggedIn, ...rest }) => {
       {!!user && <TopBar />}
       <div className="main">
         {!!user && !['superadmin'].includes(user.role) && <Drawer />}
-        <main className="main-content">
+        {/*
+         height: auto;
+    margin-left: 0 !important;
+    max-width: 100%;
+    padding: 0 !important;
+    overflow: initial;
+        */}
+        <main className="tw-relative tw-flex tw-grow tw-basis-full tw-flex-col tw-overflow-auto tw-px-2 print:!tw-ml-0 print:tw-h-auto print:tw-max-w-full print:tw-overflow-visible print:tw-p-0 sm:tw-px-12 sm:tw-pt-4 sm:tw-pb-12">
           <SentryRoute {...rest} render={(props) => (user ? <Component {...props} /> : <Redirect to={{ pathname: '/auth' }} />)} />
         </main>
       </div>
+      <BottomBar />
     </>
   );
 };

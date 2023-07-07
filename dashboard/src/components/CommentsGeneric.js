@@ -219,7 +219,7 @@ function CommentsTable({ comments, onDisplayComment, onEditComment, onAddComment
   return (
     <>
       {showAddCommentButton && (
-        <div className="tw-my-1.5 tw-flex tw-justify-center">
+        <div className="tw-my-1.5 tw-flex tw-justify-center tw-self-center">
           <button type="button" className={`button-submit !tw-bg-${color}`} onClick={onAddComment}>
             ＋ Ajouter un commentaire
           </button>
