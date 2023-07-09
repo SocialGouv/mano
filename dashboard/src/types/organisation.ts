@@ -9,10 +9,11 @@ interface GroupedServices {
   services: string[];
 }
 
-interface ConsultationsFields {
+interface CustomFieldsGroup {
   name: string;
   fields: CustomField[];
 }
+
 [{ services: ['Médecine généraliste', 'Médecin spéciliste'], groupTitle: 'Orientations' }];
 export interface OrganisationInstance {
   _id: string;
@@ -39,10 +40,10 @@ export interface OrganisationInstance {
 
   customFieldsObs?: CustomField[];
   personFields?: PredefinedField[];
-  customFieldsPersons?: CustomField[];
+  customFieldsPersons?: CustomFieldsGroup[];
   customFieldsMedicalFile?: CustomField[];
   fieldsPersonsCustomizableOptions?: CustomField[];
-  consultations?: ConsultationsFields;
+  consultations?: CustomFieldsGroup[];
 
   actionsGroupedCategories?: GroupedCategories[];
   structuresGroupedCategories?: GroupedCategories[];

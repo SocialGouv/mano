@@ -4,6 +4,7 @@ import { organisationState } from './auth';
 import { toast } from 'react-toastify';
 import { capture } from '../services/sentry';
 import type { PersonInstance } from '../types/person';
+import type { PredefinedField, CustomField } from '../types/field';
 
 const collectionName = 'person';
 export const personsState = atom<PersonInstance[]>({
@@ -28,11 +29,11 @@ export const personFieldsSelector = selector({
   },
 });
 
-export const fieldsPersonsCustomizableOptionsSelector = selector({
+export const fieldsPersonsCustomizableOptionsSelector = selector<CustomField[]>({
   key: 'fieldsPersonsCustomizableOptionsSelector',
   get: ({ get }) => {
     const organisation = get(organisationState);
-    return organisation.fieldsPersonsCustomizableOptions;
+    return organisation.fieldsPersonsCustomizableOptions as CustomField[];
   },
 });
 
@@ -63,8 +64,8 @@ export const flattenedCustomFieldsPersonsSelector = selector({
 export const personFieldsIncludingCustomFieldsSelector = selector({
   key: 'personFieldsIncludingCustomFieldsSelector',
   get: ({ get }) => {
-    const personFields = get(personFieldsSelector);
-    const fieldsPersonsCustomizableOptions = get(fieldsPersonsCustomizableOptionsSelector);
+    const personFields = get(personFieldsSelector) as PredefinedField[];
+    const fieldsPersonsCustomizableOptions = get(fieldsPersonsCustomizableOptionsSelector) as CustomField[];
     const flattenedCustomFieldsPersons = get(flattenedCustomFieldsPersonsSelector);
     return [
       ...personFields,
@@ -93,7 +94,7 @@ export const allowedFieldsInHistorySelector = selector({
 export const filterPersonsBaseSelector = selector({
   key: 'filterPersonsBaseSelector',
   get: ({ get }) => {
-    const personFields = get(personFieldsSelector);
+    const personFields = get(personFieldsSelector) as PredefinedField[];
     const filterPersonsBase = [];
     for (const field of personFields) {
       if (!field.filterable) continue;
@@ -128,8 +129,8 @@ Prepare for encryption hook
 export const usePreparePersonForEncryption = () => {
   const flattenedCustomFieldsPersons = useRecoilValue(flattenedCustomFieldsPersonsSelector);
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
-  const personFields = useRecoilValue(personFieldsSelector);
-  const preparePersonForEncryption = (person, { checkRequiredFields = true } = {}) => {
+  const personFields = useRecoilValue(personFieldsSelector) as PredefinedField[];
+  const preparePersonForEncryption = (person: PersonInstance, { checkRequiredFields = true } = {}) => {
     if (!!checkRequiredFields) {
       try {
         if (!person.name) {
@@ -149,9 +150,9 @@ export const usePreparePersonForEncryption = () => {
       ...fieldsPersonsCustomizableOptions.map((f) => f.name),
       ...encryptedFields,
     ];
-    const decrypted = {};
+    const decrypted: any = {};
     for (let field of encryptedFieldsIncludingCustom) {
-      decrypted[field] = person[field];
+      decrypted[field] = person[field] as never;
     }
     return {
       _id: person._id,
@@ -167,17 +168,26 @@ export const usePreparePersonForEncryption = () => {
   return preparePersonForEncryption;
 };
 
-const defaultSort = (a, b, sortOrder) => (sortOrder === 'ASC' ? (a.name || '').localeCompare(b.name) : (b.name || '').localeCompare(a.name));
+type SortOrder = 'ASC' | 'DESC';
 
-export const sortPersons = (sortBy, sortOrder) => (a, b) => {
+type SortBy = 'name' | 'createdAt' | 'formattedBirthDate' | 'alertness' | 'group' | 'user' | 'followedSince' | 'lastUpdateCheckForGDPR';
+
+const defaultSort = (a: PersonInstance, b: PersonInstance, sortOrder: SortOrder) =>
+  sortOrder === 'ASC' ? (a.name || '').localeCompare(b.name) : (b.name || '').localeCompare(a.name);
+
+export const sortPersons = (sortBy: SortBy, sortOrder: SortOrder) => (a: PersonInstance, b: PersonInstance) => {
   if (sortBy === 'createdAt') {
-    return sortOrder === 'ASC' ? new Date(b.createdAt) - new Date(a.createdAt) : new Date(a.createdAt) - new Date(b.createdAt);
+    return sortOrder === 'ASC'
+      ? new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      : new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
   }
   if (sortBy === 'formattedBirthDate') {
     if (!a.birthdate && !b.birthdate) return defaultSort(a, b, sortOrder);
     if (!a.birthdate) return sortOrder === 'ASC' ? 1 : -1;
     if (!b.birthdate) return sortOrder === 'DESC' ? 1 : -1;
-    return sortOrder === 'ASC' ? new Date(b.birthdate) - new Date(a.birthdate) : new Date(a.birthdate) - new Date(b.birthdate);
+    return sortOrder === 'ASC'
+      ? new Date(b.birthdate).getTime() - new Date(a.birthdate).getTime()
+      : new Date(a.birthdate).getTime() - new Date(b.birthdate).getTime();
   }
   if (sortBy === 'alertness') {
     if (a.alertness === b.alertness) return defaultSort(a, b, sortOrder);
@@ -201,15 +211,17 @@ export const sortPersons = (sortBy, sortOrder) => (a, b) => {
     if (!a.followedSince && !b.followedSince) return defaultSort(a, b, sortOrder);
     if (!a.followedSince) return sortOrder === 'ASC' ? 1 : -1;
     if (!b.followedSince) return sortOrder === 'DESC' ? 1 : -1;
-    return sortOrder === 'ASC' ? new Date(b.followedSince) - new Date(a.followedSince) : new Date(a.followedSince) - new Date(b.followedSince);
+    return sortOrder === 'ASC'
+      ? new Date(b.followedSince).getTime() - new Date(a.followedSince).getTime()
+      : new Date(a.followedSince).getTime() - new Date(b.followedSince).getTime();
   }
   if (sortBy === 'lastUpdateCheckForGDPR') {
     if (!a.lastUpdateCheckForGDPR && !b.lastUpdateCheckForGDPR) return defaultSort(a, b, sortOrder);
     if (!a.lastUpdateCheckForGDPR) return sortOrder === 'ASC' ? 1 : -1;
     if (!b.lastUpdateCheckForGDPR) return sortOrder === 'DESC' ? 1 : -1;
     return sortOrder === 'ASC'
-      ? new Date(b.lastUpdateCheckForGDPR) - new Date(a.lastUpdateCheckForGDPR)
-      : new Date(a.lastUpdateCheckForGDPR) - new Date(b.lastUpdateCheckForGDPR);
+      ? new Date(b.lastUpdateCheckForGDPR).getTime() - new Date(a.lastUpdateCheckForGDPR).getTime()
+      : new Date(a.lastUpdateCheckForGDPR).getTime() - new Date(b.lastUpdateCheckForGDPR).getTime();
   }
   // DEFAULT SORTING
   // (sortBy === 'name')

@@ -11,41 +11,19 @@ import { formatDateTimeWithNameOfDay } from '../services/date';
 import { download, viewBlobInNewWindow } from '../utils';
 import type { Document } from '../types/document';
 import type { UUIDV4 } from '../types/uuid';
-import type { Person } from '../types/person';
+import type { PersonInstance } from '../types/person';
+import UserName from './UserName';
 
 type DocumentModalProps = {
   document: Document;
   onClose: () => void;
-  person: Person;
-  children?: React.ReactNode;
+  personId: UUIDV4;
   onDelete: (document: Document) => void;
   onChangeName: (name: string) => Promise<void>;
-  groupsDisabled?: boolean;
   color?: string;
 };
 
-export function DocumentModal({
-  document,
-  onClose,
-  person,
-  children,
-  onDelete,
-  onChangeName,
-  groupsDisabled = false,
-  color = 'main',
-}: DocumentModalProps) {
-  const users = useRecoilValue(usersState);
-  const preparePersonForEncryption = usePreparePersonForEncryption();
-  const setPersons = useSetRecoilState(personsState);
-
-  const groups = useRecoilValue(groupsState);
-  const organisation = useRecoilValue(organisationState);
-
-  const canToggleGroupCheck = useMemo(
-    () => !groupsDisabled && !!organisation.groupsEnabled && groups.find((group) => group.persons.includes(person._id)),
-    [groups, person._id, organisation.groupsEnabled, groupsDisabled]
-  );
-
+export function DocumentModal({ document, onClose, personId, onDelete, onChangeName, color = 'main' }: DocumentModalProps) {
   const initialName = useMemo(() => document.name, [document.name]);
   const [name, setName] = useState(initialName);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -80,7 +58,7 @@ export function DocumentModal({
                 className={`button-submit !tw-bg-${color}`}
                 onClick={async () => {
                   const file = await API.download({
-                    path: document.downloadPath ?? `/person/${document.person ?? person._id}/document/${document.file.filename}`,
+                    path: document.downloadPath ?? `/person/${personId}/document/${document.file.filename}`,
                     encryptedEntityKey: document.encryptedEntityKey,
                   });
                   download(file, name);
@@ -95,7 +73,7 @@ export function DocumentModal({
                   // Open a new window or tab immediately
 
                   const file = await API.download({
-                    path: document.downloadPath ?? `/person/${document.person ?? person._id}/document/${document.file.filename}`,
+                    path: document.downloadPath ?? `/person/${personId}/document/${document.file.filename}`,
                     encryptedEntityKey: document.encryptedEntityKey,
                   });
                   const url = URL.createObjectURL(file);
@@ -104,7 +82,7 @@ export function DocumentModal({
                     const fileURL = await viewBlobInNewWindow(url);
                     window.open(fileURL, '_blank');
                   } catch (error) {
-                    alert('Notice', error);
+                    console.log(error);
                   }
                   // Create a blob URL from the File object
                 }}>
@@ -114,55 +92,8 @@ export function DocumentModal({
           )}
 
           <small className="tw-pt-4 tw-opacity-60">
-            Créé par {users.find((e) => e._id === document.createdBy)?.name} le {formatDateTimeWithNameOfDay(document.createdAt)}
+            Créé par <UserName id={document.createdBy} /> le {formatDateTimeWithNameOfDay(document.createdAt)}
           </small>
-          {children}
-          {!!canToggleGroupCheck && (
-            <div>
-              <label htmlFor="document-for-group">
-                <input
-                  type="checkbox"
-                  className="tw-mr-2"
-                  id="document-for-group"
-                  name="group"
-                  defaultChecked={document.group}
-                  value={document.group}
-                  onChange={async () => {
-                    const _person = !document.person ? person : document.personPopulated;
-                    const isAttachedToAnotherPerson = _person._id !== person._id;
-                    const personResponse = await API.put({
-                      path: `/person/${_person._id}`,
-                      body: preparePersonForEncryption({
-                        ..._person,
-                        documents: _person.documents.map((_document) =>
-                          document._id === _document._id ? { ..._document, group: !_document.group } : _document
-                        ),
-                      }),
-                    });
-                    if (personResponse.ok) {
-                      toast.success('Document mis à jour !');
-                      const newPerson = personResponse.decryptedData;
-                      setPersons((persons) =>
-                        persons.map((p) => {
-                          if (p._id === _person._id) return newPerson;
-                          return p;
-                        })
-                      );
-                      if (isAttachedToAnotherPerson) onClose();
-                    }
-                  }}
-                />
-                Document familial
-                <br />
-                <small className="tw-block tw-text-gray-500">Ce document sera visible pour toute la famille</small>
-              </label>
-              {!!document.personPopulated && (
-                <small className="tw-block tw-text-gray-500">
-                  Note: Ce document est lié à <PersonName item={document} />
-                </small>
-              )}
-            </div>
-          )}
         </div>
       </ModalBody>
       <ModalFooter>
