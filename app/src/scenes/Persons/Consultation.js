@@ -76,6 +76,7 @@ const Consultation = ({ navigation, route }) => {
         onlyVisibleBy: consult.onlyVisibleBy || [],
         user: consult.user || user._id,
         teams: consult.teams || [],
+        history: consult.history || [],
         organisation: consult.organisation || organisation._id,
       };
     },

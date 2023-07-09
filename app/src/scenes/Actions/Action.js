@@ -50,6 +50,7 @@ const castToAction = (action) => {
     entityKey: action.entityKey || '',
     teams: action.teams || (action.team ? [action.team] : undefined),
     structure: action.structure || null,
+    history: action.history || [],
   };
 };
 

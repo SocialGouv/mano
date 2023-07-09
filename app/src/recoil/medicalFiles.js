@@ -18,7 +18,7 @@ export const customFieldsMedicalFileSelector = selector({
   },
 });
 
-const encryptedFields = ['person', 'documents', 'comments'];
+const encryptedFields = ['person', 'documents', 'comments', 'history'];
 
 export const prepareMedicalFileForEncryption = (customFieldsMedicalFile) => (medicalFile) => {
   try {
