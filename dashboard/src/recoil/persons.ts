@@ -3,9 +3,10 @@ import { atom, selector, useRecoilValue } from 'recoil';
 import { organisationState } from './auth';
 import { toast } from 'react-toastify';
 import { capture } from '../services/sentry';
+import type { PersonInstance } from '../types/person';
 
 const collectionName = 'person';
-export const personsState = atom({
+export const personsState = atom<PersonInstance[]>({
   key: collectionName,
   default: [],
   effects: [({ onSet }) => onSet(async (newValue) => setCacheItem(collectionName, newValue))],

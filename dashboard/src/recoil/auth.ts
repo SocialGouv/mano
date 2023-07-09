@@ -1,5 +1,6 @@
 import { atom } from 'recoil';
 import { AppSentry } from '../services/sentry';
+import type { OrganisationInstance } from '../types/organisation';
 
 export const userState = atom({
   key: 'userState',
@@ -7,13 +8,13 @@ export const userState = atom({
   effects: [({ onSet }) => onSet((user) => AppSentry.setUser(user))],
 });
 
-export const organisationState = atom({
+export const organisationState = atom<OrganisationInstance>({
   key: 'organisationState',
-  default: {},
+  default: { _id: '' },
   effects: [
     ({ onSet }) =>
       onSet((organisation) => {
-        AppSentry.setTag('organisationId', organisation._id);
+        AppSentry.setTag('organisationId', organisation?._id);
       }),
   ],
 });
