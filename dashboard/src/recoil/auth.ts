@@ -1,8 +1,10 @@
 import { atom } from 'recoil';
 import { AppSentry } from '../services/sentry';
 import type { OrganisationInstance } from '../types/organisation';
+import type { UserInstance } from '../types/user';
+import type { TeamInstance } from '../types/team';
 
-export const userState = atom({
+export const userState = atom<UserInstance | null>({
   key: 'userState',
   default: null,
   effects: [({ onSet }) => onSet((user) => AppSentry.setUser(user))],
@@ -19,17 +21,17 @@ export const organisationState = atom<OrganisationInstance>({
   ],
 });
 
-export const teamsState = atom({
+export const teamsState = atom<TeamInstance[]>({
   key: 'teamsState',
   default: [],
 });
 
-export const usersState = atom({
+export const usersState = atom<UserInstance[]>({
   key: 'usersState',
   default: [],
 });
 
-export const currentTeamState = atom({
+export const currentTeamState = atom<TeamInstance | null>({
   key: 'currentTeamState',
   default: null,
 });
