@@ -1,3 +1,10 @@
+# [1.279.0](https://github.com/SocialGouv/mano/compare/v1.278.2...v1.279.0) (2023-07-11)
+
+
+### Features
+
+* **dashboard:** more typing + DocumentsGeneric preparation for Documents organisation ([#1603](https://github.com/SocialGouv/mano/issues/1603)) ([1637ff0](https://github.com/SocialGouv/mano/commit/1637ff0d99bb3c2aaf9e42bf3b918ebea271a380))
+
 ## [1.278.2](https://github.com/SocialGouv/mano/compare/v1.278.1...v1.278.2) (2023-07-07)
 
 
