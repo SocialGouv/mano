@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { toast } from 'react-toastify';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { organisationState, userState } from '../../../recoil/auth';
+import { organisationAuthentifiedState, userAuthentifiedState } from '../../../recoil/auth';
 import { consultationsState, prepareConsultationForEncryption } from '../../../recoil/consultations';
 import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../../recoil/medicalFiles';
 import { arrayOfitemsGroupedByConsultationSelector } from '../../../recoil/selectors';
@@ -9,10 +9,17 @@ import { prepareTreatmentForEncryption, treatmentsState } from '../../../recoil/
 import API from '../../../services/api';
 import { capture } from '../../../services/sentry';
 import { DocumentsModule } from '../../../components/DocumentsGeneric';
+import type { PersonPopulated } from '../../../types/person';
+import type { DocumentForModule } from '../../../types/document';
+import type { MedicalFileInstance } from '../../../types/medicalFile';
 
-const PersonDocumentsMedical = ({ person }) => {
-  const user = useRecoilValue(userState);
-  const organisation = useRecoilValue(organisationState);
+interface PersonDocumentsProps {
+  person: PersonPopulated;
+}
+
+const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
+  const user = useRecoilValue(userAuthentifiedState);
+  const organisation = useRecoilValue(organisationAuthentifiedState);
 
   const allConsultations = useRecoilValue(arrayOfitemsGroupedByConsultationSelector);
   const setAllConsultations = useSetRecoilState(consultationsState);
@@ -25,10 +32,15 @@ const PersonDocumentsMedical = ({ person }) => {
 
   const treatments = useMemo(() => (allTreatments || []).filter((t) => t.person === person._id), [allTreatments, person._id]);
 
-  const medicalFile = useMemo(() => (allMedicalFiles || []).find((m) => m.person === person._id), [allMedicalFiles, person._id]);
+  const medicalFile: MedicalFileInstance | undefined = useMemo(
+    () => (allMedicalFiles || []).find((m) => m.person === person._id),
+    [allMedicalFiles, person._id]
+  );
 
   const allMedicalDocuments = useMemo(() => {
-    const ordonnances = {};
+    // ordonnaces is an object of DocumentForModule
+    // define ordannace typed
+    const ordonnances: Record<string, DocumentForModule> = {};
     for (const treatment of treatments) {
       for (const document of treatment.documents || []) {
         ordonnances[document._id] = {
@@ -37,11 +49,11 @@ const PersonDocumentsMedical = ({ person }) => {
             item: treatment,
             type: 'treatment',
           },
-        };
+        } as DocumentForModule;
       }
     }
 
-    const consultationsDocs = {};
+    const consultationsDocs: Record<string, DocumentForModule> = {};
     for (const consultation of personConsultations) {
       if (!!consultation?.onlyVisibleBy?.length) {
         if (!consultation.onlyVisibleBy.includes(user._id)) continue;
@@ -57,40 +69,38 @@ const PersonDocumentsMedical = ({ person }) => {
       }
     }
 
-    const otherDocs = {};
-    for (const document of medicalFile?.documents || []) {
-      otherDocs[document._id] = {
-        ...document,
-        linkedItem: {
-          item: medicalFile,
-          type: 'medical-file',
-        },
-      };
+    const otherDocs: Record<string, DocumentForModule> = {};
+    if (medicalFile) {
+      for (const document of medicalFile?.documents || []) {
+        otherDocs[document._id] = {
+          ...document,
+          linkedItem: {
+            item: medicalFile,
+            type: 'medical-file',
+          },
+        };
+      }
     }
     return [...Object.values(ordonnances), ...Object.values(consultationsDocs), ...Object.values(otherDocs)].sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
   }, [personConsultations, medicalFile, treatments, user._id]);
-
-  const documents = allMedicalDocuments;
 
   return (
     <DocumentsModule
       showPanel
-      documents={documents}
+      documents={allMedicalDocuments}
       color="blue-900"
       personId={person._id}
       onDeleteDocument={async (document) => {
-        if (!window.confirm('Voulez-vous vraiment supprimer ce document ?')) return;
-        await API.delete({ path: document.downloadPath ?? `/person/${document.person ?? person._id}/document/${document.file.filename}` });
-
+        await API.delete({ path: document.downloadPath ?? `/person/${person._id}/document/${document.file.filename}` });
         if (document.linkedItem.type === 'treatment') {
           const treatment = document.linkedItem.item;
           const treatmentResponse = await API.put({
             path: `/treatment/${treatment._id}`,
             body: prepareTreatmentForEncryption({
               ...treatment,
-              documents: treatment.documents.map((d) => d._id !== document._id),
+              documents: treatment.documents.filter((d) => d._id !== document._id),
             }),
           });
           if (treatmentResponse.ok) {
@@ -132,6 +142,7 @@ const PersonDocumentsMedical = ({ person }) => {
           }
         }
         if (document.linkedItem.type === 'medical-file') {
+          if (!medicalFile?._id) return;
           const medicalFileResponse = await API.put({
             path: `/medical-file/${medicalFile._id}`,
             body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({
@@ -209,6 +220,7 @@ const PersonDocumentsMedical = ({ person }) => {
           }
         }
         if (document.linkedItem.type === 'medical-file') {
+          if (!medicalFile?._id) return;
           const medicalFileResponse = await API.put({
             path: `/medical-file/${medicalFile._id}`,
             body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({
@@ -235,6 +247,7 @@ const PersonDocumentsMedical = ({ person }) => {
         }
       }}
       onAddDocuments={async (documents) => {
+        if (!medicalFile?._id) return;
         const medicalFileResponse = await API.put({
           path: `/medical-file/${medicalFile._id}`,
           body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({

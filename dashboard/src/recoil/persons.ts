@@ -25,7 +25,7 @@ export const personFieldsSelector = selector({
   key: 'personFieldsSelector',
   get: ({ get }) => {
     const organisation = get(organisationState);
-    return organisation.personFields;
+    return organisation?.personFields || [];
   },
 });
 
@@ -33,7 +33,7 @@ export const fieldsPersonsCustomizableOptionsSelector = selector<CustomField[]>(
   key: 'fieldsPersonsCustomizableOptionsSelector',
   get: ({ get }) => {
     const organisation = get(organisationState);
-    return organisation.fieldsPersonsCustomizableOptions as CustomField[];
+    return (organisation?.fieldsPersonsCustomizableOptions || []) as CustomField[];
   },
 });
 
@@ -41,7 +41,7 @@ export const customFieldsPersonsSelector = selector({
   key: 'customFieldsPersonsSelector',
   get: ({ get }) => {
     const organisation = get(organisationState);
-    return organisation.customFieldsPersons || [];
+    return organisation?.customFieldsPersons || [];
   },
 });
 

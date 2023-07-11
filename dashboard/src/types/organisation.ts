@@ -1,4 +1,4 @@
-import { CustomField, PredefinedField } from './field';
+import { CustomField, PredefinedField, CustomFieldsGroup } from './field';
 
 interface GroupedCategories {
   groupTitle: string;
@@ -9,15 +9,10 @@ interface GroupedServices {
   services: string[];
 }
 
-interface CustomFieldsGroup {
-  name: string;
-  fields: CustomField[];
-}
-
 [{ services: ['Médecine généraliste', 'Médecin spéciliste'], groupTitle: 'Orientations' }];
 export interface OrganisationInstance {
   _id: string;
-  name?: string;
+  name: string;
 
   collaborations?: string[];
 
@@ -38,12 +33,12 @@ export interface OrganisationInstance {
 
   groupedServices?: GroupedServices[];
 
-  customFieldsObs?: CustomField[];
-  personFields?: PredefinedField[];
-  customFieldsPersons?: CustomFieldsGroup[];
-  customFieldsMedicalFile?: CustomField[];
-  fieldsPersonsCustomizableOptions?: CustomField[];
-  consultations?: CustomFieldsGroup[];
+  customFieldsObs: CustomField[];
+  personFields: PredefinedField[];
+  customFieldsPersons: CustomFieldsGroup[];
+  customFieldsMedicalFile: CustomField[];
+  fieldsPersonsCustomizableOptions: CustomField[];
+  consultations: CustomFieldsGroup[];
 
   actionsGroupedCategories?: GroupedCategories[];
   structuresGroupedCategories?: GroupedCategories[];

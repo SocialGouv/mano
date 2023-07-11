@@ -2,18 +2,21 @@ import { atom } from 'recoil';
 import { looseUuidRegex } from '../utils';
 import { toast } from 'react-toastify';
 import { capture } from '../services/sentry';
+import type { ConsultationInstance } from '../types/consultation';
+import type { CustomFieldsGroup } from '../types/field';
+import type { UserInstance } from '../types/user';
 
 const collectionName = 'consultation';
-export const consultationsState = atom({
+export const consultationsState = atom<ConsultationInstance[]>({
   key: collectionName,
   default: [],
 });
 
-const encryptedFields = ['name', 'type', 'person', 'user', 'teams', 'documents', 'comments'];
+const encryptedFields: Array<keyof ConsultationInstance> = ['name', 'type', 'person', 'user', 'teams', 'documents', 'comments'];
 
 export const prepareConsultationForEncryption =
-  (customFieldsConsultations) =>
-  (consultation, { checkRequiredFields = true } = {}) => {
+  (customFieldsConsultations: CustomFieldsGroup[]) =>
+  (consultation: ConsultationInstance, { checkRequiredFields = true } = {}) => {
     if (!!checkRequiredFields) {
       try {
         if (!looseUuidRegex.test(consultation.person)) {
@@ -37,7 +40,7 @@ export const prepareConsultationForEncryption =
     }
     const consultationTypeCustomFields = customFieldsConsultations.find((consult) => consult.name === consultation.type)?.fields || [];
     const encryptedFieldsIncludingCustom = [...consultationTypeCustomFields.map((f) => f.name), ...encryptedFields];
-    const decrypted = {};
+    const decrypted: any = {};
     for (let field of encryptedFieldsIncludingCustom) {
       decrypted[field] = consultation[field];
     }
@@ -59,11 +62,11 @@ export const prepareConsultationForEncryption =
 
 export const defaultConsultationFields = { isConsultation: true, withTime: true };
 
-export const formatConsultation = (consultation) => {
+export const formatConsultation = (consultation: ConsultationInstance) => {
   return { ...consultation, ...defaultConsultationFields };
 };
 
-export const disableConsultationRow = (actionOrConsultation, user) => {
+export const disableConsultationRow = (actionOrConsultation: any, user: UserInstance) => {
   if (!actionOrConsultation.isConsultation) return false;
   if (!user.healthcareProfessional) return true;
   if (!actionOrConsultation.onlyVisibleBy?.length) return false;

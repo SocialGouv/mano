@@ -458,6 +458,7 @@ function DocumentModal({ document, onClose, personId, onDelete, onSubmit, canTog
           className="button-destructive"
           disabled={isUpdating}
           onClick={async () => {
+            if (!window.confirm('Voulez-vous vraiment supprimer ce document ?')) return;
             onDelete(document);
           }}>
           Supprimer

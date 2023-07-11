@@ -1,14 +1,26 @@
 import { UUIDV4 } from './uuid';
+import { MedicalFileInstance } from './medicalFile';
+import { ConsultationInstance } from './consultation';
+import { TreatmentInstance } from './treatment';
+import { PersonInstance } from './person';
 
-type Item = {
-  _id: UUIDV4;
-  [key: string]: any;
-};
-
-export type LinkedItem = {
-  item: Item;
-  type: 'person' | 'medical-file' | 'consultation' | 'treatment';
-};
+export type LinkedItem =
+  | {
+      item: MedicalFileInstance;
+      type: 'medical-file';
+    }
+  | {
+      item: ConsultationInstance;
+      type: 'consultation';
+    }
+  | {
+      item: TreatmentInstance;
+      type: 'treatment';
+    }
+  | {
+      item: PersonInstance;
+      type: 'person';
+    };
 
 export type FileMetadata = {
   originalname: string;
@@ -19,7 +31,7 @@ export type FileMetadata = {
 };
 
 export interface Document {
-  _id: UUIDV4;
+  _id: string;
   name: string;
   group?: boolean;
   encryptedEntityKey: string;

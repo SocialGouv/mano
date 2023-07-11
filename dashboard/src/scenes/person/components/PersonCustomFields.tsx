@@ -1,22 +1,30 @@
 import { Col, Row } from 'reactstrap';
 import { useRecoilValue } from 'recoil';
-import { currentTeamState } from '../../../recoil/auth';
+import { currentTeamAuthentifiedState } from '../../../recoil/auth';
 import { useMemo, useState } from 'react';
 import EditModal from './EditModal';
 import CustomFieldDisplay from '../../../components/CustomFieldDisplay';
+import type { PersonPopulated } from '../../../types/person';
+import type { CustomField } from '../../../types/field';
 
-export default function PersonCustomFields({ person, sectionName, fields, colspan = null, isMedicalFile = false }) {
-  const [editModal, setEditModal] = useState(false);
-  const team = useRecoilValue(currentTeamState);
+interface PersonCustomFieldsProps {
+  person: PersonPopulated;
+  sectionName: string;
+  fields: CustomField[];
+  colspan?: number | null;
+  isMedicalFile?: boolean;
+}
+
+export default function PersonCustomFields({ person, sectionName, fields, colspan = null, isMedicalFile = false }: PersonCustomFieldsProps) {
+  const [editModal, setEditModal] = useState('');
+  const team = useRecoilValue(currentTeamAuthentifiedState);
   const enabledFields = useMemo(() => {
     return fields.filter((f) => f.enabled || f.enabledTeams?.includes(team._id));
   }, [fields, team]);
   if (!enabledFields.length) return null;
   return (
     <div className="p-3 border tw-min-h-[200px] tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
-      {Boolean(editModal) && (
-        <EditModal isMedicalFile={isMedicalFile} person={person} selectedPanel={editModal} onClose={() => setEditModal(false)} />
-      )}
+      {Boolean(editModal) && <EditModal isMedicalFile={isMedicalFile} person={person} selectedPanel={editModal} onClose={() => setEditModal('')} />}
       <div className="tw-flex">
         <h4 className="tw-flex-1 tw-text-xl">{sectionName}</h4>
         <div>

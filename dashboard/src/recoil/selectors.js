@@ -94,10 +94,12 @@ export const itemsGroupedByPersonSelector = selector({
   key: 'itemsGroupedByPersonSelector',
   get: ({ get }) => {
     const persons = get(personsState);
+    const originalPersonsObject = {};
     const personsObject = {};
     const user = get(userState);
     const usersObject = get(usersObjectSelector);
     for (const person of persons) {
+      originalPersonsObject[person._id] = { ...person };
       personsObject[person._id] = {
         ...person,
         userPopulated: usersObject[person.user],
@@ -132,7 +134,16 @@ export const itemsGroupedByPersonSelector = selector({
 
     for (const person of persons) {
       if (!person.documents?.length) continue;
+      const documentsForModule = [];
       for (const document of person.documents) {
+        const documentForModule = {
+          ...document,
+          linkedItem: {
+            item: originalPersonsObject[person._id],
+            type: 'person',
+          },
+        };
+        documentsForModule.push(documentForModule);
         personsObject[person._id].interactions.push(document.createdAt);
         if (!document.group) continue;
         if (!personsObject[person._id].group) continue;
@@ -142,9 +153,10 @@ export const itemsGroupedByPersonSelector = selector({
           if (!personsObject[personIdInGroup].groupDocuments) {
             personsObject[personIdInGroup].groupDocuments = [];
           }
-          personsObject[personIdInGroup].groupDocuments.push({ ...document, person: person._id, personPopulated: person });
+          personsObject[personIdInGroup].groupDocuments.push(documentForModule);
         }
       }
+      personsObject[person._id].documentsForModule = documentsForModule;
     }
 
     // to dispatch comments efficiently

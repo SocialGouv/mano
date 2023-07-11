@@ -133,11 +133,11 @@ const App = ({ resetRecoil }) => {
           <RestrictedRoute path="/report" component={Report} />
           <RestrictedRoute path="*" component={() => <Redirect to={'stats'} />} />
         </Switch>
-        <DataLoader />
         <ActionModal />
         <ConsultationModal />
         <TreatmentModal />
         <ModalConfirm />
+        <DataLoader />
       </Router>
     </div>
   );

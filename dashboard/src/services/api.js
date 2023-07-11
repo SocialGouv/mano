@@ -193,7 +193,7 @@ const deleteFile = async ({ path }) => {
 };
 
 const execute = async ({ method, path = '', body = null, query = {}, headers = {}, forceMigrationLastUpdate = null, skipDecrypt = false } = {}) => {
-  const organisation = getRecoil(organisationState);
+  const organisation = getRecoil(organisationState) || {};
   const tokenCached = getRecoil(authTokenState);
   const { encryptionLastUpdateAt, encryptionEnabled, encryptedVerificationKey, migrationLastUpdateAt } = organisation;
   try {

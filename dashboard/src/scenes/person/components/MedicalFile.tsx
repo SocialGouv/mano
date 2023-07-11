@@ -1,5 +1,5 @@
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { organisationState, userState } from '../../../recoil/auth';
+import { organisationAuthentifiedState, userAuthentifiedState } from '../../../recoil/auth';
 import { Consultations } from './Consultations';
 import { InfosMain } from './InfosMain';
 import PersonCustomFields from './PersonCustomFields';
@@ -14,19 +14,44 @@ import PersonDocumentsMedical from './PersonDocumentsMedical';
 import { MedicalFilePrint } from './MedicalFilePrint';
 import API from '../../../services/api';
 import CommentsMedical from './CommentsMedical';
+import type { PersonPopulated } from '../../../types/person';
+import type { MedicalFileInstance } from '../../../types/medicalFile';
+import type { CustomField } from '../../../types/field';
 
-export default function MedicalFile({ person }) {
-  const user = useRecoilValue(userState);
+interface MedicalFileProps {
+  person: PersonPopulated;
+}
+
+export default function MedicalFile({ person }: MedicalFileProps) {
+  const user = useRecoilValue(userAuthentifiedState);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
   const flattenedCustomFieldsPersons = useRecoilValue(flattenedCustomFieldsPersonsSelector);
-  const organisation = useRecoilValue(organisationState);
+  const organisation = useRecoilValue(organisationAuthentifiedState);
   // These custom fields are displayed by default, because they where displayed before they became custom fields
-  const customFieldsMedicalFileWithLegacyFields = useMemo(() => {
+  const customFieldsMedicalFileWithLegacyFields: CustomField[] = useMemo(() => {
     const c = [...customFieldsMedicalFile];
-    if (flattenedCustomFieldsPersons.find((e) => e.name === 'structureMedical'))
-      c.unshift({ name: 'structureMedical', label: 'Structure de suivi médical', type: 'text', enabled: true });
-    if (flattenedCustomFieldsPersons.find((e) => e.name === 'healthInsurances'))
-      c.unshift({ name: 'healthInsurances', label: 'Couverture(s) médicale(s)', type: 'multi-choice', enabled: true });
+    if (flattenedCustomFieldsPersons.find((e) => e.name === 'structureMedical')) {
+      const structureMedicalField: CustomField = {
+        name: 'structureMedical',
+        type: 'text',
+        label: 'Structure de suivi médical',
+        enabled: true,
+        required: false,
+        showInStats: true,
+      };
+      c.unshift(structureMedicalField);
+    }
+    if (flattenedCustomFieldsPersons.find((e) => e.name === 'healthInsurances')) {
+      const healthInsurancesField: CustomField = {
+        name: 'healthInsurances',
+        label: 'Couverture(s) médicale(s)',
+        type: 'multi-choice',
+        enabled: true,
+        showInStats: true,
+        required: true,
+      };
+      c.unshift(healthInsurancesField);
+    }
     return c;
   }, [customFieldsMedicalFile, flattenedCustomFieldsPersons]);
 
@@ -38,10 +63,15 @@ export default function MedicalFile({ person }) {
       console.log('Creating medical file');
       API.post({
         path: '/medical-file',
-        body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({ person: person._id, documents: [], organisation: organisation._id }),
+        body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({
+          person: person._id,
+          documents: [],
+          organisation: organisation._id,
+        }),
       }).then((response) => {
         if (!response.ok) return;
-        setAllMedicalFiles((medicalFiles) => [...medicalFiles, response.decryptedData]);
+        const newMedicalFile = response.decryptedData as MedicalFileInstance;
+        setAllMedicalFiles((medicalFiles: MedicalFileInstance[]) => [...medicalFiles, newMedicalFile]);
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

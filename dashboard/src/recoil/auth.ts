@@ -1,4 +1,4 @@
-import { atom } from 'recoil';
+import { atom, selector } from 'recoil';
 import { AppSentry } from '../services/sentry';
 import type { OrganisationInstance } from '../types/organisation';
 import type { UserInstance } from '../types/user';
@@ -10,15 +10,33 @@ export const userState = atom<UserInstance | null>({
   effects: [({ onSet }) => onSet((user) => AppSentry.setUser(user))],
 });
 
-export const organisationState = atom<OrganisationInstance>({
+export const userAuthentifiedState = selector<UserInstance>({
+  key: 'userAuthentifiedState',
+  get: ({ get }) => {
+    const user = get(userState);
+    if (!user) throw new Error('User is not authenticated');
+    return user;
+  },
+});
+
+export const organisationState = atom<OrganisationInstance | null>({
   key: 'organisationState',
-  default: { _id: '' },
+  default: null,
   effects: [
     ({ onSet }) =>
       onSet((organisation) => {
         AppSentry.setTag('organisationId', organisation?._id);
       }),
   ],
+});
+
+export const organisationAuthentifiedState = selector<OrganisationInstance>({
+  key: 'organisationAuthentifiedState',
+  get: ({ get }) => {
+    const organisation = get(organisationState);
+    if (!organisation) throw new Error('organisation is not defined');
+    return organisation;
+  },
 });
 
 export const teamsState = atom<TeamInstance[]>({
@@ -34,6 +52,15 @@ export const usersState = atom<UserInstance[]>({
 export const currentTeamState = atom<TeamInstance | null>({
   key: 'currentTeamState',
   default: null,
+});
+
+export const currentTeamAuthentifiedState = selector<TeamInstance>({
+  key: 'currentTeamAuthentifiedState',
+  get: ({ get }) => {
+    const currentTeam = get(currentTeamState);
+    if (!currentTeam) throw new Error('currentTeam is not defined');
+    return currentTeam;
+  },
 });
 
 export const sessionInitialDateTimestamp = atom({

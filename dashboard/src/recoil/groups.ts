@@ -20,16 +20,13 @@ export const groupSelector = selectorFamily({
     },
 });
 
-const encryptedFields: EncryptedGroupKeys[] = ['persons', 'relations'];
+const encryptedFields: Array<keyof GroupInstance> = ['persons', 'relations'];
 
-export const prepareGroupForEncryption = (group: GroupInstance): GroupToBeEncrypted => {
-  const decrypted: EncryptedGroupFields = {
-    persons: [],
-    relations: [],
-  };
+export const prepareGroupForEncryption = (group: GroupInstance) => {
+  const decrypted: any = {};
 
   for (let field of encryptedFields) {
-    decrypted[field] = group[field] as never;
+    decrypted[field] = group[field];
   }
 
   return {
