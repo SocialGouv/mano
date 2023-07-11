@@ -41,6 +41,7 @@ const encryptedFields = [
   'teams',
   'user',
   'urgent',
+  'history',
 ];
 
 export const prepareActionForEncryption = (action) => {

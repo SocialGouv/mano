@@ -74,6 +74,7 @@ const Treatment = ({ navigation, route }) => {
       documents,
       comments,
       user: treatmentDB?.user ?? user._id,
+      history: treatmentDB?.history ?? user._id,
     });
     const treatmentResponse = isNew ? await API.post({ path: '/treatment', body }) : await API.put({ path: `/treatment/${treatmentDB._id}`, body });
     if (!treatmentResponse.ok) return false;
