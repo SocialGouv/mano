@@ -459,7 +459,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                 onAddDocuments={async (nextDocuments) => {
                   const newData = {
                     ...data,
-                    documents: nextDocuments,
+                    documents: [...data.documents, ...nextDocuments],
                   };
                   setData(newData);
                   const ok = await handleSubmit({ newData });

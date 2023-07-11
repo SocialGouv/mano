@@ -250,13 +250,13 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
           }
         }
       }}
-      onAddDocuments={async (documents) => {
+      onAddDocuments={async (nextDocuments) => {
         if (!medicalFile?._id) return;
         const medicalFileResponse = await API.put({
           path: `/medical-file/${medicalFile._id}`,
           body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({
             ...medicalFile,
-            documents: [...(medicalFile.documents || []), ...documents],
+            documents: [...(medicalFile.documents || []), ...nextDocuments],
           }),
         });
         if (medicalFileResponse.ok) {
