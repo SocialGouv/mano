@@ -1,3 +1,10 @@
+# [1.280.0](https://github.com/SocialGouv/mano/compare/v1.279.0...v1.280.0) (2023-07-11)
+
+
+### Features
+
+* **app:** prepare app for history ([#1602](https://github.com/SocialGouv/mano/issues/1602)) ([eadae75](https://github.com/SocialGouv/mano/commit/eadae757d2fd46f4dab6365edda508387809204b))
+
 # [1.279.0](https://github.com/SocialGouv/mano/compare/v1.278.2...v1.279.0) (2023-07-11)
 
 
