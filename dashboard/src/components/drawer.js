@@ -29,10 +29,8 @@ const Drawer = () => {
     <nav
       title="Navigation principale"
       className={[
-        'noprint tw-absolute tw-flex tw-h-screen tw-w-screen tw-overflow-hidden tw-bg-gray-900/80 tw-opacity-100 tw-transition-all sm:!tw-pointer-events-auto sm:!tw-visible sm:tw-relative sm:!tw-z-[500] sm:tw-h-auto sm:tw-w-auto sm:tw-translate-x-0 sm:tw-bg-transparent',
-        showDrawer
-          ? 'tw-visible tw-z-[500] tw-translate-x-0 tw-transition-all'
-          : 'tw-pointer-events-none tw-invisible tw-z-[-1] -tw-translate-x-full',
+        'noprint tw-absolute tw-flex tw-h-screen tw-w-screen tw-overflow-hidden tw-bg-gray-900/80 tw-opacity-100 tw-transition-all sm:!tw-pointer-events-auto sm:!tw-visible sm:tw-relative sm:!tw-z-30 sm:tw-h-auto sm:tw-w-auto sm:tw-translate-x-0 sm:tw-bg-transparent',
+        showDrawer ? 'tw-visible tw-z-30 tw-translate-x-0 tw-transition-all' : 'tw-pointer-events-none tw-invisible tw-z-[-1] -tw-translate-x-full',
       ].join(' ')}>
       <div
         className={[

@@ -1,19 +1,21 @@
 import { atom, selector } from 'recoil';
-import { organisationState } from './auth';
+import { organisationAuthentifiedState } from './auth';
 import { capture } from '../services/sentry';
 import { toast } from 'react-toastify';
 import { looseUuidRegex } from '../utils';
+import type { MedicalFileInstance, NewMedicalFileInstance } from '../types/medicalFile';
+import type { CustomField } from '../types/field';
 
 const collectionName = 'medical-file';
-export const medicalFileState = atom({
+export const medicalFileState = atom<MedicalFileInstance[]>({
   key: collectionName,
   default: [],
 });
 
-export const customFieldsMedicalFileSelector = selector({
+export const customFieldsMedicalFileSelector = selector<CustomField[]>({
   key: 'customFieldsMedicalFileSelector',
   get: ({ get }) => {
-    const organisation = get(organisationState);
+    const organisation = get(organisationAuthentifiedState);
     if (Array.isArray(organisation.customFieldsMedicalFile)) return organisation.customFieldsMedicalFile;
     return defaultMedicalFileCustomFields;
   },
@@ -22,8 +24,8 @@ export const customFieldsMedicalFileSelector = selector({
 const encryptedFields = ['person', 'documents', 'comments'];
 
 export const prepareMedicalFileForEncryption =
-  (customFieldsMedicalFile) =>
-  (medicalFile, { checkRequiredFields = true } = {}) => {
+  (customFieldsMedicalFile: CustomField[]) =>
+  (medicalFile: MedicalFileInstance | NewMedicalFileInstance, { checkRequiredFields = true } = {}) => {
     if (!!checkRequiredFields) {
       try {
         if (!looseUuidRegex.test(medicalFile.person)) {
@@ -38,7 +40,7 @@ export const prepareMedicalFileForEncryption =
       }
     }
     const encryptedFieldsIncludingCustom = [...customFieldsMedicalFile.map((f) => f.name), ...encryptedFields];
-    const decrypted = {};
+    const decrypted: any = {};
     for (let field of encryptedFieldsIncludingCustom) {
       decrypted[field] = medicalFile[field];
     }
@@ -53,12 +55,11 @@ export const prepareMedicalFileForEncryption =
     };
   };
 
-const defaultMedicalFileCustomFields = [
+const defaultMedicalFileCustomFields: CustomField[] = [
   {
     name: 'numeroSecuriteSociale',
     label: 'Numéro de sécurité sociale',
     type: 'text',
-    options: null,
     enabled: true,
     required: false,
     showInStats: false,

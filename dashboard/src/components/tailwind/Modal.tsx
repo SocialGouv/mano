@@ -15,6 +15,18 @@ Use example:
 
  */
 
+interface ModalContainerProps {
+  children: React.ReactNode;
+  open: boolean;
+  onClose?: null | (() => void);
+  className?: string;
+  onAfterEnter?: () => void;
+  onAfterLeave?: () => void;
+  onBeforeLeave?: () => void;
+  size?: 'lg' | 'xl' | '3xl' | 'full' | 'prose';
+  blurryBackground?: boolean; // if true, the background will be blurred
+}
+
 const ModalContainer = ({
   children,
   open,
@@ -26,15 +38,15 @@ const ModalContainer = ({
   onBeforeLeave = () => null,
   size = 'lg', // lg, xl, 3xl, full, prose
   blurryBackground = false,
-}) => {
-  const backgroundRef = useRef(null);
+}: ModalContainerProps) => {
+  const backgroundRef = useRef<HTMLDivElement | null>(null);
 
   return (
     <>
       <Transition.Root show={open} as={Fragment}>
         <Dialog
           as="div"
-          className={['tw-relative tw-z-[3000]', className].join(' ')}
+          className={['tw-relative tw-z-[100]', className].join(' ')}
           // onClose={setOpen} // uncomment this if you want backdrop click to close modal
           onClose={nullFunction} // uncomment this if you want backdrop click to NOT close modal
         >
@@ -49,7 +61,7 @@ const ModalContainer = ({
             <div className={['tw-fixed tw-inset-0 tw-bg-black/70 tw-transition-opacity ', blurryBackground ? 'tw-backdrop-blur-xl' : ''].join(' ')} />
           </Transition.Child>
 
-          <div className="tw-fixed tw-inset-0 tw-z-[3001] tw-overflow-y-auto" ref={backgroundRef}>
+          <div className="tw-fixed tw-inset-0 tw-z-[101] tw-overflow-y-auto" ref={backgroundRef}>
             <div className="tw-flex tw-min-h-full tw-items-end tw-justify-center tw-p-4 tw-text-center sm:tw-items-center sm:tw-p-0">
               <Transition.Child
                 as={Fragment}
@@ -102,9 +114,15 @@ const ModalContainer = ({
 
 const nullFunction = () => null;
 
-const ModalHeader = ({ children, title, onClose }) => {
+interface ModalHeaderProps {
+  children?: React.ReactNode;
+  title?: string;
+  onClose?: null | (() => void);
+}
+
+const ModalHeader = ({ children, title, onClose }: ModalHeaderProps) => {
   return (
-    <div className="tw-z-[10001] tw-order-1 tw-flex tw-w-full tw-max-w-full tw-shrink-0 tw-items-center tw-justify-between tw-rounded-t-lg tw-border-b tw-border-gray-200 tw-bg-white">
+    <div className="tw-z-[103] tw-order-1 tw-flex tw-w-full tw-max-w-full tw-shrink-0 tw-items-center tw-justify-between tw-rounded-t-lg tw-border-b tw-border-gray-200 tw-bg-white">
       <div className="tw-w-full tw-py-4 sm:tw-flex sm:tw-items-start">
         <div className="tw-mt-3 tw-w-full tw-text-center sm:tw-mt-0 sm:tw-text-left">
           {!!title && (
@@ -130,9 +148,15 @@ const ModalHeader = ({ children, title, onClose }) => {
   );
 };
 
-const ModalBody = forwardRef(({ children, className = '', overflowY = true }, ref) => {
+interface ModalBodyProps {
+  children: React.ReactNode;
+  className?: string;
+  overflowY?: boolean;
+}
+
+const ModalBody = forwardRef<HTMLDivElement, ModalBodyProps>(({ children, className = '', overflowY = true }, ref) => {
   return (
-    <div ref={ref} className={['tw-z-[10000] tw-order-2 tw-shrink', overflowY ? 'tw-overflow-y-auto' : ''].join(' ')}>
+    <div ref={ref} className={['tw-z-[102] tw-order-2 tw-shrink', overflowY ? 'tw-overflow-y-auto' : ''].join(' ')}>
       <div className="sm:tw-flex sm:tw-items-start">
         <div className={['tw-w-full tw-text-center sm:tw-mt-0 sm:tw-text-left', className].join(' ')}>{children}</div>
       </div>
@@ -140,7 +164,11 @@ const ModalBody = forwardRef(({ children, className = '', overflowY = true }, re
   );
 });
 
-const ModalFooter = ({ children }) => {
+interface ModalFooterProps {
+  children: React.ReactNode;
+}
+
+const ModalFooter = ({ children }: ModalFooterProps) => {
   return (
     <div className="tw-order-3 tw-flex tw-shrink-0 tw-justify-end tw-gap-3 tw-rounded-b-lg tw-border-t tw-border-gray-200 tw-bg-gray-50 tw-px-4 tw-py-3 sm:tw-px-6">
       {children}

@@ -67,7 +67,7 @@ export function CommentsModule({
     <>
       {!!showPanel ? (
         <div className="tw-relative">
-          <div className="tw-sticky tw-top-0 tw-z-50 tw-flex tw-bg-white tw-p-3">
+          <div className="tw-sticky tw-top-0 tw-z-10 tw-flex tw-bg-white tw-p-3 tw-shadow-sm">
             <h4 className="tw-flex-1 tw-text-xl">Commentaires {comments.length ? `(${comments.length})` : ''}</h4>
             <div className="flex-col tw-flex tw-items-center tw-gap-2">
               <button

@@ -84,7 +84,7 @@ const PersonPlaces = ({ person }) => {
                     <button
                       aria-label={`Modifier le nom du lieu ${place?.name}`}
                       title={`Modifier le nom du lieu ${place?.name}`}
-                      className="noprint tw-invisible tw-z-50 tw-ml-4 tw-cursor-pointer tw-p-0 tw-text-sm tw-text-main hover:tw-underline group-hover:tw-visible"
+                      className="noprint tw-invisible tw-z-10 tw-ml-4 tw-cursor-pointer tw-p-0 tw-text-sm tw-text-main hover:tw-underline group-hover:tw-visible"
                       onClick={() => setPlaceToEdit(place)}
                       type="button">
                       Modifier le nom du lieu
@@ -211,7 +211,10 @@ const RelPersonPlaceModal = ({ open, setOpen, person, relPersonPlaceModal, setPl
     <ModalContainer open={open}>
       <ModalHeader title="Ajouter un lieu fréquenté" />
       <ModalBody>
-        <form id="new-rel-person-place" className="tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8 tw-py-4" onSubmit={onSaveRelPersonPlace}>
+        <form
+          id="new-rel-person-place"
+          className="tw-flex tw-min-h-[50vh] tw-w-full tw-flex-col tw-gap-4 tw-px-8 tw-py-4"
+          onSubmit={onSaveRelPersonPlace}>
           <div>
             <label htmlFor="place" className="tailwindui">
               Lieu
@@ -240,7 +243,7 @@ const RelPersonPlaceModal = ({ open, setOpen, person, relPersonPlaceModal, setPl
                     <button
                       aria-label={`Modifier le nom du lieu ${place?.name}`}
                       title={`Modifier le nom du lieu ${place?.name}`}
-                      className="noprint tw-z-50 tw-ml-4 tw-cursor-pointer tw-p-0 tw-text-sm tw-text-main hover:tw-underline"
+                      className="noprint tw-z-10 tw-ml-4 tw-cursor-pointer tw-p-0 tw-text-sm tw-text-main hover:tw-underline"
                       onMouseUp={onEditPlace}
                       // onTouchEnd required to work on tablet
                       // see https://github.com/JedWatson/react-select/issues/3117#issuecomment-1286232693 for similar issue

@@ -2,16 +2,28 @@ import { atom } from 'recoil';
 import { looseUuidRegex } from '../utils';
 import { toast } from 'react-toastify';
 import { capture } from '../services/sentry';
+import type { TreatmentInstance } from '../types/treatment';
 
 const collectionName = 'treatment';
-export const treatmentsState = atom({
+export const treatmentsState = atom<TreatmentInstance[]>({
   key: collectionName,
   default: [],
 });
 
-const encryptedFields = ['person', 'user', 'startDate', 'endDate', 'name', 'dosage', 'frequency', 'indication', 'documents', 'comments'];
+const encryptedFields: Array<keyof TreatmentInstance> = [
+  'person',
+  'user',
+  'startDate',
+  'endDate',
+  'name',
+  'dosage',
+  'frequency',
+  'indication',
+  'documents',
+  'comments',
+];
 
-export const prepareTreatmentForEncryption = (treatment, { checkRequiredFields = true } = {}) => {
+export const prepareTreatmentForEncryption = (treatment: TreatmentInstance, { checkRequiredFields = true } = {}) => {
   if (!!checkRequiredFields) {
     try {
       if (!looseUuidRegex.test(treatment.person)) {
@@ -28,7 +40,7 @@ export const prepareTreatmentForEncryption = (treatment, { checkRequiredFields =
       throw error;
     }
   }
-  const decrypted = {};
+  const decrypted: any = {};
   for (let field of encryptedFields) {
     decrypted[field] = treatment[field];
   }

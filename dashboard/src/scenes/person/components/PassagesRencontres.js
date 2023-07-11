@@ -60,7 +60,7 @@ export default function PassagesRencontres({ person }) {
 
   return (
     <div className="tw-relative">
-      <div className="tw-sticky tw-top-0 tw-z-50 tw-mb-3 tw-flex tw-bg-white tw-px-3 tw-pt-3 tw-text-main">
+      <div className="tw-sticky tw-top-0 tw-z-10 tw-mb-3 tw-flex tw-bg-white tw-p-3 tw-text-main tw-shadow-sm">
         <div className="tw-flex tw-flex-1">
           {organisation.passagesEnabled && (
             <button

@@ -6,7 +6,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { organisationState, userState } from '../../../recoil/auth';
 import { outOfBoundariesDate } from '../../../services/date';
 import API from '../../../services/api';
-import Documents from '../../../components/Documents';
 import { prepareTreatmentForEncryption, treatmentsState } from '../../../recoil/treatments';
 import DatePicker from '../../../components/DatePicker';
 import { CommentsModule } from '../../../components/CommentsGeneric';
@@ -15,6 +14,7 @@ import { itemsGroupedByTreatmentSelector } from '../../../recoil/selectors';
 import { modalConfirmState } from '../../../components/ModalConfirm';
 import CustomFieldDisplay from '../../../components/CustomFieldDisplay';
 import UserName from '../../../components/UserName';
+import { DocumentsModule } from '../../../components/DocumentsGeneric';
 
 export default function TreatmentModal() {
   const treatmentsObjects = useRecoilValue(itemsGroupedByTreatmentSelector);
@@ -206,14 +206,7 @@ function TreatmentContent({ onClose, treatment, personId }) {
         }}
       />
       <ModalBody>
-        <form
-          id="add-treatment-form"
-          onSubmit={async (e) => {
-            e.preventDefault();
-            const ok = handleSubmit({ closeOnSubmit: true });
-            if (ok && isNewTreatment) toast.success('Traitement créé !');
-            if (ok && !isNewTreatment) toast.success('Traitement mis à jour !');
-          }}>
+        <div>
           <ul className="noprint tw-mb-5 tw-mt-4 tw-flex tw-list-none tw-flex-wrap tw-border-b tw-border-zinc-200 tw-px-2">
             <li className="tw-cursor-pointer">
               <button
@@ -252,10 +245,17 @@ function TreatmentContent({ onClose, treatment, personId }) {
               </button>
             </li>
           </ul>
-          <div
+          <form
+            id="add-treatment-form"
             className={['tw-flex tw-h-[50vh] tw-w-full tw-flex-wrap tw-overflow-y-auto tw-p-4', activeTab !== 'Informations' && 'tw-hidden']
               .filter(Boolean)
-              .join(' ')}>
+              .join(' ')}
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const ok = handleSubmit({ closeOnSubmit: true });
+              if (ok && isNewTreatment) toast.success('Traitement créé !');
+              if (ok && !isNewTreatment) toast.success('Traitement mis à jour !');
+            }}>
             <div className="tw-flex tw-w-full tw-flex-wrap">
               <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
                 <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-blue-900'} htmlFor="medicine-name">
@@ -332,7 +332,7 @@ function TreatmentContent({ onClose, treatment, personId }) {
                 )}
               </div>
             </div>
-          </div>
+          </form>
           <div
             className={[
               'tw-flex tw-h-[50vh] tw-w-full tw-flex-col tw-flex-wrap tw-gap-4 tw-overflow-y-auto',
@@ -340,25 +340,38 @@ function TreatmentContent({ onClose, treatment, personId }) {
             ]
               .filter(Boolean)
               .join(' ')}>
-            <Documents
-              title="Documents"
-              color="blue-900"
+            <DocumentsModule
               personId={data.person}
-              documents={data.documents}
-              onAdd={async (nextDocuments) => {
+              color="blue-900"
+              showAssociatedItem={false}
+              documents={data.documents.map((doc) => ({ ...doc, linkedItem: { item: treatment, type: 'treatment' } }))}
+              onAddDocuments={async (nextDocuments) => {
                 const newData = {
                   ...data,
-                  documents: nextDocuments,
+                  documents: [...data.documents, ...nextDocuments],
                 };
                 setData(newData);
                 const ok = await handleSubmit({ newData });
                 if (ok) toast.success('Documents ajoutés');
               }}
-              onDelete={async (document) => {
+              onDeleteDocument={async (document) => {
                 const newData = { ...data, documents: data.documents.filter((d) => d._id !== document._id) };
                 setData(newData);
                 const ok = await handleSubmit({ newData });
                 if (ok) toast.success('Document supprimé');
+                return ok;
+              }}
+              onSubmitDocument={async (document) => {
+                const newData = {
+                  ...data,
+                  documents: data.documents.map((d) => {
+                    if (d._id === document._id) return document;
+                    return d;
+                  }),
+                };
+                setData(newData);
+                const ok = await handleSubmit({ newData });
+                if (ok) toast.success('Document mis à jour');
               }}
             />
           </div>
@@ -389,7 +402,7 @@ function TreatmentContent({ onClose, treatment, personId }) {
               }}
             />
           </div>
-        </form>
+        </div>
       </ModalBody>
       <ModalFooter>
         <button name="Fermer" type="button" className="button-cancel" onClick={() => onClose()}>

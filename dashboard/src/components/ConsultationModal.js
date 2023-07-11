@@ -11,7 +11,6 @@ import API from '../services/api';
 import { dayjsInstance } from '../services/date';
 import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
 import CustomFieldInput from './CustomFieldInput';
-import Documents from './Documents';
 import { modalConfirmState } from './ModalConfirm';
 import SelectAsInput from './SelectAsInput';
 import SelectStatus from './SelectStatus';
@@ -24,6 +23,7 @@ import PersonName from './PersonName';
 import TagTeam from './TagTeam';
 import CustomFieldDisplay from './CustomFieldDisplay';
 import { itemsGroupedByConsultationSelector } from '../recoil/selectors';
+import { DocumentsModule } from './DocumentsGeneric';
 
 export default function ConsultationModal() {
   const consultationsObjects = useRecoilValue(itemsGroupedByConsultationSelector);
@@ -126,16 +126,20 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
   async function handleSubmit({ newData = {}, closeOnSubmit = false } = {}) {
     const body = { ...data, ...newData };
     if (!body.type) {
-      return toast.error('Veuillez choisir un type de consultation');
+      toast.error('Veuillez choisir un type de consultation');
+      return false;
     }
     if (!body.dueAt) {
-      return toast.error('Vous devez préciser une date prévue');
+      toast.error('Vous devez préciser une date prévue');
+      return false;
     }
     if (!body.person) {
-      return toast.error('Veuillez sélectionner une personne suivie');
+      toast.error('Veuillez sélectionner une personne suivie');
+      return false;
     }
     if (!body.teams.length) {
-      return toast.error('Veuillez sélectionner au moins une équipe');
+      toast.error('Veuillez sélectionner au moins une équipe');
+      return false;
     }
     if ([DONE, CANCEL].includes(body.status)) {
       body.completedAt = body.completedAt || new Date();
@@ -173,6 +177,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
         await createReportAtDateIfNotExist(completedAt);
       }
     }
+    console.log({ closeOnSubmit });
     if (closeOnSubmit) onClose();
     return true;
   }
@@ -234,13 +239,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
         }}
       />
       <ModalBody>
-        <form
-          id="add-consultation-form"
-          className="tw-flex tw-h-full tw-w-full tw-flex-col"
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSubmit({ closeOnSubmit: true });
-          }}>
+        <div className="tw-flex tw-h-full tw-w-full tw-flex-col">
           <ul className="noprint tw-mb-5 tw-mt-4 tw-flex tw-list-none tw-flex-wrap tw-border-b tw-border-zinc-200 tw-px-2">
             <li className="tw-cursor-pointer">
               <button
@@ -279,10 +278,15 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
               </button>
             </li>
           </ul>
-          <div
+          <form
+            id="add-consultation-form"
             className={['tw-flex tw-h-[50vh] tw-w-full tw-flex-wrap tw-overflow-y-auto tw-p-4', activeTab !== 'Informations' && 'tw-hidden']
               .filter(Boolean)
-              .join(' ')}>
+              .join(' ')}
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSubmit({ closeOnSubmit: true });
+            }}>
             <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
               <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-blue-900'} htmlFor="create-consultation-team">
                 Personne suivie
@@ -438,7 +442,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                 )}
               </div>
             </div>
-          </div>
+          </form>
           <div
             className={[
               'tw-flex tw-h-[50vh] tw-w-full tw-flex-col tw-flex-wrap tw-gap-4 tw-overflow-y-auto',
@@ -447,24 +451,39 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
               .filter(Boolean)
               .join(' ')}>
             {data.person && (
-              <Documents
+              <DocumentsModule
                 personId={data.person}
                 color="blue-900"
-                documents={data.documents}
-                onAdd={async (nextDocuments) => {
+                showAssociatedItem={false}
+                documents={data.documents.map((doc) => ({ ...doc, linkedItem: { item: consultation, type: 'consultation' } }))}
+                onAddDocuments={async (nextDocuments) => {
                   const newData = {
                     ...data,
-                    documents: nextDocuments,
+                    documents: [...data.documents, ...nextDocuments],
                   };
                   setData(newData);
                   const ok = await handleSubmit({ newData });
                   if (ok) toast.success('Documents ajoutés');
                 }}
-                onDelete={async (document) => {
+                onDeleteDocument={async (document) => {
                   const newData = { ...data, documents: data.documents.filter((d) => d._id !== document._id) };
                   setData(newData);
                   const ok = await handleSubmit({ newData });
                   if (ok) toast.success('Document supprimé');
+                  return ok;
+                }}
+                onSubmitDocument={async (document) => {
+                  const newData = {
+                    ...data,
+                    documents: data.documents.map((d) => {
+                      if (d._id === document._id) return document;
+                      return d;
+                    }),
+                  };
+                  console.log('newData', newData);
+                  setData(newData);
+                  const ok = await handleSubmit({ newData });
+                  if (ok) toast.success('Document mis à jour');
                 }}
               />
             )}
@@ -493,7 +512,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
               }}
             />
           </div>
-        </form>
+        </div>
       </ModalBody>
       <ModalFooter>
         <button name="Fermer" type="button" className="button-cancel" onClick={() => onClose()}>

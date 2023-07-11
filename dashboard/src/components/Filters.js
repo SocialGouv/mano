@@ -178,7 +178,7 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :', saveInURLParams
           })}
         </ul>
       </div>
-      <div className="border-b noprint tw-z-50 tw-mb-8 tw-flex tw-w-full tw-flex-col tw-justify-center tw-gap-2 tw-self-center tw-border-gray-300 tw-pb-4">
+      <div className="border-b noprint tw-z-10 tw-mb-8 tw-flex tw-w-full tw-flex-col tw-justify-center tw-gap-2 tw-self-center tw-border-gray-300 tw-pb-4">
         <div className="tw-flex tw-flex-wrap">
           <div className="tw-basis-5/6">
             <p className="tw-m-0">{title}</p>
