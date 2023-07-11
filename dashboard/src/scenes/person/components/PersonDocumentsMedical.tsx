@@ -112,6 +112,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
               })
             );
             toast.success('Document supprimé');
+            return true;
           } else {
             toast.error('Erreur lors de la suppression du document, vous pouvez contactez le support');
             capture('Error while deleting treatment document', { treatment, document });
@@ -136,13 +137,14 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
               })
             );
             toast.success('Document supprimé');
+            return true;
           } else {
             toast.error('Erreur lors de la suppression du document, vous pouvez contactez le support');
             capture('Error while deleting consultation document', { consultation, document });
           }
         }
         if (document.linkedItem.type === 'medical-file') {
-          if (!medicalFile?._id) return;
+          if (!medicalFile?._id) return false;
           const medicalFileResponse = await API.put({
             path: `/medical-file/${medicalFile._id}`,
             body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({
@@ -159,11 +161,13 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
               })
             );
             toast.success('Document supprimé');
+            return true;
           } else {
             toast.error('Erreur lors de la suppression du document, vous pouvez contactez le support');
             capture('Error while deleting medical file document', { medicalFile, document });
           }
         }
+        return false;
       }}
       onSubmitDocument={async (document) => {
         if (document.linkedItem.type === 'treatment') {

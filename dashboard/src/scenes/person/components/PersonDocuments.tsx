@@ -57,8 +57,10 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
             })
           );
           toast.success('Document supprimé');
+          return true;
         } else {
           toast.error('Erreur lors de la suppression du document, vous pouvez contactez le support');
+          return false;
         }
       }}
       onSubmitDocument={async (document) => {
@@ -66,6 +68,13 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
         // so we need to get the person to update
         const _person = document.linkedItem.item as PersonInstance;
         await API.delete({ path: document.downloadPath ?? `/person/${_person._id}/document/${document.file.filename}` });
+        console.log('document', document);
+        console.log(
+          _person.documents?.map((d) => {
+            if (d._id === document._id) return document;
+            return d;
+          })
+        );
         const personResponse = await API.put({
           path: `/person/${_person._id}`,
           body: preparePersonForEncryption({
@@ -78,6 +87,7 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
         });
         if (personResponse.ok) {
           const newPerson = personResponse.decryptedData;
+          console.log('newPerson', newPerson);
           setPersons((persons) =>
             persons.map((p) => {
               if (p._id === _person._id) return newPerson;

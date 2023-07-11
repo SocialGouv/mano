@@ -214,7 +214,7 @@ const List = () => {
           <button
             type="button"
             onClick={setMobileBottomSheetOpened}
-            className="tw-fixed tw-top-3/4 tw-right-4 tw-z-50 tw-inline-flex tw-h-12 tw-w-12 tw-items-center tw-justify-center tw-rounded-full tw-bg-red-500 tw-text-6xl tw-text-white">
+            className="tw-fixed tw-top-3/4 tw-right-4 tw-z-20 tw-inline-flex tw-h-12 tw-w-12 tw-items-center tw-justify-center tw-rounded-full tw-bg-red-500 tw-text-6xl tw-text-white">
             <span className="tw-absolute tw-m-auto tw-block tw-h-1 tw-w-6/12 tw-bg-white" />
             <span className="tw-absolute tw-m-auto tw-block tw-h-1 tw-w-6/12 tw-rotate-90 tw-bg-white" />
           </button>

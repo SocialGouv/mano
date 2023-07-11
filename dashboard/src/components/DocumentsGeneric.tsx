@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { useHistory } from 'react-router-dom';
-import { userState } from '../recoil/auth';
+import { userState, organisationAuthentifiedState } from '../recoil/auth';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from './tailwind/Modal';
 import { formatDateTimeWithNameOfDay } from '../services/date';
 import { FullScreenIcon } from '../scenes/person/components/FullScreenIcon';
@@ -19,8 +19,9 @@ interface DocumentsModuleProps {
   title?: string;
   personId: UUIDV4;
   showPanel?: boolean;
+  showAssociatedItem?: boolean;
   canToggleGroupCheck?: boolean;
-  onDeleteDocument: (document: DocumentForModule) => Promise<void>;
+  onDeleteDocument: (document: DocumentForModule) => Promise<boolean>;
   onSubmitDocument: (document: DocumentForModule) => Promise<void>;
   onAddDocuments: (documents: Document[]) => Promise<void>;
   color?: 'main' | 'blue-900';
@@ -32,6 +33,7 @@ export function DocumentsModule({
   personId,
   showPanel = false,
   canToggleGroupCheck = false,
+  showAssociatedItem = true,
   onDeleteDocument,
   onSubmitDocument,
   onAddDocuments,
@@ -46,7 +48,7 @@ export function DocumentsModule({
     <>
       {!!showPanel ? (
         <div className="tw-relative">
-          <div className="tw-sticky tw-top-0 tw-z-50 tw-flex tw-items-center tw-bg-white tw-p-3">
+          <div className="tw-sticky tw-top-0 tw-z-10 tw-flex tw-items-center tw-bg-white tw-p-3">
             <h4 className="tw-flex-1 tw-text-xl">Documents {documents.length ? `(${documents.length})` : ''}</h4>
             <div className="tw-flex tw-items-center tw-gap-2">
               <label
@@ -87,26 +89,16 @@ export function DocumentsModule({
       {!!documentToEdit && (
         <DocumentModal
           document={documentToEdit}
+          key={documentToEdit.name}
           personId={personId}
           onClose={() => setDocumentToEdit(null)}
           onDelete={onDeleteDocument}
           onSubmit={onSubmitDocument}
           canToggleGroupCheck={canToggleGroupCheck}
           color={color}
+          showAssociatedItem={showAssociatedItem}
         />
       )}
-      {/* {!!documentToDisplay && (
-        <CommentDisplay
-          comment={documentToDisplay}
-          onClose={() => setDocumentToDisplay(null)}
-          onEditDocument={() => {
-            setDocumentToDisplay(null);
-            setDocumentToEdit(documentToDisplay);
-          }}
-          canToggleGroupCheck={canToggleGroupCheck}
-          color={color}
-        />
-      )} */}
       <DocumentsFullScreen
         open={!!fullScreen}
         documents={documents}
@@ -178,6 +170,8 @@ function DocumentTable({
   withClickableLabel,
   onAddDocuments,
 }: DocumentTableProps) {
+  const organisation = useRecoilValue(organisationAuthentifiedState);
+
   if (!documents.length) {
     return (
       <div className="tw-flex tw-flex-col tw-items-center tw-gap-6">
@@ -213,7 +207,6 @@ function DocumentTable({
     <>
       {showAddDocumentButton && (
         <div className="tw-my-1.5 tw-flex tw-justify-center tw-self-center">
-          ＋
           <label aria-label="Ajouter des documents" className={`button-submit mb-0 !tw-bg-${color}`}>
             ＋ Ajouter des documents
             <AddDocumentInput onAddDocuments={onAddDocuments} personId={personId} />
@@ -222,38 +215,56 @@ function DocumentTable({
       )}
       <table className="tw-w-full tw-table-fixed">
         <tbody className="tw-text-sm">
-          {(documents || []).map((doc, index) => (
-            <tr
-              key={doc._id}
-              data-test-id={doc.downloadPath}
-              aria-label={`Document ${doc.name}`}
-              className={['tw-w-full tw-border-t tw-border-zinc-200 tw-bg-blue-900', Boolean(index % 2) ? 'tw-bg-opacity-0' : 'tw-bg-opacity-5'].join(
-                ' '
-              )}
-              onClick={() => {
-                onDisplayDocument(doc);
-              }}>
-              <td className="tw-p-3">
-                <p className="tw-m-0 tw-flex tw-items-center tw-overflow-hidden tw-font-bold">{doc.name}</p>
-                <div className="tw-flex tw-text-xs">
-                  <div className="tw-flex-1 tw-grow">
-                    <p className="tw-m-0 tw-mt-1">{formatDateTimeWithNameOfDay(doc.createdAt)}</p>
-                    <p className="tw-m-0">
-                      Créé par <UserName id={doc.createdBy} />
+          {(documents || []).map((doc, index) => {
+            console.log(doc);
+            return (
+              <tr
+                key={doc._id}
+                data-test-id={doc.downloadPath}
+                aria-label={`Document ${doc.name}`}
+                className={[
+                  'tw-w-full tw-border-t tw-border-zinc-200 tw-bg-blue-900',
+                  Boolean(index % 2) ? 'tw-bg-opacity-0' : 'tw-bg-opacity-5',
+                ].join(' ')}
+                onClick={() => {
+                  onDisplayDocument(doc);
+                }}>
+                <td className="tw-p-3">
+                  <p className="tw-m-0 tw-flex tw-items-center tw-overflow-hidden tw-font-bold">
+                    <p className="tw-m-0 tw-flex tw-items-center tw-overflow-hidden tw-font-bold">
+                      {!!organisation.groupsEnabled && !!doc.group && (
+                        <span className="tw-mr-2 tw-text-xl" aria-label="Commentaire familial" title="Commentaire familial">
+                          👪
+                        </span>
+                      )}
                     </p>
-                  </div>
-                  {!!withClickableLabel && !['medical-file', 'person'].includes(doc.linkedItem?.type) && (
-                    <div>
-                      <div className="tw-rounded tw-border tw-border-blue-900 tw-bg-blue-900/10 tw-px-1">
-                        {doc.linkedItem.type === 'treatment' && 'Traitement'}
-                        {doc.linkedItem.type === 'consultation' && 'Consultation'}
-                      </div>
-                    </div>
+                    {doc.name}
+                  </p>
+                  {!!organisation.groupsEnabled && !!doc.group && personId !== doc.linkedItem.item._id && (
+                    <p className="tw--xs tw-m-0 tw-mt-1">
+                      Ce document est lié à <PersonName item={{ person: doc.linkedItem.item._id }} />
+                    </p>
                   )}
-                </div>
-              </td>
-            </tr>
-          ))}
+                  <div className="tw-flex tw-text-xs">
+                    <div className="tw-flex-1 tw-grow">
+                      <p className="tw-m-0 tw-mt-1">{formatDateTimeWithNameOfDay(doc.createdAt)}</p>
+                      <p className="tw-m-0">
+                        Créé par <UserName id={doc.createdBy} />
+                      </p>
+                    </div>
+                    {!!withClickableLabel && !['medical-file', 'person'].includes(doc.linkedItem?.type) && (
+                      <div>
+                        <div className="tw-rounded tw-border tw-border-blue-900 tw-bg-blue-900/10 tw-px-1">
+                          {doc.linkedItem.type === 'treatment' && 'Traitement'}
+                          {doc.linkedItem.type === 'consultation' && 'Consultation'}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </>
@@ -315,17 +326,18 @@ type DocumentModalProps = {
   personId: UUIDV4;
   onClose: () => void;
   onSubmit: (document: DocumentForModule) => Promise<void>;
-  onDelete: (document: DocumentForModule) => Promise<void>;
+  onDelete: (document: DocumentForModule) => Promise<boolean>;
   canToggleGroupCheck: boolean;
-  color?: string;
+  showAssociatedItem: boolean;
+  color: string;
 };
 
-function DocumentModal({ document, onClose, personId, onDelete, onSubmit, canToggleGroupCheck = false, color = 'main' }: DocumentModalProps) {
+function DocumentModal({ document, onClose, personId, onDelete, onSubmit, showAssociatedItem, canToggleGroupCheck, color }: DocumentModalProps) {
   const initialName = useMemo(() => document.name, [document.name]);
   const [name, setName] = useState(initialName);
   const [isUpdating, setIsUpdating] = useState(false);
-  const canSave = useMemo(() => name !== initialName, [name, initialName]);
   const [isEditing, setIsEditing] = useState(false);
+  const canSave = useMemo(() => isEditing && name !== initialName, [name, initialName, isEditing]);
   const history = useHistory();
 
   return (
@@ -408,15 +420,17 @@ function DocumentModal({ document, onClose, personId, onDelete, onSubmit, canTog
                 <br />
                 <small className="tw-block tw-text-gray-500">Ce document sera visible pour toute la famille</small>
               </label>
-              <small className="tw-block tw-text-gray-500">
-                Note: Ce document est lié à <PersonName item={document} />
-              </small>
+              {!!document.group && personId !== document.linkedItem.item._id && (
+                <small className="tw-block tw-text-gray-500">
+                  Note: Ce document est lié à <PersonName item={{ person: document.linkedItem.item._id }} />
+                </small>
+              )}
             </div>
           )}
           <small className="tw-pt-4 tw-opacity-60">
             Créé par <UserName id={document.createdBy} /> le {formatDateTimeWithNameOfDay(document.createdAt)}
           </small>
-          {document?.linkedItem?.type === 'treatment' && (
+          {!!showAssociatedItem && document?.linkedItem?.type === 'treatment' && (
             <button
               onClick={() => {
                 const searchParams = new URLSearchParams(history.location.search);
@@ -428,7 +442,7 @@ function DocumentModal({ document, onClose, personId, onDelete, onSubmit, canTog
               Voir le traitement associé
             </button>
           )}
-          {document?.linkedItem?.type === 'consultation' && (
+          {!!showAssociatedItem && document?.linkedItem?.type === 'consultation' && (
             <button
               onClick={() => {
                 const searchParams = new URLSearchParams(history.location.search);
@@ -459,7 +473,8 @@ function DocumentModal({ document, onClose, personId, onDelete, onSubmit, canTog
           disabled={isUpdating}
           onClick={async () => {
             if (!window.confirm('Voulez-vous vraiment supprimer ce document ?')) return;
-            onDelete(document);
+            const ok = await onDelete(document);
+            if (ok) onClose();
           }}>
           Supprimer
         </button>
@@ -478,7 +493,7 @@ function DocumentModal({ document, onClose, personId, onDelete, onSubmit, canTog
               e.preventDefault();
               setIsEditing(true);
             }}>
-            Modifier le nom
+            Modifier
           </button>
         )}
       </ModalFooter>
