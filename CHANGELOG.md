@@ -1,3 +1,10 @@
+## [1.280.2](https://github.com/SocialGouv/mano/compare/v1.280.1...v1.280.2) (2023-07-12)
+
+
+### Bug Fixes
+
+* lint ([fd72c0c](https://github.com/SocialGouv/mano/commit/fd72c0c85751d6badfdff3f682a1b8315b7ddb64))
+
 ## [1.280.1](https://github.com/SocialGouv/mano/compare/v1.280.0...v1.280.1) (2023-07-12)
 
 
