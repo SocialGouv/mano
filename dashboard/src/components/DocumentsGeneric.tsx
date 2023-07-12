@@ -6,19 +6,21 @@ import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from './tailwind/
 import { formatDateTimeWithNameOfDay } from '../services/date';
 import { FullScreenIcon } from '../scenes/person/components/FullScreenIcon';
 import UserName from './UserName';
-import type { DocumentForModule, Document, FileMetadata } from '../types/document';
+import type { DocumentForModule, Document, FileMetadata, FolderForModule } from '../types/document';
 import API from '../services/api';
 import { download, viewBlobInNewWindow } from '../utils';
 import type { UUIDV4 } from '../types/uuid';
 import PersonName from './PersonName';
 import { capture } from '../services/sentry';
 import { toast } from 'react-toastify';
+import DocumentsOrganizer from './DocumentsOrganizer';
 
 interface DocumentsModuleProps {
-  documents: DocumentForModule[];
+  documents: Array<DocumentForModule | FolderForModule>;
   title?: string;
   personId: UUIDV4;
   showPanel?: boolean;
+  withDocumentOrganizer?: boolean;
   showAssociatedItem?: boolean;
   canToggleGroupCheck?: boolean;
   onDeleteDocument: (document: DocumentForModule) => Promise<boolean>;
@@ -32,6 +34,7 @@ export function DocumentsModule({
   title = 'Documents',
   personId,
   showPanel = false,
+  withDocumentOrganizer = false,
   canToggleGroupCheck = false,
   showAssociatedItem = true,
   onDeleteDocument,
@@ -44,12 +47,14 @@ export function DocumentsModule({
   const [documentToEdit, setDocumentToEdit] = useState<DocumentForModule | null>(null);
   const [fullScreen, setFullScreen] = useState(false);
 
+  const onlyDocuments = useMemo(() => documents.filter((d) => d.type === 'document'), [documents]) as DocumentForModule[];
+
   return (
     <>
       {!!showPanel ? (
         <div className="tw-relative">
           <div className="tw-sticky tw-top-0 tw-z-10 tw-flex tw-items-center tw-bg-white tw-p-3">
-            <h4 className="tw-flex-1 tw-text-xl">Documents {documents.length ? `(${documents.length})` : ''}</h4>
+            <h4 className="tw-flex-1 tw-text-xl">Documents {onlyDocuments.length ? `(${onlyDocuments.length})` : ''}</h4>
             <div className="tw-flex tw-items-center tw-gap-2">
               <label
                 aria-label="Ajouter des documents"
@@ -69,7 +74,7 @@ export function DocumentsModule({
           </div>
           <DocumentTable
             withClickableLabel
-            documents={documents}
+            documents={onlyDocuments}
             color={color}
             onDisplayDocument={setDocumentToEdit}
             onAddDocuments={onAddDocuments}
@@ -79,7 +84,7 @@ export function DocumentsModule({
       ) : (
         <DocumentTable
           showAddDocumentButton
-          documents={documents}
+          documents={onlyDocuments}
           color={color}
           onDisplayDocument={setDocumentToEdit}
           onAddDocuments={onAddDocuments}
@@ -101,11 +106,12 @@ export function DocumentsModule({
       )}
       <DocumentsFullScreen
         open={!!fullScreen}
-        documents={documents}
+        documents={withDocumentOrganizer ? documents : onlyDocuments}
         personId={personId}
         onDisplayDocument={setDocumentToEdit}
         onAddDocuments={onAddDocuments}
         onClose={() => setFullScreen(false)}
+        withDocumentOrganizer={withDocumentOrganizer}
         title={title}
         color={color}
       />
@@ -115,7 +121,8 @@ export function DocumentsModule({
 
 interface DocumentsFullScreenProps {
   open: boolean;
-  documents: DocumentForModule[];
+  withDocumentOrganizer: boolean;
+  documents: Array<DocumentForModule | FolderForModule>;
   personId: UUIDV4;
   onAddDocuments: (documents: Document[]) => Promise<void>;
   onDisplayDocument: (document: DocumentForModule) => void;
@@ -124,19 +131,33 @@ interface DocumentsFullScreenProps {
   color: 'main' | 'blue-900';
 }
 
-function DocumentsFullScreen({ open, personId, documents, onClose, title, color, onDisplayDocument, onAddDocuments }: DocumentsFullScreenProps) {
+function DocumentsFullScreen({
+  open,
+  withDocumentOrganizer,
+  personId,
+  documents,
+  onClose,
+  title,
+  color,
+  onDisplayDocument,
+  onAddDocuments,
+}: DocumentsFullScreenProps) {
   return (
     <ModalContainer open={open} size="prose" onClose={onClose}>
       <ModalHeader title={title} />
       <ModalBody>
-        <DocumentTable
-          documents={documents}
-          onDisplayDocument={onDisplayDocument}
-          onAddDocuments={onAddDocuments}
-          withClickableLabel
-          color={color}
-          personId={personId}
-        />
+        {withDocumentOrganizer ? (
+          <DocumentsOrganizer items={documents} onSave={console.log} onFolderClick={console.log} onDocumentClick={console.log} />
+        ) : (
+          <DocumentTable
+            documents={documents as DocumentForModule[]}
+            onDisplayDocument={onDisplayDocument}
+            onAddDocuments={onAddDocuments}
+            withClickableLabel
+            color={color}
+            personId={personId}
+          />
+        )}
       </ModalBody>
       <ModalFooter>
         <button type="button" name="cancel" className="button-cancel" onClick={onClose}>

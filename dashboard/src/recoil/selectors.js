@@ -138,6 +138,7 @@ export const itemsGroupedByPersonSelector = selector({
       for (const document of person.documents) {
         const documentForModule = {
           ...document,
+          type: document.type ?? 'document', // or 'folder'
           linkedItem: {
             item: originalPersonsObject[person._id],
             type: 'person',

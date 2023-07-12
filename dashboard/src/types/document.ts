@@ -30,8 +30,9 @@ export type FileMetadata = {
   mimetype: string;
 };
 
+export type DocumentOrFolderId = string;
 export interface Document {
-  _id: string;
+  _id: DocumentOrFolderId;
   name: string;
   group?: boolean;
   encryptedEntityKey: string;
@@ -39,11 +40,28 @@ export interface Document {
   createdBy: UUIDV4;
   downloadPath: string;
   file: FileMetadata;
-  // for folder
-  ancestor?: string;
-  order?: number;
+  // for tree
+  parentId?: DocumentOrFolderId;
+  position?: number;
+  // type is always equal to 'document'
+  type: string;
+}
+
+export interface Folder {
+  _id: DocumentOrFolderId;
+  name: string;
+  createdAt?: Date;
+  createdBy?: UUIDV4;
+  parentId: DocumentOrFolderId | null;
+  position: number;
+  // type is always equal to 'folder'
+  type: string;
 }
 
 export interface DocumentForModule extends Document {
+  linkedItem: LinkedItem;
+}
+
+export interface FolderForModule extends Folder {
   linkedItem: LinkedItem;
 }
