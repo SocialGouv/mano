@@ -1,6 +1,6 @@
 import { setCacheItem } from '../services/dataManagement';
 import { atom, selectorFamily } from 'recoil';
-import type { GroupInstance, GroupToBeEncrypted, EncryptedGroupFields, EncryptedGroupKeys } from '../types/group';
+import type { GroupInstance } from '../types/group';
 import type { UUIDV4 } from '../types/uuid';
 
 const collectionName = 'group';
