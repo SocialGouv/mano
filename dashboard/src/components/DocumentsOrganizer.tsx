@@ -1,23 +1,25 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import SortableJS from 'sortablejs';
-import type { DocumentForModule, DocumentOrFolderId, FolderForModule, Folder } from '../types/document';
+import type { DocumentWithLinkedItem, DocumentOrFolderId, FolderWithLinkedItem, Folder } from '../types/document';
 
-type Item = DocumentForModule | FolderForModule;
+type Item = DocumentWithLinkedItem | FolderWithLinkedItem;
+type FolderChildren = Array<FolderForTree | DocumentForTree>;
+
+interface DocumentForTree extends DocumentWithLinkedItem {}
+interface FolderForTree extends FolderWithLinkedItem {
+  children: FolderChildren;
+}
+
+interface RootForTree extends Folder {
+  children: FolderChildren;
+}
 
 interface DocumentsOrganizerProps {
   items: Item[];
   onSave: (newOrder: Item[]) => void;
-  onFolderClick: (folder: FolderForModule) => void;
-  onDocumentClick: (document: DocumentForModule) => void;
+  onFolderClick: (folder: FolderForTree) => void;
+  onDocumentClick: (document: DocumentForTree) => void;
 }
-
-interface DocumentForTree extends DocumentForModule {}
-
-interface FolderForTree extends Folder {
-  children: Array<FolderForTree | DocumentForTree>;
-}
-
-type FolderChildren = Array<FolderForTree | DocumentForTree>;
 
 export default function DocumentsOrganizer({ items, onSave, onFolderClick, onDocumentClick }: DocumentsOrganizerProps) {
   const documentsTree = buildFolderTree(items);
@@ -25,18 +27,14 @@ export default function DocumentsOrganizer({ items, onSave, onFolderClick, onDoc
   // reloadTreeKey to prevent error `Failed to execute 'removeChild' on 'Node'` from sortablejs after updating messy tree
   const [reloadTreeKey, setReloadeTreeKey] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
-  const [cachedOpenedPositions, setCachedOpenedPositions] = useState(JSON.parse(localStorage.getItem('positions-cached') || '[]'));
-  useEffect(() => {
-    localStorage.setItem('positions-cached', JSON.stringify(cachedOpenedPositions));
-  }, [cachedOpenedPositions]);
 
   const rootRef = useRef<HTMLDivElement>(null);
 
   const onListChange = useCallback(async () => {
     if (!rootRef.current) return;
+    console.log('CALLING ONLISTCHANGE');
     setIsSaving(true);
     const elementsNewState = getElementsNewState(rootRef.current.children[0] as HTMLDivElement);
-    setCachedOpenedPositions(elementsNewState);
     const newOrder = elementsNewState.map((newItem) => {
       const originalItem = items.find((original) => original._id === newItem._id);
       if (!originalItem) throw new Error('Item not found');
@@ -44,19 +42,14 @@ export default function DocumentsOrganizer({ items, onSave, onFolderClick, onDoc
         ...originalItem,
         position: newItem.position,
         parentId: newItem.parentId,
-      };
+      } as Item;
     });
     setReloadeTreeKey((k) => k + 1);
     onSave(newOrder);
     setReloadeTreeKey((k) => k + 1);
     setIsSaving(false);
-  }, [items, reloadTreeKey]);
+  }, [items, onSave]);
 
-  const onToggleOpen = () => {
-    if (!rootRef.current) return;
-    const elementsNewState = getElementsNewState(rootRef.current.children[0] as HTMLDivElement);
-    setCachedOpenedPositions(elementsNewState);
-  };
   return (
     <>
       {/* TODO find a way for tailwind to not filter margins from compiling,
@@ -70,9 +63,7 @@ export default function DocumentsOrganizer({ items, onSave, onFolderClick, onDoc
           level={0}
           key={JSON.stringify(items)}
           onListChange={onListChange}
-          onToggleOpen={onToggleOpen}
           initShowOpen
-          cachedOpenedPositions={cachedOpenedPositions}
           onFolderClick={onFolderClick}
           onDocumentClick={onDocumentClick}
           className="dir-ltr"
@@ -90,16 +81,14 @@ export default function DocumentsOrganizer({ items, onSave, onFolderClick, onDoc
 const horizontalSpacing = 2;
 
 interface BranchProps {
-  folder: FolderForTree;
+  folder: FolderForTree | RootForTree;
   level: number;
   position?: number;
-  parentId?: DocumentOrFolderId;
+  parentId: DocumentOrFolderId;
   initShowOpen: boolean;
-  cachedOpenedPositions: Array<{ _id: string; position: number; parentId: string }>;
   onListChange: () => void;
-  onToggleOpen: (open: boolean) => void;
-  onFolderClick: (folder: FolderForModule) => void;
-  onDocumentClick: (document: DocumentForModule) => void;
+  onFolderClick: (folder: FolderForTree) => void;
+  onDocumentClick: (document: DocumentForTree) => void;
   className?: string;
 }
 
@@ -107,31 +96,22 @@ function Branch({
   folder,
   level,
   position,
-  initShowOpen,
-  cachedOpenedPositions,
   parentId,
   onListChange,
-  onToggleOpen,
   onFolderClick,
   onDocumentClick,
+  initShowOpen = false,
   className = '',
 }: BranchProps) {
   const [open, setIsOpen] = useState(initShowOpen);
-  useEffect(() => {
-    if (!!isMounted) onToggleOpen(open);
-  }, [open]);
-
-  const [isMounted, setIsMounted] = useState(false);
-  useEffect(() => {
-    if (!isMounted) setIsMounted(true);
-  }, []);
 
   const gridRef = useRef<HTMLDivElement>(null);
   const sortableRef = useRef<SortableJS>();
   useEffect(() => {
     if (!gridRef.current) return;
+    console.log('CALLING SORTABLE');
     sortableRef.current = SortableJS.create(gridRef.current, { animation: 150, group: 'shared', onEnd: onListChange });
-  }, []);
+  }, [onListChange]);
 
   return (
     <div
@@ -146,7 +126,14 @@ function Branch({
         <small className="mr-1 inline-block w-3 cursor-pointer text-trueGray-400" onClick={() => setIsOpen(!open)}>
           {open ? '\u25BC' : '\u25B6'}
         </small>
-        <a onClick={() => onFolderClick(folder)} className="inline cursor-pointer text-warmGray-500">
+        <button
+          type="button"
+          onClick={() => {
+            if (folder._id === 'root') return;
+            const notRootFolder = folder as FolderForTree;
+            onFolderClick(notRootFolder);
+          }}
+          className="inline cursor-pointer text-warmGray-500">
           {folder.name ? (
             `${open ? '📂' : '📁'} ${folder.name} (${folder.children?.length || 0})`
           ) : (
@@ -164,7 +151,7 @@ function Branch({
               />
             </svg>
           )}
-        </a>
+        </button>
       </span>
       <div ref={gridRef} id={`child-container-${folder._id || 'root'}`} className={`flex flex-col ${!open ? 'hidden' : ''}`}>
         {folder.children?.map((child, index) => {
@@ -172,15 +159,13 @@ function Branch({
             child = child as FolderForTree;
             return (
               <Branch
-                parentId={child.parentId}
-                position={child.position || index + 1}
+                parentId={child.parentId || folder._id}
+                position={child.position || index}
                 key={child._id}
                 folder={child}
                 level={level + 1}
+                initShowOpen={false}
                 onListChange={onListChange}
-                onToggleOpen={onToggleOpen}
-                initShowOpen={!!cachedOpenedPositions.find((item) => item._id === child._id && !!item.initShowOpen)}
-                cachedOpenedPositions={cachedOpenedPositions}
                 onFolderClick={onFolderClick}
                 onDocumentClick={onDocumentClick}
               />
@@ -189,8 +174,8 @@ function Branch({
           child = child as DocumentForTree;
           return (
             <DocumentRow
-              parentId={child.parentId}
-              position={child.position}
+              parentId={child.parentId || folder._id}
+              position={child.position || index}
               key={child._id}
               document={child}
               level={level + 1}
@@ -206,14 +191,15 @@ function Branch({
 interface DocumentRowProps {
   document: DocumentForTree;
   level: number;
-  position?: number;
-  parentId?: DocumentOrFolderId;
-  onDocumentClick: (document: DocumentForModule) => void;
+  position: number;
+  parentId: DocumentOrFolderId;
+  onDocumentClick: (document: DocumentForTree) => void;
 }
 
 function DocumentRow({ document, level, position, parentId, onDocumentClick }: DocumentRowProps) {
   return (
-    <a
+    <button
+      type="button"
       key={document._id}
       data-position={position}
       data-parentid={parentId}
@@ -221,7 +207,7 @@ function DocumentRow({ document, level, position, parentId, onDocumentClick }: D
       onClick={() => onDocumentClick(document)}
       className={`block cursor-pointer  overflow-hidden text-ellipsis whitespace-nowrap text-warmGray-500 ml-${level * horizontalSpacing}`}>
       {'📃 '} <span>{document.name}</span>
-    </a>
+    </button>
   );
 }
 
@@ -231,7 +217,7 @@ const buildFolderTree = (items: Item[]) => {
     name: 'Documents',
     // children: [],
     position: 0,
-    parentId: null,
+    parentId: 'NA', // for type safety easiness purpose
     type: 'folder',
   };
   const findChildren = (folder: Item): FolderChildren => {

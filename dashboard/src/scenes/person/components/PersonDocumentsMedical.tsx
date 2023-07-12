@@ -10,7 +10,7 @@ import API from '../../../services/api';
 import { capture } from '../../../services/sentry';
 import { DocumentsModule } from '../../../components/DocumentsGeneric';
 import type { PersonPopulated } from '../../../types/person';
-import type { DocumentForModule } from '../../../types/document';
+import type { DocumentWithLinkedItem } from '../../../types/document';
 import type { MedicalFileInstance } from '../../../types/medicalFile';
 
 interface PersonDocumentsProps {
@@ -38,9 +38,9 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
   );
 
   const allMedicalDocuments = useMemo(() => {
-    // ordonnaces is an object of DocumentForModule
+    // ordonnaces is an object of DocumentWithLinkedItem
     // define ordannace typed
-    const ordonnances: Record<string, DocumentForModule> = {};
+    const ordonnances: Record<string, DocumentWithLinkedItem> = {};
     for (const treatment of treatments) {
       for (const document of treatment.documents || []) {
         ordonnances[document._id] = {
@@ -49,11 +49,11 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
             item: treatment,
             type: 'treatment',
           },
-        } as DocumentForModule;
+        } as DocumentWithLinkedItem;
       }
     }
 
-    const consultationsDocs: Record<string, DocumentForModule> = {};
+    const consultationsDocs: Record<string, DocumentWithLinkedItem> = {};
     for (const consultation of personConsultations) {
       if (!!consultation?.onlyVisibleBy?.length) {
         if (!consultation.onlyVisibleBy.includes(user._id)) continue;
@@ -69,7 +69,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
       }
     }
 
-    const otherDocs: Record<string, DocumentForModule> = {};
+    const otherDocs: Record<string, DocumentWithLinkedItem> = {};
     if (medicalFile) {
       for (const document of medicalFile?.documents || []) {
         otherDocs[document._id] = {

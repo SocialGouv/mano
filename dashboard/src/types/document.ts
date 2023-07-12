@@ -34,15 +34,15 @@ export type DocumentOrFolderId = string;
 export interface Document {
   _id: DocumentOrFolderId;
   name: string;
-  group?: boolean;
+  group: boolean | undefined;
   encryptedEntityKey: string;
   createdAt: Date;
   createdBy: UUIDV4;
   downloadPath: string;
   file: FileMetadata;
   // for tree
-  parentId?: DocumentOrFolderId;
-  position?: number;
+  parentId: DocumentOrFolderId | undefined;
+  position: number | undefined;
   // type is always equal to 'document'
   type: string;
 }
@@ -52,16 +52,16 @@ export interface Folder {
   name: string;
   createdAt?: Date;
   createdBy?: UUIDV4;
-  parentId: DocumentOrFolderId | null;
-  position: number;
+  parentId: DocumentOrFolderId | undefined;
+  position: number | undefined;
   // type is always equal to 'folder'
   type: string;
 }
 
-export interface DocumentForModule extends Document {
+export interface DocumentWithLinkedItem extends Document {
   linkedItem: LinkedItem;
 }
 
-export interface FolderForModule extends Folder {
+export interface FolderWithLinkedItem extends Folder {
   linkedItem: LinkedItem;
 }

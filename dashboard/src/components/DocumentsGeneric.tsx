@@ -6,7 +6,7 @@ import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from './tailwind/
 import { formatDateTimeWithNameOfDay } from '../services/date';
 import { FullScreenIcon } from '../scenes/person/components/FullScreenIcon';
 import UserName from './UserName';
-import type { DocumentForModule, Document, FileMetadata, FolderForModule } from '../types/document';
+import type { DocumentWithLinkedItem, Document, FileMetadata, FolderWithLinkedItem } from '../types/document';
 import API from '../services/api';
 import { download, viewBlobInNewWindow } from '../utils';
 import type { UUIDV4 } from '../types/uuid';
@@ -16,15 +16,15 @@ import { toast } from 'react-toastify';
 import DocumentsOrganizer from './DocumentsOrganizer';
 
 interface DocumentsModuleProps {
-  documents: Array<DocumentForModule | FolderForModule>;
+  documents: Array<DocumentWithLinkedItem | FolderWithLinkedItem>;
   title?: string;
   personId: UUIDV4;
   showPanel?: boolean;
   withDocumentOrganizer?: boolean;
   showAssociatedItem?: boolean;
   canToggleGroupCheck?: boolean;
-  onDeleteDocument: (document: DocumentForModule) => Promise<boolean>;
-  onSubmitDocument: (document: DocumentForModule) => Promise<void>;
+  onDeleteDocument: (document: DocumentWithLinkedItem) => Promise<boolean>;
+  onSubmitDocument: (document: DocumentWithLinkedItem) => Promise<void>;
   onAddDocuments: (documents: Document[]) => Promise<void>;
   color?: 'main' | 'blue-900';
 }
@@ -44,10 +44,10 @@ export function DocumentsModule({
 }: DocumentsModuleProps) {
   if (!onDeleteDocument) throw new Error('onDeleteDocument is required');
   if (!onSubmitDocument) throw new Error('onSubmitDocument is required');
-  const [documentToEdit, setDocumentToEdit] = useState<DocumentForModule | null>(null);
+  const [documentToEdit, setDocumentToEdit] = useState<DocumentWithLinkedItem | null>(null);
   const [fullScreen, setFullScreen] = useState(false);
 
-  const onlyDocuments = useMemo(() => documents.filter((d) => d.type === 'document'), [documents]) as DocumentForModule[];
+  const onlyDocuments = useMemo(() => documents.filter((d) => d.type === 'document'), [documents]) as DocumentWithLinkedItem[];
 
   return (
     <>
@@ -122,10 +122,10 @@ export function DocumentsModule({
 interface DocumentsFullScreenProps {
   open: boolean;
   withDocumentOrganizer: boolean;
-  documents: Array<DocumentForModule | FolderForModule>;
+  documents: Array<DocumentWithLinkedItem | FolderWithLinkedItem>;
   personId: UUIDV4;
   onAddDocuments: (documents: Document[]) => Promise<void>;
-  onDisplayDocument: (document: DocumentForModule) => void;
+  onDisplayDocument: (document: DocumentWithLinkedItem) => void;
   onClose: () => void;
   title: string;
   color: 'main' | 'blue-900';
@@ -150,7 +150,7 @@ function DocumentsFullScreen({
           <DocumentsOrganizer items={documents} onSave={console.log} onFolderClick={console.log} onDocumentClick={console.log} />
         ) : (
           <DocumentTable
-            documents={documents as DocumentForModule[]}
+            documents={documents as DocumentWithLinkedItem[]}
             onDisplayDocument={onDisplayDocument}
             onAddDocuments={onAddDocuments}
             withClickableLabel
@@ -173,10 +173,10 @@ function DocumentsFullScreen({
 }
 
 interface DocumentTableProps {
-  documents: DocumentForModule[];
+  documents: DocumentWithLinkedItem[];
   personId: UUIDV4;
   onAddDocuments: (documents: Document[]) => Promise<void>;
-  onDisplayDocument: (document: DocumentForModule) => void;
+  onDisplayDocument: (document: DocumentWithLinkedItem) => void;
   color: 'main' | 'blue-900';
   showAddDocumentButton?: boolean;
   withClickableLabel?: boolean;
@@ -332,6 +332,10 @@ function AddDocumentInput({ personId, onAddDocuments }: AddDocumentInputProps) {
             createdBy: user?._id ?? '',
             downloadPath: `/person/${personId}/document/${fileUploaded.filename}`,
             file: fileUploaded,
+            group: false,
+            parentId: 'root',
+            position: undefined,
+            type: 'document',
           };
           docsResponses.push(document);
         }
@@ -343,11 +347,11 @@ function AddDocumentInput({ personId, onAddDocuments }: AddDocumentInputProps) {
 }
 
 type DocumentModalProps = {
-  document: DocumentForModule;
+  document: DocumentWithLinkedItem;
   personId: UUIDV4;
   onClose: () => void;
-  onSubmit: (document: DocumentForModule) => Promise<void>;
-  onDelete: (document: DocumentForModule) => Promise<boolean>;
+  onSubmit: (document: DocumentWithLinkedItem) => Promise<void>;
+  onDelete: (document: DocumentWithLinkedItem) => Promise<boolean>;
   canToggleGroupCheck: boolean;
   showAssociatedItem: boolean;
   color: string;

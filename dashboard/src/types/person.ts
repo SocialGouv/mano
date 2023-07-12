@@ -1,6 +1,6 @@
 import type { UUIDV4 } from './uuid';
 import type { ElementHistory } from './history';
-import type { Document, DocumentForModule, Folder } from './document';
+import type { Document, DocumentWithLinkedItem, Folder } from './document';
 import type { UserInstance } from './user';
 import type { GroupInstance } from './group';
 import type { TreatmentInstance } from './treatment';
@@ -39,8 +39,8 @@ export interface PersonPopulated extends PersonInstance {
   interactions: Date[];
   lastUpdateCheckForGDPR: Date;
   group?: GroupInstance;
-  documentsForModule?: DocumentForModule[];
-  groupDocuments?: DocumentForModule[];
+  documentsForModule?: DocumentWithLinkedItem[];
+  groupDocuments?: DocumentWithLinkedItem[];
   actions?: any[];
   comments?: any[];
   places?: any[];
