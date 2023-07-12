@@ -1,3 +1,10 @@
+## [1.280.1](https://github.com/SocialGouv/mano/compare/v1.280.0...v1.280.1) (2023-07-12)
+
+
+### Bug Fixes
+
+* **dshboard:** nouveau pasasge pour les comptes rendus ([#1610](https://github.com/SocialGouv/mano/issues/1610)) ([c37192f](https://github.com/SocialGouv/mano/commit/c37192f7b5253bd05cff84e72c794f359e8d1db1))
+
 # [1.280.0](https://github.com/SocialGouv/mano/compare/v1.279.0...v1.280.0) (2023-07-11)
 
 
