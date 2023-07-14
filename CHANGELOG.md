@@ -1,3 +1,10 @@
+## [1.280.3](https://github.com/SocialGouv/mano/compare/v1.280.2...v1.280.3) (2023-07-14)
+
+
+### Bug Fixes
+
+* rename document ([649b977](https://github.com/SocialGouv/mano/commit/649b977304ed1803460e0566ebcfe5b54a8dc50c))
+
 ## [1.280.2](https://github.com/SocialGouv/mano/compare/v1.280.1...v1.280.2) (2023-07-12)
 
 
