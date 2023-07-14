@@ -9,7 +9,7 @@ import { capture } from '../../../services/sentry';
 import { DocumentsModule } from '../../../components/DocumentsGeneric';
 import { groupsState } from '../../../recoil/groups';
 import type { PersonPopulated, PersonInstance } from '../../../types/person';
-import type { DocumentWithLinkedItem } from '../../../types/document';
+import type { DocumentWithLinkedItem, Document } from '../../../types/document';
 import type { UUIDV4 } from '../../../types/uuid';
 import { personsObjectSelector } from '../../../recoil/selectors';
 
@@ -40,12 +40,18 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
   return (
     <DocumentsModule
       showPanel
-      onSaveNewOrder={async (documents) => {
+      onSaveNewOrder={async (nextDocuments) => {
         const personResponse = await API.put({
           path: `/person/${person._id}`,
           body: preparePersonForEncryption({
             ...person,
-            documents,
+            documents: [
+              ...nextDocuments,
+              ...(person.documents || []).filter((docOrFolder) => {
+                const document = docOrFolder as unknown as Document;
+                return !!document.group;
+              }),
+            ],
           }),
         });
         if (!personResponse.ok) {
@@ -63,7 +69,7 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
       }}
       documents={documents}
       personId={person._id}
-      title={`Documents de ${person.name} (${documents.length})`}
+      title={`Documents de ${person.name}`}
       canToggleGroupCheck={canToggleGroupCheck}
       onDeleteDocument={async (documentOrFolder) => {
         // the document can be a group document, or a person document, or a folder
@@ -124,7 +130,6 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
         }
       }}
       onAddDocuments={async (documents) => {
-        console.log('onAddDocuments', documents);
         const personResponse = await API.put({
           path: `/person/${person._id}`,
           body: preparePersonForEncryption({

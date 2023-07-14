@@ -67,7 +67,7 @@ export function DocumentsModule({
             <div className="tw-flex tw-items-center tw-gap-2">
               <label
                 aria-label="Ajouter des documents"
-                className={`tw-text-md tw-mb-0 tw-h-8 tw-w-8 tw-rounded-full tw-font-bold tw-text-white tw-transition hover:tw-scale-125 tw-bg-${color} tw-inline-flex tw-items-center tw-justify-center`}>
+                className={`tw-text-md tw-mb-0 tw-h-8 tw-w-8 tw-cursor-pointer tw-rounded-full tw-font-bold tw-text-white tw-transition hover:tw-scale-125 tw-bg-${color} tw-inline-flex tw-items-center tw-justify-center`}>
                 ＋
                 <AddDocumentInput onAddDocuments={onAddDocuments} personId={personId} />
               </label>
@@ -196,6 +196,7 @@ function DocumentsFullScreen({
             }}
             onFolderClick={onEditFolderRequest}
             onDocumentClick={onDisplayDocument}
+            color={color}
           />
         ) : (
           <DocumentTable
@@ -306,7 +307,7 @@ function DocumentTable({
                 <td className="tw-p-3">
                   <p className="tw-m-0 tw-flex tw-items-center tw-overflow-hidden tw-font-bold">
                     {!!organisation.groupsEnabled && !!doc.group && (
-                      <span className="tw-mr-2 tw-text-xl" aria-label="Commentaire familial" title="Commentaire familial">
+                      <span className="tw-mr-2 tw-text-xl" aria-label="Document familial" title="Document familial">
                         👪
                       </span>
                     )}
@@ -326,7 +327,7 @@ function DocumentTable({
                     </div>
                     {!!withClickableLabel && !['medical-file', 'person'].includes(doc.linkedItem?.type) && (
                       <div>
-                        <div className="tw-rounded tw-border tw-border-blue-900 tw-bg-blue-900/10 tw-px-1">
+                        <div className={`tw-rounded tw-border tw-border-${color} tw-bg-${color} tw-bg-opacity-10 tw-px-1`}>
                           {doc.linkedItem.type === 'treatment' && 'Traitement'}
                           {doc.linkedItem.type === 'consultation' && 'Consultation'}
                         </div>
@@ -432,7 +433,7 @@ function DocumentModal({ document, onClose, personId, onDelete, onSubmit, showAs
                 setIsUpdating(false);
                 setIsEditing(false);
               }}>
-              <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-blue-900'} htmlFor="create-consultation-name">
+              <label className={isEditing ? '' : `tw-text-sm tw-font-semibold tw-blue-${color}`} htmlFor="create-consultation-name">
                 Nom
               </label>
               <input
@@ -562,7 +563,7 @@ function DocumentModal({ document, onClose, personId, onDelete, onSubmit, showAs
           Supprimer
         </button>
         {(isEditing || canSave) && (
-          <button title="Sauvegarder ce document" type="submit" className="button-submit !tw-bg-blue-900" form="edit-document-form">
+          <button title="Sauvegarder ce document" type="submit" className={`button-submit !tw-bg-${color}`} form="edit-document-form">
             Sauvegarder
           </button>
         )}
