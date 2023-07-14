@@ -10,8 +10,9 @@ import API from '../../../services/api';
 import { capture } from '../../../services/sentry';
 import { DocumentsModule } from '../../../components/DocumentsGeneric';
 import type { PersonPopulated } from '../../../types/person';
-import type { DocumentWithLinkedItem } from '../../../types/document';
+import type { DocumentWithLinkedItem, FolderWithLinkedItem, Document, Folder } from '../../../types/document';
 import type { MedicalFileInstance } from '../../../types/medicalFile';
+import type { ConsultationInstance } from '../../../types/consultation';
 
 interface PersonDocumentsProps {
   person: PersonPopulated;
@@ -21,7 +22,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
   const user = useRecoilValue(userAuthentifiedState);
   const organisation = useRecoilValue(organisationAuthentifiedState);
 
-  const allConsultations = useRecoilValue(arrayOfitemsGroupedByConsultationSelector);
+  const allConsultations = useRecoilValue<ConsultationInstance[]>(arrayOfitemsGroupedByConsultationSelector);
   const setAllConsultations = useSetRecoilState(consultationsState);
   const [allTreatments, setAllTreatments] = useRecoilState(treatmentsState);
   const [allMedicalFiles, setAllMedicalFiles] = useRecoilState(medicalFileState);
@@ -40,20 +41,20 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
   const allMedicalDocuments = useMemo(() => {
     // ordonnaces is an object of DocumentWithLinkedItem
     // define ordannace typed
-    const ordonnances: Record<string, DocumentWithLinkedItem> = {};
+    const ordonnances: Record<string, DocumentWithLinkedItem | FolderWithLinkedItem> = {};
     for (const treatment of treatments) {
       for (const document of treatment.documents || []) {
         ordonnances[document._id] = {
           ...document,
           linkedItem: {
-            item: treatment,
+            _id: treatment._id,
             type: 'treatment',
           },
         } as DocumentWithLinkedItem;
       }
     }
 
-    const consultationsDocs: Record<string, DocumentWithLinkedItem> = {};
+    const consultationsDocs: Record<string, DocumentWithLinkedItem | FolderWithLinkedItem> = {};
     for (const consultation of personConsultations) {
       if (!!consultation?.onlyVisibleBy?.length) {
         if (!consultation.onlyVisibleBy.includes(user._id)) continue;
@@ -62,20 +63,20 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
         consultationsDocs[document._id] = {
           ...document,
           linkedItem: {
-            item: consultation,
+            _id: consultation._id,
             type: 'consultation',
           },
         };
       }
     }
 
-    const otherDocs: Record<string, DocumentWithLinkedItem> = {};
+    const otherDocs: Record<string, DocumentWithLinkedItem | FolderWithLinkedItem> = {};
     if (medicalFile) {
       for (const document of medicalFile?.documents || []) {
         otherDocs[document._id] = {
           ...document,
           linkedItem: {
-            item: medicalFile,
+            _id: medicalFile._id,
             type: 'medical-file',
           },
         };
@@ -91,16 +92,21 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
       showPanel
       documents={allMedicalDocuments}
       color="blue-900"
+      title={`Documents médicaux de ${person.name} (${allMedicalDocuments.length})`}
       personId={person._id}
-      onDeleteDocument={async (document) => {
-        await API.delete({ path: document.downloadPath ?? `/person/${person._id}/document/${document.file.filename}` });
-        if (document.linkedItem.type === 'treatment') {
-          const treatment = document.linkedItem.item;
+      onDeleteDocument={async (documentOrFolder) => {
+        if (documentOrFolder.type === 'document') {
+          const document = documentOrFolder as DocumentWithLinkedItem;
+          await API.delete({ path: document.downloadPath ?? `/person/${person._id}/document/${document.file.filename}` });
+        }
+        if (documentOrFolder.linkedItem.type === 'treatment') {
+          const treatment = allTreatments.find((t) => t._id === documentOrFolder.linkedItem._id);
+          if (!treatment) return false;
           const treatmentResponse = await API.put({
             path: `/treatment/${treatment._id}`,
             body: prepareTreatmentForEncryption({
               ...treatment,
-              documents: treatment.documents.filter((d) => d._id !== document._id),
+              documents: treatment.documents.filter((d) => d._id !== documentOrFolder._id),
             }),
           });
           if (treatmentResponse.ok) {
@@ -118,14 +124,14 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
             capture('Error while deleting treatment document', { treatment, document });
           }
         }
-        if (document.linkedItem.type === 'consultation') {
-          const consultation = document.linkedItem.item;
-
+        if (documentOrFolder.linkedItem.type === 'consultation') {
+          const consultation = allConsultations.find((c) => c._id === documentOrFolder.linkedItem._id);
+          if (!consultation) return false;
           const consultationResponse = await API.put({
             path: `/consultation/${consultation._id}`,
             body: prepareConsultationForEncryption(organisation.consultations)({
               ...consultation,
-              documents: consultation.documents.filter((d) => d._id !== document._id),
+              documents: consultation.documents.filter((d) => d._id !== documentOrFolder._id),
             }),
           });
           if (consultationResponse.ok) {
@@ -143,13 +149,13 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
             capture('Error while deleting consultation document', { consultation, document });
           }
         }
-        if (document.linkedItem.type === 'medical-file') {
+        if (documentOrFolder.linkedItem.type === 'medical-file') {
           if (!medicalFile?._id) return false;
           const medicalFileResponse = await API.put({
             path: `/medical-file/${medicalFile._id}`,
             body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({
               ...medicalFile,
-              documents: medicalFile.documents.filter((d) => d._id !== document._id),
+              documents: medicalFile.documents.filter((d) => d._id !== documentOrFolder._id),
             }),
           });
           if (medicalFileResponse.ok) {
@@ -169,15 +175,21 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
         }
         return false;
       }}
-      onSubmitDocument={async (document) => {
-        if (document.linkedItem.type === 'treatment') {
-          const treatment = document.linkedItem.item;
+      onSubmitDocument={async (documentOrFolder) => {
+        if (documentOrFolder.linkedItem.type === 'treatment') {
+          const treatment = allTreatments.find((t) => t._id === documentOrFolder.linkedItem._id);
+          if (!treatment) return;
           const treatmentResponse = await API.put({
             path: `/treatment/${treatment._id}`,
             body: prepareTreatmentForEncryption({
               ...treatment,
               documents: treatment.documents.map((d) => {
-                if (d._id === document._id) return document;
+                if (d._id === documentOrFolder._id) {
+                  // remove linkedItem from document
+                  const { linkedItem, ...rest } = documentOrFolder;
+                  const document = rest as Document | Folder;
+                  return document;
+                }
                 return d;
               }),
             }),
@@ -196,15 +208,20 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
             capture('Error while updating treatment document', { treatment, document });
           }
         }
-        if (document.linkedItem.type === 'consultation') {
-          const consultation = document.linkedItem.item;
-
+        if (documentOrFolder.linkedItem.type === 'consultation') {
+          const consultation = allConsultations.find((c) => c._id === documentOrFolder.linkedItem._id);
+          if (!consultation) return;
           const consultationResponse = await API.put({
             path: `/consultation/${consultation._id}`,
             body: prepareConsultationForEncryption(organisation.consultations)({
               ...consultation,
               documents: consultation.documents.map((d) => {
-                if (d._id === document._id) return document;
+                if (d._id === documentOrFolder._id) {
+                  // remove linkedItem from document
+                  const { linkedItem, ...rest } = documentOrFolder;
+                  const document = rest as Document | Folder;
+                  return document;
+                }
                 return d;
               }),
             }),
@@ -223,14 +240,19 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
             capture('Error while updating consultation document', { consultation, document });
           }
         }
-        if (document.linkedItem.type === 'medical-file') {
+        if (documentOrFolder.linkedItem.type === 'medical-file') {
           if (!medicalFile?._id) return;
           const medicalFileResponse = await API.put({
             path: `/medical-file/${medicalFile._id}`,
             body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({
               ...medicalFile,
               documents: medicalFile.documents.map((d) => {
-                if (d._id === document._id) return document;
+                if (d._id === documentOrFolder._id) {
+                  // remove linkedItem from document
+                  const { linkedItem, ...rest } = documentOrFolder;
+                  const document = rest as Document | Folder;
+                  return document;
+                }
                 return d;
               }),
             }),

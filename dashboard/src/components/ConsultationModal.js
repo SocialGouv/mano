@@ -454,7 +454,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                 personId={data.person}
                 color="blue-900"
                 showAssociatedItem={false}
-                documents={data.documents.map((doc) => ({ ...doc, linkedItem: { item: consultation, type: 'consultation' } }))}
+                documents={data.documents.map((doc) => ({ ...doc, linkedItem: { _id: consultation._id, type: 'consultation' } }))}
                 onAddDocuments={async (nextDocuments) => {
                   const newData = {
                     ...data,

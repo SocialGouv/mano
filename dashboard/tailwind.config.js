@@ -1,7 +1,27 @@
 /** @type {import('tailwindcss').Config} */
+
+// const horizontalSpacing = 10;
+// const initPadding = 4; // 1rem
+// const paddingLefts = [];
+// const maxNumberOfLevels = 10;
+// pddings: `tw-pl-${level * horizontalSpacing + initPadding}`
+
 module.exports = {
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
-  safelist: ['tw-min-w-0'],
+  safelist: [
+    'tw-min-w-0',
+    'tw-pl-4',
+    'tw-pl-14',
+    'tw-pl-24',
+    'tw-pl-34',
+    'tw-pl-44',
+    'tw-pl-54',
+    'tw-pl-64',
+    'tw-pl-74',
+    'tw-pl-84',
+    'tw-pl-94',
+    'tw-pl-104',
+  ],
   theme: {
     extend: {
       animation: {

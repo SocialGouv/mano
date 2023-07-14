@@ -99,7 +99,7 @@ export const itemsGroupedByPersonSelector = selector({
     const user = get(userState);
     const usersObject = get(usersObjectSelector);
     for (const person of persons) {
-      originalPersonsObject[person._id] = { ...person };
+      originalPersonsObject[person._id] = { name: person.name, _id: person._id };
       personsObject[person._id] = {
         ...person,
         userPopulated: usersObject[person.user],
@@ -140,7 +140,7 @@ export const itemsGroupedByPersonSelector = selector({
           ...document,
           type: document.type ?? 'document', // or 'folder'
           linkedItem: {
-            item: originalPersonsObject[person._id],
+            _id: person._id,
             type: 'person',
           },
         };

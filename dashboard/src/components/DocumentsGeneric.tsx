@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { useHistory } from 'react-router-dom';
-import { userState, organisationAuthentifiedState } from '../recoil/auth';
+import { v4 as uuid } from 'uuid';
+import { userState, organisationAuthentifiedState, userAuthentifiedState } from '../recoil/auth';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from './tailwind/Modal';
 import { formatDateTimeWithNameOfDay } from '../services/date';
 import { FullScreenIcon } from '../scenes/person/components/FullScreenIcon';
 import UserName from './UserName';
-import type { DocumentWithLinkedItem, Document, FileMetadata, FolderWithLinkedItem } from '../types/document';
+import type { DocumentWithLinkedItem, Document, FileMetadata, FolderWithLinkedItem, Folder, LinkedItemType } from '../types/document';
 import API from '../services/api';
 import { download, viewBlobInNewWindow } from '../utils';
 import type { UUIDV4 } from '../types/uuid';
@@ -15,38 +16,46 @@ import { capture } from '../services/sentry';
 import { toast } from 'react-toastify';
 import DocumentsOrganizer from './DocumentsOrganizer';
 
+type ItemWithLink = DocumentWithLinkedItem | FolderWithLinkedItem;
+type Item = Document | Folder;
+
 interface DocumentsModuleProps {
-  documents: Array<DocumentWithLinkedItem | FolderWithLinkedItem>;
+  documents: ItemWithLink[];
   title?: string;
   personId: UUIDV4;
   showPanel?: boolean;
-  withDocumentOrganizer?: boolean;
   showAssociatedItem?: boolean;
   canToggleGroupCheck?: boolean;
-  onDeleteDocument: (document: DocumentWithLinkedItem) => Promise<boolean>;
-  onSubmitDocument: (document: DocumentWithLinkedItem) => Promise<void>;
-  onAddDocuments: (documents: Document[]) => Promise<void>;
+  initialRootStructure?: LinkedItemType[];
+  onDeleteDocument: (item: ItemWithLink) => Promise<boolean>;
+  onSubmitDocument: (item: ItemWithLink) => Promise<void>;
+  onAddDocuments: (items: Item[]) => Promise<void>;
+  onSaveNewOrder?: (items: ItemWithLink[]) => Promise<boolean>;
   color?: 'main' | 'blue-900';
 }
 
 export function DocumentsModule({
   documents = [],
+  initialRootStructure = [],
   title = 'Documents',
   personId,
   showPanel = false,
-  withDocumentOrganizer = false,
   canToggleGroupCheck = false,
   showAssociatedItem = true,
   onDeleteDocument,
   onSubmitDocument,
   onAddDocuments,
+  onSaveNewOrder,
   color = 'main',
 }: DocumentsModuleProps) {
   if (!onDeleteDocument) throw new Error('onDeleteDocument is required');
   if (!onSubmitDocument) throw new Error('onSubmitDocument is required');
   const [documentToEdit, setDocumentToEdit] = useState<DocumentWithLinkedItem | null>(null);
+  const [folderToEdit, setFolderToEdit] = useState<FolderWithLinkedItem | null>(null);
+  const [addFolder, setAddFolder] = useState(false);
   const [fullScreen, setFullScreen] = useState(false);
 
+  const withDocumentOrganizer = !!onSaveNewOrder;
   const onlyDocuments = useMemo(() => documents.filter((d) => d.type === 'document'), [documents]) as DocumentWithLinkedItem[];
 
   return (
@@ -104,14 +113,30 @@ export function DocumentsModule({
           showAssociatedItem={showAssociatedItem}
         />
       )}
+      {(!!addFolder || !!folderToEdit) && (
+        <FolderModal
+          key={`${addFolder}${folderToEdit?._id}`}
+          folder={folderToEdit}
+          onClose={() => {
+            setFolderToEdit(null);
+            setAddFolder(false);
+          }}
+          onDelete={onDeleteDocument}
+          onSubmit={onSubmitDocument}
+          onAddFolder={(folder) => onAddDocuments([folder])}
+          color={color}
+        />
+      )}
       <DocumentsFullScreen
         open={!!fullScreen}
         documents={withDocumentOrganizer ? documents : onlyDocuments}
         personId={personId}
+        initialRootStructure={initialRootStructure}
         onDisplayDocument={setDocumentToEdit}
         onAddDocuments={onAddDocuments}
+        onAddFolderRequest={() => setAddFolder(true)}
+        onSaveNewOrder={onSaveNewOrder}
         onClose={() => setFullScreen(false)}
-        withDocumentOrganizer={withDocumentOrganizer}
         title={title}
         color={color}
       />
@@ -121,33 +146,54 @@ export function DocumentsModule({
 
 interface DocumentsFullScreenProps {
   open: boolean;
-  withDocumentOrganizer: boolean;
   documents: Array<DocumentWithLinkedItem | FolderWithLinkedItem>;
+  initialRootStructure: LinkedItemType[];
   personId: UUIDV4;
+  onSaveNewOrder?: (documents: ItemWithLink[]) => Promise<boolean>;
   onAddDocuments: (documents: Document[]) => Promise<void>;
   onDisplayDocument: (document: DocumentWithLinkedItem) => void;
   onClose: () => void;
+  onAddFolderRequest: () => void;
   title: string;
   color: 'main' | 'blue-900';
 }
 
 function DocumentsFullScreen({
   open,
-  withDocumentOrganizer,
   personId,
   documents,
+  initialRootStructure,
   onClose,
   title,
   color,
   onDisplayDocument,
   onAddDocuments,
+  onSaveNewOrder,
+  onAddFolderRequest,
 }: DocumentsFullScreenProps) {
+  const withDocumentOrganizer = !!onSaveNewOrder;
   return (
-    <ModalContainer open={open} size="prose" onClose={onClose}>
+    <ModalContainer open={open} size={withDocumentOrganizer ? 'full' : 'prose'} onClose={onClose}>
       <ModalHeader title={title} />
       <ModalBody>
         {withDocumentOrganizer ? (
-          <DocumentsOrganizer items={documents} onSave={console.log} onFolderClick={console.log} onDocumentClick={console.log} />
+          <DocumentsOrganizer
+            items={documents.map((doc) => {
+              if (!!doc.parentId) return doc;
+              return {
+                ...doc,
+                parentId: 'root',
+              };
+            })}
+            initialRootStructure={initialRootStructure}
+            onSave={(newOrder) => {
+              const ok = onSaveNewOrder(newOrder);
+              if (!ok) onClose();
+              return ok;
+            }}
+            onFolderClick={console.log}
+            onDocumentClick={onDisplayDocument}
+          />
         ) : (
           <DocumentTable
             documents={documents as DocumentWithLinkedItem[]}
@@ -167,6 +213,11 @@ function DocumentsFullScreen({
           ＋ Ajouter des documents
           <AddDocumentInput onAddDocuments={onAddDocuments} personId={personId} />
         </label>
+        {!!withDocumentOrganizer && (
+          <button type="button" onClick={onAddFolderRequest} className={`button-submit mb-0 !tw-bg-${color}`}>
+            ＋ Ajouter un dossier
+          </button>
+        )}
       </ModalFooter>
     </ModalContainer>
   );
@@ -237,14 +288,13 @@ function DocumentTable({
       <table className="tw-w-full tw-table-fixed">
         <tbody className="tw-text-sm">
           {(documents || []).map((doc, index) => {
-            console.log(doc);
             return (
               <tr
                 key={doc._id}
                 data-test-id={doc.downloadPath}
                 aria-label={`Document ${doc.name}`}
                 className={[
-                  'tw-w-full tw-border-t tw-border-zinc-200 tw-bg-blue-900',
+                  `tw-w-full tw-border-t tw-border-zinc-200 tw-bg-${color}`,
                   Boolean(index % 2) ? 'tw-bg-opacity-0' : 'tw-bg-opacity-5',
                 ].join(' ')}
                 onClick={() => {
@@ -252,18 +302,16 @@ function DocumentTable({
                 }}>
                 <td className="tw-p-3">
                   <p className="tw-m-0 tw-flex tw-items-center tw-overflow-hidden tw-font-bold">
-                    <p className="tw-m-0 tw-flex tw-items-center tw-overflow-hidden tw-font-bold">
-                      {!!organisation.groupsEnabled && !!doc.group && (
-                        <span className="tw-mr-2 tw-text-xl" aria-label="Commentaire familial" title="Commentaire familial">
-                          👪
-                        </span>
-                      )}
-                    </p>
+                    {!!organisation.groupsEnabled && !!doc.group && (
+                      <span className="tw-mr-2 tw-text-xl" aria-label="Commentaire familial" title="Commentaire familial">
+                        👪
+                      </span>
+                    )}
                     {doc.name}
                   </p>
-                  {!!organisation.groupsEnabled && !!doc.group && personId !== doc.linkedItem.item._id && (
+                  {!!organisation.groupsEnabled && !!doc.group && personId !== doc.linkedItem._id && (
                     <p className="tw--xs tw-m-0 tw-mt-1">
-                      Ce document est lié à <PersonName item={{ person: doc.linkedItem.item._id }} />
+                      Ce document est lié à <PersonName item={{ person: doc.linkedItem._id }} />
                     </p>
                   )}
                   <div className="tw-flex tw-text-xs">
@@ -445,9 +493,9 @@ function DocumentModal({ document, onClose, personId, onDelete, onSubmit, showAs
                 <br />
                 <small className="tw-block tw-text-gray-500">Ce document sera visible pour toute la famille</small>
               </label>
-              {!!document.group && personId !== document.linkedItem.item._id && (
+              {!!document.group && personId !== document.linkedItem._id && (
                 <small className="tw-block tw-text-gray-500">
-                  Note: Ce document est lié à <PersonName item={{ person: document.linkedItem.item._id }} />
+                  Note: Ce document est lié à <PersonName item={{ person: document.linkedItem._id }} />
                 </small>
               )}
             </div>
@@ -459,7 +507,7 @@ function DocumentModal({ document, onClose, personId, onDelete, onSubmit, showAs
             <button
               onClick={() => {
                 const searchParams = new URLSearchParams(history.location.search);
-                searchParams.set('treatmentId', document.linkedItem.item._id);
+                searchParams.set('treatmentId', document.linkedItem._id);
                 history.push(`?${searchParams.toString()}`);
                 onClose();
               }}
@@ -471,7 +519,7 @@ function DocumentModal({ document, onClose, personId, onDelete, onSubmit, showAs
             <button
               onClick={() => {
                 const searchParams = new URLSearchParams(history.location.search);
-                searchParams.set('consultationId', document.linkedItem.item._id);
+                searchParams.set('consultationId', document.linkedItem._id);
                 history.push(`?${searchParams.toString()}`);
                 onClose();
               }}
@@ -523,5 +571,109 @@ function DocumentModal({ document, onClose, personId, onDelete, onSubmit, showAs
         )}
       </ModalFooter>
     </ModalContainer>
+  );
+}
+
+interface FolderModalProps {
+  folder?: FolderWithLinkedItem | null;
+  onClose: () => void;
+  onDelete: (folder: FolderWithLinkedItem) => Promise<boolean>;
+  onSubmit: (folder: FolderWithLinkedItem) => Promise<void>;
+  onAddFolder: (items: Folder) => Promise<void>;
+  color?: 'main' | 'blue-900';
+}
+
+function FolderModal({ folder, onClose, onDelete, onSubmit, onAddFolder, color }: FolderModalProps) {
+  const isNewFolder = !folder?._id;
+  const user = useRecoilValue(userAuthentifiedState);
+
+  const initialName = useMemo(() => folder?.name, [folder?.name]);
+  const [name, setName] = useState(initialName ?? '');
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+
+  return (
+    <>
+      <ModalContainer open className="[overflow-wrap:anywhere]" size="prose">
+        <ModalHeader title={isNewFolder ? 'Créer un dossier' : 'Éditer le dossier'} />
+        <ModalBody className="tw-pb-4">
+          <div className="tw-flex tw-w-full tw-flex-col tw-justify-between tw-gap-4 tw-px-8 tw-py-4">
+            <form
+              id="edit-folder-form"
+              className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2"
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (!name) {
+                  toast.error('Veuillez saisir un nom');
+                  return false;
+                }
+                setIsUpdating(true);
+                if (isNewFolder) {
+                  const nextFolder: Folder = {
+                    _id: uuid(),
+                    name,
+                    createdAt: new Date(),
+                    createdBy: user._id,
+                    parentId: 'root',
+                    position: undefined,
+                    type: 'folder',
+                  };
+                  await onAddFolder(nextFolder);
+                } else {
+                  await onSubmit({ ...folder, name });
+                }
+                setIsUpdating(false);
+                setIsEditing(false);
+                onClose();
+                return true;
+              }}>
+              <div className="tw-flex tw-w-full tw-flex-col tw-gap-6">
+                <div className="tw-flex tw-flex-1 tw-flex-col">
+                  <label className={isEditing ? '' : `tw-text-sm tw-font-semibold tw-text-${color}`} htmlFor="create-consultation-name">
+                    Nom (facultatif)
+                  </label>
+                  <input
+                    className="tailwindui"
+                    placeholder="Nouveau dossier"
+                    id="create-consultation-name"
+                    name="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
+              </div>
+            </form>
+          </div>
+        </ModalBody>
+        <ModalFooter>
+          <button
+            type="button"
+            name="cancel"
+            className="button-cancel"
+            onClick={() => {
+              onClose();
+            }}>
+            Annuler
+          </button>
+          {!isNewFolder && (
+            <button
+              type="button"
+              className="button-destructive"
+              disabled={isUpdating}
+              onClick={async () => {
+                if (!window.confirm('Voulez-vous vraiment supprimer ce dossier ?')) return;
+                window.sessionStorage.removeItem('currentComment');
+                await onDelete(folder);
+                onClose();
+              }}>
+              Supprimer
+            </button>
+          )}
+          <button type="submit" form="edit-folder-form" className={`button-submit !tw-bg-${color}`} disabled={isUpdating}>
+            Enregistrer
+          </button>
+        </ModalFooter>
+      </ModalContainer>
+    </>
   );
 }
