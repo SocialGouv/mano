@@ -67,7 +67,6 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
         // the document can be a group document, or a person document
         // so we need to get the person to update
         const _person = document.linkedItem.item as PersonInstance;
-        await API.delete({ path: document.downloadPath ?? `/person/${_person._id}/document/${document.file.filename}` });
         console.log('document', document);
         console.log(
           _person.documents?.map((d) => {
