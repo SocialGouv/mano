@@ -135,6 +135,7 @@ export function DocumentsModule({
         onDisplayDocument={setDocumentToEdit}
         onAddDocuments={onAddDocuments}
         onAddFolderRequest={() => setAddFolder(true)}
+        onEditFolderRequest={setFolderToEdit}
         onSaveNewOrder={onSaveNewOrder}
         onClose={() => setFullScreen(false)}
         title={title}
@@ -154,6 +155,7 @@ interface DocumentsFullScreenProps {
   onDisplayDocument: (document: DocumentWithLinkedItem) => void;
   onClose: () => void;
   onAddFolderRequest: () => void;
+  onEditFolderRequest: (folder: FolderWithLinkedItem) => void;
   title: string;
   color: 'main' | 'blue-900';
 }
@@ -170,6 +172,7 @@ function DocumentsFullScreen({
   onAddDocuments,
   onSaveNewOrder,
   onAddFolderRequest,
+  onEditFolderRequest,
 }: DocumentsFullScreenProps) {
   const withDocumentOrganizer = !!onSaveNewOrder;
   return (
@@ -191,7 +194,7 @@ function DocumentsFullScreen({
               if (!ok) onClose();
               return ok;
             }}
-            onFolderClick={console.log}
+            onFolderClick={onEditFolderRequest}
             onDocumentClick={onDisplayDocument}
           />
         ) : (
@@ -430,9 +433,16 @@ function DocumentModal({ document, onClose, personId, onDelete, onSubmit, showAs
                 setIsEditing(false);
               }}>
               <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-blue-900'} htmlFor="create-consultation-name">
-                Nom (facultatif)
+                Nom
               </label>
-              <input className="tailwindui" id="create-consultation-name" name="name" value={name} onChange={(e) => setName(e.target.value)} />
+              <input
+                required
+                className="tailwindui"
+                id="create-consultation-name"
+                name="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
             </form>
           ) : (
             <div className="tw-flex tw-w-full tw-flex-col tw-items-center tw-gap-2">

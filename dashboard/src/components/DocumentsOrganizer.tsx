@@ -142,7 +142,7 @@ function Branch({
       {folder.name !== 'Dossier Racine' && (
         <span
           className={[
-            'tw-inline-block tw-max-w-full tw-overflow-hidden tw-text-ellipsis tw-whitespace-nowrap tw-py-2',
+            'tw-inline-block tw-max-w-full tw-flex-col tw-overflow-hidden tw-text-ellipsis tw-whitespace-nowrap tw-py-2',
             `tw-pl-${level * horizontalSpacing + 4}`,
             Boolean(lineIndex % 2) ? 'tw-bg-main tw-bg-opacity-0' : 'tw-bg-main tw-bg-opacity-5',
           ].join(' ')}>
@@ -175,6 +175,15 @@ function Branch({
               </svg>
             )}
           </button>
+          {!folder.children?.length && !!open && (
+            <p
+              className={[
+                'tw-block tw-cursor-pointer tw-overflow-hidden tw-text-ellipsis tw-whitespace-nowrap tw-py-2 tw-text-left tw-text-gray-400',
+                `tw-pl-${(level + 1) * horizontalSpacing + 4}`,
+              ].join(' ')}>
+              <span>Dossier vide</span>
+            </p>
+          )}
         </span>
       )}
       <div ref={gridRef} id={`child-container-${folder._id || 'root'}`} className={`tw-flex tw-flex-col ${!open ? 'tw-hidden' : ''}`}>

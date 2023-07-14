@@ -117,7 +117,7 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
               return p;
             })
           );
-          toast.success('Document mis à jour');
+          toast.success(documentOrFolder.type === 'document' ? 'Document mis à jour' : 'Dossier mis à jour');
         } else {
           toast.error('Erreur lors de la mise à jour du document, vous pouvez contactez le support');
           capture('Error while updating treatment document', { _person, document });
