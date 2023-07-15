@@ -4,6 +4,8 @@ import type { DocumentWithLinkedItem, DocumentOrFolderId, FolderWithLinkedItem, 
 // import UserName from './UserName';
 import { useRecoilValue } from 'recoil';
 import { organisationAuthentifiedState } from '../recoil/auth';
+import UserName from './UserName';
+import { formatDateTimeWithNameOfDay } from '../services/date';
 
 type Item = DocumentWithLinkedItem | FolderWithLinkedItem;
 
@@ -27,6 +29,10 @@ interface DocumentsOrganizerProps {
   color: 'main' | 'blue-900';
 }
 
+const modalWidth = window.innerWidth * 0.9;
+const informationsWidth = modalWidth * 0.4;
+const informationsStyle = { flexBasis: informationsWidth };
+
 export default function DocumentsOrganizer({ items, initialRootStructure, onSave, onFolderClick, onDocumentClick, color }: DocumentsOrganizerProps) {
   const [openedFolderIds, setOpenedFolderIds] = useState<DocumentOrFolderId[]>(['root']);
 
@@ -43,7 +49,6 @@ export default function DocumentsOrganizer({ items, initialRootStructure, onSave
     // we want to keep alternate line colors
     let elements = document.querySelectorAll('[data-visible="true"]');
     for (let i = 0; i < elements.length; i++) {
-      console.log(elements[i]);
       if (i % 2 === 0) {
         elements[i].classList.add('before:tw-bg-opacity-0');
         elements[i].classList.remove('before:tw-bg-opacity-5');
@@ -84,8 +89,16 @@ export default function DocumentsOrganizer({ items, initialRootStructure, onSave
 
   return (
     <>
-      <div dir="ltr" className="tw-hidden"></div>
-      <div id="person-documents" ref={rootRef} key={reloadTreeKey} dir="rtl" className="tw-min-h-1/2 tw-overflow-auto tw-pb-10 tw-text-gray-800">
+      <div className="tw-flex tw-w-full tw-border tw-border-gray-100 tw-py-1 tw-text-xs tw-text-gray-400">
+        <p className="tw-m-0 tw-grow tw-pl-4">Nom</p>
+        <div style={informationsStyle} className="tw-flex tw-shrink-0 tw-items-center">
+          <p className="m-0 tw-shrink-0 tw-grow tw-basis-0 tw-overflow-hidden tw-truncate">Créé par</p>
+          <p className="m-0 tw-shrink-0 tw-grow tw-basis-0 tw-overflow-hidden tw-truncate">Créé le</p>
+          {/* <p className="m-0 tw-shrink-0 tw-grow tw-basis-0 tw-overflow-hidden tw-truncate">Type</p> */}
+          {/* <p className="m-0 tw-shrink-0 tw-grow tw-basis-0 tw-overflow-hidden tw-truncate">Taille</p> */}
+        </div>
+      </div>
+      <div id="person-documents" ref={rootRef} key={reloadTreeKey} className="tw-min-h-1/2 tw-overflow-x-hidden tw-pb-10 tw-text-gray-800">
         <Branch
           key={JSON.stringify(items)}
           parentId="root"
@@ -162,37 +175,43 @@ function Branch({
       data-parentid={parentId}
       data-id={folder._id}
       data-type="folder"
-      dir="ltr"
       className="tw-relative tw-flex tw-flex-col">
       {folder.name !== 'Dossier Racine' && (
         <span
           data-visible={parentIsOpen ? 'true' : 'false'}
           className={[
-            'tw-relative tw-inline-block tw-max-w-full tw-flex-col tw-text-ellipsis tw-whitespace-nowrap tw-py-2 tw-pl-4',
+            'tw-relative tw-inline-flex tw-max-w-full tw-justify-between tw-text-ellipsis tw-whitespace-nowrap tw-py-2 tw-pl-4',
             `before:tw-bg-${color} before:tw-pointer-events-none before:tw-absolute before:tw-right-0 before:tw-top-0 before:tw-h-full before:tw-bg-main`,
             `before:-tw-left-${level * 10}`,
             cantMove ? 'shared-documents' : '',
           ].join(' ')}>
-          <small
-            className={`tw-mr-1 tw-inline-block tw-w-3 tw-cursor-pointer tw-text-${color}`}
-            onClick={() => {
-              if (open) {
-                setOpenedFolderIds(openedFolderIds.filter((id) => id !== folder._id));
-              } else {
-                setOpenedFolderIds([...openedFolderIds, folder._id]);
-              }
-            }}>
-            {open ? '\u25BC' : '\u25B6'}
-          </small>
-          <div
-            // type="button"
-            onClick={() => {
-              if (folder._id === 'root') return;
-              const notRootFolder = folder as FolderForTree;
-              onFolderClick(notRootFolder);
-            }}
-            className="tw-inline tw-cursor-pointer">
-            {open ? '📂' : '📁'} {folder.name} ({folder.children?.length || 0})
+          <div className="tw-flex tw-w-full tw-justify-between tw-overflow-hidden">
+            <div className="tw-flex tw-flex-1 tw-items-center tw-overflow-hidden tw-pr-5">
+              <small
+                className={`tw-mr-1 tw-inline-block tw-w-3 tw-cursor-pointer tw-text-${color}`}
+                onClick={() => {
+                  if (open) {
+                    setOpenedFolderIds(openedFolderIds.filter((id) => id !== folder._id));
+                  } else {
+                    setOpenedFolderIds([...openedFolderIds, folder._id]);
+                  }
+                }}>
+                {open ? '\u25BC' : '\u25B6'}
+              </small>
+              <button
+                type="button"
+                onClick={() => {
+                  if (folder._id === 'root') return;
+                  const notRootFolder = folder as FolderForTree;
+                  onFolderClick(notRootFolder);
+                }}
+                className="tw-inline-flex tw-flex-1 tw-gap-x-2 tw-overflow-hidden">
+                <span>{open ? '📂' : '📁'}</span>
+                <span className="tw-truncate">{folder.name}</span>
+                <span>({folder.children?.length || 0})</span>
+              </button>
+            </div>
+            <Informations item={folder} />
           </div>
         </span>
       )}
@@ -275,22 +294,43 @@ function DocumentRow({ document, level, parentIsOpen, position, parentId, color,
       data-parentid={parentId}
       data-id={document._id}
       className={[
-        'tw-relative tw-flex tw-text-ellipsis tw-whitespace-nowrap tw-pl-4 tw-text-gray-800',
-        `before:tw-bg-${color} before:tw-absolute before:tw-right-0 before:tw-top-0 before:tw-h-full before:tw-bg-main`,
+        'tw-relative tw-flex tw-justify-between tw-text-ellipsis tw-whitespace-nowrap tw-pl-4 tw-text-gray-800',
+        `before:tw-bg-${color}  before:tw-pointer-events-none before:tw-absolute before:tw-right-0 before:tw-top-0 before:tw-h-full before:tw-bg-main`,
         `before:-tw-left-${level * 10}`,
         !!document.group ? 'shared-documents' : '',
       ].join(' ')}>
-      <button type="button" onClick={() => onDocumentClick(document)} className="tw-inline-block tw-grow tw-py-2 tw-text-left">
-        {!!organisation.groupsEnabled && !!document.group && (
-          <span className="tw-mr-2 tw-text-xl" aria-label="Document familial" title="Document familial">
-            👪
-          </span>
-        )}
-        {'📃 '} <span>{document.name}</span>
-      </button>
+      <div className="tw-flex tw-w-full tw-justify-between tw-overflow-hidden">
+        <button
+          type="button"
+          onClick={() => onDocumentClick(document)}
+          className="tw-inline-flex tw-flex-1 tw-overflow-hidden tw-py-2 tw-pr-5 tw-text-left">
+          {!!organisation.groupsEnabled && !!document.group && (
+            <span className="tw-mr-2 tw-text-xl" aria-label="Document familial" title="Document familial">
+              👪
+            </span>
+          )}
+          <span>📃</span>
+          <span className="tw-ml-2 tw-truncate">{document.name}</span>
+        </button>
+        <Informations item={document} />
+      </div>
       {/* <p className={`tw-m-0 tw-border-l tw-py-2 tw-text-xs tw-opacity-60 tw-border-${color} tw-flex-shrink-0 tw-flex-grow-0 tw-basis-10 tw-px-2`}>
         Créé par <UserName id={document.createdBy} />
       </p> */}
+    </div>
+  );
+}
+
+function Informations({ item }: { item: Item | FolderForTree | RootForTree }) {
+  const modalWidth = useRef(window.innerWidth * 0.9);
+  return (
+    <div style={informationsStyle} className="tw-flex tw-shrink-0 tw-items-center tw-text-xs tw-text-gray-600">
+      <p className="m-0 tw-shrink-0 tw-grow tw-basis-0 tw-overflow-hidden tw-truncate">
+        <UserName id={item.createdBy} />
+      </p>
+      <p className="m-0 tw-shrink-0 tw-grow tw-basis-0 tw-overflow-hidden tw-truncate">{formatDateTimeWithNameOfDay(item.createdAt)}</p>
+      {/* <p className="m-0 tw-shrink-0 tw-grow tw-basis-0 tw-overflow-hidden tw-truncate">Info 3</p> */}
+      {/* <p className="m-0 tw-shrink-0 tw-grow tw-basis-0 tw-overflow-hidden tw-truncate">Info 4</p> */}
     </div>
   );
 }
