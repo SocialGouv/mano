@@ -129,16 +129,18 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
           capture('Error while updating treatment document', { _person, document });
         }
       }}
-      onAddDocuments={async (documents) => {
+      onAddDocuments={async (newDocuments) => {
         const personResponse = await API.put({
           path: `/person/${person._id}`,
           body: preparePersonForEncryption({
             ...person,
-            documents: [...(person.documents || []), ...documents],
+            documents: [...(person.documents || []), ...newDocuments],
           }),
         });
         if (personResponse.ok) {
-          toast.success('Documents enregistrés !');
+          if (newDocuments.filter((d) => d.type === 'document').length === 1) toast.success('Document enregistré !');
+          if (newDocuments.filter((d) => d.type === 'document').length > 1) toast.success('Documents enregistrés !');
+          if (newDocuments.filter((d) => d.type === 'folder').length > 0) toast.success('Dossier créé !');
           const newPerson = personResponse.decryptedData;
           setPersons((persons) =>
             persons.map((p) => {

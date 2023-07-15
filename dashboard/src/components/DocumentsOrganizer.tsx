@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import SortableJS from 'sortablejs';
 import type { DocumentWithLinkedItem, DocumentOrFolderId, FolderWithLinkedItem, Folder, LinkedItemType } from '../types/document';
 // import UserName from './UserName';
@@ -28,28 +28,31 @@ interface DocumentsOrganizerProps {
 }
 
 export default function DocumentsOrganizer({ items, initialRootStructure, onSave, onFolderClick, onDocumentClick, color }: DocumentsOrganizerProps) {
-  const [openedFolderIds, setOpenedFolderIds] = useState<DocumentOrFolderId[]>([]);
-  const [lastUpdatedItems, setLastUpdatedItems] = useState(items);
-  const documentsTree = buildFolderTree(lastUpdatedItems, initialRootStructure);
+  const [openedFolderIds, setOpenedFolderIds] = useState<DocumentOrFolderId[]>(['root']);
+
   const itemsRef = useRef(items);
-  useEffect(() => {
-    if (JSON.stringify(itemsRef.current) === JSON.stringify(items)) return;
+  const documentsTree = useMemo(() => {
+    if (JSON.stringify(itemsRef.current) === JSON.stringify(items)) {
+      return buildFolderTree(itemsRef.current, initialRootStructure);
+    }
     itemsRef.current = items;
-    setLastUpdatedItems(items);
-  }, [items]);
+    return buildFolderTree(items, initialRootStructure);
+  }, [items, initialRootStructure]);
 
   useEffect(() => {
+    // we want to keep alternate line colors
     let elements = document.querySelectorAll('[data-visible="true"]');
     for (let i = 0; i < elements.length; i++) {
+      console.log(elements[i]);
       if (i % 2 === 0) {
-        elements[i].classList.add('tw-bg-opacity-0');
-        elements[i].classList.remove('tw-bg-opacity-5');
+        elements[i].classList.add('before:tw-bg-opacity-0');
+        elements[i].classList.remove('before:tw-bg-opacity-5');
       } else {
-        elements[i].classList.add('tw-bg-opacity-5');
-        elements[i].classList.remove('tw-bg-opacity-0');
+        elements[i].classList.add('before:tw-bg-opacity-5');
+        elements[i].classList.remove('before:tw-bg-opacity-0');
       }
     }
-  }, [documentsTree]);
+  }, [documentsTree, openedFolderIds]);
 
   // reloadTreeKey to prevent error `Failed to execute 'removeChild' on 'Node'` from sortablejs after updating messy tree
   const [reloadTreeKey, setReloadeTreeKey] = useState(0);
@@ -57,46 +60,44 @@ export default function DocumentsOrganizer({ items, initialRootStructure, onSave
 
   const rootRef = useRef<HTMLDivElement>(null);
 
-  const onListChange = useCallback(async () => {
-    if (!rootRef.current) return;
-    setIsSaving(true);
-    const elementsNewState = getElementsNewState(rootRef.current.children[0] as HTMLDivElement);
-    const newOrder = elementsNewState.map((newItem) => {
-      const originalItem = items.find((original) => original._id === newItem._id);
-      if (!originalItem) throw new Error(`Item not found: ${newItem._id}`);
-      return {
-        ...originalItem,
-        position: newItem.position,
-        parentId: newItem.parentId,
-      } as Item;
-    });
-    setReloadeTreeKey((k) => k + 1);
-    onSave(newOrder);
-    itemsRef.current = newOrder;
-    setLastUpdatedItems(newOrder);
-    setReloadeTreeKey((k) => k + 1);
-    setIsSaving(false);
-  }, [items, onSave]);
+  const onListChange = useCallback(
+    async (save: boolean) => {
+      if (!rootRef.current) return;
+      setIsSaving(true);
+      const elementsNewState = getElementsNewState(rootRef.current.children[0] as HTMLDivElement);
+      const newOrder = elementsNewState.map((newItem) => {
+        const originalItem = items.find((original) => original._id === newItem._id);
+        if (!originalItem) throw new Error(`Item not found: ${newItem._id}`);
+        return {
+          ...originalItem,
+          position: newItem.position,
+          parentId: newItem.parentId,
+        } as Item;
+      });
+      // setReloadeTreeKey((k) => k + 1);
+      if (save) onSave(newOrder);
+      // setReloadeTreeKey((k) => k + 1);
+      setIsSaving(false);
+    },
+    [items, onSave]
+  );
 
   return (
     <>
-      {/* TODO find a way for tailwind to not filter margins from compiling,
-       because things like `ml-${level}` are not compiled */}
       <div dir="ltr" className="tw-hidden"></div>
-      <div ref={rootRef} key={reloadTreeKey} dir="rtl" className="tw-min-h-1/2 tw-overflow-auto tw-pb-10">
+      <div id="person-documents" ref={rootRef} key={reloadTreeKey} dir="rtl" className="tw-min-h-1/2 tw-overflow-auto tw-pb-10 tw-text-gray-800">
         <Branch
+          key={JSON.stringify(items)}
           parentId="root"
           position={0}
           folder={documentsTree}
-          level={-1}
-          key={JSON.stringify(items)}
-          onListChange={onListChange}
+          level={-1} // -1 because root is not displayed and we want all the root items to be stuck to the left
           initShowOpen
+          onListChange={onListChange}
           onFolderClick={onFolderClick}
           onDocumentClick={onDocumentClick}
           openedFolderIds={openedFolderIds}
           setOpenedFolderIds={setOpenedFolderIds}
-          dir="ltr"
           color={color}
         />
       </div>
@@ -109,20 +110,17 @@ export default function DocumentsOrganizer({ items, initialRootStructure, onSave
   );
 }
 
-const horizontalSpacing = 10;
-
 interface BranchProps {
   folder: FolderForTree | RootForTree;
   level: number;
-  position?: number;
+  position: number;
   parentId: DocumentOrFolderId;
   initShowOpen: boolean;
-  onListChange: () => void;
+  onListChange: (save: boolean) => void;
   onFolderClick: (folder: FolderForTree) => void;
   onDocumentClick: (document: DocumentForTree) => void;
   setOpenedFolderIds: (ids: DocumentOrFolderId[]) => void;
   openedFolderIds: DocumentOrFolderId[];
-  dir?: 'ltr' | 'rtl';
   color: 'main' | 'blue-900';
 }
 
@@ -138,21 +136,24 @@ function Branch({
   openedFolderIds,
   initShowOpen,
   color,
-  dir = 'ltr',
 }: BranchProps) {
   const open = initShowOpen || openedFolderIds.includes(folder._id);
-
+  const parentIsOpen = openedFolderIds.includes(parentId);
   const gridRef = useRef<HTMLDivElement>(null);
   const sortableRef = useRef<SortableJS>();
   useEffect(() => {
     if (!gridRef.current) return;
     sortableRef.current = SortableJS.create(gridRef.current, {
       animation: 150,
-      group: 'shared',
-      filter: '.shared-data', // 'shared-data' class is not draggable
-      onEnd: onListChange,
+      group: 'person-documents',
+      invertSwap: true,
+      // swapThreshold: 0.5,
+      filter: '.shared-documents', // 'shared-documents' class is not draggable
+      onEnd: () => onListChange(true),
     });
   }, [onListChange]);
+
+  const cantMove = ['Dossier Racine', 'Documents familiaux'].includes(folder.name);
 
   return (
     <div
@@ -161,15 +162,16 @@ function Branch({
       data-parentid={parentId}
       data-id={folder._id}
       data-type="folder"
-      dir={dir}
-      className="tw-flex tw-flex-col">
+      dir="ltr"
+      className="tw-relative tw-flex tw-flex-col">
       {folder.name !== 'Dossier Racine' && (
         <span
-          data-visible="true"
+          data-visible={parentIsOpen ? 'true' : 'false'}
           className={[
-            'tw-inline-block tw-max-w-full tw-flex-col tw-overflow-hidden tw-text-ellipsis tw-whitespace-nowrap tw-py-2',
-            `tw-bg-${color} tw-pl-${level * horizontalSpacing + 4}`,
-            folder.name.includes('Documents familiaux') ? 'shared-data' : '',
+            'tw-relative tw-inline-block tw-max-w-full tw-flex-col tw-text-ellipsis tw-whitespace-nowrap tw-py-2 tw-pl-4',
+            `before:tw-bg-${color} before:tw-pointer-events-none before:tw-absolute before:tw-right-0 before:tw-top-0 before:tw-h-full before:tw-bg-main`,
+            `before:-tw-left-${level * 10}`,
+            cantMove ? 'shared-documents' : '',
           ].join(' ')}>
           <small
             className={`tw-mr-1 tw-inline-block tw-w-3 tw-cursor-pointer tw-text-${color}`}
@@ -189,34 +191,26 @@ function Branch({
               const notRootFolder = folder as FolderForTree;
               onFolderClick(notRootFolder);
             }}
-            className="tw-inline tw-cursor-pointer tw-text-gray-800">
-            {folder.name ? (
-              `${open ? '📂' : '📁'} ${folder.name} (${folder.children?.length || 0})`
-            ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="-tw-mt-2 tw-inline tw-h-6 tw-w-6 tw-cursor-pointer"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                />
-              </svg>
-            )}
+            className="tw-inline tw-cursor-pointer">
+            {open ? '📂' : '📁'} {folder.name} ({folder.children?.length || 0})
           </div>
         </span>
       )}
-      <div ref={gridRef} id={`child-container-${folder._id || 'root'}`} className={`tw-flex tw-flex-col ${!open ? 'tw-hidden' : ''}`}>
+      {/* Folder's children */}
+      <div
+        ref={gridRef}
+        id={`child-container-${folder._id || 'root'}`}
+        className={[
+          'tw-flex tw-flex-col',
+          level >= 0 ? 'tw-pl-10' : '',
+          !open ? 'tw-hidden' : '',
+          //  lol
+        ].join(' ')}>
         {!folder.children?.length && !!open && (
           <p
             data-id="empty-folder"
             className={[
               'tw-mb-1 tw-block tw-cursor-pointer tw-overflow-hidden tw-text-ellipsis tw-whitespace-nowrap tw-py-px tw-text-left tw-text-xs tw-text-gray-400',
-              `tw-pl-${(level + 1) * horizontalSpacing + 4}`,
             ].join(' ')}>
             <span>Dossier vide</span>
           </p>
@@ -226,17 +220,17 @@ function Branch({
             child = child as FolderForTree;
             return (
               <Branch
-                parentId={child.parentId || folder._id}
-                position={child.position || index}
                 key={child._id}
                 folder={child}
+                parentId={child.parentId || folder._id}
+                position={child.position || index}
                 level={level + 1}
                 initShowOpen={false}
                 onListChange={onListChange}
-                onFolderClick={onFolderClick}
-                setOpenedFolderIds={setOpenedFolderIds}
-                openedFolderIds={openedFolderIds}
                 onDocumentClick={onDocumentClick}
+                onFolderClick={onFolderClick}
+                openedFolderIds={openedFolderIds}
+                setOpenedFolderIds={setOpenedFolderIds}
                 color={color}
               />
             );
@@ -244,13 +238,13 @@ function Branch({
           child = child as DocumentForTree;
           return (
             <DocumentRow
-              parentIsOpen={open}
-              parentId={child.parentId || folder._id}
-              position={child.position || index}
               key={child._id}
               document={child}
+              parentId={child.parentId || folder._id}
+              position={child.position || index}
               level={level + 1}
               onDocumentClick={onDocumentClick}
+              parentIsOpen={open}
               color={color}
             />
           );
@@ -281,9 +275,10 @@ function DocumentRow({ document, level, parentIsOpen, position, parentId, color,
       data-parentid={parentId}
       data-id={document._id}
       className={[
-        'tw-flex tw-overflow-hidden tw-text-ellipsis tw-whitespace-nowrap tw-text-gray-800',
-        `tw-bg-${color} tw-pl-${level * horizontalSpacing + 4}`,
-        !!document.group ? 'shared-data' : '',
+        'tw-relative tw-flex tw-text-ellipsis tw-whitespace-nowrap tw-pl-4 tw-text-gray-800',
+        `before:tw-bg-${color} before:tw-absolute before:tw-right-0 before:tw-top-0 before:tw-h-full before:tw-bg-main`,
+        `before:-tw-left-${level * 10}`,
+        !!document.group ? 'shared-documents' : '',
       ].join(' ')}>
       <button type="button" onClick={() => onDocumentClick(document)} className="tw-inline-block tw-grow tw-py-2 tw-text-left">
         {!!organisation.groupsEnabled && !!document.group && (
@@ -311,18 +306,26 @@ const buildFolderTree = (items: Item[], initialRootStructure?: LinkedItemType[])
     type: 'folder',
     // children: [],
   };
-  const groupedDocuments = items.filter((item) => {
-    if (item.type !== 'document') return false;
-    const document = item as DocumentWithLinkedItem;
-    return !!document.group;
-  });
+
+  const groupedDocuments = items
+    .filter((item) => {
+      if (item.type !== 'document') return false;
+      const document = item as DocumentWithLinkedItem;
+      return !!document.group;
+    })
+    .map((item) => {
+      return {
+        ...item,
+        parentId: item.parentId || 'grouped-documents',
+      } as DocumentForTree;
+    });
+
   const ungroupedDocuments = items.filter((item) => {
     if (item.type !== 'document') return true;
     const document = item as DocumentWithLinkedItem;
     return !document.group;
   });
-  if (groupedDocuments.length) {
-  }
+
   const findChildren = (folder: Item, isRoot: boolean): FolderChildren => {
     const children = ungroupedDocuments
       .filter((item: Item) => item.parentId === folder._id)
@@ -351,16 +354,11 @@ const buildFolderTree = (items: Item[], initialRootStructure?: LinkedItemType[])
       {
         _id: 'grouped-documents',
         name: '👪 Documents familiaux',
-        position: children.length,
+        position: children.length, // always at the end
         createdAt: new Date(),
-        children: groupedDocuments.map((item) => {
-          return {
-            ...item,
-            parentId: item.parentId || 'grouped-documents',
-          } as DocumentForTree;
-        }),
+        children: groupedDocuments,
         createdBy: 'we do not care',
-        parentId: 'NA', // for type safety easiness purpose
+        parentId: 'root',
         type: 'folder',
       },
     ];
