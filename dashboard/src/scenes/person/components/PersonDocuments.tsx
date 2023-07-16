@@ -9,7 +9,7 @@ import { capture } from '../../../services/sentry';
 import { DocumentsModule } from '../../../components/DocumentsGeneric';
 import { groupsState } from '../../../recoil/groups';
 import type { PersonPopulated, PersonInstance } from '../../../types/person';
-import type { DocumentWithLinkedItem, Document } from '../../../types/document';
+import type { Document } from '../../../types/document';
 import type { UUIDV4 } from '../../../types/uuid';
 import { personsObjectSelector } from '../../../recoil/selectors';
 
@@ -71,19 +71,18 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
       personId={person._id}
       title={`Documents de ${person.name}`}
       canToggleGroupCheck={canToggleGroupCheck}
-      onDeleteDocument={async (documentOrFolder) => {
-        // the document can be a group document, or a person document, or a folder
-        // so we need to get the person to update
-        const _person = persons[documentOrFolder.linkedItem._id];
-        if (documentOrFolder.type === 'document') {
-          const document = documentOrFolder as DocumentWithLinkedItem;
-          await API.delete({ path: document.downloadPath ?? `/person/${_person._id}/document/${document.file.filename}` });
-        }
+      onDeleteFolder={async (folder) => {
+        const _person = persons[folder.linkedItem._id];
         const personResponse = await API.put({
           path: `/person/${_person._id}`,
           body: preparePersonForEncryption({
             ..._person,
-            documents: _person.documents?.filter((d) => d._id !== documentOrFolder._id),
+            documents: (_person.documents || [])
+              .filter((f) => f._id !== folder._id)
+              .map((item) => {
+                if (item.parentId === folder._id) return { ...item, parentId: '' };
+                return item;
+              }),
           }),
         });
         if (personResponse.ok) {
@@ -94,7 +93,34 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
               return p;
             })
           );
-          toast.success(documentOrFolder.type === 'document' ? 'Document supprimé' : 'Dossier supprimé');
+          toast.success('Dossier supprimé');
+          return true;
+        } else {
+          toast.error('Erreur lors de la suppression du document, vous pouvez contactez le support');
+          return false;
+        }
+      }}
+      onDeleteDocument={async (document) => {
+        // the document can be a group document, or a person document
+        // so we need to get the person to update
+        const _person = persons[document.linkedItem._id];
+        await API.delete({ path: document.downloadPath ?? `/person/${_person._id}/document/${document.file.filename}` });
+        const personResponse = await API.put({
+          path: `/person/${_person._id}`,
+          body: preparePersonForEncryption({
+            ..._person,
+            documents: _person.documents?.filter((d) => d._id !== document._id),
+          }),
+        });
+        if (personResponse.ok) {
+          const newPerson = personResponse.decryptedData;
+          setPersons((persons) =>
+            persons.map((p) => {
+              if (p._id === _person._id) return newPerson;
+              return p;
+            })
+          );
+          toast.success('Document supprimé');
           return true;
         } else {
           toast.error('Erreur lors de la suppression du document, vous pouvez contactez le support');

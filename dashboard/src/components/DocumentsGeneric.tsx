@@ -27,10 +27,11 @@ interface DocumentsModuleProps {
   showAssociatedItem?: boolean;
   canToggleGroupCheck?: boolean;
   initialRootStructure?: LinkedItemType[];
-  onDeleteDocument: (item: ItemWithLink) => Promise<boolean>;
+  onDeleteDocument: (item: DocumentWithLinkedItem) => Promise<boolean>;
   onSubmitDocument: (item: ItemWithLink) => Promise<void>;
   onAddDocuments: (items: Item[]) => Promise<void>;
   onSaveNewOrder?: (items: ItemWithLink[]) => Promise<boolean>;
+  onDeleteFolder?: (item: FolderWithLinkedItem) => Promise<boolean>;
   color?: 'main' | 'blue-900';
 }
 
@@ -46,6 +47,7 @@ export function DocumentsModule({
   onSubmitDocument,
   onAddDocuments,
   onSaveNewOrder,
+  onDeleteFolder = async () => false,
   color = 'main',
 }: DocumentsModuleProps) {
   if (!onDeleteDocument) throw new Error('onDeleteDocument is required');
@@ -56,6 +58,10 @@ export function DocumentsModule({
   const [fullScreen, setFullScreen] = useState(false);
 
   const withDocumentOrganizer = !!onSaveNewOrder;
+  if (withDocumentOrganizer) {
+    if (!onSaveNewOrder) throw new Error('onSaveNewOrder is required');
+    if (!onDeleteFolder) throw new Error('onDeleteFolder is required');
+  }
   const onlyDocuments = useMemo(() => documents.filter((d) => d.type === 'document'), [documents]) as DocumentWithLinkedItem[];
 
   return (
@@ -113,7 +119,7 @@ export function DocumentsModule({
           showAssociatedItem={showAssociatedItem}
         />
       )}
-      {(!!addFolder || !!folderToEdit) && (
+      {withDocumentOrganizer && (!!addFolder || !!folderToEdit) && (
         <FolderModal
           key={`${addFolder}${folderToEdit?._id}`}
           folder={folderToEdit}
@@ -121,7 +127,7 @@ export function DocumentsModule({
             setFolderToEdit(null);
             setAddFolder(false);
           }}
-          onDelete={onDeleteDocument}
+          onDelete={onDeleteFolder}
           onSubmit={onSubmitDocument}
           onAddFolder={(folder) => onAddDocuments([folder])}
           color={color}
@@ -433,17 +439,10 @@ function DocumentModal({ document, onClose, personId, onDelete, onSubmit, showAs
                 setIsUpdating(false);
                 setIsEditing(false);
               }}>
-              <label className={isEditing ? '' : `tw-text-sm tw-font-semibold tw-blue-${color}`} htmlFor="create-consultation-name">
+              <label className={isEditing ? '' : `tw-text-sm tw-font-semibold tw-blue-${color}`} htmlFor="document-name">
                 Nom
               </label>
-              <input
-                required
-                className="tailwindui"
-                id="create-consultation-name"
-                name="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
+              <input required className="tailwindui" id="document-name" name="name" value={name} onChange={(e) => setName(e.target.value)} />
             </form>
           ) : (
             <div className="tw-flex tw-w-full tw-flex-col tw-items-center tw-gap-2">
@@ -640,13 +639,13 @@ function FolderModal({ folder, onClose, onDelete, onSubmit, onAddFolder, color }
               }}>
               <div className="tw-flex tw-w-full tw-flex-col tw-gap-6">
                 <div className="tw-flex tw-flex-1 tw-flex-col">
-                  <label className={isEditing ? '' : `tw-text-sm tw-font-semibold tw-text-${color}`} htmlFor="create-consultation-name">
-                    Nom (facultatif)
+                  <label className={isEditing ? '' : `tw-text-sm tw-font-semibold tw-text-${color}`} htmlFor="folder-name">
+                    Nom
                   </label>
                   <input
                     className="tailwindui"
                     placeholder="Nouveau dossier"
-                    id="create-consultation-name"
+                    id="folder-name"
                     name="name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
@@ -673,7 +672,6 @@ function FolderModal({ folder, onClose, onDelete, onSubmit, onAddFolder, color }
               disabled={isUpdating}
               onClick={async () => {
                 if (!window.confirm('Voulez-vous vraiment supprimer ce dossier ?')) return;
-                window.sessionStorage.removeItem('currentComment');
                 await onDelete(folder);
                 onClose();
               }}>

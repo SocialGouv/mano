@@ -79,9 +79,9 @@ export default function DocumentsOrganizer({ items, initialRootStructure, onSave
           parentId: newItem.parentId,
         } as Item;
       });
-      // setReloadeTreeKey((k) => k + 1);
+      setReloadeTreeKey((k) => k + 1);
       if (save) onSave(newOrder);
-      // setReloadeTreeKey((k) => k + 1);
+      setReloadeTreeKey((k) => k + 1);
       setIsSaving(false);
     },
     [items, onSave]
@@ -322,7 +322,6 @@ function DocumentRow({ document, level, parentIsOpen, position, parentId, color,
 }
 
 function Informations({ item }: { item: Item | FolderForTree | RootForTree }) {
-  const modalWidth = useRef(window.innerWidth * 0.9);
   return (
     <div style={informationsStyle} className="tw-flex tw-shrink-0 tw-items-center tw-text-xs tw-text-gray-600">
       <p className="m-0 tw-shrink-0 tw-grow tw-basis-0 tw-overflow-hidden tw-truncate">
