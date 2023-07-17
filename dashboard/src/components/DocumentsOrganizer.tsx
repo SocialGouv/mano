@@ -22,32 +22,40 @@ type FolderChildren = Array<FolderForTree | DocumentForTree | RootForTree>;
 
 interface DocumentsOrganizerProps {
   items: Item[];
-  onSave: (newOrder: Item[]) => Promise<boolean>;
+  onSave: (newOrder: Item[], root: LinkedItemType) => Promise<boolean>;
   onFolderClick: (folder: FolderForTree) => void;
   onDocumentClick: (document: DocumentForTree) => void;
-  initialRootStructure?: LinkedItemType[];
+  linkedItemType: LinkedItemType;
   color: 'main' | 'blue-900';
 }
+
+const rootKeysAndFolderNames = {
+  person: 'Dossier Racine',
+  'family-documents': '👪 Documents familiaux',
+  consultation: 'Consultations',
+  'medical-file': 'Documents médicaux',
+  treatment: 'Traitements',
+};
 
 const modalWidth = window.innerWidth * 0.9;
 const informationsWidth = modalWidth * 0.4;
 const informationsStyle = { flexBasis: informationsWidth };
 
-export default function DocumentsOrganizer({ items, initialRootStructure, onSave, onFolderClick, onDocumentClick, color }: DocumentsOrganizerProps) {
+export default function DocumentsOrganizer({ items, linkedItemType, onSave, onFolderClick, onDocumentClick, color }: DocumentsOrganizerProps) {
   const [openedFolderIds, setOpenedFolderIds] = useState<DocumentOrFolderId[]>(['root']);
 
   const itemsRef = useRef(items);
   const documentsTree = useMemo(() => {
     if (JSON.stringify(itemsRef.current) === JSON.stringify(items)) {
-      return buildFolderTree(itemsRef.current, initialRootStructure);
+      return buildFolderTree(itemsRef.current, linkedItemType);
     }
     itemsRef.current = items;
-    return buildFolderTree(items, initialRootStructure);
-  }, [items, initialRootStructure]);
+    return buildFolderTree(items, linkedItemType);
+  }, [items, linkedItemType]);
 
   useEffect(() => {
     // we want to keep alternate line colors
-    let elements = document.querySelectorAll('[data-visible="true"]');
+    let elements = document.getElementById(`${linkedItemType}-documents`)?.querySelectorAll('[data-visible="true"]') || [];
     for (let i = 0; i < elements.length; i++) {
       if (i % 2 === 0) {
         elements[i].classList.add('before:tw-bg-opacity-0');
@@ -57,10 +65,10 @@ export default function DocumentsOrganizer({ items, initialRootStructure, onSave
         elements[i].classList.remove('before:tw-bg-opacity-0');
       }
     }
-  }, [documentsTree, openedFolderIds]);
+  }, [documentsTree, linkedItemType, openedFolderIds]);
 
   // reloadTreeKey to prevent error `Failed to execute 'removeChild' on 'Node'` from sortablejs after updating messy tree
-  const [reloadTreeKey, setReloadeTreeKey] = useState(0);
+  // const [reloadTreeKey, setReloadeTreeKey] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
 
   const rootRef = useRef<HTMLDivElement>(null);
@@ -79,12 +87,12 @@ export default function DocumentsOrganizer({ items, initialRootStructure, onSave
           parentId: newItem.parentId,
         } as Item;
       });
-      setReloadeTreeKey((k) => k + 1);
-      if (save) onSave(newOrder);
-      setReloadeTreeKey((k) => k + 1);
+      // setReloadeTreeKey((k) => k + 1);
+      if (save) onSave(newOrder, linkedItemType);
+      // setReloadeTreeKey((k) => k + 1);
       setIsSaving(false);
     },
-    [items, onSave]
+    [items, linkedItemType, onSave]
   );
 
   return (
@@ -98,14 +106,19 @@ export default function DocumentsOrganizer({ items, initialRootStructure, onSave
           {/* <p className="m-0 tw-shrink-0 tw-grow tw-basis-0 tw-overflow-hidden tw-truncate">Taille</p> */}
         </div>
       </div>
-      <div id="person-documents" ref={rootRef} key={reloadTreeKey} className="tw-min-h-1/2 tw-overflow-x-hidden tw-pb-10 tw-text-gray-800">
+      <div
+        // key={reloadTreeKey}
+        id={`${linkedItemType}-documents`}
+        ref={rootRef}
+        className="tw-overflow-x-hidden tw-pb-10 tw-text-gray-800">
         <Branch
           key={JSON.stringify(items)}
+          linkedItemType={linkedItemType}
           parentId="root"
           position={0}
           folder={documentsTree}
-          level={-1} // -1 because root is not displayed and we want all the root items to be stuck to the left
-          initShowOpen
+          level={linkedItemType === 'person' ? -1 : 0} // -1 because root is not displayed and we want all the root items to be stuck to the left
+          initShowOpen={linkedItemType === 'person'}
           onListChange={onListChange}
           onFolderClick={onFolderClick}
           onDocumentClick={onDocumentClick}
@@ -127,6 +140,7 @@ interface BranchProps {
   folder: FolderForTree | RootForTree;
   level: number;
   position: number;
+  linkedItemType: LinkedItemType;
   parentId: DocumentOrFolderId;
   initShowOpen: boolean;
   onListChange: (save: boolean) => void;
@@ -142,6 +156,7 @@ function Branch({
   level,
   position,
   parentId,
+  linkedItemType,
   onListChange,
   onFolderClick,
   onDocumentClick,
@@ -158,15 +173,15 @@ function Branch({
     if (!gridRef.current) return;
     sortableRef.current = SortableJS.create(gridRef.current, {
       animation: 150,
-      group: 'person-documents',
+      group: `${linkedItemType}-documents`,
       invertSwap: true,
       // swapThreshold: 0.5,
-      filter: '.shared-documents', // 'shared-documents' class is not draggable
+      filter: '.unmovable', // 'unmovable' class is not draggable
       onEnd: () => onListChange(true),
     });
-  }, [onListChange]);
+  }, [onListChange, linkedItemType]);
 
-  const cantMove = ['Dossier Racine', 'Documents familiaux'].includes(folder.name);
+  const cantMove = Object.values(rootKeysAndFolderNames).includes(folder.name);
 
   return (
     <div
@@ -181,9 +196,9 @@ function Branch({
           data-visible={parentIsOpen ? 'true' : 'false'}
           className={[
             'tw-relative tw-inline-flex tw-max-w-full tw-justify-between tw-text-ellipsis tw-whitespace-nowrap tw-py-2 tw-pl-4',
-            `before:tw-bg-${color} before:tw-pointer-events-none before:tw-absolute before:tw-right-0 before:tw-top-0 before:tw-h-full before:tw-bg-main`,
+            `before:tw-pointer-events-none before:tw-absolute before:tw-right-0 before:tw-top-0 before:tw-h-full before:tw-bg-${color}`,
             `before:-tw-left-${level * 10}`,
-            cantMove ? 'shared-documents' : '',
+            cantMove ? 'unmovable' : '',
           ].join(' ')}>
           <div className="tw-flex tw-w-full tw-justify-between tw-overflow-hidden">
             <div className="tw-flex tw-flex-1 tw-items-center tw-overflow-hidden tw-pr-5">
@@ -205,7 +220,10 @@ function Branch({
                   const notRootFolder = folder as FolderForTree;
                   onFolderClick(notRootFolder);
                 }}
-                className="tw-inline-flex tw-flex-1 tw-gap-x-2 tw-overflow-hidden">
+                className={[
+                  'tw-inline-flex tw-flex-1 tw-gap-x-2 tw-overflow-hidden',
+                  cantMove || folder._id === 'root' ? '!tw-cursor-not-allowed' : 'tw-cursor-default',
+                ].join(' ')}>
                 <span>{open ? '📂' : '📁'}</span>
                 <span className="tw-truncate">{folder.name}</span>
                 <span>({folder.children?.length || 0})</span>
@@ -229,7 +247,7 @@ function Branch({
           <p
             data-id="empty-folder"
             className={[
-              'tw-mb-1 tw-block tw-cursor-pointer tw-overflow-hidden tw-text-ellipsis tw-whitespace-nowrap tw-py-px tw-text-left tw-text-xs tw-text-gray-400',
+              'unmovable tw-mb-1 tw-block tw-overflow-hidden tw-text-ellipsis tw-whitespace-nowrap tw-py-px tw-text-left tw-text-xs tw-text-gray-400',
             ].join(' ')}>
             <span>Dossier vide</span>
           </p>
@@ -241,6 +259,7 @@ function Branch({
               <Branch
                 key={child._id}
                 folder={child}
+                linkedItemType={linkedItemType}
                 parentId={child.parentId || folder._id}
                 position={child.position || index}
                 level={level + 1}
@@ -295,9 +314,9 @@ function DocumentRow({ document, level, parentIsOpen, position, parentId, color,
       data-id={document._id}
       className={[
         'tw-relative tw-flex tw-justify-between tw-text-ellipsis tw-whitespace-nowrap tw-pl-4 tw-text-gray-800',
-        `before:tw-bg-${color}  before:tw-pointer-events-none before:tw-absolute before:tw-right-0 before:tw-top-0 before:tw-h-full before:tw-bg-main`,
+        `before:tw-pointer-events-none before:tw-absolute before:tw-right-0 before:tw-top-0 before:tw-h-full before:tw-bg-${color}`,
         `before:-tw-left-${level * 10}`,
-        !!document.group ? 'shared-documents' : '',
+        !!document.group ? 'unmovable' : '',
       ].join(' ')}>
       <div className="tw-flex tw-w-full tw-justify-between tw-overflow-hidden">
         <button
@@ -322,6 +341,9 @@ function DocumentRow({ document, level, parentIsOpen, position, parentId, color,
 }
 
 function Informations({ item }: { item: Item | FolderForTree | RootForTree }) {
+  if (item.type === 'folder' && Object.values(rootKeysAndFolderNames).includes(item.name)) {
+    return null;
+  }
   return (
     <div style={informationsStyle} className="tw-flex tw-shrink-0 tw-items-center tw-text-xs tw-text-gray-600">
       <p className="m-0 tw-shrink-0 tw-grow tw-basis-0 tw-overflow-hidden tw-truncate">
@@ -334,10 +356,10 @@ function Informations({ item }: { item: Item | FolderForTree | RootForTree }) {
   );
 }
 
-const buildFolderTree = (items: Item[], initialRootStructure?: LinkedItemType[]) => {
+const buildFolderTree = (items: Item[], rootKey: LinkedItemType) => {
   const rootFolderItem = {
     _id: 'root',
-    name: 'Dossier Racine',
+    name: rootKeysAndFolderNames[rootKey],
     position: 0,
     createdAt: new Date(),
     createdBy: 'we do not care',
@@ -355,7 +377,7 @@ const buildFolderTree = (items: Item[], initialRootStructure?: LinkedItemType[])
     .map((item) => {
       return {
         ...item,
-        parentId: item.parentId || 'grouped-documents',
+        parentId: item.parentId || 'family-documents',
       } as DocumentForTree;
     });
 
@@ -391,8 +413,8 @@ const buildFolderTree = (items: Item[], initialRootStructure?: LinkedItemType[])
     return [
       ...children,
       {
-        _id: 'grouped-documents',
-        name: '👪 Documents familiaux',
+        _id: 'family-documents',
+        name: rootKeysAndFolderNames['family-documents'],
         position: children.length, // always at the end
         createdAt: new Date(),
         children: groupedDocuments,
@@ -422,7 +444,7 @@ const findChildrenRecursive = async (folder: HTMLDivElement, allItems: ItemState
   for (const [index, child] of Object.entries(Array.from(childrenContainer.children))) {
     const childElement = child as HTMLDivElement;
     if (childElement.dataset.id === 'empty-folder') continue;
-    if (childElement.dataset.id === 'grouped-documents') continue;
+    if (childElement.dataset.id === 'family-documents') continue;
     const updatedChild = {
       position: Number(index) + 1,
       parentId: folder.dataset.id,

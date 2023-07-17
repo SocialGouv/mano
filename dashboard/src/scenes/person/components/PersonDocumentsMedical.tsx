@@ -6,13 +6,14 @@ import { consultationsState, prepareConsultationForEncryption } from '../../../r
 import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../../recoil/medicalFiles';
 import { arrayOfitemsGroupedByConsultationSelector } from '../../../recoil/selectors';
 import { prepareTreatmentForEncryption, treatmentsState } from '../../../recoil/treatments';
-import API from '../../../services/api';
+import API, { encryptItem } from '../../../services/api';
 import { capture } from '../../../services/sentry';
 import { DocumentsModule } from '../../../components/DocumentsGeneric';
 import type { PersonPopulated } from '../../../types/person';
 import type { DocumentWithLinkedItem, FolderWithLinkedItem, Document, Folder } from '../../../types/document';
 import type { MedicalFileInstance } from '../../../types/medicalFile';
 import type { ConsultationInstance } from '../../../types/consultation';
+import { useDataLoader } from '../../../components/DataLoader';
 
 interface PersonDocumentsProps {
   person: PersonPopulated;
@@ -26,6 +27,8 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
   const setAllConsultations = useSetRecoilState(consultationsState);
   const [allTreatments, setAllTreatments] = useRecoilState(treatmentsState);
   const [allMedicalFiles, setAllMedicalFiles] = useRecoilState(medicalFileState);
+
+  const { refresh } = useDataLoader();
 
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
 
@@ -46,6 +49,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
       for (const document of treatment.documents || []) {
         ordonnances[document._id] = {
           ...document,
+          type: document.type ?? 'document', // or 'folder'
           linkedItem: {
             _id: treatment._id,
             type: 'treatment',
@@ -62,6 +66,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
       for (const document of consultation.documents || []) {
         consultationsDocs[document._id] = {
           ...document,
+          type: document.type ?? 'document', // or 'folder'
           linkedItem: {
             _id: consultation._id,
             type: 'consultation',
@@ -75,6 +80,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
       for (const document of medicalFile?.documents || []) {
         otherDocs[document._id] = {
           ...document,
+          type: document.type ?? 'document', // or 'folder'
           linkedItem: {
             _id: medicalFile._id,
             type: 'medical-file',
@@ -82,6 +88,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
         };
       }
     }
+    console.log({ consultationsDocs });
     return [...Object.values(ordonnances), ...Object.values(consultationsDocs), ...Object.values(otherDocs)].sort(
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
@@ -90,6 +97,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
   return (
     <DocumentsModule
       showPanel
+      initialRootStructure={['medical-file', 'consultation', 'treatment']}
       documents={allMedicalDocuments}
       color="blue-900"
       title={`Documents médicaux de ${person.name} (${allMedicalDocuments.length})`}
@@ -272,6 +280,102 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
           }
         }
       }}
+      onSaveNewOrder={async (nextDocuments, type) => {
+        try {
+          const groupedById: any = {};
+          for (const document of nextDocuments) {
+            if (!groupedById[document.linkedItem._id]) groupedById[document.linkedItem._id] = [];
+            groupedById[document.linkedItem._id].push(document);
+          }
+          if (!type) throw new Error('Type is required');
+          if (type === 'treatment') {
+            const treatmentsToUpdate = await Promise.all(
+              Object.keys(groupedById)
+                .map((treatmentId) => {
+                  const treatment = allTreatments.find((t) => t._id === treatmentId);
+                  if (!treatment) throw new Error('Treatment not found');
+                  return prepareTreatmentForEncryption({
+                    ...treatment,
+                    documents: groupedById[treatmentId],
+                  });
+                })
+                .map(encryptItem)
+            );
+            const treatmentsResponse = await API.put({
+              path: '/treatment/documents-reorder',
+              body: treatmentsToUpdate,
+            });
+            if (treatmentsResponse.ok) {
+              toast.success('Documents mis à jour');
+              refresh();
+              return true;
+            } else {
+              toast.error('Erreur lors de la mise à jour des documents, vous pouvez contactez le support');
+              capture('Error while updating treatment documents order', { nextDocuments, type });
+            }
+            return false;
+          }
+          if (type === 'consultation') {
+            const consultationsToUpdate = await Promise.all(
+              Object.keys(groupedById)
+                .map((consultationId) => {
+                  const consultation = allConsultations.find((c) => c._id === consultationId);
+                  if (!consultation) throw new Error('Consultation not found');
+                  const nextConsultation = prepareConsultationForEncryption(organisation.consultations)({
+                    ...consultation,
+                    documents: groupedById[consultationId],
+                  });
+                  return nextConsultation;
+                })
+                .map(encryptItem)
+            );
+            console.log({ consultationsToUpdate });
+            const consultationsResponse = await API.put({
+              path: '/consultation/documents-reorder',
+              body: consultationsToUpdate,
+            });
+            if (consultationsResponse.ok) {
+              toast.success('Documents mis à jour');
+              refresh();
+              return true;
+            } else {
+              toast.error('Erreur lors de la mise à jour des documents, vous pouvez contactez le support');
+              capture('Error while updating consultation documents order', { nextDocuments, type });
+            }
+            return false;
+          }
+          if (type === 'medical-file') {
+            if (!medicalFile?._id) throw new Error('Medical file not found');
+            const medicalFileResponse = await API.put({
+              path: `/medical-file/${medicalFile._id}`,
+              body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({
+                ...medicalFile,
+                documents: groupedById[medicalFile._id],
+              }),
+            });
+            if (medicalFileResponse.ok) {
+              const newMedicalFile = medicalFileResponse.decryptedData;
+              setAllMedicalFiles((allMedicalFiles) =>
+                allMedicalFiles.map((m) => {
+                  if (m._id === medicalFile._id) return newMedicalFile;
+                  return m;
+                })
+              );
+              toast.success('Documents mis à jour');
+              return true;
+            } else {
+              toast.error('Erreur lors de la mise à jour des documents, vous pouvez contactez le support');
+              capture('Error while updating medical file documents reorder', { nextDocuments, type });
+            }
+            return false;
+          }
+          return false;
+        } catch (e) {
+          toast.error('Erreur lors de la mise à jour des documents, vous pouvez contactez le support');
+          capture('Error while updating documents order', { nextDocuments, type });
+        }
+        return false;
+      }}
       onAddDocuments={async (nextDocuments) => {
         if (!medicalFile?._id) return;
         const medicalFileResponse = await API.put({
@@ -282,7 +386,8 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
           }),
         });
         if (medicalFileResponse.ok) {
-          toast.success('Documents enregistrés !');
+          if (nextDocuments.filter((d) => d.type === 'document').length > 1) toast.success('Documents enregistrés !');
+          if (nextDocuments.filter((d) => d.type === 'folder').length > 0) toast.success('Dossier créé !');
           setAllMedicalFiles((allMedicalFiles) =>
             allMedicalFiles.map((m) => {
               if (m._id === medicalFile._id) return medicalFileResponse.decryptedData;

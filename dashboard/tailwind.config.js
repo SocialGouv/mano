@@ -15,6 +15,8 @@ module.exports = {
     'before:-tw-left-70',
     'before:-tw-left-80',
     'before:-tw-left-90',
+    'before:tw-bg-main',
+    'before:tw-bg-blue-900',
   ],
   theme: {
     extend: {

@@ -30,7 +30,7 @@ interface DocumentsModuleProps {
   onDeleteDocument: (item: DocumentWithLinkedItem) => Promise<boolean>;
   onSubmitDocument: (item: ItemWithLink) => Promise<void>;
   onAddDocuments: (items: Item[]) => Promise<void>;
-  onSaveNewOrder?: (items: ItemWithLink[]) => Promise<boolean>;
+  onSaveNewOrder?: (items: ItemWithLink[], root?: LinkedItemType) => Promise<boolean>;
   onDeleteFolder?: (item: FolderWithLinkedItem) => Promise<boolean>;
   color?: 'main' | 'blue-900';
 }
@@ -62,7 +62,7 @@ export function DocumentsModule({
     if (!onSaveNewOrder) throw new Error('onSaveNewOrder is required');
     if (!onDeleteFolder) throw new Error('onDeleteFolder is required');
   }
-  const onlyDocuments = useMemo(() => documents.filter((d) => d.type === 'document'), [documents]) as DocumentWithLinkedItem[];
+  const onlyDocuments = useMemo(() => documents.filter((d) => d.type !== 'folder'), [documents]) as DocumentWithLinkedItem[];
 
   return (
     <>
@@ -156,7 +156,7 @@ interface DocumentsFullScreenProps {
   documents: Array<DocumentWithLinkedItem | FolderWithLinkedItem>;
   initialRootStructure: LinkedItemType[];
   personId: UUIDV4;
-  onSaveNewOrder?: (documents: ItemWithLink[]) => Promise<boolean>;
+  onSaveNewOrder?: (documents: ItemWithLink[], root?: LinkedItemType) => Promise<boolean>;
   onAddDocuments: (documents: Document[]) => Promise<void>;
   onDisplayDocument: (document: DocumentWithLinkedItem) => void;
   onClose: () => void;
@@ -186,24 +186,32 @@ function DocumentsFullScreen({
       <ModalHeader title={title} />
       <ModalBody>
         {withDocumentOrganizer ? (
-          <DocumentsOrganizer
-            items={documents.map((doc) => {
-              if (!!doc.parentId) return doc;
-              return {
-                ...doc,
-                parentId: 'root',
-              };
+          <div className="tw-min-h-1/2 ">
+            {initialRootStructure.map((root) => {
+              return (
+                <DocumentsOrganizer
+                  items={documents
+                    .filter((doc) => doc.linkedItem.type === root)
+                    .map((doc) => {
+                      if (!!doc.parentId) return doc;
+                      return {
+                        ...doc,
+                        parentId: 'root',
+                      };
+                    })}
+                  linkedItemType={root}
+                  onSave={(newOrder, root) => {
+                    const ok = onSaveNewOrder(newOrder, root);
+                    if (!ok) onClose();
+                    return ok;
+                  }}
+                  onFolderClick={onEditFolderRequest}
+                  onDocumentClick={onDisplayDocument}
+                  color={color}
+                />
+              );
             })}
-            initialRootStructure={initialRootStructure}
-            onSave={(newOrder) => {
-              const ok = onSaveNewOrder(newOrder);
-              if (!ok) onClose();
-              return ok;
-            }}
-            onFolderClick={onEditFolderRequest}
-            onDocumentClick={onDisplayDocument}
-            color={color}
-          />
+          </div>
         ) : (
           <DocumentTable
             documents={documents as DocumentWithLinkedItem[]}

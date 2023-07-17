@@ -7,7 +7,7 @@ const { catchErrors } = require("../errors");
 const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
 const validateUser = require("../middleware/validateUser");
 const { looseUuidRegex, positiveIntegerRegex } = require("../utils");
-const { Consultation } = require("../db/sequelize");
+const { Consultation, sequelize } = require("../db/sequelize");
 
 const TODO = "A FAIRE";
 const DONE = "FAIT";
@@ -152,6 +152,50 @@ router.get(
       hasMore: data.length === Number(limit),
       total,
     });
+  })
+);
+
+router.put(
+  "/documents-reorder",
+  passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"], { healthcareProfessional: true }),
+  validateEncryptionAndMigrations,
+  catchErrors(async (req, res, next) => {
+    try {
+      z.array(
+        z.object({
+          _id: z.string().regex(looseUuidRegex),
+          encrypted: z.string(),
+          encryptedEntityKey: z.string(),
+        })
+      ).parse(req.body);
+    } catch (e) {
+      const error = new Error(`Invalid request in consultation document order: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+
+    await sequelize.transaction(async (t) => {
+      for (const consultation of req.body) {
+        const query = { where: { _id: consultation._id, organisation: req.user.organisation } };
+        if (!(await Consultation.findOne(query))) {
+          const error = new Error(`Consultation not found`);
+          error.status = 404;
+          throw error;
+        }
+
+        const { encrypted, encryptedEntityKey } = consultation;
+
+        const updateConsultation = {
+          encrypted: encrypted,
+          encryptedEntityKey: encryptedEntityKey,
+        };
+        console.log("UPDATING CONSULTATINO", updateConsultation, query, { silent: false, transaction: t });
+        await Consultation.update(updateConsultation, query, { silent: false, transaction: t });
+      }
+    });
+
+    return res.status(200).send({ ok: true });
   })
 );
 

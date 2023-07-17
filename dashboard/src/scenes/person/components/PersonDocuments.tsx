@@ -40,6 +40,7 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
   return (
     <DocumentsModule
       showPanel
+      initialRootStructure={['person']}
       onSaveNewOrder={async (nextDocuments) => {
         const personResponse = await API.put({
           path: `/person/${person._id}`,
@@ -164,7 +165,6 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
           }),
         });
         if (personResponse.ok) {
-          if (newDocuments.filter((d) => d.type === 'document').length === 1) toast.success('Document enregistré !');
           if (newDocuments.filter((d) => d.type === 'document').length > 1) toast.success('Documents enregistrés !');
           if (newDocuments.filter((d) => d.type === 'folder').length > 0) toast.success('Dossier créé !');
           const newPerson = personResponse.decryptedData;
