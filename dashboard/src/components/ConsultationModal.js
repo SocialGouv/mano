@@ -444,7 +444,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
           </form>
           <div
             className={[
-              'tw-flex tw-h-[50vh] tw-w-full tw-flex-col tw-flex-wrap tw-gap-4 tw-overflow-y-auto',
+              'tw-flex tw-h-[50vh] tw-w-full tw-flex-col tw-gap-4 tw-overflow-y-auto',
               activeTab !== 'Documents' && 'tw-hidden',
             ]
               .filter(Boolean)
@@ -457,7 +457,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                 documents={data.documents.map((doc) => ({
                   ...doc,
                   type: doc.type ?? 'document', // or 'folder'
-                  linkedItem: { _id: consultation._id, type: 'consultation' },
+                  linkedItem: { _id: consultation?._id, type: 'consultation' },
                 }))}
                 onAddDocuments={async (nextDocuments) => {
                   const newData = {

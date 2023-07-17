@@ -25,7 +25,7 @@ interface DocumentsOrganizerProps {
   onSave: (newOrder: Item[], root: LinkedItemType) => Promise<boolean>;
   onFolderClick: (folder: FolderForTree) => void;
   onDocumentClick: (document: DocumentForTree) => void;
-  linkedItemType: LinkedItemType;
+  linkedItemType: LinkedItemType | 'family-documents';
   color: 'main' | 'blue-900';
 }
 
@@ -76,6 +76,7 @@ export default function DocumentsOrganizer({ items, linkedItemType, onSave, onFo
   const onListChange = useCallback(
     async (save: boolean) => {
       if (!rootRef.current) return;
+      if (linkedItemType === 'family-documents') return;
       setIsSaving(true);
       const elementsNewState = getElementsNewState(rootRef.current.children[0] as HTMLDivElement);
       const newOrder = elementsNewState.map((newItem) => {
@@ -140,7 +141,7 @@ interface BranchProps {
   folder: FolderForTree | RootForTree;
   level: number;
   position: number;
-  linkedItemType: LinkedItemType;
+  linkedItemType: LinkedItemType | 'family-documents';
   parentId: DocumentOrFolderId;
   initShowOpen: boolean;
   onListChange: (save: boolean) => void;
@@ -171,6 +172,7 @@ function Branch({
   const sortableRef = useRef<SortableJS>();
   useEffect(() => {
     if (!gridRef.current) return;
+    if (linkedItemType === 'family-documents') return;
     sortableRef.current = SortableJS.create(gridRef.current, {
       animation: 150,
       group: `${linkedItemType}-documents`,
@@ -356,7 +358,7 @@ function Informations({ item }: { item: Item | FolderForTree | RootForTree }) {
   );
 }
 
-const buildFolderTree = (items: Item[], rootKey: LinkedItemType) => {
+const buildFolderTree = (items: Item[], rootKey: LinkedItemType | 'family-documents') => {
   const rootFolderItem = {
     _id: 'root',
     name: rootKeysAndFolderNames[rootKey],
@@ -388,41 +390,30 @@ const buildFolderTree = (items: Item[], rootKey: LinkedItemType) => {
   });
 
   const findChildren = (folder: Item, isRoot: boolean): FolderChildren => {
-    const children = ungroupedDocuments
-      .filter((item: Item) => item.parentId === folder._id)
-      .sort((a, b) => {
-        if (!a.position) return 1;
-        if (!b.position) return -1;
-        return a.position - b.position;
-      })
-      .map((item) => {
-        if (item.type === 'folder') {
-          return {
-            ...item,
-            parentId: item.parentId || 'root',
-            children: findChildren(item, false),
-          } as FolderForTree;
-        }
-        return {
-          ...item,
-          parentId: item.parentId || 'root',
-        } as DocumentForTree;
-      });
-    if (!isRoot) return children;
-    if (!groupedDocuments.length) return children;
-    return [
-      ...children,
-      {
-        _id: 'family-documents',
-        name: rootKeysAndFolderNames['family-documents'],
-        position: children.length, // always at the end
-        createdAt: new Date(),
-        children: groupedDocuments,
-        createdBy: 'we do not care',
-        parentId: 'root',
-        type: 'folder',
-      },
-    ];
+    const children =
+      rootKey === 'family-documents'
+        ? groupedDocuments
+        : ungroupedDocuments
+            .filter((item: Item) => item.parentId === folder._id)
+            .sort((a, b) => {
+              if (!a.position) return 1;
+              if (!b.position) return -1;
+              return a.position - b.position;
+            })
+            .map((item) => {
+              if (item.type === 'folder') {
+                return {
+                  ...item,
+                  parentId: item.parentId || 'root',
+                  children: findChildren(item, false),
+                } as FolderForTree;
+              }
+              return {
+                ...item,
+                parentId: item.parentId || 'root',
+              } as DocumentForTree;
+            });
+    return children;
   };
   const rootChildren = findChildren(rootFolderItem as Item, true);
   const rootForTree: RootForTree = {

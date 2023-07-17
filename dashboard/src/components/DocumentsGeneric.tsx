@@ -26,7 +26,7 @@ interface DocumentsModuleProps {
   showPanel?: boolean;
   showAssociatedItem?: boolean;
   canToggleGroupCheck?: boolean;
-  initialRootStructure?: LinkedItemType[];
+  initialRootStructure?: Array<LinkedItemType | 'family-documents'>;
   onDeleteDocument: (item: DocumentWithLinkedItem) => Promise<boolean>;
   onSubmitDocument: (item: ItemWithLink) => Promise<void>;
   onAddDocuments: (items: Item[]) => Promise<void>;
@@ -154,7 +154,7 @@ export function DocumentsModule({
 interface DocumentsFullScreenProps {
   open: boolean;
   documents: Array<DocumentWithLinkedItem | FolderWithLinkedItem>;
-  initialRootStructure: LinkedItemType[];
+  initialRootStructure: Array<LinkedItemType | 'family-documents'>;
   personId: UUIDV4;
   onSaveNewOrder?: (documents: ItemWithLink[], root?: LinkedItemType) => Promise<boolean>;
   onAddDocuments: (documents: Document[]) => Promise<void>;
@@ -191,7 +191,11 @@ function DocumentsFullScreen({
               return (
                 <DocumentsOrganizer
                   items={documents
-                    .filter((doc) => doc.linkedItem.type === root)
+                    .filter((doc) => {
+                      const itemType = doc.linkedItem.type;
+                      const rootType = root === 'family-documents' ? 'person' : root;
+                      return itemType === rootType;
+                    })
                     .map((doc) => {
                       if (!!doc.parentId) return doc;
                       return {

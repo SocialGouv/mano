@@ -40,7 +40,8 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
   return (
     <DocumentsModule
       showPanel
-      initialRootStructure={['person']}
+      initialRootStructure={['person', 'family-documents']}
+      documents={documents}
       onSaveNewOrder={async (nextDocuments) => {
         const personResponse = await API.put({
           path: `/person/${person._id}`,
@@ -68,7 +69,6 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
         );
         return true;
       }}
-      documents={documents}
       personId={person._id}
       title={`Documents de ${person.name}`}
       canToggleGroupCheck={canToggleGroupCheck}

@@ -88,7 +88,6 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
         };
       }
     }
-    console.log({ consultationsDocs });
     return [...Object.values(ordonnances), ...Object.values(consultationsDocs), ...Object.values(otherDocs)].sort(
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
