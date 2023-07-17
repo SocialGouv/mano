@@ -129,13 +129,18 @@ const ActionsSortableList = ({ data, limit }) => {
             render: (action) => <ActionStatus status={action.status} />,
           },
           {
-            title: 'Équipe en charge',
+            title: 'Équipe(s) en charge',
             dataKey: 'team',
-            render: (a) => (
-              <div className="px-2 tw-flex-shrink-0">
-                {Array.isArray(a?.teams) ? a.teams.map((e) => <TagTeam key={e} teamId={e} />) : <TagTeam teamId={a?.team} />}
-              </div>
-            ),
+            render: (a) => {
+              if (!Array.isArray(a?.teams)) return <TagTeam teamId={a?.team} />;
+              return (
+                <div className="tw-flex tw-flex-col">
+                  {a.teams.map((e) => (
+                    <TagTeam key={e} teamId={e} />
+                  ))}
+                </div>
+              );
+            },
           },
         ]}
       />

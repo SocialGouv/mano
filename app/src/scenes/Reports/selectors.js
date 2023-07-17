@@ -58,13 +58,13 @@ export const commentsForReport = selectorFamily({
     ({ date }) =>
     ({ get }) => {
       const now = Date.now();
-      console.log('commentsForReport start');
       const actions = get(actionsObjectSelector);
       const persons = get(itemsGroupedByPersonSelector);
       const comments = get(commentsState);
       const currentTeam = get(currentTeamState);
       const filteredComments = comments
         .filter((c) => c.team === currentTeam._id)
+        .filter((c) => !c.comment.includes('a changé le status'))
         .filter((c) => getIsDayWithinHoursOffsetOfDay(c.date || c.createdAt, date, currentTeam?.nightSession ? 12 : 0))
         .map((comment) => {
           const commentPopulated = { ...comment };
@@ -77,13 +77,12 @@ export const commentsForReport = selectorFamily({
             const id = comment.action;
             const action = actions[id];
             commentPopulated.action = action;
-            commentPopulated.person = persons[action.person];
+            commentPopulated.personPopulated = persons[action.person];
             commentPopulated.type = 'action';
           }
           return commentPopulated;
         })
         .filter((c) => c.action || c.person);
-      console.log('commentsForReport', Date.now() - now);
       return filteredComments;
     },
 });

@@ -51,6 +51,7 @@ const CommentsForReport = ({ navigation, route }) => {
   const renderItem = ({ item }) => {
     const comment = item;
     const commentedItem = comment.type === 'action' ? comment.action : comment.person;
+
     return (
       <CommentRow
         key={comment._id}
@@ -59,7 +60,11 @@ const CommentsForReport = ({ navigation, route }) => {
         canToggleGroupCheck={
           !!organisation.groupsEnabled && comment.person?._id && groups.find((group) => group.persons.includes(comment.person._id))
         }
-        itemName={`${comment.type === 'action' ? 'Action' : 'Personne suivie'} : ${commentedItem?.name}`}
+        itemName={
+          comment.type === 'action'
+            ? `Action : ${commentedItem?.name} (pour ${comment.personPopulated?.name})`
+            : `Personne suivie : ${commentedItem?.name}`
+        }
         onItemNamePress={() => (comment.type === 'action' ? onActionPress(comment.action) : onPseudoPress(comment.person))}
         onDelete={async () => {
           const response = await API.delete({ path: `/comment/${comment._id}` });
