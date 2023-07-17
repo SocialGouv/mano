@@ -1,3 +1,10 @@
+## [1.280.4](https://github.com/SocialGouv/mano/compare/v1.280.3...v1.280.4) (2023-07-17)
+
+
+### Bug Fixes
+
+* **dashboard:** toujours montrer les documents/passages même quand pas de champ person ([52f8fdf](https://github.com/SocialGouv/mano/commit/52f8fdfb6ea2bc4f0181b9a694b8d3b920f11739))
+
 ## [1.280.3](https://github.com/SocialGouv/mano/compare/v1.280.2...v1.280.3) (2023-07-14)
 
 
