@@ -554,7 +554,7 @@ const Stats = () => {
             personsCreated={personsCreated}
             personsUpdated={personsUpdated}
             rencontres={rencontresFilteredByPersons}
-            actions={actionsFilteredByPersons}
+            actions={actionsWithDetailedGroupAndCategories}
             // numberOfActionsPerPersonConcernedByActions={numberOfActionsPerPersonConcernedByActions}
             personsWithActions={personsWithActions}
             // filter by persons
