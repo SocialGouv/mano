@@ -68,6 +68,7 @@ const DocumentsManager = ({ personDB, documents = [], onAddDocument, onDelete })
 
             setAsset({
               ...document,
+              type: 'document',
               fileName: document.name,
               base64,
             });
@@ -125,10 +126,12 @@ const DocumentsManager = ({ personDB, documents = [], onAddDocument, onDelete })
     setName('');
   };
 
+  const onlyDocuments = documents.filter((doc) => doc.type !== 'folder');
+
   return (
     <>
-      {documents.length > 0 && <Hint>Cliquez sur un document pour le consulter</Hint>}
-      {documents.map((doc) => (
+      {onlyDocuments.length > 0 && <Hint>Cliquez sur un document pour le consulter</Hint>}
+      {onlyDocuments.map((doc) => (
         <Document key={doc.name} document={doc} personId={personDB._id} onDelete={onDelete} />
       ))}
       <Button caption="Ajouter..." disabled={!!loading} loading={!!loading} onPress={onAddPress} />
