@@ -97,7 +97,7 @@ export default function DocumentsOrganizer({ items, linkedItemType, onSave, onFo
   );
 
   return (
-    <>
+    <div id={`${linkedItemType}-documents`}>
       <div className="tw-flex tw-w-full tw-border tw-border-gray-100 tw-py-1 tw-text-xs tw-text-gray-400">
         <p className="tw-m-0 tw-grow tw-pl-4">Nom</p>
         <div style={informationsStyle} className="tw-flex tw-shrink-0 tw-items-center">
@@ -109,7 +109,7 @@ export default function DocumentsOrganizer({ items, linkedItemType, onSave, onFo
       </div>
       <div
         // key={reloadTreeKey}
-        id={`${linkedItemType}-documents`}
+
         ref={rootRef}
         className="tw-overflow-x-hidden tw-pb-10 tw-text-gray-800">
         <Branch
@@ -133,7 +133,7 @@ export default function DocumentsOrganizer({ items, linkedItemType, onSave, onFo
           {/* <Loader color="#bbbbbb" size={40} /> */}
         </div>
       )}
-    </>
+    </div>
   );
 }
 
@@ -167,6 +167,9 @@ function Branch({
   color,
 }: BranchProps) {
   const open = initShowOpen || openedFolderIds.includes(folder._id);
+  if (!folder.children.length && !openedFolderIds.includes(folder._id)) {
+    setOpenedFolderIds([...openedFolderIds, folder._id]);
+  }
   const parentIsOpen = openedFolderIds.includes(parentId);
   const gridRef = useRef<HTMLDivElement>(null);
   const sortableRef = useRef<SortableJS>();
@@ -239,12 +242,7 @@ function Branch({
       <div
         ref={gridRef}
         id={`child-container-${folder._id || 'root'}`}
-        className={[
-          'tw-flex tw-flex-col',
-          level >= 0 ? 'tw-pl-10' : '',
-          !open ? 'tw-hidden' : '',
-          //  lol
-        ].join(' ')}>
+        className={['tw-flex tw-flex-col', level >= 0 ? 'tw-pl-10' : '', !open ? 'tw-hidden' : ''].join(' ')}>
         {!folder.children?.length && !!open && (
           <p
             data-id="empty-folder"
