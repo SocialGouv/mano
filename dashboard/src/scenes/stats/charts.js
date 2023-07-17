@@ -101,13 +101,20 @@ export const CustomResponsiveBar = ({
     categories = chartData.map((cat) => cat.name);
   }
 
-  const total = useMemo(() => {
-    if (!isMultiChoice) return data.reduce((sum, item) => sum + getItemValue(item), 0);
+  const biggestValue = useMemo(() => {
+    if (!isMultiChoice) {
+      return chartData.map((item) => getItemValue(item)).reduce((max, value) => Math.max(max, value), 1);
+    }
     // if we have multiple choice, data is sorted already in getMultichoiceBarData
     const biggestItem = chartData[0]; // { name: 'A name', ['A name']: 123 }
     const biggestItemValue = biggestItem?.[biggestItem?.name];
     return biggestItemValue || 1;
-  }, [data, chartData, isMultiChoice]);
+  }, [chartData, isMultiChoice]);
+
+  const total = useMemo(() => {
+    if (!isMultiChoice) return data.reduce((sum, item) => sum + getItemValue(item), 0);
+    return biggestValue;
+  }, [data, biggestValue, isMultiChoice]);
 
   const onClick = ({ id }) => {
     if (!onItemClick) return;
@@ -169,7 +176,7 @@ export const CustomResponsiveBar = ({
           indexBy="name"
           margin={{ top: 10, right: 0, bottom: 60, left: 60 }}
           padding={0.3}
-          maxValue={total}
+          maxValue={biggestValue}
           valueScale={{ type: 'linear' }}
           indexScale={{ type: 'band', round: true }}
           colors={{ scheme: 'set2' }}
