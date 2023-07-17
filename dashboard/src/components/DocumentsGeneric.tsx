@@ -174,7 +174,7 @@ function DocumentTable({
 
   if (!documents.length) {
     return (
-      <div className="tw-flex tw-flex-col tw-items-center tw-gap-6">
+      <div className="tw-flex tw-flex-col tw-items-center tw-gap-6 tw-pb-6">
         <div className="tw-mt-8 tw-mb-2 tw-w-full tw-text-center tw-text-gray-300">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -187,13 +187,13 @@ function DocumentTable({
             fill="none"
             strokeLinecap="round"
             strokeLinejoin="round">
-            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-            <path d="M3 20l1.3 -3.9a9 8 0 1 1 3.4 2.9l-4.7 1"></path>
-            <line x1={12} y1={12} x2={12} y2="12.01"></line>
-            <line x1={8} y1={12} x2={8} y2="12.01"></line>
-            <line x1={16} y1={12} x2={16} y2="12.01"></line>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
+            />
           </svg>
-          Aucun commentaire pour le moment
+          Aucun document pour le moment
         </div>
         <label aria-label="Ajouter des documents" className={`button-submit mb-0 !tw-bg-${color}`}>
           ＋ Ajouter des documents

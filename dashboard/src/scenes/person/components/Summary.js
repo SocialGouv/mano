@@ -39,13 +39,13 @@ export default function Summary({ person }) {
               })}
             </div>
 
-            <div className="tw-col-span-4 tw-flex tw-h-0 tw-min-h-full tw-flex-col tw-gap-4 tw-overflow-auto">
+            <div className="tw-col-span-4 tw-flex tw-h-screen tw-flex-col tw-gap-4 tw-self-stretch tw-overflow-auto">
               {(organisation.rencontresEnabled === true || organisation.passagesEnabled === true) && (
-                <div className="tw-h-1/2 tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+                <div className="tw-basis-1/2 tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
                   <PassagesRencontres person={person} />
                 </div>
               )}
-              <div className="tw-h-1/2 tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+              <div className="tw-basis-1/2 tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
                 <PersonDocuments person={person} />
               </div>
             </div>
