@@ -107,11 +107,12 @@ test("Documents organizer", async ({ page }) => {
   const now3 = dayjs();
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Dossier créé !").click();
-  await page
-    .locator("span")
-    .filter({ hasText: `▶📁Dossier1(0)User Admin Test - 1${now3.format("dddd D MMMM YYYY HH:mm")}` })
-    .locator("small")
-    .click();
+  // await page
+  //   .locator("span")
+  //   .filter({ hasText: `▼📁Dossier1(0)User Admin Test - 1${now3.format("dddd D MMMM YYYY HH:mm")}` })
+  //   .locator("small")
+  //   .click();
+
   // drag and drop not possible - we just test the CRUD
   await page.getByText("Dossier vide").click();
   await page.getByRole("button", { name: "📂 Dossier1 (0)" }).click();
@@ -146,7 +147,7 @@ test("Documents organizer", async ({ page }) => {
     page.locator("#person-documents").filter({ hasText: `📃image-4\.jpgUser Admin Test - 1${now2.format("dddd D MMMM YYYY HH:mm")}` })
   ).toBeVisible();
   // await expect(page.getByRole("button", { name: "📂 👪 Documents familiaux(1)" })).toBeVisible();
-  await expect(page.locator("span").filter({ hasText: `▶📁Dossier2(0)User Admin Test - 1${now3.format("dddd D MMMM YYYY HH:mm")}` })).toBeVisible();
+  await expect(page.locator("span").filter({ hasText: `▼📂Dossier2(0)User Admin Test - 1${now3.format("dddd D MMMM YYYY HH:mm")}` })).toBeVisible();
   await page.getByRole("button", { name: "📃 image-2.jpg" }).click();
   page.once("dialog", (dialog) => {
     expect(dialog.message()).toBe(`Voulez-vous vraiment supprimer ce document ?`);
@@ -154,7 +155,8 @@ test("Documents organizer", async ({ page }) => {
   });
   await page.getByRole("dialog", { name: "image-2.jpg" }).getByRole("button", { name: "Supprimer" }).click();
   await page.getByText("Document supprimé").click();
-  await page.getByRole("button", { name: "📁 Dossier2 (0)" }).click();
+
+  await page.getByRole("button", { name: "📂 Dossier2 (0)" }).click();
   page.once("dialog", (dialog) => {
     expect(dialog.message()).toBe(`Voulez-vous vraiment supprimer ce dossier ?`);
     dialog.accept();
@@ -182,6 +184,6 @@ test("Documents organizer", async ({ page }) => {
   ).toBeVisible();
   // await expect(page.locator("#family-person-documents").getByRole("button", { name: "📂 👪 Documents familiaux(1)" })).toBeVisible();
   await expect(
-    page.locator("span").filter({ hasText: `▶📁Dossier2(0)User Admin Test - 1${now3.format("dddd D MMMM YYYY HH:mm")}` })
+    page.locator("span").filter({ hasText: `▼📁Dossier2(0)User Admin Test - 1${now3.format("dddd D MMMM YYYY HH:mm")}` })
   ).not.toBeVisible();
 });
