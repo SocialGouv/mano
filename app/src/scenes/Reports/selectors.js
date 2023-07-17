@@ -77,13 +77,12 @@ export const commentsForReport = selectorFamily({
             const id = comment.action;
             const action = actions[id];
             commentPopulated.action = action;
-            commentPopulated.person = persons[action.person];
+            commentPopulated.personPopulated = persons[action.person];
             commentPopulated.type = 'action';
           }
           return commentPopulated;
         })
         .filter((c) => c.action || c.person);
-      console.log('commentsForReport', Date.now() - now);
       return filteredComments;
     },
 });
