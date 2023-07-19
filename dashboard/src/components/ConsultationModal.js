@@ -177,7 +177,6 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
         await createReportAtDateIfNotExist(completedAt);
       }
     }
-    console.log({ closeOnSubmit });
     if (closeOnSubmit) onClose();
     return true;
   }
@@ -480,7 +479,6 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                       return d;
                     }),
                   };
-                  console.log('newData', newData);
                   setData(newData);
                   const ok = await handleSubmit({ newData });
                   if (ok) toast.success('Document mis à jour');

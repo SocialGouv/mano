@@ -60,7 +60,6 @@ export default function MedicalFile({ person }: MedicalFileProps) {
 
   useEffect(() => {
     if (!medicalFile) {
-      console.log('Creating medical file');
       API.post({
         path: '/medical-file',
         body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({

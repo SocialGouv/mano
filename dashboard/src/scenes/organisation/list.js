@@ -30,12 +30,8 @@ const List = () => {
   useEffect(() => {
     (async () => {
       if (!refresh) return;
-      const now = Date.now();
-      console.log('refreshing');
       const { data } = await API.get({ path: '/organisation', query: { withCounters: true } });
-      console.log('data downloaded', Date.now() - now);
       const sortedDataAscendant = data?.sort((org1, org2) => (org1[sortBy] > org2[sortBy] ? 1 : -1));
-      console.log('data sorted', Date.now() - now);
       setOrganisations(sortOrder === 'ASC' ? sortedDataAscendant : [...(sortedDataAscendant || [])].reverse());
       setUpdateKey((k) => k + 1);
       setRefresh(false);

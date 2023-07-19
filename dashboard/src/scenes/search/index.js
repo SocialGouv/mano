@@ -642,8 +642,6 @@ const TerritoryObservations = ({ observations }) => {
   if (!observations?.length) return <div />;
   const moreThanOne = observations.length > 1;
 
-  console.log({ observations });
-
   return (
     <Table
       className="Table"
