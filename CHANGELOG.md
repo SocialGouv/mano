@@ -1,3 +1,10 @@
+## [1.280.5](https://github.com/SocialGouv/mano/compare/v1.280.4...v1.280.5) (2023-07-19)
+
+
+### Bug Fixes
+
+* Action missing person in reception ([#1617](https://github.com/SocialGouv/mano/issues/1617)) ([4cf4047](https://github.com/SocialGouv/mano/commit/4cf40476d8728e06f7eda13e59245b64539340d0))
+
 ## [1.280.4](https://github.com/SocialGouv/mano/compare/v1.280.3...v1.280.4) (2023-07-17)
 
 
