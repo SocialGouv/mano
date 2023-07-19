@@ -461,8 +461,6 @@ function CommentModal({
     return false;
   }, [comment, isNewComment, user]);
 
-  console.log('comment', comment);
-
   return (
     <>
       <ModalContainer

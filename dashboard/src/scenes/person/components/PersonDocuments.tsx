@@ -67,13 +67,6 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
         // the document can be a group document, or a person document
         // so we need to get the person to update
         const _person = document.linkedItem.item as PersonInstance;
-        console.log('document', document);
-        console.log(
-          _person.documents?.map((d) => {
-            if (d._id === document._id) return document;
-            return d;
-          })
-        );
         const personResponse = await API.put({
           path: `/person/${_person._id}`,
           body: preparePersonForEncryption({
@@ -86,7 +79,6 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
         });
         if (personResponse.ok) {
           const newPerson = personResponse.decryptedData;
-          console.log('newPerson', newPerson);
           setPersons((persons) =>
             persons.map((p) => {
               if (p._id === _person._id) return newPerson;

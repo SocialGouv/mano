@@ -27,7 +27,6 @@ const PersonFamily = ({ person }) => {
   const onAddFamilyLink = async (e) => {
     e.preventDefault();
     const { personId, description, ...otherNewRelations } = Object.fromEntries(new FormData(e.target));
-    console.log({ personId, description, otherNewRelations });
     if (person._id === personId) {
       return toast.error("Le lien avec cette personne est vite vu : c'est elle !");
     }
@@ -56,7 +55,6 @@ const PersonFamily = ({ person }) => {
     for (const otherNewRelation of Object.keys(otherNewRelations) || []) {
       const otherPersonId = otherNewRelation.replace('description-', '');
       const description = otherNewRelations[otherNewRelation];
-      console.log({ otherPersonId, description });
       if (person._id === otherPersonId) {
         continue;
       }

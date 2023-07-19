@@ -37,7 +37,7 @@ export default function ActionModal() {
     return actionsObjects[currentActionId];
   }, [currentActionId, actionsObjects]);
   const personId = searchParams.get('personId');
-  const personIds = searchParams.get('personIds')?.split(',');
+  const personIds = searchParams.get('personIds')?.split(',').filter(Boolean);
   const dueAt = searchParams.get('dueAt');
   const completedAt = searchParams.get('completedAt');
 
@@ -405,7 +405,9 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
                     {isMulti ? 'Personne(s) suivie(s)' : 'Personne suivie'}
                   </label>
                   {isEditing ? (
-                    <SelectPerson noLabel value={data.person} onChange={handleChange} isMulti={isMulti} inputId="create-action-person-select" />
+                    <div className="tw-w-full">
+                      <SelectPerson noLabel value={data.person} onChange={handleChange} isMulti={isMulti} inputId="create-action-person-select" />
+                    </div>
                   ) : (
                     <PersonName item={data} />
                   )}
@@ -415,12 +417,14 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
                     Catégorie(s)
                   </label>
                   {isEditing ? (
-                    <ActionsCategorySelect
-                      values={data.categories}
-                      id="categories"
-                      onChange={(v) => handleChange({ currentTarget: { value: v, name: 'categories' } })}
-                      withMostUsed
-                    />
+                    <div className="tw-w-full">
+                      <ActionsCategorySelect
+                        values={data.categories}
+                        id="categories"
+                        onChange={(v) => handleChange({ currentTarget: { value: v, name: 'categories' } })}
+                        withMostUsed
+                      />
+                    </div>
                   ) : (
                     <CustomFieldDisplay value={data.categories?.join(', ')} type="text" />
                   )}
@@ -458,6 +462,40 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
                     </label>
                   </div>
                 )}
+                <div>
+                  {!!isNewAction && !['restricted-access'].includes(user.role) && (
+                    <>
+                      <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
+                        <label htmlFor="create-comment-description">Commentaire (optionnel)</label>
+                        <textarea
+                          id="create-comment-description"
+                          name="comment"
+                          value={data.comment}
+                          onChange={handleChange}
+                          className="tw-w-full tw-rounded tw-border tw-border-gray-300 tw-py-1.5 tw-px-3 tw-text-base tw-transition-all"
+                        />
+                      </div>
+                      <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
+                        <label htmlFor="create-comment-urgent">
+                          <input
+                            type="checkbox"
+                            id="create-comment-urgent"
+                            style={{ marginRight: '0.5rem' }}
+                            name="commentUrgent"
+                            checked={data.commentUrgent}
+                            onChange={() => {
+                              handleChange({
+                                target: { name: 'commentUrgent', checked: Boolean(!data.commentUrgent), value: Boolean(!data.commentUrgent) },
+                              });
+                            }}
+                          />
+                          Commentaire prioritaire <br />
+                          <small className="text-muted">Ce commentaire sera mise en avant par rapport aux autres</small>
+                        </label>
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
               <div className="tw-flex tw-shrink-0 tw-flex-col tw-px-4">
                 <hr className="tw-m-0 tw-w-px tw-shrink-0 tw-basis-full tw-border tw-bg-gray-300" />
@@ -469,15 +507,7 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
                   </label>
                   {isEditing ? (
                     <>
-                      <div>
-                        <DatePicker
-                          withTime={data.withTime}
-                          id="dueAt"
-                          name="dueAt"
-                          defaultValue={data.dueAt ?? new Date()}
-                          onChange={handleChange}
-                        />
-                      </div>
+                      <DatePicker withTime={data.withTime} id="dueAt" name="dueAt" defaultValue={data.dueAt ?? new Date()} onChange={handleChange} />
                       <div>
                         <input
                           type="checkbox"
@@ -501,13 +531,15 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
                     Équipe(s) en charge
                   </label>
                   {isEditing ? (
-                    <SelectTeamMultiple
-                      onChange={(teamIds) => handleChange({ target: { value: teamIds, name: 'teams' } })}
-                      value={Array.isArray(data.teams) ? data.teams : [data.team]}
-                      colored
-                      inputId="create-action-team-select"
-                      classNamePrefix="create-action-team-select"
-                    />
+                    <div className="tw-w-full">
+                      <SelectTeamMultiple
+                        onChange={(teamIds) => handleChange({ target: { value: teamIds, name: 'teams' } })}
+                        value={Array.isArray(data.teams) ? data.teams : [data.team]}
+                        colored
+                        inputId="create-action-team-select"
+                        classNamePrefix="create-action-team-select"
+                      />
+                    </div>
                   ) : (
                     <div className="tw-flex tw-flex-col">
                       {(Array.isArray(data.teams) ? data.teams : [data.team]).map((teamId) => (
@@ -535,13 +567,15 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
                 </div>
                 <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
                   <label htmlFor="update-action-select-status">Statut</label>
-                  <SelectStatus
-                    name="status"
-                    value={data.status || ''}
-                    onChange={handleChange}
-                    inputId="update-action-select-status"
-                    classNamePrefix="update-action-select-status"
-                  />
+                  <div className="tw-w-full">
+                    <SelectStatus
+                      name="status"
+                      value={data.status || ''}
+                      onChange={handleChange}
+                      inputId="update-action-select-status"
+                      classNamePrefix="update-action-select-status"
+                    />
+                  </div>
                 </div>
                 <div
                   className={['tw-mb-4 tw-flex tw-flex-1 tw-flex-col', [DONE, CANCEL].includes(data.status) ? 'tw-visible' : 'tw-invisible'].join(
@@ -553,40 +587,6 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
                   </div>
                 </div>
               </div>
-            </div>
-            <div>
-              {!!isNewAction && !['restricted-access'].includes(user.role) && (
-                <>
-                  <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
-                    <label htmlFor="create-comment-description">Commentaire (optionnel)</label>
-                    <textarea
-                      id="create-comment-description"
-                      name="comment"
-                      value={data.comment}
-                      onChange={handleChange}
-                      className="tw-w-full tw-rounded tw-border tw-border-gray-300 tw-py-1.5 tw-px-3 tw-text-base tw-transition-all"
-                    />
-                  </div>
-                  <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
-                    <label htmlFor="create-comment-urgent">
-                      <input
-                        type="checkbox"
-                        id="create-comment-urgent"
-                        style={{ marginRight: '0.5rem' }}
-                        name="commentUrgent"
-                        checked={data.commentUrgent}
-                        onChange={() => {
-                          handleChange({
-                            target: { name: 'commentUrgent', checked: Boolean(!data.commentUrgent), value: Boolean(!data.commentUrgent) },
-                          });
-                        }}
-                      />
-                      Commentaire prioritaire <br />
-                      <small className="text-muted">Ce commentaire sera mise en avant par rapport aux autres</small>
-                    </label>
-                  </div>
-                </>
-              )}
             </div>
           </div>
           {!['restricted-access'].includes(user.role) && (

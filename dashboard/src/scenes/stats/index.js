@@ -184,11 +184,7 @@ const itemsForStatsSelector = selectorFamily({
             if (date >= isoEndDate) continue;
             passagesFilteredByPersons.push(passage);
             personsWithPassages[person._id] = person;
-            // if (person._id === 'ffd41d5a-c273-4548-b94b-750354ff3aff') {
-            //   console.log('passage', createdDate, isoStartDate, createdDate < isoStartDate);
-            // }
             if (createdDate < isoStartDate) {
-              // console.log('passage before period', person._id, person.firstName);
               personsInPassagesBeforePeriod[person._id] = person;
             }
           }
