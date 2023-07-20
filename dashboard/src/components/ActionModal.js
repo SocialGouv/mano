@@ -591,10 +591,7 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
           </div>
           {!['restricted-access'].includes(user.role) && (
             <div
-              className={[
-                'tw-flex tw-w-full tw-flex-col tw-flex-wrap tw-gap-4 tw-overflow-y-auto sm:tw-h-[50vh]',
-                activeTab !== 'Commentaires' && 'tw-hidden',
-              ]
+              className={['tw-flex tw-w-full tw-flex-col tw-gap-4 tw-overflow-y-auto sm:tw-h-[50vh]', activeTab !== 'Commentaires' && 'tw-hidden']
                 .filter(Boolean)
                 .join(' ')}>
               <CommentsModule

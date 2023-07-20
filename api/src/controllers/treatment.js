@@ -4,7 +4,7 @@ const passport = require("passport");
 const { Op } = require("sequelize");
 const { z } = require("zod");
 const { catchErrors } = require("../errors");
-const { Treatment } = require("../db/sequelize");
+const { Treatment, sequelize } = require("../db/sequelize");
 const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
 const validateUser = require("../middleware/validateUser");
 const { looseUuidRegex, positiveIntegerRegex } = require("../utils");
@@ -89,6 +89,49 @@ router.get(
       attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "createdAt", "updatedAt", "deletedAt"],
     });
     return res.status(200).send({ ok: true, data, hasMore: data.length === Number(limit), total });
+  })
+);
+
+router.put(
+  "/documents-reorder",
+  passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"], { healthcareProfessional: true }),
+  validateEncryptionAndMigrations,
+  catchErrors(async (req, res, next) => {
+    try {
+      z.array(
+        z.object({
+          _id: z.string().regex(looseUuidRegex),
+          encrypted: z.string(),
+          encryptedEntityKey: z.string(),
+        })
+      ).parse(req.body);
+    } catch (e) {
+      const error = new Error(`Invalid request in treatment document order: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+
+    await sequelize.transaction(async (t) => {
+      for (const treatment of req.body) {
+        const query = { where: { _id: treatment._id, organisation: req.user.organisation } };
+        if (!(await Treatment.findOne(query))) {
+          const error = new Error(`Treatment not found`);
+          error.status = 404;
+          throw error;
+        }
+
+        const { encrypted, encryptedEntityKey } = treatment;
+
+        const updateTreatment = {
+          encrypted: encrypted,
+          encryptedEntityKey: encryptedEntityKey,
+        };
+        await Treatment.update(updateTreatment, query, { silent: false, transaction: t });
+      }
+    });
+
+    return res.status(200).send({ ok: true });
   })
 );
 

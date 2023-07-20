@@ -444,7 +444,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
           </form>
           <div
             className={[
-              'tw-flex tw-h-[50vh] tw-w-full tw-flex-col tw-flex-wrap tw-gap-4 tw-overflow-y-auto',
+              'tw-flex tw-h-[50vh] tw-w-full tw-flex-col tw-gap-4 tw-overflow-y-auto',
               activeTab !== 'Documents' && 'tw-hidden',
             ]
               .filter(Boolean)
@@ -454,7 +454,11 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                 personId={data.person}
                 color="blue-900"
                 showAssociatedItem={false}
-                documents={data.documents.map((doc) => ({ ...doc, linkedItem: { item: consultation, type: 'consultation' } }))}
+                documents={data.documents.map((doc) => ({
+                  ...doc,
+                  type: doc.type ?? 'document', // or 'folder'
+                  linkedItem: { _id: consultation?._id, type: 'consultation' },
+                }))}
                 onAddDocuments={async (nextDocuments) => {
                   const newData = {
                     ...data,
@@ -462,7 +466,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                   };
                   setData(newData);
                   const ok = await handleSubmit({ newData });
-                  if (ok) toast.success('Documents ajoutés');
+                  if (ok && nextDocuments.length > 1) toast.success('Documents ajoutés');
                 }}
                 onDeleteDocument={async (document) => {
                   const newData = { ...data, documents: data.documents.filter((d) => d._id !== document._id) };

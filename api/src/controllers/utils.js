@@ -28,7 +28,9 @@ router.get("/version", async (req, res) => {
     inAppMessage: [
       `La nouvelle version ${MOBILE_APP_VERSION} de Mano est disponible !`,
       `Vous avez la version ${req.headers.version} actuellement sur votre téléphone.
-Cette nouvelle version améliore considérablement la vitesse de l'application lors de la création de personne/d'action"
+Cette nouvelle version :
+- Permet la compatibilité avec la nouvelle organisation des dossiers sur le navigateur
+- Affiche le nome de la personne concernée dans les commentaires d'actions des comptes-rendus"
 `,
       [
         { text: "Télécharger", link: `https://mano-app.fabrique.social.gouv.fr/download?ts=${Date.now()}` },

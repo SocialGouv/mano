@@ -363,4 +363,14 @@ $theme-colors: (
   visibility: hidden;
 }
 
+.document-row {
+  position: relative;
+  overflow: visible !important;
+  &::before {
+    content: '';
+    @apply tw-absolute -tw-left-20 tw-right-0 tw-top-0 tw-h-full tw-bg-main;
+    border: 2px solid black;
+  }
+}
+
 @import '~bootstrap/scss/bootstrap.scss';

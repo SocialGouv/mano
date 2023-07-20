@@ -1,34 +1,43 @@
 import { useMemo, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { useHistory } from 'react-router-dom';
-import { userState, organisationAuthentifiedState } from '../recoil/auth';
+import { v4 as uuid } from 'uuid';
+import { userState, organisationAuthentifiedState, userAuthentifiedState } from '../recoil/auth';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from './tailwind/Modal';
 import { formatDateTimeWithNameOfDay } from '../services/date';
 import { FullScreenIcon } from '../scenes/person/components/FullScreenIcon';
 import UserName from './UserName';
-import type { DocumentForModule, Document, FileMetadata } from '../types/document';
+import type { DocumentWithLinkedItem, Document, FileMetadata, FolderWithLinkedItem, Folder, LinkedItemType } from '../types/document';
 import API from '../services/api';
 import { download, viewBlobInNewWindow } from '../utils';
 import type { UUIDV4 } from '../types/uuid';
 import PersonName from './PersonName';
 import { capture } from '../services/sentry';
 import { toast } from 'react-toastify';
+import DocumentsOrganizer from './DocumentsOrganizer';
+
+type ItemWithLink = DocumentWithLinkedItem | FolderWithLinkedItem;
+type Item = Document | Folder;
 
 interface DocumentsModuleProps {
-  documents: DocumentForModule[];
+  documents: ItemWithLink[];
   title?: string;
   personId: UUIDV4;
   showPanel?: boolean;
   showAssociatedItem?: boolean;
   canToggleGroupCheck?: boolean;
-  onDeleteDocument: (document: DocumentForModule) => Promise<boolean>;
-  onSubmitDocument: (document: DocumentForModule) => Promise<void>;
-  onAddDocuments: (documents: Document[]) => Promise<void>;
+  initialRootStructure?: Array<LinkedItemType | 'family-documents'>;
+  onDeleteDocument: (item: DocumentWithLinkedItem) => Promise<boolean>;
+  onSubmitDocument: (item: ItemWithLink) => Promise<void>;
+  onAddDocuments: (items: Item[]) => Promise<void>;
+  onSaveNewOrder?: (items: ItemWithLink[], root?: LinkedItemType) => Promise<boolean>;
+  onDeleteFolder?: (item: FolderWithLinkedItem) => Promise<boolean>;
   color?: 'main' | 'blue-900';
 }
 
 export function DocumentsModule({
   documents = [],
+  initialRootStructure = [],
   title = 'Documents',
   personId,
   showPanel = false,
@@ -37,23 +46,34 @@ export function DocumentsModule({
   onDeleteDocument,
   onSubmitDocument,
   onAddDocuments,
+  onSaveNewOrder,
+  onDeleteFolder = async () => false,
   color = 'main',
 }: DocumentsModuleProps) {
   if (!onDeleteDocument) throw new Error('onDeleteDocument is required');
   if (!onSubmitDocument) throw new Error('onSubmitDocument is required');
-  const [documentToEdit, setDocumentToEdit] = useState<DocumentForModule | null>(null);
+  const [documentToEdit, setDocumentToEdit] = useState<DocumentWithLinkedItem | null>(null);
+  const [folderToEdit, setFolderToEdit] = useState<FolderWithLinkedItem | null>(null);
+  const [addFolder, setAddFolder] = useState(false);
   const [fullScreen, setFullScreen] = useState(false);
+
+  const withDocumentOrganizer = !!onSaveNewOrder;
+  if (withDocumentOrganizer) {
+    if (!onSaveNewOrder) throw new Error('onSaveNewOrder is required');
+    if (!onDeleteFolder) throw new Error('onDeleteFolder is required');
+  }
+  const onlyDocuments = useMemo(() => documents.filter((d) => d.type !== 'folder'), [documents]) as DocumentWithLinkedItem[];
 
   return (
     <>
       {!!showPanel ? (
         <div className="tw-relative">
           <div className="tw-sticky tw-top-0 tw-z-10 tw-flex tw-items-center tw-bg-white tw-p-3">
-            <h4 className="tw-flex-1 tw-text-xl">Documents {documents.length ? `(${documents.length})` : ''}</h4>
+            <h4 className="tw-flex-1 tw-text-xl">Documents {onlyDocuments.length ? `(${onlyDocuments.length})` : ''}</h4>
             <div className="tw-flex tw-items-center tw-gap-2">
               <label
                 aria-label="Ajouter des documents"
-                className={`tw-text-md tw-mb-0 tw-h-8 tw-w-8 tw-rounded-full tw-font-bold tw-text-white tw-transition hover:tw-scale-125 tw-bg-${color} tw-inline-flex tw-items-center tw-justify-center`}>
+                className={`tw-text-md tw-mb-0 tw-h-8 tw-w-8 tw-cursor-pointer tw-rounded-full tw-font-bold tw-text-white tw-transition hover:tw-scale-125 tw-bg-${color} tw-inline-flex tw-items-center tw-justify-center`}>
                 ＋
                 <AddDocumentInput onAddDocuments={onAddDocuments} personId={personId} />
               </label>
@@ -69,7 +89,7 @@ export function DocumentsModule({
           </div>
           <DocumentTable
             withClickableLabel
-            documents={documents}
+            documents={onlyDocuments}
             color={color}
             onDisplayDocument={setDocumentToEdit}
             onAddDocuments={onAddDocuments}
@@ -79,7 +99,7 @@ export function DocumentsModule({
       ) : (
         <DocumentTable
           showAddDocumentButton
-          documents={documents}
+          documents={onlyDocuments}
           color={color}
           onDisplayDocument={setDocumentToEdit}
           onAddDocuments={onAddDocuments}
@@ -99,12 +119,30 @@ export function DocumentsModule({
           showAssociatedItem={showAssociatedItem}
         />
       )}
+      {withDocumentOrganizer && (!!addFolder || !!folderToEdit) && (
+        <FolderModal
+          key={`${addFolder}${folderToEdit?._id}`}
+          folder={folderToEdit}
+          onClose={() => {
+            setFolderToEdit(null);
+            setAddFolder(false);
+          }}
+          onDelete={onDeleteFolder}
+          onSubmit={onSubmitDocument}
+          onAddFolder={(folder) => onAddDocuments([folder])}
+          color={color}
+        />
+      )}
       <DocumentsFullScreen
         open={!!fullScreen}
-        documents={documents}
+        documents={withDocumentOrganizer ? documents : onlyDocuments}
         personId={personId}
+        initialRootStructure={initialRootStructure}
         onDisplayDocument={setDocumentToEdit}
         onAddDocuments={onAddDocuments}
+        onAddFolderRequest={() => setAddFolder(true)}
+        onEditFolderRequest={setFolderToEdit}
+        onSaveNewOrder={onSaveNewOrder}
         onClose={() => setFullScreen(false)}
         title={title}
         color={color}
@@ -115,28 +153,79 @@ export function DocumentsModule({
 
 interface DocumentsFullScreenProps {
   open: boolean;
-  documents: DocumentForModule[];
+  documents: Array<DocumentWithLinkedItem | FolderWithLinkedItem>;
+  initialRootStructure: Array<LinkedItemType | 'family-documents'>;
   personId: UUIDV4;
+  onSaveNewOrder?: (documents: ItemWithLink[], root?: LinkedItemType) => Promise<boolean>;
   onAddDocuments: (documents: Document[]) => Promise<void>;
-  onDisplayDocument: (document: DocumentForModule) => void;
+  onDisplayDocument: (document: DocumentWithLinkedItem) => void;
   onClose: () => void;
+  onAddFolderRequest: () => void;
+  onEditFolderRequest: (folder: FolderWithLinkedItem) => void;
   title: string;
   color: 'main' | 'blue-900';
 }
 
-function DocumentsFullScreen({ open, personId, documents, onClose, title, color, onDisplayDocument, onAddDocuments }: DocumentsFullScreenProps) {
+function DocumentsFullScreen({
+  open,
+  personId,
+  documents,
+  initialRootStructure,
+  onClose,
+  title,
+  color,
+  onDisplayDocument,
+  onAddDocuments,
+  onSaveNewOrder,
+  onAddFolderRequest,
+  onEditFolderRequest,
+}: DocumentsFullScreenProps) {
+  const withDocumentOrganizer = !!onSaveNewOrder;
   return (
-    <ModalContainer open={open} size="prose" onClose={onClose}>
+    <ModalContainer open={open} size={withDocumentOrganizer ? 'full' : 'prose'} onClose={onClose}>
       <ModalHeader title={title} />
       <ModalBody>
-        <DocumentTable
-          documents={documents}
-          onDisplayDocument={onDisplayDocument}
-          onAddDocuments={onAddDocuments}
-          withClickableLabel
-          color={color}
-          personId={personId}
-        />
+        {withDocumentOrganizer ? (
+          <div className="tw-min-h-1/2 ">
+            {initialRootStructure.map((root) => {
+              return (
+                <DocumentsOrganizer
+                  items={documents
+                    .filter((doc) => {
+                      const itemType = doc.linkedItem.type;
+                      const rootType = root === 'family-documents' ? 'person' : root;
+                      return itemType === rootType;
+                    })
+                    .map((doc) => {
+                      if (!!doc.parentId) return doc;
+                      return {
+                        ...doc,
+                        parentId: 'root',
+                      };
+                    })}
+                  linkedItemType={root}
+                  onSave={(newOrder, root) => {
+                    const ok = onSaveNewOrder(newOrder, root);
+                    if (!ok) onClose();
+                    return ok;
+                  }}
+                  onFolderClick={onEditFolderRequest}
+                  onDocumentClick={onDisplayDocument}
+                  color={color}
+                />
+              );
+            })}
+          </div>
+        ) : (
+          <DocumentTable
+            documents={documents as DocumentWithLinkedItem[]}
+            onDisplayDocument={onDisplayDocument}
+            onAddDocuments={onAddDocuments}
+            withClickableLabel
+            color={color}
+            personId={personId}
+          />
+        )}
       </ModalBody>
       <ModalFooter>
         <button type="button" name="cancel" className="button-cancel" onClick={onClose}>
@@ -146,16 +235,21 @@ function DocumentsFullScreen({ open, personId, documents, onClose, title, color,
           ＋ Ajouter des documents
           <AddDocumentInput onAddDocuments={onAddDocuments} personId={personId} />
         </label>
+        {!!withDocumentOrganizer && (
+          <button type="button" onClick={onAddFolderRequest} className={`button-submit mb-0 !tw-bg-${color}`}>
+            ＋ Ajouter un dossier
+          </button>
+        )}
       </ModalFooter>
     </ModalContainer>
   );
 }
 
 interface DocumentTableProps {
-  documents: DocumentForModule[];
+  documents: DocumentWithLinkedItem[];
   personId: UUIDV4;
   onAddDocuments: (documents: Document[]) => Promise<void>;
-  onDisplayDocument: (document: DocumentForModule) => void;
+  onDisplayDocument: (document: DocumentWithLinkedItem) => void;
   color: 'main' | 'blue-900';
   showAddDocumentButton?: boolean;
   withClickableLabel?: boolean;
@@ -216,14 +310,13 @@ function DocumentTable({
       <table className="tw-w-full tw-table-fixed">
         <tbody className="tw-text-sm">
           {(documents || []).map((doc, index) => {
-            console.log(doc);
             return (
               <tr
                 key={doc._id}
                 data-test-id={doc.downloadPath}
                 aria-label={`Document ${doc.name}`}
                 className={[
-                  'tw-w-full tw-border-t tw-border-zinc-200 tw-bg-blue-900',
+                  `tw-w-full tw-border-t tw-border-zinc-200 tw-bg-${color}`,
                   Boolean(index % 2) ? 'tw-bg-opacity-0' : 'tw-bg-opacity-5',
                 ].join(' ')}
                 onClick={() => {
@@ -231,18 +324,16 @@ function DocumentTable({
                 }}>
                 <td className="tw-p-3">
                   <p className="tw-m-0 tw-flex tw-items-center tw-overflow-hidden tw-font-bold">
-                    <p className="tw-m-0 tw-flex tw-items-center tw-overflow-hidden tw-font-bold">
-                      {!!organisation.groupsEnabled && !!doc.group && (
-                        <span className="tw-mr-2 tw-text-xl" aria-label="Commentaire familial" title="Commentaire familial">
-                          👪
-                        </span>
-                      )}
-                    </p>
+                    {!!organisation.groupsEnabled && !!doc.group && (
+                      <span className="tw-mr-2 tw-text-xl" aria-label="Document familial" title="Document familial">
+                        👪
+                      </span>
+                    )}
                     {doc.name}
                   </p>
-                  {!!organisation.groupsEnabled && !!doc.group && personId !== doc.linkedItem.item._id && (
+                  {!!organisation.groupsEnabled && !!doc.group && personId !== doc.linkedItem._id && (
                     <p className="tw--xs tw-m-0 tw-mt-1">
-                      Ce document est lié à <PersonName item={{ person: doc.linkedItem.item._id }} />
+                      Ce document est lié à <PersonName item={{ person: doc.linkedItem._id }} />
                     </p>
                   )}
                   <div className="tw-flex tw-text-xs">
@@ -254,7 +345,7 @@ function DocumentTable({
                     </div>
                     {!!withClickableLabel && !['medical-file', 'person'].includes(doc.linkedItem?.type) && (
                       <div>
-                        <div className="tw-rounded tw-border tw-border-blue-900 tw-bg-blue-900/10 tw-px-1">
+                        <div className={`tw-rounded tw-border tw-border-${color} tw-bg-${color} tw-bg-opacity-10 tw-px-1`}>
                           {doc.linkedItem.type === 'treatment' && 'Traitement'}
                           {doc.linkedItem.type === 'consultation' && 'Consultation'}
                         </div>
@@ -311,6 +402,10 @@ function AddDocumentInput({ personId, onAddDocuments }: AddDocumentInputProps) {
             createdBy: user?._id ?? '',
             downloadPath: `/person/${personId}/document/${fileUploaded.filename}`,
             file: fileUploaded,
+            group: false,
+            parentId: 'root',
+            position: undefined,
+            type: 'document',
           };
           docsResponses.push(document);
         }
@@ -322,11 +417,11 @@ function AddDocumentInput({ personId, onAddDocuments }: AddDocumentInputProps) {
 }
 
 type DocumentModalProps = {
-  document: DocumentForModule;
+  document: DocumentWithLinkedItem;
   personId: UUIDV4;
   onClose: () => void;
-  onSubmit: (document: DocumentForModule) => Promise<void>;
-  onDelete: (document: DocumentForModule) => Promise<boolean>;
+  onSubmit: (document: DocumentWithLinkedItem) => Promise<void>;
+  onDelete: (document: DocumentWithLinkedItem) => Promise<boolean>;
   canToggleGroupCheck: boolean;
   showAssociatedItem: boolean;
   color: string;
@@ -356,10 +451,10 @@ function DocumentModal({ document, onClose, personId, onDelete, onSubmit, showAs
                 setIsUpdating(false);
                 setIsEditing(false);
               }}>
-              <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-blue-900'} htmlFor="create-consultation-name">
-                Nom (facultatif)
+              <label className={isEditing ? '' : `tw-text-sm tw-font-semibold tw-blue-${color}`} htmlFor="document-name">
+                Nom
               </label>
-              <input className="tailwindui" id="create-consultation-name" name="name" value={name} onChange={(e) => setName(e.target.value)} />
+              <input required className="tailwindui" id="document-name" name="name" value={name} onChange={(e) => setName(e.target.value)} />
             </form>
           ) : (
             <div className="tw-flex tw-w-full tw-flex-col tw-items-center tw-gap-2">
@@ -420,9 +515,9 @@ function DocumentModal({ document, onClose, personId, onDelete, onSubmit, showAs
                 <br />
                 <small className="tw-block tw-text-gray-500">Ce document sera visible pour toute la famille</small>
               </label>
-              {!!document.group && personId !== document.linkedItem.item._id && (
+              {!!document.group && personId !== document.linkedItem._id && (
                 <small className="tw-block tw-text-gray-500">
-                  Note: Ce document est lié à <PersonName item={{ person: document.linkedItem.item._id }} />
+                  Note: Ce document est lié à <PersonName item={{ person: document.linkedItem._id }} />
                 </small>
               )}
             </div>
@@ -434,7 +529,7 @@ function DocumentModal({ document, onClose, personId, onDelete, onSubmit, showAs
             <button
               onClick={() => {
                 const searchParams = new URLSearchParams(history.location.search);
-                searchParams.set('treatmentId', document.linkedItem.item._id);
+                searchParams.set('treatmentId', document.linkedItem._id);
                 history.push(`?${searchParams.toString()}`);
                 onClose();
               }}
@@ -446,7 +541,7 @@ function DocumentModal({ document, onClose, personId, onDelete, onSubmit, showAs
             <button
               onClick={() => {
                 const searchParams = new URLSearchParams(history.location.search);
-                searchParams.set('consultationId', document.linkedItem.item._id);
+                searchParams.set('consultationId', document.linkedItem._id);
                 history.push(`?${searchParams.toString()}`);
                 onClose();
               }}
@@ -479,7 +574,7 @@ function DocumentModal({ document, onClose, personId, onDelete, onSubmit, showAs
           Supprimer
         </button>
         {(isEditing || canSave) && (
-          <button title="Sauvegarder ce document" type="submit" className="button-submit !tw-bg-blue-900" form="edit-document-form">
+          <button title="Sauvegarder ce document" type="submit" className={`button-submit !tw-bg-${color}`} form="edit-document-form">
             Sauvegarder
           </button>
         )}
@@ -498,5 +593,108 @@ function DocumentModal({ document, onClose, personId, onDelete, onSubmit, showAs
         )}
       </ModalFooter>
     </ModalContainer>
+  );
+}
+
+interface FolderModalProps {
+  folder?: FolderWithLinkedItem | null;
+  onClose: () => void;
+  onDelete: (folder: FolderWithLinkedItem) => Promise<boolean>;
+  onSubmit: (folder: FolderWithLinkedItem) => Promise<void>;
+  onAddFolder: (items: Folder) => Promise<void>;
+  color?: 'main' | 'blue-900';
+}
+
+function FolderModal({ folder, onClose, onDelete, onSubmit, onAddFolder, color }: FolderModalProps) {
+  const isNewFolder = !folder?._id;
+  const user = useRecoilValue(userAuthentifiedState);
+
+  const initialName = useMemo(() => folder?.name, [folder?.name]);
+  const [name, setName] = useState(initialName ?? '');
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+
+  return (
+    <>
+      <ModalContainer open className="[overflow-wrap:anywhere]" size="prose">
+        <ModalHeader title={isNewFolder ? 'Créer un dossier' : 'Éditer le dossier'} />
+        <ModalBody className="tw-pb-4">
+          <div className="tw-flex tw-w-full tw-flex-col tw-justify-between tw-gap-4 tw-px-8 tw-py-4">
+            <form
+              id="edit-folder-form"
+              className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2"
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (!name) {
+                  toast.error('Veuillez saisir un nom');
+                  return false;
+                }
+                setIsUpdating(true);
+                if (isNewFolder) {
+                  const nextFolder: Folder = {
+                    _id: uuid(),
+                    name,
+                    createdAt: new Date(),
+                    createdBy: user._id,
+                    parentId: 'root',
+                    position: undefined,
+                    type: 'folder',
+                  };
+                  await onAddFolder(nextFolder);
+                } else {
+                  await onSubmit({ ...folder, name });
+                }
+                setIsUpdating(false);
+                setIsEditing(false);
+                onClose();
+                return true;
+              }}>
+              <div className="tw-flex tw-w-full tw-flex-col tw-gap-6">
+                <div className="tw-flex tw-flex-1 tw-flex-col">
+                  <label className={isEditing ? '' : `tw-text-sm tw-font-semibold tw-text-${color}`} htmlFor="folder-name">
+                    Nom
+                  </label>
+                  <input
+                    className="tailwindui"
+                    placeholder="Nouveau dossier"
+                    id="folder-name"
+                    name="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
+              </div>
+            </form>
+          </div>
+        </ModalBody>
+        <ModalFooter>
+          <button
+            type="button"
+            name="cancel"
+            className="button-cancel"
+            onClick={() => {
+              onClose();
+            }}>
+            Annuler
+          </button>
+          {!isNewFolder && (
+            <button
+              type="button"
+              className="button-destructive"
+              disabled={isUpdating}
+              onClick={async () => {
+                if (!window.confirm('Voulez-vous vraiment supprimer ce dossier ?')) return;
+                await onDelete(folder);
+                onClose();
+              }}>
+              Supprimer
+            </button>
+          )}
+          <button type="submit" form="edit-folder-form" className={`button-submit !tw-bg-${color}`} disabled={isUpdating}>
+            Enregistrer
+          </button>
+        </ModalFooter>
+      </ModalContainer>
+    </>
   );
 }

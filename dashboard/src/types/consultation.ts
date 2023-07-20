@@ -1,5 +1,5 @@
 import { UUIDV4 } from './uuid';
-import { Document } from './document';
+import { Document, Folder } from './document';
 
 export interface ConsultationInstance {
   _id: string;
@@ -11,7 +11,7 @@ export interface ConsultationInstance {
   dosage: string;
   frequency: string;
   indication: string;
-  documents: Document[];
+  documents: Array<Document | Folder>;
   comments: any[];
   createdAt: Date;
   updatedAt: Date;
