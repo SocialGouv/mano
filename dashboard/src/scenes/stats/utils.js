@@ -95,7 +95,7 @@ export const getMultichoiceBarData = (source, key, { options = [] } = {}) => {
       newData['Non renseigné'].push(item);
       return newData;
     }
-    const choices = typeof item[key] === 'string' ? item[key].split(',') : item[key];
+    const choices = typeof item[key] === 'string' ? [item[key]] : item[key];
 
     for (const choice of choices) {
       if (!newData[choice]) newData[choice] = [];
