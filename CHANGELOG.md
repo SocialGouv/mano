@@ -1,3 +1,10 @@
+# [1.281.0](https://github.com/SocialGouv/mano/compare/v1.280.5...v1.281.0) (2023-07-20)
+
+
+### Features
+
+* **dashboard:** documents organizer ([#1611](https://github.com/SocialGouv/mano/issues/1611)) ([788b04e](https://github.com/SocialGouv/mano/commit/788b04e0f0c4d3d74a7c6e3ab4eab44af44bc92d))
+
 ## [1.280.5](https://github.com/SocialGouv/mano/compare/v1.280.4...v1.280.5) (2023-07-19)
 
 
