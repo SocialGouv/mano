@@ -1,3 +1,10 @@
+## [1.281.1](https://github.com/SocialGouv/mano/compare/v1.281.0...v1.281.1) (2023-07-20)
+
+
+### Bug Fixes
+
+* **dashboard:** affichage des catégories d'action avec virgules dans les statistiques ([#1618](https://github.com/SocialGouv/mano/issues/1618)) ([2b58a48](https://github.com/SocialGouv/mano/commit/2b58a483f92d59087cf56f585e1554edf17fd42b))
+
 # [1.281.0](https://github.com/SocialGouv/mano/compare/v1.280.5...v1.281.0) (2023-07-20)
 
 
