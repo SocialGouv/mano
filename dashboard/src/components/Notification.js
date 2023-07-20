@@ -13,7 +13,7 @@ import DateBloc from './DateBloc';
 import Table from './table';
 import UserName from './UserName';
 import API from '../services/api';
-import { ModalContainer, ModalBody, ModalHeader, ModalFooter } from './tailwind/Modal';
+import { ModalContainer, ModalBody, ModalFooter } from './tailwind/Modal';
 import PersonName from './PersonName';
 import BellIconWithNotifications from '../assets/icons/BellIconWithNotifications';
 
@@ -103,8 +103,10 @@ const Actions = ({ setShowModal, actions, setSortOrder, setSortBy, sortBy, sortO
   if (!actions.length) return null;
   return (
     <>
-      <ModalHeader title="Actions urgentes et vigilance" />
-      <ModalBody className="tw-p-8">
+      <ModalBody className="relative tw-mb-6 tw-h-[45vh]">
+        <h3 className="tw-sticky tw-top-0 tw-mb-0 tw-flex tw-w-full tw-max-w-full tw-shrink-0 tw-items-center tw-justify-between tw-rounded-t-lg tw-border-b tw-border-gray-200 tw-bg-white tw-py-4 tw-px-4 tw-text-lg tw-font-medium tw-leading-6 tw-text-gray-900 sm:tw-px-6">
+          Actions urgents et vigilance
+        </h3>
         <Table
           data={actions}
           rowKey={'_id'}
@@ -200,8 +202,10 @@ const Comments = ({ setShowModal, comments }) => {
   if (!comments.length) return null;
   return (
     <>
-      <ModalHeader title="Commentaires urgents et vigilance" />
-      <ModalBody className="tw-p-4">
+      <ModalBody className="relative tw-h-[45vh]">
+        <h3 className="tw-sticky tw-top-0 tw-mb-0 tw-flex tw-w-full tw-max-w-full tw-shrink-0 tw-items-center tw-justify-between tw-rounded-t-lg tw-border-y tw-border-gray-200 tw-bg-white tw-py-4 tw-px-4 tw-text-lg tw-font-medium tw-leading-6 tw-text-gray-900 sm:tw-px-6">
+          Commentaires urgents et vigilance
+        </h3>
         <Table
           data={comments}
           rowKey={'_id'}
