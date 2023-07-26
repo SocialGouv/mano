@@ -133,11 +133,7 @@ test("Create action with comments", async ({ page }) => {
 
   await page.getByRole("button", { name: "Actions et commentaires urgents et vigilance" }).click();
 
-  await page
-    .getByRole("dialog", { name: "Commentaires urgents et vigilance" })
-    .getByRole("cell", { name: "action avec commentaire" })
-    .first()
-    .click();
+  await page.locator('[data-test-id="action avec commentaire"]').getByRole("cell", { name: "action avec commentaire" }).click();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/report\/.*\?reportsTeam=%5B%22.*%22%5D&tab=comment-created&actionId=.*/);
   await page.getByRole("button", { name: "Commentaires (1)" }).click();
   await expect(page.getByRole("heading", { name: "Action: action avec commentaire (créée par User Admin Test - 7)" })).toBeVisible();
@@ -155,7 +151,8 @@ test("Create action with comments", async ({ page }) => {
   await page.locator(`[data-test-id="${person1Name}Résumé"]`).getByText(person1Name).click();
 
   await page.getByRole("button", { name: "Actions et commentaires urgents et vigilance" }).click();
-  await page.getByRole("dialog", { name: "Commentaires urgents et vigilance" }).getByText(person1Name).nth(2).click();
+  await page.locator('[data-test-id="Une personne avec un commentaire prioritaire modifié"]').getByText(person1Name).click();
+
   await expect(page.getByRole("dialog", { name: "Commentaires urgents et vigilance" })).not.toBeVisible();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*/);
   await page.locator(`[data-test-id="${person1Name}Résumé"]`).getByText(person1Name).click();
@@ -184,7 +181,7 @@ test("Create action with comments", async ({ page }) => {
 
   await page.getByRole("button", { name: "Actions et commentaires urgents et vigilance" }).click();
   await page
-    .getByRole("dialog", { name: "Commentaires urgents et vigilance" })
+    .getByRole("dialog", { name: "Actions urgentes et vigilance" })
     .locator('[data-test-id="action avec commentaire"]')
     .getByRole("button", { name: "Déprioriser" })
     .click();
