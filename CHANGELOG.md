@@ -1,3 +1,10 @@
+## [1.282.1](https://github.com/SocialGouv/mano/compare/v1.282.0...v1.282.1) (2023-07-26)
+
+
+### Bug Fixes
+
+* **dashboard:** titre des actions/commentaires urgents ([#1619](https://github.com/SocialGouv/mano/issues/1619)) ([25f88d9](https://github.com/SocialGouv/mano/commit/25f88d94c7805c720d0b0ca7699e2c9c92072cc3))
+
 # [1.282.0](https://github.com/SocialGouv/mano/compare/v1.281.1...v1.282.0) (2023-07-26)
 
 
