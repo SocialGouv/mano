@@ -1,3 +1,10 @@
+# [1.282.0](https://github.com/SocialGouv/mano/compare/v1.281.1...v1.282.0) (2023-07-26)
+
+
+### Features
+
+* **dashboard:** ajouter l'id de la personne suivie dans l'export des actions ([810d815](https://github.com/SocialGouv/mano/commit/810d8158ac2dc7a3ba3fc420e791e7bd2ee7d119))
+
 ## [1.281.1](https://github.com/SocialGouv/mano/compare/v1.281.0...v1.281.1) (2023-07-20)
 
 
