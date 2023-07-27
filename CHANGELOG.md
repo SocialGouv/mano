@@ -1,3 +1,11 @@
+## [1.282.3](https://github.com/SocialGouv/mano/compare/v1.282.2...v1.282.3) (2023-07-27)
+
+
+### Bug Fixes
+
+* **dashboard:** peut mettre un commentaire prioritaire pour une action ([b523c06](https://github.com/SocialGouv/mano/commit/b523c06ce629882680d31a14cca3b30b89f07551))
+* **dashboard:** possibilité de modifier une action urgent ou pas sans cliquer sur le bouton Modifier ([7027c8f](https://github.com/SocialGouv/mano/commit/7027c8f96c7d85ae11f76f5cf051d5e0843b4379))
+
 ## [1.282.2](https://github.com/SocialGouv/mano/compare/v1.282.1...v1.282.2) (2023-07-27)
 
 
