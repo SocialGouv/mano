@@ -77,16 +77,17 @@ export default function Notification() {
         <BellIconWithNotifications size={24} notificationsNumber={actionsFiltered.length + commentsFiltered.length} />
       </button>
       <ModalContainer open={showModal} onClose={() => setShowModal(false)} size="full">
-        <Actions
-          setShowModal={setShowModal}
-          actions={actionsFiltered}
-          setSortOrder={setActionsSortOrder}
-          setSortBy={setActionsSortBy}
-          sortBy={actionsSortBy}
-          sortOrder={actionsSortOrder}
-        />
-        <Comments setShowModal={setShowModal} comments={commentsFiltered} />
-
+        <ModalBody className="relative tw-mb-6">
+          <Actions
+            setShowModal={setShowModal}
+            actions={actionsFiltered}
+            setSortOrder={setActionsSortOrder}
+            setSortBy={setActionsSortBy}
+            sortBy={actionsSortBy}
+            sortOrder={actionsSortOrder}
+          />
+          <Comments setShowModal={setShowModal} comments={commentsFiltered} />
+        </ModalBody>
         <ModalFooter>
           <ButtonCustom className="tw-my-4 tw-mx-auto" title="OK, merci" onClick={() => setShowModal(false)} />
         </ModalFooter>
@@ -102,96 +103,92 @@ const Actions = ({ setShowModal, actions, setSortOrder, setSortBy, sortBy, sortO
 
   if (!actions.length) return null;
   return (
-    <>
-      <ModalBody className="relative tw-mb-6 tw-h-[45vh]">
-        <div role="dialog" title="Actions urgentes et vigilance" name="Actions urgentes et vigilance">
-          <h3 className="tw-sticky tw-top-0 tw-mb-0 tw-flex tw-w-full tw-max-w-full tw-shrink-0 tw-items-center tw-justify-between tw-rounded-t-lg tw-border-b tw-border-gray-200 tw-bg-white tw-py-4 tw-px-4 tw-text-lg tw-font-medium tw-leading-6 tw-text-gray-900 sm:tw-px-6">
-            Actions urgentes et vigilance
-          </h3>
-          <Table
-            data={actions}
-            rowKey={'_id'}
-            dataTestId="name"
-            onRowClick={(action) => {
-              setShowModal(false);
-              const searchParams = new URLSearchParams(history.location.search);
-              searchParams.set('actionId', action._id);
-              history.push(`?${searchParams.toString()}`);
-            }}
-            columns={[
-              {
-                title: 'Date',
-                dataKey: 'dueAt',
-                onSortOrder: setSortOrder,
-                onSortBy: setSortBy,
-                sortBy,
-                sortOrder,
-                render: (action) => {
-                  return <DateBloc date={[DONE, CANCEL].includes(action.status) ? action.completedAt : action.dueAt} />;
-                },
-              },
-              {
-                title: 'Heure',
-                dataKey: '_id',
-                render: (action) => {
-                  if (!action.dueAt || !action.withTime) return null;
-                  return formatTime(action.dueAt);
-                },
-              },
-              { title: 'Nom', dataKey: 'name', onSortOrder: setSortOrder, onSortBy: setSortBy, sortBy, sortOrder },
-              {
-                title: 'Personne suivie',
-                dataKey: 'person',
-                onSortOrder: setSortOrder,
-                onSortBy: setSortBy,
-                sortBy,
-                sortOrder,
-                render: (action) => (
-                  <PersonName
-                    item={action}
-                    onClick={() => {
-                      setShowModal(false);
-                      history.push(`/person/${action.person}?tab=Résumé`);
-                    }}
-                  />
-                ),
-              },
-              {
-                title: '',
-                dataKey: 'urgent',
-                small: true,
-                className: '!tw-min-w-0 !tw-w-4',
-                render: (action) => {
-                  return (
-                    <button
-                      className="button-destructive !tw-ml-0"
-                      onClick={async (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const actionResponse = await API.put({
-                          path: `/action/${action._id}`,
-                          body: prepareActionForEncryption({ ...action, urgent: false, user: action.user || user._id }),
-                        });
-                        if (actionResponse.ok) {
-                          const newAction = actionResponse.decryptedData;
-                          setActions((actions) =>
-                            actions.map((a) => {
-                              if (a._id === newAction._id) return newAction;
-                              return a;
-                            })
-                          );
-                        }
-                      }}>
-                      Déprioriser
-                    </button>
-                  );
-                },
-              },
-            ]}
-          />
-        </div>
-      </ModalBody>
-    </>
+    <div role="dialog" title="Actions urgentes et vigilance" name="Actions urgentes et vigilance">
+      <h3 className="tw-mb-0 tw-flex tw-w-full tw-max-w-full tw-shrink-0 tw-items-center tw-justify-between tw-rounded-t-lg tw-border-b tw-border-gray-200 tw-bg-white tw-py-4 tw-px-4 tw-text-lg tw-font-medium tw-leading-6 tw-text-gray-900 sm:tw-px-6">
+        Actions urgentes et vigilance
+      </h3>
+      <Table
+        data={actions}
+        rowKey={'_id'}
+        dataTestId="name"
+        onRowClick={(action) => {
+          setShowModal(false);
+          const searchParams = new URLSearchParams(history.location.search);
+          searchParams.set('actionId', action._id);
+          history.push(`?${searchParams.toString()}`);
+        }}
+        columns={[
+          {
+            title: 'Date',
+            dataKey: 'dueAt',
+            onSortOrder: setSortOrder,
+            onSortBy: setSortBy,
+            sortBy,
+            sortOrder,
+            render: (action) => {
+              return <DateBloc date={[DONE, CANCEL].includes(action.status) ? action.completedAt : action.dueAt} />;
+            },
+          },
+          {
+            title: 'Heure',
+            dataKey: '_id',
+            render: (action) => {
+              if (!action.dueAt || !action.withTime) return null;
+              return formatTime(action.dueAt);
+            },
+          },
+          { title: 'Nom', dataKey: 'name', onSortOrder: setSortOrder, onSortBy: setSortBy, sortBy, sortOrder },
+          {
+            title: 'Personne suivie',
+            dataKey: 'person',
+            onSortOrder: setSortOrder,
+            onSortBy: setSortBy,
+            sortBy,
+            sortOrder,
+            render: (action) => (
+              <PersonName
+                item={action}
+                onClick={() => {
+                  setShowModal(false);
+                  history.push(`/person/${action.person}?tab=Résumé`);
+                }}
+              />
+            ),
+          },
+          {
+            title: '',
+            dataKey: 'urgent',
+            small: true,
+            className: '!tw-min-w-0 !tw-w-4',
+            render: (action) => {
+              return (
+                <button
+                  className="button-destructive !tw-ml-0"
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const actionResponse = await API.put({
+                      path: `/action/${action._id}`,
+                      body: prepareActionForEncryption({ ...action, urgent: false, user: action.user || user._id }),
+                    });
+                    if (actionResponse.ok) {
+                      const newAction = actionResponse.decryptedData;
+                      setActions((actions) =>
+                        actions.map((a) => {
+                          if (a._id === newAction._id) return newAction;
+                          return a;
+                        })
+                      );
+                    }
+                  }}>
+                  Déprioriser
+                </button>
+              );
+            },
+          },
+        ]}
+      />
+    </div>
   );
 };
 
@@ -203,148 +200,144 @@ const Comments = ({ setShowModal, comments }) => {
 
   if (!comments.length) return null;
   return (
-    <>
-      <ModalBody className="relative tw-h-[45vh]">
-        <div role="dialog" title="Commentaires urgents et vigilance" name="Commentaires urgents et vigilance">
-          <h3 className="tw-sticky tw-top-0 tw-mb-0 tw-flex tw-w-full tw-max-w-full tw-shrink-0 tw-items-center tw-justify-between tw-rounded-t-lg tw-border-y tw-border-gray-200 tw-bg-white tw-py-4 tw-px-4 tw-text-lg tw-font-medium tw-leading-6 tw-text-gray-900 sm:tw-px-6">
-            Commentaires urgents et vigilance
-          </h3>
-          <Table
-            data={comments}
-            rowKey={'_id'}
-            dataTestId="comment"
-            onRowClick={(comment) => {
-              setShowModal(false);
-              if (comment.type === 'action') {
-                const searchParams = new URLSearchParams(history.location.search);
-                searchParams.set('actionId', comment.action);
-                history.push(`?${searchParams.toString()}`);
-              } else {
-                history.push(`/person/${comment.person}`);
-              }
-            }}
-            columns={[
-              {
-                title: 'Date',
-                dataKey: 'date',
-                render: (comment) => {
-                  return <DateBloc date={comment.date || comment.createdAt} />;
-                },
-              },
-              {
-                title: 'Heure',
-                dataKey: '_id',
-                render: (comment) => <span>{dayjs(comment.date || comment.createdAt).format('HH:mm')}</span>,
-              },
-              {
-                title: 'Utilisateur',
-                dataKey: 'user',
-                render: (comment) => <UserName id={comment.user} />,
-              },
-              {
-                title: 'Type',
-                dataKey: 'type',
-                render: (comment) => <span>{comment.type === 'action' ? 'Action' : 'Personne suivie'}</span>,
-              },
-              {
-                title: 'Nom',
-                dataKey: 'person',
-                render: (comment) => (
+    <div role="dialog" title="Commentaires urgents et vigilance" name="Commentaires urgents et vigilance">
+      <h3 className="tw-mb-0 tw-flex tw-w-full tw-max-w-full tw-shrink-0 tw-items-center tw-justify-between tw-rounded-t-lg tw-border-y tw-border-gray-200 tw-bg-white tw-py-4 tw-px-4 tw-text-lg tw-font-medium tw-leading-6 tw-text-gray-900 sm:tw-px-6">
+        Commentaires urgents et vigilance
+      </h3>
+      <Table
+        data={comments}
+        rowKey={'_id'}
+        dataTestId="comment"
+        onRowClick={(comment) => {
+          setShowModal(false);
+          if (comment.type === 'action') {
+            const searchParams = new URLSearchParams(history.location.search);
+            searchParams.set('actionId', comment.action);
+            history.push(`?${searchParams.toString()}`);
+          } else {
+            history.push(`/person/${comment.person}`);
+          }
+        }}
+        columns={[
+          {
+            title: 'Date',
+            dataKey: 'date',
+            render: (comment) => {
+              return <DateBloc date={comment.date || comment.createdAt} />;
+            },
+          },
+          {
+            title: 'Heure',
+            dataKey: '_id',
+            render: (comment) => <span>{dayjs(comment.date || comment.createdAt).format('HH:mm')}</span>,
+          },
+          {
+            title: 'Utilisateur',
+            dataKey: 'user',
+            render: (comment) => <UserName id={comment.user} />,
+          },
+          {
+            title: 'Type',
+            dataKey: 'type',
+            render: (comment) => <span>{comment.type === 'action' ? 'Action' : 'Personne suivie'}</span>,
+          },
+          {
+            title: 'Nom',
+            dataKey: 'person',
+            render: (comment) => (
+              <>
+                {comment.type === 'action' && (
                   <>
-                    {comment.type === 'action' && (
-                      <>
-                        <b>{comment.actionPopulated?.name}</b>
-                        <br />
-                        <i>
-                          (pour{' '}
-                          <PersonName
-                            item={comment}
-                            onClick={() => {
-                              setShowModal(false);
-                              history.push(`/person/${comment.personPopulated._id}?tab=Résumé`);
-                            }}
-                          />
-                          )
-                        </i>
-                      </>
-                    )}
-                    {comment.type === 'person' && (
-                      <b>
-                        {
-                          <PersonName
-                            onClick={() => {
-                              setShowModal(false);
-                              history.push(`/person/${comment.person}?tab=Résumé`);
-                            }}
-                            item={comment}
-                          />
-                        }
-                      </b>
-                    )}
+                    <b>{comment.actionPopulated?.name}</b>
+                    <br />
+                    <i>
+                      (pour{' '}
+                      <PersonName
+                        item={comment}
+                        onClick={() => {
+                          setShowModal(false);
+                          history.push(`/person/${comment.personPopulated._id}?tab=Résumé`);
+                        }}
+                      />
+                      )
+                    </i>
                   </>
-                ),
-              },
-              {
-                title: 'Commentaire',
-                dataKey: 'comment',
-                render: (comment) => {
-                  return (
-                    <p>
-                      {comment.comment
-                        ? comment.comment.split('\n').map((c, i, a) => {
-                            if (i === a.length - 1) return c;
-                            return (
-                              <React.Fragment key={i}>
-                                {c}
-                                <br />
-                              </React.Fragment>
-                            );
-                          })
-                        : ''}
-                    </p>
-                  );
-                },
-              },
-              {
-                title: '',
-                dataKey: 'urgent',
-                small: true,
-                className: '!tw-min-w-0 !tw-w-4',
-                render: (comment) => {
-                  return (
-                    <button
-                      className="button-destructive !tw-ml-0"
-                      onClick={async (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const commentResponse = await API.put({
-                          path: `/comment/${comment._id}`,
-                          body: prepareCommentForEncryption({
-                            ...comment,
-                            user: comment.user || user._id,
-                            team: comment.team || currentTeam._id,
-                            urgent: false,
-                          }),
-                        });
-                        if (commentResponse.ok) {
-                          const newComment = commentResponse.decryptedData;
-                          setComments((comments) =>
-                            comments.map((a) => {
-                              if (a._id === newComment._id) return newComment;
-                              return a;
-                            })
-                          );
-                        }
-                      }}>
-                      Déprioriser
-                    </button>
-                  );
-                },
-              },
-            ]}
-          />
-        </div>
-      </ModalBody>
-    </>
+                )}
+                {comment.type === 'person' && (
+                  <b>
+                    {
+                      <PersonName
+                        onClick={() => {
+                          setShowModal(false);
+                          history.push(`/person/${comment.person}?tab=Résumé`);
+                        }}
+                        item={comment}
+                      />
+                    }
+                  </b>
+                )}
+              </>
+            ),
+          },
+          {
+            title: 'Commentaire',
+            dataKey: 'comment',
+            render: (comment) => {
+              return (
+                <p>
+                  {comment.comment
+                    ? comment.comment.split('\n').map((c, i, a) => {
+                        if (i === a.length - 1) return c;
+                        return (
+                          <React.Fragment key={i}>
+                            {c}
+                            <br />
+                          </React.Fragment>
+                        );
+                      })
+                    : ''}
+                </p>
+              );
+            },
+          },
+          {
+            title: '',
+            dataKey: 'urgent',
+            small: true,
+            className: '!tw-min-w-0 !tw-w-4',
+            render: (comment) => {
+              return (
+                <button
+                  className="button-destructive !tw-ml-0"
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const commentResponse = await API.put({
+                      path: `/comment/${comment._id}`,
+                      body: prepareCommentForEncryption({
+                        ...comment,
+                        user: comment.user || user._id,
+                        team: comment.team || currentTeam._id,
+                        urgent: false,
+                      }),
+                    });
+                    if (commentResponse.ok) {
+                      const newComment = commentResponse.decryptedData;
+                      setComments((comments) =>
+                        comments.map((a) => {
+                          if (a._id === newComment._id) return newComment;
+                          return a;
+                        })
+                      );
+                    }
+                  }}>
+                  Déprioriser
+                </button>
+              );
+            },
+          },
+        ]}
+      />
+    </div>
   );
 };

@@ -322,6 +322,7 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
   };
   const canSave = useMemo(() => {
     if (data.status !== initialState.status) return true;
+    if (data.urgent !== initialState.urgent) return true;
     if (JSON.stringify(data.onlyVisibleBy) !== JSON.stringify(initialState.onlyVisibleBy)) return true;
     if (JSON.stringify(data.completedAt) !== JSON.stringify(initialState.completedAt)) return true;
     return false;
@@ -446,19 +447,27 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
                 {!!canToggleGroupCheck && (
                   <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
                     <label htmlFor="create-action-for-group">
-                      <input
-                        type="checkbox"
-                        disabled={!isEditing}
-                        className="tw-mr-2"
-                        id="create-action-for-group"
-                        name="group"
-                        checked={data.group}
-                        onChange={() => {
-                          handleChange({ target: { name: 'group', checked: Boolean(!data.group), value: Boolean(!data.group) } });
-                        }}
-                      />
-                      Action familiale <br />
-                      <small className="text-muted">Cette action sera à effectuer pour toute la famille</small>
+                      {isEditing ? (
+                        <>
+                          <input
+                            type="checkbox"
+                            className="tw-mr-2"
+                            id="create-action-for-group"
+                            name="group"
+                            checked={data.group}
+                            onChange={() => {
+                              handleChange({ target: { name: 'group', checked: Boolean(!data.group), value: Boolean(!data.group) } });
+                            }}
+                          />
+                          Action familiale <br />
+                          <small className="text-muted">Cette action sera à effectuer pour toute la famille</small>
+                        </>
+                      ) : data.group ? (
+                        <>
+                          Action familiale <br />
+                          <small className="text-muted">Cette action sera à effectuer pour toute la famille</small>
+                        </>
+                      ) : null}
                     </label>
                   </div>
                 )}
@@ -552,7 +561,6 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
                   <label htmlFor="create-action-urgent">
                     <input
                       type="checkbox"
-                      disabled={!isEditing}
                       id="create-action-urgent"
                       className="tw-mr-2"
                       name="urgent"
