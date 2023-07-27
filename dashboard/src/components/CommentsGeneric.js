@@ -396,10 +396,9 @@ function CommentDisplay({ comment, onClose, onEditComment, canToggleUrgentCheck,
             </div>
             {(!!canToggleUrgentCheck || !!canToggleGroupCheck) && (
               <div className="tw-flex tw-gap-8">
-                {!!canToggleUrgentCheck && (
+                {!!canToggleUrgentCheck && !!comment.urgent && (
                   <div className="tw-flex tw-flex-1 tw-flex-col">
                     <label htmlFor="create-comment-urgent">
-                      <input type="checkbox" id="create-comment-urgent" className="tw-mr-2" name="urgent" checked={comment.urgent} disabled />
                       Commentaire prioritaire <br />
                       <small className="text-muted">Ce commentaire sera mis en avant par rapport aux autres</small>
                     </label>

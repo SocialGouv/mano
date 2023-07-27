@@ -605,6 +605,7 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
               <CommentsModule
                 comments={action?.comments.map((comment) => ({ ...comment, type: 'action', person: action.person }))}
                 color="main"
+                canToggleUrgentCheck
                 typeForNewComment="action"
                 actionId={action?._id}
                 onDeleteComment={async (comment) => {
