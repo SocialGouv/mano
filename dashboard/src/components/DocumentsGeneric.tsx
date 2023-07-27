@@ -473,10 +473,8 @@ function DocumentModal({ document, onClose, personId, onDelete, onSubmit, showAs
               </button>
               <button
                 type="button"
-                className={`button-submit !tw-bg-${color}`}
+                className={`button-submit tw-inline-flex tw-flex-col tw-items-center !tw-bg-${color}`}
                 onClick={async () => {
-                  // Open a new window or tab immediately
-
                   const file = await API.download({
                     path: document.downloadPath ?? `/person/${personId}/document/${document.file.filename}`,
                     encryptedEntityKey: document.encryptedEntityKey,
@@ -489,9 +487,9 @@ function DocumentModal({ document, onClose, personId, onDelete, onSubmit, showAs
                   } catch (error) {
                     console.log(error);
                   }
-                  // Create a blob URL from the File object
                 }}>
                 Ouvrir dans une nouvelle fenêtre
+                <small className="tw-text-center tw-text-[10px]">Fonctionnel sur Firefox seulement</small>
               </button>
             </div>
           )}
