@@ -1,3 +1,11 @@
+## [1.282.2](https://github.com/SocialGouv/mano/compare/v1.282.1...v1.282.2) (2023-07-27)
+
+
+### Bug Fixes
+
+* **dashboard:** hauteur de la fenêtre d'édition d'un champ custo ([#1621](https://github.com/SocialGouv/mano/issues/1621)) ([ad875c0](https://github.com/SocialGouv/mano/commit/ad875c0e978fa352d293449427253bcefc452d0b))
+* **dashboard:** ouvrir un doc dans une nouvelle fenêtere sur Firefox seulement ([#1622](https://github.com/SocialGouv/mano/issues/1622)) ([38a44da](https://github.com/SocialGouv/mano/commit/38a44daf339630f3632656745a5871f9c1675c85))
+
 ## [1.282.1](https://github.com/SocialGouv/mano/compare/v1.282.0...v1.282.1) (2023-07-26)
 
 
