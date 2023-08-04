@@ -133,10 +133,14 @@ const MergeTwoPersons = ({ person }) => {
       entityKey: originPerson.entityKey,
       documents: [
         ...(originPerson.documents || []),
-        ...(personToMergeAndDelete.documents || []).map((_doc) => ({
-          ..._doc,
-          downloadPath: _doc.downloadPath ?? `/person/${personToMergeAndDelete._id}/document/${_doc.file.filename}`,
-        })),
+        ...(personToMergeAndDelete.documents || []).map((_docOrFolder) => {
+          if (_docOrFolder.type === 'folder') return _docOrFolder;
+          const _doc = _docOrFolder;
+          return {
+            ..._doc,
+            downloadPath: _doc.downloadPath ?? `/person/${personToMergeAndDelete._id}/document/${_doc.file.filename}`,
+          };
+        }),
       ],
       ...mergedPerson,
     };
