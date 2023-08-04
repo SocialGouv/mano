@@ -1,3 +1,10 @@
+## [1.282.4](https://github.com/SocialGouv/mano/compare/v1.282.3...v1.282.4) (2023-08-04)
+
+
+### Bug Fixes
+
+* **dashboard:** fusionner des personnes avec des documents ([ea8bd04](https://github.com/SocialGouv/mano/commit/ea8bd048a71ebe6c18075e7e4d3f4b90d39af481))
+
 ## [1.282.3](https://github.com/SocialGouv/mano/compare/v1.282.2...v1.282.3) (2023-07-27)
 
 
