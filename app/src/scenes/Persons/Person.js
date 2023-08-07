@@ -324,64 +324,34 @@ const Person = ({ route, navigation }) => {
 
   return (
     <>
-      <SceneContainer backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey} testID="person">
+      <SceneContainer>
         <ScreenTitle
           title={person.name}
           onBack={onGoBackRequested}
-          onEdit={!editable ? onEdit : null}
+          backgroundColor={colors.person.backgroundColor}
+          color={colors.person.color}
+          // onEdit={!editable ? onEdit : null}
           onSave={!editable || isUpdateDisabled ? null : onUpdatePerson}
           saving={updating}
-          backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
+          // backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
           testID="person"
         />
-        <TabNavigator.Navigator
-          tabBar={(props) => (
-            <Tabs
-              numberOfTabs={2}
-              {...props}
-              backgroundColor={!person?.outOfActiveList ? colors.app.backgroundColor : colors.app.colorBackgroundDarkGrey}
-            />
-          )}
-          removeClippedSubviews={Platform.OS === 'android'}
-          screenOptions={{ swipeEnabled: true }}>
-          <TabNavigator.Screen lazy name="Summary" options={{ tabBarLabel: 'Résumé' }}>
-            {() => (
-              <PersonSummary
-                navigation={navigation}
-                route={route}
-                person={person}
-                personDB={personDB}
-                backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
-                onChange={onChange}
-                onUpdatePerson={onUpdatePerson}
-                onCommentWrite={setWritingComment}
-                onEdit={onEdit}
-                onDelete={onDelete}
-                onBack={onBack}
-                isUpdateDisabled={isUpdateDisabled}
-                updating={updating}
-                editable={editable}
-              />
-            )}
-          </TabNavigator.Screen>
-          <TabNavigator.Screen lazy name="Folders" options={{ tabBarLabel: 'Dossiers' }}>
-            {() => (
-              <FoldersNavigator
-                navigation={navigation}
-                route={route}
-                person={person}
-                personDB={personDB}
-                backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
-                onChange={onChange}
-                onUpdatePerson={onUpdatePerson}
-                onEdit={onEdit}
-                isUpdateDisabled={isUpdateDisabled}
-                editable={editable}
-                updating={updating}
-              />
-            )}
-          </TabNavigator.Screen>
-        </TabNavigator.Navigator>
+        <PersonSummary
+          navigation={navigation}
+          route={route}
+          person={person}
+          personDB={personDB}
+          backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
+          onChange={onChange}
+          onUpdatePerson={onUpdatePerson}
+          onCommentWrite={setWritingComment}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          onBack={onBack}
+          isUpdateDisabled={isUpdateDisabled}
+          updating={updating}
+          editable={editable}
+        />
       </SceneContainer>
     </>
   );

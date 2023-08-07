@@ -1,7 +1,6 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useIsFocused } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import InputLabelled from '../components/InputLabelled';
+import styled from 'styled-components';
+import { getEmail } from './localStorage';
 
 const emailValidatorRE = new RegExp(
   '^(([^<>()\\[\\]\\\\.,;:\\s@"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@"]+)*)|(".+"))' +
@@ -11,7 +10,17 @@ const validateEmail = (email) => {
   return emailValidatorRE.test(String(email).toLowerCase());
 };
 
-const EmailInput = ({ innerRef, onChange, onFocus, onSubmitEditing, testID = 'email' }) => {
+const usePersistentEmail = (setEmail) => {
+  useEffect(() => {
+    (async () => {
+      const email = await getEmail();
+      setEmail(email);
+    })();
+    return () => {};
+  }, []);
+};
+
+const EmailInput = ({ innerRef, onChange, onFocus, onSubmitEditing }) => {
   const [email, setEmail] = useState('');
   const onInputChange = (email) => {
     email = email.trim();
@@ -22,41 +31,36 @@ const EmailInput = ({ innerRef, onChange, onFocus, onSubmitEditing, testID = 'em
       example: 'example@example.com',
     });
   };
-
-  const isFocused = useIsFocused();
-
-  useEffect(() => {
-    (async () => {
-      const storedEmail = await AsyncStorage.getItem('persistent_email');
-      if (storedEmail) {
-        setEmail(storedEmail);
-        onInputChange(storedEmail);
-      } else {
-        setEmail('');
-        onInputChange('');
-      }
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isFocused]);
-
+  usePersistentEmail(onInputChange);
   return (
-    <InputLabelled
-      label="Email"
+    <EmailInputStyled
       ref={innerRef}
       onChangeText={onInputChange}
       value={email}
       onFocus={onFocus}
-      placeholder="example@example.com"
-      autoCapitalize="none"
+      placeholder={'example@example.com'}
+      textAlign={'center'}
+      autoCapitalize={'none'}
       autoCorrect={false}
-      autoCompleteType="email"
-      keyboardType="email-address"
-      textContentType="emailAddress"
-      returnKeyType="next"
+      autoCompleteType={'email'}
+      keyboardType={'email-address'}
+      textContentType={'emailAddress'}
+      returnKeyType={'next'}
       onSubmitEditing={onSubmitEditing}
-      testID={testID}
     />
   );
 };
+
+const EmailInputStyled = styled.TextInput`
+  height: 50px;
+  border-radius: 8px;
+  border: 1px solid #666;
+  color: #000;
+  flex: 1;
+  font-size: 20px;
+  margin-bottom: 10px;
+  padding-left: 5px;
+  padding-right: 5px;
+`;
 
 export default React.forwardRef((props, ref) => <EmailInput innerRef={ref} {...props} />);

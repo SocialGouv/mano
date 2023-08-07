@@ -1,9 +1,9 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import * as Sentry from '@sentry/react-native';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
-import ActionRow from '../../components/ActionRow';
+import ActionRow from './ActionRow';
 import Spinner from '../../components/Spinner';
 import { ListEmptyActions, ListNoMoreActions } from '../../components/ListEmptyContainer';
 import FloatAddButton from '../../components/FloatAddButton';
@@ -16,7 +16,10 @@ import { refreshTriggerState, loadingState } from '../../components/Loader';
 import Button from '../../components/Button';
 import ConsultationRow from '../../components/ConsultationRow';
 import { userState } from '../../recoil/auth';
-import { Dimensions } from 'react-native';
+import { Animated, Dimensions, StyleSheet } from 'react-native';
+import SceneContainer from '../../components/SceneContainer';
+import ScreenTitle from '../../components/ScreenTitle';
+import colors from '../../utils/colors';
 
 const keyExtractor = (action) => action._id;
 
@@ -26,6 +29,7 @@ const ActionsList = ({ showActionSheetWithOptions }) => {
   const navigation = useNavigation();
   const loading = useRecoilValue(loadingState);
   const user = useRecoilValue(userState);
+  const offset = useRef(new Animated.Value(0));
 
   const status = useRoute().params.status;
   const [limit, setLimit] = useState(limitSteps);
@@ -101,14 +105,30 @@ const ActionsList = ({ showActionSheetWithOptions }) => {
     if (item.isConsultation) {
       return <ConsultationRow consultation={item} onConsultationPress={onConsultationPress} onPseudoPress={onPseudoPress} withBadge showPseudo />;
     }
-    return <ActionRow action={item} onPseudoPress={onPseudoPress} onActionPress={onActionPress} />;
+    const { _id, name, person, status, completedAt, dueAt, placeId } = item;
+    const { navigate } = navigation;
+
+    return (
+      <ActionRow
+        pseudo={person ? person.name : null}
+        name={name}
+        completedAt={completedAt}
+        dueAt={dueAt}
+        status={status}
+        onPseudoPress={onPseudoPress}
+        onActionPress={onActionPress}
+      />
+    );
   };
 
   const getItemType = (item) => item.type || 'action';
 
   return (
-    <Container>
-      <FlashListStyled
+    <SceneContainer>
+      <ScreenTitle title="AGENDA" backgroundColor={colors.action.backgroundColor} color={colors.action.color} offset={offset.current} />
+      <Animated.FlatList
+        contentContainerStyle={styles.contentContainerStyle}
+        style={styles.flatList}
         refreshing={refreshTrigger.status}
         onRefresh={onRefresh}
         data={actionsByStatus}
@@ -120,9 +140,17 @@ const ActionsList = ({ showActionSheetWithOptions }) => {
         ListEmptyComponent={ListEmptyComponent}
         onEndReachedThreshold={0.3}
         ListFooterComponent={FlatListFooterComponent}
+        onScroll={Animated.event(
+          [
+            {
+              nativeEvent: { contentOffset: { y: offset.current } },
+            },
+          ],
+          { useNativeDriver: false /* top not supporter */ }
+        )}
       />
-      <FloatAddButton onPress={onPressFloatingButton} />
-    </Container>
+      <FloatAddButton onPress={onPressFloatingButton} color={colors.action.backgroundColor} />
+    </SceneContainer>
   );
 };
 
@@ -134,10 +162,17 @@ const SectionHeaderStyled = styled(MyText)`
   background-color: #fff;
 `;
 
-const Container = styled.View`
-  flex: 1;
-  height: 100%;
-  min-height: ${Dimensions.get('window').height - 230}px;
-`;
+const styles = StyleSheet.create({
+  contentContainerStyle: { flexGrow: 1, paddingTop: 120 },
+  stickOnTitleContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    paddingRight: 10,
+    height: 50,
+    alignItems: 'center',
+  },
+  filterText: { marginRight: 10 },
+});
 
 export default connectActionSheet(ActionsList);

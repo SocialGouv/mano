@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { ActivityIndicator } from 'react-native';
+import { ActivityIndicator, View, TouchableOpacity } from 'react-native';
 import colors from '../../utils/colors';
+import Button from '../../components/Button';
 import SceneContainer from '../../components/SceneContainer';
 import ScrollContainer from '../../components/ScrollContainer';
 import { MyText } from '../../components/MyText';
@@ -43,11 +44,36 @@ export const TeamSelection = (props) => {
       routes: [{ name: 'Home' }],
     });
 
+  const user = useRecoilValue(userState);
+  const setCurrentTeam = useSetRecoilState(currentTeamState);
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
+  const teams = user.teams || [];
+  const [teamIndex, setTeamIndex] = useState(0);
+
+  const onTeamSelected = async () => {
+    setRefreshTrigger({ status: true, options: { showFullScreen: true, initialLoad: true } });
+    setCurrentTeam(user.teams[teamIndex]);
+    onSelect();
+  };
+
   return (
-    <SceneContainer backgroundColor="#fff">
-      <Title>Choisissez une équipe</Title>
+    <SceneContainer>
+      <ScreenTitle title="Choisissez une équipe" backgroundColor={colors.app.color} color={'white'} offset />
       <Wrapper>
-        <TeamBody onSelect={onSelect} {...props} />
+        <View>
+          {teams.map(({ _id, name }, i) => (
+            <TouchableOpacity key={_id} activeOpacity={0.9} onPress={() => setTeamIndex(i)}>
+              <Team selected={teamIndex === i}>{name}</Team>
+            </TouchableOpacity>
+          ))}
+        </View>
+        <Button
+          caption={`Choisissez ${teams[teamIndex].name}`}
+          backgroundColor={colors.action.backgroundColor}
+          color={colors.action.color}
+          style={{ width: '100%' }}
+          onPress={onTeamSelected}
+        />
       </Wrapper>
     </SceneContainer>
   );
@@ -69,6 +95,8 @@ const Wrapper = styled.View`
   display: flex;
   flex-direction: column;
   padding-horizontal: 20px;
+  margin-top: 100px;
+  justify-content: space-between;
   flex: 1;
   padding-bottom: 20px;
 `;
@@ -80,7 +108,11 @@ const TeamContainer = styled.TouchableOpacity`
   border-radius: 12px;
 `;
 
-const Team = styled(MyText)`
+const Team = styled.Text`
   text-align: center;
-  color: ${colors.app.color};
+  background-color: ${(p) => (p.selected ? colors.teamSelection.selectedBackgroundColor : colors.teamSelection.backgroundColor)};
+  color: ${colors.teamSelection.color};
+  padding-vertical: 20px;
+  margin-vertical: 10px;
+  border-radius: 20px;
 `;

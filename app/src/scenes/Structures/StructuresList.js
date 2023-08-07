@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Alert } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Alert, Animated } from 'react-native';
 import { useRecoilState } from 'recoil';
 import API from '../../services/api';
 import { PersonIcon } from '../../icons';
@@ -11,11 +11,12 @@ import { ListEmptyStructures } from '../../components/ListEmptyContainer';
 import FloatAddButton from '../../components/FloatAddButton';
 import { FlashListStyled } from '../../components/Lists';
 import { structuresState } from '../../recoil/structures';
+import colors from '../../utils/colors';
 
 const Structures = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
-
+  const offset = useRef(new Animated.Value(0));
   const [structures, setStructures] = useRecoilState(structuresState);
 
   const getStructures = async (refresh = true) => {
@@ -41,7 +42,13 @@ const Structures = ({ navigation }) => {
   };
   return (
     <SceneContainer>
-      <ScreenTitle title="Structures" onBack={navigation.goBack} />
+      <ScreenTitle
+        title="Structures"
+        onBack={navigation.goBack}
+        backgroundColor={colors.structure.backgroundColor}
+        color={colors.structure.color}
+        offset={offset.current}
+      />
       <FlashListStyled
         refreshing={refreshing}
         onRefresh={getStructures}
@@ -52,6 +59,14 @@ const Structures = ({ navigation }) => {
         keyExtractor={keyExtractor}
         ListEmptyComponent={loading ? Spinner : ListEmptyStructures}
         defaultTop={0}
+        onScroll={Animated.event(
+          [
+            {
+              nativeEvent: { contentOffset: { y: offset.current } },
+            },
+          ],
+          { useNativeDriver: false /* top not supporter */ }
+        )}
       />
       <FloatAddButton onPress={onCreateStructureRequest} />
     </SceneContainer>

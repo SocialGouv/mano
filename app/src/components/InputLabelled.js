@@ -1,95 +1,33 @@
 import React from 'react';
 import styled from 'styled-components';
-import { TouchableWithoutFeedback } from 'react-native';
 import Label from './Label';
 import InputMultilineAutoAdjust from './InputMultilineAutoAdjust';
-import { MyText, MyTextInput } from './MyText';
-import colors from '../utils/colors';
-import Spacer from './Spacer';
 
-const InputLabelled = React.forwardRef(({ error, label, multiline, editable = true, onClear, noMargin, EndIcon, onEndIconPress, ...props }, ref) => {
-  if (!editable) {
-    const value = String(props.value || '')
-      .split('\\n')
-      .join('\u000A');
-    return (
-      <FieldContainer noMargin={noMargin}>
-        {!!label && <InlineLabel bold>{`${label} : `}</InlineLabel>}
-        <Row>
-          <Content ref={ref}>{value}</Content>
-          <Spacer grow />
-        </Row>
-      </FieldContainer>
-    );
-  }
-  return (
-    <InputContainer>
-      {label && <Label label={label} />}
-      {multiline ? (
-        <InputMultilineAutoAdjust ref={ref} {...props} />
-      ) : (
-        <Input autoComplete="off" ref={ref} {...props} value={String(props.value || '')} />
-      )}
-      {Boolean(EndIcon) && Boolean(props?.value?.length) && (
-        <TouchableWithoutFeedback onPress={onEndIconPress}>
-          <IconWrapper>
-            <EndIcon size={20} color={colors.app.color} />
-          </IconWrapper>
-        </TouchableWithoutFeedback>
-      )}
-      {/* {Boolean(onClear) && Boolean(props?.value?.length) && <ButtonReset onPress={onClear} />} */}
-      {!!error && <Error>{error}</Error>}
-    </InputContainer>
-  );
-});
-
-const FieldContainer = styled.View`
-  flex-grow: 1;
-  margin-bottom: ${(props) => (props.noMargin ? 0 : 25)}px;
-`;
+const InputLabelled = React.forwardRef(({ error, label, multiline, ...props }, ref) => (
+  <InputContainer>
+    {label && <Label label={label} />}
+    {multiline ? <InputMultilineAutoAdjust ref={ref} {...props} /> : <Input ref={ref} {...props} />}
+    <Error>{error}</Error>
+  </InputContainer>
+));
 
 const InputContainer = styled.View`
-  margin-bottom: 30px;
+  margin-bottom: 15px;
   flex-grow: 1;
 `;
 
-const Error = styled(MyText)`
+const Error = styled.Text`
   margin-left: 5px;
   font-size: 14px;
   color: red;
   height: 18px;
 `;
 
-const InlineLabel = styled(MyText)`
-  font-size: 15px;
-  color: ${colors.app.color};
-  margin-bottom: 15px;
-`;
-
-const Content = styled(MyText)`
-  font-size: 17px;
-  line-height: 20px;
-`;
-
-const Input = styled(MyTextInput)`
-  border: 1px solid rgba(30, 36, 55, 0.1);
-  border-radius: 12px;
-  padding-horizontal: 12px;
-  padding-vertical: 15px;
-`;
-
-const IconWrapper = styled.View`
-  position: absolute;
-  right: 12px;
-  top: 0;
-  bottom: 0;
-  justify-content: center;
-  padding-top: 22px;
-`;
-
-const Row = styled.View`
-  flex-direction: row;
-  align-items: center;
+const Input = styled.TextInput`
+  border: 1px solid #666;
+  border-radius: 8px;
+  padding-horizontal: 15px;
+  padding-vertical: 10px;
 `;
 
 export default InputLabelled;

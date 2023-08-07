@@ -3,20 +3,16 @@ import packageInfo from '../package.json';
 // https://www.gouvernement.fr/charte/charte-graphique-les-fondamentaux/les-couleurs
 // Menthe
 const theme = {
-  main: '#008e7f', // higher contrast
-  main75: '#49c3a6',
-  main50: '#94c7bf',
-  main25: '#c7e1dd',
+  main: '#0046FE',
+  mainLight: '#F2F6FF',
   black: '#1D2021',
-  black75: '#3b3b3b',
-  black50: '#777777',
-  black25: '#b9b9b9',
+  black75: '#565A5B',
+  black50: '#8C9294',
+  black25: '#CBD3D6',
   black05: '#F7F9FA',
   white: '#FFFFFF',
   redDark: '#F5222D',
   redLight: '#FBE4E4',
-  orangeLight: '#FEF3C7',
-  orangeDark: '#D97706',
 };
 
 const getHost = () => {

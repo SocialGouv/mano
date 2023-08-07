@@ -22,6 +22,7 @@ import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIf
 import { dayjsInstance } from '../../services/dateDayjs';
 import { groupsState } from '../../recoil/groups';
 import { useFocusEffect } from '@react-navigation/native';
+import colors from '../../utils/colors';
 
 const NewActionForm = ({ route, navigation }) => {
   const setActions = useSetRecoilState(actionsState);
@@ -30,7 +31,7 @@ const NewActionForm = ({ route, navigation }) => {
   const groups = useRecoilValue(groupsState);
   const user = useRecoilValue(userState);
   const [name, setName] = useState('');
-  const [dueAt, setDueAt] = useState(null);
+  const [dueAt, setDueAt] = useState(new Date());
   const [withTime, setWithTime] = useState(false);
   const [urgent, setUrgent] = useState(false);
   const [group, setGroup] = useState(false);
@@ -167,56 +168,26 @@ const NewActionForm = ({ route, navigation }) => {
 
   return (
     <SceneContainer>
-      <ScreenTitle title="Nouvelle action" onBack={onGoBackRequested} testID="new-action" />
+      <ScreenTitle
+        title="Nouvelle action"
+        onBack={onGoBackRequested}
+        testID="new-action"
+        backgroundColor={colors.action.backgroundColor}
+        color={colors.action.color}
+      />
       <ScrollContainer keyboardShouldPersistTaps="handled" testID="new-action-form">
         <View>
           <InputLabelled label="Nom de l’action" onChangeText={setName} value={name} placeholder="Rdv chez le dentiste" testID="new-action-name" />
-          {forCurrentPerson ? (
-            <InputFromSearchList
-              label="Personne concernée"
-              value={actionPersons[0]?.name || '-- Aucune --'}
-              onSearchRequest={onSearchPerson}
-              disabled
-            />
-          ) : (
-            <>
-              <Label label="Personne(s) concerné(es)" />
-              <Tags
-                data={actionPersons}
-                onChange={setActionPersons}
-                editable
-                onAddRequest={onSearchPerson}
-                renderTag={(person) => <MyText>{person?.name}</MyText>}
-              />
-            </>
-          )}
-          <ActionStatusSelect onSelect={setStatus} value={status} editable testID="new-action-status" />
-          <DateAndTimeInput
-            label="À faire le"
-            setDate={setDueAt}
-            date={dueAt}
-            showTime
-            showDay
-            withTime={withTime}
-            setWithTime={setWithTime}
-            testID="new-action-dueAt"
+          <InputFromSearchList label="Personne concernée" value={actionPersons[0]?.name || '-- Aucune --'} onSearchRequest={onSearchPerson} />
+          <Button
+            caption="Créer"
+            disabled={!isReadyToSave}
+            onPress={onCreateAction}
+            loading={posting}
+            testID="new-action-create"
+            backgroundColor={colors.action.backgroundColor}
+            color={colors.action.color}
           />
-          <ActionCategoriesModalSelect withMostUsed onChange={setCategories} values={categories} editable />
-          <CheckboxLabelled
-            label="Action prioritaire (cette action sera mise en avant par rapport aux autres)"
-            alone
-            onPress={() => setUrgent(!urgent)}
-            value={urgent}
-          />
-          {!!canToggleGroupCheck && (
-            <CheckboxLabelled
-              label="Action familiale (cette action sera à effectuer pour toute la famille)"
-              alone
-              onPress={() => setGroup(!group)}
-              value={group}
-            />
-          )}
-          <Button caption="Créer" disabled={!isReadyToSave} onPress={onCreateAction} loading={posting} testID="new-action-create" />
         </View>
       </ScrollContainer>
     </SceneContainer>

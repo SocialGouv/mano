@@ -1,18 +1,41 @@
 import React from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { TouchableOpacity, StyleSheet, View } from 'react-native';
 
-const RowContainer = ({ Component = TouchableOpacity, onPress, disabled, noPadding, children, center, testID = '', styles: stylesProps = {} }) => {
+const RowContainer = ({ onPress, noPadding, children }) => {
   return (
-    <Component onPress={onPress} disabled={disabled} testID={testID}>
-      <View className="overflow-hidden rounded-2xl bg-[#f4f5f8] mx-2.5 mb-2.5" style={stylesProps?.container}>
-        <View
-          className={['py-5 px-3 items-center flex-row w-full', noPadding && 'p-0', center && 'justify-center'].join(' ')}
-          style={stylesProps?.subContainer}>
-          {children}
-        </View>
+    <TouchableOpacity onPress={onPress}>
+      <View style={styles.container}>
+        <View style={[styles.subContainer, noPadding && styles.noPadding]}>{children}</View>
       </View>
-    </Component>
+    </TouchableOpacity>
   );
 };
+
+// seems to be a problem with the nested shadow-offset and styled-components
+// switching temporarily to stylesheet for this
+const styles = StyleSheet.create({
+  container: {
+    overflow: 'hidden',
+    borderRadius: 10,
+    backgroundColor: 'white',
+    margin: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 5,
+    shadowOpacity: 0.55,
+    elevation: 10,
+  },
+  subContainer: {
+    padding: 15,
+    alignItems: 'center',
+    borderBottomColor: '#ddd',
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    width: '100%',
+  },
+  noPadding: {
+    padding: 0,
+  },
+});
 
 export default RowContainer;

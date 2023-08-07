@@ -47,19 +47,19 @@
 div.tailwindui,
 input.tailwindui,
 textarea.tailwindui {
-  @apply tw-relative tw-mt-1 tw-block tw-w-full tw-appearance-none tw-rounded tw-border tw-border-gray-300 tw-py-2 tw-px-2 tw-text-base tw-shadow-sm focus:tw-border-indigo-500 focus:tw-ring-indigo-500 sm:tw-text-sm;
+  // @apply tw-relative tw-mt-1 tw-block tw-w-full tw-appearance-none tw-rounded tw-border tw-border-gray-300 tw-py-2 tw-px-2 tw-text-base tw-shadow-sm focus:tw-border-indigo-500 focus:tw-ring-indigo-500 sm:tw-text-sm;
 }
 label.tailwindui {
   @apply tw-mb-2 tw-block tw-text-gray-700;
 }
 
 .input-focus-helper {
-  outline: 1px dashed #eee !important;
-  min-width: 50px !important;
+  // outline: 1px dashed #eee !important;
+  // min-width: 50px !important;
 }
 .input-focus-helper:focus,
 .input-focus-helper:active {
-  outline: auto !important;
+  // outline: auto !important;
 }
 
 /* table selego */
@@ -348,12 +348,12 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 30px rgba(222, 243, 237, 1) inset !important;
+  // -webkit-box-shadow: 0 0 0 30px rgba(222, 243, 237, 1) inset !important;
 }
 
-$theme-colors: (
-  'primary': #49c3a6,
-);
+// $theme-colors: (
+//   'primary': #49c3a6,
+// );
 
 .rrt-success {
   background-color: #49c3a6 !important;
@@ -374,3 +374,96 @@ $theme-colors: (
 }
 
 @import '~bootstrap/scss/bootstrap.scss';
+
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Lato, serif;
+  background-color: #f7f9fa;
+  color: #1d2021;
+}
+
+ul {
+  list-style: inside;
+  position: 0;
+  margin: 0;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.main {
+  flex: 1;
+  height: 100%;
+  flex-direction: column;
+  display: flex;
+  height: 100%;
+  overflow-y: auto;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+}
+table {
+  background-color: white;
+  padding: 24px !important;
+}
+table tr {
+  cursor: pointer;
+}
+a {
+  text-decoration: none;
+}
+
+.image-input {
+  height: 100px;
+  min-width: 150px;
+  background: #f3f3f3 url('./assets/image.svg') center no-repeat;
+  background-size: 50%;
+  border: 2px solid #eee;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.time-range {
+  background-color: white;
+  border-radius: 5px;
+  border-color: lightgray;
+  border-style: solid;
+  border-width: 1px;
+  padding: 4.5px 4px;
+}
+
+.time-range {
+  border: none !important;
+  width: 100%;
+  .react-daterange-picker__wrapper {
+    border: none !important;
+  }
+
+  .react-daterange-picker__clear-button {
+    border-radius: 100px;
+    border: none;
+    padding: 2px;
+    width: 14px;
+    height: 14px;
+    background-color: #cbd3d6;
+  }
+
+  .react-daterange-picker__clear-button__icon {
+    width: 10px;
+    height: 10px;
+    color: white;
+    stroke: white;
+  }
+}

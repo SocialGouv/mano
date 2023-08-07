@@ -8,10 +8,10 @@ import ScrollContainer from '../../components/ScrollContainer';
 import Button from '../../components/Button';
 import InputLabelled from '../../components/InputLabelled';
 import ButtonsContainer from '../../components/ButtonsContainer';
-import ActionRow from '../../components/ActionRow';
-import CommentRow from '../Comments/CommentRow';
-import PlaceRow from '../Places/PlaceRow';
-import SubList from '../../components/SubList';
+// import ActionRow from '../../components/ActionRow';
+// import CommentRow from '../Comments/CommentRow';
+// import PlaceRow from '../Places/PlaceRow';
+// import SubList from '../../components/SubList';
 import DateAndTimeInput from '../../components/DateAndTimeInput';
 import GenderSelect from '../../components/Selects/GenderSelect';
 import Spacer from '../../components/Spacer';
@@ -105,7 +105,7 @@ const PersonSummary = ({
   );
 
   return (
-    <ScrollContainer ref={scrollViewRef} backgroundColor={backgroundColor || colors.app.color} testID="person-summary">
+    <ScrollContainer ref={scrollViewRef} testID="person-summary">
       {person.outOfActiveList && (
         <AlterOutOfActiveList>
           <Text style={{ color: colors.app.colorWhite }}>
@@ -237,19 +237,21 @@ const PersonSummary = ({
         </DeleteButtonAndConfirmModal>
         <Button
           caption={editable ? 'Mettre à jour' : 'Modifier'}
+          backgroundColor={colors.person.backgroundColor}
+          color={colors.person.color}
           onPress={editable ? onUpdatePerson : onEdit}
           disabled={editable ? isUpdateDisabled : false}
           loading={updating}
         />
       </ButtonsContainer>
-      <ButtonsContainer>
+      {/* <ButtonsContainer>
         <Button
           caption={person.outOfActiveList ? 'Réintégrer dans la file active' : 'Sortie de file active'}
           onPress={() => (person.outOfActiveList ? onGetBackToActiveList() : onRemoveFromActiveList())}
           color={colors.warning.color}
         />
-      </ButtonsContainer>
-
+      </ButtonsContainer> */}
+      {/*
       <SubList
         label="Actions"
         onAdd={onAddActionRequest}
@@ -346,7 +348,7 @@ const PersonSummary = ({
           return <PlaceRow key={index} place={place} relPersonPlace={relPersonPlace} personDB={personDB} />;
         }}
         ifEmpty="Pas encore de lieu"
-      />
+      /> */}
     </ScrollContainer>
   );
 };

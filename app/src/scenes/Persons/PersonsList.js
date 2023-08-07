@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { Animated } from 'react-native';
+import { Animated, StyleSheet } from 'react-native';
 import * as Sentry from '@sentry/react-native';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
@@ -13,6 +13,7 @@ import { arrayOfitemsGroupedByPersonSelector, itemsGroupedByPersonSelector } fro
 import { selector, selectorFamily, useRecoilState, useRecoilValue } from 'recoil';
 import { loadingState, refreshTriggerState } from '../../components/Loader';
 import { filterBySearch } from '../../utils/search';
+import colors from '../../utils/colors';
 
 const personsFilteredSelector = selectorFamily({
   key: 'personsFilteredSelector',
@@ -94,7 +95,8 @@ const PersonsList = ({ navigation, route }) => {
       Sentry.setContext('person', { _id: person._id });
       navigation.push('Person', { person, fromRoute: 'PersonsList' });
     };
-    return <PersonRow onPress={onPress} person={person} />;
+    const { birthdate, name, _id } = person;
+    return <PersonRow onPress={onPress} birthdate={birthdate} name={name} _id={_id} />;
   };
 
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -115,20 +117,20 @@ const PersonsList = ({ navigation, route }) => {
 
   return (
     <SceneContainer>
-      <ScreenTitle title="Personnes suivies" parentScroll={scrollY} customRight={`Filtres (${numberOfFilters})`} onPressRight={onFiltersPress} />
-      <Search
-        placeholder="Rechercher une personne..."
-        onFocus={() => listref?.current?.scrollToOffset({ offset: 100 })}
-        parentScroll={scrollY}
-        onChange={setSearch}
-      />
-      <FlashListStyled
+      <ScreenTitle title={'USAGERS'} offset={scrollY} backgroundColor={colors.person.backgroundColor} color={colors.person.color} />
+      <Animated.FlatList
+        contentContainerStyle={styles.contentContainerStyle}
         ref={listref}
-        withHeaderSearch
         refreshing={refreshTrigger.status}
         onRefresh={onRefresh}
-        onScroll={onScroll}
-        parentScroll={scrollY}
+        onScroll={Animated.event(
+          [
+            {
+              nativeEvent: { contentOffset: { y: scrollY } },
+            },
+          ],
+          { useNativeDriver: false /* top not supporter */ }
+        )}
         data={filteredPersons}
         extraData={filteredPersons}
         estimatedItemSize={114}
@@ -145,3 +147,9 @@ const PersonsList = ({ navigation, route }) => {
 };
 
 export default PersonsList;
+
+const styles = StyleSheet.create({
+  contentContainerStyle: { flexGrow: 1, paddingTop: 100 },
+  stickOnTitleContainer: { display: 'flex', flexDirection: 'row', alignItems: 'center' },
+  search: { flex: 1 },
+});

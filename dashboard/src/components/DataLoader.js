@@ -20,7 +20,7 @@ import { organisationState, userState } from '../recoil/auth';
 
 import { clearCache, dashboardCurrentCacheKey, getCacheItem, getCacheItemDefaultValue, setCacheItem } from '../services/dataManagement';
 import API from '../services/api';
-import { RandomPicture, RandomPicturePreloader } from './LoaderRandomPicture';
+import { RandomPicturePreloader } from './LoaderRandomPicture';
 import ProgressBar from './LoaderProgressBar';
 import useDataMigrator from './DataMigrator';
 import { groupsState } from '../recoil/groups';
@@ -409,7 +409,7 @@ export default function DataLoader() {
     return (
       <FullScreenContainer>
         <InsideContainer>
-          <RandomPicture />
+          {/* <RandomPicture /> */}
           <ProgressBar progress={progress} total={total} loadingText={loadingText} />
         </InsideContainer>
       </FullScreenContainer>

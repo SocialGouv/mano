@@ -14,7 +14,6 @@ import EmailInput from '../../services/EmailInput';
 import { MyText } from '../../components/MyText';
 import InputLabelled from '../../components/InputLabelled';
 import EyeIcon from '../../icons/EyeIcon';
-import Title, { SubTitle } from '../../components/Title';
 import { DEVMODE_ENCRYPTION_KEY, DEVMODE_PASSWORD, VERSION } from '../../config';
 import { useSetRecoilState } from 'recoil';
 import { currentTeamState, organisationState, teamsState, usersState, userState } from '../../recoil/auth';
@@ -290,19 +289,24 @@ const Login = ({ navigation }) => {
                 testID="login-encryption"
               />
             )}
-            {authViaCookie ? (
+            {authViaCookie && (
               <TouchableWithoutFeedback onPress={onResetCurrentUser}>
                 <Hint>Se connecter avec un autre utilisateur</Hint>
               </TouchableWithoutFeedback>
-            ) : (
-              <TouchableWithoutFeedback onPress={onForgetPassword}>
-                <Hint>J'ai oublié mon mot de passe</Hint>
-              </TouchableWithoutFeedback>
             )}
             <ButtonsContainer>
-              <Button caption="Connecter" onPress={onConnect} loading={loading} disabled={loading} testID="button-connect" />
+              <Button
+                caption="Connecter"
+                backgroundColor={colors.menu.backgroundColor}
+                color={colors.menu.color}
+                borderColor={colors.menu.color}
+                onPress={onConnect}
+                loading={loading}
+                disabled={loading}
+                testID="button-connect"
+              />
             </ButtonsContainer>
-            <Version>Mano v{VERSION}</Version>
+            <Version>Mano - 14 janvier 2021</Version>
           </View>
         </ScrollContainer>
       </SceneContainer>
@@ -313,6 +317,27 @@ const Login = ({ navigation }) => {
 const Background = styled.View`
   flex: 1;
   background-color: #fff;
+`;
+
+const Title = styled.Text`
+  background-color: ${colors.app.color};
+  padding-horizontal: 30px;
+  padding-vertical: 15px;
+  font-weight: bold;
+  font-style: italic;
+  transform: rotate(-1deg);
+  font-size: 22px;
+  margin-top: 20%;
+  align-self: center;
+  color: #fff;
+`;
+
+const SubTitle = styled.Text`
+  font-size: 13px;
+  margin-top: 15%;
+  margin-bottom: 10%;
+  align-self: center;
+  text-align: center;
 `;
 
 const Hint = styled(MyText)`

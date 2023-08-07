@@ -1,178 +1,132 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import { ActivityIndicator, Animated, StatusBar, StyleSheet, TouchableOpacity, View, SafeAreaView } from 'react-native';
-import { MyText } from './MyText';
-import colors from '../utils/colors';
-import ArrowLeftExtended from '../icons/ArrowLeftExtended';
+import { Animated, Dimensions, StatusBar, TouchableOpacity } from 'react-native';
+import ButtonRight from './ButtonRight';
+import Svg, { Circle } from 'react-native-svg';
 
-const hitSlop = {
-  top: 20,
-  left: 20,
-  bottom: 20,
-  right: 20,
-};
+const AnimatedSvg = Animated.createAnimatedComponent(Svg);
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
-const AnimatedSafeAreaView = Animated.createAnimatedComponent(SafeAreaView);
+const ScreenTitle = ({ title, onBack, onAdd, backgroundColor = '#fff', color = '#000', offset, onLayout }) => {
+  const showRightButton = Boolean(onAdd);
+  const [titleHeight, setTitleHeight] = useState(0);
+  // const [_offset, set_offset] = useState(0);
+  // useEffect(() => {
+  //   return () => {
+  //     set_offset(getCurveOptions());
+  //   };
+  // }, [offset]);
 
-const ScreenTitle = ({
-  title,
-  onBack,
-  onAdd,
-  onEdit,
-  onSave,
-  onPressRight,
-  customRight,
-  backgroundColor = colors.app.color,
-  color = '#FFF',
-  saving,
-  children,
-  parentScroll,
-  testID = '',
-  forceTop = false,
-}) => {
-  const showRightButton = Boolean(onAdd) || Boolean(onEdit) || Boolean(onSave);
-  const showLeftButton = showRightButton || Boolean(onBack);
+  let animatedOffset, animatedRadius;
+
+  if (offset) {
+    if (!(offset instanceof Animated.Value)) {
+      animatedOffset = -1000 + titleHeight + 25;
+      animatedRadius = 1000;
+    } else {
+      animatedOffset = offset.interpolate({
+        inputRange: [0, 100],
+        outputRange: [-1000 + titleHeight + 25, -3000 + titleHeight],
+        extrapolate: 'clamp',
+      });
+      animatedRadius = offset.interpolate({
+        inputRange: [0, 100],
+        outputRange: [1000, 3000],
+        extrapolate: 'clamp',
+      });
+    }
+  }
 
   return (
     <>
-      <AnimatedSafeAreaView style={[styles.color(backgroundColor), styles.wrapper(parentScroll, forceTop)]}>
+      <Container
+        backgroundColor={backgroundColor}
+        onLayout={(e) => {
+          setTitleHeight(e.nativeEvent.layout.height);
+          if (onLayout) {
+            onLayout(e);
+          }
+        }}>
         <StatusBar backgroundColor={backgroundColor} />
-        <Animated.View style={[styles.color(backgroundColor), styles.container(forceTop)]}>
-          <Animated.View style={styles.titleContainer(parentScroll, forceTop)}>
-            {!forceTop && <Animated.View style={[styles.buttonsContainer]} />}
-            <Animated.View style={styles.titleCaptionContainer}>
-              <Title heavy ellipsizeMode="tail" color={color}>
-                {title}
-              </Title>
-              {Boolean(onPressRight) && (
-                <TouchableOpacity hitSlop={hitSlop} onPress={onPressRight}>
-                  <ButtonText>{customRight}</ButtonText>
-                </TouchableOpacity>
-              )}
-            </Animated.View>
-          </Animated.View>
-          <View style={[styles.buttonsContainer, styles.buttonsContainerFixed]}>
-            {!!showLeftButton && (
-              <Animated.View style={styles.buttonContainer(Boolean(onBack))} pointerEvents={onBack ? 'auto' : 'none'}>
-                <TouchableOpacity hitSlop={hitSlop} onPress={onBack} testID={`${testID}-back-button`}>
-                  <ArrowLeftExtended color="#fff" size={20} />
-                </TouchableOpacity>
-              </Animated.View>
-            )}
-            {!!showLeftButton && (
-              <Animated.View style={styles.buttonContainer(Boolean(onBack))} pointerEvents={onBack ? 'auto' : 'none'}>
-                {Boolean(onAdd) && (
-                  <TouchableOpacity hitSlop={hitSlop} onPress={onAdd}>
-                    <ButtonText>Créer</ButtonText>
-                  </TouchableOpacity>
-                )}
-                {Boolean(onEdit) &&
-                  (saving ? (
-                    <ActivityIndicator size="small" color={color} />
-                  ) : (
-                    <TouchableOpacity hitSlop={hitSlop} onPress={onEdit}>
-                      <ButtonText>Modifier</ButtonText>
-                    </TouchableOpacity>
-                  ))}
-                {Boolean(onSave) &&
-                  (saving ? (
-                    <ActivityIndicator size="small" color={color} />
-                  ) : (
-                    <TouchableOpacity hitSlop={hitSlop} onPress={onSave}>
-                      <ButtonText>Enregistrer</ButtonText>
-                    </TouchableOpacity>
-                  ))}
-              </Animated.View>
-            )}
-          </View>
-        </Animated.View>
-        {children}
-      </AnimatedSafeAreaView>
+        <TitleContainer backgroundColor={backgroundColor}>
+          <ButtonContainer pointerEvents={onBack ? 'auto' : 'none'} show={Boolean(onBack)}>
+            <TouchableOpacity onPress={onBack}>
+              <Icon>
+                <Back color={color}>{'<'}</Back>
+              </Icon>
+            </TouchableOpacity>
+          </ButtonContainer>
+          <Title ellipsizeMode="tail" color={color}>
+            {title}
+          </Title>
+          <ButtonContainer pointerEvents={showRightButton ? 'auto' : 'none'} show={showRightButton}>
+            {Boolean(onAdd) && <ButtonRight onPress={onAdd} caption="+" color={color} />}
+          </ButtonContainer>
+        </TitleContainer>
+      </Container>
+      {offset && (
+        <CurveContainer pointerEvents={'none'}>
+          <AnimatedCircle
+            cx={`${Dimensions.get('window').width / 2}`}
+            // cy={`-${1000 - titleHeight - 25 + }`}
+            cy={animatedOffset}
+            r={animatedRadius}
+            fill={backgroundColor}
+            opacity="1"
+            accessible={false}
+          />
+        </CurveContainer>
+      )}
     </>
   );
 };
 
-const Title = styled(MyText)`
-  font-size: 25px;
+const Container = styled.SafeAreaView`
+  background-color: ${(props) => props.backgroundColor};
+  overflow: visible;
+  z-index: 100;
+`;
+
+const TitleContainer = styled.View`
+  padding-horizontal: 15px;
+  padding-top: 5px;
+  padding-bottom: 10px;
+  align-items: center;
+  flex-direction: row;
+  background-color: ${(props) => props.backgroundColor};
+`;
+
+const Title = styled.Text`
+  font-size: 20px;
+  flex-grow: 1;
+  flex-shrink: 1;
+  text-align: center;
   color: ${(props) => props.color};
 `;
 
-const ButtonText = styled(MyText)`
-  color: #ffffff;
+const ButtonContainer = styled.View`
+  ${(props) => !props.show && 'opacity: 0;'}
+  min-width: 30px;
 `;
 
-const styles = StyleSheet.create({
-  wrapper: (parentScroll, forceTop) => ({
-    overflow: 'visible',
-    zIndex: 100,
-    marginTop: forceTop ? 0 : parentScroll?.interpolate ? -90 : 0,
-    transform: [
-      {
-        translateY: forceTop
-          ? 0
-          : parentScroll?.interpolate
-          ? parentScroll.interpolate({
-              inputRange: [0, 100],
-              outputRange: [90, 0],
-              extrapolate: 'clamp',
-            })
-          : 0,
-      },
-    ],
-  }),
-  titleContainer: (parentScroll, forceTop) => ({
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
-    transform: [
-      {
-        translateY: forceTop
-          ? 0
-          : parentScroll?.interpolate
-          ? parentScroll.interpolate({
-              inputRange: [0, 100],
-              outputRange: [0, -90],
-              extrapolate: 'clamp',
-            })
-          : 0,
-      },
-    ],
-  }),
-  color: (backgroundColor) => ({
-    backgroundColor,
-  }),
-  container: (forceTop) => ({
-    paddingHorizontal: 15,
-    paddingTop: forceTop ? 0 : '5%',
-    paddingBottom: forceTop ? 0 : '5%',
-  }),
-  buttonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    height: 30,
-    width: '100%',
-  },
-  buttonsContainerFixed: {
-    position: 'absolute',
-    top: 15,
-    left: 15,
-    right: 15,
-    borderWidth: 0,
-  },
+const iconSize = 30;
+const Icon = styled.View`
+  height: ${iconSize}px;
+  width: ${iconSize}px;
+  margin-right: 15px;
+`;
 
-  buttonContainer: (show) => ({
-    minWidth: 30,
-    opacity: show ? 1 : 0,
-  }),
+const Back = styled.Text`
+  align-self: center;
+  font-size: ${iconSize - 4}px;
+  line-height: ${iconSize - 1}px;
+  color: ${(props) => props.color};
+  text-align: center;
+`;
 
-  titleCaptionContainer: {
-    flexShrink: 1,
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    flexGrow: 0,
-    width: '100%',
-    flexDirection: 'row',
-  },
-});
+const CurveContainer = styled(AnimatedSvg)`
+  position: absolute;
+  z-index: 99;
+`;
 
 export default ScreenTitle;

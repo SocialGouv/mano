@@ -24,8 +24,8 @@ const Menu = ({ navigation }) => {
     <SceneContainer>
       <ScreenTitle title="Menu" />
       <ScrollContainer noPadding>
-        <Spacer height={30} />
-        <Row
+        {/* <Spacer height={30} /> */}
+        {/* <Row
           withNextButton
           caption={`Comptes-rendus de l'équipe ${currentTeam?.name}`}
           onPress={() => {
@@ -51,10 +51,10 @@ const Menu = ({ navigation }) => {
         <Row withNextButton caption="Charte des utilisateurs" onPress={() => navigation.navigate('Charte')} />
         <Row withNextButton caption="Mentions Légales" onPress={() => navigation.navigate('Legal')} />
         <Row withNextButton caption="Politique de Confidentialité" onPress={() => navigation.navigate('Privacy')} />
-        <Spacer height={30} />
-        <Row caption="Se déconnecter" color="#F00" loading={isLoggingOut} Component={TouchableWithoutFeedback} onPress={() => onLogoutRequest()} />
+        <Spacer height={30} /> */}
+        {/* <Row caption="Se déconnecter" color="#F00" loading={isLoggingOut} Component={TouchableWithoutFeedback} onPress={() => onLogoutRequest()} /> */}
         <Row
-          caption="Se déconnecter et vider le cache"
+          caption="Se déconnecter"
           color="#F00"
           loading={isLoggingOut}
           Component={TouchableWithoutFeedback}

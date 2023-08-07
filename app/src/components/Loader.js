@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { Dimensions } from 'react-native';
+import { Dimensions, ActivityIndicator } from 'react-native';
 import API from '../services/api';
 import { MyText } from './MyText';
 import colors from '../utils/colors';
@@ -414,6 +414,12 @@ export const LoaderProgress = () => {
 
   return (
     <Container fullScreen={fullScreen} testID="loader">
+      <ActivityIndicator />
+    </Container>
+  );
+
+  return (
+    <Container fullScreen={fullScreen} testID="loader">
       {!!fullScreen && <ImageStyled source={picture.current} />}
       <Caption>{loading}</Caption>
       <ProgressContainer fullScreen={fullScreen}>
@@ -425,7 +431,7 @@ export const LoaderProgress = () => {
 
 const Container = styled.SafeAreaView`
   width: 100%;
-  background-color: ${colors.app.color};
+  // background-color: ${colors.app.color};
   ${(p) => !p.fullScreen && 'position: absolute;'}
   ${(p) => !p.fullScreen && 'top: 0;'}
   ${(p) => p.fullScreen && 'height: 100%;'}

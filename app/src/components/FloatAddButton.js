@@ -2,13 +2,12 @@ import React from 'react';
 import { TouchableWithoutFeedback } from 'react-native';
 import styled from 'styled-components';
 import { Plus } from '../icons';
-import colors from '../utils/colors';
 
-const FloatAddButton = ({ onPress, color = colors.app.secondary, testID }) => {
+const FloatAddButton = ({ onPress, color }) => {
   return (
-    <TouchableWithoutFeedback onPress={onPress} testID={testID}>
+    <TouchableWithoutFeedback onPress={onPress}>
       <Button color={color}>
-        <Plus name="add" size={20} color="white" />
+        <Plus name={'add'} size={20} color="white" />
       </Button>
     </TouchableWithoutFeedback>
   );
@@ -26,6 +25,12 @@ const Button = styled.View`
   background-color: ${(props) => props.color};
   justify-content: center;
   align-items: center;
+`;
+
+const Action = styled.Text`
+  color: #fff;
+  font-size: 25px;
+  font-weight: bold;
 `;
 
 export default FloatAddButton;

@@ -6,7 +6,7 @@ import { NavigationContainer, useNavigationContainerRef } from '@react-navigatio
 import { createStackNavigator } from '@react-navigation/stack';
 import { useMMKVNumber } from 'react-native-mmkv';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { AgendaIcon, PersonIcon, TerritoryIcon } from './icons';
+import { AgendaIcon, PersonIcon, StructuresIcon, TerritoryIcon } from './icons';
 import { RecoilRoot, useRecoilValue, useResetRecoilState } from 'recoil';
 import logEvents from './services/logEvents';
 import Login from './scenes/Login/Login';
@@ -59,12 +59,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { currentTeamState, organisationState, teamsState, userState } from './recoil/auth';
 import { appCurrentCacheKey, clearCache } from './services/dataManagement';
 import useResetAllCachedDataRecoilStates from './recoil/reset';
+import MenuIcon from './icons/MenuIcon';
+import { TODO } from './recoil/actions';
+import ActionsList from './scenes/Actions/ActionsList';
 
 const ActionsStack = createStackNavigator();
 const ActionsNavigator = () => {
   return (
     <ActionsStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="ActionsList">
-      <ActionsStack.Screen name="ActionsList" component={ActionsTabNavigator} />
+      <ActionsStack.Screen name="ActionsList" component={ActionsList} initialParams={{ status: TODO }} />
       <ActionsStack.Screen name="Action" component={Action} />
       <ActionsStack.Screen name="NewActionForm" component={NewActionForm} />
       <ActionsStack.Screen name="PersonsSearch" component={PersonsSearch} />
@@ -209,41 +212,28 @@ const TabNavigator = () => {
         name="Agenda"
         component={ActionsNavigator}
         options={{
-          tabBarIcon: AgendaIcon,
+          tabBarIcon: ({ size, color }) => <AgendaIcon size={size} color={color} />,
           tabBarLabel: 'AGENDA',
-          tabBarTestID: 'tab-bar-actions',
         }}
       />
       {!!organisation?.territoriesEnabled && (
         <Tab.Screen
           lazy
           name="Territories"
-          component={TerritoriesNavigator}
+          component={PersonsNavigator}
           options={{
-            tabBarIcon: TerritoryIcon,
-            tabBarLabel: 'TERRITOIRES',
-            tabBarTestID: 'tab-bar-territories',
+            tabBarIcon: ({ size, color }) => <PersonIcon size={size} color={color} />,
+            tabBarLabel: 'USAGERS',
           }}
         />
       )}
       <Tab.Screen
         lazy
-        name="Persons"
-        component={PersonsNavigator}
+        name="Structures"
+        component={StructuresNavigator}
         options={{
-          tabBarIcon: PersonIcon,
-          tabBarLabel: 'PERSONNES',
-          tabBarTestID: 'tab-bar-persons',
-        }}
-      />
-      <Tab.Screen
-        lazy
-        name="Notifications"
-        component={NotificationsNavigator}
-        options={{
-          tabBarIcon: BellWithNotifications,
-          tabBarLabel: 'PRIORITÉS',
-          tabBarTestID: 'tab-bar-notifications',
+          tabBarIcon: ({ size, color }) => <StructuresIcon size={size} color={color} />,
+          tabBarLabel: 'STRUCTURES',
         }}
       />
       <Tab.Screen
@@ -251,9 +241,8 @@ const TabNavigator = () => {
         name="MenuTab"
         component={MenuNavigator}
         options={{
-          tabBarIcon: DotsIcon,
-          tabBarLabel: 'MENU',
-          tabBarTestID: 'tab-bar-profil',
+          tabBarIcon: ({ size, color }) => <MenuIcon size={size} color={color} />,
+          tabBarLabel: 'PROFIL',
         }}
       />
     </Tab.Navigator>

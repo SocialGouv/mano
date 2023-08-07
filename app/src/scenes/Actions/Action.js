@@ -32,6 +32,7 @@ import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIf
 import { groupsState } from '../../recoil/groups';
 import { useFocusEffect } from '@react-navigation/native';
 import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
+import colors from '../../utils/colors';
 
 const castToAction = (action) => {
   if (!action) action = {};
@@ -414,6 +415,8 @@ const Action = ({ navigation, route }) => {
         onSave={!editable || isUpdateDisabled ? null : onUpdateRequest}
         saving={updating}
         testID="action"
+        backgroundColor={colors.action.backgroundColor}
+        color={colors.action.color}
       />
       <ScrollContainer ref={scrollViewRef}>
         {!!action.user && <UserName metaCaption="Action ajoutée par" id={action.user?._id || action.user} />}
@@ -472,30 +475,14 @@ const Action = ({ navigation, route }) => {
           ref={descriptionRef}
           onFocus={() => _scrollToInput(descriptionRef)}
         />
-        <ActionCategoriesModalSelect onChange={(categories) => setAction((a) => ({ ...a, categories }))} values={categories} editable={editable} />
-        {editable ? (
-          <CheckboxLabelled
-            label="Action prioritaire (cette action sera mise en avant par rapport aux autres)"
-            alone
-            onPress={() => setAction((a) => ({ ...a, urgent: !a.urgent }))}
-            value={urgent}
-          />
-        ) : null}
-        {editable && !!canToggleGroupCheck ? (
-          <CheckboxLabelled
-            label="Action familiale (cette action sera à effectuer pour toute la famille)"
-            alone
-            onPress={() => setAction((a) => ({ ...a, group: !a.group }))}
-            value={group}
-          />
-        ) : null}
-
         {!editable && <Spacer />}
         <ButtonsContainer>
           <ButtonDelete onPress={onDeleteRequest} />
           <Button
             caption={editable ? 'Mettre à jour' : 'Modifier'}
             onPress={editable ? onUpdateRequest : () => setEditable(true)}
+            backgroundColor={colors.action.backgroundColor}
+            color={colors.action.color}
             disabled={editable ? isUpdateDisabled : false}
             loading={updating}
           />
