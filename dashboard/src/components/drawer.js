@@ -61,12 +61,12 @@ export default function Drawer() {
           </NavLink>
         </li>
         <li>
-          <NavLink to="/place" activeClassName="active">
+          <NavLink to="/place" activeClassName="active" className="tw-pointer-events-none tw-opacity-20">
             Hébergement
           </NavLink>
         </li>
         <li>
-          <NavLink to="/structure" activeClassName="active">
+          <NavLink to="/structure" activeClassName="active" className="tw-pointer-events-none tw-opacity-20">
             Structures
           </NavLink>
         </li>

@@ -7,7 +7,7 @@ import Table from '../../components/table';
 import { useRecoilValue } from 'recoil';
 import { actionsState } from '../../recoil/actions';
 
-export default () => {
+export default function ActionList() {
   const action = useRecoilValue(actionsState);
   const history = useHistory();
 
@@ -29,7 +29,7 @@ export default () => {
       />
     </Container>
   );
-};
+}
 
 const Status = ({ status }) => {
   if (status === 'A FAIRE') return <Badge color="danger">{status}</Badge>;
