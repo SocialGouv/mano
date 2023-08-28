@@ -239,6 +239,7 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                   {!isMedicalFile &&
                     !['restricted-access'].includes(user.role) &&
                     customFieldsPersons.map(({ name, fields }, index) => {
+                      if (!fields.filter((f) => f.enabled || f.enabledTeams?.includes(team._id)).length) return null;
                       return (
                         <div key={name + index}>
                           <div
