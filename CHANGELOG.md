@@ -1,3 +1,11 @@
+## [1.282.5](https://github.com/SocialGouv/mano/compare/v1.282.4...v1.282.5) (2023-08-28)
+
+
+### Bug Fixes
+
+* **dashboard:** masquer les sections de champs custo dans la fenêtre d'écition lorsqu'il n'y a aucun champ custo disponible pour l'équipe courante ([#1635](https://github.com/SocialGouv/mano/issues/1635)) ([db32511](https://github.com/SocialGouv/mano/commit/db32511f129fe346e9791130453557072cae3a51))
+* **dashboard:** on affiche la stat d'un champ custo de consultation quel que soit la section à laquelle il appartient ([#1636](https://github.com/SocialGouv/mano/issues/1636)) ([1a5c60b](https://github.com/SocialGouv/mano/commit/1a5c60b67f9ae7c036b19dc9b8b2a271bccc3700))
+
 ## [1.282.4](https://github.com/SocialGouv/mano/compare/v1.282.3...v1.282.4) (2023-08-04)
 
 
