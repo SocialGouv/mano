@@ -45,7 +45,7 @@ const ConsultationsStats = ({ consultations, personsWithConsultations, filterBas
           <div key={c.name}>
             <h4 className="tw-my-8 tw-mx-0 tw-text-xl tw-text-black75">Statistiques des consultations de type « {c.name} »</h4>
             <CustomFieldsStats
-              data={consultations.filter((d) => d.type === c.name)}
+              data={consultations}
               customFields={c.fields}
               help={(label) => `${label.capitalize()} des consultations réalisées dans la période définie.`}
               totalTitleForMultiChoice={<span className="tw-font-bold">Nombre de consultations concernées</span>}
