@@ -1,3 +1,10 @@
+## [1.282.7](https://github.com/SocialGouv/mano/compare/v1.282.6...v1.282.7) (2023-08-31)
+
+
+### Bug Fixes
+
+* **dashboard:** test à 50000 téléchargements par batch ([aee85e6](https://github.com/SocialGouv/mano/commit/aee85e633b5b97b18a2f5fe58a064ac813b58756))
+
 ## [1.282.6](https://github.com/SocialGouv/mano/compare/v1.282.5...v1.282.6) (2023-08-31)
 
 
