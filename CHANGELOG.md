@@ -1,3 +1,15 @@
+# [1.283.0](https://github.com/SocialGouv/mano/compare/v1.282.8...v1.283.0) (2023-09-02)
+
+
+### Bug Fixes
+
+* **dashboard:** quand on met le filtre "âge non renseigné", les personnes qui ont 0 an sont désormais exclues ([243a442](https://github.com/SocialGouv/mano/commit/243a44273481800cd1afd547547c03d6eb934373))
+
+
+### Features
+
+* **dashboard:** affichage des "Autres pseudos" dans la liste des Personnes suivies ([10e2a1d](https://github.com/SocialGouv/mano/commit/10e2a1d435ba7e1e68442f1752156f66b2fa8e4d))
+
 ## [1.282.8](https://github.com/SocialGouv/mano/compare/v1.282.7...v1.282.8) (2023-08-31)
 
 
