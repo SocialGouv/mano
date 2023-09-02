@@ -224,11 +224,19 @@ const List = () => {
               if (p.outOfActiveList)
                 return (
                   <div className="tw-max-w-md tw-text-black50">
-                    <div className="tw-flex tw-font-bold [overflow-wrap:anywhere]">{p.name}</div>
+                    <div className="tw-flex tw-items-center tw-gap-1 tw-font-bold [overflow-wrap:anywhere]">
+                      {p.name}
+                      {p.otherNames ? <small className="tw-text-main75"> - {p.otherNames}</small> : null}
+                    </div>
                     <div>Sortie de file active : {p.outOfActiveListReasons?.join(', ')}</div>
                   </div>
                 );
-              return <div className="tw-flex tw-max-w-md tw-font-bold [overflow-wrap:anywhere]">{p.name}</div>;
+              return (
+                <div className="tw-flex tw-max-w-md tw-items-center tw-gap-1 tw-font-bold [overflow-wrap:anywhere]">
+                  {p.name}
+                  {p.otherNames ? <small className="tw-text-main75"> - {p.otherNames}</small> : null}
+                </div>
+              );
             },
           },
           {
