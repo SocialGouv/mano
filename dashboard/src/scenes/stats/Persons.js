@@ -273,25 +273,24 @@ export const AgeRangeBar = ({ persons, onItemClick }) => {
       newData['Non renseigné'].push(person);
       return newData;
     }
-    const parsedDate = Date.parse(person.birthdate);
-    const fromNowInYear = (Date.now() - parsedDate) / 1000 / 60 / 60 / 24 / 365.25;
-    if (fromNowInYear < 2) {
+    // now person has an `age` field
+    if (person.age < 2) {
       newData['0 - 2'].push(person);
       return newData;
     }
-    if (fromNowInYear < 18) {
+    if (person.age < 18) {
       newData['3 - 17'].push(person);
       return newData;
     }
-    if (fromNowInYear < 25) {
+    if (person.age < 25) {
       newData['18 - 24'].push(person);
       return newData;
     }
-    if (fromNowInYear < 45) {
+    if (person.age < 45) {
       newData['25 - 44'].push(person);
       return newData;
     }
-    if (fromNowInYear < 60) {
+    if (person.age < 60) {
       newData['45 - 59'].push(person);
       return newData;
     }

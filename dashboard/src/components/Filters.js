@@ -16,10 +16,13 @@ export const filterItem =
       if (['number'].includes(filter.type)) {
         const { number, number2, comparator } = filter.value;
         if (comparator === 'unfilled') {
-          if (!!itemValue) return false;
+          if (typeof itemValue === 'number') return false;
           continue;
         }
-        if (!itemValue) return false;
+        // be careful:
+        // now we want to exclude everything that is not a number
+        // BUT we can't use `isNaN` here because if itemValue is `null`, isNaN(null) === false, because `Number(null) === 0`
+        if (typeof itemValue !== 'number') return false;
         if (comparator === 'between') {
           if (Number(number) < Number(number2)) {
             if (Number(itemValue) >= Number(number) && Number(itemValue) <= Number(number2)) continue;
