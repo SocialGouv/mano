@@ -1,3 +1,10 @@
+## [1.283.1](https://github.com/SocialGouv/mano/compare/v1.283.0...v1.283.1) (2023-09-04)
+
+
+### Bug Fixes
+
+* **app:** refraichit les données à chaque foit que les actions/personnes/territoires, ou qu'une personne, reviennent à l'écran ([#1638](https://github.com/SocialGouv/mano/issues/1638)) ([ecefc52](https://github.com/SocialGouv/mano/commit/ecefc52e9be114f1a7c562d025514ae9bb44f421))
+
 # [1.283.0](https://github.com/SocialGouv/mano/compare/v1.282.8...v1.283.0) (2023-09-02)
 
 
