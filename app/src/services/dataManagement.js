@@ -25,7 +25,7 @@ initCacheAndcheckIfExpired();
 export async function getData({ collectionName, setProgress = () => {}, lastRefresh = 0 }) {
   const response = await API.get({
     path: `/${collectionName}`,
-    batch: 2000,
+    batch: 5000,
     setProgress,
     query: { after: lastRefresh, withDeleted: Boolean(lastRefresh) },
   });
