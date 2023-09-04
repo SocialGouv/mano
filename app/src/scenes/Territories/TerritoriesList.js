@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Animated } from 'react-native';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
@@ -11,7 +11,7 @@ import Row from '../../components/Row';
 import { TerritoryIcon } from '../../icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { territoriesSearchSelector } from '../../recoil/selectors';
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { refreshTriggerState, loadingState } from '../../components/Loader';
 
 const TerritoriesList = () => {
@@ -26,6 +26,10 @@ const TerritoriesList = () => {
   const onRefresh = async () => {
     setRefreshTrigger({ status: true, options: { showFullScreen: false, initialLoad: false } });
   };
+  const isFocused = useIsFocused();
+  useEffect(() => {
+    if (isFocused && refreshTrigger.status !== true) onRefresh();
+  }, [isFocused]);
 
   const onCreateTerritoryRequest = () => navigation.navigate('NewTerritoryForm');
 

@@ -9,7 +9,7 @@ import ScreenTitle from '../../components/ScreenTitle';
 import FoldersNavigator from './FoldersNavigator';
 import Tabs from '../../components/Tabs';
 import colors from '../../utils/colors';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import {
   allowedFieldsInHistorySelector,
   personsState,
@@ -40,7 +40,7 @@ const Person = ({ route, navigation }) => {
   const flattenedCustomFieldsPersons = useRecoilValue(flattenedCustomFieldsPersonsSelector);
   const allowedFieldsInHistory = useRecoilValue(allowedFieldsInHistorySelector);
   const preparePersonForEncryption = usePreparePersonForEncryption();
-  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
+  const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
   const [persons, setPersons] = useRecoilState(personsState);
   const actions = useRecoilValue(actionsState);
   const groups = useRecoilValue(groupsState);
@@ -53,7 +53,14 @@ const Person = ({ route, navigation }) => {
   const relsPersonPlace = useRecoilValue(relsPersonPlaceState);
   const user = useRecoilValue(userState);
 
-  const [personDB, setPersonDB] = useState(() => persons.find((p) => p._id === route.params?.person?._id));
+  const personDB = useMemo(() => persons.find((p) => p._id === route.params?.person?._id), [persons, route.params?.person?._id]);
+
+  const isFocused = useIsFocused();
+  useEffect(() => {
+    if (isFocused && refreshTrigger.status !== true) {
+      setRefreshTrigger({ status: true, options: { showFullScreen: false, initialLoad: false } });
+    }
+  }, [isFocused]);
 
   const castToPerson = useCallback(
     (person = {}) => {
@@ -155,7 +162,6 @@ const Person = ({ route, navigation }) => {
       })
     );
     setPerson(castToPerson(newPerson));
-    setPersonDB(newPerson);
     if (alert) Alert.alert('Personne mise à jour !');
     setUpdating(false);
     setEditable(false);
