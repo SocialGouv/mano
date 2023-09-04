@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated } from 'react-native';
 import * as Sentry from '@sentry/react-native';
 import SceneContainer from '../../components/SceneContainer';
@@ -13,6 +13,7 @@ import { arrayOfitemsGroupedByPersonSelector, itemsGroupedByPersonSelector } fro
 import { selector, selectorFamily, useRecoilState, useRecoilValue } from 'recoil';
 import { loadingState, refreshTriggerState } from '../../components/Loader';
 import { filterBySearch } from '../../utils/search';
+import { useIsFocused } from '@react-navigation/native';
 
 const personsFilteredSelector = selectorFamily({
   key: 'personsFilteredSelector',
@@ -80,6 +81,10 @@ const PersonsList = ({ navigation, route }) => {
     setRefreshTrigger({ status: true, options: { showFullScreen: false, initialLoad: false } });
   };
 
+  const isFocused = useIsFocused();
+  useEffect(() => {
+    if (isFocused && refreshTrigger.status !== true) onRefresh();
+  }, [isFocused]);
   const onCreatePersonRequest = () => navigation.navigate('NewPersonForm', { toRoute: 'Person' });
 
   const onFiltersPress = () => navigation.push('PersonsFilter', route.params);

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import * as Sentry from '@sentry/react-native';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -11,7 +11,7 @@ import { MyText } from '../../components/MyText';
 import { FlashListStyled } from '../../components/Lists';
 import { TODO } from '../../recoil/actions';
 import { actionsByStatusSelector, totalActionsByStatusSelector } from '../../recoil/selectors';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { refreshTriggerState, loadingState } from '../../components/Loader';
 import Button from '../../components/Button';
 import ConsultationRow from '../../components/ConsultationRow';
@@ -39,6 +39,11 @@ const ActionsList = ({ showActionSheetWithOptions }) => {
   const onRefresh = useCallback(async () => {
     setRefreshTrigger({ status: true, options: { showFullScreen: false, initialLoad: false } });
   }, [setRefreshTrigger]);
+
+  const isFocused = useIsFocused();
+  useEffect(() => {
+    if (isFocused && refreshTrigger.status !== true) onRefresh();
+  }, [isFocused]);
 
   const onPressFloatingButton = async () => {
     if (!user.healthcareProfessional) {

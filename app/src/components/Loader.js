@@ -23,7 +23,6 @@ import { reportsState } from '../recoil/reports';
 import { consultationsState, formatConsultation } from '../recoil/consultations';
 import { medicalFileState } from '../recoil/medicalFiles';
 import { treatmentsState } from '../recoil/treatments';
-import { sortByName } from '../utils/sortByName';
 import { rencontresState } from '../recoil/rencontres';
 import { passagesState } from '../recoil/passages';
 import { groupsState } from '../recoil/groups';
@@ -69,7 +68,7 @@ export const DataLoader = () => {
   const setProgress = useSetRecoilState(progressState);
   const setFullScreen = useSetRecoilState(loaderFullScreenState);
   const [organisation, setOrganisation] = useRecoilState(organisationState);
-  const setUser = useSetRecoilState(userState);
+  const [user, setUser] = useRecoilState(userState);
   const organisationId = organisation?._id;
 
   const [persons, setPersons] = useRecoilState(personsState);
@@ -93,6 +92,7 @@ export const DataLoader = () => {
 
   const refresh = async () => {
     const { showFullScreen, initialLoad } = refreshTrigger.options;
+
     setLoading('Chargement...');
     setFullScreen(showFullScreen);
 
@@ -101,18 +101,29 @@ export const DataLoader = () => {
     and the latest user roles
     */
     const userResponse = await API.get({ path: '/user/me' });
-    setOrganisation(userResponse.user.organisation);
-    setUser(userResponse.user);
+    if (userResponse.ok) {
+      if (JSON.stringify(userResponse.user.organisation) !== JSON.stringify(organisation)) {
+        setOrganisation(userResponse.user.organisation);
+      }
+      if (JSON.stringify(userResponse.user) !== JSON.stringify(user)) {
+        setUser(userResponse.user);
+      }
+    }
 
     const serverDateResponse = await API.get({ path: '/now' });
     const serverDate = serverDateResponse.data;
-
     /*
     Get number of data to download to show the appropriate loading progress bar
     */
     const response = await API.get({
       path: '/organisation/stats',
-      query: { organisation: organisationId, after: lastRefresh, withDeleted: true },
+      query: {
+        organisation: organisationId,
+        after: lastRefresh,
+        withDeleted: true,
+        // Medical data is never saved in cache so we always have to download all at every page reload.
+        withAllMedicalData: initialLoad,
+      },
     });
     if (!response.ok) {
       capture('error getting stats', { extra: response });
@@ -130,33 +141,18 @@ export const DataLoader = () => {
       response.data.territoryObservations +
       response.data.places +
       response.data.comments +
+      response.data.consultations +
+      response.data.treatments +
+      response.data.medicalFiles +
       response.data.passages +
       response.data.rencontres +
       response.data.reports +
       response.data.groups +
       response.data.relsPersonPlace;
 
-    // medical data is never saved in cache
-    // so we always have to download all at every page reload
-    const medicalDataResponse = await API.get({
-      path: '/organisation/stats',
-      query: { organisation: organisationId, after: initialLoad ? 0 : lastRefresh, withDeleted: true },
-    });
-    if (!medicalDataResponse.ok) {
-      setRefreshTrigger({
-        status: false,
-        options: { showFullScreen: false, initialLoad: false },
-      });
-      return;
-    }
-
-    total = total + medicalDataResponse.data.consultations + medicalDataResponse.data.treatments + medicalDataResponse.data.medicalFiles;
-
     if (initialLoad) {
-      const numberOfCollections = 9;
-      total = total + numberOfCollections; // for the progress bar to be beautiful
+      total = total + Object.keys(response.data).length; // for the progress bar to be beautiful
     }
-
     /*
     Get persons
     */
@@ -191,7 +187,7 @@ export const DataLoader = () => {
     /*
     Get consultations
     */
-    if (medicalDataResponse.data.consultations || initialLoad) {
+    if (response.data.consultations || initialLoad) {
       setLoading('Chargement des consultations');
       const refreshedConsultations = await getData({
         collectionName: 'consultation',
@@ -206,7 +202,7 @@ export const DataLoader = () => {
     /*
     Get treatments
     */
-    if (medicalDataResponse.data.treatments || initialLoad) {
+    if (response.data.treatments || initialLoad) {
       setLoading('Chargement des traitements');
       const refreshedTreatments = await getData({
         collectionName: 'treatment',
@@ -221,7 +217,7 @@ export const DataLoader = () => {
     /*
       Get medicalFiles
       */
-    if (medicalDataResponse.data.medicalFiles || initialLoad) {
+    if (response.data.medicalFiles || initialLoad) {
       setLoading('Chargement des informations médicales');
       const refreshedMedicalFiles = await getData({
         collectionName: 'medical-file',
