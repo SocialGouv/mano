@@ -7,7 +7,7 @@ import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from './tailwind/
 import { formatDateTimeWithNameOfDay } from '../services/date';
 import { FullScreenIcon } from '../scenes/person/components/FullScreenIcon';
 import UserName from './UserName';
-import type { DocumentWithLinkedItem, Document, FileMetadata, FolderWithLinkedItem, Folder, LinkedItemType } from '../types/document';
+import type { DocumentWithLinkedItem, Document, FileMetadata, FolderWithLinkedItem, Folder } from '../types/document';
 import API from '../services/api';
 import { download, viewBlobInNewWindow } from '../utils';
 import type { UUIDV4 } from '../types/uuid';
@@ -26,19 +26,19 @@ interface DocumentsModuleProps {
   showPanel?: boolean;
   showAssociatedItem?: boolean;
   canToggleGroupCheck?: boolean;
-  initialRootStructure?: Array<LinkedItemType | 'family-documents'>;
+  socialOrMedical: 'social' | 'medical';
   onDeleteDocument: (item: DocumentWithLinkedItem) => Promise<boolean>;
   onSubmitDocument: (item: ItemWithLink) => Promise<void>;
   onAddDocuments: (items: Item[]) => Promise<void>;
-  onSaveNewOrder?: (items: ItemWithLink[], root?: LinkedItemType) => Promise<boolean>;
+  onSaveNewOrder?: (items: ItemWithLink[]) => Promise<boolean>;
   onDeleteFolder?: (item: FolderWithLinkedItem) => Promise<boolean>;
   color?: 'main' | 'blue-900';
 }
 
 export function DocumentsModule({
   documents = [],
-  initialRootStructure = [],
   title = 'Documents',
+  socialOrMedical,
   personId,
   showPanel = false,
   canToggleGroupCheck = false,
@@ -137,7 +137,7 @@ export function DocumentsModule({
         open={!!fullScreen}
         documents={withDocumentOrganizer ? documents : onlyDocuments}
         personId={personId}
-        initialRootStructure={initialRootStructure}
+        socialOrMedical={socialOrMedical}
         onDisplayDocument={setDocumentToEdit}
         onAddDocuments={onAddDocuments}
         onAddFolderRequest={() => setAddFolder(true)}
@@ -154,9 +154,9 @@ export function DocumentsModule({
 interface DocumentsFullScreenProps {
   open: boolean;
   documents: Array<DocumentWithLinkedItem | FolderWithLinkedItem>;
-  initialRootStructure: Array<LinkedItemType | 'family-documents'>;
+  socialOrMedical: 'social' | 'medical';
   personId: UUIDV4;
-  onSaveNewOrder?: (documents: ItemWithLink[], root?: LinkedItemType) => Promise<boolean>;
+  onSaveNewOrder?: (documents: ItemWithLink[]) => Promise<boolean>;
   onAddDocuments: (documents: Document[]) => Promise<void>;
   onDisplayDocument: (document: DocumentWithLinkedItem) => void;
   onClose: () => void;
@@ -170,7 +170,7 @@ function DocumentsFullScreen({
   open,
   personId,
   documents,
-  initialRootStructure,
+  socialOrMedical,
   onClose,
   title,
   color,
@@ -187,14 +187,16 @@ function DocumentsFullScreen({
       <ModalBody>
         {withDocumentOrganizer ? (
           <div className="tw-min-h-1/2 ">
-            {initialRootStructure.map((root) => {
-              return (
+            {socialOrMedical === 'social' && (
+              <>
                 <DocumentsOrganizer
                   items={documents
                     .filter((doc) => {
-                      const itemType = doc.linkedItem.type;
-                      const rootType = root === 'family-documents' ? 'person' : root;
-                      return itemType === rootType;
+                      if (doc.type === 'document') {
+                        const document = doc as DocumentWithLinkedItem;
+                        if (!!document.group) return false;
+                      }
+                      return true;
                     })
                     .map((doc) => {
                       if (!!doc.parentId) return doc;
@@ -203,9 +205,33 @@ function DocumentsFullScreen({
                         parentId: 'root',
                       };
                     })}
-                  linkedItemType={root}
-                  onSave={(newOrder, root) => {
-                    const ok = onSaveNewOrder(newOrder, root);
+                  onSave={(newOrder) => {
+                    const ok = onSaveNewOrder(newOrder);
+                    if (!ok) onClose();
+                    return ok;
+                  }}
+                  htmlId="social"
+                  onFolderClick={onEditFolderRequest}
+                  onDocumentClick={onDisplayDocument}
+                  color={color}
+                />
+                <DocumentsOrganizer
+                  items={documents
+                    .filter((item) => {
+                      if (item.type !== 'document') return false;
+                      const doc = item as DocumentWithLinkedItem;
+                      return !!doc.group;
+                    })
+                    .map((doc) => {
+                      return {
+                        ...doc,
+                        parentId: 'root',
+                      };
+                    })}
+                  htmlId="family"
+                  rootFolderName="👪 Documents familiaux"
+                  onSave={(newOrder) => {
+                    const ok = onSaveNewOrder(newOrder);
                     if (!ok) onClose();
                     return ok;
                   }}
@@ -213,8 +239,29 @@ function DocumentsFullScreen({
                   onDocumentClick={onDisplayDocument}
                   color={color}
                 />
-              );
-            })}
+              </>
+            )}
+            {socialOrMedical === 'medical' && (
+              <DocumentsOrganizer
+                initialRootStructure={['medical-file', 'consultation', 'treatment']}
+                htmlId="medical"
+                items={documents.map((doc) => {
+                  if (!!doc.parentId) return doc;
+                  return {
+                    ...doc,
+                    parentId: doc.linkedItem.type,
+                  };
+                })}
+                onSave={(newOrder) => {
+                  const ok = onSaveNewOrder(newOrder);
+                  if (!ok) onClose();
+                  return ok;
+                }}
+                onFolderClick={onEditFolderRequest}
+                onDocumentClick={onDisplayDocument}
+                color={color}
+              />
+            )}
           </div>
         ) : (
           <DocumentTable

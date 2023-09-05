@@ -22,11 +22,13 @@ type FolderChildren = Array<FolderForTree | DocumentForTree | RootForTree>;
 
 interface DocumentsOrganizerProps {
   items: Item[];
-  onSave: (newOrder: Item[], root: LinkedItemType) => Promise<boolean>;
+  onSave: (newOrder: Array<Item>) => Promise<boolean>;
   onFolderClick: (folder: FolderForTree) => void;
   onDocumentClick: (document: DocumentForTree) => void;
-  linkedItemType: LinkedItemType | 'family-documents';
   color: 'main' | 'blue-900';
+  htmlId: 'social' | 'family' | 'medical';
+  initialRootStructure?: Array<LinkedItemType>;
+  rootFolderName?: '' | '👪 Documents familiaux';
 }
 
 const rootKeysAndFolderNames = {
@@ -41,21 +43,30 @@ const modalWidth = window.innerWidth * 0.9;
 const informationsWidth = modalWidth * 0.4;
 const informationsStyle = { flexBasis: informationsWidth };
 
-export default function DocumentsOrganizer({ items, linkedItemType, onSave, onFolderClick, onDocumentClick, color }: DocumentsOrganizerProps) {
+export default function DocumentsOrganizer({
+  items,
+  initialRootStructure = [],
+  htmlId,
+  rootFolderName = '',
+  onSave,
+  onFolderClick,
+  onDocumentClick,
+  color,
+}: DocumentsOrganizerProps) {
   const [openedFolderIds, setOpenedFolderIds] = useState<DocumentOrFolderId[]>(['root']);
 
   const itemsRef = useRef(items);
   const documentsTree = useMemo(() => {
     if (JSON.stringify(itemsRef.current) === JSON.stringify(items)) {
-      return buildFolderTree(itemsRef.current, linkedItemType);
+      return buildFolderTree(itemsRef.current, initialRootStructure, rootFolderName);
     }
     itemsRef.current = items;
-    return buildFolderTree(items, linkedItemType);
-  }, [items, linkedItemType]);
+    return buildFolderTree(items, initialRootStructure, rootFolderName);
+  }, [items, initialRootStructure, rootFolderName]);
 
   useEffect(() => {
     // we want to keep alternate line colors
-    let elements = document.getElementById(`${linkedItemType}-documents`)?.querySelectorAll('[data-visible="true"]') || [];
+    let elements = document.getElementById(`${htmlId}-documents`)?.querySelectorAll('[data-visible="true"]') || [];
     for (let i = 0; i < elements.length; i++) {
       if (i % 2 === 0) {
         elements[i].classList.add('before:tw-bg-opacity-0');
@@ -65,7 +76,7 @@ export default function DocumentsOrganizer({ items, linkedItemType, onSave, onFo
         elements[i].classList.remove('before:tw-bg-opacity-0');
       }
     }
-  }, [documentsTree, linkedItemType, openedFolderIds]);
+  }, [documentsTree, htmlId, openedFolderIds]);
 
   // reloadTreeKey to prevent error `Failed to execute 'removeChild' on 'Node'` from sortablejs after updating messy tree
   // const [reloadTreeKey, setReloadeTreeKey] = useState(0);
@@ -76,7 +87,7 @@ export default function DocumentsOrganizer({ items, linkedItemType, onSave, onFo
   const onListChange = useCallback(
     async (save: boolean) => {
       if (!rootRef.current) return;
-      if (linkedItemType === 'family-documents') return;
+      if (htmlId === 'family') return;
       setIsSaving(true);
       const elementsNewState = getElementsNewState(rootRef.current.children[0] as HTMLDivElement);
       const newOrder = elementsNewState.map((newItem) => {
@@ -89,15 +100,15 @@ export default function DocumentsOrganizer({ items, linkedItemType, onSave, onFo
         } as Item;
       });
       // setReloadeTreeKey((k) => k + 1);
-      if (save) onSave(newOrder, linkedItemType);
+      if (save) onSave(newOrder);
       // setReloadeTreeKey((k) => k + 1);
       setIsSaving(false);
     },
-    [items, linkedItemType, onSave]
+    [items, htmlId, onSave]
   );
 
   return (
-    <div id={`${linkedItemType}-documents`}>
+    <div id={`${htmlId}-documents`}>
       <div className="tw-flex tw-w-full tw-border tw-border-gray-100 tw-py-1 tw-text-xs tw-text-gray-400">
         <p className="tw-m-0 tw-grow tw-pl-4">Nom</p>
         <div style={informationsStyle} className="tw-flex tw-shrink-0 tw-items-center">
@@ -114,12 +125,12 @@ export default function DocumentsOrganizer({ items, linkedItemType, onSave, onFo
         className="tw-overflow-x-hidden tw-pb-10 tw-text-gray-800">
         <Branch
           key={JSON.stringify(items)}
-          linkedItemType={linkedItemType}
           parentId="root"
           position={0}
           folder={documentsTree}
-          level={linkedItemType === 'person' ? -1 : 0} // -1 because root is not displayed and we want all the root items to be stuck to the left
-          initShowOpen={linkedItemType === 'person'}
+          level={htmlId === 'social' ? -1 : 0} // -1 because root is not displayed and we want all the root items to be stuck to the left
+          htmlId={htmlId}
+          initShowOpen
           onListChange={onListChange}
           onFolderClick={onFolderClick}
           onDocumentClick={onDocumentClick}
@@ -141,7 +152,7 @@ interface BranchProps {
   folder: FolderForTree | RootForTree;
   level: number;
   position: number;
-  linkedItemType: LinkedItemType | 'family-documents';
+  htmlId: 'social' | 'family' | 'medical';
   parentId: DocumentOrFolderId;
   initShowOpen: boolean;
   onListChange: (save: boolean) => void;
@@ -157,7 +168,7 @@ function Branch({
   level,
   position,
   parentId,
-  linkedItemType,
+  htmlId,
   onListChange,
   onFolderClick,
   onDocumentClick,
@@ -175,16 +186,16 @@ function Branch({
   const sortableRef = useRef<SortableJS>();
   useEffect(() => {
     if (!gridRef.current) return;
-    if (linkedItemType === 'family-documents') return;
+    if (htmlId === 'family') return;
     sortableRef.current = SortableJS.create(gridRef.current, {
       animation: 150,
-      group: `${linkedItemType}-documents`,
+      group: `${htmlId}-documents`,
       invertSwap: true,
       // swapThreshold: 0.5,
       filter: '.unmovable', // 'unmovable' class is not draggable
       onEnd: () => onListChange(true),
     });
-  }, [onListChange, linkedItemType]);
+  }, [onListChange, htmlId]);
 
   const cantMove = Object.values(rootKeysAndFolderNames).includes(folder.name);
 
@@ -259,7 +270,7 @@ function Branch({
               <Branch
                 key={child._id}
                 folder={child}
-                linkedItemType={linkedItemType}
+                htmlId={htmlId}
                 parentId={child.parentId || folder._id}
                 position={child.position || index}
                 level={level + 1}
@@ -356,64 +367,53 @@ function Informations({ item }: { item: Item | FolderForTree | RootForTree }) {
   );
 }
 
-const buildFolderTree = (items: Item[], rootKey: LinkedItemType | 'family-documents') => {
+const buildFolderTree = (items: Item[], initialRootStructure: Array<LinkedItemType>, rootFolderName: '' | '👪 Documents familiaux') => {
   const rootFolderItem = {
     _id: 'root',
-    name: rootKeysAndFolderNames[rootKey],
+    name: rootFolderName,
     position: 0,
-    createdAt: new Date(),
-    createdBy: 'we do not care',
     parentId: 'NA', // for type safety easiness purpose
     type: 'folder',
-    // children: [],
+    createdAt: new Date(),
+    createdBy: 'we do not care',
+    children: initialRootStructure.map((type, index) => {
+      const rootFolder = {
+        _id: type,
+        name: rootKeysAndFolderNames[type],
+        position: index,
+        parentId: 'root',
+        type: 'folder',
+        createdAt: new Date(),
+        createdBy: 'we do not care',
+      };
+      return rootFolder as Item;
+    }),
   };
 
-  const groupedDocuments = items
-    .filter((item) => {
-      if (item.type !== 'document') return false;
-      const document = item as DocumentWithLinkedItem;
-      return !!document.group;
-    })
-    .map((item) => {
-      return {
-        ...item,
-        parentId: item.parentId || 'family-documents',
-      } as DocumentForTree;
-    });
-
-  const ungroupedDocuments = items.filter((item) => {
-    if (item.type !== 'document') return true;
-    const document = item as DocumentWithLinkedItem;
-    return !document.group;
-  });
-
-  const findChildren = (folder: Item, isRoot: boolean): FolderChildren => {
-    const children =
-      rootKey === 'family-documents'
-        ? groupedDocuments
-        : ungroupedDocuments
-            .filter((item: Item) => item.parentId === folder._id)
-            .sort((a, b) => {
-              if (!a.position) return 1;
-              if (!b.position) return -1;
-              return a.position - b.position;
-            })
-            .map((item) => {
-              if (item.type === 'folder') {
-                return {
-                  ...item,
-                  parentId: item.parentId || 'root',
-                  children: findChildren(item, false),
-                } as FolderForTree;
-              }
-              return {
-                ...item,
-                parentId: item.parentId || 'root',
-              } as DocumentForTree;
-            });
+  const findChildren = (folder: Item): FolderChildren => {
+    const children = items
+      .filter((item: Item) => item.parentId === folder._id)
+      .sort((a, b) => {
+        if (!a.position) return 1;
+        if (!b.position) return -1;
+        return a.position - b.position;
+      })
+      .map((item) => {
+        if (item.type === 'folder') {
+          return {
+            ...item,
+            parentId: item.parentId || 'root',
+            children: findChildren(item),
+          } as FolderForTree;
+        }
+        return {
+          ...item,
+          parentId: item.parentId || 'root',
+        } as DocumentForTree;
+      });
     return children;
   };
-  const rootChildren = findChildren(rootFolderItem as Item, true);
+  const rootChildren = findChildren(rootFolderItem as unknown as Item);
   const rootForTree: RootForTree = {
     ...rootFolderItem,
     children: rootChildren,
