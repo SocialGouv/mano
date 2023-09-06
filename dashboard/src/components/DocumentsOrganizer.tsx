@@ -99,6 +99,8 @@ export default function DocumentsOrganizer({
 
   if (!items.length) return null;
 
+  console.log({ documentsTree });
+
   return (
     <div id={`${htmlId}-documents`}>
       <div className="tw-flex tw-w-full tw-border tw-border-gray-100 tw-py-1 tw-text-xs tw-text-gray-400">
@@ -346,8 +348,8 @@ function DocumentRow({ document, level, parentIsOpen, position, parentId, color,
 }
 
 function Informations({ item }: { item: Item | FolderForTree | RootForTree }) {
-  if (item.type === 'folder' && ['Dossier Racine', '👪 Documents familiaux'].includes(item.name)) {
-    return null;
+  if (item.type === 'folder') {
+    if (['root', 'treatment', 'consultation'].includes(item._id)) return null;
   }
   return (
     <div style={informationsStyle} className="tw-flex tw-shrink-0 tw-items-center tw-text-xs tw-text-gray-600">

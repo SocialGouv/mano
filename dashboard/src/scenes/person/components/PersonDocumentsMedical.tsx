@@ -49,7 +49,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
       {
         _id: 'treatment',
         name: 'Traitements',
-        position: 0,
+        position: 1,
         parentId: 'root',
         type: 'folder',
         linkedItem: {
@@ -80,7 +80,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
       {
         _id: 'consultation',
         name: 'Consultations',
-        position: 1,
+        position: 0,
         parentId: 'root',
         type: 'folder',
         linkedItem: {
@@ -316,6 +316,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
       }}
       onSaveNewOrder={async (nextDocuments) => {
         try {
+          await new Promise((resolve) => setTimeout(resolve, 100)); // if not, the UX is jumpy and shit
           const groupedById: any = {
             treatment: {},
             consultation: {},
