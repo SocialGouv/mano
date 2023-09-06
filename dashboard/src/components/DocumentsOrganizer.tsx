@@ -121,7 +121,7 @@ export default function DocumentsOrganizer({
           movable={false}
           position={0}
           folder={documentsTree}
-          level={-1} // -1 because root is not displayed and we want all the root items to be stuck to the left
+          level={rootFolderName === 'Dossier Racine' ? -1 : 0} // -1 because root is not displayed and we want all the root items to be stuck to the left
           htmlId={htmlId}
           initShowOpen
           onListChange={onListChange}
