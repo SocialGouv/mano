@@ -181,6 +181,8 @@ function DocumentsFullScreen({
   onEditFolderRequest,
 }: DocumentsFullScreenProps) {
   const withDocumentOrganizer = !!onSaveNewOrder;
+  const organisation = useRecoilValue(organisationAuthentifiedState);
+
   return (
     <ModalContainer open={open} size={withDocumentOrganizer ? 'full' : 'prose'} onClose={onClose}>
       <ModalHeader title={title} />
@@ -215,43 +217,38 @@ function DocumentsFullScreen({
                   onDocumentClick={onDisplayDocument}
                   color={color}
                 />
-                <DocumentsOrganizer
-                  items={documents
-                    .filter((item) => {
-                      if (item.type !== 'document') return false;
-                      const doc = item as DocumentWithLinkedItem;
-                      return !!doc.group;
-                    })
-                    .map((doc) => {
-                      return {
-                        ...doc,
-                        parentId: 'root',
-                      };
-                    })}
-                  htmlId="family"
-                  rootFolderName="👪 Documents familiaux"
-                  onSave={(newOrder) => {
-                    const ok = onSaveNewOrder(newOrder);
-                    if (!ok) onClose();
-                    return ok;
-                  }}
-                  onFolderClick={onEditFolderRequest}
-                  onDocumentClick={onDisplayDocument}
-                  color={color}
-                />
+                {!!organisation.groupsEnabled && (
+                  <DocumentsOrganizer
+                    items={documents
+                      .filter((item) => {
+                        if (item.type !== 'document') return false;
+                        const doc = item as DocumentWithLinkedItem;
+                        return !!doc.group;
+                      })
+                      .map((doc) => {
+                        return {
+                          ...doc,
+                          parentId: 'root',
+                        };
+                      })}
+                    htmlId="family"
+                    rootFolderName="👪 Documents familiaux"
+                    onSave={(newOrder) => {
+                      const ok = onSaveNewOrder(newOrder);
+                      if (!ok) onClose();
+                      return ok;
+                    }}
+                    onFolderClick={onEditFolderRequest}
+                    onDocumentClick={onDisplayDocument}
+                    color={color}
+                  />
+                )}
               </>
             )}
             {socialOrMedical === 'medical' && (
               <DocumentsOrganizer
-                initialRootStructure={['medical-file', 'consultation', 'treatment']}
                 htmlId="medical"
-                items={documents.map((doc) => {
-                  if (!!doc.parentId) return doc;
-                  return {
-                    ...doc,
-                    parentId: doc.linkedItem.type,
-                  };
-                })}
+                items={documents}
                 onSave={(newOrder) => {
                   const ok = onSaveNewOrder(newOrder);
                   if (!ok) onClose();
@@ -450,7 +447,7 @@ function AddDocumentInput({ personId, onAddDocuments }: AddDocumentInputProps) {
             downloadPath: `/person/${personId}/document/${fileUploaded.filename}`,
             file: fileUploaded,
             group: false,
-            parentId: 'root',
+            parentId: undefined, // it will be 'treatment', 'consultation' or 'root'
             position: undefined,
             type: 'document',
           };

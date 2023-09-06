@@ -41,11 +41,9 @@ export const prepareConsultationForEncryption =
     const consultationTypeCustomFields = customFieldsConsultations.find((consult) => consult.name === consultation.type)?.fields || [];
     const encryptedFieldsIncludingCustom = [...consultationTypeCustomFields.map((f) => f.name), ...encryptedFields];
     const decrypted: any = {};
-    console.log('encryptedFieldsIncludingCustom', encryptedFieldsIncludingCustom);
     for (let field of encryptedFieldsIncludingCustom) {
       decrypted[field] = consultation[field];
     }
-    console.log('decrypted', decrypted);
     return {
       _id: consultation._id,
       organisation: consultation.organisation,

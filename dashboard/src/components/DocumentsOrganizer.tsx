@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import SortableJS from 'sortablejs';
-import type { DocumentWithLinkedItem, DocumentOrFolderId, FolderWithLinkedItem, Folder, LinkedItemType } from '../types/document';
+import type { DocumentWithLinkedItem, DocumentOrFolderId, FolderWithLinkedItem, Folder } from '../types/document';
 // import UserName from './UserName';
 import { useRecoilValue } from 'recoil';
 import { organisationAuthentifiedState } from '../recoil/auth';
@@ -27,17 +27,8 @@ interface DocumentsOrganizerProps {
   onDocumentClick: (document: DocumentForTree) => void;
   color: 'main' | 'blue-900';
   htmlId: 'social' | 'family' | 'medical';
-  initialRootStructure?: Array<LinkedItemType>;
-  rootFolderName?: '' | '👪 Documents familiaux';
+  rootFolderName?: 'Dossier Racine' | '👪 Documents familiaux';
 }
-
-const rootKeysAndFolderNames = {
-  person: 'Dossier Racine',
-  'family-documents': '👪 Documents familiaux',
-  consultation: 'Consultations',
-  'medical-file': 'Documents médicaux',
-  treatment: 'Traitements',
-};
 
 const modalWidth = window.innerWidth * 0.9;
 const informationsWidth = modalWidth * 0.4;
@@ -45,9 +36,8 @@ const informationsStyle = { flexBasis: informationsWidth };
 
 export default function DocumentsOrganizer({
   items,
-  initialRootStructure = [],
   htmlId,
-  rootFolderName = '',
+  rootFolderName = 'Dossier Racine',
   onSave,
   onFolderClick,
   onDocumentClick,
@@ -58,11 +48,11 @@ export default function DocumentsOrganizer({
   const itemsRef = useRef(items);
   const documentsTree = useMemo(() => {
     if (JSON.stringify(itemsRef.current) === JSON.stringify(items)) {
-      return buildFolderTree(itemsRef.current, initialRootStructure, rootFolderName);
+      return buildFolderTree(itemsRef.current, rootFolderName);
     }
     itemsRef.current = items;
-    return buildFolderTree(items, initialRootStructure, rootFolderName);
-  }, [items, initialRootStructure, rootFolderName]);
+    return buildFolderTree(items, rootFolderName);
+  }, [items, rootFolderName]);
 
   useEffect(() => {
     // we want to keep alternate line colors
@@ -107,6 +97,8 @@ export default function DocumentsOrganizer({
     [items, htmlId, onSave]
   );
 
+  if (!items.length) return null;
+
   return (
     <div id={`${htmlId}-documents`}>
       <div className="tw-flex tw-w-full tw-border tw-border-gray-100 tw-py-1 tw-text-xs tw-text-gray-400">
@@ -126,9 +118,10 @@ export default function DocumentsOrganizer({
         <Branch
           key={JSON.stringify(items)}
           parentId="root"
+          movable={false}
           position={0}
           folder={documentsTree}
-          level={htmlId === 'social' ? -1 : 0} // -1 because root is not displayed and we want all the root items to be stuck to the left
+          level={-1} // -1 because root is not displayed and we want all the root items to be stuck to the left
           htmlId={htmlId}
           initShowOpen
           onListChange={onListChange}
@@ -152,6 +145,7 @@ interface BranchProps {
   folder: FolderForTree | RootForTree;
   level: number;
   position: number;
+  movable?: boolean;
   htmlId: 'social' | 'family' | 'medical';
   parentId: DocumentOrFolderId;
   initShowOpen: boolean;
@@ -167,6 +161,7 @@ function Branch({
   folder,
   level,
   position,
+  movable = true,
   parentId,
   htmlId,
   onListChange,
@@ -197,8 +192,6 @@ function Branch({
     });
   }, [onListChange, htmlId]);
 
-  const cantMove = Object.values(rootKeysAndFolderNames).includes(folder.name);
-
   return (
     <div
       data-position={position}
@@ -214,7 +207,7 @@ function Branch({
             'tw-relative tw-inline-flex tw-max-w-full tw-justify-between tw-text-ellipsis tw-whitespace-nowrap tw-py-2 tw-pl-4',
             `before:tw-pointer-events-none before:tw-absolute before:tw-right-0 before:tw-top-0 before:tw-h-full before:tw-bg-${color}`,
             `before:-tw-left-${level * 10}`,
-            cantMove ? 'unmovable' : '',
+            movable ? '' : 'unmovable',
           ].join(' ')}>
           <div className="tw-flex tw-w-full tw-justify-between tw-overflow-hidden">
             <div className="tw-flex tw-flex-1 tw-items-center tw-overflow-hidden tw-pr-5">
@@ -227,19 +220,19 @@ function Branch({
                     setOpenedFolderIds([...openedFolderIds, folder._id]);
                   }
                 }}>
+                {/* open ? arrow down : arrow right */}
                 {open ? '\u25BC' : '\u25B6'}
               </small>
               <button
                 type="button"
                 onClick={() => {
-                  if (folder._id === 'root') return;
+                  if (folder.movable === false) return;
                   const notRootFolder = folder as FolderForTree;
                   onFolderClick(notRootFolder);
                 }}
-                className={[
-                  'tw-inline-flex tw-flex-1 tw-gap-x-2 tw-overflow-hidden',
-                  cantMove || folder._id === 'root' ? '!tw-cursor-not-allowed' : 'tw-cursor-default',
-                ].join(' ')}>
+                className={['tw-inline-flex tw-flex-1 tw-gap-x-2 tw-overflow-hidden', movable ? 'tw-cursor-default' : '!tw-cursor-not-allowed'].join(
+                  ' '
+                )}>
                 <span>{open ? '📂' : '📁'}</span>
                 <span className="tw-truncate">{folder.name}</span>
                 <span>({folder.children?.length || 0})</span>
@@ -273,6 +266,7 @@ function Branch({
                 htmlId={htmlId}
                 parentId={child.parentId || folder._id}
                 position={child.position || index}
+                movable={child.movable}
                 level={level + 1}
                 initShowOpen={false}
                 onListChange={onListChange}
@@ -352,7 +346,7 @@ function DocumentRow({ document, level, parentIsOpen, position, parentId, color,
 }
 
 function Informations({ item }: { item: Item | FolderForTree | RootForTree }) {
-  if (item.type === 'folder' && Object.values(rootKeysAndFolderNames).includes(item.name)) {
+  if (item.type === 'folder' && ['Dossier Racine', '👪 Documents familiaux'].includes(item.name)) {
     return null;
   }
   return (
@@ -367,8 +361,8 @@ function Informations({ item }: { item: Item | FolderForTree | RootForTree }) {
   );
 }
 
-const buildFolderTree = (items: Item[], initialRootStructure: Array<LinkedItemType>, rootFolderName: '' | '👪 Documents familiaux') => {
-  const rootFolderItem = {
+const buildFolderTree = (items: Item[], rootFolderName: 'Dossier Racine' | '👪 Documents familiaux') => {
+  const rootFolderItem: Omit<Item, 'linkedItem'> = {
     _id: 'root',
     name: rootFolderName,
     position: 0,
@@ -376,26 +370,26 @@ const buildFolderTree = (items: Item[], initialRootStructure: Array<LinkedItemTy
     type: 'folder',
     createdAt: new Date(),
     createdBy: 'we do not care',
-    children: initialRootStructure.map((type, index) => {
-      const rootFolder = {
-        _id: type,
-        name: rootKeysAndFolderNames[type],
-        position: index,
-        parentId: 'root',
-        type: 'folder',
-        createdAt: new Date(),
-        createdBy: 'we do not care',
-      };
-      return rootFolder as Item;
-    }),
-  };
+    movable: false,
+  } as Item;
 
   const findChildren = (folder: Item): FolderChildren => {
     const children = items
       .filter((item: Item) => item.parentId === folder._id)
       .sort((a, b) => {
-        if (!a.position) return 1;
-        if (!b.position) return -1;
+        /*
+        https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#description
+        compareFn(a, b) return value	sort order
+        > 0	sort a after b, e.g. [b, a]
+        < 0	sort a before b, e.g. [a, b]
+        === 0	keep original order of a and b
+        */
+        if (!a.position && a.position !== 0) return 1;
+        if (!b.position && b.position !== 0) return -1;
+        // all the non movable should be first
+        if (!!a.movable && b.movable === false) return 1;
+        if (a.movable === false && !!b.movable) return -1;
+
         return a.position - b.position;
       })
       .map((item) => {
