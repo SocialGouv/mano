@@ -15,6 +15,7 @@ import { toast } from 'react-toastify';
 import { organisationState, userState } from '../../recoil/auth';
 import PersonFamily from './PersonFamily';
 import { groupSelector } from '../../recoil/groups';
+import TabsNav from '../../components/tailwind/TabsNav';
 
 export default function View() {
   const { personId } = useParams();
@@ -70,43 +71,32 @@ export default function View() {
       <div className="tw-flex tw-w-full tw-justify-center">
         <div className="noprint tw-flex tw-flex-1">
           {!['restricted-access'].includes(user.role) && (
-            <ul className="nav nav-tabs tw-m-auto">
-              <li role="presentation" className="nav-item">
-                <button onClick={() => setCurrentTab('Résumé')} className={currentTab === 'Résumé' ? 'active nav-link' : 'btn-link nav-link'}>
-                  Résumé
-                </button>
-              </li>
-              {Boolean(user.healthcareProfessional) && (
-                <li role="presentation" className="nav-item">
-                  <button
-                    onClick={() => setCurrentTab('Dossier Médical')}
-                    className={currentTab === 'Dossier Médical' ? 'active nav-link' : 'btn-link nav-link'}>
-                    Dossier Médical
-                  </button>
-                </li>
-              )}
-              <li role="presentation" className="nav-item">
-                <button
-                  onClick={() => setCurrentTab('Lieux fréquentés')}
-                  className={currentTab === 'Lieux fréquentés' ? 'active nav-link' : 'btn-link nav-link'}>
-                  Lieux fréquentés ({person.relsPersonPlace?.length || 0})
-                </button>
-              </li>
-              <li role="presentation" className="nav-item">
-                <button onClick={() => setCurrentTab('Historique')} className={currentTab === 'Historique' ? 'active nav-link' : 'btn-link nav-link'}>
-                  Historique
-                </button>
-              </li>
-              {Boolean(organisation.groupsEnabled) && (
-                <li role="presentation" className="nav-item">
-                  <button
-                    onClick={() => setCurrentTab('Liens familiaux')}
-                    className={currentTab === 'Liens familiaux' ? 'active nav-link' : 'btn-link nav-link'}>
-                    Liens familiaux ({personGroup.relations.length})
-                  </button>
-                </li>
-              )}
-            </ul>
+            <TabsNav
+              className="tw-justify-center tw-px-3 tw-py-2"
+              tabs={[
+                'Résumé',
+                Boolean(user.healthcareProfessional) && 'Dossier Médical',
+                `Lieux fréquentés (${person.relsPersonPlace?.length || 0})`,
+                'Historique',
+                Boolean(organisation.groupsEnabled) && `Liens familiaux (${personGroup.relations.length})`,
+              ].filter(Boolean)}
+              onClick={(tab, index) => {
+                if (tab.includes('Résumé')) setCurrentTab('Résumé');
+                if (tab.includes('Dossier Médical')) setCurrentTab('Dossier Médical');
+                if (tab.includes('Lieux fréquentés')) setCurrentTab('Lieux fréquentés');
+                if (tab.includes('Historique')) setCurrentTab('Historique');
+                if (tab.includes('Liens familiaux')) setCurrentTab('Liens familiaux');
+              }}
+              activeTabIndex={[
+                'Résumé',
+                Boolean(user.healthcareProfessional) && 'Dossier Médical',
+                `Lieux fréquentés`,
+                'Historique',
+                Boolean(organisation.groupsEnabled) && `Liens familiaux`,
+              ]
+                .filter(Boolean)
+                .findIndex((tab) => tab.includes(currentTab))}
+            />
           )}
         </div>
       </div>

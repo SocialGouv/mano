@@ -35,6 +35,7 @@ import MedicalFilesStats from './MedicalFiles';
 import ButtonCustom from '../../components/ButtonCustom';
 import dayjs from 'dayjs';
 import { filterItem } from '../../components/Filters';
+import TabsNav from '../../components/tailwind/TabsNav';
 
 const tabs = [
   'Général',
@@ -454,6 +455,23 @@ const Stats = () => {
     ...fieldsPersonsCustomizableOptions.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
     ...flattenedCustomFieldsPersons.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
   ];
+
+  const availableTabs = tabs.filter((tabCaption) => {
+    if (['Observations'].includes(tabCaption)) {
+      return !!organisation.territoriesEnabled;
+    }
+    if (['Services'].includes(tabCaption)) {
+      return !!organisation.receptionEnabled;
+    }
+    if (['Rencontres'].includes(tabCaption)) {
+      return !!organisation.rencontresEnabled;
+    }
+    if (['Passages'].includes(tabCaption)) {
+      return !!organisation.passagesEnabled;
+    }
+    return true;
+  });
+
   return (
     <>
       <HeaderStyled className=" !tw-py-4 tw-px-0">
@@ -506,40 +524,12 @@ const Stats = () => {
           <ExportFormattedData personCreated={personsCreated} personUpdated={personsUpdated} actions={actionsWithDetailedGroupAndCategories} />
         </div>
       </div>
-      <ul className="noprint tw-mb-5 tw-flex tw-list-none tw-flex-wrap tw-border-b tw-border-zinc-200 tw-pl-0">
-        {tabs
-          .filter((tabCaption) => {
-            if (['Observations'].includes(tabCaption)) {
-              return !!organisation.territoriesEnabled;
-            }
-            if (['Services'].includes(tabCaption)) {
-              return !!organisation.receptionEnabled;
-            }
-            if (['Rencontres'].includes(tabCaption)) {
-              return !!organisation.rencontresEnabled;
-            }
-            if (['Passages'].includes(tabCaption)) {
-              return !!organisation.passagesEnabled;
-            }
-            return true;
-          })
-          .map((tabCaption, index) => {
-            return (
-              <li key={index} className="tw-cursor-pointer">
-                <button
-                  key={tabCaption}
-                  className={[
-                    '-tw-mb-px tw-block tw-rounded-t-md tw-border tw-border-transparent tw-py-2 tw-px-4',
-                    activeTab !== tabCaption && 'tw-text-main75',
-                    activeTab === tabCaption && 'tw-border-x-zinc-200 tw-border-t-zinc-200 tw-bg-white',
-                  ].join(' ')}
-                  onClick={() => setActiveTab(tabCaption)}>
-                  {tabCaption}
-                </button>
-              </li>
-            );
-          })}
-      </ul>
+      <TabsNav
+        className="tw-flex-wrap tw-justify-center tw-px-3 tw-py-2"
+        tabs={availableTabs}
+        onClick={(tabCaption) => setActiveTab(tabCaption)}
+        activeTabIndex={availableTabs.findIndex((tab) => tab === activeTab)}
+      />
       <div className="print:tw-flex print:tw-flex-col print:tw-px-8 print:tw-py-4">
         {activeTab === 'Général' && (
           <GeneralStats
