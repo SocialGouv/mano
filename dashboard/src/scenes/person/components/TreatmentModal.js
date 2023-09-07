@@ -252,7 +252,7 @@ function TreatmentContent({ onClose, treatment, personId }) {
               .join(' ')}
             onSubmit={async (e) => {
               e.preventDefault();
-              const ok = handleSubmit({ closeOnSubmit: true });
+              const ok = await handleSubmit({ closeOnSubmit: true });
               if (ok && isNewTreatment) toast.success('Traitement créé !');
               if (ok && !isNewTreatment) toast.success('Traitement mis à jour !');
             }}>
@@ -377,10 +377,7 @@ function TreatmentContent({ onClose, treatment, personId }) {
             />
           </div>
           <div
-            className={[
-              'tw-flex tw-h-[50vh] tw-w-full tw-flex-col tw-gap-4 tw-overflow-y-auto',
-              activeTab !== 'Commentaires' && 'tw-hidden',
-            ]
+            className={['tw-flex tw-h-[50vh] tw-w-full tw-flex-col tw-gap-4 tw-overflow-y-auto', activeTab !== 'Commentaires' && 'tw-hidden']
               .filter(Boolean)
               .join(' ')}>
             <CommentsModule

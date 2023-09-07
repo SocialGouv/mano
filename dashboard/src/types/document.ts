@@ -28,6 +28,7 @@ export interface Document {
   // for tree
   parentId: DocumentOrFolderId | undefined;
   position: number | undefined;
+  movable?: boolean;
   // type is always equal to 'document'
   type: string;
 }
@@ -39,6 +40,7 @@ export interface Folder {
   createdBy: UUIDV4;
   parentId: DocumentOrFolderId | undefined;
   position: number | undefined;
+  movable?: boolean;
   // type is always equal to 'folder'
   type: string;
 }

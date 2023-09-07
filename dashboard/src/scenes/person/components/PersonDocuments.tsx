@@ -40,7 +40,7 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
   return (
     <DocumentsModule
       showPanel
-      initialRootStructure={['person', 'family-documents']}
+      socialOrMedical="social"
       documents={documents}
       onSaveNewOrder={async (nextDocuments) => {
         const personResponse = await API.put({
