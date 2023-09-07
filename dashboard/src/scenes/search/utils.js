@@ -45,8 +45,6 @@ export const filterBySearch = (search, items = [], userSpecificExcludeFields = [
   const anyOtherPrropertyContainsOneOfTheWords = [];
   const anyOtherPrropertyContainsOneOfTheWordsWithNoAccent = [];
 
-  console.log({ userSpecificExcludeFields });
-
   for (const item of items) {
     const lowerCaseName = item?.name?.toLocaleLowerCase() || '';
     if (lowerCaseName.startsWith(searchLowercased)) {

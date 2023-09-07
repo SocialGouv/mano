@@ -140,7 +140,7 @@ const observationsBySearchSelector = selectorFamily({
       const populatedObservations = get(populatedObservationsSelector);
       const observations = get(onlyFilledObservationsTerritories);
       if (!search?.length) return [];
-      const observationsFilteredBySearch = filterBySearch(search, observations, true);
+      const observationsFilteredBySearch = filterBySearch(search, observations);
       return observationsFilteredBySearch.map((obs) => populatedObservations[obs._id]).filter(Boolean);
     },
 });
