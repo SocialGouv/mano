@@ -1,3 +1,10 @@
+## [1.283.2](https://github.com/SocialGouv/mano/compare/v1.283.1...v1.283.2) (2023-09-07)
+
+
+### Bug Fixes
+
+* **dashboard:** possibilité de réorganiser les documents médicaux dans n'importe quel dossier ([#1640](https://github.com/SocialGouv/mano/issues/1640)) ([7c74d48](https://github.com/SocialGouv/mano/commit/7c74d48b045271cebd871d697c2ebf4b1236f8f7))
+
 ## [1.283.1](https://github.com/SocialGouv/mano/compare/v1.283.0...v1.283.1) (2023-09-04)
 
 
