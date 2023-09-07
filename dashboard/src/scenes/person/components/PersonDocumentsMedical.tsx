@@ -316,7 +316,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
       }}
       onSaveNewOrder={async (nextDocuments) => {
         try {
-          await new Promise((resolve) => setTimeout(resolve, 100)); // if not, the UX is jumpy and shit
+          await new Promise((resolve) => setTimeout(resolve, 100)); // if not, the UX is jumpy and shit - no idea why
           const groupedById: any = {
             treatment: {},
             consultation: {},
