@@ -1,3 +1,10 @@
+## [1.283.4](https://github.com/SocialGouv/mano/compare/v1.283.3...v1.283.4) (2023-09-08)
+
+
+### Bug Fixes
+
+* out of active list empty ([#1647](https://github.com/SocialGouv/mano/issues/1647)) ([bb8df86](https://github.com/SocialGouv/mano/commit/bb8df860f5e3b3deb02235743870a4331912b1de))
+
 ## [1.283.3](https://github.com/SocialGouv/mano/compare/v1.283.2...v1.283.3) (2023-09-08)
 
 
