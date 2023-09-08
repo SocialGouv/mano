@@ -6,9 +6,10 @@ import Row from '../../components/Row';
 import Spacer from '../../components/Spacer';
 import API from '../../services/api';
 import ScrollContainer from '../../components/ScrollContainer';
-import { FRAMAFORM_MANO, MANO_DOWNLOAD_URL } from '../../config';
+import { FRAMAFORM_MANO, MANO_DOWNLOAD_URL, MANO_TEST_ORGANISATION_ID } from '../../config';
 import { useRecoilValue } from 'recoil';
 import { currentTeamState, organisationState } from '../../recoil/auth';
+import { capture } from '../../services/sentry';
 
 const Menu = ({ navigation }) => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -52,6 +53,18 @@ const Menu = ({ navigation }) => {
         <Row withNextButton caption="Mentions Légales" onPress={() => navigation.navigate('Legal')} />
         <Row withNextButton caption="Politique de Confidentialité" onPress={() => navigation.navigate('Privacy')} />
         <Spacer height={30} />
+        {organisation._id === MANO_TEST_ORGANISATION_ID && (
+          <>
+            <Row
+              caption="Test Sentry"
+              onPress={() => {
+                capture('Test Sentry Capture', { extra: { test: 'test' } });
+                throw new Error('Test Sentry Error Crash');
+              }}
+            />
+            <Spacer height={30} />
+          </>
+        )}
         <Row caption="Se déconnecter" color="#F00" loading={isLoggingOut} Component={TouchableWithoutFeedback} onPress={() => onLogoutRequest()} />
         <Row
           caption="Se déconnecter et vider le cache"
