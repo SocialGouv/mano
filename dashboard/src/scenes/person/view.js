@@ -5,7 +5,7 @@ import Places from './Places';
 import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
 import API from '../../services/api';
 import { formatDateWithFullMonth } from '../../services/date';
-import History from './components/History';
+import History from './components/PersonHistory';
 import MedicalFile from './components/MedicalFile';
 import Summary from './components/Summary';
 import BackButton from '../../components/backButton';

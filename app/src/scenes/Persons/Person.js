@@ -11,7 +11,7 @@ import Tabs from '../../components/Tabs';
 import colors from '../../utils/colors';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import {
-  allowedFieldsInHistorySelector,
+  allowedPersonFieldsInHistorySelector,
   personsState,
   usePreparePersonForEncryption,
   flattenedCustomFieldsPersonsSelector,
@@ -38,7 +38,7 @@ const cleanValue = (value) => {
 
 const Person = ({ route, navigation }) => {
   const flattenedCustomFieldsPersons = useRecoilValue(flattenedCustomFieldsPersonsSelector);
-  const allowedFieldsInHistory = useRecoilValue(allowedFieldsInHistorySelector);
+  const allowedFieldsInHistory = useRecoilValue(allowedPersonFieldsInHistorySelector);
   const preparePersonForEncryption = usePreparePersonForEncryption();
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
   const [persons, setPersons] = useRecoilState(personsState);

@@ -1,5 +1,4 @@
 import React from 'react';
-import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import { personsObjectSelector } from '../recoil/selectors';
@@ -9,20 +8,14 @@ export default function PersonName({ item, onClick = null, redirectToTab = 'Rés
   const persons = useRecoilValue(personsObjectSelector);
   const personName = item?.personPopulated?.name || persons[item.person]?.name;
   return (
-    <BoldOnHover
+    <span
+      className="hover:tw-cursor-zoom-in hover:tw-bg-yellow-400"
       onClick={(e) => {
         e.stopPropagation();
         if (onClick) return onClick();
         if (item.person) history.push(`/person/${item.person}?tab=${redirectToTab}`);
       }}>
       {personName}
-    </BoldOnHover>
+    </span>
   );
 }
-
-const BoldOnHover = styled.span`
-  &:hover {
-    background-color: yellow;
-    cursor: zoom-in;
-  }
-`;
