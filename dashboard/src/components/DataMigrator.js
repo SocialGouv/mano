@@ -1,5 +1,5 @@
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { prepareActionForEncryption } from '../recoil/actions';
+import { mappedIdsToLabels, prepareActionForEncryption } from '../recoil/actions';
 import { organisationState, userState } from '../recoil/auth';
 import { usePreparePersonForEncryption } from '../recoil/persons';
 import { prepareReportForEncryption } from '../recoil/reports';
@@ -396,6 +396,59 @@ export default function useDataMigrator() {
         const response = await API.put({
           path: `/migration/fix-family-relation-user-deleted`,
           body: { groupsToUpdate: encryptedGroupsToUpdate, groupIdsToDestroy },
+          query: { migrationLastUpdateAt },
+        });
+        if (response.ok) {
+          setOrganisation(response.organisation);
+          migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
+        }
+      }
+
+      if (!organisation.migrations?.includes('integrate-comments-in-actions-history')) {
+        setLoadingText(LOADING_TEXT);
+        const comments = await API.get({
+          path: '/comment',
+          query: { organisation: organisationId, after: 0, withDeleted: false },
+        }).then((res) => res.decryptedData || []);
+        const actions = await API.get({
+          path: '/action',
+          query: { organisation: organisationId, after: 0, withDeleted: false },
+        }).then((res) => res.decryptedData || []);
+
+        const actionsPerId = {};
+        for (const action of actions) {
+          actionsPerId[action._id] = action;
+        }
+        const actionsToUpdate = {};
+        const commentIdsToDelete = [];
+
+        for (const comment of comments) {
+          if (!comment.action) continue;
+          if (!comment.comment.includes("a changé le status de l'action: ")) continue;
+          const action = actionsToUpdate[comment.action] ?? actionsPerId[comment.action];
+          if (!action) {
+            commentIdsToDelete.push(comment._id);
+            continue;
+          }
+          if (!action.history) action.history = [];
+          const statusName = comment.comment.split("a changé le status de l'action: ")[1];
+          const statusId = mappedIdsToLabels.find((e) => e.name === statusName)?._id;
+          action.history.push({
+            user: comment.user,
+            date: comment.createdAt,
+            data: {
+              status: { oldValue: '', newValue: statusId },
+            },
+          });
+          actionsToUpdate[comment.action] = action;
+          commentIdsToDelete.push(comment._id);
+        }
+
+        const encryptedActionsToUpdate = await Promise.all(Object.values(actionsToUpdate).map(prepareActionForEncryption).map(encryptItem));
+
+        const response = await API.put({
+          path: `/migration/integrate-comments-in-actions-history`,
+          body: { commentIdsToDelete, actionsToUpdate: encryptedActionsToUpdate },
           query: { migrationLastUpdateAt },
         });
         if (response.ok) {
