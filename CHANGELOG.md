@@ -1,3 +1,10 @@
+## [1.283.5](https://github.com/SocialGouv/mano/compare/v1.283.4...v1.283.5) (2023-09-08)
+
+
+### Bug Fixes
+
+* **dashboard:** interdiction de supprimer le champ Motif de sortie de file active ([f0568e7](https://github.com/SocialGouv/mano/commit/f0568e700829896064a67af8d5f99cb1c58de3d1))
+
 ## [1.283.4](https://github.com/SocialGouv/mano/compare/v1.283.3...v1.283.4) (2023-09-08)
 
 
