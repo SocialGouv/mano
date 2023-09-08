@@ -1,3 +1,10 @@
+## [1.283.7](https://github.com/SocialGouv/mano/compare/v1.283.6...v1.283.7) (2023-09-08)
+
+
+### Bug Fixes
+
+* **dashboard:** design de la liste de traitements ([a0eafad](https://github.com/SocialGouv/mano/commit/a0eafad9ba39096d242876132a6e044ae3645ec7))
+
 ## [1.283.6](https://github.com/SocialGouv/mano/compare/v1.283.5...v1.283.6) (2023-09-08)
 
 
