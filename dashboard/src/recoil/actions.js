@@ -42,7 +42,10 @@ const encryptedFields = [
   'teams',
   'user',
   'urgent',
+  'history',
 ];
+
+export const allowedActionFieldsInHistory = encryptedFields.filter((field) => !['category', 'team', 'history'].includes(field));
 
 export const prepareActionForEncryption = (action, { checkRequiredFields = true } = {}) => {
   if (!!checkRequiredFields) {

@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { useHistory, useLocation } from 'react-router-dom';
-import { actionsState, CANCEL, DONE, mappedIdsToLabels, prepareActionForEncryption, TODO } from '../recoil/actions';
+import { actionsState, allowedActionFieldsInHistory, CANCEL, DONE, mappedIdsToLabels, prepareActionForEncryption, TODO } from '../recoil/actions';
 import { currentTeamState, organisationState, teamsState, userState } from '../recoil/auth';
 import { dayjsInstance, now, outOfBoundariesDate } from '../services/date';
 import API from '../services/api';
@@ -80,7 +80,7 @@ export default function ActionModal() {
   );
 }
 
-const ActionContent = ({ onClose, action, personId = null, personIds = null, isMulti = false, completedAt = null, dueAt = null }) => {
+function ActionContent({ onClose, action, personId = null, personIds = null, isMulti = false, completedAt = null, dueAt = null }) {
   const teams = useRecoilValue(teamsState);
   const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
@@ -282,6 +282,18 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
     if (!body.dueAt) body.dueAt = data.completedAt || new Date();
 
     delete body.team;
+
+    const historyEntry = {
+      date: new Date(),
+      user: user._id,
+      data: {},
+    };
+    for (const key in body) {
+      if (!allowedActionFieldsInHistory.includes(key)) continue;
+      if (body[key] !== action[key]) historyEntry.data[key] = { oldValue: action[key], newValue: body[key] };
+    }
+    if (!!Object.keys(historyEntry.data).length) body.history = [...(action.history || []), historyEntry];
+
     const actionResponse = await API.put({
       path: `/action/${action._id}`,
       body: prepareActionForEncryption({ ...body, user: data.user || user._id }),
@@ -371,12 +383,13 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
           {!['restricted-access'].includes(user.role) && data?._id && (
             <TabsNav
               className="tw-px-3 tw-py-2"
-              tabs={['Informations', `Commentaires ${data?.comments?.length ? `(${data.comments.length})` : ''}`]}
+              tabs={['Informations', `Commentaires ${data?.comments?.length ? `(${data.comments.length})` : ''}`, 'Historique']}
               onClick={(tab, index) => {
-                if (index === 0) setActiveTab('Informations');
-                if (index === 1) setActiveTab('Commentaires');
+                if (tab.includes('Informations')) setActiveTab('Informations');
+                if (tab.includes('Commentaires')) setActiveTab('Commentaires');
+                if (tab.includes('Historique')) setActiveTab('Historique');
               }}
-              activeTabIndex={['Informations', 'Commentaires'].findIndex((tab) => tab === activeTab)}
+              activeTabIndex={['Informations', 'Commentaires', 'Historique'].findIndex((tab) => tab === activeTab)}
             />
           )}
           <div
@@ -676,4 +689,61 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
       </ModalFooter>
     </>
   );
-};
+}
+
+function ActionHistory({ action }) {
+  const history = useMemo(() => (action.history || []).reverse(), [action.history]);
+
+  return (
+    <div>
+      <div>
+        <h3>Historique</h3>
+      </div>
+      <table className="table table-striped table-bordered">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Utilisateur</th>
+            <th>Donnée</th>
+          </tr>
+        </thead>
+        <tbody className="small">
+          {history.map((h) => {
+            return (
+              <tr key={h.date} className="tw-cursor-default">
+                <td>{dayjsInstance(h.date).format('DD/MM/YYYY HH:mm')}</td>
+                <td>
+                  <UserName id={h.user} />
+                </td>
+                <td className="tw-max-w-prose">
+                  {Object.entries(h.data).map(([key, value]) => {
+                    const personField = personFieldsIncludingCustomFields.find((f) => f.name === key);
+                    if (key === 'teams') {
+                      return (
+                        <p className="tw-flex tw-flex-col" key={key}>
+                          <span>{personField?.label} : </span>
+                          <code>"{(value.oldValue || []).map((teamId) => teams.find((t) => t._id === teamId)?.name).join(', ')}"</code>
+                          <span>↓</span>
+                          <code>"{(value.newValue || []).map((teamId) => teams.find((t) => t._id === teamId)?.name).join(', ')}"</code>
+                        </p>
+                      );
+                    }
+
+                    return (
+                      <p
+                        key={key}
+                        data-test-id={`${personField?.label}: ${JSON.stringify(value.oldValue || '')} ➔ ${JSON.stringify(value.newValue)}`}>
+                        {personField?.label} : <br />
+                        <code>{JSON.stringify(value.oldValue || '')}</code> ➔ <code>{JSON.stringify(value.newValue)}</code>
+                      </p>
+                    );
+                  })}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
