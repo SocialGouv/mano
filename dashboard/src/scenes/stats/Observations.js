@@ -3,8 +3,6 @@ import SelectCustom from '../../components/SelectCustom';
 import CustomFieldsStats from './CustomFieldsStats';
 
 const ObservationsStats = ({ territories, setSelectedTerritories, observations, customFieldsObs }) => {
-  console.log({ customFieldsObs });
-
   return (
     <>
       <h3 className="tw-my-5 tw-text-xl">Statistiques des observations de territoire</h3>

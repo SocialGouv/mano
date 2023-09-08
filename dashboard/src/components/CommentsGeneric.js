@@ -509,30 +509,28 @@ function CommentModal({
             <React.Fragment>
               <ModalBody className="tw-px-4 tw-py-2">
                 <div className="tw-flex tw-w-full tw-flex-col tw-gap-6">
-                  {!isNewComment && (
-                    <div className="tw-flex tw-gap-8">
-                      <div className="tw-flex tw-flex-1 tw-flex-col">
-                        <label htmlFor="user">Créé par</label>
-                        <SelectUser
-                          inputId="user"
-                          isDisabled={isNewComment || !isEditable}
-                          value={values.user || user._id}
-                          onChange={(userId) => handleChange({ target: { value: userId, name: 'user' } })}
-                        />
-                      </div>
-                      <div className="tw-flex tw-flex-1 tw-flex-col">
-                        <label htmlFor="date">Créé le / Concerne le</label>
-                        <DatePicker
-                          required
-                          withTime
-                          disabled={!isEditable}
-                          id="date"
-                          defaultValue={(values.date || values.createdAt) ?? new Date()}
-                          onChange={handleChange}
-                        />
-                      </div>
+                  <div className="tw-flex tw-gap-8">
+                    <div className="tw-flex tw-flex-1 tw-flex-col">
+                      <label htmlFor="user">Créé par</label>
+                      <SelectUser
+                        inputId="user"
+                        isDisabled={isNewComment || !isEditable}
+                        value={values.user || user._id}
+                        onChange={(userId) => handleChange({ target: { value: userId, name: 'user' } })}
+                      />
                     </div>
-                  )}
+                    <div className="tw-flex tw-flex-1 tw-flex-col">
+                      <label htmlFor="date">Créé le / Concerne le</label>
+                      <DatePicker
+                        required
+                        withTime
+                        disabled={!isEditable}
+                        id="date"
+                        defaultValue={(values.date || values.createdAt) ?? new Date()}
+                        onChange={handleChange}
+                      />
+                    </div>
+                  </div>
                   <div className="tw-flex tw-flex-1 tw-flex-col">
                     <label htmlFor="comment">Commentaire</label>
                     <div className="tw-block tw-w-full tw-overflow-hidden tw-rounded tw-border tw-border-gray-300 tw-text-base tw-transition-all">
