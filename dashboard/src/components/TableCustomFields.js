@@ -411,6 +411,7 @@ export const EditCustomField = ({ open, onDelete, data, editingField, onClose, o
                   name="enabled"
                   id="enabled"
                   checked={field.enabled}
+                  disabled={onlyOptionsEditable}
                   onChange={(e) => setField({ ...field, enabled: e.target.checked })}
                 />
                 <span>Activé pour toute l'organisation</span>
@@ -425,6 +426,7 @@ export const EditCustomField = ({ open, onDelete, data, editingField, onClose, o
                 name="showInStats"
                 className="tw-mr-2"
                 checked={field.showInStats}
+                disabled={onlyOptionsEditable}
                 onChange={(e) => setField({ ...field, showInStats: e.target.checked })}
               />
               <label htmlFor="showInStats">Voir dans les statistiques</label>
@@ -436,7 +438,7 @@ export const EditCustomField = ({ open, onDelete, data, editingField, onClose, o
         <button type="button" name="cancel" className="button-cancel" onClick={onClose}>
           Annuler
         </button>
-        {!isNewField && (
+        {!isNewField && !onlyOptionsEditable && (
           <DeleteButtonAndConfirmModal
             title={`Voulez-vous vraiment supprimer le champ ${editingField?.label}`}
             textToConfirm={editingField?.label}
