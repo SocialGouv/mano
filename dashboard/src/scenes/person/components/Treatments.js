@@ -1,12 +1,13 @@
 import React, { useMemo, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { useHistory } from 'react-router-dom';
-import { usersState, userState } from '../../../recoil/auth';
+import { userState } from '../../../recoil/auth';
 import { formatDateWithFullMonth } from '../../../services/date';
 import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from '../../../components/tailwind/Modal';
 import { treatmentsState } from '../../../recoil/treatments';
 import { AgendaMutedIcon } from './AgendaMutedIcon';
 import { FullScreenIcon } from './FullScreenIcon';
+import UserName from '../../../components/UserName';
 
 export const Treatments = ({ person }) => {
   const [fullScreen, setFullScreen] = useState(false);
@@ -79,7 +80,6 @@ export const Treatments = ({ person }) => {
 
 const TreatmentsTable = ({ filteredData, person }) => {
   const user = useRecoilValue(userState);
-  const users = useRecoilValue(usersState);
   const history = useHistory();
 
   const displayTreatment = (treatment) => {
@@ -118,14 +118,17 @@ const TreatmentsTable = ({ filteredData, person }) => {
                     searchParams.set('treatmentId', treatment._id);
                     history.push(`?${searchParams.toString()}`);
                   }}>
-                  <div className="tw-flex">
-                    <div className="tw-flex tw-flex-1 tw-items-center">
-                      <TreatmentDate treatment={treatment} />
-                      {Boolean(treatment.documents?.length) && <div className="tw-ml-2 tw-text-xs">{treatment.documents?.length} document(s)</div>}
-                    </div>
-                    <div>Créé par {treatment.user ? users.find((u) => u._id === treatment.user)?.name : ''}</div>
+                  <TreatmentDate treatment={treatment} />
+                  <div className="tw-mt-2 tw-font-semibold">{displayTreatment(treatment)}</div>
+                  <div className="tw-flex tw-w-full tw-justify-between">
+                    <p className="tw-mt-2 tw-mb-0 tw-flex tw-basis-full tw-gap-1 tw-text-xs tw-opacity-50 [overflow-wrap:anywhere]">
+                      <span>Créé par</span>
+                      <UserName id={treatment.user} />
+                    </p>
+                    {Boolean(treatment.documents?.length) && (
+                      <div className="tw-ml-2 tw-shrink-0 tw-text-xs">{treatment.documents?.length} document(s)</div>
+                    )}
                   </div>
-                  <div className="tw-mt-2">{displayTreatment(treatment)}</div>
                 </div>
               </td>
             </tr>
