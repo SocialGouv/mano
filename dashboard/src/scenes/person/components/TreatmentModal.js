@@ -142,7 +142,7 @@ function TreatmentContent({ onClose, treatment, personId }) {
       return false;
     }
 
-    if (!isNewTreatment) {
+    if (!isNewTreatment && !!treatment) {
       const historyEntry = {
         date: new Date(),
         user: user._id,

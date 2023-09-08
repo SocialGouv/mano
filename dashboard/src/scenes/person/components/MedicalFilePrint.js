@@ -171,6 +171,7 @@ export function MedicalFilePrint({ person }) {
             'withTime',
             'personPopulated',
             'userPopulated',
+            'history',
           ];
           return (
             <div key={c._id} className="tw-mb-8">
