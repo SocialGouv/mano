@@ -7,7 +7,7 @@ import ScreenTitle from '../../components/ScreenTitle';
 import ScrollContainer from '../../components/ScrollContainer';
 import OutOfActiveListReasonMultiCheckBox from '../../components/Selects/OutOfActiveListReasonMultiCheckBox';
 import { userState } from '../../recoil/auth';
-import { allowedFieldsInHistorySelector, personsState, usePreparePersonForEncryption } from '../../recoil/persons';
+import { allowedPersonFieldsInHistorySelector, personsState, usePreparePersonForEncryption } from '../../recoil/persons';
 import API from '../../services/api';
 import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
 
@@ -16,7 +16,7 @@ const PersonsOutOfActiveListReason = ({ navigation, route }) => {
   const [submitting, setSubmitting] = useState(false);
   const setPersons = useSetRecoilState(personsState);
   const personsObject = useRecoilValue(itemsGroupedByPersonSelector);
-  const allowedFieldsInHistory = useRecoilValue(allowedFieldsInHistorySelector);
+  const allowedFieldsInHistory = useRecoilValue(allowedPersonFieldsInHistorySelector);
   const preparePersonForEncryption = usePreparePersonForEncryption();
 
   const user = useRecoilValue(userState);

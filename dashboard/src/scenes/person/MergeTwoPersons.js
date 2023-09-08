@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
 import ButtonCustom from '../../components/ButtonCustom';
 import {
-  allowedFieldsInHistorySelector,
+  allowedPersonFieldsInHistorySelector,
   personFieldsIncludingCustomFieldsSelector,
   personsState,
   usePreparePersonForEncryption,
@@ -87,7 +87,7 @@ const MergeTwoPersons = ({ person }) => {
   const [personToMergeAndDelete, setPersonToMergeAndDelete] = useState(null);
 
   const allFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
-  const allowedFieldsInHistory = useRecoilValue(allowedFieldsInHistorySelector);
+  const allowedFieldsInHistory = useRecoilValue(allowedPersonFieldsInHistorySelector);
 
   const personsToMergeWith = useMemo(() => persons.filter((p) => p._id !== originPerson?._id), [persons, originPerson]);
 

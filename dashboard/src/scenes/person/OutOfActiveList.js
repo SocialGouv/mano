@@ -9,7 +9,7 @@ import { fieldsPersonsCustomizableOptionsSelector, personsState, usePreparePerso
 import API from '../../services/api';
 import { outOfBoundariesDate } from '../../services/date';
 import SelectCustom from '../../components/SelectCustom';
-import { cleanHistory } from './components/History';
+import { cleanHistory } from './components/PersonHistory';
 import DatePicker from '../../components/DatePicker';
 
 const OutOfActiveList = ({ person }) => {

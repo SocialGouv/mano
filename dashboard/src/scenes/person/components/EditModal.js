@@ -1,7 +1,7 @@
 import { Col, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import SelectAsInput from '../../../components/SelectAsInput';
 import {
-  allowedFieldsInHistorySelector,
+  allowedPersonFieldsInHistorySelector,
   customFieldsPersonsSelector,
   flattenedCustomFieldsPersonsSelector,
   personFieldsSelector,
@@ -18,7 +18,7 @@ import ButtonCustom from '../../../components/ButtonCustom';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
 import API from '../../../services/api';
-import { cleanHistory } from './History';
+import { cleanHistory } from './PersonHistory';
 import DatePicker from '../../../components/DatePicker';
 import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../../recoil/medicalFiles';
 
@@ -27,7 +27,7 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
   const user = useRecoilValue(userState);
   const customFieldsPersons = useRecoilValue(customFieldsPersonsSelector);
   const flattenedCustomFieldsPersons = useRecoilValue(flattenedCustomFieldsPersonsSelector);
-  const allowedFieldsInHistory = useRecoilValue(allowedFieldsInHistorySelector);
+  const allowedFieldsInHistory = useRecoilValue(allowedPersonFieldsInHistorySelector);
   const team = useRecoilValue(currentTeamState);
   const [persons, setPersons] = useRecoilState(personsState);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
