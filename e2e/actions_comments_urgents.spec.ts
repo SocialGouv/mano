@@ -134,7 +134,7 @@ test("Create action with comments", async ({ page }) => {
   await page.getByRole("button", { name: "Actions et commentaires urgents et vigilance" }).click();
 
   await page.locator('[data-test-id="action avec commentaire"]').getByRole("cell", { name: "action avec commentaire" }).click();
-  await expect(page).toHaveURL(/http:\/\/localhost:8090\/report\/.*\?reportsTeam=%5B%22.*%22%5D&tab=comment-created&actionId=.*/);
+  await expect(page).toHaveURL(/http:\/\/localhost:8090\/report\/.*\?reportsTeam=%5B%22.*%22%5D&actionId=.*/);
   await page.getByRole("button", { name: "Commentaires (1)" }).click();
   await expect(page.getByRole("heading", { name: "Action: action avec commentaire (créée par User Admin Test - 7)" })).toBeVisible();
   await page.getByRole("button", { name: "Fermer" }).first().click();

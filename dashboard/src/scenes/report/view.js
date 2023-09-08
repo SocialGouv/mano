@@ -54,7 +54,6 @@ import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import TagTeam from '../../components/TagTeam';
 import ReceptionService from '../../components/ReceptionService';
 import { useLocalStorage } from '../../services/useLocalStorage';
-import useSearchParamState from '../../services/useSearchParamState';
 import { arrayOfitemsGroupedByActionSelector, arrayOfitemsGroupedByConsultationSelector, personsObjectSelector } from '../../recoil/selectors';
 import { treatmentsState } from '../../recoil/treatments';
 import { medicalFileState } from '../../recoil/medicalFiles';
@@ -145,7 +144,13 @@ const View = () => {
   const history = useHistory();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const [activeTab, setActiveTab] = useSearchParamState('tab', ['restricted-access'].includes(user.role) ? 'reception' : 'resume');
+  const [activeTab, setActiveTab] = useState(['restricted-access'].includes(user.role) ? 'reception' : 'resume');
+  const searchParamTab = searchParams.get('tab');
+  useEffect(() => {
+    if (searchParamTab) {
+      setActiveTab(searchParamTab);
+    }
+  }, [searchParamTab]);
 
   const { refresh } = useDataLoader();
 
