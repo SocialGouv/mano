@@ -182,7 +182,7 @@ export const itemsGroupedByPersonSelector = selector({
         }
       }
     }
-    for (const comment of comments.filter((c) => !c.comment.includes('a changé le status'))) {
+    for (const comment of comments) {
       if (comment.action) {
         const person = personPerAction[comment.action];
         if (!person) continue;

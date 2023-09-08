@@ -314,7 +314,7 @@ const Action = ({ navigation, route }) => {
     setActions((actions) => [response.decryptedData, ...actions]);
     await createReportAtDateIfNotExist(response.decryptedData.createdAt);
 
-    for (let c of comments.filter((c) => c.action === actionDB._id).filter((c) => !c.comment.includes('a changé le status'))) {
+    for (let c of comments.filter((c) => c.action === actionDB._id)) {
       const body = {
         comment: c.comment,
         action: response.decryptedData._id,

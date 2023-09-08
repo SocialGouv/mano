@@ -227,7 +227,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
       return;
     }
     setActions((actions) => [response.decryptedData, ...actions]);
-    for (let c of action.comments.filter((c) => c.action === action._id).filter((c) => !c.comment.includes('a changé le status'))) {
+    for (let c of action.comments.filter((c) => c.action === action._id)) {
       const body = {
         comment: c.comment,
         action: response.decryptedData._id,

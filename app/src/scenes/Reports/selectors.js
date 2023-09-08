@@ -64,7 +64,6 @@ export const commentsForReport = selectorFamily({
       const currentTeam = get(currentTeamState);
       const filteredComments = comments
         .filter((c) => c.team === currentTeam._id)
-        .filter((c) => !c.comment.includes('a changé le status'))
         .filter((c) => getIsDayWithinHoursOffsetOfDay(c.date || c.createdAt, date, currentTeam?.nightSession ? 12 : 0))
         .map((comment) => {
           const commentPopulated = { ...comment };
