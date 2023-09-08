@@ -1,3 +1,12 @@
+## [1.283.3](https://github.com/SocialGouv/mano/compare/v1.283.2...v1.283.3) (2023-09-08)
+
+
+### Bug Fixes
+
+* **dashboard:** après avoir navigué dans différentes tabs d'un CR, quand on clique sur Retour, ça ne marchait pas - désormais on retourne dans la liste des CR ([#1644](https://github.com/SocialGouv/mano/issues/1644)) ([ebcc0b6](https://github.com/SocialGouv/mano/commit/ebcc0b66904a196e759d070b5d28a7daa9a7eecd))
+* **dashboard:** lors du téléchargement d'un export depuis les statistiques, exporte aussi le nom de l'utilisateur qui a créé la personne ou l'action ([#1642](https://github.com/SocialGouv/mano/issues/1642)) ([389f437](https://github.com/SocialGouv/mano/commit/389f43764d21ce3f4696271e3696a79a5db33d12))
+* **dashboard:** on peut voir les stats médicales même si on n'est pas un personnel médical ([#1645](https://github.com/SocialGouv/mano/issues/1645)) ([105031e](https://github.com/SocialGouv/mano/commit/105031ea07bba553c76a485c115e1cdabe11142e))
+
 ## [1.283.2](https://github.com/SocialGouv/mano/compare/v1.283.1...v1.283.2) (2023-09-07)
 
 
