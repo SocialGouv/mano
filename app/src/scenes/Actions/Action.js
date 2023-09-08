@@ -21,7 +21,7 @@ import ActionCategoriesModalSelect from '../../components/ActionCategoriesModalS
 import Label from '../../components/Label';
 import Tags from '../../components/Tags';
 import { MyText } from '../../components/MyText';
-import { actionsState, DONE, CANCEL, TODO, prepareActionForEncryption, mappedIdsToLabels } from '../../recoil/actions';
+import { actionsState, DONE, CANCEL, TODO, prepareActionForEncryption, allowedActionFieldsInHistory } from '../../recoil/actions';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import API from '../../services/api';
@@ -205,6 +205,18 @@ const Action = ({ navigation, route }) => {
         }
       }
       delete action.team;
+
+      const historyEntry = {
+        date: new Date(),
+        user: user._id,
+        data: {},
+      };
+      for (const key in action) {
+        if (!allowedActionFieldsInHistory.map((field) => field.name).includes(key)) continue;
+        if (action[key] !== oldAction[key]) historyEntry.data[key] = { oldValue: oldAction[key], newValue: action[key] };
+      }
+      if (!!Object.keys(historyEntry.data).length) action.history = [...(action.history || []), historyEntry];
+
       const response = await API.put({
         path: `/action/${oldAction._id}`,
         body: prepareActionForEncryption(action),
@@ -218,17 +230,6 @@ const Action = ({ navigation, route }) => {
         })
       );
       if (!!newAction.completedAt) await createReportAtDateIfNotExist(newAction.completedAt);
-      if (!statusChanged) return response;
-      const comment = {
-        comment: `${user.name} a changé le status de l'action: ${mappedIdsToLabels.find((status) => status._id === newAction.status)?.name}`,
-        action: actionDB?._id,
-        team: currentTeam._id,
-        user: user._id,
-        organisation: organisation._id,
-        date: new Date().toISOString(),
-      };
-      const commentResponse = await API.post({ path: '/comment', body: prepareCommentForEncryption(comment) });
-      if (commentResponse.ok) setComments((comments) => [commentResponse.decryptedData, ...comments]);
       return response;
     } catch (error) {
       capture(error, { extra: { message: 'error in updating action', action } });

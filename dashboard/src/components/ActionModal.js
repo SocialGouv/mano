@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { useHistory, useLocation } from 'react-router-dom';
-import { actionsState, allowedActionFieldsInHistory, CANCEL, DONE, mappedIdsToLabels, prepareActionForEncryption, TODO } from '../recoil/actions';
+import { actionsState, allowedActionFieldsInHistory, CANCEL, DONE, prepareActionForEncryption, TODO } from '../recoil/actions';
 import { currentTeamState, organisationState, teamsState, userState } from '../recoil/auth';
 import { dayjsInstance, now, outOfBoundariesDate } from '../services/date';
 import API from '../services/api';
@@ -289,7 +289,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
       data: {},
     };
     for (const key in body) {
-      if (!allowedActionFieldsInHistory.includes(key)) continue;
+      if (!allowedActionFieldsInHistory.map((field) => field.name).includes(key)) continue;
       if (body[key] !== action[key]) historyEntry.data[key] = { oldValue: action[key], newValue: body[key] };
     }
     if (!!Object.keys(historyEntry.data).length) body.history = [...(action.history || []), historyEntry];
@@ -311,17 +311,6 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
       if (dayjsInstance(newAction.completedAt).format('YYYY-MM-DD') !== dayjsInstance(newAction.createdAt).format('YYYY-MM-DD')) {
         await createReportAtDateIfNotExist(newAction.completedAt);
       }
-    }
-    if (statusChanged) {
-      const comment = {
-        comment: `${user.name} a changé le status de l'action: ${mappedIdsToLabels.find((status) => status._id === newAction.status)?.name}`,
-        action: action._id,
-        team: currentTeam._id,
-        user: user._id,
-        organisation: organisation._id,
-      };
-      const commentResponse = await API.post({ path: '/comment', body: prepareCommentForEncryption(comment) });
-      if (commentResponse.ok) setComments((comments) => [commentResponse.decryptedData, ...comments]);
     }
     toast.success('Mise à jour !');
     if (location.pathname !== '/stats') refresh(); // if we refresh when we're on stats page, it will remove the view we're on
@@ -658,6 +647,12 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
               />
             </div>
           )}
+          <div
+            className={['tw-flex tw-w-full tw-flex-col tw-gap-4 tw-overflow-y-auto sm:tw-h-[50vh]', activeTab !== 'Historique' && 'tw-hidden']
+              .filter(Boolean)
+              .join(' ')}>
+            <ActionHistory action={action} />
+          </div>
         </form>
       </ModalBody>
       <ModalFooter>
@@ -692,58 +687,81 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
 }
 
 function ActionHistory({ action }) {
-  const history = useMemo(() => (action.history || []).reverse(), [action.history]);
+  const history = useMemo(() => [...(action?.history || [])].reverse(), [action?.history]);
+  const teams = useRecoilValue(teamsState);
 
   return (
     <div>
-      <div>
-        <h3>Historique</h3>
-      </div>
-      <table className="table table-striped table-bordered">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Utilisateur</th>
-            <th>Donnée</th>
-          </tr>
-        </thead>
-        <tbody className="small">
-          {history.map((h) => {
-            return (
-              <tr key={h.date} className="tw-cursor-default">
-                <td>{dayjsInstance(h.date).format('DD/MM/YYYY HH:mm')}</td>
-                <td>
-                  <UserName id={h.user} />
-                </td>
-                <td className="tw-max-w-prose">
-                  {Object.entries(h.data).map(([key, value]) => {
-                    const personField = personFieldsIncludingCustomFields.find((f) => f.name === key);
-                    if (key === 'teams') {
+      {!history?.length ? (
+        <div className="tw-py-10 tw-text-center tw-text-gray-300">
+          <p className="tw-text-lg tw-font-bold">Cette action n'a pas encore d'historique.</p>
+          <p className="tw-mt-2 tw-text-sm">
+            Lorsqu'une action est modifiée, les changements sont enregistrés dans un historique,
+            <br />
+            que vous pourrez ainsi retrouver sur cette page.
+          </p>
+        </div>
+      ) : (
+        <table className="table table-striped table-bordered">
+          <thead>
+            <tr className="tw-cursor-default">
+              <th>Date</th>
+              <th>Utilisateur</th>
+              <th>Donnée</th>
+            </tr>
+          </thead>
+          <tbody className="small">
+            {history.map((h) => {
+              return (
+                <tr key={h.date} className="tw-cursor-default">
+                  <td>{dayjsInstance(h.date).format('DD/MM/YYYY HH:mm')}</td>
+                  <td>
+                    <UserName id={h.user} />
+                  </td>
+                  <td className="tw-max-w-prose">
+                    {Object.entries(h.data).map(([key, value]) => {
+                      const actionField = allowedActionFieldsInHistory.find((f) => f.name === key);
+                      if (key === 'teams') {
+                        return (
+                          <p className="tw-flex tw-flex-col" key={key}>
+                            <span>{actionField?.label} : </span>
+                            <code>"{(value.oldValue || []).map((teamId) => teams.find((t) => t._id === teamId)?.name).join(', ')}"</code>
+                            <span>↓</span>
+                            <code>"{(value.newValue || []).map((teamId) => teams.find((t) => t._id === teamId)?.name).join(', ')}"</code>
+                          </p>
+                        );
+                      }
+                      if (key === 'person') {
+                        return (
+                          <p key={key}>
+                            {actionField?.label} : <br />
+                            <code>
+                              <PersonName item={{ person: value.oldValue }} />
+                            </code>{' '}
+                            ➔{' '}
+                            <code>
+                              <PersonName item={{ person: value.newValue }} />
+                            </code>
+                          </p>
+                        );
+                      }
+
                       return (
-                        <p className="tw-flex tw-flex-col" key={key}>
-                          <span>{personField?.label} : </span>
-                          <code>"{(value.oldValue || []).map((teamId) => teams.find((t) => t._id === teamId)?.name).join(', ')}"</code>
-                          <span>↓</span>
-                          <code>"{(value.newValue || []).map((teamId) => teams.find((t) => t._id === teamId)?.name).join(', ')}"</code>
+                        <p
+                          key={key}
+                          data-test-id={`${actionField?.label}: ${JSON.stringify(value.oldValue || '')} ➔ ${JSON.stringify(value.newValue)}`}>
+                          {actionField?.label} : <br />
+                          <code>{JSON.stringify(value.oldValue || '')}</code> ➔ <code>{JSON.stringify(value.newValue)}</code>
                         </p>
                       );
-                    }
-
-                    return (
-                      <p
-                        key={key}
-                        data-test-id={`${personField?.label}: ${JSON.stringify(value.oldValue || '')} ➔ ${JSON.stringify(value.newValue)}`}>
-                        {personField?.label} : <br />
-                        <code>{JSON.stringify(value.oldValue || '')}</code> ➔ <code>{JSON.stringify(value.newValue)}</code>
-                      </p>
-                    );
-                  })}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+                    })}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 }
