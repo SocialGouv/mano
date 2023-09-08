@@ -216,66 +216,64 @@ export const itemsGroupedByPersonSelector = selector({
       personsObject[relPersonPlace.person].relsPersonPlace.push(relPersonPlace);
       personsObject[relPersonPlace.person].interactions.push(relPersonPlace.createdAt);
     }
-    if (user.healthcareProfessional) {
-      for (const consultation of consultations) {
-        if (!personsObject[consultation.person]) continue;
-        personsObject[consultation.person].consultations = personsObject[consultation.person].consultations || [];
-        personsObject[consultation.person].consultations.push(consultation);
-        personsObject[consultation.person].hasAtLeastOneConsultation = true;
-        personsObject[consultation.person].interactions.push(consultation.dueAt);
-        personsObject[consultation.person].interactions.push(consultation.createdAt);
-        personsObject[consultation.person].interactions.push(consultation.completedAt);
-        const consultationIsVisibleByMe = consultation.onlyVisibleBy.length === 0 || consultation.onlyVisibleBy.includes(user._id);
-        for (const comment of consultation.comments || []) {
-          personsObject[consultation.person].interactions.push(comment.date);
-          if (!consultationIsVisibleByMe) continue;
-          personsObject[consultation.person].commentsMedical = personsObject[consultation.person].commentsMedical || [];
-          personsObject[consultation.person].commentsMedical.push({
-            ...comment,
-            consultation,
-            person: consultation.person,
-            type: 'consultation',
-          });
-        }
+    for (const consultation of consultations) {
+      if (!personsObject[consultation.person]) continue;
+      personsObject[consultation.person].consultations = personsObject[consultation.person].consultations || [];
+      personsObject[consultation.person].consultations.push(consultation);
+      personsObject[consultation.person].hasAtLeastOneConsultation = true;
+      personsObject[consultation.person].interactions.push(consultation.dueAt);
+      personsObject[consultation.person].interactions.push(consultation.createdAt);
+      personsObject[consultation.person].interactions.push(consultation.completedAt);
+      const consultationIsVisibleByMe = consultation.onlyVisibleBy.length === 0 || consultation.onlyVisibleBy.includes(user._id);
+      for (const comment of consultation.comments || []) {
+        personsObject[consultation.person].interactions.push(comment.date);
+        if (!consultationIsVisibleByMe) continue;
+        personsObject[consultation.person].commentsMedical = personsObject[consultation.person].commentsMedical || [];
+        personsObject[consultation.person].commentsMedical.push({
+          ...comment,
+          consultation,
+          person: consultation.person,
+          type: 'consultation',
+        });
       }
-      for (const treatment of treatments) {
-        if (!personsObject[treatment.person]) continue;
-        personsObject[treatment.person].treatments = personsObject[treatment.person].treatments || [];
-        personsObject[treatment.person].treatments.push(treatment);
-        personsObject[treatment.person].interactions.push(treatment.createdAt);
-        for (const comment of treatment.comments || []) {
-          personsObject[treatment.person].interactions.push(comment.date);
-          personsObject[treatment.person].commentsMedical = personsObject[treatment.person].commentsMedical || [];
-          personsObject[treatment.person].commentsMedical.push({
-            ...comment,
-            treatment,
-            person: treatment.person,
-            type: 'treatment',
-          });
-        }
+    }
+    for (const treatment of treatments) {
+      if (!personsObject[treatment.person]) continue;
+      personsObject[treatment.person].treatments = personsObject[treatment.person].treatments || [];
+      personsObject[treatment.person].treatments.push(treatment);
+      personsObject[treatment.person].interactions.push(treatment.createdAt);
+      for (const comment of treatment.comments || []) {
+        personsObject[treatment.person].interactions.push(comment.date);
+        personsObject[treatment.person].commentsMedical = personsObject[treatment.person].commentsMedical || [];
+        personsObject[treatment.person].commentsMedical.push({
+          ...comment,
+          treatment,
+          person: treatment.person,
+          type: 'treatment',
+        });
       }
-      for (const medicalFile of medicalFiles) {
-        if (!personsObject[medicalFile.person]) continue;
-        if (personsObject[medicalFile.person].medicalFile) {
-          personsObject[medicalFile.person].medicalFile = {
-            ...medicalFile,
-            ...personsObject[medicalFile.person].medicalFile,
-            documents: [...(medicalFile?.documents || []), ...(personsObject[medicalFile.person].medicalFile?.documents || [])],
-            comments: [...(medicalFile?.comments || []), ...(personsObject[medicalFile.person].medicalFile?.comments || [])],
-          };
-        } else {
-          personsObject[medicalFile.person].medicalFile = medicalFile;
-        }
-        personsObject[medicalFile.person].interactions.push(medicalFile.createdAt);
-        for (const comment of medicalFile.comments || []) {
-          personsObject[medicalFile.person].interactions.push(comment.date);
-          personsObject[medicalFile.person].commentsMedical = personsObject[medicalFile.person].commentsMedical || [];
-          personsObject[medicalFile.person].commentsMedical.push({
-            ...comment,
-            person: medicalFile.person,
-            type: 'medical-file',
-          });
-        }
+    }
+    for (const medicalFile of medicalFiles) {
+      if (!personsObject[medicalFile.person]) continue;
+      if (personsObject[medicalFile.person].medicalFile) {
+        personsObject[medicalFile.person].medicalFile = {
+          ...medicalFile,
+          ...personsObject[medicalFile.person].medicalFile,
+          documents: [...(medicalFile?.documents || []), ...(personsObject[medicalFile.person].medicalFile?.documents || [])],
+          comments: [...(medicalFile?.comments || []), ...(personsObject[medicalFile.person].medicalFile?.comments || [])],
+        };
+      } else {
+        personsObject[medicalFile.person].medicalFile = medicalFile;
+      }
+      personsObject[medicalFile.person].interactions.push(medicalFile.createdAt);
+      for (const comment of medicalFile.comments || []) {
+        personsObject[medicalFile.person].interactions.push(comment.date);
+        personsObject[medicalFile.person].commentsMedical = personsObject[medicalFile.person].commentsMedical || [];
+        personsObject[medicalFile.person].commentsMedical.push({
+          ...comment,
+          person: medicalFile.person,
+          type: 'medical-file',
+        });
       }
     }
     for (const passage of passages) {
@@ -357,6 +355,17 @@ export const personsWithMedicalFileMergedSelector = selector({
     const user = get(userState);
     const persons = get(arrayOfitemsGroupedByPersonSelector);
     if (!user.healthcareProfessional) return persons;
+    return persons.map((p) => ({
+      ...(p.medicalFile || {}),
+      ...p,
+    }));
+  },
+});
+
+export const personsForStatsSelector = selector({
+  key: 'personsForStatsSelector',
+  get: ({ get }) => {
+    const persons = get(arrayOfitemsGroupedByPersonSelector);
     return persons.map((p) => ({
       ...(p.medicalFile || {}),
       ...p,

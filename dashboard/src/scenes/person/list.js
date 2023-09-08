@@ -55,8 +55,9 @@ const personsFilteredBySearchSelector = selectorFamily({
       if (!search?.length) {
         return personsSorted;
       }
-
-      const personsfilteredBySearch = filterBySearch(search, personsSorted);
+      const user = get(userState);
+      const excludeFields = user.healthcareProfessional ? [] : ['consultations', 'treatments', 'commentsMedical', 'medicalFile'];
+      const personsfilteredBySearch = filterBySearch(search, personsSorted, excludeFields);
 
       return personsfilteredBySearch;
     },

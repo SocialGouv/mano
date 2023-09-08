@@ -10,7 +10,7 @@ import { capture } from '../../services/sentry';
 import UserName from '../../components/UserName';
 import Search from '../../components/search';
 import TagTeam from '../../components/TagTeam';
-import { organisationState, teamsState } from '../../recoil/auth';
+import { organisationState, teamsState, userState } from '../../recoil/auth';
 import { actionsState, CANCEL, DONE, sortActionsOrConsultations } from '../../recoil/actions';
 import { personsState, sortPersons } from '../../recoil/persons';
 import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
@@ -48,8 +48,10 @@ const personsFilteredBySearchForSearchSelector = selectorFamily({
     ({ get }) => {
       const persons = get(personsWithFormattedBirthDateSelector);
       const personsPopulated = get(itemsGroupedByPersonSelector);
+      const user = get(userState);
+      const excludeFields = user.healthcareProfessional ? [] : ['consultations', 'treatments', 'commentsMedical', 'medicalFile'];
       if (!search?.length) return [];
-      return filterBySearch(search, persons).map((p) => personsPopulated[p._id]);
+      return filterBySearch(search, persons, excludeFields).map((p) => personsPopulated[p._id]);
     },
 });
 const actionsObjectSelector = selector({
@@ -138,7 +140,7 @@ const observationsBySearchSelector = selectorFamily({
       const populatedObservations = get(populatedObservationsSelector);
       const observations = get(onlyFilledObservationsTerritories);
       if (!search?.length) return [];
-      const observationsFilteredBySearch = filterBySearch(search, observations, true);
+      const observationsFilteredBySearch = filterBySearch(search, observations);
       return observationsFilteredBySearch.map((obs) => populatedObservations[obs._id]).filter(Boolean);
     },
 });

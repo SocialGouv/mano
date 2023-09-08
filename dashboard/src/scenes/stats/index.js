@@ -8,12 +8,12 @@ import {
   flattenedCustomFieldsPersonsSelector,
 } from '../../recoil/persons';
 import { customFieldsObsSelector, territoryObservationsState } from '../../recoil/territoryObservations';
-import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
+import { currentTeamState, organisationState, teamsState } from '../../recoil/auth';
 import { actionsCategoriesSelector, DONE, flattenedActionsCategoriesSelector } from '../../recoil/actions';
 import { reportsState } from '../../recoil/reports';
 import { territoriesState } from '../../recoil/territory';
 import { customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
-import { personsWithMedicalFileMergedSelector, populatedPassagesSelector } from '../../recoil/selectors';
+import { personsForStatsSelector, populatedPassagesSelector } from '../../recoil/selectors';
 import useTitle from '../../services/useTitle';
 import DateRangePickerWithPresets, { formatPeriod } from '../../components/DateRangePickerWithPresets';
 import { useDataLoader } from '../../components/DataLoader';
@@ -100,7 +100,7 @@ const itemsForStatsSelector = selectorFamily({
       const filtersExceptOutOfActiveList = activeFilters.filter((f) => f.field !== 'outOfActiveList');
       const outOfActiveListFilter = activeFilters.find((f) => f.field === 'outOfActiveList')?.value;
 
-      const allPersons = get(personsWithMedicalFileMergedSelector);
+      const allPersons = get(personsForStatsSelector);
 
       const offsetHours = allSelectedTeamsAreNightSession ? 12 : 0;
       const isoStartDate = period.startDate ? dayjs(period.startDate).startOf('day').add(offsetHours, 'hour').toISOString() : null;
@@ -234,7 +234,6 @@ const initFilters = [filterMakingThingsClearAboutOutOfActiveListStatus];
 
 const Stats = () => {
   const organisation = useRecoilValue(organisationState);
-  const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
   const teams = useRecoilValue(teamsState);
 
@@ -510,9 +509,6 @@ const Stats = () => {
       <ul className="noprint tw-mb-5 tw-flex tw-list-none tw-flex-wrap tw-border-b tw-border-zinc-200 tw-pl-0">
         {tabs
           .filter((tabCaption) => {
-            if (['Consultations', 'Dossiers médicaux des personnes créées', 'Dossiers médicaux des personnes suivies'].includes(tabCaption)) {
-              return !!user.healthcareProfessional;
-            }
             if (['Observations'].includes(tabCaption)) {
               return !!organisation.territoriesEnabled;
             }
@@ -640,42 +636,38 @@ const Stats = () => {
           />
         )}
         {activeTab === 'Comptes-rendus' && <ReportsStats reports={reports} />}
-        {user.healthcareProfessional && (
-          <>
-            {activeTab === 'Consultations' && (
-              <ConsultationsStats
-                consultations={consultationsFilteredByPersons} // filter by persons
-                // filter by persons
-                personsWithConsultations={personsWithConsultations}
-                filterBase={filterPersonsWithAllFields()}
-                filterPersons={filterPersons}
-                setFilterPersons={setFilterPersons}
-              />
-            )}
-            {activeTab === 'Dossiers médicaux des personnes créées' && (
-              <MedicalFilesStats
-                filterBase={filterPersonsWithAllFields(true)}
-                title="personnes créées"
-                filterPersons={filterPersons}
-                setFilterPersons={setFilterPersons}
-                personsForStats={personsCreated}
-                customFieldsMedicalFile={customFieldsMedicalFile}
-                personFields={personFields}
-              />
-            )}
-            {activeTab === 'Dossiers médicaux des personnes suivies' && (
-              <MedicalFilesStats
-                title="personnes suivies"
-                personsForStats={personsUpdated}
-                customFieldsMedicalFile={customFieldsMedicalFile}
-                personFields={personFields}
-                // filter by persons
-                filterBase={filterPersonsWithAllFields(true)}
-                filterPersons={filterPersons}
-                setFilterPersons={setFilterPersons}
-              />
-            )}
-          </>
+        {activeTab === 'Consultations' && (
+          <ConsultationsStats
+            consultations={consultationsFilteredByPersons} // filter by persons
+            // filter by persons
+            personsWithConsultations={personsWithConsultations}
+            filterBase={filterPersonsWithAllFields()}
+            filterPersons={filterPersons}
+            setFilterPersons={setFilterPersons}
+          />
+        )}
+        {activeTab === 'Dossiers médicaux des personnes créées' && (
+          <MedicalFilesStats
+            filterBase={filterPersonsWithAllFields(true)}
+            title="personnes créées"
+            filterPersons={filterPersons}
+            setFilterPersons={setFilterPersons}
+            personsForStats={personsCreated}
+            customFieldsMedicalFile={customFieldsMedicalFile}
+            personFields={personFields}
+          />
+        )}
+        {activeTab === 'Dossiers médicaux des personnes suivies' && (
+          <MedicalFilesStats
+            title="personnes suivies"
+            personsForStats={personsUpdated}
+            customFieldsMedicalFile={customFieldsMedicalFile}
+            personFields={personFields}
+            // filter by persons
+            filterBase={filterPersonsWithAllFields(true)}
+            filterPersons={filterPersons}
+            setFilterPersons={setFilterPersons}
+          />
         )}
       </div>
       {/* HACK: this last div is because Chrome crop the end of the page - I didn't find any better solution */}

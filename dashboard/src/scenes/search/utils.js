@@ -13,16 +13,17 @@ const excludeFields = new Set([
 ]);
 const isObject = (variable) => typeof variable === 'object' && variable !== null && !Array.isArray(variable);
 
-const prepareItemForSearch = (item) => {
+const prepareItemForSearch = (item, userSpecificExcludeFields) => {
   if (typeof item === 'string') return item;
   if (!item) return '';
   const itemClean = {};
   for (let key of Object.keys(item)) {
     if (excludeFields.has(key)) continue;
+    if (userSpecificExcludeFields.has(key)) continue;
     if (isObject(item[key])) {
-      itemClean[key] = prepareItemForSearch(item[key]);
+      itemClean[key] = prepareItemForSearch(item[key], userSpecificExcludeFields);
     } else if (Array.isArray(item[key])) {
-      itemClean[key] = item[key].map(prepareItemForSearch);
+      itemClean[key] = item[key].map((subItem) => prepareItemForSearch(subItem, userSpecificExcludeFields));
     } else {
       itemClean[key] = item[key];
     }
@@ -30,7 +31,7 @@ const prepareItemForSearch = (item) => {
   return itemClean;
 };
 
-export const filterBySearch = (search, items = [], debug = false) => {
+export const filterBySearch = (search, items = [], userSpecificExcludeFields = []) => {
   const searchLowercased = search.toLocaleLowerCase();
   // replace all accents with normal letters
   const searchNormalized = searchLowercased.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -55,6 +56,7 @@ export const filterBySearch = (search, items = [], debug = false) => {
       itemsNameStartWithWordWithNoAccent.push(item);
       continue;
     }
+
     if (searchTerms.every((word) => lowerCaseName.includes(word))) {
       itemsNameContainsOneOfTheWords.push(item);
       continue;
@@ -63,7 +65,7 @@ export const filterBySearch = (search, items = [], debug = false) => {
       itemsNameContainsOneOfTheWordsWithNoAccent.push(item);
       continue;
     }
-    const stringifiedItem = JSON.stringify(prepareItemForSearch(item)).toLocaleLowerCase();
+    const stringifiedItem = JSON.stringify(prepareItemForSearch(item, new Set(userSpecificExcludeFields))).toLocaleLowerCase();
     if (searchTerms.filter((word) => stringifiedItem.includes(word)).length === searchTerms.length) {
       anyOtherPrropertyContainsOneOfTheWords.push(item);
       continue;
