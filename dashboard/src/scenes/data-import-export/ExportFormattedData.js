@@ -1,10 +1,11 @@
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
 import { Menu, Transition } from '@headlessui/react';
 import { useRecoilValue } from 'recoil';
 import { personFieldsIncludingCustomFieldsSelector, personsState } from '../../recoil/persons';
 import { utils, writeFile } from 'xlsx';
 import { dayjsInstance } from '../../services/date';
 import { teamsState, userState } from '../../recoil/auth';
+import API from '../../services/api';
 
 // Source: https://tailwindui.com/components/application-ui/elements/dropdowns
 export default function ExportFormattedData({ personCreated, personUpdated, actions }) {
@@ -12,15 +13,27 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
   const persons = useRecoilValue(personsState);
   const user = useRecoilValue(userState);
   const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
+  const [users, setUsers] = useState([]);
 
-  function transformPerson(person) {
+  async function fetchUsers() {
+    if (users.length) return users;
+    const response = await API.get({ path: '/user' });
+    if (response.data) {
+      setUsers(response.data);
+      return response.data;
+    }
+    return [];
+  }
+
+  const transformPerson = (loadedUsers) => (person) => {
     return {
       id: person._id,
       ...personFieldsIncludingCustomFields
-        .filter((person) => !['_id', 'organisation', 'user', 'createdAt', 'updatedAt', 'documents', 'history'].includes(person.name))
+        .filter((field) => !['_id', 'user', 'organisation', 'createdAt', 'updatedAt', 'documents', 'history'].includes(field.name))
         .reduce((fields, field) => {
           if (field.name === 'assignedTeams') {
             fields[field.label] = (person[field.name] || []).map((t) => teams.find((person) => person._id === t)?.name)?.join(', ');
+          } else if (field.name === 'user') {
           } else if (['date', 'date-with-time'].includes(field.type))
             fields[field.label || field.name] = person[field.name] ? dayjsInstance(person[field.name]).format('YYYY-MM-DD') : '';
           else if (['boolean'].includes(field.type)) fields[field.label || field.name] = person[field.name] ? 'Oui' : 'Non';
@@ -29,12 +42,13 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
           else fields[field.label || field.name] = person[field.name];
           return fields;
         }, {}),
-      'Créé le': dayjsInstance(person.createdAt).format('YYYY-MM-DD'),
-      'Mis à jour le': dayjsInstance(person.updatedAt).format('YYYY-MM-DD'),
+      'Créée par': loadedUsers.find((u) => u._id === person.user)?.name,
+      'Créée le': dayjsInstance(person.createdAt).format('YYYY-MM-DD'),
+      'Mise à jour le': dayjsInstance(person.updatedAt).format('YYYY-MM-DD'),
     };
-  }
+  };
 
-  function transformAction(action) {
+  const transformAction = (loadedUsers) => (action) => {
     return {
       id: action._id,
       Nom: action.name,
@@ -50,12 +64,13 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
       Statut: action.status,
       'Complétée le': action.completedAt ? dayjsInstance(action.completedAt).format('YYYY-MM-DD') : '',
       'À faire le': action.dueAt ? dayjsInstance(action.dueAt).format(action.withTime ? 'YYYY-MM-DD HH:mm' : 'YYYY-MM-DD') : '',
-      'Créé le': dayjsInstance(action.createdAt).format('YYYY-MM-DD'),
-      'Mis à jour le': dayjsInstance(action.updatedAt).format('YYYY-MM-DD'),
+      'Créée par': loadedUsers.find((u) => u._id === action.user)?.name,
+      'Créée le': dayjsInstance(action.createdAt).format('YYYY-MM-DD'),
+      'Mise à jour le': dayjsInstance(action.updatedAt).format('YYYY-MM-DD'),
     };
-  }
+  };
 
-  function exportXlsx(name, json) {
+  async function exportXlsx(name, json) {
     const wb = utils.book_new();
     const ws = utils.json_to_sheet(json);
     utils.book_append_sheet(wb, ws, name);
@@ -86,19 +101,22 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
           <div className="tw-py-1">
             <MenuItem
               text="Personnes suivies"
-              onClick={() => {
-                exportXlsx('Personnes suivies', personUpdated.map(transformPerson));
+              onClick={async () => {
+                const loadedUsers = await fetchUsers();
+                exportXlsx('Personnes suivies', personUpdated.map(transformPerson(loadedUsers)));
               }}
             />
             <MenuItem
               text="Personnes créées"
-              onClick={() => {
-                exportXlsx('Personnes créées', personCreated.map(transformPerson));
+              onClick={async () => {
+                const loadedUsers = await fetchUsers();
+                exportXlsx('Personnes créées', personCreated.map(transformPerson(loadedUsers)));
               }}
             />
             <MenuItem
               text="Actions"
-              onClick={() => {
+              onClick={async () => {
+                const loadedUsers = await fetchUsers();
                 exportXlsx(
                   'Actions',
                   actions
@@ -106,7 +124,7 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
                       if (!uniqueActions.find((a) => a._id === action._id)) uniqueActions.push(action);
                       return uniqueActions;
                     }, [])
-                    .map(transformAction)
+                    .map(transformAction(loadedUsers))
                 );
               }}
             />
