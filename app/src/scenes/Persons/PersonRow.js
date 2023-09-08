@@ -18,7 +18,7 @@ export const PersonName = ({ person: { name, outOfActiveList, outOfActiveListRea
     return (
       <OutOfActiveListContainer>
         <NameMuted>{name}</NameMuted>
-        <ActiveListReasonText>Sortie de file active : {outOfActiveListReasons.join(', ')}</ActiveListReasonText>
+        <ActiveListReasonText>Sortie de file active : {outOfActiveListReasons?.join(', ')}</ActiveListReasonText>
       </OutOfActiveListContainer>
     );
   }
@@ -26,7 +26,7 @@ export const PersonName = ({ person: { name, outOfActiveList, outOfActiveListRea
 };
 
 const PersonRow = ({ onPress, person, isPersonsSearchRow = false, showActionSheetWithOptions, children }) => {
-  const { outOfActiveList, birthdate, formattedBirthDate, alertness } = person;
+  const { outOfActiveList, formattedBirthDate, alertness } = person;
   const navigation = useNavigation();
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
