@@ -50,6 +50,16 @@ test("Actions", async ({ page }) => {
     await page.getByText("Mise à jour !").click();
 
     await changeReactSelectValue(page, "action-select-status-filter", "FAITE");
+
+    await page.getByRole("cell", { name: action2Name }).click();
+    await page.getByRole("button", { name: "Historique" }).click();
+    await page.locator(`[data-test-id="Nom de l'action\\: \\"${action1Name}\\" ➔ \\"${action2Name}\\""]`).click();
+    await page.locator(`[data-test-id="Description\\: \\"\\" ➔ \\"plouf\\""]`).click();
+    await page.locator('[data-test-id="Action urgente\\: \\"\\" ➔ true"]').click();
+    await page.locator('[data-test-id="Status\\: \\"A FAIRE\\" ➔ \\"FAIT\\""]').click();
+
+    await page.getByText("Fermer").click();
+
     await page.getByRole("cell", { name: action2Name }).click();
     await page.getByRole("button", { name: "Modifier" }).click();
     page.once("dialog", (dialog) => {
