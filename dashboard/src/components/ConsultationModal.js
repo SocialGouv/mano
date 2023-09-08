@@ -24,6 +24,7 @@ import TagTeam from './TagTeam';
 import CustomFieldDisplay from './CustomFieldDisplay';
 import { itemsGroupedByConsultationSelector } from '../recoil/selectors';
 import { DocumentsModule } from './DocumentsGeneric';
+import TabsNav from './tailwind/TabsNav';
 
 export default function ConsultationModal() {
   const consultationsObjects = useRecoilValue(itemsGroupedByConsultationSelector);
@@ -239,44 +240,20 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
       />
       <ModalBody>
         <div className="tw-flex tw-h-full tw-w-full tw-flex-col">
-          <ul className="noprint tw-mb-5 tw-mt-4 tw-flex tw-list-none tw-flex-wrap tw-border-b tw-border-zinc-200 tw-px-2">
-            <li className="tw-cursor-pointer">
-              <button
-                type="button"
-                className={[
-                  '-tw-mb-px tw-block tw-rounded-t-md tw-border tw-border-transparent tw-py-2 tw-px-4',
-                  activeTab !== 'Informations' && 'tw-text-main75',
-                  activeTab === 'Informations' && 'tw-border-x-zinc-200 tw-border-t-zinc-200 tw-bg-white',
-                ].join(' ')}
-                onClick={() => setActiveTab('Informations')}>
-                Informations
-              </button>
-            </li>
-            <li className="tw-cursor-pointer">
-              <button
-                type="button"
-                className={[
-                  '-tw-mb-px tw-block tw-rounded-t-md tw-border tw-border-transparent tw-py-2 tw-px-4',
-                  activeTab !== 'Documents' && 'tw-text-main75',
-                  activeTab === 'Documents' && 'tw-border-x-zinc-200 tw-border-t-zinc-200 tw-bg-white',
-                ].join(' ')}
-                onClick={() => setActiveTab('Documents')}>
-                Documents {data?.documents?.length ? `(${data.documents.length})` : ''}
-              </button>
-            </li>
-            <li className="tw-cursor-pointer">
-              <button
-                type="button"
-                className={[
-                  '-tw-mb-px tw-block tw-rounded-t-md tw-border tw-border-transparent tw-py-2 tw-px-4',
-                  activeTab !== 'Commentaires' && 'tw-text-main75',
-                  activeTab === 'Commentaires' && 'tw-border-x-zinc-200 tw-border-t-zinc-200 tw-bg-white',
-                ].join(' ')}
-                onClick={() => setActiveTab('Commentaires')}>
-                Commentaires {data?.comments?.length ? `(${data.comments.length})` : ''}
-              </button>
-            </li>
-          </ul>
+          <TabsNav
+            className="tw-px-3 tw-py-2"
+            tabs={[
+              'Informations',
+              `Documents ${data?.documents?.length ? `(${data.documents.length})` : ''}`,
+              `Commentaires ${data?.comments?.length ? `(${data.comments.length})` : ''}`,
+            ]}
+            onClick={(tab) => {
+              if (tab.includes('Informations')) setActiveTab('Informations');
+              if (tab.includes('Documents')) setActiveTab('Documents');
+              if (tab.includes('Commentaires')) setActiveTab('Commentaires');
+            }}
+            activeTabIndex={['Informations', 'Documents', 'Commentaires'].findIndex((tab) => tab === activeTab)}
+          />
           <form
             id="add-consultation-form"
             className={['tw-flex tw-h-[50vh] tw-w-full tw-flex-wrap tw-overflow-y-auto tw-p-4', activeTab !== 'Informations' && 'tw-hidden']
@@ -443,10 +420,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
             </div>
           </form>
           <div
-            className={[
-              'tw-flex tw-h-[50vh] tw-w-full tw-flex-col tw-gap-4 tw-overflow-y-auto',
-              activeTab !== 'Documents' && 'tw-hidden',
-            ]
+            className={['tw-flex tw-h-[50vh] tw-w-full tw-flex-col tw-gap-4 tw-overflow-y-auto', activeTab !== 'Documents' && 'tw-hidden']
               .filter(Boolean)
               .join(' ')}>
             {data.person && (

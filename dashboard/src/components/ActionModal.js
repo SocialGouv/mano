@@ -376,7 +376,7 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
                 if (index === 0) setActiveTab('Informations');
                 if (index === 1) setActiveTab('Commentaires');
               }}
-              activeTabIndex={activeTab === 'Informations' ? 0 : 1}
+              activeTabIndex={['Informations', 'Commentaires'].findIndex((tab) => tab === activeTab)}
             />
           )}
           <div

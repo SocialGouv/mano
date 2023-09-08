@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, Fragment } from 'react';
+import React, { useMemo, Fragment } from 'react';
 import { useHistory } from 'react-router-dom';
 import DateBloc from '../../components/DateBloc';
 import Header from '../../components/header';
@@ -28,6 +28,7 @@ import ExclamationMarkButton from '../../components/tailwind/ExclamationMarkButt
 import ConsultationButton from '../../components/ConsultationButton';
 import { useLocalStorage } from '../../services/useLocalStorage';
 import { territoryObservationsState } from '../../recoil/territoryObservations';
+import TabsNav from '../../components/tailwind/TabsNav';
 
 const personsWithFormattedBirthDateSelector = selector({
   key: 'personsWithFormattedBirthDateSelector',
@@ -153,11 +154,6 @@ const View = () => {
 
   const [search, setSearch] = useLocalStorage('fullsearch', '');
   const [activeTab, setActiveTab] = useLocalStorage('fullsearch-tab', 0);
-  const [tabsContents, setTabsContents] = useState(initTabs);
-
-  useEffect(() => {
-    if (!search) setTabsContents(initTabs);
-  }, [search]);
 
   const allActions = useRecoilValue(actionsState);
   const allTerritories = useRecoilValue(territoriesState);
@@ -187,38 +183,29 @@ const View = () => {
   const renderContent = () => {
     if (!search) return 'Pas de recherche, pas de résultat !';
     if (search.length < 3) return 'Recherche trop courte (moins de 3 caractères), pas de résultat !';
+
     return (
       <>
-        <ul className="tw-mb-5 tw-flex tw-list-none tw-flex-wrap tw-justify-evenly tw-border-b tw-border-zinc-200 tw-pl-0">
-          {tabsContents
-            .filter((tabCaption) => {
-              if (['Observations', 'Territoires'].includes(tabCaption)) {
-                return !!organisation.territoriesEnabled;
-              }
-              return true;
-            })
-            .map((tabCaption, index) => {
-              return (
-                <li key={index} className="tw-grow tw-cursor-pointer">
-                  <button
-                    key={tabCaption}
-                    className={[
-                      '-tw-mb-px tw-block tw-w-full tw-rounded-t-md tw-border tw-border-transparent tw-py-2 tw-px-4',
-                      activeTab !== tabCaption && 'tw-text-main75',
-                      activeTab === tabCaption && 'tw-border-x-zinc-200 tw-border-t-zinc-200 tw-bg-white',
-                    ].join(' ')}
-                    onClick={() => setActiveTab(tabCaption)}>
-                    {tabCaption === 'Actions' && `Actions (${actions.length})`}
-                    {tabCaption === 'Personnes' && `Personnes (${persons.length})`}
-                    {tabCaption === 'Commentaires' && `Commentaires (${comments.length})`}
-                    {tabCaption === 'Lieux' && `Lieux (${places.length})`}
-                    {tabCaption === 'Territoires' && `Territoires (${territories.length})`}
-                    {tabCaption === 'Observations' && `Observations (${observations.length})`}
-                  </button>
-                </li>
-              );
-            })}
-        </ul>
+        <TabsNav
+          className="tw-justify-center tw-px-3 tw-py-2"
+          tabs={[
+            `Actions (${actions.length})`,
+            `Personnes (${persons.length})`,
+            `Commentaires (${comments.length})`,
+            `Lieux (${places.length})`,
+            !!organisation.territoriesEnabled && `Territoires (${territories.length})`,
+            !!organisation.territoriesEnabled && `Observations (${observations.length})`,
+          ].filter(Boolean)}
+          onClick={(tab) => {
+            if (tab.includes('Actions')) setActiveTab('Actions');
+            if (tab.includes('Personnes')) setActiveTab('Personnes');
+            if (tab.includes('Commentaires')) setActiveTab('Commentaires');
+            if (tab.includes('Lieux')) setActiveTab('Lieux');
+            if (tab.includes('Territoires')) setActiveTab('Territoires');
+            if (tab.includes('Observations')) setActiveTab('Observations');
+          }}
+          activeTabIndex={initTabs.findIndex((tab) => tab === activeTab)}
+        />
         <div className="[&_table]:!tw-p0 tw-w-full tw-rounded-lg tw-bg-white tw-py-4 tw-px-8 print:tw-mb-4 [&_.title]:!tw-pb-5">
           {activeTab === 'Actions' && <Actions actions={actions} />}
           {activeTab === 'Personnes' && <Persons persons={persons} />}
