@@ -4,9 +4,9 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { useHistory, useLocation } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { organisationState, userState } from '../../../recoil/auth';
-import { outOfBoundariesDate } from '../../../services/date';
+import { dayjsInstance, outOfBoundariesDate } from '../../../services/date';
 import API from '../../../services/api';
-import { prepareTreatmentForEncryption, treatmentsState } from '../../../recoil/treatments';
+import { allowedTreatmentFieldsInHistory, prepareTreatmentForEncryption, treatmentsState } from '../../../recoil/treatments';
 import DatePicker from '../../../components/DatePicker';
 import { CommentsModule } from '../../../components/CommentsGeneric';
 import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from '../../../components/tailwind/Modal';
@@ -16,6 +16,7 @@ import CustomFieldDisplay from '../../../components/CustomFieldDisplay';
 import UserName from '../../../components/UserName';
 import { DocumentsModule } from '../../../components/DocumentsGeneric';
 import TabsNav from '../../../components/tailwind/TabsNav';
+import PersonName from '../../../components/PersonName';
 
 export default function TreatmentModal() {
   const treatmentsObjects = useRecoilValue(itemsGroupedByTreatmentSelector);
@@ -84,6 +85,7 @@ function TreatmentContent({ onClose, treatment, personId }) {
       return {
         documents: [],
         comments: [],
+        history: [],
         ...treatment,
       };
     }
@@ -100,6 +102,7 @@ function TreatmentContent({ onClose, treatment, personId }) {
       organisation: organisation._id,
       documents: [],
       comments: [],
+      history: [],
     };
   }, [treatment, user, personId, organisation]);
   const [activeTab, setActiveTab] = useState('Informations');
@@ -138,6 +141,23 @@ function TreatmentContent({ onClose, treatment, personId }) {
       toast.error('La date de fin de traitement est hors limites (entre 1900 et 2100)');
       return false;
     }
+
+    if (!isNewTreatment) {
+      const historyEntry = {
+        date: new Date(),
+        user: user._id,
+        data: {},
+      };
+      for (const key in body) {
+        if (!allowedTreatmentFieldsInHistory.map((field) => field.name).includes(key)) continue;
+        if (body[key] !== treatment[key]) historyEntry.data[key] = { oldValue: treatment[key], newValue: body[key] };
+      }
+      if (!!Object.keys(historyEntry.data).length) {
+        const prevHistory = Array.isArray(treatment.history) ? treatment.history : [];
+        body.history = [...prevHistory, historyEntry];
+      }
+    }
+
     const treatmentResponse = isNewTreatment
       ? await API.post({
           path: '/treatment',
@@ -215,13 +235,15 @@ function TreatmentContent({ onClose, treatment, personId }) {
               'Informations',
               `Documents ${data?.documents?.length ? `(${data.documents.length})` : ''}`,
               `Commentaires ${data?.comments?.length ? `(${data.comments.length})` : ''}`,
+              'Historique',
             ]}
             onClick={(tab) => {
               if (tab.includes('Informations')) setActiveTab('Informations');
               if (tab.includes('Documents')) setActiveTab('Documents');
               if (tab.includes('Commentaires')) setActiveTab('Commentaires');
+              if (tab.includes('Historique')) setActiveTab('Historique');
             }}
-            activeTabIndex={['Informations', 'Documents', 'Commentaires'].findIndex((tab) => tab === activeTab)}
+            activeTabIndex={['Informations', 'Documents', 'Commentaires', 'Historique'].findIndex((tab) => tab === activeTab)}
           />
           <form
             id="add-treatment-form"
@@ -378,6 +400,12 @@ function TreatmentContent({ onClose, treatment, personId }) {
               }}
             />
           </div>
+          <div
+            className={['tw-flex tw-h-[50vh] tw-w-full tw-flex-col tw-gap-4 tw-overflow-y-auto', activeTab !== 'Historique' && 'tw-hidden']
+              .filter(Boolean)
+              .join(' ')}>
+            <TreatmentHistory treatment={treatment} />
+          </div>
         </div>
       </ModalBody>
       <ModalFooter>
@@ -427,5 +455,75 @@ function TreatmentContent({ onClose, treatment, personId }) {
         )}
       </ModalFooter>
     </>
+  );
+}
+
+function TreatmentHistory({ treatment }) {
+  const history = useMemo(() => [...(treatment?.history || [])].reverse(), [treatment?.history]);
+
+  return (
+    <div>
+      {!history?.length ? (
+        <div className="tw-py-10 tw-text-center tw-text-gray-300">
+          <p className="tw-text-lg tw-font-bold">Ce traitement n'a pas encore d'historique.</p>
+          <p className="tw-mt-2 tw-text-sm">
+            Lorsqu'un traitement est modifié, les changements sont enregistrés dans un historique,
+            <br />
+            que vous pourrez ainsi retrouver sur cette page.
+          </p>
+        </div>
+      ) : (
+        <table className="table table-striped table-bordered">
+          <thead>
+            <tr className="tw-cursor-default">
+              <th>Date</th>
+              <th>Utilisateur</th>
+              <th>Donnée</th>
+            </tr>
+          </thead>
+          <tbody className="small">
+            {history.map((h) => {
+              return (
+                <tr key={h.date} className="tw-cursor-default">
+                  <td>{dayjsInstance(h.date).format('DD/MM/YYYY HH:mm')}</td>
+                  <td>
+                    <UserName id={h.user} />
+                  </td>
+                  <td className="tw-max-w-prose">
+                    {Object.entries(h.data).map(([key, value]) => {
+                      const treatmentField = allowedTreatmentFieldsInHistory.find((f) => f.name === key);
+
+                      if (key === 'person') {
+                        return (
+                          <p key={key}>
+                            {treatmentField?.label} : <br />
+                            <code>
+                              <PersonName item={{ person: value.oldValue }} />
+                            </code>{' '}
+                            ➔{' '}
+                            <code>
+                              <PersonName item={{ person: value.newValue }} />
+                            </code>
+                          </p>
+                        );
+                      }
+
+                      return (
+                        <p
+                          key={key}
+                          data-test-id={`${treatmentField?.label}: ${JSON.stringify(value.oldValue || '')} ➔ ${JSON.stringify(value.newValue)}`}>
+                          {treatmentField?.label} : <br />
+                          <code>{JSON.stringify(value.oldValue || '')}</code> ➔ <code>{JSON.stringify(value.newValue)}</code>
+                        </p>
+                      );
+                    })}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      )}
+    </div>
   );
 }

@@ -117,6 +117,7 @@ export function MedicalFilePrint({ person }) {
             'createdAt',
             'person',
             'organisation',
+            'history',
           ];
           return (
             <div key={c._id} className="tw-mb-8">

@@ -10,6 +10,16 @@ export const treatmentsState = atom({
 
 const encryptedFields = ['person', 'user', 'startDate', 'endDate', 'name', 'dosage', 'frequency', 'indication', 'documents', 'comments', 'history'];
 
+export const allowedTreatmentFieldsInHistory = [
+  { name: 'person', label: 'Personne suivie' },
+  { name: 'name', label: "Nom de l'action" },
+  { name: 'startDate', label: 'Faite le' },
+  { name: 'endDate', label: 'Faite le' },
+  { name: 'dosage', label: 'Faite le' },
+  { name: 'frequency', label: 'Faite le' },
+  { name: 'indication', label: 'Faite le' },
+];
+
 export const prepareTreatmentForEncryption = (treatment) => {
   try {
     if (!looseUuidRegex.test(treatment.person)) {
