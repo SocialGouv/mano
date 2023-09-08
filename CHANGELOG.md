@@ -1,3 +1,10 @@
+## [1.283.6](https://github.com/SocialGouv/mano/compare/v1.283.5...v1.283.6) (2023-09-08)
+
+
+### Bug Fixes
+
+* **dashboard:** peut modifier la date d'un commentaire directement lors de sa création ([5a96764](https://github.com/SocialGouv/mano/commit/5a9676489a41f6247a5329c24eb87b2dd97dcfe1))
+
 ## [1.283.5](https://github.com/SocialGouv/mano/compare/v1.283.4...v1.283.5) (2023-09-08)
 
 
