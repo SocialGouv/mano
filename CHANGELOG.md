@@ -1,3 +1,10 @@
+## [1.283.8](https://github.com/SocialGouv/mano/compare/v1.283.7...v1.283.8) (2023-09-11)
+
+
+### Bug Fixes
+
+* test passage ([b6ed48a](https://github.com/SocialGouv/mano/commit/b6ed48a35fcb7e4a1cf0b69a3ab800ec593681af))
+
 ## [1.283.7](https://github.com/SocialGouv/mano/compare/v1.283.6...v1.283.7) (2023-09-08)
 
 
