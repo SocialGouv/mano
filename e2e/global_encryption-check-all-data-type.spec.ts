@@ -61,7 +61,7 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Ajouter un passage" }).click();
   await page.getByRole("dialog").getByLabel("Commentaire").fill("le passage");
   await page.getByRole("button", { name: "Enregistrer" }).click();
-  await page.getByText("Passage enregistré").click();
+  await page.getByText("Passage enregistré !").click();
   await page.getByRole("button", { name: "Rencontres (0)" }).click();
   await page.getByRole("button", { name: "Ajouter une rencontre" }).click();
   await page.getByRole("dialog").getByLabel("Commentaire").fill("La rencontre");

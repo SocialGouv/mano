@@ -49,7 +49,7 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Ajouter un passage" }).click();
   await page.getByRole("dialog").getByLabel("Commentaire").fill("test passage");
   await page.getByRole("button", { name: "Enregistrer" }).click();
-  await page.getByText("Passage enregistré").click();
+  await page.getByText("Passage enregistré !").click();
 
   /* ***** comptes rendus ***** */
 
@@ -67,7 +67,7 @@ test("test", async ({ page }) => {
   await page.locator("#react-select-persons-option-0").click();
   await page.getByRole("dialog").getByLabel("Commentaire").fill("ajout passage");
   await page.getByRole("button", { name: "Enregistrer" }).click();
-  await page.getByText("Passages enregistrés").click();
+  await page.getByText("Passages enregistrés !").click();
 
   await page.getByRole("cell", { name: "ajout passage" }).click();
   await page.getByRole("dialog").getByLabel("Commentaire").fill("ajout passage modification");
@@ -247,7 +247,7 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Passages (0)" }).click();
   await page.getByRole("button", { name: "Ajouter un passage" }).click();
   await page.getByRole("button", { name: "Enregistrer" }).click();
-  await page.getByText("Passage enregistré").click();
+  await page.getByText("Passage enregistré !").click();
   await page.getByRole("button", { name: "Rencontres (0)" }).click();
   await page.getByRole("button", { name: "Ajouter une rencontre" }).click();
   await page.getByRole("button", { name: "Enregistrer" }).click();

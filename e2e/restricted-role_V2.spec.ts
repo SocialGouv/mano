@@ -51,7 +51,7 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Ajouter un passage" }).click();
   await page.getByRole("dialog").getByLabel("Commentaire", { exact: true }).fill("passage a voir par restricted");
   await page.getByRole("button", { name: "Enregistrer" }).click();
-  await page.getByText("Passage enregistré").click();
+  await page.getByText("Passage enregistré !").click();
   await page.getByRole("button", { name: "Rencontres (0)" }).click();
   await page.getByRole("button", { name: "Ajouter une rencontre" }).click();
   await page.getByRole("dialog").getByLabel("Commentaire", { exact: true }).fill("idem");
@@ -189,7 +189,7 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Ajouter un passage" }).click();
   await page.getByRole("dialog").getByLabel("Commentaire", { exact: true }).fill("pouvoir ajouter des passage avec commentaires");
   await page.getByRole("button", { name: "Enregistrer" }).click();
-  await page.getByText("Passage enregistré").click();
+  await page.getByText("Passage enregistré !").click();
   await page.getByText("passage a voir par restricted").click();
   await page.getByRole("dialog").getByLabel("Commentaire", { exact: true }).fill("peut modifier le passage");
   await page.getByRole("button", { name: "Enregistrer" }).click();

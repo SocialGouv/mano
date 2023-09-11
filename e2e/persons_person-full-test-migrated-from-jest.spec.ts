@@ -120,7 +120,7 @@ test("test", async ({ page }) => {
   await page.getByLabel("Date").press("Enter");
   await page.getByRole("dialog").getByLabel("Commentaire").fill("hello commentaire passage je veux dire");
   await page.getByRole("button", { name: "Enregistrer" }).click();
-  await page.getByText("Passage enregistré").click();
+  await page.getByText("Passage enregistré !").click();
 
   await page.getByRole("button", { name: "Rencontres (0)" }).click();
   await page.locator("button[aria-label='Ajouter une rencontre']").click();

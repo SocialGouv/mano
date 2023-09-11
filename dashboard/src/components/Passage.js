@@ -109,7 +109,7 @@ const Passage = ({ passage, personId, onFinished }) => {
 
                 setOpen(false);
                 onFinished();
-                toast.success(body.person?.length > 1 ? 'Passage enregistré' : 'Passages enregistrés');
+                toast.success(body.person?.length > 1 ? 'Passage enregistré !' : 'Passages enregistrés !');
                 actions.setSubmitting(false);
                 return;
               }
