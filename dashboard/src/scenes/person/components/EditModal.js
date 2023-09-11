@@ -298,6 +298,21 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
               body.entityKey = medicalFile.entityKey;
               const bodyMedicalFile = body;
 
+              const historyEntry = {
+                date: new Date(),
+                user: user._id,
+                data: {},
+              };
+              for (const key in bodyMedicalFile) {
+                if (!customFieldsMedicalFile.map((field) => field.name).includes(key)) continue;
+                if (bodyMedicalFile[key] !== medicalFile[key]) {
+                  historyEntry.data[key] = { oldValue: medicalFile[key], newValue: bodyMedicalFile[key] };
+                }
+              }
+              if (!!Object.keys(historyEntry.data).length) {
+                bodyMedicalFile.history = [...(medicalFile.history || []), historyEntry];
+              }
+
               const mfResponse = await API.put({
                 path: `/medical-file/${medicalFile._id}`,
                 body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({ ...medicalFile, ...bodyMedicalFile }),
@@ -316,13 +331,27 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
               const structureMedical = flattenedCustomFieldsPersons.find((e) => e.name === 'structureMedical');
               const healthInsurances = flattenedCustomFieldsPersons.find((e) => e.name === 'healthInsurances');
               if (structureMedical || healthInsurances) {
+                const bodySocial = {
+                  ...person,
+                  structureMedical: structureMedical ? body.structureMedical : undefined,
+                  healthInsurances: healthInsurances ? body.healthInsurances : undefined,
+                };
+
+                const historyEntry = {
+                  date: new Date(),
+                  user: user._id,
+                  data: {},
+                };
+                for (const key in bodySocial) {
+                  if (!allowedFieldsInHistory.includes(key)) continue;
+                  if (bodySocial[key] !== person[key]) historyEntry.data[key] = { oldValue: person[key], newValue: bodySocial[key] };
+                  if (!!Object.keys(historyEntry.data).length) bodySocial.history = [...cleanHistory(person.history || []), historyEntry];
+                }
+                if (!!Object.keys(historyEntry.data).length) bodySocial.history = [...(person.history || []), historyEntry];
+
                 const personResponse = await API.put({
                   path: `/person/${person._id}`,
-                  body: preparePersonForEncryption({
-                    ...person,
-                    structureMedical: structureMedical ? body.structureMedical : undefined,
-                    healthInsurances: healthInsurances ? body.healthInsurances : undefined,
-                  }),
+                  body: preparePersonForEncryption(bodySocial),
                 });
                 if (personResponse.ok) {
                   const newPerson = personResponse.decryptedData;

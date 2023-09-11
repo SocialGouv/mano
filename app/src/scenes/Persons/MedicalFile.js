@@ -190,6 +190,20 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
 
   const onUpdateRequest = async (latestMedicalFile) => {
     if (!latestMedicalFile) latestMedicalFile = medicalFile;
+
+    const historyEntry = {
+      date: new Date(),
+      user: user._id,
+      data: {},
+    };
+    for (const key in latestMedicalFile) {
+      if (!customFieldsMedicalFile.map((field) => field.name).includes(key)) continue;
+      if (latestMedicalFile[key] !== medicalFileDB[key]) {
+        historyEntry.data[key] = { oldValue: medicalFileDB[key], newValue: latestMedicalFile[key] };
+      }
+    }
+    if (!!Object.keys(historyEntry.data).length) latestMedicalFile.history = [...(medicalFileDB.history || []), historyEntry];
+
     const response = await API.put({
       path: `/medical-file/${medicalFileDB._id}`,
       body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({ ...medicalFileDB, ...latestMedicalFile }),
@@ -309,7 +323,7 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
       <ButtonsContainer>
         <Button
           caption={editable ? 'Mettre à jour' : 'Modifier'}
-          onPress={editable ? onUpdateRequest : onEdit}
+          onPress={() => (editable ? onUpdateRequest() : onEdit())}
           disabled={editable ? isUpdateDisabled && isMedicalFileUpdateDisabled : false}
           loading={updating}
         />
