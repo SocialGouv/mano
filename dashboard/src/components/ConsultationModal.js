@@ -156,7 +156,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
       body.completedAt = null;
     }
 
-    if (!isNewConsultation) {
+    if (!isNewConsultation && !!consultation) {
       const historyEntry = {
         date: new Date(),
         user: user._id,
