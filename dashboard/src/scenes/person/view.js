@@ -16,11 +16,13 @@ import { organisationState, userState } from '../../recoil/auth';
 import PersonFamily from './PersonFamily';
 import { groupSelector } from '../../recoil/groups';
 import TabsNav from '../../components/tailwind/TabsNav';
+import { useDataLoader } from '../../components/DataLoader';
 
 export default function View() {
   const { personId } = useParams();
   const history = useHistory();
   const location = useLocation();
+  const { refresh } = useDataLoader();
 
   const organisation = useRecoilValue(organisationState);
   const person = useRecoilValue(itemsGroupedByPersonSelector)[personId];
@@ -86,6 +88,7 @@ export default function View() {
                 if (tab.includes('Lieux fréquentés')) setCurrentTab('Lieux fréquentés');
                 if (tab.includes('Historique')) setCurrentTab('Historique');
                 if (tab.includes('Liens familiaux')) setCurrentTab('Liens familiaux');
+                refresh();
               }}
               activeTabIndex={[
                 'Résumé',

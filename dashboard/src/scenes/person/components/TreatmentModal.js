@@ -17,6 +17,7 @@ import UserName from '../../../components/UserName';
 import { DocumentsModule } from '../../../components/DocumentsGeneric';
 import TabsNav from '../../../components/tailwind/TabsNav';
 import PersonName from '../../../components/PersonName';
+import { useDataLoader } from '../../../components/DataLoader';
 
 export default function TreatmentModal() {
   const treatmentsObjects = useRecoilValue(itemsGroupedByTreatmentSelector);
@@ -79,6 +80,7 @@ function TreatmentContent({ onClose, treatment, personId }) {
   const setModalConfirmState = useSetRecoilState(modalConfirmState);
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
+  const { refresh } = useDataLoader();
 
   const initialState = useMemo(() => {
     if (!!treatment) {
@@ -185,6 +187,7 @@ function TreatmentContent({ onClose, treatment, personId }) {
       );
     }
     if (closeOnSubmit) onClose();
+    refresh();
     return true;
   }
 
@@ -242,6 +245,7 @@ function TreatmentContent({ onClose, treatment, personId }) {
               if (tab.includes('Documents')) setActiveTab('Documents');
               if (tab.includes('Commentaires')) setActiveTab('Commentaires');
               if (tab.includes('Historique')) setActiveTab('Historique');
+              refresh();
             }}
             activeTabIndex={['Informations', 'Documents', 'Commentaires', 'Historique'].findIndex((tab) => tab === activeTab)}
           />

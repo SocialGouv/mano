@@ -30,6 +30,7 @@ import CustomFieldDisplay from './CustomFieldDisplay';
 import { itemsGroupedByConsultationSelector } from '../recoil/selectors';
 import { DocumentsModule } from './DocumentsGeneric';
 import TabsNav from './tailwind/TabsNav';
+import { useDataLoader } from './DataLoader';
 
 export default function ConsultationModal() {
   const consultationsObjects = useRecoilValue(itemsGroupedByConsultationSelector);
@@ -90,6 +91,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
   const setAllConsultations = useSetRecoilState(consultationsState);
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
   const consultationsFieldsIncludingCustomFields = useRecoilValue(consultationsFieldsIncludingCustomFieldsSelector);
+  const { refresh } = useDataLoader();
 
   const [isEditing, setIsEditing] = useState(!consultation);
 
@@ -201,6 +203,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
       }
     }
     if (closeOnSubmit) onClose();
+    refresh();
     return true;
   }
 
@@ -275,6 +278,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
               if (tab.includes('Documents')) setActiveTab('Documents');
               if (tab.includes('Commentaires')) setActiveTab('Commentaires');
               if (tab.includes('Historique')) setActiveTab('Historique');
+              refresh();
             }}
             activeTabIndex={['Informations', 'Documents', 'Commentaires', 'Historique'].findIndex((tab) => tab === activeTab)}
           />

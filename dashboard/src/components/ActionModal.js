@@ -377,6 +377,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                 if (tab.includes('Informations')) setActiveTab('Informations');
                 if (tab.includes('Commentaires')) setActiveTab('Commentaires');
                 if (tab.includes('Historique')) setActiveTab('Historique');
+                refresh();
               }}
               activeTabIndex={['Informations', 'Commentaires', 'Historique'].findIndex((tab) => tab === activeTab)}
             />
