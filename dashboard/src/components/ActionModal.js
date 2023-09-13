@@ -697,78 +697,78 @@ function ActionHistory({ action }) {
   const history = useMemo(() => [...(action?.history || [])].reverse(), [action?.history]);
   const teams = useRecoilValue(teamsState);
 
+  console.log({ action });
+
   return (
     <div>
-      {!history?.length ? (
-        <div className="tw-py-10 tw-text-center tw-text-gray-300">
-          <p className="tw-text-lg tw-font-bold">Cette action n'a pas encore d'historique.</p>
-          <p className="tw-mt-2 tw-text-sm">
-            Lorsqu'une action est modifiée, les changements sont enregistrés dans un historique,
-            <br />
-            que vous pourrez ainsi retrouver sur cette page.
-          </p>
-        </div>
-      ) : (
-        <table className="table table-striped table-bordered">
-          <thead>
-            <tr className="tw-cursor-default">
-              <th>Date</th>
-              <th>Utilisateur</th>
-              <th>Donnée</th>
-            </tr>
-          </thead>
-          <tbody className="small">
-            {history.map((h) => {
-              return (
-                <tr key={h.date} className="tw-cursor-default">
-                  <td>{dayjsInstance(h.date).format('DD/MM/YYYY HH:mm')}</td>
-                  <td>
-                    <UserName id={h.user} />
-                  </td>
-                  <td className="tw-max-w-prose">
-                    {Object.entries(h.data).map(([key, value]) => {
-                      const actionField = allowedActionFieldsInHistory.find((f) => f.name === key);
-                      if (key === 'teams') {
-                        return (
-                          <p className="tw-flex tw-flex-col" key={key}>
-                            <span>{actionField?.label} : </span>
-                            <code>"{(value.oldValue || []).map((teamId) => teams.find((t) => t._id === teamId)?.name).join(', ')}"</code>
-                            <span>↓</span>
-                            <code>"{(value.newValue || []).map((teamId) => teams.find((t) => t._id === teamId)?.name).join(', ')}"</code>
-                          </p>
-                        );
-                      }
-                      if (key === 'person') {
-                        return (
-                          <p key={key}>
-                            {actionField?.label} : <br />
-                            <code>
-                              <PersonName item={{ person: value.oldValue }} />
-                            </code>{' '}
-                            ➔{' '}
-                            <code>
-                              <PersonName item={{ person: value.newValue }} />
-                            </code>
-                          </p>
-                        );
-                      }
-
+      <table className="table table-striped table-bordered">
+        <thead>
+          <tr className="tw-cursor-default">
+            <th>Date</th>
+            <th>Utilisateur</th>
+            <th>Donnée</th>
+          </tr>
+        </thead>
+        <tbody className="small">
+          {history.map((h) => {
+            return (
+              <tr key={h.date} className="tw-cursor-default">
+                <td>{dayjsInstance(h.date).format('DD/MM/YYYY HH:mm')}</td>
+                <td>
+                  <UserName id={h.user} />
+                </td>
+                <td className="tw-max-w-prose">
+                  {Object.entries(h.data).map(([key, value]) => {
+                    const actionField = allowedActionFieldsInHistory.find((f) => f.name === key);
+                    if (key === 'teams') {
                       return (
-                        <p
-                          key={key}
-                          data-test-id={`${actionField?.label}: ${JSON.stringify(value.oldValue || '')} ➔ ${JSON.stringify(value.newValue)}`}>
-                          {actionField?.label} : <br />
-                          <code>{JSON.stringify(value.oldValue || '')}</code> ➔ <code>{JSON.stringify(value.newValue)}</code>
+                        <p className="tw-flex tw-flex-col" key={key}>
+                          <span>{actionField?.label} : </span>
+                          <code>"{(value.oldValue || []).map((teamId) => teams.find((t) => t._id === teamId)?.name).join(', ')}"</code>
+                          <span>↓</span>
+                          <code>"{(value.newValue || []).map((teamId) => teams.find((t) => t._id === teamId)?.name).join(', ')}"</code>
                         </p>
                       );
-                    })}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      )}
+                    }
+                    if (key === 'person') {
+                      return (
+                        <p key={key}>
+                          {actionField?.label} : <br />
+                          <code>
+                            <PersonName item={{ person: value.oldValue }} />
+                          </code>{' '}
+                          ➔{' '}
+                          <code>
+                            <PersonName item={{ person: value.newValue }} />
+                          </code>
+                        </p>
+                      );
+                    }
+
+                    return (
+                      <p
+                        key={key}
+                        data-test-id={`${actionField?.label}: ${JSON.stringify(value.oldValue || '')} ➔ ${JSON.stringify(value.newValue)}`}>
+                        {actionField?.label} : <br />
+                        <code>{JSON.stringify(value.oldValue || '')}</code> ➔ <code>{JSON.stringify(value.newValue)}</code>
+                      </p>
+                    );
+                  })}
+                </td>
+              </tr>
+            );
+          })}
+          <tr key={action.createdAt} className="tw-cursor-default">
+            <td>{dayjsInstance(action.createdAt).format('DD/MM/YYYY HH:mm')}</td>
+            <td>
+              <UserName id={action.user} />
+            </td>
+            <td className="tw-max-w-prose">
+              <p>Création de l'action</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   );
 }
