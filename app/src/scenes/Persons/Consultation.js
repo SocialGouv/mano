@@ -14,7 +14,12 @@ import DocumentsManager from '../../components/DocumentsManager';
 import Spacer from '../../components/Spacer';
 import Label from '../../components/Label';
 import ActionStatusSelect from '../../components/Selects/ActionStatusSelect';
-import { consultationsState, encryptedFields, prepareConsultationForEncryption } from '../../recoil/consultations';
+import {
+  consultationsFieldsIncludingCustomFieldsSelector,
+  consultationsState,
+  encryptedFields,
+  prepareConsultationForEncryption,
+} from '../../recoil/consultations';
 import ConsultationTypeSelect from '../../components/Selects/ConsultationTypeSelect';
 import CustomFieldInput from '../../components/CustomFieldInput';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
@@ -40,6 +45,7 @@ const Consultation = ({ navigation, route }) => {
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
   const person = route?.params?.personDB || route?.params?.person;
+  const consultationsFieldsIncludingCustomFields = useRecoilValue(consultationsFieldsIncludingCustomFieldsSelector);
 
   const consultationDB = useMemo(() => {
     if (route?.params?.consultationDB?._id) {
@@ -137,12 +143,28 @@ const Consultation = ({ navigation, route }) => {
       } else {
         consultationToSave.completedAt = null;
       }
+
+      if (!isNew) {
+        const historyEntry = {
+          date: new Date(),
+          user: user._id,
+          data: {},
+        };
+        for (const key in consultationToSave) {
+          if (!consultationsFieldsIncludingCustomFields.map((field) => field.name).includes(key)) continue;
+          if (consultationToSave[key] !== consultationDB[key]) {
+            historyEntry.data[key] = { oldValue: consultationDB[key], newValue: consultationToSave[key] };
+          }
+        }
+        if (!!Object.keys(historyEntry.data).length) consultationToSave.history = [...(consultationDB.history || []), historyEntry];
+      }
+
       const body = prepareConsultationForEncryption(organisation.consultations)({
         ...consultationToSave,
         teams: isNew ? [currentTeam._id] : consultationToSave.teams,
         _id: consultationDB?._id,
       });
-      console.log('body', body);
+
       const consultationResponse = isNew
         ? await API.post({ path: '/consultation', body })
         : await API.put({ path: `/consultation/${consultationDB._id}`, body });

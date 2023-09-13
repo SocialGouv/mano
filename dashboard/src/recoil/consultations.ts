@@ -1,10 +1,11 @@
-import { atom } from 'recoil';
+import { atom, selector } from 'recoil';
 import { looseUuidRegex } from '../utils';
 import { toast } from 'react-toastify';
 import { capture } from '../services/sentry';
 import type { ConsultationInstance } from '../types/consultation';
 import type { CustomFieldsGroup } from '../types/field';
 import type { UserInstance } from '../types/user';
+import { organisationState } from './auth';
 
 const collectionName = 'consultation';
 export const consultationsState = atom<ConsultationInstance[]>({
@@ -12,7 +13,54 @@ export const consultationsState = atom<ConsultationInstance[]>({
   default: [],
 });
 
-const encryptedFields: Array<keyof ConsultationInstance> = ['name', 'type', 'person', 'user', 'teams', 'documents', 'comments'];
+const encryptedFields: Array<keyof ConsultationInstance> = ['name', 'type', 'person', 'user', 'teams', 'documents', 'comments', 'history'];
+
+export const consultationFieldsSelector = selector({
+  key: 'consultationFieldsSelector',
+  get: ({ get }) => {
+    const organisation = get(organisationState);
+    return organisation?.consultations || [];
+  },
+});
+
+export const flattenedCustomFieldsConsultationsSelector = selector({
+  key: 'flattenedCustomFieldsConsultationsSelector',
+  get: ({ get }) => {
+    const customFieldsConsultationsSections = get(consultationFieldsSelector);
+    const customFieldsConsultations = [];
+    for (const section of customFieldsConsultationsSections) {
+      for (const field of section.fields) {
+        customFieldsConsultations.push(field);
+      }
+    }
+    return customFieldsConsultations;
+  },
+});
+
+/* Other utils selector */
+
+export const consultationsFieldsIncludingCustomFieldsSelector = selector({
+  key: 'consultationsFieldsIncludingCustomFieldsSelector',
+  get: ({ get }) => {
+    const flattenedCustomFieldsConsultations = get(flattenedCustomFieldsConsultationsSelector);
+    return [
+      { name: 'name', label: 'Nom' },
+      { name: 'type', label: 'Type' },
+      { name: 'onlyVisibleBy', label: 'Seulement visible par moi' },
+      { name: 'person', label: 'Personne suivie' },
+      { name: 'teams', label: ':Equipe(s) en charge' },
+      { name: 'completedAt', label: 'Faite le' },
+      { name: 'dueAt', label: 'À faire le' },
+      { name: 'status', label: 'Status' },
+      ...flattenedCustomFieldsConsultations.map((f) => {
+        return {
+          name: f.name,
+          label: f.label,
+        };
+      }),
+    ];
+  },
+});
 
 export const prepareConsultationForEncryption =
   (customFieldsConsultations: CustomFieldsGroup[]) =>
