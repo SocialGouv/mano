@@ -82,6 +82,24 @@ export default function ConsultationModal() {
   );
 }
 
+const newConsultationInitialState = (organisationId, personId, userId, date, teams) => ({
+  _id: null,
+  dueAt: date ? new Date(date) : new Date(),
+  completedAt: new Date(),
+  name: '',
+  type: '',
+  status: TODO,
+  teams: teams.length === 1 ? [teams[0]._id] : [],
+  user: userId,
+  person: personId || null,
+  organisation: organisationId,
+  onlyVisibleBy: [],
+  documents: [],
+  comments: [],
+  history: [],
+  createdAt: new Date(),
+});
+
 function ConsultationContent({ personId, consultation, date, onClose }) {
   const organisation = useRecoilValue(organisationState);
   const teams = useRecoilValue(teamsState);
@@ -92,6 +110,8 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
   const consultationsFieldsIncludingCustomFields = useRecoilValue(consultationsFieldsIncludingCustomFieldsSelector);
   const { refresh } = useDataLoader();
+
+  const newConsultationInitialStateRef = useRef(newConsultationInitialState(organisation._id, personId, user._id, date, teams));
 
   const [isEditing, setIsEditing] = useState(!consultation);
 
@@ -105,24 +125,8 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
         ...consultation,
       };
     }
-    return {
-      _id: null,
-      dueAt: date ? new Date(date) : new Date(),
-      completedAt: new Date(),
-      name: '',
-      type: '',
-      status: TODO,
-      teams: teams.length === 1 ? [teams[0]._id] : [],
-      user: user._id,
-      person: personId || null,
-      organisation: organisation._id,
-      onlyVisibleBy: [],
-      documents: [],
-      comments: [],
-      history: [],
-      createdAt: new Date(),
-    };
-  }, [organisation._id, personId, user._id, consultation, date, teams]);
+    return newConsultationInitialStateRef.current;
+  }, [consultation, teams]);
 
   const [data, setData] = useState(initialState);
 

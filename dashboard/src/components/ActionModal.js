@@ -80,6 +80,26 @@ export default function ActionModal() {
   );
 }
 
+const newActionInitialState = (organisationId, personId, userId, dueAt, completedAt, teams, isMulti, personIds) => ({
+  _id: null,
+  dueAt: dueAt || (!!completedAt ? new Date(completedAt) : new Date()),
+  withTime: false,
+  completedAt,
+  status: !!completedAt ? DONE : TODO,
+  teams: teams.length === 1 ? [teams[0]._id] : [],
+  user: userId,
+  person: isMulti ? personIds : personId,
+  organisation: organisationId,
+  categories: [],
+  name: '',
+  description: '',
+  urgent: false,
+  group: false,
+  createdAt: new Date(),
+  comment: '',
+  commentUrgent: false,
+});
+
 function ActionContent({ onClose, action, personId = null, personIds = null, isMulti = false, completedAt = null, dueAt = null }) {
   const teams = useRecoilValue(teamsState);
   const user = useRecoilValue(userState);
@@ -94,28 +114,14 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { refresh } = useDataLoader();
 
+  const newActionInitialStateRef = useRef(
+    newActionInitialState(organisation?._id, personId, user?._id, dueAt, completedAt, teams, isMulti, personIds)
+  );
+
   const initialState = useMemo(() => {
     if (action) return action;
-    return {
-      _id: null,
-      dueAt: dueAt || (!!completedAt ? new Date(completedAt) : new Date()),
-      withTime: false,
-      completedAt,
-      status: !!completedAt ? DONE : TODO,
-      teams: teams.length === 1 ? [teams[0]._id] : [],
-      user: user._id,
-      person: isMulti ? personIds : personId,
-      organisation: organisation._id,
-      categories: [],
-      name: '',
-      description: '',
-      urgent: false,
-      group: false,
-      createdAt: new Date(),
-      comment: '',
-      commentUrgent: false,
-    };
-  }, [organisation?._id, personId, user?._id, action, dueAt, completedAt, teams, isMulti, personIds]);
+    return newActionInitialStateRef.current;
+  }, [action]);
 
   const [data, setData] = useState(initialState);
   const isNewAction = !data._id;

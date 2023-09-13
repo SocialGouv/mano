@@ -75,12 +75,33 @@ export default function TreatmentModal() {
  * @param {Object} props.person
  */
 
+// if we create those objects within the component,
+// it will be re-created on each dependency change
+// and intialState will be re-created on each dependency change
+const newTreatmentInitialState = (user, personId, organisation) => ({
+  _id: null,
+  startDate: new Date(),
+  endDate: null,
+  name: '',
+  dosage: '',
+  frequency: '',
+  indication: '',
+  user: user._id,
+  person: personId,
+  organisation: organisation._id,
+  documents: [],
+  comments: [],
+  history: [],
+});
+
 function TreatmentContent({ onClose, treatment, personId }) {
   const setAllTreatments = useSetRecoilState(treatmentsState);
   const setModalConfirmState = useSetRecoilState(modalConfirmState);
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
   const { refresh } = useDataLoader();
+
+  const newTreatmentInitialStateRef = useRef(newTreatmentInitialState(user, personId, organisation));
 
   const initialState = useMemo(() => {
     if (!!treatment) {
@@ -91,22 +112,9 @@ function TreatmentContent({ onClose, treatment, personId }) {
         ...treatment,
       };
     }
-    return {
-      _id: null,
-      startDate: new Date(),
-      endDate: null,
-      name: '',
-      dosage: '',
-      frequency: '',
-      indication: '',
-      user: user._id,
-      person: personId,
-      organisation: organisation._id,
-      documents: [],
-      comments: [],
-      history: [],
-    };
-  }, [treatment, user, personId, organisation]);
+    return newTreatmentInitialStateRef.current;
+  }, [treatment]);
+
   const [activeTab, setActiveTab] = useState('Informations');
   const [data, setData] = useState(initialState);
   const isNewTreatment = !data?._id;
@@ -175,15 +183,13 @@ function TreatmentContent({ onClose, treatment, personId }) {
     }
     setData(treatmentResponse.decryptedData);
     if (isNewTreatment) {
-      setAllTreatments((all) => [...all, treatmentResponse.decryptedData].sort((a, b) => new Date(b.startDate) - new Date(a.startDate)));
+      setAllTreatments((all) => [...all, treatmentResponse.decryptedData]);
     } else {
       setAllTreatments((all) =>
-        all
-          .map((c) => {
-            if (c._id === data._id) return treatmentResponse.decryptedData;
-            return c;
-          })
-          .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
+        all.map((c) => {
+          if (c._id === data._id) return treatmentResponse.decryptedData;
+          return c;
+        })
       );
     }
     if (closeOnSubmit) onClose();
