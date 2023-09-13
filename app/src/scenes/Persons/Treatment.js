@@ -8,7 +8,7 @@ import ScreenTitle from '../../components/ScreenTitle';
 import InputLabelled from '../../components/InputLabelled';
 import Button from '../../components/Button';
 import API from '../../services/api';
-import { prepareTreatmentForEncryption, treatmentsState } from '../../recoil/treatments';
+import { allowedTreatmentFieldsInHistory, prepareTreatmentForEncryption, treatmentsState } from '../../recoil/treatments';
 import DateAndTimeInput from '../../components/DateAndTimeInput';
 import DocumentsManager from '../../components/DocumentsManager';
 import Spacer from '../../components/Spacer';
@@ -63,7 +63,7 @@ const Treatment = ({ navigation, route }) => {
     if (!startDate) return Alert.alert('Veuillez indiquer une date de début');
     Keyboard.dismiss();
     setPosting(true);
-    const body = prepareTreatmentForEncryption({
+    const body = {
       name,
       dosage,
       frequency,
@@ -74,9 +74,27 @@ const Treatment = ({ navigation, route }) => {
       documents,
       comments,
       user: treatmentDB?.user ?? user._id,
-      history: treatmentDB?.history ?? user._id,
-    });
-    const treatmentResponse = isNew ? await API.post({ path: '/treatment', body }) : await API.put({ path: `/treatment/${treatmentDB._id}`, body });
+    };
+
+    if (!isNew) {
+      const historyEntry = {
+        date: new Date(),
+        user: user._id,
+        data: {},
+      };
+      for (const key in body) {
+        if (!allowedTreatmentFieldsInHistory.map((field) => field.name).includes(key)) continue;
+        if (body[key] !== treatmentDB[key]) historyEntry.data[key] = { oldValue: treatmentDB[key], newValue: body[key] };
+      }
+      if (!!Object.keys(historyEntry.data).length) {
+        const prevHistory = Array.isArray(treatmentDB.history) ? treatmentDB.history : [];
+        body.history = [...prevHistory, historyEntry];
+      }
+    }
+
+    const treatmentResponse = isNew
+      ? await API.post({ path: '/treatment', body: prepareTreatmentForEncryption(body) })
+      : await API.put({ path: `/treatment/${treatmentDB._id}`, body: prepareTreatmentForEncryption(body) });
     if (!treatmentResponse.ok) return false;
     if (isNew) {
       setAllTreatments((all) => [...all, treatmentResponse.decryptedData].sort((a, b) => new Date(b.startDate) - new Date(a.startDate)));
