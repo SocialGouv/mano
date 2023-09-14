@@ -1,3 +1,10 @@
+# [1.284.0](https://github.com/SocialGouv/mano/compare/v1.283.8...v1.284.0) (2023-09-14)
+
+
+### Features
+
+* historique pour les actions, consultations, traitements et dossier médical ([#1648](https://github.com/SocialGouv/mano/issues/1648)) ([3ed90d8](https://github.com/SocialGouv/mano/commit/3ed90d812d452508b5404596ae6bbb97255b3240)), closes [#1651](https://github.com/SocialGouv/mano/issues/1651) [#1652](https://github.com/SocialGouv/mano/issues/1652) [#1654](https://github.com/SocialGouv/mano/issues/1654)
+
 ## [1.283.8](https://github.com/SocialGouv/mano/compare/v1.283.7...v1.283.8) (2023-09-11)
 
 
