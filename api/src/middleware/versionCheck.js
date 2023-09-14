@@ -28,7 +28,7 @@ module.exports = ({ headers: { version, platform } }, res, next) => {
         inAppMessage: [
           `Veuillez mettre à jour votre application\u00A0!`,
           `Les fonctionnalités de cette nouvelle version sont\u00A0:
-- Compatibilité de l 'historique des actions (seulement sur navigateur)`,
+- Compatibilité de l 'historique des actions, consultations, traitements et dossier médical (seulement consultable sur navigateur)`,
           [{ text: "Télécharger la dernière version", link: `https://mano-app.fabrique.social.gouv.fr/download?ts=${Date.now()}` }],
         ],
       });
