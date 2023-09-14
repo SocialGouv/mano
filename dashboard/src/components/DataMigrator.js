@@ -444,7 +444,11 @@ export default function useDataMigrator() {
           commentIdsToDelete.push(comment._id);
         }
 
-        const encryptedActionsToUpdate = await Promise.all(Object.values(actionsToUpdate).map(prepareActionForEncryption).map(encryptItem));
+        const encryptedActionsToUpdate = await Promise.all(
+          Object.values(actionsToUpdate)
+            .map((action) => prepareActionForEncryption(action, { checkRequiredFields: false }))
+            .map(encryptItem)
+        );
 
         const response = await API.put({
           path: `/migration/integrate-comments-in-actions-history`,
