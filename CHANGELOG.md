@@ -1,3 +1,10 @@
+## [1.284.1](https://github.com/SocialGouv/mano/compare/v1.284.0...v1.284.1) (2023-09-14)
+
+
+### Bug Fixes
+
+* checkRequiredFields false on migration ([89854a3](https://github.com/SocialGouv/mano/commit/89854a34914e859152041a7847ee8d982d3ca564))
+
 # [1.284.0](https://github.com/SocialGouv/mano/compare/v1.283.8...v1.284.0) (2023-09-14)
 
 
