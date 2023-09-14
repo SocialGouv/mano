@@ -36,7 +36,7 @@ test("Traitement", async ({ page }) => {
     .getByRole("dialog", { name: "Traitement: Paracétamol (créée par User Admin Test - 1)" })
     .getByRole("button", { name: "Historique" })
     .click();
-  await page.getByText("Ce traitement n'a pas encore d'historique.Lorsqu'un traitement est modifié, les ").click();
+  await page.getByText("Création du traitement").click();
   await page.getByRole("button", { name: "Informations" }).click();
   await page.getByTitle("Modifier ce traitement - seul le créateur peut modifier un traitement").click();
   await page.getByPlaceholder("1mg").click();
