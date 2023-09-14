@@ -20,7 +20,9 @@ ENV SENTRY_ORG=incubateur
 ENV SENTRY_URL=https://sentry.fabrique.social.gouv.fr/
 ENV SENTRY_PROJECT=mano
 
-RUN yarn build
+RUN --mount=type=secret,id=sentry_auth_token export SENTRY_AUTH_TOKEN=$(cat /run/secrets/sentry_auth_token); \
+  yarn build && \
+  yarn sentry:sourcemaps
 
 FROM ghcr.io/socialgouv/docker/nginx4spa:7.0.1
 

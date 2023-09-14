@@ -62,6 +62,8 @@ jobs:
     build-dashboard:
       use: build
       with:
+        secrets:
+          sentry_auth_token: ${{ secrets.SENTRY_AUTH_TOKEN }}
         imagePackage: dashboard
         dockerfile: dashboard/Dockerfile
         context: "."
