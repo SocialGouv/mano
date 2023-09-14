@@ -60,7 +60,6 @@ test("test", async ({ page }) => {
   await page.getByRole("dialog", { name: "Consultation (créée par User Admin Test - 1)" }).getByText("Fermer").click();
   await page.getByText("Fermer").first().click();
   await page.getByRole("button", { name: "Ajouter un traitement" }).click();
-  await page.getByPlaceholder("Amoxicilline").click();
   await page.getByPlaceholder("Amoxicilline").fill("Aspirine");
   await page.getByRole("button", { name: "Commentaires", exact: true }).click();
   await page.getByRole("button", { name: "Informations" }).click();

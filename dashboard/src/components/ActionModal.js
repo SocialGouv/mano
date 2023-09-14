@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { useHistory, useLocation } from 'react-router-dom';
-import { actionsState, CANCEL, DONE, mappedIdsToLabels, prepareActionForEncryption, TODO } from '../recoil/actions';
+import { actionsState, allowedActionFieldsInHistory, CANCEL, DONE, prepareActionForEncryption, TODO } from '../recoil/actions';
 import { currentTeamState, organisationState, teamsState, userState } from '../recoil/auth';
 import { dayjsInstance, now, outOfBoundariesDate } from '../services/date';
 import API from '../services/api';
@@ -80,7 +80,27 @@ export default function ActionModal() {
   );
 }
 
-const ActionContent = ({ onClose, action, personId = null, personIds = null, isMulti = false, completedAt = null, dueAt = null }) => {
+const newActionInitialState = (organisationId, personId, userId, dueAt, completedAt, teams, isMulti, personIds) => ({
+  _id: null,
+  dueAt: dueAt || (!!completedAt ? new Date(completedAt) : new Date()),
+  withTime: false,
+  completedAt,
+  status: !!completedAt ? DONE : TODO,
+  teams: teams.length === 1 ? [teams[0]._id] : [],
+  user: userId,
+  person: isMulti ? personIds : personId,
+  organisation: organisationId,
+  categories: [],
+  name: '',
+  description: '',
+  urgent: false,
+  group: false,
+  createdAt: new Date(),
+  comment: '',
+  commentUrgent: false,
+});
+
+function ActionContent({ onClose, action, personId = null, personIds = null, isMulti = false, completedAt = null, dueAt = null }) {
   const teams = useRecoilValue(teamsState);
   const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
@@ -94,28 +114,14 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { refresh } = useDataLoader();
 
+  const newActionInitialStateRef = useRef(
+    newActionInitialState(organisation?._id, personId, user?._id, dueAt, completedAt, teams, isMulti, personIds)
+  );
+
   const initialState = useMemo(() => {
     if (action) return action;
-    return {
-      _id: null,
-      dueAt: dueAt || (!!completedAt ? new Date(completedAt) : new Date()),
-      withTime: false,
-      completedAt,
-      status: !!completedAt ? DONE : TODO,
-      teams: teams.length === 1 ? [teams[0]._id] : [],
-      user: user._id,
-      person: isMulti ? personIds : personId,
-      organisation: organisation._id,
-      categories: [],
-      name: '',
-      description: '',
-      urgent: false,
-      group: false,
-      createdAt: new Date(),
-      comment: '',
-      commentUrgent: false,
-    };
-  }, [organisation?._id, personId, user?._id, action, dueAt, completedAt, teams, isMulti, personIds]);
+    return newActionInitialStateRef.current;
+  }, [action]);
 
   const [data, setData] = useState(initialState);
   const isNewAction = !data._id;
@@ -227,7 +233,7 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
       return;
     }
     setActions((actions) => [response.decryptedData, ...actions]);
-    for (let c of action.comments.filter((c) => c.action === action._id).filter((c) => !c.comment.includes('a changé le status'))) {
+    for (let c of action.comments.filter((c) => c.action === action._id)) {
       const body = {
         comment: c.comment,
         action: response.decryptedData._id,
@@ -282,6 +288,18 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
     if (!body.dueAt) body.dueAt = data.completedAt || new Date();
 
     delete body.team;
+
+    const historyEntry = {
+      date: new Date(),
+      user: user._id,
+      data: {},
+    };
+    for (const key in body) {
+      if (!allowedActionFieldsInHistory.map((field) => field.name).includes(key)) continue;
+      if (body[key] !== action[key]) historyEntry.data[key] = { oldValue: action[key], newValue: body[key] };
+    }
+    if (!!Object.keys(historyEntry.data).length) body.history = [...(action.history || []), historyEntry];
+
     const actionResponse = await API.put({
       path: `/action/${action._id}`,
       body: prepareActionForEncryption({ ...body, user: data.user || user._id }),
@@ -299,17 +317,6 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
       if (dayjsInstance(newAction.completedAt).format('YYYY-MM-DD') !== dayjsInstance(newAction.createdAt).format('YYYY-MM-DD')) {
         await createReportAtDateIfNotExist(newAction.completedAt);
       }
-    }
-    if (statusChanged) {
-      const comment = {
-        comment: `${user.name} a changé le status de l'action: ${mappedIdsToLabels.find((status) => status._id === newAction.status)?.name}`,
-        action: action._id,
-        team: currentTeam._id,
-        user: user._id,
-        organisation: organisation._id,
-      };
-      const commentResponse = await API.post({ path: '/comment', body: prepareCommentForEncryption(comment) });
-      if (commentResponse.ok) setComments((comments) => [commentResponse.decryptedData, ...comments]);
     }
     toast.success('Mise à jour !');
     if (location.pathname !== '/stats') refresh(); // if we refresh when we're on stats page, it will remove the view we're on
@@ -371,12 +378,14 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
           {!['restricted-access'].includes(user.role) && data?._id && (
             <TabsNav
               className="tw-px-3 tw-py-2"
-              tabs={['Informations', `Commentaires ${data?.comments?.length ? `(${data.comments.length})` : ''}`]}
+              tabs={['Informations', `Commentaires ${data?.comments?.length ? `(${data.comments.length})` : ''}`, 'Historique']}
               onClick={(tab, index) => {
-                if (index === 0) setActiveTab('Informations');
-                if (index === 1) setActiveTab('Commentaires');
+                if (tab.includes('Informations')) setActiveTab('Informations');
+                if (tab.includes('Commentaires')) setActiveTab('Commentaires');
+                if (tab.includes('Historique')) setActiveTab('Historique');
+                refresh();
               }}
-              activeTabIndex={['Informations', 'Commentaires'].findIndex((tab) => tab === activeTab)}
+              activeTabIndex={['Informations', 'Commentaires', 'Historique'].findIndex((tab) => tab === activeTab)}
             />
           )}
           <div
@@ -645,6 +654,12 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
               />
             </div>
           )}
+          <div
+            className={['tw-flex tw-w-full tw-flex-col tw-gap-4 tw-overflow-y-auto sm:tw-h-[50vh]', activeTab !== 'Historique' && 'tw-hidden']
+              .filter(Boolean)
+              .join(' ')}>
+            <ActionHistory action={action} />
+          </div>
         </form>
       </ModalBody>
       <ModalFooter>
@@ -676,4 +691,86 @@ const ActionContent = ({ onClose, action, personId = null, personIds = null, isM
       </ModalFooter>
     </>
   );
-};
+}
+
+function ActionHistory({ action }) {
+  const history = useMemo(() => [...(action?.history || [])].reverse(), [action?.history]);
+  const teams = useRecoilValue(teamsState);
+
+  console.log({ action });
+
+  return (
+    <div>
+      <table className="table table-striped table-bordered">
+        <thead>
+          <tr className="tw-cursor-default">
+            <th>Date</th>
+            <th>Utilisateur</th>
+            <th>Donnée</th>
+          </tr>
+        </thead>
+        <tbody className="small">
+          {history.map((h) => {
+            return (
+              <tr key={h.date} className="tw-cursor-default">
+                <td>{dayjsInstance(h.date).format('DD/MM/YYYY HH:mm')}</td>
+                <td>
+                  <UserName id={h.user} />
+                </td>
+                <td className="tw-max-w-prose">
+                  {Object.entries(h.data).map(([key, value]) => {
+                    const actionField = allowedActionFieldsInHistory.find((f) => f.name === key);
+                    if (key === 'teams') {
+                      return (
+                        <p className="tw-flex tw-flex-col" key={key}>
+                          <span>{actionField?.label} : </span>
+                          <code>"{(value.oldValue || []).map((teamId) => teams.find((t) => t._id === teamId)?.name).join(', ')}"</code>
+                          <span>↓</span>
+                          <code>"{(value.newValue || []).map((teamId) => teams.find((t) => t._id === teamId)?.name).join(', ')}"</code>
+                        </p>
+                      );
+                    }
+                    if (key === 'person') {
+                      return (
+                        <p key={key}>
+                          {actionField?.label} : <br />
+                          <code>
+                            <PersonName item={{ person: value.oldValue }} />
+                          </code>{' '}
+                          ➔{' '}
+                          <code>
+                            <PersonName item={{ person: value.newValue }} />
+                          </code>
+                        </p>
+                      );
+                    }
+
+                    return (
+                      <p
+                        key={key}
+                        data-test-id={`${actionField?.label}: ${JSON.stringify(value.oldValue || '')} ➔ ${JSON.stringify(value.newValue)}`}>
+                        {actionField?.label} : <br />
+                        <code>{JSON.stringify(value.oldValue || '')}</code> ➔ <code>{JSON.stringify(value.newValue)}</code>
+                      </p>
+                    );
+                  })}
+                </td>
+              </tr>
+            );
+          })}
+          {!!action?.createdAt && (
+            <tr key={action.createdAt} className="tw-cursor-default">
+              <td>{dayjsInstance(action.createdAt).format('DD/MM/YYYY HH:mm')}</td>
+              <td>
+                <UserName id={action.user} />
+              </td>
+              <td className="tw-max-w-prose">
+                <p>Création de l'action</p>
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}

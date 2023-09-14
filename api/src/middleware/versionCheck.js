@@ -1,6 +1,6 @@
 const { VERSION, MINIMUM_DASHBOARD_VERSION } = require("../config");
 
-const MINIMUM_MOBILE_APP_VERSION = [2, 35, 0];
+const MINIMUM_MOBILE_APP_VERSION = [2, 37, 0];
 
 module.exports = ({ headers: { version, platform } }, res, next) => {
   if (platform === "website") return next();
@@ -28,8 +28,7 @@ module.exports = ({ headers: { version, platform } }, res, next) => {
         inAppMessage: [
           `Veuillez mettre à jour votre application\u00A0!`,
           `Les fonctionnalités de cette nouvelle version sont\u00A0:
-- Compatibilité avec les consultations par équipe
-- Possibilité de rajouter des commentaires dans les consultations, les traitements et les dossiers médicaux`,
+- Compatibilité de l 'historique des actions, consultations, traitements et dossier médical (seulement consultable sur navigateur)`,
           [{ text: "Télécharger la dernière version", link: `https://mano-app.fabrique.social.gouv.fr/download?ts=${Date.now()}` }],
         ],
       });

@@ -96,17 +96,20 @@ const App = ({ resetRecoil }) => {
     }
   }, [recoilResetKey, resetRecoil]);
 
+  const { refresh } = useDataLoader();
+
   useEffect(() => {
     const onWindowFocus = (e) => {
       if (authToken && e.newState === 'active') {
-        API.get({ path: '/check-auth' }); // will force logout if session is expired
+        API.get({ path: '/check-auth' }) // will force logout if session is expired
+          .then(() => refresh()); // will refresh data if session is still valid
       }
     };
     lifecycle.addEventListener('statechange', onWindowFocus);
     return () => {
       lifecycle.removeEventListener('statechange', onWindowFocus);
     };
-  }, [authToken]);
+  }, [authToken, refresh]);
 
   return (
     <div className="main-container">

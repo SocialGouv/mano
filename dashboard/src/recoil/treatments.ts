@@ -21,6 +21,17 @@ const encryptedFields: Array<keyof TreatmentInstance> = [
   'indication',
   'documents',
   'comments',
+  'history',
+];
+
+export const allowedTreatmentFieldsInHistory = [
+  { name: 'person', label: 'Personne suivie' },
+  { name: 'name', label: 'Nom du traitement' },
+  { name: 'startDate', label: 'Date de début' },
+  { name: 'endDate', label: 'Date de fin' },
+  { name: 'dosage', label: 'Dosage' },
+  { name: 'frequency', label: 'Fréquence' },
+  { name: 'indication', label: 'Indication' },
 ];
 
 export const prepareTreatmentForEncryption = (treatment: TreatmentInstance, { checkRequiredFields = true } = {}) => {

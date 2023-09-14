@@ -44,6 +44,19 @@ const encryptedFields = [
   'history',
 ];
 
+export const allowedActionFieldsInHistory = [
+  { name: 'categories', label: 'Catégorie(s)' },
+  { name: 'person', label: 'Personne suivie' },
+  { name: 'group', label: 'Action familiale' },
+  { name: 'name', label: "Nom de l'action" },
+  { name: 'description', label: 'Description' },
+  { name: 'teams', label: 'Équipe(s) en charge' },
+  { name: 'urgent', label: 'Action urgente' },
+  { name: 'completedAt', label: 'Faite le' },
+  { name: 'dueAt', label: 'À faire le' },
+  { name: 'status', label: 'Status' },
+];
+
 export const prepareActionForEncryption = (action) => {
   try {
     if (!looseUuidRegex.test(action.person)) {

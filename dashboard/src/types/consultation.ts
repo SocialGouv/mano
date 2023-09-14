@@ -13,6 +13,7 @@ export interface ConsultationInstance {
   indication: string;
   documents: Array<Document | Folder>;
   comments: any[];
+  history: any[];
   createdAt: Date;
   updatedAt: Date;
   [key: string]: any;

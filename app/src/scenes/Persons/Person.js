@@ -87,6 +87,7 @@ const Person = ({ route, navigation }) => {
         outOfActiveList: person.outOfActiveList || false,
         outOfActiveListReasons: person.outOfActiveListReasons || [],
         documents: person.documents || [],
+        history: person.history || [],
       };
     },
     [flattenedCustomFieldsPersons]
@@ -144,6 +145,10 @@ const Person = ({ route, navigation }) => {
       if (personToUpdate[key] !== oldPerson[key]) historyEntry.data[key] = { oldValue: oldPerson[key], newValue: personToUpdate[key] };
     }
     if (!!Object.keys(historyEntry.data).length) personToUpdate.history = [...(oldPerson.history || []), historyEntry];
+
+    console.log('personToUpdate.history', personToUpdate.history);
+    console.log('oldPerson.history', oldPerson.history);
+    console.log('historyEntry', historyEntry);
 
     const response = await API.put({
       path: `/person/${personDB._id}`,

@@ -6,7 +6,12 @@ import { toast } from 'react-toastify';
 import { useLocation, useHistory } from 'react-router-dom';
 import { CANCEL, DONE, TODO } from '../recoil/actions';
 import { currentTeamState, organisationState, teamsState, userState } from '../recoil/auth';
-import { consultationsState, defaultConsultationFields, prepareConsultationForEncryption } from '../recoil/consultations';
+import {
+  consultationsFieldsIncludingCustomFieldsSelector,
+  consultationsState,
+  defaultConsultationFields,
+  prepareConsultationForEncryption,
+} from '../recoil/consultations';
 import API from '../services/api';
 import { dayjsInstance } from '../services/date';
 import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
@@ -25,6 +30,7 @@ import CustomFieldDisplay from './CustomFieldDisplay';
 import { itemsGroupedByConsultationSelector } from '../recoil/selectors';
 import { DocumentsModule } from './DocumentsGeneric';
 import TabsNav from './tailwind/TabsNav';
+import { useDataLoader } from './DataLoader';
 
 export default function ConsultationModal() {
   const consultationsObjects = useRecoilValue(itemsGroupedByConsultationSelector);
@@ -76,6 +82,24 @@ export default function ConsultationModal() {
   );
 }
 
+const newConsultationInitialState = (organisationId, personId, userId, date, teams) => ({
+  _id: null,
+  dueAt: date ? new Date(date) : new Date(),
+  completedAt: new Date(),
+  name: '',
+  type: '',
+  status: TODO,
+  teams: teams.length === 1 ? [teams[0]._id] : [],
+  user: userId,
+  person: personId || null,
+  organisation: organisationId,
+  onlyVisibleBy: [],
+  documents: [],
+  comments: [],
+  history: [],
+  createdAt: new Date(),
+});
+
 function ConsultationContent({ personId, consultation, date, onClose }) {
   const organisation = useRecoilValue(organisationState);
   const teams = useRecoilValue(teamsState);
@@ -84,6 +108,10 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
   const setModalConfirmState = useSetRecoilState(modalConfirmState);
   const setAllConsultations = useSetRecoilState(consultationsState);
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
+  const consultationsFieldsIncludingCustomFields = useRecoilValue(consultationsFieldsIncludingCustomFieldsSelector);
+  const { refresh } = useDataLoader();
+
+  const newConsultationInitialStateRef = useRef(newConsultationInitialState(organisation._id, personId, user._id, date, teams));
 
   const [isEditing, setIsEditing] = useState(!consultation);
 
@@ -92,27 +120,13 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
       return {
         documents: [],
         comments: [],
+        history: [],
         teams: consultation.teams ?? teams.length === 1 ? [teams[0]._id] : [],
         ...consultation,
       };
     }
-    return {
-      _id: null,
-      dueAt: date ? new Date(date) : new Date(),
-      completedAt: new Date(),
-      name: '',
-      type: '',
-      status: TODO,
-      teams: teams.length === 1 ? [teams[0]._id] : [],
-      user: user._id,
-      person: personId || null,
-      organisation: organisation._id,
-      onlyVisibleBy: [],
-      documents: [],
-      comments: [],
-      createdAt: new Date(),
-    };
-  }, [organisation._id, personId, user._id, consultation, date, teams]);
+    return newConsultationInitialStateRef.current;
+  }, [consultation, teams]);
 
   const [data, setData] = useState(initialState);
 
@@ -147,6 +161,20 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
     } else {
       body.completedAt = null;
     }
+
+    if (!isNewConsultation && !!consultation) {
+      const historyEntry = {
+        date: new Date(),
+        user: user._id,
+        data: {},
+      };
+      for (const key in body) {
+        if (!consultationsFieldsIncludingCustomFields.map((field) => field.name).includes(key)) continue;
+        if (body[key] !== consultation[key]) historyEntry.data[key] = { oldValue: consultation[key], newValue: body[key] };
+      }
+      if (!!Object.keys(historyEntry.data).length) body.history = [...(consultation.history || []), historyEntry];
+    }
+
     const consultationResponse = isNewConsultation
       ? await API.post({
           path: '/consultation',
@@ -179,6 +207,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
       }
     }
     if (closeOnSubmit) onClose();
+    refresh();
     return true;
   }
 
@@ -246,13 +275,16 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
               'Informations',
               `Documents ${data?.documents?.length ? `(${data.documents.length})` : ''}`,
               `Commentaires ${data?.comments?.length ? `(${data.comments.length})` : ''}`,
+              'Historique',
             ]}
             onClick={(tab) => {
               if (tab.includes('Informations')) setActiveTab('Informations');
               if (tab.includes('Documents')) setActiveTab('Documents');
               if (tab.includes('Commentaires')) setActiveTab('Commentaires');
+              if (tab.includes('Historique')) setActiveTab('Historique');
+              refresh();
             }}
-            activeTabIndex={['Informations', 'Documents', 'Commentaires'].findIndex((tab) => tab === activeTab)}
+            activeTabIndex={['Informations', 'Documents', 'Commentaires', 'Historique'].findIndex((tab) => tab === activeTab)}
           />
           <form
             id="add-consultation-form"
@@ -488,6 +520,12 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
               }}
             />
           </div>
+          <div
+            className={['tw-flex tw-h-[50vh] tw-w-full tw-flex-col tw-gap-4 tw-overflow-y-auto', activeTab !== 'Historique' && 'tw-hidden']
+              .filter(Boolean)
+              .join(' ')}>
+            <ConsultationHistory consultation={consultation} />
+          </div>
         </div>
       </ModalBody>
       <ModalFooter>
@@ -538,5 +576,97 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
         )}
       </ModalFooter>
     </>
+  );
+}
+
+function ConsultationHistory({ consultation }) {
+  const history = useMemo(() => [...(consultation?.history || [])].reverse(), [consultation?.history]);
+  const teams = useRecoilValue(teamsState);
+  const consultationsFieldsIncludingCustomFields = useRecoilValue(consultationsFieldsIncludingCustomFieldsSelector);
+
+  return (
+    <div>
+      <table className="table table-striped table-bordered">
+        <thead>
+          <tr className="tw-cursor-default">
+            <th>Date</th>
+            <th>Utilisateur</th>
+            <th>Donnée</th>
+          </tr>
+        </thead>
+        <tbody className="small">
+          {history.map((h) => {
+            return (
+              <tr key={h.date} className="tw-cursor-default">
+                <td>{dayjsInstance(h.date).format('DD/MM/YYYY HH:mm')}</td>
+                <td>
+                  <UserName id={h.user} />
+                </td>
+                <td className="tw-max-w-prose">
+                  {Object.entries(h.data).map(([key, value]) => {
+                    const consultationField = consultationsFieldsIncludingCustomFields.find((f) => f.name === key);
+
+                    if (key === 'teams') {
+                      return (
+                        <p className="tw-flex tw-flex-col" key={key}>
+                          <span>{consultationField?.label} : </span>
+                          <code>"{(value.oldValue || []).map((teamId) => teams.find((t) => t._id === teamId)?.name).join(', ')}"</code>
+                          <span>↓</span>
+                          <code>"{(value.newValue || []).map((teamId) => teams.find((t) => t._id === teamId)?.name).join(', ')}"</code>
+                        </p>
+                      );
+                    }
+
+                    if (key === 'onlyVisibleBy') {
+                      return (
+                        <p key={key}>
+                          {consultationField?.label} : <br />
+                          <code>{value.oldValue.length ? 'Oui' : 'Non'}</code> ➔ <code>{value.newValue.length ? 'Oui' : 'Non'}</code>
+                        </p>
+                      );
+                    }
+
+                    if (key === 'person') {
+                      return (
+                        <p key={key}>
+                          {consultationField?.label} : <br />
+                          <code>
+                            <PersonName item={{ person: value.oldValue }} />
+                          </code>{' '}
+                          ➔{' '}
+                          <code>
+                            <PersonName item={{ person: value.newValue }} />
+                          </code>
+                        </p>
+                      );
+                    }
+
+                    return (
+                      <p
+                        key={key}
+                        data-test-id={`${consultationField?.label}: ${JSON.stringify(value.oldValue || '')} ➔ ${JSON.stringify(value.newValue)}`}>
+                        {consultationField?.label} : <br />
+                        <code>{JSON.stringify(value.oldValue || '')}</code> ➔ <code>{JSON.stringify(value.newValue)}</code>
+                      </p>
+                    );
+                  })}
+                </td>
+              </tr>
+            );
+          })}
+          {consultation?.createdAt && (
+            <tr key={consultation.createdAt} className="tw-cursor-default">
+              <td>{dayjsInstance(consultation.createdAt).format('DD/MM/YYYY HH:mm')}</td>
+              <td>
+                <UserName id={consultation.user} />
+              </td>
+              <td className="tw-max-w-prose">
+                <p>Création de la consultation</p>
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
   );
 }

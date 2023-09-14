@@ -12,7 +12,10 @@ import UserName from '../../../components/UserName';
 export const Treatments = ({ person }) => {
   const [fullScreen, setFullScreen] = useState(false);
   const allTreatments = useRecoilValue(treatmentsState);
-  const treatments = useMemo(() => (allTreatments || []).filter((t) => t.person === person._id), [allTreatments, person._id]);
+  const treatments = useMemo(
+    () => (allTreatments || []).filter((t) => t.person === person._id).sort((a, b) => new Date(b.startDate) - new Date(a.startDate)),
+    [allTreatments, person._id]
+  );
   const filteredData = treatments;
   const history = useHistory();
 

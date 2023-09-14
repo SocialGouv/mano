@@ -17,4 +17,5 @@ export interface TreatmentInstance {
   comments: any[];
   createdAt: Date;
   updatedAt: Date;
+  history: any[];
 }
