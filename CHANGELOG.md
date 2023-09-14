@@ -1,3 +1,10 @@
+## [1.284.3](https://github.com/SocialGouv/mano/compare/v1.284.2...v1.284.3) (2023-09-14)
+
+
+### Bug Fixes
+
+* sentry sourcemap script ([5b94b37](https://github.com/SocialGouv/mano/commit/5b94b373c4dfe9db9b65a5031cbf9f3469eab9ee))
+
 ## [1.284.2](https://github.com/SocialGouv/mano/compare/v1.284.1...v1.284.2) (2023-09-14)
 
 
