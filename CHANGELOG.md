@@ -1,3 +1,10 @@
+## [1.284.5](https://github.com/SocialGouv/mano/compare/v1.284.4...v1.284.5) (2023-09-14)
+
+
+### Bug Fixes
+
+* remove sourcemap ([fe82111](https://github.com/SocialGouv/mano/commit/fe821113cd80b58bac56bedab899222418ba9036))
+
 ## [1.284.4](https://github.com/SocialGouv/mano/compare/v1.284.3...v1.284.4) (2023-09-14)
 
 
