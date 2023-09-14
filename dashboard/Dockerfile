@@ -20,7 +20,7 @@ ENV SENTRY_ORG=incubateur
 ENV SENTRY_URL=https://sentry.fabrique.social.gouv.fr/
 ENV SENTRY_PROJECT=mano
 
-RUN yarn build && node scripts/sentry.js
+RUN yarn build && yarn sentry:sourcemaps
 
 FROM ghcr.io/socialgouv/docker/nginx4spa:7.0.1
 
