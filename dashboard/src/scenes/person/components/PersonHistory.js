@@ -130,15 +130,17 @@ export default function PersonHistory({ person }) {
               </tr>
             );
           })}
-          <tr key={person.createdAt} className="tw-cursor-default">
-            <td>{dayjsInstance(person.createdAt).format('DD/MM/YYYY HH:mm')}</td>
-            <td>
-              <UserName id={person.user} />
-            </td>
-            <td className="tw-max-w-prose">
-              <p>Création de la personne</p>
-            </td>
-          </tr>
+          {person?.createdAt && (
+            <tr key={person.createdAt} className="tw-cursor-default">
+              <td>{dayjsInstance(person.createdAt).format('DD/MM/YYYY HH:mm')}</td>
+              <td>
+                <UserName id={person.user} />
+              </td>
+              <td className="tw-max-w-prose">
+                <p>Création de la personne</p>
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>

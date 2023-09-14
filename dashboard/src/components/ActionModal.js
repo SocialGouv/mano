@@ -758,15 +758,17 @@ function ActionHistory({ action }) {
               </tr>
             );
           })}
-          <tr key={action.createdAt} className="tw-cursor-default">
-            <td>{dayjsInstance(action.createdAt).format('DD/MM/YYYY HH:mm')}</td>
-            <td>
-              <UserName id={action.user} />
-            </td>
-            <td className="tw-max-w-prose">
-              <p>Création de l'action</p>
-            </td>
-          </tr>
+          {!!action?.createdAt && (
+            <tr key={action.createdAt} className="tw-cursor-default">
+              <td>{dayjsInstance(action.createdAt).format('DD/MM/YYYY HH:mm')}</td>
+              <td>
+                <UserName id={action.user} />
+              </td>
+              <td className="tw-max-w-prose">
+                <p>Création de l'action</p>
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>

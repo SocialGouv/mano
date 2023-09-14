@@ -521,15 +521,17 @@ function TreatmentHistory({ treatment }) {
               </tr>
             );
           })}
-          <tr key={treatment.createdAt} className="tw-cursor-default">
-            <td>{dayjsInstance(treatment.createdAt).format('DD/MM/YYYY HH:mm')}</td>
-            <td>
-              <UserName id={treatment.user} />
-            </td>
-            <td className="tw-max-w-prose">
-              <p>Création du traitement</p>
-            </td>
-          </tr>
+          {!!treatment?.createdAt && (
+            <tr key={treatment.createdAt} className="tw-cursor-default">
+              <td>{dayjsInstance(treatment.createdAt).format('DD/MM/YYYY HH:mm')}</td>
+              <td>
+                <UserName id={treatment.user} />
+              </td>
+              <td className="tw-max-w-prose">
+                <p>Création du traitement</p>
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>

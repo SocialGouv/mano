@@ -654,15 +654,17 @@ function ConsultationHistory({ consultation }) {
               </tr>
             );
           })}
-          <tr key={consultation.createdAt} className="tw-cursor-default">
-            <td>{dayjsInstance(consultation.createdAt).format('DD/MM/YYYY HH:mm')}</td>
-            <td>
-              <UserName id={consultation.user} />
-            </td>
-            <td className="tw-max-w-prose">
-              <p>Création de la consultation</p>
-            </td>
-          </tr>
+          {consultation?.createdAt && (
+            <tr key={consultation.createdAt} className="tw-cursor-default">
+              <td>{dayjsInstance(consultation.createdAt).format('DD/MM/YYYY HH:mm')}</td>
+              <td>
+                <UserName id={consultation.user} />
+              </td>
+              <td className="tw-max-w-prose">
+                <p>Création de la consultation</p>
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>
