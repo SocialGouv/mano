@@ -1,3 +1,10 @@
+## [1.284.2](https://github.com/SocialGouv/mano/compare/v1.284.1...v1.284.2) (2023-09-14)
+
+
+### Bug Fixes
+
+* **dashboard:** sentry sourcemap setup ([#1656](https://github.com/SocialGouv/mano/issues/1656)) ([17e346c](https://github.com/SocialGouv/mano/commit/17e346cb00b548e95710dbf038e940bba8ee692b))
+
 ## [1.284.1](https://github.com/SocialGouv/mano/compare/v1.284.0...v1.284.1) (2023-09-14)
 
 
