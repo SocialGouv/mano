@@ -16,6 +16,7 @@ import API from '../../services/api';
 import useTitle from '../../services/useTitle';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
 import { emailRegex } from '../../utils';
+import { capture } from '../../services/sentry';
 
 const View = () => {
   const [localUser, setLocalUser] = useState(null);
@@ -41,6 +42,15 @@ const View = () => {
   return (
     <>
       <SmallHeaderWithBackButton />
+      <button
+        type="button"
+        className="tw-absolute tw-bottom-0 tw-right-0 tw-m-4 tw-rounded tw-bg-white tw-p-2 tw-text-sm tw-text-white tw-opacity-0"
+        onClick={() => {
+          capture(new Error('Test Capture Error Sentry Manually'));
+          throw new Error('Test Throw Error Sentry Manually');
+        }}>
+        Test Sentry
+      </button>
       <Formik
         initialValues={{
           name: localUser.name,
@@ -105,24 +115,24 @@ const View = () => {
                 </FormGroup>
               </Col>
               {values.role !== 'restricted-access' && (
-              <Col md={12}>
-                <Label htmlFor="healthcareProfessional" style={{ marginBottom: 0 }}>
-                  <input
-                    type="checkbox"
-                    id="healthcareProfessional"
-                    style={{ marginRight: '0.5rem' }}
-                    name="healthcareProfessional"
-                    checked={values.healthcareProfessional}
-                    onChange={() => {
-                      handleChange({ target: { value: !values.healthcareProfessional, name: 'healthcareProfessional' } });
-                    }}
-                  />
-                  Professionnel·le de santé
-                </Label>
-                <div>
-                  <small className="text-muted">Un·e professionnel·le de santé a accès au dossier médical complet des personnes.</small>
-                </div>
-              </Col>
+                <Col md={12}>
+                  <Label htmlFor="healthcareProfessional" style={{ marginBottom: 0 }}>
+                    <input
+                      type="checkbox"
+                      id="healthcareProfessional"
+                      style={{ marginRight: '0.5rem' }}
+                      name="healthcareProfessional"
+                      checked={values.healthcareProfessional}
+                      onChange={() => {
+                        handleChange({ target: { value: !values.healthcareProfessional, name: 'healthcareProfessional' } });
+                      }}
+                    />
+                    Professionnel·le de santé
+                  </Label>
+                  <div>
+                    <small className="text-muted">Un·e professionnel·le de santé a accès au dossier médical complet des personnes.</small>
+                  </div>
+                </Col>
               )}
             </Row>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
