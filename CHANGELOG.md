@@ -1,3 +1,10 @@
+## [1.284.4](https://github.com/SocialGouv/mano/compare/v1.284.3...v1.284.4) (2023-09-14)
+
+
+### Bug Fixes
+
+* trick ([61c1fa3](https://github.com/SocialGouv/mano/commit/61c1fa303594fec3d30c564cedfbeabe6efd09ce))
+
 ## [1.284.3](https://github.com/SocialGouv/mano/compare/v1.284.2...v1.284.3) (2023-09-14)
 
 
