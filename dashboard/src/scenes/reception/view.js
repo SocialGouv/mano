@@ -208,8 +208,8 @@ const Reception = () => {
       <SmallHeader
         title={
           <span data-test-id="reception-title">
-            Accueil du <b>{formatDateWithNameOfDay(now())}</b> de l'équipe {currentTeam?.nightSession ? 'de nuit ' : ''}
-            <b>{currentTeam?.name || ''}</b>
+            Accueil du <b>{formatDateWithNameOfDay(now())}</b> de l'équipe {currentTeam.nightSession ? 'de nuit ' : ''}
+            <b>{currentTeam.name || ''}</b>
           </span>
         }
       />
@@ -283,7 +283,7 @@ const Reception = () => {
           <ActionsCalendar
             actions={dataConsolidated}
             columns={['Heure', 'Nom', 'Personne suivie', 'Statut']}
-            isNightSession={currentTeam?.nightSession}
+            isNightSession={currentTeam.nightSession}
           />
         </Col>
         <Col md={4}>
@@ -306,20 +306,18 @@ const Reception = () => {
               )}
             </PassagesWrapper>
           )}
-          {!!currentTeam && (
-            <ServicesWrapper>
-              <h5 className="services-title">Services</h5>
-              <div className="services-incrementators">
-                <ReceptionService
-                  services={services}
-                  onUpdateServices={setServices}
-                  team={currentTeam}
-                  report={todaysReport}
-                  dateString={startOfToday().format('YYYY-MM-DD')}
-                />
-              </div>
-            </ServicesWrapper>
-          )}
+          <ServicesWrapper>
+            <h5 className="services-title">Services</h5>
+            <div className="services-incrementators">
+              <ReceptionService
+                services={services}
+                onUpdateServices={setServices}
+                team={currentTeam}
+                report={todaysReport}
+                dateString={startOfToday().format('YYYY-MM-DD')}
+              />
+            </div>
+          </ServicesWrapper>
         </Col>
       </Row>
       <PassagesToday isOpen={todaysPassagesOpen} setOpen={setTodaysPassagesOpen} passages={passages} />
