@@ -89,6 +89,8 @@ if (ENV === 'production') {
 
 const App = ({ resetRecoil }) => {
   const authToken = useRecoilValue(authTokenState);
+  const user = useRecoilValue(userState);
+
   const recoilResetKey = useRecoilValue(recoilResetKeyState);
   useEffect(() => {
     if (!!recoilResetKey) {
@@ -140,7 +142,7 @@ const App = ({ resetRecoil }) => {
         <ConsultationModal />
         <TreatmentModal />
         <ModalConfirm />
-        <DataLoader />
+        {!!user && <DataLoader />}
       </Router>
     </div>
   );
