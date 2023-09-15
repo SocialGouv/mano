@@ -1,3 +1,10 @@
+## [1.284.7](https://github.com/SocialGouv/mano/compare/v1.284.6...v1.284.7) (2023-09-15)
+
+
+### Bug Fixes
+
+* **dashboard:** MANO-PC - Cannot read properties of null (reading '_id') ([#1659](https://github.com/SocialGouv/mano/issues/1659)) ([c8da742](https://github.com/SocialGouv/mano/commit/c8da7428ed85ee1a0fe6fe6528199db41904fd0b))
+
 ## [1.284.6](https://github.com/SocialGouv/mano/compare/v1.284.5...v1.284.6) (2023-09-15)
 
 
