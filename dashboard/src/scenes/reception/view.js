@@ -208,8 +208,8 @@ const Reception = () => {
       <SmallHeader
         title={
           <span data-test-id="reception-title">
-            Accueil du <b>{formatDateWithNameOfDay(now())}</b> de l'équipe {currentTeam?.nightSession ? 'de nuit ' : ''}
-            <b>{currentTeam?.name || ''}</b>
+            Accueil du <b>{formatDateWithNameOfDay(now())}</b> de l'équipe {currentTeam.nightSession ? 'de nuit ' : ''}
+            <b>{currentTeam.name || ''}</b>
           </span>
         }
       />
@@ -283,7 +283,7 @@ const Reception = () => {
           <ActionsCalendar
             actions={dataConsolidated}
             columns={['Heure', 'Nom', 'Personne suivie', 'Statut']}
-            isNightSession={currentTeam?.nightSession}
+            isNightSession={currentTeam.nightSession}
           />
         </Col>
         <Col md={4}>
