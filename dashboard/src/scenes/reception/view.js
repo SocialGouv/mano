@@ -306,18 +306,20 @@ const Reception = () => {
               )}
             </PassagesWrapper>
           )}
-          <ServicesWrapper>
-            <h5 className="services-title">Services</h5>
-            <div className="services-incrementators">
-              <ReceptionService
-                services={services}
-                onUpdateServices={setServices}
-                team={currentTeam}
-                report={todaysReport}
-                dateString={startOfToday().format('YYYY-MM-DD')}
-              />
-            </div>
-          </ServicesWrapper>
+          {!!currentTeam && (
+            <ServicesWrapper>
+              <h5 className="services-title">Services</h5>
+              <div className="services-incrementators">
+                <ReceptionService
+                  services={services}
+                  onUpdateServices={setServices}
+                  team={currentTeam}
+                  report={todaysReport}
+                  dateString={startOfToday().format('YYYY-MM-DD')}
+                />
+              </div>
+            </ServicesWrapper>
+          )}
         </Col>
       </Row>
       <PassagesToday isOpen={todaysPassagesOpen} setOpen={setTodaysPassagesOpen} passages={passages} />

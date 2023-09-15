@@ -15,7 +15,8 @@ const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = '', ser
   useEffect(
     // Init services for a team. We need to fetch services from legacy report and database and merge them.
     function initServices() {
-      if (!dateString || !team._id || dateString === 'undefined') {
+      console.log('init services');
+      if (!dateString || !team?._id || dateString === 'undefined') {
         return capture('Missing params for initServices in reception', { extra: { dateString, team, report } });
       }
       API.get({ path: `/service/team/${team._id}/date/${dateString}` }).then((res) => {
@@ -32,9 +33,7 @@ const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = '', ser
         setServices(mergedServices);
       });
     },
-    // We have to ignore API because uh... ?! We should not use this and only have a fetch fonction with params.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [dateString, report, team._id]
+    [dateString, report, team, organisation.services, setServices]
   );
 
   const selectedServices = groupedServices.find((e) => e.groupTitle === selected)?.services || [];
