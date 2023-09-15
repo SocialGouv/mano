@@ -20,6 +20,11 @@ api:
 dashboard:
   host: "dashboard-mano.fabrique.social.gouv.fr"
   certSecretName: dashboard-crt
+  with:
+    secrets:
+      sentry_auth_token:
+        secretName: dashboard
+        secretKey: SENTRY_AUTH_TOKEN
 
 metabase:
   enabled: true
