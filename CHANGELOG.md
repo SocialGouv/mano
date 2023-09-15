@@ -1,3 +1,10 @@
+## [1.284.6](https://github.com/SocialGouv/mano/compare/v1.284.5...v1.284.6) (2023-09-15)
+
+
+### Bug Fixes
+
+* sentry secret ([#1657](https://github.com/SocialGouv/mano/issues/1657)) ([f281871](https://github.com/SocialGouv/mano/commit/f2818713e49b07f3cf35a5a27324e982d10043ae))
+
 ## [1.284.5](https://github.com/SocialGouv/mano/compare/v1.284.4...v1.284.5) (2023-09-14)
 
 
