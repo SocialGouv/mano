@@ -1,3 +1,10 @@
+## [1.284.8](https://github.com/SocialGouv/mano/compare/v1.284.7...v1.284.8) (2023-09-18)
+
+
+### Bug Fixes
+
+* MANO-PT ([#1660](https://github.com/SocialGouv/mano/issues/1660)) ([cdfbfb3](https://github.com/SocialGouv/mano/commit/cdfbfb3f9db0dd3c58616e0cd27ffda8cec61fed))
+
 ## [1.284.7](https://github.com/SocialGouv/mano/compare/v1.284.6...v1.284.7) (2023-09-15)
 
 
