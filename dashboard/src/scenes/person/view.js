@@ -38,6 +38,12 @@ export default function View() {
 
   const preparePersonForEncryption = usePreparePersonForEncryption();
 
+  if (!person) {
+    toast.error("Cette personne n'existe pas, ou vient d'être supprimée par un(e) autre utilisateur(rice) de votre organisation");
+    history.push('/person');
+    return null;
+  }
+
   return (
     <div>
       <div className="tw-flex tw-w-full tw-justify-between">
