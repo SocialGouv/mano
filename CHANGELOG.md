@@ -1,3 +1,10 @@
+## [1.284.9](https://github.com/SocialGouv/mano/compare/v1.284.8...v1.284.9) (2023-09-19)
+
+
+### Bug Fixes
+
+* MANO-PX MANO-Q7 person is undefined ([#1662](https://github.com/SocialGouv/mano/issues/1662)) ([0cc5097](https://github.com/SocialGouv/mano/commit/0cc5097701060ce3b24d6ea6765493c563d1b437))
+
 ## [1.284.8](https://github.com/SocialGouv/mano/compare/v1.284.7...v1.284.8) (2023-09-18)
 
 
