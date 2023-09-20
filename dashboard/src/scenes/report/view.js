@@ -898,8 +898,10 @@ const Reception = ({ reports, selectedTeamsObject, dateString }) => {
     function initServices() {
       // Init services for a team. We need to fetch services from legacy report and database and merge them.
       async function getServicesForTeam(team, report) {
-        if (!dateString || !team || dateString === 'undefined')
+        if (!dateString || !team || dateString === 'undefined') {
           return capture('Missing params for initServices in report', { extra: { dateString, team, report } });
+        }
+        console.log('INIT SERVICE FROM REPORT VIEW');
         const res = await API.get({ path: `/service/team/${team}/date/${dateString}` });
         if (!res.ok) return toast.error(<ErrorOnGetServices />);
         const servicesFromLegacyReport = report?.services?.length ? JSON.parse(report?.services) : {};
@@ -918,7 +920,8 @@ const Reception = ({ reports, selectedTeamsObject, dateString }) => {
         setServices(results.reduce((acc, curr) => ({ ...acc, ...curr }), {}));
       });
     },
-    [dateString, reports, organisation.services]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [dateString, reports]
   );
 
   if (!organisation.receptionEnabled || !organisation?.services) return null;

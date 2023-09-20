@@ -15,10 +15,11 @@ const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = '', ser
   useEffect(
     // Init services for a team. We need to fetch services from legacy report and database and merge them.
     function initServices() {
-      console.log('init services');
+      console.log('INIT SERVICE FROM ReceptionService ?');
       if (!dateString || !team?._id || dateString === 'undefined') {
         return capture('Missing params for initServices in reception', { extra: { dateString, team, report } });
       }
+      console.log('INIT SERVICE FROM ReceptionService ');
       API.get({ path: `/service/team/${team._id}/date/${dateString}` }).then((res) => {
         if (!res.ok) return toast.error(<ErrorOnGetServices />);
         const servicesFromLegacyReport = report?.services?.length ? JSON.parse(report?.services) : {};
@@ -33,7 +34,8 @@ const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = '', ser
         setServices(mergedServices);
       });
     },
-    [dateString, report, team, organisation.services, setServices]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [dateString, report, team]
   );
 
   const selectedServices = groupedServices.find((e) => e.groupTitle === selected)?.services || [];
