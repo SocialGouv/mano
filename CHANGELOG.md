@@ -1,3 +1,10 @@
+## [1.284.10](https://github.com/SocialGouv/mano/compare/v1.284.9...v1.284.10) (2023-09-20)
+
+
+### Bug Fixes
+
+* **dashboard:** init services deps ([#1664](https://github.com/SocialGouv/mano/issues/1664)) ([84ab7aa](https://github.com/SocialGouv/mano/commit/84ab7aafbb5eee6ec116f41ee67290e7dcda1f7a))
+
 ## [1.284.9](https://github.com/SocialGouv/mano/compare/v1.284.8...v1.284.9) (2023-09-19)
 
 
