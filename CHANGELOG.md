@@ -1,3 +1,10 @@
+## [1.284.11](https://github.com/SocialGouv/mano/compare/v1.284.10...v1.284.11) (2023-09-21)
+
+
+### Bug Fixes
+
+* **dashboard:** statistiques avec filtre 'Date de sortie de file active' où certaines personnes toujours dans la file active avaient une date de sortie de file active définie malgré tout, perturbant les statistiques ([#1667](https://github.com/SocialGouv/mano/issues/1667)) ([6c64855](https://github.com/SocialGouv/mano/commit/6c64855b27118e51bfe7e76fb44c5031ebf362b2))
+
 ## [1.284.10](https://github.com/SocialGouv/mano/compare/v1.284.9...v1.284.10) (2023-09-20)
 
 
