@@ -1,3 +1,10 @@
+## [1.284.14](https://github.com/SocialGouv/mano/compare/v1.284.13...v1.284.14) (2023-09-21)
+
+
+### Reverts
+
+* Revert "Revert "fix: disable sourcemap while sentry down"" ([ab3916a](https://github.com/SocialGouv/mano/commit/ab3916ae3e5bdc5389021a21753b542f999f69c4))
+
 ## [1.284.13](https://github.com/SocialGouv/mano/compare/v1.284.12...v1.284.13) (2023-09-21)
 
 
