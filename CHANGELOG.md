@@ -1,3 +1,10 @@
+## [1.284.12](https://github.com/SocialGouv/mano/compare/v1.284.11...v1.284.12) (2023-09-21)
+
+
+### Bug Fixes
+
+* disable sourcemap while sentry down ([f7f0cb3](https://github.com/SocialGouv/mano/commit/f7f0cb37ed98649fb930c061ec24afe9304991dc))
+
 ## [1.284.11](https://github.com/SocialGouv/mano/compare/v1.284.10...v1.284.11) (2023-09-21)
 
 
