@@ -128,13 +128,15 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
     return [...treatmentsDocs, ...consultationsDocs, ...otherDocs].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }, [personConsultations, medicalFile, treatments, user._id]);
 
+  const onlyDocuments = useMemo(() => allMedicalDocuments.filter((d) => d.type !== 'folder'), [allMedicalDocuments]) as DocumentWithLinkedItem[];
+
   return (
     <DocumentsModule
       showPanel
       socialOrMedical="medical"
       documents={allMedicalDocuments}
       color="blue-900"
-      title={`Documents médicaux de ${person.name} (${allMedicalDocuments.length})`}
+      title={`Documents médicaux de ${person.name} (${onlyDocuments.length})`}
       personId={person._id}
       onDeleteDocument={async (documentOrFolder) => {
         if (documentOrFolder.type === 'document') {
@@ -328,6 +330,8 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
             if (!groupedById[document.linkedItem.type][document.linkedItem._id]) groupedById[document.linkedItem.type][document.linkedItem._id] = [];
             groupedById[document.linkedItem.type][document.linkedItem._id].push(document);
           }
+
+          console.log({ nextDocuments, groupedById });
           const treatmentsToUpdate = await Promise.all(
             Object.keys(groupedById.treatment)
               .map((treatmentId) => {

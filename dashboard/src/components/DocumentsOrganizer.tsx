@@ -99,8 +99,6 @@ export default function DocumentsOrganizer({
 
   if (!items.length) return null;
 
-  console.log({ documentsTree });
-
   return (
     <div id={`${htmlId}-documents`}>
       <div className="tw-flex tw-w-full tw-border tw-border-gray-100 tw-py-1 tw-text-xs tw-text-gray-400">

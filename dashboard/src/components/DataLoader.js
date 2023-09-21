@@ -245,6 +245,7 @@ export default function DataLoader() {
       setProgressBuffer(res.data.length);
     } else if (current === 'consultation') {
       setLoadingText('Chargement des consultations');
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       const res = await API.get({ path: '/consultation', query: { ...query, after: initialLoad ? 0 : lastLoad } });
       if (!res.data) return resetLoaderOnError();
       setConsultations(
@@ -254,13 +255,15 @@ export default function DataLoader() {
       setProgressBuffer(res.data.length);
     } else if (current === 'treatment') {
       setLoadingText('Chargement des traitements');
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       const res = await API.get({ path: '/treatment', query: { ...query, after: initialLoad ? 0 : lastLoad } });
       if (!res.data) return resetLoaderOnError();
       setTreatments(mergeItems(treatments, res.decryptedData));
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
     } else if (current === 'medicalFile') {
-      setLoadingText('Chargement des fichiers médicaux');
+      setLoadingText('Chargement des dossiers médicaux');
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       const res = await API.get({ path: '/medical-file', query: { ...query, after: initialLoad ? 0 : lastLoad } });
       if (!res.data) return resetLoaderOnError();
       setMedicalFiles(mergeItems(medicalFiles, res.decryptedData));
