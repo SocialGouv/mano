@@ -1,3 +1,10 @@
+## [1.284.15](https://github.com/SocialGouv/mano/compare/v1.284.14...v1.284.15) (2023-09-23)
+
+
+### Bug Fixes
+
+* tracesSampleRate: 0.05 ([4642e5a](https://github.com/SocialGouv/mano/commit/4642e5a1c4ee866f7fa97f36d0088e025a712110))
+
 ## [1.284.14](https://github.com/SocialGouv/mano/compare/v1.284.13...v1.284.14) (2023-09-21)
 
 
