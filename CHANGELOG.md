@@ -1,3 +1,10 @@
+## [1.284.16](https://github.com/SocialGouv/mano/compare/v1.284.15...v1.284.16) (2023-09-25)
+
+
+### Bug Fixes
+
+* log duplicated medical file metadata ([#1670](https://github.com/SocialGouv/mano/issues/1670)) ([91b8ef7](https://github.com/SocialGouv/mano/commit/91b8ef7678d36227479c133bf54e1822d3149f62))
+
 ## [1.284.15](https://github.com/SocialGouv/mano/compare/v1.284.14...v1.284.15) (2023-09-23)
 
 
