@@ -261,23 +261,26 @@ export const itemsGroupedByPersonSelector = selector({
     for (const medicalFile of medicalFiles) {
       if (!personsObject[medicalFile.person]) continue;
       if (personsObject[medicalFile.person].medicalFile) {
-        capture(`MEDICAL FILE EXISTS ${personsObject[medicalFile.person]._id} ${medicalFile._id}`, {
-          extra: {
-            personId: medicalFile.person,
-            firstMedicalFile: {
-              _id: personsObject[medicalFile.person].medicalFile._id,
-              createdAt: personsObject[medicalFile.person].medicalFile.createdAt,
-              updatedAt: personsObject[medicalFile.person].medicalFile.updatedAt,
-              deletedAt: personsObject[medicalFile.person].medicalFile.deletedAt,
+        if (!window.sessionStorage.getItem(`MEDICAL FILE EXISTS ${medicalFile.person}`)) {
+          capture(`MEDICAL FILE EXISTS ${medicalFile.person}`, {
+            extra: {
+              personId: medicalFile.person,
+              firstMedicalFile: {
+                _id: personsObject[medicalFile.person].medicalFile._id,
+                createdAt: personsObject[medicalFile.person].medicalFile.createdAt,
+                updatedAt: personsObject[medicalFile.person].medicalFile.updatedAt,
+                deletedAt: personsObject[medicalFile.person].medicalFile.deletedAt,
+              },
+              secondMedicalFile: {
+                _id: medicalFile._id,
+                createdAt: medicalFile.createdAt,
+                updatedAt: medicalFile.updatedAt,
+                deletedAt: medicalFile.deletedAt,
+              },
             },
-            secondMedicalFile: {
-              _id: medicalFile._id,
-              createdAt: medicalFile.createdAt,
-              updatedAt: medicalFile.updatedAt,
-              deletedAt: medicalFile.deletedAt,
-            },
-          },
-        });
+          });
+          window.sessionStorage.setItem(`MEDICAL FILE EXISTS ${medicalFile.person}`, 'true');
+        }
         personsObject[medicalFile.person].medicalFile = {
           ...medicalFile,
           ...personsObject[medicalFile.person].medicalFile,
