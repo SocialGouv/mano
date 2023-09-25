@@ -1,3 +1,10 @@
+## [1.284.17](https://github.com/SocialGouv/mano/compare/v1.284.16...v1.284.17) (2023-09-25)
+
+
+### Bug Fixes
+
+* better log for medical file ([f1e24f0](https://github.com/SocialGouv/mano/commit/f1e24f028d21e2dcf7d574aed73deff507360125))
+
 ## [1.284.16](https://github.com/SocialGouv/mano/compare/v1.284.15...v1.284.16) (2023-09-25)
 
 
