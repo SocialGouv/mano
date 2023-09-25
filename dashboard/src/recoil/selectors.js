@@ -14,6 +14,7 @@ import { medicalFileState } from './medicalFiles';
 import { treatmentsState } from './treatments';
 import { rencontresState } from './rencontres';
 import { groupsState } from './groups';
+import { capture } from '../services/sentry';
 
 const tomorrow = dayjsInstance().add(1, 'day').format('YYYY-MM-DD');
 
@@ -260,6 +261,23 @@ export const itemsGroupedByPersonSelector = selector({
     for (const medicalFile of medicalFiles) {
       if (!personsObject[medicalFile.person]) continue;
       if (personsObject[medicalFile.person].medicalFile) {
+        capture(`MEDICAL FILE EXISTS ${personsObject[medicalFile.person]._id} ${medicalFile._id}`, {
+          extra: {
+            personId: medicalFile.person,
+            firstMedicalFile: {
+              _id: personsObject[medicalFile.person].medicalFile._id,
+              createdAt: personsObject[medicalFile.person].medicalFile.createdAt,
+              updatedAt: personsObject[medicalFile.person].medicalFile.updatedAt,
+              deletedAt: personsObject[medicalFile.person].medicalFile.deletedAt,
+            },
+            secondMedicalFile: {
+              _id: medicalFile._id,
+              createdAt: medicalFile.createdAt,
+              updatedAt: medicalFile.updatedAt,
+              deletedAt: medicalFile.deletedAt,
+            },
+          },
+        });
         personsObject[medicalFile.person].medicalFile = {
           ...medicalFile,
           ...personsObject[medicalFile.person].medicalFile,
