@@ -1,3 +1,10 @@
+## [1.284.19](https://github.com/SocialGouv/mano/compare/v1.284.18...v1.284.19) (2023-09-26)
+
+
+### Bug Fixes
+
+* **dashboard:** refresh too much ([#1673](https://github.com/SocialGouv/mano/issues/1673)) ([330b733](https://github.com/SocialGouv/mano/commit/330b733b046b729cba44b0e6e4c03d94139ce169))
+
 ## [1.284.18](https://github.com/SocialGouv/mano/compare/v1.284.17...v1.284.18) (2023-09-26)
 
 
