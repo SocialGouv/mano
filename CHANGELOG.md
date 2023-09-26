@@ -1,3 +1,10 @@
+## [1.284.18](https://github.com/SocialGouv/mano/compare/v1.284.17...v1.284.18) (2023-09-26)
+
+
+### Bug Fixes
+
+* medical docs unique ([#1672](https://github.com/SocialGouv/mano/issues/1672)) ([082800c](https://github.com/SocialGouv/mano/commit/082800c8176680677c3e21d8fcd4c82d4ca6f7d6))
+
 ## [1.284.17](https://github.com/SocialGouv/mano/compare/v1.284.16...v1.284.17) (2023-09-25)
 
 
