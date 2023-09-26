@@ -38,7 +38,8 @@ const isLoadingState = atom({ key: 'isLoadingState', default: false });
 const initialLoadState = atom({ key: 'isInitialLoadState', default: false });
 const fullScreenState = atom({ key: 'fullScreenState', default: true });
 export const lastLoadState = atom({ key: 'lastLoadState', default: null, effects: [cacheEffect] });
-export const loadingTextState = atom({ key: 'loadingTextState', default: 'Chargement des données' });
+export const initialLoadingTextState = 'En attente de chargement';
+export const loadingTextState = atom({ key: 'loadingTextState', default: initialLoadingTextState });
 
 export default function DataLoader() {
   const [user, setUser] = useRecoilState(userState);
@@ -377,6 +378,7 @@ export default function DataLoader() {
   function stopLoader() {
     setIsLoading(false);
     setLastLoad(serverDate.current);
+    setLoadingText('En attente de chargement');
     setProgressBuffer(null);
     setProgress(null);
     setTotal(null);

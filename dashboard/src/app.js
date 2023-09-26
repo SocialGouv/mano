@@ -33,7 +33,7 @@ import ScrollToTop from './components/ScrollToTop';
 import TopBar from './components/TopBar';
 import VersionOutdatedAlert from './components/VersionOutdatedAlert';
 import ModalConfirm from './components/ModalConfirm';
-import DataLoader, { useDataLoader } from './components/DataLoader';
+import DataLoader, { initialLoadingTextState, loadingTextState, useDataLoader } from './components/DataLoader';
 import { Bounce, cssTransition, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import SentryRoute from './components/Sentryroute';
@@ -90,6 +90,7 @@ if (ENV === 'production') {
 const App = ({ resetRecoil }) => {
   const authToken = useRecoilValue(authTokenState);
   const user = useRecoilValue(userState);
+  const loadingText = useRecoilValue(loadingTextState);
 
   const recoilResetKey = useRecoilValue(recoilResetKeyState);
   useEffect(() => {
@@ -104,14 +105,22 @@ const App = ({ resetRecoil }) => {
     const onWindowFocus = (e) => {
       if (authToken && e.newState === 'active') {
         API.get({ path: '/check-auth' }) // will force logout if session is expired
-          .then(() => refresh()); // will refresh data if session is still valid
+          .then(() => {
+            if (loadingText !== initialLoadingTextState) {
+              // if the app is already loaded
+              // will refresh data if session is still valid
+              refresh();
+            } else {
+              console.log('initial load not done');
+            }
+          });
       }
     };
     lifecycle.addEventListener('statechange', onWindowFocus);
     return () => {
       lifecycle.removeEventListener('statechange', onWindowFocus);
     };
-  }, [authToken, refresh]);
+  }, [authToken, refresh, loadingText]);
 
   return (
     <div className="main-container">
