@@ -1,18 +1,15 @@
 import { useMemo } from 'react';
 import { toast } from 'react-toastify';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { organisationAuthentifiedState, userAuthentifiedState } from '../../../recoil/auth';
 import { consultationsState, prepareConsultationForEncryption } from '../../../recoil/consultations';
 import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../../recoil/medicalFiles';
-import { arrayOfitemsGroupedByConsultationSelector } from '../../../recoil/selectors';
 import { prepareTreatmentForEncryption, treatmentsState } from '../../../recoil/treatments';
 import API, { encryptItem } from '../../../services/api';
 import { capture } from '../../../services/sentry';
 import { DocumentsModule } from '../../../components/DocumentsGeneric';
 import type { PersonPopulated } from '../../../types/person';
 import type { DocumentWithLinkedItem, FolderWithLinkedItem, Document, Folder } from '../../../types/document';
-import type { MedicalFileInstance } from '../../../types/medicalFile';
-import type { ConsultationInstance } from '../../../types/consultation';
 import { useDataLoader } from '../../../components/DataLoader';
 
 interface PersonDocumentsProps {
@@ -22,24 +19,17 @@ interface PersonDocumentsProps {
 const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
   const user = useRecoilValue(userAuthentifiedState);
   const organisation = useRecoilValue(organisationAuthentifiedState);
-
-  const allConsultations = useRecoilValue<ConsultationInstance[]>(arrayOfitemsGroupedByConsultationSelector);
-  const setAllConsultations = useSetRecoilState(consultationsState);
-  const [allTreatments, setAllTreatments] = useRecoilState(treatmentsState);
-  const [allMedicalFiles, setAllMedicalFiles] = useRecoilState(medicalFileState);
-
   const { refresh } = useDataLoader();
 
+  const setAllConsultations = useSetRecoilState(consultationsState);
+  const consultations = useMemo(() => person.consultations ?? [], [person.consultations]);
+
+  const setAllTreatments = useSetRecoilState(treatmentsState);
+  const treatments = useMemo(() => person.treatments ?? [], [person.treatments]);
+
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
-
-  const personConsultations = useMemo(() => (allConsultations || []).filter((c) => c.person === person._id), [allConsultations, person._id]);
-
-  const treatments = useMemo(() => (allTreatments || []).filter((t) => t.person === person._id), [allTreatments, person._id]);
-
-  const medicalFile: MedicalFileInstance | undefined = useMemo(
-    () => (allMedicalFiles || []).find((m) => m.person === person._id),
-    [allMedicalFiles, person._id]
-  );
+  const setAllMedicalFiles = useSetRecoilState(medicalFileState);
+  const medicalFile = person.medicalFile;
 
   const allMedicalDocuments = useMemo(() => {
     if (!medicalFile) return [];
@@ -92,7 +82,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
         createdBy: 'we do not care',
       },
     ];
-    for (const consultation of personConsultations) {
+    for (const consultation of consultations) {
       if (!!consultation?.onlyVisibleBy?.length) {
         if (!consultation.onlyVisibleBy.includes(user._id)) continue;
       }
@@ -126,7 +116,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
     }
 
     return [...treatmentsDocs, ...consultationsDocs, ...otherDocs].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  }, [personConsultations, medicalFile, treatments, user._id]);
+  }, [consultations, medicalFile, treatments, user._id]);
 
   return (
     <DocumentsModule
@@ -142,7 +132,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
           await API.delete({ path: document.downloadPath ?? `/person/${person._id}/document/${document.file.filename}` });
         }
         if (documentOrFolder.linkedItem.type === 'treatment') {
-          const treatment = allTreatments.find((t) => t._id === documentOrFolder.linkedItem._id);
+          const treatment = treatments.find((t) => t._id === documentOrFolder.linkedItem._id);
           if (!treatment) return false;
           const treatmentResponse = await API.put({
             path: `/treatment/${treatment._id}`,
@@ -167,7 +157,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
           }
         }
         if (documentOrFolder.linkedItem.type === 'consultation') {
-          const consultation = allConsultations.find((c) => c._id === documentOrFolder.linkedItem._id);
+          const consultation = consultations.find((c) => c._id === documentOrFolder.linkedItem._id);
           if (!consultation) return false;
           const consultationResponse = await API.put({
             path: `/consultation/${consultation._id}`,
@@ -219,7 +209,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
       }}
       onSubmitDocument={async (documentOrFolder) => {
         if (documentOrFolder.linkedItem.type === 'treatment') {
-          const treatment = allTreatments.find((t) => t._id === documentOrFolder.linkedItem._id);
+          const treatment = treatments.find((t) => t._id === documentOrFolder.linkedItem._id);
           if (!treatment) return;
           const treatmentResponse = await API.put({
             path: `/treatment/${treatment._id}`,
@@ -251,7 +241,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
           }
         }
         if (documentOrFolder.linkedItem.type === 'consultation') {
-          const consultation = allConsultations.find((c) => c._id === documentOrFolder.linkedItem._id);
+          const consultation = consultations.find((c) => c._id === documentOrFolder.linkedItem._id);
           if (!consultation) return;
           const consultationResponse = await API.put({
             path: `/consultation/${consultation._id}`,
@@ -331,7 +321,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
           const treatmentsToUpdate = await Promise.all(
             Object.keys(groupedById.treatment)
               .map((treatmentId) => {
-                const treatment = allTreatments.find((t) => t._id === treatmentId);
+                const treatment = treatments.find((t) => t._id === treatmentId);
                 if (!treatment) throw new Error('Treatment not found');
                 return prepareTreatmentForEncryption({
                   ...treatment,
@@ -344,7 +334,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
           const consultationsToUpdate = await Promise.all(
             Object.keys(groupedById.consultation)
               .map((consultationId) => {
-                const consultation = allConsultations.find((c) => c._id === consultationId);
+                const consultation = consultations.find((c) => c._id === consultationId);
                 if (!consultation) throw new Error('Consultation not found');
                 const nextConsultation = prepareConsultationForEncryption(organisation.consultations)({
                   ...consultation,
