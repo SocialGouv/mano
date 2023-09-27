@@ -6,6 +6,7 @@ const PasswordInput = ({ className, showPassword, setShowPassword, type, ...prop
     <input
       className={[className, '!tw-mb-0', showPassword ? 'show-password' : 'hide-password'].join(' ')}
       type={type || showPassword ? 'text' : 'password'}
+      autocapitalize="off"
       {...props}
     />
     <EyeIcon strikedThrough={showPassword} onClick={() => setShowPassword(!showPassword)} className="tw-absolute tw-right-4 tw-mb-auto" />
