@@ -1,3 +1,10 @@
+## [1.284.20](https://github.com/SocialGouv/mano/compare/v1.284.19...v1.284.20) (2023-09-27)
+
+
+### Bug Fixes
+
+* **dashboard:** performance dans le chargement des données ([#1675](https://github.com/SocialGouv/mano/issues/1675)) ([8e6d0dd](https://github.com/SocialGouv/mano/commit/8e6d0dd7a33dcf19f359f684e2107289d12dfcc5))
+
 ## [1.284.19](https://github.com/SocialGouv/mano/compare/v1.284.18...v1.284.19) (2023-09-26)
 
 
