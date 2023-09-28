@@ -53,7 +53,7 @@ const Menu = ({ navigation }) => {
         <Row withNextButton caption="Mentions Légales" onPress={() => navigation.navigate('Legal')} />
         <Row withNextButton caption="Politique de Confidentialité" onPress={() => navigation.navigate('Privacy')} />
         <Spacer height={30} />
-        {organisation._id === MANO_TEST_ORGANISATION_ID && (
+        {(__DEV__ || organisation._id === MANO_TEST_ORGANISATION_ID) && (
           <>
             <Row
               caption="Test Sentry"
