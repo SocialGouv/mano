@@ -1,3 +1,10 @@
+## [1.284.21](https://github.com/SocialGouv/mano/compare/v1.284.20...v1.284.21) (2023-09-28)
+
+
+### Bug Fixes
+
+* app crash navigators ([#1676](https://github.com/SocialGouv/mano/issues/1676)) ([e7de454](https://github.com/SocialGouv/mano/commit/e7de454564ad7eb80464cd118dd5a142aa89fa2c))
+
 ## [1.284.20](https://github.com/SocialGouv/mano/compare/v1.284.19...v1.284.20) (2023-09-27)
 
 
