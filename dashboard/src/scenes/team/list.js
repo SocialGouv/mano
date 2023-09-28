@@ -125,7 +125,12 @@ const Create = () => {
                 body: { name: values.name, organisation: organisation._id, nightSession: values.nightSession === 'true' },
               });
               if (!newTeamRes.ok) return actions.setSubmitting(false);
-              const userPutRes = await API.put({ path: `/user/${user._id}`, body: { team: [...(user.team || []), newTeamRes.data._id] } });
+              const userPutRes = await API.put({
+                path: `/user/${user._id}`,
+                body: {
+                  team: [...(user.teams || []).map((team) => team._id), newTeamRes.data._id],
+                },
+              });
               if (!userPutRes.ok) return actions.setSubmitting(false);
               const meResponse = await API.get({ path: '/user/me' });
               setUser(meResponse.user);
