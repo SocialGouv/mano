@@ -29,8 +29,8 @@ router.get("/version", async (req, res) => {
       `La nouvelle version ${MOBILE_APP_VERSION} de Mano est disponible !`,
       `Vous avez la version ${req.headers.version} actuellement sur votre téléphone.
 Cette nouvelle version :
-- Rafraichit les données automatiquement plus souvent pour une meilleure cohérence des données entre différents utilisateurs simultanés
-- Accélère le chargement initial des données
+- Fix un bug lorsque vous appelez une section "Documents"
+- Améliore le rapport d'erreur pour les développeurs, pour un meilleur support
 `,
       [
         { text: "Télécharger", link: `https://mano-app.fabrique.social.gouv.fr/download?ts=${Date.now()}` },

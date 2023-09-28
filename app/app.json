@@ -2,8 +2,8 @@
   "name": "mano",
   "displayName": "Mano",
   "version": {
-    "buildNumber": 17,
-    "buildName": "2.37.0"
+    "buildNumber": 18,
+    "buildName": "2.37.1"
   },
   "bundle": {
     "android": "com.mano",
