@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { atom, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { atom, useRecoilState, useSetRecoilState } from 'recoil';
 import { toast } from 'react-toastify';
 
 import { personsState } from '../recoil/persons';
@@ -37,6 +37,7 @@ const loaderTriggerState = atom({ key: 'loaderTriggerState', default: false });
 const isLoadingState = atom({ key: 'isLoadingState', default: false });
 const initialLoadState = atom({ key: 'isInitialLoadState', default: false });
 const fullScreenState = atom({ key: 'fullScreenState', default: true });
+const checkDataConsistencyAtom = atom({ key: 'checkDataConsistencyAtom', default: 'idle' }); // 'idle' | 'checking' | 'unconsistent'
 export const lastLoadState = atom({ key: 'lastLoadState', default: null, effects: [cacheEffect] });
 export const initialLoadingTextState = 'En attente de chargement';
 export const loadingTextState = atom({ key: 'loadingTextState', default: initialLoadingTextState });
@@ -65,7 +66,8 @@ export default function DataLoader() {
   const [isLoading, setIsLoading] = useRecoilState(isLoadingState);
   const [fullScreen, setFullScreen] = useRecoilState(fullScreenState);
   const [loadingText, setLoadingText] = useRecoilState(loadingTextState);
-  const initialLoad = useRecoilValue(initialLoadState);
+  const [checkDataConsistencyState, setDataConsistencyState] = useRecoilState(checkDataConsistencyAtom);
+  const [initialLoad, setInitialLoad] = useRecoilState(initialLoadState);
   const [organisation, setOrganisation] = useRecoilState(organisationState);
 
   const [loadList, setLoadList] = useState({ list: [], offset: 0 });
@@ -76,7 +78,7 @@ export default function DataLoader() {
   useEffect(() => {
     initLoader();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [progress, total, loaderTrigger, loadList.list.length, isLoading]);
+  }, [lastLoad, progress, total, loaderTrigger, loadList.list.length, isLoading]);
 
   useEffect(() => {
     fetchData();
@@ -86,6 +88,10 @@ export default function DataLoader() {
     updateProgress();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [progress, progressBuffer, loadList.list.length]);
+  useEffect(() => {
+    if (checkDataConsistencyState === 'checking') checkDataConsistency();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [checkDataConsistencyState]);
 
   const organisationId = organisation?._id;
 
@@ -116,6 +122,7 @@ export default function DataLoader() {
         .then(() => (initialLoad ? migrateData() : Promise.resolve()))
         .then(() => getCacheItem(dashboardCurrentCacheKey))
         .then((lastLoadValue) => {
+          console.log('lastLoadValue', lastLoadValue);
           setLastLoad(lastLoadValue || 0);
           API.get({
             path: '/organisation/stats',
@@ -127,6 +134,7 @@ export default function DataLoader() {
               withAllMedicalData: initialLoad,
             },
           }).then(({ data: stats }) => {
+            console.log('REFRESH stats', stats);
             if (!stats) return;
             const newList = [];
             let itemsCount =
@@ -404,6 +412,170 @@ export default function DataLoader() {
     }
   }
 
+  function checkDataConsistency() {
+    setDataConsistencyState('idle'); // to not trigger effect loop
+    Promise.resolve()
+      .then(async () => {
+        /*
+            Refresh organisation (and user), to get the latest organisation fields
+            and the latest user roles
+          */
+        const userResponse = await API.get({ path: '/user/me' });
+        if (!userResponse.ok) return resetLoaderOnError();
+        setOrganisation(userResponse.user.organisation);
+        setUser(userResponse.user);
+        // Get date from server at the very beginning of the loader.
+        const serverDateResponse = await API.get({ path: '/now' });
+        serverDate.current = serverDateResponse.data;
+      })
+      .then(() => {
+        API.get({
+          path: '/organisation/stats',
+          query: {
+            organisation: organisationId,
+            after: 0,
+            withDeleted: false,
+            // Medical data is never saved in cache so we always have to download all at every page reload.
+            withAllMedicalData: true,
+          },
+        }).then(({ data: stats }) => {
+          console.log('stats', stats);
+          if (!stats) return;
+
+          let cacheIsInvalidated = false;
+
+          setLoadingText('Récupération des données dans le cache');
+          Promise.resolve()
+            .then(() => getCacheItemDefaultValue('person', []))
+            .then((cachedPersons) => {
+              console.log('SAME Persons AS PREVIOUS', cachedPersons.length, stats.persons, persons.length);
+              setPersons([...cachedPersons]);
+              if (stats.persons !== cachedPersons.length) {
+                cacheIsInvalidated = true;
+              }
+            })
+            .then(() => getCacheItemDefaultValue('group', []))
+            .then((cachedGroups) => {
+              console.log('SAME groups AS PREVIOUS', cachedGroups.length, stats.groups, groups.length);
+              setGroups([...cachedGroups]);
+              if (stats.groups !== cachedGroups.length) {
+                cacheIsInvalidated = true;
+              }
+            })
+            .then(() => getCacheItemDefaultValue('report', []))
+            .then((cachedReports) => {
+              console.log('SAME cachedReports AS PREVIOUS', cachedReports.length, stats.reports, reports.length);
+              setReports([...cachedReports]);
+              if (stats.reports !== cachedReports.length) {
+                cacheIsInvalidated = true;
+              }
+            })
+            .then(() => getCacheItemDefaultValue('passage', []))
+            .then((cachedPassages) => {
+              console.log('SAME cachedPassages AS PREVIOUS', cachedPassages.length, stats.passages, passages.length);
+              setPassages([...cachedPassages]);
+              if (stats.passages !== cachedPassages.length) {
+                cacheIsInvalidated = true;
+              }
+            })
+            .then(() => getCacheItemDefaultValue('rencontre', []))
+            .then((cachedRencontres) => {
+              console.log('SAME cachedRencontres AS PREVIOUS', cachedRencontres.length, stats.rencontres, rencontres.length);
+              setRencontres([...cachedRencontres]);
+              if (stats.rencontres !== cachedRencontres.length) {
+                cacheIsInvalidated = true;
+              }
+            })
+            .then(() => getCacheItemDefaultValue('action', []))
+            .then((cachedActions) => {
+              console.log('SAME cachedActions AS PREVIOUS', cachedActions.length, stats.actions, actions.length);
+              setActions([...cachedActions]);
+              if (stats.actions !== cachedActions.length) {
+                cacheIsInvalidated = true;
+              }
+            })
+            .then(() => getCacheItemDefaultValue('territory', []))
+            .then((cachedTerritories) => {
+              console.log('SAME cachedTerritories AS PREVIOUS', cachedTerritories.length, stats.territories, territories.length);
+              setTerritories([...cachedTerritories]);
+              if (stats.territories !== cachedTerritories.length) {
+                cacheIsInvalidated = true;
+              }
+            })
+            .then(() => getCacheItemDefaultValue('place', []))
+            .then((cachedPlaces) => {
+              console.log('SAME cachedPlaces AS PREVIOUS', cachedPlaces.length, stats.places, places.length);
+              setPlaces([...cachedPlaces]);
+              if (stats.places !== cachedPlaces.length) {
+                cacheIsInvalidated = true;
+              }
+            })
+            .then(() => getCacheItemDefaultValue('relPersonPlace', []))
+            .then((cachedRelsPersonPlace) => {
+              console.log('SAME cachedRelsPersonPlace AS PREVIOUS', cachedRelsPersonPlace.length, stats.relsPersonPlace, relsPersonPlace.length);
+              setRelsPersonPlace([...cachedRelsPersonPlace]);
+              if (stats.relsPersonPlace !== cachedRelsPersonPlace.length) {
+                cacheIsInvalidated = true;
+              }
+            })
+            .then(() => getCacheItemDefaultValue('territory-observation', []))
+            .then((cachedTerritoryObservations) => {
+              console.log(
+                'SAME cachedTerritoryObservations AS PREVIOUS',
+                cachedTerritoryObservations.length,
+                stats.territoryObservations,
+                territoryObservations.length
+              );
+              setTerritoryObservations([...cachedTerritoryObservations]);
+              if (stats.territoryObservations !== cachedTerritoryObservations.length) {
+                cacheIsInvalidated = true;
+              }
+            })
+            .then(() => getCacheItemDefaultValue('comment', []))
+            .then((cachedComments) => {
+              console.log('SAME cachedComments AS PREVIOUS', cachedComments.length, stats.comments, comments.length);
+              setComments([...cachedComments]);
+              if (stats.comments !== cachedComments.length) {
+                cacheIsInvalidated = true;
+              }
+            })
+            .then(() => {
+              if (stats.consultations !== consultations.length) {
+                cacheIsInvalidated = true;
+              }
+              if (stats.treatments !== treatments.length) {
+                cacheIsInvalidated = true;
+              }
+              if (stats.medicalFiles !== medicalFiles.length) {
+                cacheIsInvalidated = true;
+              }
+            })
+            .then(async () => {
+              console.log('cacheIsInvalidated', cacheIsInvalidated);
+              if (cacheIsInvalidated) {
+                await clearCache().then(() => {
+                  // startInitialLoad
+                  setLastLoad(0);
+                  setIsLoading(true);
+                  setFullScreen(true);
+                  setInitialLoad(true);
+                  setLoaderTrigger(true);
+                  setLoadingText('Chargement des données');
+                  setDataConsistencyState('idle');
+                });
+              } else {
+                // refresh
+                setIsLoading(true);
+                setFullScreen(false);
+                setInitialLoad(false);
+                setLoaderTrigger(true);
+                setLoadingText('Mise à jour des données');
+              }
+            });
+        });
+      });
+  }
+
   if (!isLoading) return <RandomPicturePreloader />;
   if (!total && !fullScreen) return null;
 
@@ -432,6 +604,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
   const setInitialLoad = useSetRecoilState(initialLoadState);
   const setLoadingText = useSetRecoilState(loadingTextState);
   const setLastLoad = useSetRecoilState(lastLoadState);
+  const setDataConsistencyState = useSetRecoilState(checkDataConsistencyAtom);
 
   useEffect(function refreshOnMountEffect() {
     if (options.refreshOnMount && !isLoading) refresh();
@@ -445,7 +618,8 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     setLoaderTrigger(true);
     setLoadingText('Mise à jour des données');
   }
-  function load() {
+
+  function startInitialLoad() {
     setIsLoading(true);
     setFullScreen(true);
     setInitialLoad(true);
@@ -454,14 +628,19 @@ export function useDataLoader(options = { refreshOnMount: false }) {
   }
 
   async function resetCache() {
-    await clearCache();
     setLastLoad(0);
+    await clearCache();
+  }
+
+  async function checkDataConsistency() {
+    setDataConsistencyState('checking');
   }
 
   return {
     refresh,
-    load,
+    startInitialLoad,
     resetCache,
+    checkDataConsistency,
     isLoading: Boolean(isLoading),
     isFullScreen: Boolean(fullScreen),
   };

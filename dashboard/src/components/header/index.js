@@ -13,11 +13,40 @@ const Header = ({ title, refreshButton = false, style = {}, titleStyle = {}, cla
 };
 
 export const RefreshButton = ({ className }) => {
-  const { refresh, isLoading } = useDataLoader();
+  const { refresh, isLoading, checkDataConsistency } = useDataLoader();
+  const [buttonTitle, setButtonTitle] = React.useState('Rafraichir');
+
+  React.useEffect(() => {
+    function enableCheckDataConsistency(e) {
+      // if option, then set title to check data consistency
+      if (e.key === 'Alt') setButtonTitle('NOUVEAU RAFRAICHIR');
+    }
+    function disableCheckDataConsistency(e) {
+      setButtonTitle('Rafraichir');
+    }
+
+    window.addEventListener('keydown', enableCheckDataConsistency);
+    window.addEventListener('keyup', disableCheckDataConsistency);
+    return () => {
+      window.removeEventListener('keydown', enableCheckDataConsistency);
+      window.removeEventListener('keyup', disableCheckDataConsistency);
+    };
+  }, []);
+
   return (
-    <>
-      <ButtonCustom color="link" className={className} title="Rafraichir" onClick={() => refresh()} disabled={isLoading} />
-    </>
+    <ButtonCustom
+      color="link"
+      className={className}
+      title={buttonTitle}
+      onClick={() => {
+        if (buttonTitle === 'Rafraichir') {
+          refresh();
+        } else {
+          checkDataConsistency();
+        }
+      }}
+      disabled={isLoading}
+    />
   );
 };
 
