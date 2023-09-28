@@ -27,7 +27,7 @@ const FoldersNavigator = (props) => {
           </FoldersStack.Screen>
         );
       })}
-      <FoldersStack.Screen name="SocialDocuments">{(stackProps) => <Documents {...props} {...stackProps} />}</FoldersStack.Screen>
+      <FoldersStack.Screen name="Documents_Mano">{(stackProps) => <Documents {...props} {...stackProps} />}</FoldersStack.Screen>
       <FoldersStack.Screen name="Group">{(stackProps) => <Group {...props} {...stackProps} />}</FoldersStack.Screen>
       {!!user?.healthcareProfessional && (
         <FoldersStack.Screen name="MedicalFile">{(stackProps) => <MedicalFile {...props} {...stackProps} />}</FoldersStack.Screen>
@@ -49,7 +49,7 @@ const FoldersSummary = ({ navigation, backgroundColor }) => {
       {customFieldsPersons.map(({ name }) => {
         return <Row key={name} withNextButton caption={name} onPress={() => navigation.navigate(name)} />;
       })}
-      <Row withNextButton caption="Documents" onPress={() => navigation.navigate('SocialDocuments')} />
+      <Row withNextButton caption="Documents" onPress={() => navigation.navigate('Documents_Mano')} />
       {!!organisation.groupsEnabled && <Row withNextButton caption="Liens Familiaux" onPress={() => navigation.navigate('Group')} />}
       {!!user?.healthcareProfessional && (
         <>
