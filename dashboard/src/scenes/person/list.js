@@ -26,6 +26,7 @@ import useSearchParamState from '../../services/useSearchParamState';
 import { useDataLoader } from '../../components/DataLoader';
 import ExclamationMarkButton from '../../components/tailwind/ExclamationMarkButton';
 import { customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
+import useMinimumWidth from '../../services/useMinimumWidth';
 
 const limit = 20;
 
@@ -92,6 +93,7 @@ const filterPersonsWithAllFieldsSelector = selector({
 const List = () => {
   useTitle('Personnes');
   useDataLoader({ refreshOnMount: true });
+  const isDesktop = useMinimumWidth('sm');
   const filterPersonsWithAllFields = useRecoilValue(filterPersonsWithAllFieldsSelector);
 
   const [search, setSearch] = useSearchParamState('search', '');
@@ -142,7 +144,7 @@ const List = () => {
           </div>
         </div>
       </div>
-      <details className="[&_summary]:open:tw-opacity-10">
+      <details open={isDesktop} className="[&_summary]:open:tw-opacity-10">
         <summary className="tw-my-2 tw-mx-4">Recherche et filtres...</summary>
         <div className="tw-mb-5 tw-flex tw-flex-wrap ">
           <div className="tw-mb-5 tw-flex tw-w-full tw-items-start tw-justify-start">
