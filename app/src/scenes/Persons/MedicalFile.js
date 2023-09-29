@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
-import dayjs from 'dayjs';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { v4 as uuidv4 } from 'uuid';
 import ScrollContainer from '../../components/ScrollContainer';
 import Button from '../../components/Button';
@@ -28,6 +27,7 @@ import CommentRow from '../Comments/CommentRow';
 import NewCommentInput from '../Comments/NewCommentInput';
 import { Alert } from 'react-native';
 import { formatBirthDateAndAge } from '../../services/dateDayjs';
+import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
 
 const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, editable, onEdit, isUpdateDisabled, backgroundColor, onChange }) => {
   const organisation = useRecoilValue(organisationState);
@@ -39,14 +39,17 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
 
   const allConsultations = useRecoilValue(consultationsState);
   const allTreatments = useRecoilValue(treatmentsState);
-  const [allMedicalFiles, setAllMedicalFiles] = useRecoilState(medicalFileState);
+  const setAllMedicalFiles = useSetRecoilState(medicalFileState);
 
   const consultations = useMemo(() => (allConsultations || []).filter((c) => c.person === personDB._id), [allConsultations, personDB._id]);
 
   const treatments = useMemo(() => (allTreatments || []).filter((t) => t.person === personDB._id), [allTreatments, personDB._id]);
 
-  const medicalFileDB = useMemo(() => (allMedicalFiles || []).find((m) => m.person === personDB._id), [allMedicalFiles, personDB._id]);
-  const [medicalFile, setMedicalFile] = useState(medicalFileDB);
+  const populatedPersons = useRecoilValue(itemsGroupedByPersonSelector);
+  const populatedPerson = useMemo(() => populatedPersons[personDB?._id] || {}, [populatedPersons, personDB._id]);
+
+  const medicalFileDB = populatedPerson.medicalFile;
+  const [medicalFile, setMedicalFile] = useState(populatedPerson.medicalFile);
   const [writingComment, setWritingComment] = useState('');
 
   useEffect(() => {

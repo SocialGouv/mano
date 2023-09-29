@@ -7,14 +7,13 @@ import CustomFieldDisplay from '../../../components/CustomFieldDisplay';
 import { sortActionsOrConsultations } from '../../../recoil/actions';
 import { arrayOfitemsGroupedByConsultationSelector } from '../../../recoil/selectors';
 import { treatmentsState } from '../../../recoil/treatments';
-import { medicalFileState, customFieldsMedicalFileSelector } from '../../../recoil/medicalFiles';
+import { customFieldsMedicalFileSelector } from '../../../recoil/medicalFiles';
 import { useLocalStorage } from '../../../services/useLocalStorage';
 
 export function MedicalFilePrint({ person }) {
   const organisation = useRecoilValue(organisationState);
   const allConsultations = useRecoilValue(arrayOfitemsGroupedByConsultationSelector);
   const allTreatments = useRecoilValue(treatmentsState);
-  const allMedicalFiles = useRecoilValue(medicalFileState);
   const team = useRecoilValue(currentTeamState);
 
   const [consultationTypes] = useLocalStorage('consultation-types', []);
@@ -39,7 +38,7 @@ export function MedicalFilePrint({ person }) {
 
   const treatments = useMemo(() => (allTreatments || []).filter((t) => t.person === person._id), [allTreatments, person._id]);
 
-  const medicalFile = useMemo(() => (allMedicalFiles || []).find((m) => m.person === person._id), [allMedicalFiles, person._id]);
+  const medicalFile = person.medicalFile;
 
   return (
     <div className="printonly">
