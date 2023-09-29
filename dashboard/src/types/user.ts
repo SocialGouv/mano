@@ -10,5 +10,6 @@ export type UserInstance = {
   termsAccepted: Date | null;
   healthcareProfessional: boolean | null;
   role: 'normal' | 'admin'; // Add other roles if available.
-  team: UUIDV4[];
+  team?: UUIDV4[];
+  teams?: UUIDV4[];
 };
