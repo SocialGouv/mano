@@ -11,7 +11,7 @@ import {
 import { outOfBoundariesDate } from '../../../services/date';
 import SelectTeamMultiple from '../../../components/SelectTeamMultiple';
 import { currentTeamState, userState } from '../../../recoil/auth';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import CustomFieldInput from '../../../components/CustomFieldInput';
 import { useMemo, useState } from 'react';
 import ButtonCustom from '../../../components/ButtonCustom';
@@ -31,8 +31,8 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
   const team = useRecoilValue(currentTeamState);
   const [persons, setPersons] = useRecoilState(personsState);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
-  const [allMedicalFiles, setAllMedicalFiles] = useRecoilState(medicalFileState);
-  const medicalFile = useMemo(() => (allMedicalFiles || []).find((m) => m.person === person._id), [allMedicalFiles, person._id]);
+  const setAllMedicalFiles = useSetRecoilState(medicalFileState);
+  const medicalFile = person.medicalFile;
 
   const customFieldsMedicalFileWithLegacyFields = useMemo(() => {
     const c = [...customFieldsMedicalFile];
