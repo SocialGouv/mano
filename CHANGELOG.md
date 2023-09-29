@@ -1,3 +1,10 @@
+## [1.284.23](https://github.com/SocialGouv/mano/compare/v1.284.22...v1.284.23) (2023-09-29)
+
+
+### Bug Fixes
+
+* **dashboard:** edit medical file ([#1684](https://github.com/SocialGouv/mano/issues/1684)) ([ef375b4](https://github.com/SocialGouv/mano/commit/ef375b4a6a6ce63706c939c5645d27f1e9343030))
+
 ## [1.284.22](https://github.com/SocialGouv/mano/compare/v1.284.21...v1.284.22) (2023-09-29)
 
 
