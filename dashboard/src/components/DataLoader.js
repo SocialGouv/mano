@@ -105,6 +105,7 @@ export default function DataLoader() {
     const shouldStop = progress !== null && total !== null && isLoading;
 
     if (shouldStart) {
+      console.log('START FUCKING SHIT initialLoad', initialLoad);
       Promise.resolve()
         .then(async () => {
           /*
@@ -123,6 +124,17 @@ export default function DataLoader() {
         .then(() => getCacheItem(dashboardCurrentCacheKey))
         .then((lastLoadValue) => {
           console.log('lastLoadValue', lastLoadValue);
+          console.log('initialLoad', initialLoad);
+          console.log({
+            path: '/organisation/stats',
+            query: {
+              organisation: organisationId,
+              after: lastLoadValue || 0,
+              withDeleted: true,
+              // Medical data is never saved in cache so we always have to download all at every page reload.
+              withAllMedicalData: initialLoad,
+            },
+          });
           setLastLoad(lastLoadValue || 0);
           API.get({
             path: '/organisation/stats',
