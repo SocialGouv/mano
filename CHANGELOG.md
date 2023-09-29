@@ -1,3 +1,10 @@
+## [1.284.22](https://github.com/SocialGouv/mano/compare/v1.284.21...v1.284.22) (2023-09-29)
+
+
+### Bug Fixes
+
+* **dashboard:** new team ([#1683](https://github.com/SocialGouv/mano/issues/1683)) ([4f018c5](https://github.com/SocialGouv/mano/commit/4f018c515620ef87a22424344070532e02e4eefe))
+
 ## [1.284.21](https://github.com/SocialGouv/mano/compare/v1.284.20...v1.284.21) (2023-09-28)
 
 
