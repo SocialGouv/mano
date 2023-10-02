@@ -407,7 +407,7 @@ export default function DataLoader() {
   async function resetLoaderOnError() {
     // an error was thrown, the data was not downloaded,
     // this can result in data corruption, we need to reset the loader
-    await clearCache();
+    await clearCache('resetLoaderOnError');
     setLastLoad(0);
     toast.error('Désolé, une erreur est survenue lors du chargement de vos données, veuillez réessayer', {
       onClose: () => window.location.replace('/auth'),
@@ -565,7 +565,7 @@ export default function DataLoader() {
             .then(async () => {
               console.log('cacheIsInvalidated', cacheIsInvalidated);
               if (cacheIsInvalidated) {
-                await clearCache().then(() => {
+                await clearCache('cacheIsInvalidated').then(() => {
                   // startInitialLoad
                   setLastLoad(0);
                   setIsLoading(true);
@@ -639,9 +639,9 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     setLoadingText('Chargement des données');
   }
 
-  async function resetCache() {
+  async function resetCache(from) {
+    await clearCache('resetCache' + (from ? ` from ${from}` : ''));
     setLastLoad(0);
-    await clearCache();
   }
 
   async function checkDataConsistency() {

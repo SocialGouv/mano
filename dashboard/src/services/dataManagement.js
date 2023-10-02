@@ -52,7 +52,8 @@ async function getManoCacheStorage() {
   return manoCacheStorage;
 }
 
-export async function clearCache() {
+export async function clearCache(calledFrom) {
+  console.log('clearCache called from', calledFrom);
   (await getManoCacheStorage())?.clear();
   manoCacheStorage = undefined; // needed so that the clean the all DB when required functions
   window.localStorage?.clear();

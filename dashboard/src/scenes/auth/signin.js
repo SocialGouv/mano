@@ -64,7 +64,7 @@ const SignIn = () => {
         setAuthViaCookie(true);
         const { organisation } = user;
         if (organisation._id !== window.localStorage.getItem('mano-organisationId')) {
-          await resetCache();
+          await resetCache('reset cache from different organisation');
         }
         window.localStorage.setItem('mano-organisationId', organisation._id);
         setOrganisation(organisation);
@@ -112,7 +112,7 @@ const SignIn = () => {
       if (token) setToken(token);
       setSessionInitialTimestamp(Date.now());
       if (organisation._id !== window.localStorage.getItem('mano-organisationId')) {
-        await resetCache();
+        await resetCache('reset cache from different organisation too');
       }
       window.localStorage.setItem('mano-organisationId', organisation._id);
       setOrganisation(organisation);
