@@ -1,3 +1,11 @@
+## [1.284.24](https://github.com/SocialGouv/mano/compare/v1.284.23...v1.284.24) (2023-10-02)
+
+
+### Bug Fixes
+
+* **dashboard:** évalue le nombre de commentaires qui sont en fait un historique de personne suivie ([#1686](https://github.com/SocialGouv/mano/issues/1686)) ([cc159df](https://github.com/SocialGouv/mano/commit/cc159df0cc7f7d6e8d17edb1d864d6ebb4265941))
+* **dashboard:** possibilité d'importer aussi la date et les raisons de sortie de file active ([#1685](https://github.com/SocialGouv/mano/issues/1685)) ([2b61c8c](https://github.com/SocialGouv/mano/commit/2b61c8c7a6a77781071c6a488fa072c22ad19f24))
+
 ## [1.284.23](https://github.com/SocialGouv/mano/compare/v1.284.22...v1.284.23) (2023-09-29)
 
 
