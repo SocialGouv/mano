@@ -111,51 +111,6 @@ export default function useDataMigrator() {
           migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
         }
       }
-
-      if (!organisation.migrations?.includes('re-evaluate-comments-in-persons-history')) {
-        setLoadingText(LOADING_TEXT);
-        const comments = await API.get({
-          path: '/comment',
-          query: { organisation: organisationId, after: 0, withDeleted: false },
-        }).then((res) => res.decryptedData || []);
-
-        const persons = await API.get({
-          path: '/person',
-          query: { organisation: organisationId, after: 0, withDeleted: false },
-        }).then((res) => res.decryptedData || []);
-
-        const personHistoryComments = comments.filter((c) => {
-          if (!c.comment.includes('Changement de')) return false;
-          if (!c.comment.includes('Avant:')) return false;
-          if (!c.comment.includes('Désormais:')) return false;
-          return true;
-        });
-
-        const earlisestComment = personHistoryComments[personHistoryComments.length - 1]?.createdAt?.split('T')[0];
-        const latestComment = personHistoryComments[0]?.createdAt?.split('T')[0];
-        capture(
-          `ECOMHISTFORCSV: ${organisation._id},${comments.length},${personHistoryComments.length},${persons.length},${earlisestComment},${latestComment}`,
-          {
-            extra: {
-              organisationId,
-              'total-comments': comments.length,
-              'total-history-comments': personHistoryComments.length,
-              'total-persons': persons.length,
-              'earliest-comment': earlisestComment,
-              'latest-comment': latestComment,
-            },
-          }
-        );
-
-        const response = await API.put({
-          path: `/migration/evaluate-comments-in-persons-history`,
-          query: { migrationLastUpdateAt },
-        });
-        if (response.ok) {
-          setOrganisation(response.organisation);
-          migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
-        }
-      }
     },
   };
 }
