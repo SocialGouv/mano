@@ -112,7 +112,7 @@ export default function useDataMigrator() {
         }
       }
 
-      if (!organisation.migrations?.includes('evaluate-comments-in-persons-history')) {
+      if (!organisation.migrations?.includes('re-evaluate-comments-in-persons-history')) {
         setLoadingText(LOADING_TEXT);
         const comments = await API.get({
           path: '/comment',
@@ -131,16 +131,18 @@ export default function useDataMigrator() {
           return true;
         });
 
+        const earlisestComment = personHistoryComments[personHistoryComments.length - 1]?.createdAt?.split('T')[0];
+        const latestComment = personHistoryComments[0]?.createdAt?.split('T')[0];
         capture(
-          `Evaluate comments in persons history: ${organisation.name} - ${comments.length} coms - ${personHistoryComments.length} hist - ${persons.length} persons`,
+          `ECOMHISTFORCSV: ${organisation._id},${comments.length},${personHistoryComments.length},${persons.length},${earlisestComment},${latestComment}`,
           {
             extra: {
               organisationId,
               'total-comments': comments.length,
               'total-history-comments': personHistoryComments.length,
               'total-persons': persons.length,
-              'earliest-comment': personHistoryComments[personHistoryComments.length - 1]?.createdAt,
-              'latest-comment': personHistoryComments[0]?.createdAt,
+              'earliest-comment': earlisestComment,
+              'latest-comment': latestComment,
             },
           }
         );
