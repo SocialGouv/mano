@@ -1,3 +1,10 @@
+## [1.284.26](https://github.com/SocialGouv/mano/compare/v1.284.25...v1.284.26) (2023-10-02)
+
+
+### Bug Fixes
+
+* **dashboard:** fin de levalutation ([2d7c9e5](https://github.com/SocialGouv/mano/commit/2d7c9e5f8f82bc15253b9331f6a39a63a1170f76))
+
 ## [1.284.25](https://github.com/SocialGouv/mano/compare/v1.284.24...v1.284.25) (2023-10-02)
 
 
