@@ -422,8 +422,19 @@ function AddDocumentInput({ personId, onAddDocuments }: AddDocumentInputProps) {
       key={resetFileInputKey}
       name="file"
       className="tw-hidden"
+      onClick={(e) => {
+        if (!personId) {
+          e.preventDefault();
+          toast.error('Veuillez sélectionner une personne auparavant');
+          return;
+        }
+      }}
       onChange={async (e) => {
         if (!e.target.files?.length) return;
+        if (!personId) {
+          toast.error('Veuillez sélectionner une personne auparavant');
+          return;
+        }
         const docsResponses = [];
         for (let i = 0; i < e.target.files.length; i++) {
           const fileToUpload = e.target.files[i] as any;
