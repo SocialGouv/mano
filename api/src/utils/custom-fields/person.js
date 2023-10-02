@@ -31,7 +31,7 @@ const personFields = [
     options: ["Oui", "Non"],
     filterable: true,
   },
-  { name: "outOfActiveListDate", type: "date", label: "Date de sortie de file active", encrypted: true, importable: false, filterable: true },
+  { name: "outOfActiveListDate", type: "date", label: "Date de sortie de file active", encrypted: true, importable: true, filterable: true },
   { name: "documents", type: "files", label: "Documents", encrypted: true, importable: false, filterable: false },
   { name: "history", type: "history", label: "Historique", encrypted: true, importable: false, filterable: false },
 ];
@@ -40,6 +40,7 @@ const fieldsPersonsCustomizableOptions = [
   {
     name: "outOfActiveListReasons",
     type: "multi-choice",
+    importable: true,
     label: "Motifs de sortie de file active",
     options: [
       "Relai vers autre structure",
