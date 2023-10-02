@@ -105,7 +105,6 @@ export default function DataLoader() {
     const shouldStop = progress !== null && total !== null && isLoading;
 
     if (shouldStart) {
-      console.log('START FUCKING SHIT initialLoad', initialLoad);
       Promise.resolve()
         .then(async () => {
           /*
@@ -123,18 +122,6 @@ export default function DataLoader() {
         .then(() => (initialLoad ? migrateData() : Promise.resolve()))
         .then(() => getCacheItem(dashboardCurrentCacheKey))
         .then((lastLoadValue) => {
-          console.log('lastLoadValue', lastLoadValue);
-          console.log('initialLoad', initialLoad);
-          console.log({
-            path: '/organisation/stats',
-            query: {
-              organisation: organisationId,
-              after: lastLoadValue || 0,
-              withDeleted: true,
-              // Medical data is never saved in cache so we always have to download all at every page reload.
-              withAllMedicalData: initialLoad,
-            },
-          });
           setLastLoad(lastLoadValue || 0);
           API.get({
             path: '/organisation/stats',
@@ -146,7 +133,6 @@ export default function DataLoader() {
               withAllMedicalData: initialLoad,
             },
           }).then(({ data: stats }) => {
-            console.log('REFRESH stats', stats);
             if (!stats) return;
             const newList = [];
             let itemsCount =
@@ -407,7 +393,7 @@ export default function DataLoader() {
   async function resetLoaderOnError() {
     // an error was thrown, the data was not downloaded,
     // this can result in data corruption, we need to reset the loader
-    await clearCache('resetLoaderOnError');
+    await clearCache();
     setLastLoad(0);
     toast.error('Désolé, une erreur est survenue lors du chargement de vos données, veuillez réessayer', {
       onClose: () => window.location.replace('/auth'),
@@ -565,7 +551,7 @@ export default function DataLoader() {
             .then(async () => {
               console.log('cacheIsInvalidated', cacheIsInvalidated);
               if (cacheIsInvalidated) {
-                await clearCache('cacheIsInvalidated').then(() => {
+                await clearCache().then(() => {
                   // startInitialLoad
                   setLastLoad(0);
                   setIsLoading(true);
@@ -639,8 +625,8 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     setLoadingText('Chargement des données');
   }
 
-  async function resetCache(from) {
-    await clearCache('resetCache' + (from ? ` from ${from}` : ''));
+  async function resetCache() {
+    await clearCache();
     setLastLoad(0);
   }
 
