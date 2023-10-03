@@ -1,3 +1,10 @@
+## [1.284.27](https://github.com/SocialGouv/mano/compare/v1.284.26...v1.284.27) (2023-10-03)
+
+
+### Bug Fixes
+
+* **dashboard:** statistiques des consultations: les chiffres des types de consultation se basaient sur le total général des consultations, désormais ils se basent sur le total des consultations de chaque type ([#1689](https://github.com/SocialGouv/mano/issues/1689)) ([4f6f6d4](https://github.com/SocialGouv/mano/commit/4f6f6d49f5f81fa7d748272af4572d72752eda04))
+
 ## [1.284.26](https://github.com/SocialGouv/mano/compare/v1.284.25...v1.284.26) (2023-10-02)
 
 
