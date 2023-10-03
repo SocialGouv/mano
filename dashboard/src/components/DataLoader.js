@@ -211,7 +211,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
         const res = await API.get({ path: '/report', query: { ...query, page: String(page) } });
         if (!res.ok || !res.data.length) return resetLoaderOnError();
         setProgress((p) => p + res.data.length);
-        setReports((items) => mergeItems(items, res.decryptedData));
+        setReports((items) => mergeItems(items, res.decryptedData, { filterNewItemsFunction: (r) => !!r.team && !!r.date }));
         if (res.hasMore) return loadReports(page + 1);
         return true;
       }
@@ -344,7 +344,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
         const res = await API.get({ path: '/consultation', query: { ...query, page: String(page), after: initialLoad ? 0 : lastLoadValue } });
         if (!res.ok || !res.data.length) return resetLoaderOnError();
         setProgress((p) => p + res.data.length);
-        setConsultations((items) => mergeItems(items, res.decryptedData, formatConsultation));
+        setConsultations((items) => mergeItems(items, res.decryptedData, { formatNewItemsFunction: formatConsultation }));
         if (res.hasMore) return loadConsultations(page + 1);
         return true;
       }
@@ -412,13 +412,16 @@ export function useDataLoader(options = { refreshOnMount: false }) {
   };
 }
 
-export function mergeItems(oldItems, newItems = [], formatNewItemsFunction) {
+export function mergeItems(oldItems, newItems = [], { formatNewItemsFunction, filterNewItemsFunction } = {}) {
   const newItemsCleanedAndFormatted = [];
   const newItemIds = {};
 
   for (const newItem of newItems) {
     newItemIds[newItem._id] = true;
     if (newItem.deletedAt) continue;
+    if (filterNewItemsFunction) {
+      if (!filterNewItemsFunction(newItem)) continue;
+    }
     if (formatNewItemsFunction) {
       newItemsCleanedAndFormatted.push(formatNewItemsFunction(newItem));
     } else {

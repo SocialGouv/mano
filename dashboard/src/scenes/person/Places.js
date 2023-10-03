@@ -40,6 +40,11 @@ const PersonPlaces = ({ person }) => {
     return personPlaces.length !== new Set(personPlaces).size;
   }, [person.relsPersonPlace]);
 
+  const sortedPlaces = useMemo(() => {
+    if (!person.relsPersonPlace?.length) return [];
+    return [...person.relsPersonPlace]?.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  }, [person.relsPersonPlace]);
+
   return (
     <>
       <div className="tw-my-10 tw-flex tw-items-center tw-gap-2">
@@ -74,7 +79,7 @@ const PersonPlaces = ({ person }) => {
             </tr>
           </thead>
           <tbody className="small">
-            {person.relsPersonPlace?.map((relPersonPlace) => {
+            {sortedPlaces?.map((relPersonPlace) => {
               const { place: placeId, createdAt, user } = relPersonPlace;
               const place = places.find((p) => p._id === placeId);
               return (

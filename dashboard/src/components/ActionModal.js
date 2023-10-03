@@ -612,7 +612,9 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                 .filter(Boolean)
                 .join(' ')}>
               <CommentsModule
-                comments={action?.comments.map((comment) => ({ ...comment, type: 'action', person: action.person }))}
+                comments={action?.comments
+                  .map((comment) => ({ ...comment, type: 'action', person: action.person }))
+                  .sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt))}
                 color="main"
                 canToggleUrgentCheck
                 typeForNewComment="action"
