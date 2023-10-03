@@ -330,7 +330,7 @@ router.post(
     };
 
     const prevUser = await User.findOne({ where: { email: newUser.email } });
-    if (prevUser) return res.status(400).send({ ok: false, error: "A user already exists with this email" });
+    if (prevUser) return res.status(400).send({ ok: false, error: "Un utilisateur existe déjà avec cet email" });
 
     const data = await User.create(newUser, { returning: true });
 

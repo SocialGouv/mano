@@ -1,23 +1,19 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Col, FormGroup, Input, Modal, ModalBody, ModalHeader, Row, Label } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
-import { Formik } from 'formik';
 import { toast } from 'react-toastify';
-import styled from 'styled-components';
 import { useRecoilValue } from 'recoil';
-import { SmallHeader } from '../../components/header';
-import SelectTeamMultiple from '../../components/SelectTeamMultiple';
-import Loading from '../../components/loading';
-import ButtonCustom from '../../components/ButtonCustom';
-import Table from '../../components/table';
-import CreateWrapper from '../../components/createWrapper';
-import TagTeam from '../../components/TagTeam';
-import { userState } from '../../recoil/auth';
+import { teamsState, userState } from '../../recoil/auth';
 import API from '../../services/api';
 import { formatDateWithFullMonth } from '../../services/date';
 import useTitle from '../../services/useTitle';
-import SelectRole from '../../components/SelectRole';
 import { useLocalStorage } from '../../services/useLocalStorage';
+import { ModalBody, ModalContainer, ModalHeader, ModalFooter } from '../../components/tailwind/Modal';
+import { SmallHeader } from '../../components/header';
+import SelectTeamMultiple from '../../components/SelectTeamMultiple';
+import Loading from '../../components/loading';
+import Table from '../../components/table';
+import TagTeam from '../../components/TagTeam';
+import SelectRole from '../../components/SelectRole';
 import { emailRegex } from '../../utils';
 
 const defaultSort = (a, b, sortOrder) => (sortOrder === 'ASC' ? (a.name || '').localeCompare(b.name) : (b.name || '').localeCompare(a.name));
@@ -57,25 +53,24 @@ const List = () => {
   const [sortBy, setSortBy] = useLocalStorage('users-sortBy', 'createdAt');
   const [sortOrder, setSortOrder] = useLocalStorage('users-sortOrder', 'ASC');
 
-  const getUsers = async () => {
-    const response = await API.get({ path: '/user' });
-    if (response.error) return toast.error(response.error);
-    setUsers(response.data);
-    setRefresh(false);
-  };
-
   const data = useMemo(() => users.sort(sortUsers(sortBy, sortOrder)), [users, sortBy, sortOrder]);
 
   useEffect(() => {
-    getUsers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    API.get({ path: '/user' }).then((response) => {
+      if (response.error) {
+        toast.error(response.error);
+        return false;
+      }
+      setUsers(response.data);
+      setRefresh(false);
+    });
   }, [refresh]);
 
-  if (!!refresh) return <Loading />;
+  if (!users.length) return <Loading />;
   return (
     <>
       <SmallHeader title="Utilisateurs" />
-      {['superadmin', 'admin'].includes(user.role) && <Create onChange={() => setRefresh(true)} />}
+      {['admin'].includes(user.role) && <Create users={users} onChange={() => setRefresh(true)} />}
       <Table
         data={data}
         rowKey={'_id'}
@@ -118,11 +113,11 @@ const List = () => {
             dataKey: 'teams',
             render: (user) => {
               return (
-                <TeamWrapper>
+                <div className="tw-flex tw-flex-col tw-gap-1">
                   {user.teams.map((t) => (
                     <TagTeam teamId={t._id} key={t._id} />
                   ))}
-                </TeamWrapper>
+                </div>
               );
             },
           },
@@ -150,115 +145,199 @@ const List = () => {
   );
 };
 
-const TeamWrapper = styled.div`
-  display: grid;
-  grid-auto-flow: row;
-  row-gap: 5px;
-`;
-
-const Create = ({ onChange }) => {
+const Create = ({ onChange, users }) => {
   const [open, setOpen] = useState(false);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const teams = useRecoilValue(teamsState);
+  const initialState = useMemo(() => {
+    return {
+      name: '',
+      email: '',
+      role: 'normal',
+      team: teams.map((t) => t._id),
+      healthcareProfessional: false,
+    };
+  }, [teams]);
+  useEffect(() => {
+    if (!open) setData(initialState);
+  }, [open, initialState]);
+  const [data, setData] = useState(initialState);
+  const handleChange = (event) => {
+    const target = event.currentTarget || event.target;
+    const { name, value } = target;
+    setData((data) => ({ ...data, [name]: value }));
+  };
+
+  const handleSubmit = async () => {
+    try {
+      if (data.role === 'restricted-access') data.healthcareProfessional = false;
+      if (!data.email) {
+        toast.error("L'email est obligatoire");
+        return false;
+      }
+      if (!emailRegex.test(data.email)) {
+        toast.error("L'email est invalide");
+        return false;
+      }
+      if (!data.name) {
+        toast.error('Le nom est obligatoire');
+        return false;
+      }
+      if (!data.role) {
+        toast.error('Le rôle est obligatoire');
+        return false;
+      }
+      if (!data.team?.length) {
+        toast.error('Veuillez sélectionner une équipe');
+        return false;
+      }
+      setIsSubmitting(true);
+      const { ok } = await API.post({ path: '/user', body: data });
+      setIsSubmitting(false);
+      if (!ok) {
+        return false;
+      }
+      toast.success('Création réussie !');
+      onChange();
+      setData(initialState);
+      return true;
+    } catch (errorCreatingUser) {
+      console.log('error in creating user', errorCreatingUser);
+      toast.error(errorCreatingUser.message);
+      setIsSubmitting(false);
+      return false;
+    }
+  };
+
   return (
-    <CreateWrapper>
-      <ButtonCustom onClick={() => setOpen(true)} color="primary" title="Créer un nouvel utilisateur" padding="12px 24px" />
-      <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
-        <ModalHeader toggle={() => setOpen(false)}>Créer un nouvel utilisateur</ModalHeader>
+    <div className="tw-mb-10 tw-flex tw-w-full tw-justify-end">
+      <button type="button" className="button-submit" onClick={() => setOpen(true)}>
+        Créer un nouvel utilisateur
+      </button>
+      <ModalContainer open={open} onClose={() => setOpen(false)} size="full">
+        <ModalHeader onClose={() => setOpen(false)} title="Créer de nouveaux utilisateurs" />
         <ModalBody>
-          <Formik
+          <form
+            id="create-user-form"
             initialValues={{ name: '', email: '', role: '', team: [], healthcareProfessional: false }}
-            validate={(values) => {
-              const errors = {};
-              if (values.role === 'restricted-access') values.healthcareProfessional = false;
-              if (!values.name) errors.name = 'Le nom est obligatoire';
-              if (!values.email) errors.email = "L'email est obligatoire";
-              else if (!emailRegex.test(values.email)) errors.email = "L'email est invalide";
-              if (!values.role) errors.role = 'Le rôle est obligatoire';
-              if (!values.team?.length) errors.team = 'Veuillez sélectionner une équipe';
-              return errors;
-            }}
-            onSubmit={async (body, actions) => {
-              try {
-                const { ok } = await API.post({ path: '/user', body });
-                actions.setSubmitting(false);
-                if (!ok) return;
-                toast.success('Création réussie !');
-                onChange();
-                setOpen(false);
-              } catch (errorCreatingUser) {
-                console.log('error in creating user', errorCreatingUser);
-                toast.error(errorCreatingUser.message);
-              }
+            className="tw-p-4"
+            onSubmit={async (e) => {
+              e.preventDefault();
+              await handleSubmit();
             }}>
-            {({ values, handleChange, handleSubmit, isSubmitting, errors, touched }) => (
-              <React.Fragment>
-                <Row>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label htmlFor="name">Nom</Label>
-                      <Input name="name" id="name" value={values.name} onChange={handleChange} />
-                      {touched.name && errors.name && <div className="tw-mt-0.5 tw-text-xs tw-text-red-500">{errors.name}</div>}
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label htmlFor="email">Email</Label>
-                      <Input name="email" id="email" value={values.email} onChange={handleChange} />
-                      {touched.email && errors.email && <div className="tw-mt-0.5 tw-text-xs tw-text-red-500">{errors.email}</div>}
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label htmlFor="role">Role</Label>
-                      <SelectRole handleChange={handleChange} value={values.role} />
-                      {touched.role && errors.role && <div className="tw-mt-0.5 tw-text-xs tw-text-red-500">{errors.role}</div>}
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label htmlFor="team">Équipes</Label>
-                      <div>
-                        <SelectTeamMultiple
-                          onChange={(teamIds) => handleChange({ target: { value: teamIds, name: 'team' } })}
-                          value={values.team || []}
-                          colored
-                          inputId="team"
-                        />
-                        {touched.team && errors.team && <div className="tw-mt-0.5 tw-text-xs tw-text-red-500">{errors.team}</div>}
-                      </div>
-                    </FormGroup>
-                  </Col>
-                  {values.role !== 'restricted-access' && (
-                    <Col md={12}>
-                      <Label htmlFor="healthcareProfessional" style={{ marginBottom: 0 }}>
-                        <input
-                          type="checkbox"
-                          style={{ marginRight: '0.5rem' }}
-                          name="healthcareProfessional"
-                          id="healthcareProfessional"
-                          checked={values.healthcareProfessional}
-                          onChange={handleChange}
-                        />
-                        Professionnel·le de santé
-                      </Label>
-                      <div>
-                        <small className="text-muted">Un professionnel·le de santé a accès au dossier médical complet des personnes.</small>
-                      </div>
-                    </Col>
-                  )}
-                </Row>
-                <br />
-                <Row>
-                  <Col className="tw-mt-4 tw-flex tw-justify-end">
-                    <ButtonCustom title="Sauvegarder" loading={isSubmitting} onClick={handleSubmit} />
-                  </Col>
-                </Row>
-              </React.Fragment>
-            )}
-          </Formik>
+            <div className="tw-flex tw-w-full tw-flex-wrap">
+              <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
+                <label htmlFor="email">Email</label>
+                <input
+                  className="tailwindui"
+                  placeholder="email@truc.fr"
+                  name="email"
+                  id="email"
+                  value={data.email}
+                  onChange={(event) => {
+                    const target = event.currentTarget || event.target;
+                    const { value } = target;
+                    if (data.email === data.name) {
+                      setData((data) => ({ ...data, email: value, name: value }));
+                    } else {
+                      setData((data) => ({ ...data, email: value }));
+                    }
+                  }}
+                />
+              </div>
+              <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
+                <label htmlFor="role">Role</label>
+                <div className="tw-mt-1 tw-w-full">
+                  <SelectRole handleChange={handleChange} value={data.role} />
+                </div>
+              </div>
+              <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
+                <label htmlFor="team">Équipe(s)</label>
+                <div className="tw-mt-1 tw-w-full">
+                  <SelectTeamMultiple
+                    onChange={(teamIds) => handleChange({ target: { value: teamIds, name: 'team' } })}
+                    value={data.team}
+                    inputId="team"
+                    name="team"
+                  />
+                </div>
+              </div>
+              <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
+                <label htmlFor="email">Nom</label>
+                <input
+                  className="tailwindui"
+                  placeholder="email@truc.fr"
+                  name="name"
+                  id="name"
+                  type="search"
+                  value={data.name}
+                  onChange={handleChange}
+                />
+              </div>
+              {data.role !== 'restricted-access' && (
+                <div className="tw-flex tw-basis-full tw-flex-col tw-px-4 tw-py-2">
+                  <label htmlFor="healthcareProfessional" style={{ marginBottom: 0 }}>
+                    <input
+                      type="checkbox"
+                      style={{ marginRight: '0.5rem' }}
+                      name="healthcareProfessional"
+                      id="healthcareProfessional"
+                      checked={data.healthcareProfessional}
+                      onChange={() => {
+                        handleChange({
+                          target: {
+                            name: 'healthcareProfessional',
+                            checked: Boolean(!data.healthcareProfessional),
+                            value: Boolean(!data.healthcareProfessional),
+                          },
+                        });
+                      }}
+                    />
+                    Professionnel·le de santé
+                  </label>
+                  <div>
+                    <small className="text-muted">Un professionnel·le de santé a accès au dossier médical complet des personnes.</small>
+                  </div>
+                </div>
+              )}
+            </div>
+            <details className="tw-mt-8">
+              <summary>Utilisateurs existants ({users?.length ?? 0})</summary>
+              <ul className="tw-mt-4 tw-grid tw-grid-cols-2 tw-flex-col tw-gap-2">
+                {users.map((user) => {
+                  return (
+                    <React.Fragment key={user._id}>
+                      <div className="tw-font-bold">{user.name}</div>
+                      <div className="tw-text-sm tw-text-gray-500">{user.email}</div>
+                    </React.Fragment>
+                  );
+                })}
+              </ul>
+            </details>
+          </form>
         </ModalBody>
-      </Modal>
-    </CreateWrapper>
+        <ModalFooter>
+          <button name="Fermer" type="button" className="button-cancel" onClick={() => setOpen(false)}>
+            Fermer
+          </button>
+          <button
+            type="button"
+            name="Fermer"
+            className="button-classic"
+            onClick={async () => {
+              const success = await handleSubmit();
+              if (success) setOpen(false);
+            }}
+            disabled={isSubmitting}>
+            Créer et fermer
+          </button>
+          <button type="submit" className="button-submit" form="create-user-form" disabled={isSubmitting}>
+            Créer et ajouter un autre
+          </button>
+        </ModalFooter>
+      </ModalContainer>
+    </div>
   );
 };
 
