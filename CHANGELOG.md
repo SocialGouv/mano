@@ -1,3 +1,10 @@
+## [1.284.28](https://github.com/SocialGouv/mano/compare/v1.284.27...v1.284.28) (2023-10-03)
+
+
+### Bug Fixes
+
+* **dashboard:** lorsqu'on souhaite créer une consultation sans avoir sélectionné pour quelle personne suivie, avant l'onglet 'Documents' était bland, désormais il affiche un bouton qui lance le message d'erreur 'Veuillez sélectionner une personne auparavant' lorsqu'on le clique ([#1687](https://github.com/SocialGouv/mano/issues/1687)) ([46cd68d](https://github.com/SocialGouv/mano/commit/46cd68d9c44885e618c4658e4daefdd33c2355b4))
+
 ## [1.284.27](https://github.com/SocialGouv/mano/compare/v1.284.26...v1.284.27) (2023-10-03)
 
 
