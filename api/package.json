@@ -33,7 +33,7 @@
     "pg-hstore": "^2.3.3",
     "sanitize-html": "^2.7.0",
     "sequelize": "^6.28.0",
-    "zod": "^3.13.4"
+    "zod": "^3.22.3"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.0",
