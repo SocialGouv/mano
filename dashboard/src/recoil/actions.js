@@ -1,4 +1,4 @@
-import { setCacheItem } from '../services/dataManagement';
+import { getCacheItemDefaultValue, setCacheItem } from '../services/dataManagement';
 import { atom, selector } from 'recoil';
 import { organisationState } from './auth';
 import { looseUuidRegex } from '../utils';
@@ -8,7 +8,13 @@ import { capture } from '../services/sentry';
 const collectionName = 'action';
 export const actionsState = atom({
   key: collectionName,
-  default: [],
+  default: selector({
+    key: 'action/default',
+    get: async () => {
+      const cache = await getCacheItemDefaultValue('action', []);
+      return cache;
+    },
+  }),
   effects: [({ onSet }) => onSet(async (newValue) => setCacheItem(collectionName, newValue))],
 });
 

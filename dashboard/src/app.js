@@ -195,8 +195,10 @@ export default function ContextedApp() {
   const [recoilKey, setRecoilKey] = useState(0);
   return (
     <RecoilRoot key={recoilKey}>
-      <RecoilNexus />
-      <App resetRecoil={() => setRecoilKey((k) => k + 1)} />
+      <React.Suspense fallback={<div>CHAAARGEMENT</div>}>
+        <RecoilNexus />
+        <App resetRecoil={() => setRecoilKey((k) => k + 1)} />
+      </React.Suspense>
     </RecoilRoot>
   );
 }

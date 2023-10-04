@@ -1,5 +1,5 @@
-import { setCacheItem } from '../services/dataManagement';
-import { atom } from 'recoil';
+import { getCacheItemDefaultValue, setCacheItem } from '../services/dataManagement';
+import { atom, selector } from 'recoil';
 import { looseUuidRegex } from '../utils';
 import { toast } from 'react-toastify';
 import { capture } from '../services/sentry';
@@ -7,7 +7,13 @@ import { capture } from '../services/sentry';
 const collectionName = 'rencontre';
 export const rencontresState = atom({
   key: collectionName,
-  default: [],
+  default: selector({
+    key: 'rencontre/default',
+    get: async () => {
+      const cache = await getCacheItemDefaultValue('rencontre', []);
+      return cache;
+    },
+  }),
   effects: [({ onSet }) => onSet(async (newValue) => setCacheItem(collectionName, newValue))],
 });
 
