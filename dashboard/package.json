@@ -64,7 +64,7 @@
     "crypto": "npm:crypto-browserify",
     "fork-ts-checker-webpack-plugin": "^6.5.3",
     "path": "npm:path-browserify",
-    "postcss": "^8.4.18",
+    "postcss": "^8.4.31",
     "prettier": "^2.7.1",
     "prettier-plugin-tailwindcss": "^0.4.0",
     "react-scripts": "5.0.1",
