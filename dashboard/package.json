@@ -62,7 +62,7 @@
     "autoprefixer": "^10.4.13",
     "buffer": "^6.0.3",
     "crypto": "npm:crypto-browserify",
-    "fork-ts-checker-webpack-plugin": "^6.5.3",
+    "fork-ts-checker-webpack-plugin": "^9.0.0",
     "path": "npm:path-browserify",
     "postcss": "^8.4.18",
     "prettier": "^2.7.1",
@@ -86,7 +86,7 @@
   },
   "resolutions": {
     "@typescript-eslint/typescript-estree": "^5.57.1",
-    "fork-ts-checker-webpack-plugin": "^6.5.3",
+    "fork-ts-checker-webpack-plugin": "^9.0.0",
     "typescript": "^5.0.3"
   },
   "prettier": {
