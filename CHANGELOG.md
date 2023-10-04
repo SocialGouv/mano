@@ -1,3 +1,10 @@
+## [1.284.29](https://github.com/SocialGouv/mano/compare/v1.284.28...v1.284.29) (2023-10-04)
+
+
+### Bug Fixes
+
+* **app:** MANO-APP-REACT-NATIVE-1S ([#1694](https://github.com/SocialGouv/mano/issues/1694)) ([01bf7b4](https://github.com/SocialGouv/mano/commit/01bf7b4d1858f9ef6272071c706022f91b9b2225))
+
 ## [1.284.28](https://github.com/SocialGouv/mano/compare/v1.284.27...v1.284.28) (2023-10-03)
 
 
