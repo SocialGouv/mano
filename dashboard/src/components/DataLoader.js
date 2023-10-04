@@ -52,6 +52,8 @@ export default function DataLoader() {
   const progress = useRecoilValue(progressState);
   const total = useRecoilValue(totalState);
 
+  console.log(loadingText, 'progress', progress, 'total', total, '%', progress / total);
+
   if (!isLoading) return <RandomPicturePreloader />;
   if (!total && !fullScreen) return null;
 
@@ -163,23 +165,26 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       stats.comments +
       stats.groups;
 
+    console.log('stats', stats, 'itemsCount', itemsCount);
+
     setProgress(0);
     setTotal(itemsCount);
 
     const query = {
       organisation: organisationId,
-      limit: String(10000),
+      limit: String(1000),
       after: lastLoadValue,
       withDeleted: Boolean(lastLoadValue),
     };
 
+    setLoadingText('Chargement des personnes');
+    const cachedPersons = await getCacheItemDefaultValue('person', []);
+    setPersons([...cachedPersons]);
     if (stats.persons > 0) {
-      setLoadingText('Chargement des personnes');
-      const cachedPersons = await getCacheItemDefaultValue('person', []);
-      setPersons([...cachedPersons]);
       async function loadPersons(page = 0) {
         const res = await API.get({ path: '/person', query: { ...query, page: String(page) } });
         if (!res.ok || !res.data.length) return resetLoaderOnError();
+        console.log('Persons', page, res.data.length);
         setProgress((p) => p + res.data.length);
         setPersons((items) => mergeItems(items, res.decryptedData));
         if (res.hasMore) return loadPersons(page + 1);
@@ -188,10 +193,10 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       const personSuccess = await loadPersons(0);
       if (!personSuccess) return false;
     }
+    setLoadingText('Chargement des familles');
+    const cachedGroups = await getCacheItemDefaultValue('group', []);
+    setGroups([...cachedGroups]);
     if (stats.groups > 0) {
-      setLoadingText('Chargement des familles');
-      const cachedGroups = await getCacheItemDefaultValue('group', []);
-      setGroups([...cachedGroups]);
       async function loadGroups(page = 0) {
         const res = await API.get({ path: '/group', query: { ...query, page: String(page) } });
         if (!res.ok || !res.data.length) return resetLoaderOnError();
@@ -203,10 +208,10 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       const groupsSuccess = await loadGroups(0);
       if (!groupsSuccess) return false;
     }
+    setLoadingText('Chargement des comptes-rendus');
+    const cachedReports = await getCacheItemDefaultValue('report', []);
+    setReports([...cachedReports]);
     if (stats.reports > 0) {
-      setLoadingText('Chargement des comptes-rendus');
-      const cachedReports = await getCacheItemDefaultValue('report', []);
-      setReports([...cachedReports]);
       async function loadReports(page = 0) {
         const res = await API.get({ path: '/report', query: { ...query, page: String(page) } });
         if (!res.ok || !res.data.length) return resetLoaderOnError();
@@ -218,10 +223,10 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       const reportsSuccess = await loadReports(0);
       if (!reportsSuccess) return false;
     }
+    setLoadingText('Chargement des passages');
+    const cachedPassages = await getCacheItemDefaultValue('passage', []);
+    setPassages([...cachedPassages]);
     if (stats.passages > 0) {
-      setLoadingText('Chargement des passages');
-      const cachedPassages = await getCacheItemDefaultValue('passage', []);
-      setPassages([...cachedPassages]);
       async function loadPassages(page = 0) {
         const res = await API.get({ path: '/passage', query: { ...query, page: String(page) } });
         if (!res.ok || !res.data.length) return resetLoaderOnError();
@@ -233,10 +238,10 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       const passagesSuccess = await loadPassages(0);
       if (!passagesSuccess) return false;
     }
+    setLoadingText('Chargement des rencontres');
+    const cachedRencontres = await getCacheItemDefaultValue('rencontre', []);
+    setRencontres([...cachedRencontres]);
     if (stats.rencontres > 0) {
-      setLoadingText('Chargement des rencontres');
-      const cachedRencontres = await getCacheItemDefaultValue('rencontre', []);
-      setRencontres([...cachedRencontres]);
       async function loadRencontres(page = 0) {
         const res = await API.get({ path: '/rencontre', query: { ...query, page: String(page) } });
         if (!res.ok || !res.data.length) return resetLoaderOnError();
@@ -248,10 +253,10 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       const rencontresSuccess = await loadRencontres(0);
       if (!rencontresSuccess) return false;
     }
+    setLoadingText('Chargement des actions');
+    const cachedActions = await getCacheItemDefaultValue('action', []);
+    setActions([...cachedActions]);
     if (stats.actions > 0) {
-      setLoadingText('Chargement des actions');
-      const cachedActions = await getCacheItemDefaultValue('action', []);
-      setActions([...cachedActions]);
       async function loadActions(page = 0) {
         const res = await API.get({ path: '/action', query: { ...query, page: String(page) } });
         if (!res.ok || !res.data.length) return resetLoaderOnError();
@@ -263,10 +268,10 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       const actionsSuccess = await loadActions(0);
       if (!actionsSuccess) return false;
     }
+    setLoadingText('Chargement des territoires');
+    const cachedTerritories = await getCacheItemDefaultValue('territory', []);
+    setTerritories([...cachedTerritories]);
     if (stats.territories > 0) {
-      setLoadingText('Chargement des territoires');
-      const cachedTerritories = await getCacheItemDefaultValue('territory', []);
-      setTerritories([...cachedTerritories]);
       async function loadTerritories(page = 0) {
         const res = await API.get({ path: '/territory', query: { ...query, page: String(page) } });
         if (!res.ok || !res.data.length) return resetLoaderOnError();
@@ -278,10 +283,10 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       const territoriesSuccess = await loadTerritories(0);
       if (!territoriesSuccess) return false;
     }
+    setLoadingText('Chargement des lieux');
+    const cachedPlaces = await getCacheItemDefaultValue('place', []);
+    setPlaces([...cachedPlaces]);
     if (stats.places > 0) {
-      setLoadingText('Chargement des lieux');
-      const cachedPlaces = await getCacheItemDefaultValue('place', []);
-      setPlaces([...cachedPlaces]);
       async function loadPlaces(page = 0) {
         const res = await API.get({ path: '/place', query: { ...query, page: String(page) } });
         if (!res.ok || !res.data.length) return resetLoaderOnError();
@@ -293,10 +298,10 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       const placesSuccess = await loadPlaces(0);
       if (!placesSuccess) return false;
     }
+    setLoadingText('Chargement des relations personne-lieu');
+    const cachedRelPersonPlace = await getCacheItemDefaultValue('relPersonPlace', []);
+    setRelsPersonPlace([...cachedRelPersonPlace]);
     if (stats.relsPersonPlace > 0) {
-      setLoadingText('Chargement des relations personne-lieu');
-      const cachedRelPersonPlace = await getCacheItemDefaultValue('relPersonPlace', []);
-      setRelsPersonPlace([...cachedRelPersonPlace]);
       async function loadRelPersonPlaces(page = 0) {
         const res = await API.get({ path: '/relPersonPlace', query: { ...query, page: String(page) } });
         if (!res.ok || !res.data.length) return resetLoaderOnError();
@@ -308,10 +313,10 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       const relsPersonPlacesSuccess = await loadRelPersonPlaces(0);
       if (!relsPersonPlacesSuccess) return false;
     }
+    setLoadingText('Chargement des observations de territoire');
+    const cachedObservations = await getCacheItemDefaultValue('territory-observation', []);
+    setTerritoryObservations([...cachedObservations]);
     if (stats.territoryObservations > 0) {
-      setLoadingText('Chargement des observations de territoire');
-      const cachedObservations = await getCacheItemDefaultValue('territory-observation', []);
-      setTerritoryObservations([...cachedObservations]);
       async function loadObservations(page = 0) {
         const res = await API.get({ path: '/territory-observation', query: { ...query, page: String(page) } });
         if (!res.ok || !res.data.length) return resetLoaderOnError();
@@ -323,10 +328,10 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       const territoryObservationsSuccess = await loadObservations(0);
       if (!territoryObservationsSuccess) return false;
     }
+    setLoadingText('Chargement des commentaires');
+    const cachedComments = await getCacheItemDefaultValue('comment', []);
+    setComments([...cachedComments]);
     if (stats.comments > 0) {
-      setLoadingText('Chargement des commentaires');
-      const cachedComments = await getCacheItemDefaultValue('comment', []);
-      setComments([...cachedComments]);
       async function loadComments(page = 0) {
         const res = await API.get({ path: '/comment', query: { ...query, page: String(page) } });
         if (!res.ok || !res.data.length) return resetLoaderOnError();
@@ -338,8 +343,8 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       const commentsSuccess = await loadComments(0);
       if (!commentsSuccess) return false;
     }
+    setLoadingText('Chargement des consultations');
     if (stats.consultations > 0) {
-      setLoadingText('Chargement des consultations');
       async function loadConsultations(page = 0) {
         const res = await API.get({ path: '/consultation', query: { ...query, page: String(page), after: initialLoad ? 0 : lastLoadValue } });
         if (!res.ok || !res.data.length) return resetLoaderOnError();
@@ -351,8 +356,8 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       const consultationsSuccess = await loadConsultations(0);
       if (!consultationsSuccess) return false;
     }
+    setLoadingText('Chargement des traitements');
     if (stats.treatments > 0) {
-      setLoadingText('Chargement des traitements');
       async function loadTreatments(page = 0) {
         const res = await API.get({ path: '/treatment', query: { ...query, page: String(page), after: initialLoad ? 0 : lastLoadValue } });
         if (!res.ok || !res.data.length) return resetLoaderOnError();
@@ -364,8 +369,8 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       const treatmentsSuccess = await loadTreatments(0);
       if (!treatmentsSuccess) return false;
     }
+    setLoadingText('Chargement des fichiers médicaux');
     if (stats.medicalFiles > 0) {
-      setLoadingText('Chargement des fichiers médicaux');
       async function loadMedicalFiles(page = 0) {
         const res = await API.get({ path: '/medical-file', query: { ...query, page: String(page), after: initialLoad ? 0 : lastLoadValue } });
         if (!res.ok || !res.data.length) return resetLoaderOnError();
