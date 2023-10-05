@@ -62,7 +62,7 @@ export default function ActionModal() {
   };
 
   return (
-    <ModalContainer open={open} size="3xl" onAfterLeave={onAfterLeave}>
+    <ModalContainer open={open} size="full" onAfterLeave={onAfterLeave}>
       <ActionContent
         key={open}
         personId={personId}
@@ -389,7 +389,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
             />
           )}
           <div
-            className={['tw-flex tw-w-full tw-flex-wrap tw-overflow-y-auto tw-p-4 sm:tw-h-[50vh]', activeTab !== 'Informations' && 'tw-hidden']
+            className={['tw-flex tw-w-full tw-flex-wrap tw-overflow-y-auto tw-p-4 sm:tw-h-[90vh]', activeTab !== 'Informations' && 'tw-hidden']
               .filter(Boolean)
               .join(' ')}>
             <div className="tw-flex tw-w-full tw-flex-col tw-text-left sm:tw-flex-row">
@@ -608,7 +608,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
           </div>
           {!['restricted-access'].includes(user.role) && (
             <div
-              className={['tw-flex tw-w-full tw-flex-col tw-gap-4 tw-overflow-y-auto sm:tw-h-[50vh]', activeTab !== 'Commentaires' && 'tw-hidden']
+              className={['tw-flex tw-w-full tw-flex-col tw-gap-4 tw-overflow-y-auto sm:tw-h-[90vh]', activeTab !== 'Commentaires' && 'tw-hidden']
                 .filter(Boolean)
                 .join(' ')}>
               <CommentsModule
@@ -655,7 +655,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
             </div>
           )}
           <div
-            className={['tw-flex tw-w-full tw-flex-col tw-gap-4 tw-overflow-y-auto sm:tw-h-[50vh]', activeTab !== 'Historique' && 'tw-hidden']
+            className={['tw-flex tw-w-full tw-flex-col tw-gap-4 tw-overflow-y-auto sm:tw-h-[90vh]', activeTab !== 'Historique' && 'tw-hidden']
               .filter(Boolean)
               .join(' ')}>
             <ActionHistory action={action} />

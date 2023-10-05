@@ -67,7 +67,7 @@ export default function ConsultationModal() {
   };
 
   return (
-    <ModalContainer open={open} size="3xl" onAfterLeave={onAfterLeave}>
+    <ModalContainer open={open} size="full" onAfterLeave={onAfterLeave}>
       <ConsultationContent
         key={open}
         personId={personId}
@@ -288,7 +288,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
           />
           <form
             id="add-consultation-form"
-            className={['tw-flex tw-h-[50vh] tw-w-full tw-flex-wrap tw-overflow-y-auto tw-p-4', activeTab !== 'Informations' && 'tw-hidden']
+            className={['tw-flex tw-h-[90vh] tw-w-full tw-flex-wrap tw-overflow-y-auto tw-p-4', activeTab !== 'Informations' && 'tw-hidden']
               .filter(Boolean)
               .join(' ')}
             onSubmit={(e) => {
