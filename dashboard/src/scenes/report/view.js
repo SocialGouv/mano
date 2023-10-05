@@ -57,6 +57,7 @@ import { useLocalStorage } from '../../services/useLocalStorage';
 import { arrayOfitemsGroupedByActionSelector, arrayOfitemsGroupedByConsultationSelector, personsObjectSelector } from '../../recoil/selectors';
 import { treatmentsState } from '../../recoil/treatments';
 import { medicalFileState } from '../../recoil/medicalFiles';
+import DescriptionIcon from '../../components/DescriptionIcon';
 
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithNameOfDay(date)}`;
@@ -1108,6 +1109,7 @@ const ActionCompletedAt = ({ date, status, actions, setSortOrder, setSortBy, sor
                 return (
                   <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
                     {!!action.urgent && <ExclamationMarkButton />}
+                    {!!action.description && <DescriptionIcon />}
                     {!!organisation.groupsEnabled && !!action.group && (
                       <span className="tw-text-3xl" aria-label="Action familiale" title="Action familiale">
                         👪
@@ -1214,6 +1216,7 @@ const ActionCreatedAt = ({ date, actions, setSortOrder, setSortBy, sortBy, sortO
                 return (
                   <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
                     {!!action.urgent && <ExclamationMarkButton />}
+                    {!!action.description && <DescriptionIcon />}
                     {!!organisation.groupsEnabled && !!action.group && (
                       <span className="tw-text-3xl" aria-label="Action familiale" title="Action familiale">
                         👪

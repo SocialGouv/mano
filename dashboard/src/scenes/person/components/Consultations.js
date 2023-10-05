@@ -15,6 +15,7 @@ import { AgendaMutedIcon } from './AgendaMutedIcon';
 import { disableConsultationRow } from '../../../recoil/consultations';
 import { FullScreenIcon } from './FullScreenIcon';
 import UserName from '../../../components/UserName';
+import DescriptionIcon from '../../../components/DescriptionIcon';
 
 export const Consultations = ({ person }) => {
   const [fullScreen, setFullScreen] = useState(false);
@@ -184,7 +185,10 @@ const ConsultationsTable = ({ filteredData, person }) => {
                       history.push(`?${searchParams.toString()}`);
                     }}>
                     <div className="tw-flex">
-                      <div className="tw-flex-1">{`${date}${time}`}</div>
+                      <div className="tw-flex-1">
+                        {!!consultation.description && <DescriptionIcon />}
+                        {`${date}${time}`}
+                      </div>
                       <div>
                         <ActionStatus status={consultation.status} />
                       </div>

@@ -14,6 +14,7 @@ import { CANCEL, DONE, sortActionsOrConsultations } from '../recoil/actions';
 import TagTeam from './TagTeam';
 import { useLocalStorage } from '../services/useLocalStorage';
 import TabsNav from './tailwind/TabsNav';
+import DescriptionIcon from './DescriptionIcon';
 
 const ActionsCalendar = ({ actions, isNightSession, columns = ['Heure', 'Nom', 'Personne suivie', 'Créée le', 'Statut', 'Équipe(s) en charge'] }) => {
   const history = useHistory();
@@ -118,6 +119,7 @@ const ActionsCalendar = ({ actions, isNightSession, columns = ['Heure', 'Nom', '
             return (
               <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
                 {!!actionOrConsult.urgent && <ExclamationMarkButton />}
+                {!!actionOrConsult.description && <DescriptionIcon />}
                 {!!organisation.groupsEnabled && !!actionOrConsult.group && (
                   <span className="tw-text-3xl" aria-label="Action familiale" title="Action familiale">
                     👪
