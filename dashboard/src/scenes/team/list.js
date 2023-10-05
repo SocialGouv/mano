@@ -7,7 +7,6 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 
 import { SmallHeader } from '../../components/header';
 import ButtonCustom from '../../components/ButtonCustom';
-import CreateWrapper from '../../components/createWrapper';
 import Table from '../../components/table';
 import NightSessionModale from '../../components/NightSessionModale';
 import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
@@ -99,7 +98,7 @@ const Create = () => {
   const onboardingForTeams = !teams.length;
 
   return (
-    <CreateWrapper>
+    <div className="tw-mb-10 tw-flex tw-w-full tw-justify-end">
       <ButtonCustom color="primary" onClick={() => setOpen(true)} title="Créer une nouvelle équipe" padding="12px 24px" />
       <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
         <ModalHeader close={onboardingForTeams ? <></> : null} toggle={() => setOpen(false)}>
@@ -201,7 +200,7 @@ const Create = () => {
         </ModalBody>
       </Modal>
       <OnboardingEndModal open={onboardingEndModalOpen} setOpen={setOnboardingEndModalOpen} />
-    </CreateWrapper>
+    </div>
   );
 };
 

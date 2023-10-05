@@ -6,7 +6,6 @@ import { toast } from 'react-toastify';
 import { SmallHeader } from '../../components/header';
 import ButtonCustom from '../../components/ButtonCustom';
 import Loading from '../../components/loading';
-import CreateWrapper from '../../components/createWrapper';
 import Table from '../../components/table';
 import Search from '../../components/search';
 import Page from '../../components/pagination';
@@ -110,7 +109,7 @@ const Create = () => {
   const setPlaces = useSetRecoilState(placesState);
 
   return (
-    <CreateWrapper style={{ marginBottom: 0 }}>
+    <div className="tw-flex tw-w-full tw-justify-end">
       <ButtonCustom
         disabled={!currentTeam}
         onClick={() => setOpen(true)}
@@ -152,7 +151,7 @@ const Create = () => {
           </Formik>
         </ModalBody>
       </Modal>
-    </CreateWrapper>
+    </div>
   );
 };
 
