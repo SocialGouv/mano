@@ -1,3 +1,10 @@
+# [1.285.0](https://github.com/SocialGouv/mano/compare/v1.284.29...v1.285.0) (2023-10-05)
+
+
+### Features
+
+* **dashboard:** création d'utilisateurs plus rapide avec valeurs par défaut et possiblité d'enchainer les uns après les autres rapidement ([#1691](https://github.com/SocialGouv/mano/issues/1691)) ([1a56eb0](https://github.com/SocialGouv/mano/commit/1a56eb0875e1862508648c38bcba05efd21681ba))
+
 ## [1.284.29](https://github.com/SocialGouv/mano/compare/v1.284.28...v1.284.29) (2023-10-04)
 
 
