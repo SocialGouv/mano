@@ -1,3 +1,10 @@
+## [1.286.1](https://github.com/SocialGouv/mano/compare/v1.286.0...v1.286.1) (2023-10-05)
+
+
+### Bug Fixes
+
+* Nathan n'a jamais existé ([599e419](https://github.com/SocialGouv/mano/commit/599e41909ed966d65f22e2c8bfbdd3dce0870d1c))
+
 # [1.286.0](https://github.com/SocialGouv/mano/compare/v1.285.0...v1.286.0) (2023-10-05)
 
 
