@@ -164,7 +164,7 @@ Un compte Mano pour votre organisation ${organisation.name} vient d'être créé
 
 Votre identifiant pour vous connecter à Mano est ${adminUser.email}.
 Vous pouvez dès à présent vous connecter pour choisir votre mot de passe ici:
-https://dashboard-mano.fabrique.social.gouv.fr/auth/reset?token=${token}
+https://dashboard-mano.fabrique.social.gouv.fr/auth/reset?token=${token}&newUser=true
 
 Vous pourrez ensuite paramétrer votre organisation et commencer à utiliser Mano en suivant ce lien:
 https://dashboard-mano.fabrique.social.gouv.fr/

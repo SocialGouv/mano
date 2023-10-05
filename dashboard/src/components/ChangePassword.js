@@ -100,7 +100,7 @@ const ChangePassword = ({ onSubmit, onFinished, withCurrentPassword, centerButto
             <label htmlFor="password">Mot de passe</label>
             <PasswordInput
               value={changePasswordForm.password}
-              className="tw-mb-1.5 tw-block tw-w-full tw-rounded tw-border tw-border-main75 tw-bg-transparent tw-p-2.5 tw-text-black tw-outline-main tw-transition-all"
+              className="tailwindui"
               name="password"
               id="password"
               onChange={handleChange}
@@ -114,7 +114,7 @@ const ChangePassword = ({ onSubmit, onFinished, withCurrentPassword, centerButto
           <PasswordInput
             name="newPassword"
             id="newPassword"
-            className="tw-mb-1.5 tw-block tw-w-full tw-rounded tw-border tw-border-main75 tw-bg-transparent tw-p-2.5 tw-text-black tw-outline-main tw-transition-all"
+            className="tailwindui"
             value={changePasswordForm.newPassword}
             onChange={handleChange}
             showPassword={showPassword}
@@ -139,7 +139,7 @@ const ChangePassword = ({ onSubmit, onFinished, withCurrentPassword, centerButto
           <label htmlFor="verifyPassword">Confirmez le nouveau mot de passe</label>
           <PasswordInput
             value={changePasswordForm.verifyPassword}
-            className="tw-mb-1.5 tw-block tw-w-full tw-rounded tw-border tw-border-main75 tw-bg-transparent tw-p-2.5 tw-text-black tw-outline-main tw-transition-all"
+            className="tailwindui"
             name="verifyPassword"
             id="verifyPassword"
             onChange={handleChange}

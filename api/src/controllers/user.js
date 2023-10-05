@@ -270,6 +270,7 @@ router.post(
   catchErrors(async (req, res, next) => {
     try {
       z.object({
+        name: z.string().optional(),
         token: z.string().min(1),
         password: z.string().min(1),
       }).parse(req.body);
@@ -279,8 +280,9 @@ router.post(
       return next(error);
     }
     const {
-      body: { token, password },
+      body: { token, password, name },
     } = req;
+    console.log(req.body);
 
     if (!validatePassword(password)) return res.status(400).send({ ok: false, error: passwordCheckError, code: PASSWORD_NOT_VALIDATED });
     const user = await User.findOne({ where: { forgotPasswordResetToken: token, forgotPasswordResetExpires: { [Op.gte]: new Date() } } });
@@ -292,6 +294,7 @@ router.post(
       forgotPasswordResetExpires: null,
       lastChangePasswordAt: Date.now(),
     });
+    if (name) user.set({ name: sanitizeAll(name) });
     await user.save();
     return res.status(200).send({ ok: true });
   })
@@ -304,7 +307,7 @@ router.post(
   catchErrors(async (req, res, next) => {
     try {
       z.object({
-        name: z.string().min(1),
+        name: z.string().optional(),
         email: z.preprocess((email) => email.trim().toLowerCase(), z.string().email().optional().or(z.literal(""))),
         healthcareProfessional: z.boolean(),
         team: z.array(z.string().regex(looseUuidRegex)),
@@ -348,8 +351,8 @@ router.post(
     const body = `Bonjour ${data.name} !
 
 Votre identifiant pour vous connecter à Mano est ${data.email}.
-Vous pouvez dès à présent vous connecter pour choisir votre mot de passe ici:
-https://dashboard-mano.fabrique.social.gouv.fr/auth/reset?token=${token}
+Vous pouvez dès à présent vous connecter pour choisir votre nom d'utilisateur et mot de passe ici:
+https://dashboard-mano.fabrique.social.gouv.fr/auth/reset?token=${token}&newUser=true
 NOTE: si le lien ci-dessus est expiré, vous pouvez demander une nouvelle réinitialisation de mot de passe ici: https://dashboard-mano.fabrique.social.gouv.fr
 
 Vous pourrez ensuite commencer à utiliser Mano en suivant ce lien:

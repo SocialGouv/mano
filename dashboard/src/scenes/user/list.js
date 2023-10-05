@@ -180,10 +180,6 @@ const Create = ({ onChange, users }) => {
         toast.error("L'email est invalide");
         return false;
       }
-      if (!data.name) {
-        toast.error('Le nom est obligatoire');
-        return false;
-      }
       if (!data.role) {
         toast.error('Le rôle est obligatoire');
         return false;
@@ -220,7 +216,6 @@ const Create = ({ onChange, users }) => {
         <ModalBody>
           <form
             id="create-user-form"
-            initialValues={{ name: '', email: '', role: '', team: [], healthcareProfessional: false }}
             className="tw-p-4"
             onSubmit={async (e) => {
               e.preventDefault();
@@ -229,22 +224,7 @@ const Create = ({ onChange, users }) => {
             <div className="tw-flex tw-w-full tw-flex-wrap">
               <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
                 <label htmlFor="email">Email</label>
-                <input
-                  className="tailwindui"
-                  placeholder="email@truc.fr"
-                  name="email"
-                  id="email"
-                  value={data.email}
-                  onChange={(event) => {
-                    const target = event.currentTarget || event.target;
-                    const { value } = target;
-                    if (data.email === data.name) {
-                      setData((data) => ({ ...data, email: value, name: value }));
-                    } else {
-                      setData((data) => ({ ...data, email: value }));
-                    }
-                  }}
-                />
+                <input className="tailwindui" placeholder="email@truc.fr" name="email" id="email" value={data.email} onChange={handleChange} />
               </div>
               <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
                 <label htmlFor="role">Role</label>
@@ -263,18 +243,18 @@ const Create = ({ onChange, users }) => {
                   />
                 </div>
               </div>
-              <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
+              {/* <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
                 <label htmlFor="email">Nom</label>
                 <input
                   className="tailwindui"
-                  placeholder="email@truc.fr"
+                  placeholder="Le nom est optionnel"
                   name="name"
                   id="name"
                   type="search"
                   value={data.name}
                   onChange={handleChange}
                 />
-              </div>
+              </div> */}
               {data.role !== 'restricted-access' && (
                 <div className="tw-flex tw-basis-full tw-flex-col tw-px-4 tw-py-2">
                   <label htmlFor="healthcareProfessional" style={{ marginBottom: 0 }}>
