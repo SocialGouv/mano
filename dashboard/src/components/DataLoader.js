@@ -3,6 +3,7 @@ import { atom, selector, useRecoilState, useRecoilValue, useSetRecoilState } fro
 import { toast } from 'react-toastify';
 
 import { personsState } from '../recoil/persons';
+import { groupsState } from '../recoil/groups';
 import { treatmentsState } from '../recoil/treatments';
 import { actionsState } from '../recoil/actions';
 import { medicalFileState } from '../recoil/medicalFiles';
@@ -22,7 +23,6 @@ import API from '../services/api';
 import { RandomPicture, RandomPicturePreloader } from './LoaderRandomPicture';
 import ProgressBar from './LoaderProgressBar';
 import useDataMigrator from './DataMigrator';
-import { groupsState } from '../recoil/groups';
 
 // Update to flush cache.
 
@@ -94,20 +94,20 @@ export function useDataLoader(options = { refreshOnMount: false }) {
   const setOrganisation = useSetRecoilState(organisationState);
   const { migrateData } = useDataMigrator();
 
-  const setPersons = useSetRecoilState(personsState);
-  const setGroups = useSetRecoilState(groupsState);
-  const setReports = useSetRecoilState(reportsState);
-  const setPassages = useSetRecoilState(passagesState);
-  const setRencontres = useSetRecoilState(rencontresState);
-  const setActions = useSetRecoilState(actionsState);
-  const setTerritories = useSetRecoilState(territoriesState);
-  const setPlaces = useSetRecoilState(placesState);
-  const setRelsPersonPlace = useSetRecoilState(relsPersonPlaceState);
-  const setTerritoryObservations = useSetRecoilState(territoryObservationsState);
-  const setComments = useSetRecoilState(commentsState);
-  const setConsultations = useSetRecoilState(consultationsState);
-  const setTreatments = useSetRecoilState(treatmentsState);
-  const setMedicalFiles = useSetRecoilState(medicalFileState);
+  const [persons, setPersons] = useRecoilState(personsState);
+  const [groups, setGroups] = useRecoilState(groupsState);
+  const [reports, setReports] = useRecoilState(reportsState);
+  const [passages, setPassages] = useRecoilState(passagesState);
+  const [rencontres, setRencontres] = useRecoilState(rencontresState);
+  const [actions, setActions] = useRecoilState(actionsState);
+  const [territories, setTerritories] = useRecoilState(territoriesState);
+  const [places, setPlaces] = useRecoilState(placesState);
+  const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
+  const [territoryObservations, setTerritoryObservations] = useRecoilState(territoryObservationsState);
+  const [comments, setComments] = useRecoilState(commentsState);
+  const [consultations, setConsultations] = useRecoilState(consultationsState);
+  const [treatments, setTreatments] = useRecoilState(treatmentsState);
+  const [medicalFiles, setMedicalFiles] = useRecoilState(medicalFileState);
 
   useEffect(function refreshOnMountEffect() {
     if (options.refreshOnMount && !isLoading) loadOrRefreshData(false);
@@ -168,8 +168,6 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       stats.treatments +
       stats.medicalFiles;
 
-    console.log('stats', stats, 'itemsCount', itemsCount);
-
     setProgress(0);
     setTotal(itemsCount);
 
@@ -186,11 +184,10 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       async function loadPersons(page = 0) {
         const res = await API.get({ path: '/person', query: { ...query, page: String(page) } });
         if (!res.ok || !res.data.length) return resetLoaderOnError();
-        console.log('Persons', page, res.data.length);
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
         if (res.hasMore) return loadPersons(page + 1);
-        setPersons((items) => mergeItems(items, newItems));
+        setPersons(mergeItems(persons, newItems));
         return true;
       }
       const personSuccess = await loadPersons(0);
@@ -205,7 +202,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
         if (res.hasMore) return loadGroups(page + 1);
-        setGroups((items) => mergeItems(items, newItems));
+        setGroups(mergeItems(groups, newItems));
         return true;
       }
       const groupsSuccess = await loadGroups(0);
@@ -220,7 +217,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
         if (res.hasMore) return loadReports(page + 1);
-        setReports((items) => mergeItems(items, newItems, { filterNewItemsFunction: (r) => !!r.team && !!r.date }));
+        setReports(mergeItems(reports, newItems, { filterNewItemsFunction: (r) => !!r.team && !!r.date }));
         return true;
       }
       const reportsSuccess = await loadReports(0);
@@ -235,7 +232,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
         if (res.hasMore) return loadPassages(page + 1);
-        setPassages((items) => mergeItems(items, newItems));
+        setPassages(mergeItems(passages, newItems));
         return true;
       }
       const passagesSuccess = await loadPassages(0);
@@ -250,7 +247,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
         if (res.hasMore) return loadRencontres(page + 1);
-        setRencontres((items) => mergeItems(items, newItems));
+        setRencontres(mergeItems(rencontres, newItems));
         return true;
       }
       const rencontresSuccess = await loadRencontres(0);
@@ -265,7 +262,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
         if (res.hasMore) return loadActions(page + 1);
-        setActions((items) => mergeItems(items, newItems));
+        setActions(mergeItems(actions, newItems));
         return true;
       }
       const actionsSuccess = await loadActions(0);
@@ -280,7 +277,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
         if (res.hasMore) return loadTerritories(page + 1);
-        setTerritories((items) => mergeItems(items, newItems));
+        setTerritories(mergeItems(territories, newItems));
         return true;
       }
       const territoriesSuccess = await loadTerritories(0);
@@ -295,7 +292,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
         if (res.hasMore) return loadPlaces(page + 1);
-        setPlaces((items) => mergeItems(items, newItems));
+        setPlaces(mergeItems(places, newItems));
         return true;
       }
       const placesSuccess = await loadPlaces(0);
@@ -310,7 +307,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
         if (res.hasMore) return loadRelPersonPlaces(page + 1);
-        setRelsPersonPlace((items) => mergeItems(items, newItems));
+        setRelsPersonPlace(mergeItems(relsPersonPlace, newItems));
         return true;
       }
       const relsPersonPlacesSuccess = await loadRelPersonPlaces(0);
@@ -325,7 +322,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
         if (res.hasMore) return loadObservations(page + 1);
-        setTerritoryObservations((items) => mergeItems(items, newItems));
+        setTerritoryObservations(mergeItems(territoryObservations, newItems));
         return true;
       }
       const territoryObservationsSuccess = await loadObservations(0);
@@ -340,7 +337,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
         if (res.hasMore) return loadComments(page + 1);
-        setComments((items) => mergeItems(items, newItems));
+        setComments(mergeItems(comments, newItems));
         return true;
       }
       const commentsSuccess = await loadComments(0);
@@ -355,7 +352,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
         if (res.hasMore) return loadConsultations(page + 1);
-        setConsultations((items) => mergeItems(items, newItems, { formatNewItemsFunction: formatConsultation }));
+        setConsultations(mergeItems(consultations, newItems, { formatNewItemsFunction: formatConsultation }));
         return true;
       }
       const consultationsSuccess = await loadConsultations(0);
@@ -370,7 +367,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
         if (res.hasMore) return loadTreatments(page + 1);
-        setTreatments((items) => mergeItems(items, newItems));
+        setTreatments(mergeItems(treatments, newItems));
         return true;
       }
       const treatmentsSuccess = await loadTreatments(0);
@@ -385,7 +382,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
         if (res.hasMore) return loadMedicalFiles(page + 1);
-        setMedicalFiles((items) => mergeItems(items, newItems));
+        setMedicalFiles(mergeItems(medicalFiles, newItems));
         return true;
       }
       const medicalFilesSuccess = await loadMedicalFiles(0);
