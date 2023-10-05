@@ -14,6 +14,7 @@ import { AgendaMutedIcon } from './AgendaMutedIcon';
 import { FullScreenIcon } from './FullScreenIcon';
 import UserName from '../../../components/UserName';
 import { itemsGroupedByPersonSelector } from '../../../recoil/selectors';
+import DescriptionIcon from '../../../components/DescriptionIcon';
 
 const filteredPersonActionsSelector = selectorFamily({
   key: 'filteredPersonActionsSelector',
@@ -185,8 +186,10 @@ const ActionsTable = ({ filteredData }) => {
                     history.push(`?${searchParams.toString()}`);
                   }}>
                   <div className="tw-flex">
-                    <div className="tw-flex-1">
-                      {action.urgent ? <ExclamationMarkButton /> : null} {`${date}${time}`}
+                    <div className="tw-flex tw-flex-1 tw-items-center tw-gap-x-2">
+                      {action.urgent ? <ExclamationMarkButton /> : null}
+                      {action.description ? <DescriptionIcon /> : null}
+                      <span>{`${date}${time}`}</span>
                     </div>
                     <div>
                       <ActionStatus status={action.status} />

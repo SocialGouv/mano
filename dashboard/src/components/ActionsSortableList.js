@@ -17,6 +17,7 @@ import TagTeam from './TagTeam';
 import { useLocalStorage } from '../services/useLocalStorage';
 import Page from './pagination';
 import useSearchParamState from '../services/useSearchParamState';
+import DescriptionIcon from './DescriptionIcon';
 
 const ActionsSortableList = ({ data, limit }) => {
   useTitle('Agenda');
@@ -72,6 +73,7 @@ const ActionsSortableList = ({ data, limit }) => {
               return (
                 <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
                   {!!actionOrConsult.urgent && <ExclamationMarkButton />}
+                  {!!actionOrConsult.description && <DescriptionIcon />}
                   {!!organisation.groupsEnabled && !!actionOrConsult.group && (
                     <span className="tw-text-3xl" aria-label="Action familiale" title="Action familiale">
                       👪

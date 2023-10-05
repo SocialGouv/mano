@@ -12,6 +12,7 @@ import { organisationState, userState } from '../recoil/auth';
 import TagTeam from './TagTeam';
 import useSearchParamState from '../services/useSearchParamState';
 import { disableConsultationRow } from '../recoil/consultations';
+import DescriptionIcon from './DescriptionIcon';
 
 // TODO: remove inline style when UI is stabilized.
 
