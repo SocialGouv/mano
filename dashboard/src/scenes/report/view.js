@@ -1150,7 +1150,7 @@ const ActionCompletedAt = ({ date, status, actions, setSortOrder, setSortBy, sor
               onSortBy: setSortBy,
               sortBy,
               sortOrder,
-              render: (action) => <PersonName item={action} />,
+              render: (action) => <PersonName showOtherNames item={action} />,
             },
             {
               title: 'Statut',
@@ -1256,7 +1256,7 @@ const ActionCreatedAt = ({ date, actions, setSortOrder, setSortBy, sortBy, sortO
               onSortBy: setSortBy,
               sortBy,
               sortOrder,
-              render: (action) => <PersonName item={action} />,
+              render: (action) => <PersonName showOtherNames item={action} />,
             },
             {
               title: 'Statut',
@@ -1358,7 +1358,7 @@ const Consultations = ({ date, status, consultations, setSortOrder, setSortBy, s
               onSortBy: setSortBy,
               sortBy,
               sortOrder,
-              render: (consultation) => <PersonName item={consultation} />,
+              render: (consultation) => <PersonName showOtherNames item={consultation} />,
             },
             {
               title: 'Statut',
@@ -1423,7 +1423,7 @@ const ConsultationsCreatedAt = ({ date, consultations }) => {
             {
               title: 'Personne suivie',
               dataKey: 'person',
-              render: (action) => <PersonName item={action} />,
+              render: (action) => <PersonName showOtherNames item={action} />,
             },
             { title: 'Statut', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
           ]}
@@ -1643,7 +1643,7 @@ const PassagesCreatedAt = ({ date, passages, selectedTeams }) => {
                 title: 'Personne suivie',
                 dataKey: 'person',
                 render: (passage) =>
-                  passage.person ? <PersonName item={passage} /> : <span style={{ opacity: 0.3, fontStyle: 'italic' }}>Anonyme</span>,
+                  passage.person ? <PersonName showOtherNames item={passage} /> : <span style={{ opacity: 0.3, fontStyle: 'italic' }}>Anonyme</span>,
               },
               {
                 title: 'Enregistré par',
@@ -1723,7 +1723,11 @@ const RencontresCreatedAt = ({ date, rencontres, selectedTeams }) => {
                 title: 'Personne suivie',
                 dataKey: 'person',
                 render: (rencontre) =>
-                  rencontre.person ? <PersonName item={rencontre} /> : <span style={{ opacity: 0.3, fontStyle: 'italic' }}>Anonyme</span>,
+                  rencontre.person ? (
+                    <PersonName showOtherNames item={rencontre} />
+                  ) : (
+                    <span style={{ opacity: 0.3, fontStyle: 'italic' }}>Anonyme</span>
+                  ),
               },
               {
                 title: 'Enregistrée par',
