@@ -61,4 +61,4 @@ Ensuite lancer la commande `Record new` depuis VSCode. Pour chaque test, on peut
 
 Plus d'information sur Mano ici : https://www.fabrique.social.gouv.fr/startups/mano/
 
-Pour contacter l’équipe : g.demirhan@aurore.asso.fr ou nathan.fradin.mano@gmail.com
+Pour contacter l’équipe : g.demirhan@aurore.asso.fr

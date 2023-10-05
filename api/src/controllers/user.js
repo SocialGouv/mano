@@ -365,7 +365,6 @@ Toute l'équipe Mano vous souhaite la bienvenue !
 
 Si vous avez des questions n'hésitez pas à nous contacter:
 
-Nathan Fradin, chargé de déploiement: nathan.fradin.mano@gmail.com - +33 6 29 54 94 26
 Melissa Saiter, chargée de déploiement Mano m.saiter.mano@gmail.com - +33 6 13 23 33 45
 Yoann Kittery, chargé de déploiement Mano ykittery.mano@gmail.com - +33 6 83 98 29 66
 Guillaume Demirhan, porteur du projet: g.demirhan@aurore.asso.fr - +33 7 66 56 19 96

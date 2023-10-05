@@ -3,12 +3,10 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 
 export default function Footer({ skipFirstParagraph }) {
-  const nathan = "bmF0aGFuLmZyYWRpbi5tYW5vQGdtYWlsLmNvbQ==";
   const guillaume = "Zy5kZW1pcmhhbkBhdXJvcmUuYXNzby5mcg==";
   const melissa = "bS5zYWl0ZXIubWFub0BnbWFpbC5jb20=";
   const yoann = "eWtpdHRlcnkubWFub0BnbWFpbC5jb20=";
   const [emailGuillaume, setEmailGuillaume] = useState("");
-  const [emailNathan, setEmailNathan] = useState("");
   const [emailMelissa, setEmailMelissa] = useState("");
   const [emailYoann, setEmailYoann] = useState("");
 
@@ -16,7 +14,6 @@ export default function Footer({ skipFirstParagraph }) {
 
   useEffect(() => {
     setEmailGuillaume(window.atob(guillaume));
-    setEmailNathan(window.atob(nathan));
     setEmailMelissa(window.atob(melissa));
     setEmailYoann(window.atob(yoann));
   }, []);
@@ -39,22 +36,11 @@ export default function Footer({ skipFirstParagraph }) {
                 Pour toutes questions sur les fonctionnalités de MANO, pour une présentation complète en présentiel ou commencer à utiliser l'outil
                 {`\u00A0`}:<br />
                 <span className=" block text-base  mt-3 font-medium ">
-                  Nathan, Mélissa et Yoann
+                  Mélissa et Yoann
                   <br />
                   chargés de déploiement
                 </span>
               </p>
-              <button
-                className="mx-auto p-4 px-6 md:px-12 space-x-2 text-white transition-all bg-white flex-center rounded-xl bg-opacity-10 hover:bg-opacity-30"
-                onClick={() => {
-                  window.location.href = "mailto:" + window && window.atob(nathan);
-                }}
-              >
-                <HiOutlineMail className="text-lg" />
-                <span suppressHydrationWarning className="text-base font-medium">
-                  {emailNathan}
-                </span>
-              </button>
               <button
                 className="mx-auto p-4 px-6 md:px-12 mt-2 space-x-2 text-white transition-all bg-white flex-center rounded-xl bg-opacity-10 hover:bg-opacity-30"
                 onClick={() => {
