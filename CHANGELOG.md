@@ -1,3 +1,15 @@
+# [1.286.0](https://github.com/SocialGouv/mano/compare/v1.285.0...v1.286.0) (2023-10-05)
+
+
+### Bug Fixes
+
+* **dashboard:** plus grandes fenêtres de saisie pour actions/consultations ([#1704](https://github.com/SocialGouv/mano/issues/1704)) ([89e2e93](https://github.com/SocialGouv/mano/commit/89e2e932513377ef331347d2d36dc14709ebd87d))
+
+
+### Features
+
+* **dashboard:** affiche les Autres pseudos dans les tableaux de passages/rencontres/actions/consultations des comptes rendus ([#1702](https://github.com/SocialGouv/mano/issues/1702)) ([70179d2](https://github.com/SocialGouv/mano/commit/70179d23402e5b8b7b5e18cbcf6ff46ff52dd135))
+
 # [1.285.0](https://github.com/SocialGouv/mano/compare/v1.284.29...v1.285.0) (2023-10-05)
 
 
