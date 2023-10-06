@@ -123,37 +123,40 @@ export default function useDataMigrator() {
           query: { organisation: organisationId, after: 0, withDeleted: false },
         }).then((res) => res.decryptedData || []);
 
+        const medicalFilePerPersonId = {};
         const medicalFilesPerPersonId = {};
         const medicalFilesToUpdate = {};
         const medicalFileIdsToDelete = [];
         for (const newMedicalFile of medicalFiles) {
           const personId = newMedicalFile.person;
-          if (medicalFilesPerPersonId[personId]) {
-            const existingMedicalFile = medicalFilesPerPersonId[personId];
+          if (medicalFilePerPersonId[personId]) {
+            if (!medicalFilesPerPersonId[personId]) medicalFilesPerPersonId[personId] = [medicalFilePerPersonId[personId]];
+            medicalFilesPerPersonId[personId].push(newMedicalFile);
+            const existingMedicalFile = medicalFilePerPersonId[personId];
             const nextDocuments = {};
             const nextComments = {};
-            for (const document of newMedicalFile.documents) {
+            for (const document of newMedicalFile.documents || []) {
               nextDocuments[document._id] = document;
             }
-            for (const document of existingMedicalFile.documents) {
+            for (const document of existingMedicalFile.documents || []) {
               nextDocuments[document._id] = document;
             }
-            for (const comment of newMedicalFile.comments) {
+            for (const comment of newMedicalFile.comments || []) {
               nextComments[comment._id] = comment;
             }
-            for (const comment of existingMedicalFile.comments) {
+            for (const comment of existingMedicalFile.comments || []) {
               nextComments[comment._id] = comment;
             }
-            medicalFilesPerPersonId[personId] = {
+            medicalFilePerPersonId[personId] = {
               ...newMedicalFile,
               ...existingMedicalFile,
               documents: Object.values(nextDocuments),
               comments: Object.values(nextComments),
             };
             medicalFileIdsToDelete.push(newMedicalFile._id);
-            medicalFilesToUpdate[personId] = medicalFilesPerPersonId[personId];
+            medicalFilesToUpdate[personId] = medicalFilePerPersonId[personId];
           } else {
-            medicalFilesPerPersonId[personId] = newMedicalFile;
+            medicalFilePerPersonId[personId] = newMedicalFile;
           }
         }
 
@@ -163,15 +166,22 @@ export default function useDataMigrator() {
             .map(encryptItem)
         );
 
-        const response = await API.put({
-          path: `/migration/clean-duplicated-medical-files`,
-          body: { medicalFileIdsToDelete, medicalFilesToUpdate: encryptedMedicalFilesToUpdate },
-          query: { migrationLastUpdateAt },
-        });
-        if (response.ok) {
-          setOrganisation(response.organisation);
-          migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
-        }
+        console.log('medicalFilesPerPersonId', medicalFilesPerPersonId);
+        console.log('medicalFilesToUpdate', medicalFilesToUpdate);
+        console.log(
+          'encryptedMedicalFilesToUpdate',
+          encryptedMedicalFilesToUpdate.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+        );
+
+        // const response = await API.put({
+        //   path: `/migration/clean-duplicated-medical-files`,
+        //   body: { medicalFileIdsToDelete, medicalFilesToUpdate: encryptedMedicalFilesToUpdate },
+        //   query: { migrationLastUpdateAt },
+        // });
+        // if (response.ok) {
+        //   setOrganisation(response.organisation);
+        //   migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
+        // }
       }
     },
   };

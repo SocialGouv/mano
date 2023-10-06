@@ -260,12 +260,19 @@ export const itemsGroupedByPersonSelector = selector({
     for (const medicalFile of medicalFiles) {
       if (!personsObject[medicalFile.person]) continue;
       if (personsObject[medicalFile.person].medicalFile) {
+        if ('0a0f7577-890e-4731-a71c-a78cbcf1d595' === medicalFile.person) {
+          console.log('medicalFile', medicalFile);
+          console.log('personsObject[medicalFile.person].medicalFile', personsObject[medicalFile.person].medicalFile);
+        }
         personsObject[medicalFile.person].medicalFile = {
           ...medicalFile,
           ...personsObject[medicalFile.person].medicalFile,
           documents: [...(medicalFile?.documents || []), ...(personsObject[medicalFile.person].medicalFile?.documents || [])],
           comments: [...(medicalFile?.comments || []), ...(personsObject[medicalFile.person].medicalFile?.comments || [])],
         };
+        if ('0a0f7577-890e-4731-a71c-a78cbcf1d595' === medicalFile.person) {
+          console.log('new personsObject[medicalFile.person].medicalFile', personsObject[medicalFile.person].medicalFile);
+        }
       } else {
         personsObject[medicalFile.person].medicalFile = medicalFile;
       }
