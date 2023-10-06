@@ -163,8 +163,6 @@ export default function useDataMigrator() {
             .map(encryptItem)
         );
 
-        console.log('encryptedMedicalFilesToUpdate', encryptedMedicalFilesToUpdate);
-        console.log('medicalFileIdsToDelete', medicalFileIdsToDelete);
         const response = await API.put({
           path: `/migration/clean-duplicated-medical-files`,
           body: { medicalFileIdsToDelete, medicalFilesToUpdate: encryptedMedicalFilesToUpdate },
