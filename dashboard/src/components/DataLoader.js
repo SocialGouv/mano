@@ -27,12 +27,12 @@ import useDataMigrator from './DataMigrator';
 // Update to flush cache.
 
 const isLoadingState = atom({ key: 'isLoadingState', default: false });
-const initialLoadState = atom({ key: 'isInitialLoadState', default: false });
 const fullScreenState = atom({ key: 'fullScreenState', default: true });
 const progressState = atom({ key: 'progressState', default: null });
 const totalState = atom({ key: 'totalState', default: null });
-export const initialLoadingTextState = 'En attente de chargement';
+const initialLoadingTextState = 'En attente de chargement';
 export const loadingTextState = atom({ key: 'loadingTextState', default: initialLoadingTextState });
+export const initialLoadIsDoneState = atom({ key: 'initialLoadIsDoneState', default: false });
 export const lastLoadState = atom({
   key: 'lastLoadState',
   default: selector({
@@ -84,8 +84,8 @@ export default function DataLoader() {
 export function useDataLoader(options = { refreshOnMount: false }) {
   const [fullScreen, setFullScreen] = useRecoilState(fullScreenState);
   const [isLoading, setIsLoading] = useRecoilState(isLoadingState);
-  const [initialLoad, setInitialLoad] = useRecoilState(initialLoadState);
   const setLoadingText = useSetRecoilState(loadingTextState);
+  const setInitialLoadIsDone = useSetRecoilState(initialLoadIsDoneState);
   const [lastLoadValue, setLastLoad] = useRecoilState(lastLoadState);
   const setProgress = useSetRecoilState(progressState);
   const setTotal = useSetRecoilState(totalState);
@@ -114,11 +114,37 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  /*
+  Steps
+
+  INITIALLY: Recoil takes care of cache reconciliation, so the loader don't have to worry about it
+  - each atom `person`, `action` etc. has an async default value, which is a selector that will get the data from the cache
+  - each of those atoms has an effect that will update the cache when the data is set
+
+  Then, for initial load / refresh, the loader will:
+  1. Start the UI:
+    - set isLoading to true
+    - set fullScreen to true if it's the initial load
+    - set loadingText to 'Chargement des données' if it's the initial load, 'Mise à jour des données' otherwise
+  2. Get the latest organisation, in order to get the latest migrations data, and updated custom fields
+  3. Get the latest user, in order to get the latest user roles
+  4. Get the latest stats, in order to know what data to download, with the following parameters
+    - after lastLoadValue, which is a date provided by the server, and is the last time the data was downloaded
+    - withDeleted, to get the data deleted from other users, so that we can filter it out in here
+    - withAllMedicalData, only on initial load because medical data is never saved in cache
+    The stats will be used for
+    - knowing the total items count, and setting the progress bar
+    - knowing what data to download
+  5. Get the server date, in order to know when the data was last updated
+  6. Download all the data, with the following parameters
+    - withDeleted, to get the data deleted from other users, so that we can filter it out in here
+    - after lastLoadValue, which is a date provided by the server, and is the last time the data was downloaded
+
+  */
   async function loadOrRefreshData(isStartingInitialLoad) {
     setIsLoading(true);
     setFullScreen(isStartingInitialLoad ? true : false);
-    setInitialLoad(isStartingInitialLoad ? true : false);
-    setLoadingText(setInitialLoad ? 'Chargement des données' : 'Mise à jour des données');
+    setLoadingText(isStartingInitialLoad ? 'Chargement des données' : 'Mise à jour des données');
 
     /*
     Refresh organisation (and user), to get the latest organisation fields
@@ -131,7 +157,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     const organisationId = latestOrganisation._id;
     setOrganisation(latestOrganisation);
     setUser(latestUser);
-    if (initialLoad) {
+    if (isStartingInitialLoad) {
       await migrateData();
     }
 
@@ -142,13 +168,14 @@ export function useDataLoader(options = { refreshOnMount: false }) {
         after: lastLoadValue,
         withDeleted: true,
         // Medical data is never saved in cache so we always have to download all at every page reload.
-        withAllMedicalData: initialLoad,
+        withAllMedicalData: isStartingInitialLoad,
       },
     });
 
     if (!statsResponse.ok) return false;
 
-    // Get date from server at the very beginning of the loader.
+    // Get date from server just after getting all the stats
+    // We'll set the `lastLoadValue` to this date after all the data is downloaded
     const serverDateResponse = await API.get({ path: '/now' });
     const serverDate = serverDateResponse.data;
 
@@ -177,9 +204,9 @@ export function useDataLoader(options = { refreshOnMount: false }) {
 
     const query = {
       organisation: organisationId,
-      limit: String(1000),
+      limit: String(10000),
       after: lastLoadValue,
-      withDeleted: Boolean(lastLoadValue),
+      withDeleted: true,
     };
 
     if (stats.persons > 0) {
@@ -351,7 +378,10 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       let newItems = [];
       setLoadingText('Chargement des consultations');
       async function loadConsultations(page = 0) {
-        const res = await API.get({ path: '/consultation', query: { ...query, page: String(page), after: initialLoad ? 0 : lastLoadValue } });
+        const res = await API.get({
+          path: '/consultation',
+          query: { ...query, page: String(page), after: isStartingInitialLoad ? 0 : lastLoadValue },
+        });
         if (!res.ok || !res.data.length) return resetLoaderOnError();
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
@@ -366,7 +396,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       let newItems = [];
       setLoadingText('Chargement des traitements');
       async function loadTreatments(page = 0) {
-        const res = await API.get({ path: '/treatment', query: { ...query, page: String(page), after: initialLoad ? 0 : lastLoadValue } });
+        const res = await API.get({ path: '/treatment', query: { ...query, page: String(page), after: isStartingInitialLoad ? 0 : lastLoadValue } });
         if (!res.ok || !res.data.length) return resetLoaderOnError();
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
@@ -381,7 +411,10 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       let newItems = [];
       setLoadingText('Chargement des fichiers médicaux');
       async function loadMedicalFiles(page = 0) {
-        const res = await API.get({ path: '/medical-file', query: { ...query, page: String(page), after: initialLoad ? 0 : lastLoadValue } });
+        const res = await API.get({
+          path: '/medical-file',
+          query: { ...query, page: String(page), after: isStartingInitialLoad ? 0 : lastLoadValue },
+        });
         if (!res.ok || !res.data.length) return resetLoaderOnError();
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
@@ -395,9 +428,10 @@ export function useDataLoader(options = { refreshOnMount: false }) {
 
     setIsLoading(false);
     setLastLoad(serverDate);
-    setLoadingText('En attente de chargement');
+    setLoadingText('En attente de rafraichissement');
     setProgress(null);
     setTotal(null);
+    setInitialLoadIsDone(true);
     return true;
   }
 

@@ -33,7 +33,7 @@ import ScrollToTop from './components/ScrollToTop';
 import TopBar from './components/TopBar';
 import VersionOutdatedAlert from './components/VersionOutdatedAlert';
 import ModalConfirm from './components/ModalConfirm';
-import DataLoader, { initialLoadingTextState, loadingTextState, useDataLoader } from './components/DataLoader';
+import DataLoader, { initialLoadIsDoneState, useDataLoader } from './components/DataLoader';
 import { Bounce, cssTransition, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import SentryRoute from './components/Sentryroute';
@@ -90,7 +90,7 @@ if (ENV === 'production') {
 const App = ({ resetRecoil }) => {
   const authToken = useRecoilValue(authTokenState);
   const user = useRecoilValue(userState);
-  const loadingText = useRecoilValue(loadingTextState);
+  const initialLoadIsDone = useRecoilValue(initialLoadIsDoneState);
 
   const recoilResetKey = useRecoilValue(recoilResetKeyState);
   useEffect(() => {
@@ -106,7 +106,7 @@ const App = ({ resetRecoil }) => {
       if (authToken && e.newState === 'active') {
         API.get({ path: '/check-auth' }) // will force logout if session is expired
           .then(() => {
-            if (loadingText !== initialLoadingTextState) {
+            if (initialLoadIsDone) {
               // if the app is already loaded
               // will refresh data if session is still valid
               refresh();
@@ -120,7 +120,7 @@ const App = ({ resetRecoil }) => {
     return () => {
       lifecycle.removeEventListener('statechange', onWindowFocus);
     };
-  }, [authToken, refresh, loadingText]);
+  }, [authToken, refresh, initialLoadIsDone]);
 
   return (
     <div className="main-container">
@@ -195,7 +195,10 @@ export default function ContextedApp() {
   const [recoilKey, setRecoilKey] = useState(0);
   return (
     <RecoilRoot key={recoilKey}>
+      {/* We need React.Suspense here because default values for `person`, `action` etc. tables is an async cache request */}
+      {/* https://recoiljs.org/docs/guides/asynchronous-data-queries#query-default-atom-values */}
       <React.Suspense fallback={<div></div>}>
+        {/* Recoil Nexus allows to use Recoil state outside React tree */}
         <RecoilNexus />
         <App resetRecoil={() => setRecoilKey((k) => k + 1)} />
       </React.Suspense>
