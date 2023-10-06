@@ -1,4 +1,4 @@
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { mappedIdsToLabels, prepareActionForEncryption } from '../recoil/actions';
 import { organisationState, userState } from '../recoil/auth';
 import { usePreparePersonForEncryption } from '../recoil/persons';
@@ -17,16 +17,15 @@ const LOADING_TEXT = 'Mise à jour des données de votre organisation…';
 export default function useDataMigrator() {
   const setLoadingText = useSetRecoilState(loadingTextState);
   const user = useRecoilValue(userState);
-  const [organisation, setOrganisation] = useRecoilState(organisationState);
-
-  const organisationId = organisation?._id;
+  const setOrganisation = useSetRecoilState(organisationState);
 
   const preparePersonForEncryption = usePreparePersonForEncryption();
 
   return {
     // One "if" for each migration.
     // `migrationLastUpdateAt` should be set after each migration and send in every PUT/POST/PATCH request to server.
-    migrateData: async () => {
+    migrateData: async (organisation) => {
+      const organisationId = organisation?._id;
       let migrationLastUpdateAt = organisation.migrationLastUpdateAt;
       /*
       // Example of migration:

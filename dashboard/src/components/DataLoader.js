@@ -58,8 +58,6 @@ export default function DataLoader() {
   const progress = useRecoilValue(progressState);
   const total = useRecoilValue(totalState);
 
-  console.log(loadingText, 'progress', progress, 'total', total, '%', progress / total);
-
   if (!isLoading) return <RandomPicturePreloader />;
   if (!total && !fullScreen) return null;
 
@@ -158,7 +156,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     setOrganisation(latestOrganisation);
     setUser(latestUser);
     if (isStartingInitialLoad) {
-      await migrateData();
+      await migrateData(latestOrganisation);
     }
 
     const statsResponse = await API.get({
