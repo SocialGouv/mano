@@ -55,7 +55,7 @@ export const prepareMedicalFileForEncryption =
     };
   };
 
-const defaultMedicalFileCustomFields: CustomField[] = [
+export const defaultMedicalFileCustomFields: CustomField[] = [
   {
     name: 'numeroSecuriteSociale',
     label: 'Numéro de sécurité sociale',

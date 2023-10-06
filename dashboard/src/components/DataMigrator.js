@@ -10,6 +10,7 @@ import { looseUuidRegex } from '../utils';
 import { prepareCommentForEncryption } from '../recoil/comments';
 import { prepareGroupForEncryption } from '../recoil/groups';
 import { capture } from '../services/sentry';
+import { defaultMedicalFileCustomFields, prepareMedicalFileForEncryption } from '../recoil/medicalFiles';
 
 const LOADING_TEXT = 'Mise à jour des données de votre organisation…';
 
@@ -104,6 +105,69 @@ export default function useDataMigrator() {
         const response = await API.put({
           path: `/migration/integrate-comments-in-actions-history`,
           body: { commentIdsToDelete, actionsToUpdate: encryptedActionsToUpdate },
+          query: { migrationLastUpdateAt },
+        });
+        if (response.ok) {
+          setOrganisation(response.organisation);
+          migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
+        }
+      }
+
+      if (['admin', 'normal'].includes(user.role) && !organisation.migrations?.includes('clean-duplicated-medical-files')) {
+        setLoadingText(LOADING_TEXT);
+        const customFieldsMedicalFile = Array.isArray(organisation.customFieldsMedicalFile)
+          ? organisation.customFieldsMedicalFile
+          : defaultMedicalFileCustomFields;
+        const medicalFiles = await API.get({
+          path: '/medical-file',
+          query: { organisation: organisationId, after: 0, withDeleted: false },
+        }).then((res) => res.decryptedData || []);
+
+        const medicalFilesPerPersonId = {};
+        const medicalFilesToUpdate = {};
+        const medicalFileIdsToDelete = [];
+        for (const newMedicalFile of medicalFiles) {
+          const personId = newMedicalFile.person;
+          if (medicalFilesPerPersonId[personId]) {
+            const existingMedicalFile = medicalFilesPerPersonId[personId];
+            const nextDocuments = {};
+            const nextComments = {};
+            for (const document of newMedicalFile.documents) {
+              nextDocuments[document._id] = document;
+            }
+            for (const document of existingMedicalFile.documents) {
+              nextDocuments[document._id] = document;
+            }
+            for (const comment of newMedicalFile.comments) {
+              nextComments[comment._id] = comment;
+            }
+            for (const comment of existingMedicalFile.comments) {
+              nextComments[comment._id] = comment;
+            }
+            medicalFilesPerPersonId[personId] = {
+              ...newMedicalFile,
+              ...existingMedicalFile,
+              documents: Object.values(nextDocuments),
+              comments: Object.values(nextComments),
+            };
+            medicalFileIdsToDelete.push(newMedicalFile._id);
+            medicalFilesToUpdate[personId] = medicalFilesPerPersonId[personId];
+          } else {
+            medicalFilesPerPersonId[personId] = newMedicalFile;
+          }
+        }
+
+        const encryptedMedicalFilesToUpdate = await Promise.all(
+          Object.values(medicalFilesToUpdate)
+            .map((medicalFile) => prepareMedicalFileForEncryption(customFieldsMedicalFile)(medicalFile))
+            .map(encryptItem)
+        );
+
+        console.log('encryptedMedicalFilesToUpdate', encryptedMedicalFilesToUpdate);
+        console.log('medicalFileIdsToDelete', medicalFileIdsToDelete);
+        const response = await API.put({
+          path: `/migration/clean-duplicated-medical-files`,
+          body: { medicalFileIdsToDelete, medicalFilesToUpdate: encryptedMedicalFilesToUpdate },
           query: { migrationLastUpdateAt },
         });
         if (response.ok) {

@@ -8,7 +8,7 @@ const { looseUuidRegex, dateRegex } = require("../utils");
 const { capture } = require("../sentry");
 const validateUser = require("../middleware/validateUser");
 const { serializeOrganisation } = require("../utils/data-serializer");
-const { Organisation, Person, Action, Comment, Report, Team, Service, sequelize, Group } = require("../db/sequelize");
+const { Organisation, Person, Action, Comment, Report, Team, Service, sequelize, Group, MedicalFile } = require("../db/sequelize");
 
 router.put(
   "/:migrationName",
@@ -85,6 +85,29 @@ router.put(
           }
           for (const { _id, encrypted, encryptedEntityKey } of req.body.actionsToUpdate) {
             await Action.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx, paranoid: false });
+          }
+        }
+
+        if (req.params.migrationName === "clean-duplicated-medical-files") {
+          try {
+            z.array(z.string().regex(looseUuidRegex)).parse(req.body.medicalFileIdsToDelete);
+            z.array(
+              z.object({
+                _id: z.string().regex(looseUuidRegex),
+                encrypted: z.string(),
+                encryptedEntityKey: z.string(),
+              })
+            ).parse(req.body.medicalFilesToUpdate);
+          } catch (e) {
+            const error = new Error(`Invalid request in clean-duplicated-medical-files migration: ${e}`);
+            error.status = 400;
+            throw error;
+          }
+          for (const _id of req.body.medicalFileIdsToDelete) {
+            await MedicalFile.destroy({ where: { _id, organisation: req.user.organisation }, transaction: tx });
+          }
+          for (const { _id, encrypted, encryptedEntityKey } of req.body.medicalFilesToUpdate) {
+            await MedicalFile.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx, paranoid: false });
           }
         }
 
