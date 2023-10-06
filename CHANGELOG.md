@@ -1,3 +1,10 @@
+## [1.286.2](https://github.com/SocialGouv/mano/compare/v1.286.1...v1.286.2) (2023-10-06)
+
+
+### Bug Fixes
+
+* **dashboard:** indication sur l'icône Description ([3d4ced0](https://github.com/SocialGouv/mano/commit/3d4ced0e34cd42bf5a237f1ec199b8920d71fd62))
+
 ## [1.286.1](https://github.com/SocialGouv/mano/compare/v1.286.0...v1.286.1) (2023-10-05)
 
 
