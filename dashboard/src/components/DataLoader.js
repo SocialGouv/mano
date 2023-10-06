@@ -164,9 +164,11 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       stats.relsPersonPlace +
       stats.territoryObservations +
       stats.comments +
-      stats.consultations +
-      stats.treatments +
-      stats.medicalFiles;
+      stats.consultations;
+
+    if (['admin', 'normal'].includes(latestUser.role)) {
+      itemsCount += stats.treatments + stats.medicalFiles;
+    }
 
     setProgress(0);
     setTotal(itemsCount);
@@ -358,7 +360,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       const consultationsSuccess = await loadConsultations(0);
       if (!consultationsSuccess) return false;
     }
-    if (stats.treatments > 0) {
+    if (['admin', 'normal'].includes(latestUser.role) && stats.treatments > 0) {
       let newItems = [];
       setLoadingText('Chargement des traitements');
       async function loadTreatments(page = 0) {
@@ -373,7 +375,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       const treatmentsSuccess = await loadTreatments(0);
       if (!treatmentsSuccess) return false;
     }
-    if (stats.medicalFiles > 0) {
+    if (['admin', 'normal'].includes(latestUser.role) && stats.medicalFiles > 0) {
       let newItems = [];
       setLoadingText('Chargement des fichiers médicaux');
       async function loadMedicalFiles(page = 0) {
