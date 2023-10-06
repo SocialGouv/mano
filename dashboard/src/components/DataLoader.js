@@ -131,9 +131,6 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     const organisationId = latestOrganisation._id;
     setOrganisation(latestOrganisation);
     setUser(latestUser);
-    // Get date from server at the very beginning of the loader.
-    const serverDateResponse = await API.get({ path: '/now' });
-    const serverDate = serverDateResponse.data;
     if (initialLoad) {
       await migrateData();
     }
@@ -150,6 +147,11 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     });
 
     if (!statsResponse.ok) return false;
+
+    // Get date from server at the very beginning of the loader.
+    const serverDateResponse = await API.get({ path: '/now' });
+    const serverDate = serverDateResponse.data;
+
     const stats = statsResponse.data;
     let itemsCount =
       0 +
