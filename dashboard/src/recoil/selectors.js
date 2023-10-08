@@ -122,7 +122,7 @@ export const itemsGroupedByPersonSelector = selector({
     const comments = get(commentsState);
     const consultations = get(consultationsState);
     const treatments = get(treatmentsState);
-    const medicalFiles = get(medicalFileState);
+    const medicalFiles = [...get(medicalFileState)].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     const passages = get(passagesState);
     const relsPersonPlace = get(relsPersonPlaceState);
     const places = get(placesObjectSelector);
@@ -260,11 +260,26 @@ export const itemsGroupedByPersonSelector = selector({
     for (const medicalFile of medicalFiles) {
       if (!personsObject[medicalFile.person]) continue;
       if (personsObject[medicalFile.person].medicalFile) {
+        const nextDocuments = {};
+        const nextComments = {};
+        const existingMedicalFile = personsObject[medicalFile.person].medicalFile;
+        for (const document of medicalFile.documents || []) {
+          nextDocuments[document._id] = document;
+        }
+        for (const document of existingMedicalFile.documents || []) {
+          nextDocuments[document._id] = document;
+        }
+        for (const comment of medicalFile.comments || []) {
+          nextComments[comment._id] = comment;
+        }
+        for (const comment of existingMedicalFile.comments || []) {
+          nextComments[comment._id] = comment;
+        }
         personsObject[medicalFile.person].medicalFile = {
           ...medicalFile,
           ...personsObject[medicalFile.person].medicalFile,
-          documents: [...(medicalFile?.documents || []), ...(personsObject[medicalFile.person].medicalFile?.documents || [])],
-          comments: [...(medicalFile?.comments || []), ...(personsObject[medicalFile.person].medicalFile?.comments || [])],
+          documents: Object.values(nextDocuments),
+          comments: Object.values(nextComments),
         };
       } else {
         personsObject[medicalFile.person].medicalFile = medicalFile;

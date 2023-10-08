@@ -145,7 +145,7 @@ test("test", async ({ page }) => {
   await page.getByLabel("Nom de l'action").fill("Action");
 
   // à ne pas voir concernant les actions
-  await expect(page.getByLabel("Description")).not.toBeVisible();
+  await expect(page.getByLabel("Description", { exact: true })).not.toBeVisible();
   await expect(page.getByRole("heading", { name: "Commentaires" })).not.toBeVisible();
   await expect(page.getByRole("button", { name: "Supprimer" })).not.toBeVisible();
   await page.getByRole("button", { name: "Sauvegarder" }).click();
