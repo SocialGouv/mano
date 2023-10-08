@@ -1,3 +1,10 @@
+## [1.286.3](https://github.com/SocialGouv/mano/compare/v1.286.2...v1.286.3) (2023-10-08)
+
+
+### Bug Fixes
+
+* **app,dashboard:** fix temporaire des duplicatas de dossier médical ([#1711](https://github.com/SocialGouv/mano/issues/1711)) ([a476e61](https://github.com/SocialGouv/mano/commit/a476e61ece8acd3ee2c64fd494d6772a04a8390e))
+
 ## [1.286.2](https://github.com/SocialGouv/mano/compare/v1.286.1...v1.286.2) (2023-10-06)
 
 
