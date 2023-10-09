@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-export default function AutoResizeTextarea({ name, value, onChange, rows = 1, placeholder = 'Description' }) {
+export default function AutoResizeTextarea({ name, value, onChange, rows = 1, placeholder = 'Description', id }) {
   const [resizedHeight, setResizedHeight] = useState(null);
   const textbox = useRef(null);
   useEffect(() => {
@@ -47,7 +47,7 @@ export default function AutoResizeTextarea({ name, value, onChange, rows = 1, pl
         ref={textbox}
         defaultValue={value}
         name={name}
-        id={name}
+        id={id || name}
         onChange={onChange}
         className="tw-absolute tw-inset-0 tw-h-full tw-w-full tw-py-1.5 tw-px-3"
         placeholder={placeholder}

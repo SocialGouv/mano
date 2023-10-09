@@ -13,6 +13,7 @@ import SelectPerson from './SelectPerson';
 import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
 import DatePicker from './DatePicker';
 import { outOfBoundariesDate } from '../services/date';
+import AutoResizeTextarea from './AutoresizeTextArea';
 
 const Rencontre = ({ rencontre, personId, onFinished }) => {
   const user = useRecoilValue(userState);
@@ -141,7 +142,14 @@ const Rencontre = ({ rencontre, personId, onFinished }) => {
                     <Col md={12}>
                       <FormGroup>
                         <Label htmlFor="update-rencontre-comment">Commentaire</Label>
-                        <Input name="comment" type="textarea" value={values.comment} onChange={handleChange} id="update-rencontre-comment" />
+                        <AutoResizeTextarea
+                          id="update-rencontre-comment"
+                          name="comment"
+                          placeholder="Tapez votre commentaire ici..."
+                          value={values.comment}
+                          rows={5}
+                          onChange={handleChange}
+                        />
                       </FormGroup>
                     </Col>
                     <Col md={6}>

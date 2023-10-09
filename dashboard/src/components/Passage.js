@@ -13,6 +13,7 @@ import SelectPerson from './SelectPerson';
 import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
 import DatePicker from './DatePicker';
 import { outOfBoundariesDate } from '../services/date';
+import AutoResizeTextarea from './AutoresizeTextArea';
 
 const Passage = ({ passage, personId, onFinished }) => {
   const user = useRecoilValue(userState);
@@ -185,7 +186,14 @@ const Passage = ({ passage, personId, onFinished }) => {
                     <Col md={12}>
                       <FormGroup>
                         <Label htmlFor="update-passage-comment">Commentaire</Label>
-                        <Input name="comment" type="textarea" value={values.comment} onChange={handleChange} id="update-passage-comment" />
+                        <AutoResizeTextarea
+                          id="update-passage-comment"
+                          name="comment"
+                          placeholder="Tapez votre commentaire ici..."
+                          value={values.comment}
+                          rows={5}
+                          onChange={handleChange}
+                        />
                       </FormGroup>
                     </Col>
                     <Col md={6}>
