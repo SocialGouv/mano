@@ -20,17 +20,8 @@ export default function Footer({ skipFirstParagraph }) {
   return (
     <>
       <section className="bg-shamrock-400 flex justify-center" id="contact">
-        <div className="px-5 py-12 lg:py-24 lg:mx-24 md:container md:grid md:grid-cols-12">
-          <div className="mb-8 text-center lg:col-span-5 col-span-full flex flex-col justify-center">
-            <h3 className="mb-2 text-xl font-semibold text-white">Nous contacter</h3>
-            {!skipFirstParagraph && (
-              <p className="mb-8 text-sm text-white">
-                Que vous ayez besoin d’un renseignement complémentaire ou d’une présentation complète ou que vous soyez déjà convaincus, nous serons
-                ravis d’échanger avec vous
-              </p>
-            )}
-          </div>
-          <div className="grid grid-cols-1 gap-10 lg:col-span-8 lg:col-start-7 col-span-full">
+        <div className="px-5 py-12 lg:py-24 lg:mx-24 md:container">
+          <div className="grid grid-cols-2 gap-10">
             <div>
               <p className="mb-3  text-sm text-white text-center">
                 Pour toutes questions sur les fonctionnalités de MANO, pour une présentation complète en présentiel ou commencer à utiliser l'outil
