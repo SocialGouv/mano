@@ -38,7 +38,7 @@ export default function Index() {
           <div>
             Pour toutes questions sur les fonctionnalités de MANO, pour une présentation complète en présentiel ou commencer à utiliser l'outil&nbsp;:
             écrivez à <b className="font-medium">Mélissa et Yoann, chargés de déploiement.</b>
-            <div className="grid grid-cols-2 gap-8 my-8 text-black">
+            <div className="grid md:grid-cols-2 gap-8 my-8 text-black">
               <div className="text-center grid gap-2">
                 <div>Mélissa Saiter</div>
                 <div>
