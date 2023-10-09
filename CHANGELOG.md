@@ -1,3 +1,10 @@
+## [1.288.3](https://github.com/SocialGouv/mano/compare/v1.288.2...v1.288.3) (2023-10-09)
+
+
+### Bug Fixes
+
+* **website:** add régions ([479ffd7](https://github.com/SocialGouv/mano/commit/479ffd7cc8e8497b23c96b551c8a35564448570e))
+
 ## [1.288.2](https://github.com/SocialGouv/mano/compare/v1.288.1...v1.288.2) (2023-10-09)
 
 
