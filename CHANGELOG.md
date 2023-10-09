@@ -1,3 +1,10 @@
+## [1.288.1](https://github.com/SocialGouv/mano/compare/v1.288.0...v1.288.1) (2023-10-09)
+
+
+### Bug Fixes
+
+* oops wrong email ([0962578](https://github.com/SocialGouv/mano/commit/0962578fefb18a10444750fdf9dc2f2be1e72eba))
+
 # [1.288.0](https://github.com/SocialGouv/mano/compare/v1.287.0...v1.288.0) (2023-10-09)
 
 
