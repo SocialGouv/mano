@@ -38,7 +38,7 @@ export default function Index() {
           <div>
             Pour toutes questions sur les fonctionnalités de MANO, pour une présentation complète en présentiel ou commencer à utiliser l'outil&nbsp;:
             écrivez à <b className="font-medium">Mélissa et Yoann, chargés de déploiement.</b>
-            <div className="grid md:grid-cols-2 gap-8 my-8 text-black">
+            <div className="grid md:grid-cols-2 gap-8 my-8 text-black place-items-start">
               <div className="text-center grid gap-2">
                 <div>Mélissa Saiter</div>
                 <div>
@@ -50,6 +50,9 @@ export default function Index() {
                   <a href="tel:+33613233345" className="hover:underline">
                     06 13 23 33 45
                   </a>
+                </div>
+                <div className="text-xs mt-4 max-w-sm mx-auto">
+                  Île-de-France, Hauts-de-France, Auvergne&nbsp;Rhone&nbsp;Alpes, Grand&nbsp;Est, Normandie, Bretagne, Guadeloupe et Martinique
                 </div>
               </div>
               <div className="text-center grid gap-2">
@@ -63,6 +66,10 @@ export default function Index() {
                   <a href="tel:+330683982966" className="hover:underline">
                     06 83 98 29 66
                   </a>
+                </div>
+                <div className="text-xs mt-4  max-w-sm mx-auto">
+                  Île-de-france, PACA, Occitanie, Nouvelle&nbsp;Aquitaine, Pays&nbsp;de&nbsp;la&nbsp;Loire, Centre&nbsp;Val&nbsp;de&nbsp;Loire, Corse,
+                  Réunion
                 </div>
               </div>
             </div>
