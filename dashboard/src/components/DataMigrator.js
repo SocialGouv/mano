@@ -49,6 +49,8 @@ export default function useDataMigrator() {
         if (response.ok) {
           setOrganisation(response.organisation);
           migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
+        else {
+          return false;
         }
       }
       // End of example of migration.
@@ -108,8 +110,11 @@ export default function useDataMigrator() {
         if (response.ok) {
           setOrganisation(response.organisation);
           migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
+        } else {
+          return false;
         }
       }
+      return true;
     },
   };
 }

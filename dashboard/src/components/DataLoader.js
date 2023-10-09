@@ -156,7 +156,8 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     setOrganisation(latestOrganisation);
     setUser(latestUser);
     if (isStartingInitialLoad) {
-      await migrateData(latestOrganisation);
+      const migrationIsSuccessful = await migrateData(latestOrganisation);
+      if (!migrationIsSuccessful) return resetLoaderOnError();
     }
 
     const statsResponse = await API.get({
