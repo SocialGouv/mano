@@ -184,9 +184,7 @@ const SignIn = () => {
 
   return (
     <div className="tw-mx-10 tw-my-0 tw-w-full tw-max-w-lg tw-overflow-y-auto tw-overflow-x-hidden tw-rounded-lg tw-bg-white tw-px-7 tw-pt-10 tw-pb-2 tw-text-black sm:tw-drop-shadow-2xl">
-      <h1 className="tw-mb-6 tw-text-center tw-text-3xl tw-font-bold">
-        {userName ? `Bienvenue ${userName?.split(' ')?.[0]}\u00a0!` : 'Bienvenue\u00a0!'}
-      </h1>
+      <h1 className="tw-mb-6 tw-text-center tw-text-3xl tw-font-bold">{userName ? `Bienvenue ${userName?.split(' ')?.[0]}` : 'Bienvenue'}&nbsp;!</h1>
       <form onSubmit={handleSubmit} method="POST">
         {!authViaCookie && (
           <>
@@ -223,8 +221,8 @@ const SignIn = () => {
               </div>
               {!!showErrors && <p className="tw-text-xs tw-text-red-500">{signinFormErrors.password}</p>}
             </div>
-            <div className="tw-mb-5 -tw-mt-5 tw-text-right tw-text-xs">
-              <Link to="/auth/forgot">Mot de passe oublié ?</Link>
+            <div className="tw-mb-5 -tw-mt-5 tw-text-right tw-text-sm">
+              <Link to="/auth/forgot">Première connexion ou mot de passe oublié&nbsp;?</Link>
             </div>
           </>
         )}
@@ -265,7 +263,7 @@ const SignIn = () => {
             className="tw-m-auto tw-font-[Helvetica] !tw-text-base !tw-font-normal"
           />
         )}
-        <p className="tw-mx-auto tw-mt-5 tw-mb-0 tw-block tw-text-center tw-text-xs">Version: {packageInfo.version}</p>
+        <p className="tw-mx-auto tw-mt-5 tw-mb-0 tw-block tw-text-center tw-text-xs tw-text-gray-500">Version&nbsp;: {packageInfo.version}</p>
       </form>
     </div>
   );

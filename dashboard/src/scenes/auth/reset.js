@@ -42,7 +42,7 @@ const Reset = () => {
         withCurrentPassword={false}
         centerButton
       />
-      <p className="tw-mx-auto tw-mt-5 tw-mb-0 tw-block tw-text-center tw-text-xs">Version: {packageInfo.version}</p>
+      <p className="tw-mx-auto tw-mt-5 tw-mb-0 tw-block tw-text-center tw-text-xs tw-text-gray-500">Version&nbsp;: {packageInfo.version}</p>
     </div>
   );
 };
