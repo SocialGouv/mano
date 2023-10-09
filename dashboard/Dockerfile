@@ -16,7 +16,11 @@ COPY dashboard/. .
 ENV NODE_ENV=production
 
 RUN --mount=type=secret,id=sentry_auth_token \
-    yarn build;
+    yarn build; \
+    if [ -f "/run/secrets/sentry_auth_token" ]; then \
+        export SENTRY_AUTH_TOKEN=$(cat /run/secrets/sentry_auth_token); \
+        yarn sentry:sourcemaps; \
+    fi
 
 
 FROM ghcr.io/socialgouv/docker/nginx4spa:7.0.1
