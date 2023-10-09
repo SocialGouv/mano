@@ -30,61 +30,73 @@ export default function Index() {
   return (
     <div>
       <Header />
-      <div className="w-full h-18"></div>
-      <section className="relative">
-        <div className="block w-full h-60 md:hidden">
-          <img
-            className="object-cover w-full h-full"
-            src="/hero.jpg"
-            alt="Crédits photo: Nathan Dumlao @https://unsplash.com/photos/i__uqGnARyI"
-          />
-        </div>
-        <div className="container flex items-center h-auto overflow-hidden md:h-160 lg:h-184">
-          <div className="w-full px-5 py-12 lg:py-24 md:w-7/12">
-            <h1 className="mb-4 text-2xl font-semibold text-black md:text-3xl lg:text-4xl">
-              Faciliter notre travail pour mieux agir auprès de nos publics précaires.
-            </h1>
-            <p className="text-sm text-gray-600 opacity-90">
-              <i>
-                Un service gratuit dédié aux professionnels de maraude et de lieux d’accueil.
-                <br /> MANO c’est une application smartphone pour être accessible en rue lors des
-                maraudes et une interface web pour plus d’ergonomie sur ordinateur.
-              </i>
-              <br />
-              <br />
-              Jeanne, rencontrée en rue, a "complètement oublié où est [son] rendez-vous super
-              important d’aujourd’hui !" et vous n'arrivez pas à joindre le collègue qui le lui
-              avait organisé.
-              <br />
-              <br />
-              Karim vous demande de renouveler sa demande d’AME. Pour la cinquième année consécutive
-              vous allez devoir lui redemander toutes ses informations personnelles.
-              <br />
-              <br />
-              <span className="font-medium text-black">
-                Ces scènes vous rappellent quelque chose ? MANO a été conçu pour les éviter !
-              </span>
-            </p>
+      <div className="container px-8 lg:mx-auto">
+        <h1 className="my-16 text-2xl font-semibold text-black">Faciliter notre travail pour mieux agir auprès de nos publics précaires.</h1>
+
+        <div className="text-gray-600 max-w-3xl mx-auto">
+          <h2 className="text-xl mb-4">Contatez-nous</h2>
+          <div>
+            Pour toutes questions sur les fonctionnalités de MANO, pour une présentation complète en présentiel ou commencer à utiliser l'outil&nbsp;:
+            écrivez à <b className="font-medium">Mélissa et Yoann, chargés de déploiement.</b>
+            <div className="grid grid-cols-2 gap-8 my-8 text-black">
+              <div className="text-center grid gap-2">
+                <div>Mélissa Saiter</div>
+                <div className="text-[#00897f]">m.saiter.mano@gmail.com</div>
+                <div>06 13 23 33 45</div>
+              </div>
+              <div className="text-center grid gap-2">
+                <div>Yoann Kittery</div>
+                <div className="text-[#00897f]">ykittery.mano@gmail.com</div>
+                <div>06 83 98 29 66</div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div className="text-gray-600">
+              Que vous ayez besoin d’un renseignement complémentaire ou d’une présentation complète ou que vous soyez déjà convaincus, nous serons
+              ravis d’échanger avec vous.
+            </div>
           </div>
         </div>
-        <div className="absolute inset-y-0 right-0 hidden md:block w-35/100">
-          <img
-            className="object-cover w-full h-full"
-            src="/hero.jpg"
-            alt="Crédits photo: Nathan Dumlao @https://unsplash.com/photos/i__uqGnARyI"
-          />
+      </div>
+
+      <div className="w-full h-18"></div>
+
+      <div className="container grid lg:grid-cols-5 gap-8 px-8 my-16">
+        <div className="lg:col-span-3">
+          <p className="text-gray-600">
+            <i>
+              Un service gratuit dédié aux professionnels de maraude et de lieux d’accueil.
+              <br /> MANO c’est une application smartphone pour être accessible en rue lors des maraudes et une interface web pour plus d’ergonomie
+              sur ordinateur.
+            </i>
+            <br />
+            <br />
+            Jeanne, rencontrée en rue, a "complètement oublié où est [son] rendez-vous super important d’aujourd’hui !" et vous n'arrivez pas à
+            joindre le collègue qui le lui avait organisé.
+            <br />
+            <br />
+            Karim vous demande de renouveler sa demande d’AME. Pour la cinquième année consécutive vous allez devoir lui redemander toutes ses
+            informations personnelles.
+            <br />
+            <br />
+            <span className="font-medium text-black">Ces scènes vous rappellent quelque chose&nbsp;?</span>
+            <br />
+            <br />
+            <span className="font-medium text-black">MANO a été conçu pour les éviter&nbsp;!</span>
+          </p>
         </div>
-      </section>
+        <div className="lg:col-span-2 flex items-center justify-center">
+          <img className="h-[420px]" src="/hero.jpg" alt="Crédits photo: Nathan Dumlao @https://unsplash.com/photos/i__uqGnARyI" />
+        </div>
+      </div>
 
       <section className="bg-gray-50" id="pourquoi-mano">
         <div className="px-5 py-12 lg:py-24 md:container">
           <div className="mb-20 text-center md:mx-auto md:w-8/12">
-            <h3 className="mb-5 text-2xl font-semibold text-center text-black md:text-3xl lg:text-4xl">
-              MANO, à quoi ça sert ?
-            </h3>
+            <h3 className="mb-5 text-2xl font-semibold text-center text-black md:text-3xl lg:text-4xl">MANO, à quoi ça sert ?</h3>
             <p className="text-sm text-gray-600 md:text-base">
-              MANO renforce la continuité de suivi au cœur du travail des maraudes et des lieux
-              d’accueil.
+              MANO renforce la continuité de suivi au cœur du travail des maraudes et des lieux d’accueil.
             </p>
           </div>
           <div className="grid grid-cols-1 gap-20">
@@ -93,13 +105,10 @@ export default function Index() {
                 <img className="w-40" src="/mockup/one.png" alt="" />
               </div>
               <div className="text-center col-span-full md:col-span-5 md:text-left md:row-start-1 md:flex md:flex-col md:justify-center">
-                <h4 className="mb-2 text-xl font-semibold text-black md:text-2xl lg:text-3xl">
-                  Un dossier usager
-                </h4>
+                <h4 className="mb-2 text-xl font-semibold text-black md:text-2xl lg:text-3xl">Un dossier usager</h4>
                 <p className="text-sm text-gray-600 md:text-base">
-                  Vous pouvez remplir et consulter des dossiers médico-sociaux sur les personnes que
-                  vous suivez. Il est accessible également à vos collègues et à eux seuls. Plus
-                  d’informations perdues sur un post-it ou dans une boîte mail !
+                  Vous pouvez remplir et consulter des dossiers médico-sociaux sur les personnes que vous suivez. Il est accessible également à vos
+                  collègues et à eux seuls. Plus d’informations perdues sur un post-it ou dans une boîte mail !
                 </p>
               </div>
               <div className="col-span-5 col-start-7"></div>
@@ -109,13 +118,10 @@ export default function Index() {
                 <img className="w-40" src="/mockup/two.png" alt="" />
               </div>
               <div className="text-center col-span-full md:col-span-5 md:col-start-8 md:flex md:text-left md:justify-center md:flex-col">
-                <h4 className="mb-2 text-xl font-semibold text-black md:text-2xl lg:text-3xl">
-                  Un agenda des tâches à réaliser
-                </h4>
+                <h4 className="mb-2 text-xl font-semibold text-black md:text-2xl lg:text-3xl">Un agenda des tâches à réaliser</h4>
                 <p className="text-sm text-gray-600 md:text-base">
-                  Toutes les tâches effectuées et celles prévues par les autres membres de votre
-                  équipe se retrouvent résumées et détaillées, jour par jour. Plus possible de rater
-                  une échéance ou d’oublier un engagement !
+                  Toutes les tâches effectuées et celles prévues par les autres membres de votre équipe se retrouvent résumées et détaillées, jour par
+                  jour. Plus possible de rater une échéance ou d’oublier un engagement !
                 </p>
               </div>
               <div className="col-span-5 col-start-7"></div>
@@ -125,12 +131,10 @@ export default function Index() {
                 <img className="w-full" src="/mockup/three.png" alt="" />
               </div>
               <div className="text-center col-span-full md:col-span-5 md:text-left md:row-start-1 md:flex md:flex-col md:justify-center">
-                <h4 className="mb-2 text-xl font-semibold text-black md:text-2xl lg:text-3xl">
-                  Des statistiques d’activité automatisées
-                </h4>
+                <h4 className="mb-2 text-xl font-semibold text-black md:text-2xl lg:text-3xl">Des statistiques d’activité automatisées</h4>
                 <p className="text-sm text-gray-600 md:text-base">
-                  Les statistiques anonymisées et les comptes rendus sont générés automatiquement.
-                  Les transmissions et les rapports d’activités n’ont jamais été aussi simples !
+                  Les statistiques anonymisées et les comptes rendus sont générés automatiquement. Les transmissions et les rapports d’activités n’ont
+                  jamais été aussi simples !
                 </p>
               </div>
               <div className="col-span-5 col-start-7"></div>
@@ -141,15 +145,12 @@ export default function Index() {
 
       <section className="px-5 py-12 lg:py-24 md:container" id="la-protection-des-donnees">
         <div className="mb-10 text-center md:mx-auto md:w-8/12">
-          <h3 className="mb-2 text-2xl font-semibold text-center text-black md:text-3xl lg:text-4xl">
-            La protection des données
-          </h3>
+          <h3 className="mb-2 text-2xl font-semibold text-center text-black md:text-3xl lg:text-4xl">La protection des données</h3>
           <p className="text-sm text-gray-600 md:text-base">
-            La protection des données est un enjeu crucial pour l’équipe MANO et les structures qui
-            l’utilisent. Voici ce qui la garantie :
+            La protection des données est un enjeu crucial pour l’équipe MANO et les structures qui l’utilisent. Voici ce qui la garantie :
           </p>
         </div>
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4 md:gap-4">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 md:gap-4">
           <DataProtectionCard
             number="1"
             content="Dans le logiciel, les dossiers des personnes suivies sont accessibles uniquement par les utilisateurs de l'organisation qui les a créées."
@@ -176,16 +177,12 @@ export default function Index() {
       <section className="bg-gray-50" id="qui-sommes-nous">
         <div className="px-5 py-12 lg:py-24 md:container">
           <div className="mb-10 text-center">
-            <h3 className="mb-2 text-2xl font-semibold text-center text-black md:text-3xl lg:text-4xl">
-              Qui sommes-nous ?
-            </h3>
+            <h3 className="mb-2 text-2xl font-semibold text-center text-black md:text-3xl lg:text-4xl">Qui sommes-nous ?</h3>
             <p className="text-sm text-gray-600 md:text-base">
-              Cet outil a été créé par M. Guillaume DEMIRHAN, infirmier au sein du CAARUD EGO de
-              l’association AURORE et est encadré par M. Léon GOMBEROFF, directeur de ce service. Il
-              est financé par l’Agence Régionale de Santé d’Ile de France et le guichet «
-              Transformation numérique des écosystèmes » du plan France Relance. Les fonctionnalités
-              de MANO ont été conçues par ses utilisateurs et l’outil est en amélioration continue.
-              Il est incubé au sein de la{" "}
+              Cet outil a été créé par M. Guillaume DEMIRHAN, infirmier au sein du CAARUD EGO de l’association AURORE et est encadré par M. Léon
+              GOMBEROFF, directeur de ce service. Il est financé par l’Agence Régionale de Santé d’Ile de France et le guichet « Transformation
+              numérique des écosystèmes » du plan France Relance. Les fonctionnalités de MANO ont été conçues par ses utilisateurs et l’outil est en
+              amélioration continue. Il est incubé au sein de la{" "}
               <a href="" className="text-shamrock-400">
                 Fabrique numérique du Ministère de la Santé et des Solidarités
               </a>
@@ -202,24 +199,20 @@ export default function Index() {
       <section className="py-12 lg:py-24" id="ils-nous-font-confiance">
         <div className="px-5 mb-16 md:container">
           <div className="mb-8 text-center md:w-10/12 md:mx-auto">
-            <h3 className="mb-2 text-2xl font-semibold text-center text-black md:text-3xl lg:text-4xl">
-              Ils nous font confiance
-            </h3>
+            <h3 className="mb-2 text-2xl font-semibold text-center text-black md:text-3xl lg:text-4xl">Ils nous font confiance</h3>
             <p className="text-sm text-gray-600 md:text-base">
-              Certaines maraudes sont en charge de territoires éclatés (comme les différentes gares
-              SNCF de Paris), d'autres d'un micro territoire resserré (par exemple une portion des
-              maréchaux entre deux portes du périphérique parisien). Certains équipes ne travaillent
-              qu'en rue, d'autres gèrent{" "}
-              <a
-                href="https://www.lesenfantsducanal.fr/nos-actions/busabri/"
-                className="text-shamrock-400">
+              Certaines maraudes sont en charge de territoires éclatés (comme les différentes gares SNCF de Paris), d'autres d'un micro territoire
+              resserré (par exemple une portion des maréchaux entre deux portes du périphérique parisien). Certains équipes ne travaillent qu'en rue,
+              d'autres gèrent{" "}
+              <a href="https://www.lesenfantsducanal.fr/nos-actions/busabri/" className="text-shamrock-400">
                 un accueil de jour
               </a>
-              . Certains professionnels suivent uniquement des personnes en difficulté psychologique
-              (comme les EMPP), d'autres des personnes usagères de drogue (comme{" "}
+              . Certains professionnels suivent uniquement des personnes en difficulté psychologique (comme les EMPP), d'autres des personnes usagères
+              de drogue (comme{" "}
               <a
                 href="https://www.drogues-info-service.fr/Tout-savoir-sur-les-drogues/Se-faire-aider/La-reduction-des-risques#.VJQ7Xl4A8"
-                className="text-shamrock-400">
+                className="text-shamrock-400"
+              >
                 une SCMR
               </a>
               ). Dans tous les cas, MANO s'adapte à leurs spécificités.{" "}
@@ -270,9 +263,7 @@ export default function Index() {
       <section className="bg-shamrock-50" id="ils-nous-apprecient">
         <div className="container grid grid-cols-12 px-5 py-12 lg:py-24">
           <div className="mb-2 md:flex md:items-center md:col-span-6 col-span-full">
-            <h3 className="text-2xl font-semibold text-center text-black md:text-left lg:text-3xl">
-              Ils apprécient aussi
-            </h3>
+            <h3 className="text-2xl font-semibold text-center text-black md:text-left lg:text-3xl">Ils apprécient aussi</h3>
           </div>
           <div className="grid grid-cols-1 gap-5 col-span-full md:col-span-6">
             <AppriciateCheck content="la liste des structures spécialisées avec contacts, horaires et itinéraire pour s’y rendre" />
@@ -305,9 +296,7 @@ const CompanyLogo = ({ logoName }) => (
 
 const StatisticCard = ({ number, content }) => (
   <div className="text-center">
-    <h4 className="mb-2 text-2xl font-semibold text-shamrock-400">
-      {number ? Number(number).toLocaleString() : "-"}
-    </h4>
+    <h4 className="mb-2 text-2xl font-semibold text-shamrock-400">{number ? Number(number).toLocaleString() : "-"}</h4>
     <p className="text-sm text-black text-medium">{content}</p>
   </div>
 );
