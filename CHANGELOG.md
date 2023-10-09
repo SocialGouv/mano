@@ -1,3 +1,10 @@
+## [1.288.2](https://github.com/SocialGouv/mano/compare/v1.288.1...v1.288.2) (2023-10-09)
+
+
+### Bug Fixes
+
+* oops encore une erreur d affichage ([72d0d6e](https://github.com/SocialGouv/mano/commit/72d0d6e8a22a2a2b4292a4e8c05abba0395112dd))
+
 ## [1.288.1](https://github.com/SocialGouv/mano/compare/v1.288.0...v1.288.1) (2023-10-09)
 
 
