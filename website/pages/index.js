@@ -41,13 +41,29 @@ export default function Index() {
             <div className="grid grid-cols-2 gap-8 my-8 text-black">
               <div className="text-center grid gap-2">
                 <div>Mélissa Saiter</div>
-                <div className="text-[#00897f]">m.saiter.mano@gmail.com</div>
-                <div>06 13 23 33 45</div>
+                <div>
+                  <a href="mailto:m.saiter.mano@gmail.com" className="text-[#00897f] hover:underline">
+                    m.saiter.mano@gmail.com
+                  </a>
+                </div>
+                <div>
+                  <a href="tel:+33613233345" className="hover:underline">
+                    06 13 23 33 45
+                  </a>
+                </div>
               </div>
               <div className="text-center grid gap-2">
                 <div>Yoann Kittery</div>
-                <div className="text-[#00897f]">ykittery.mano@gmail.com</div>
-                <div>06 83 98 29 66</div>
+                <div>
+                  <a href="mailto:m.saiter.mano@gmail.com" className="text-[#00897f] hover:underline">
+                    ykittery.mano@gmail.com
+                  </a>
+                </div>
+                <div>
+                  <a href="tel:+330683982966" className="hover:underline">
+                    06 83 98 29 66
+                  </a>
+                </div>
               </div>
             </div>
           </div>
