@@ -212,7 +212,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       setLoadingText('Chargement des personnes');
       async function loadPersons(page = 0) {
         const res = await API.get({ path: '/person', query: { ...query, page: String(page) } });
-        if (!res.ok || !res.data.length) return resetLoaderOnError();
+        if (!res.ok) return resetLoaderOnError();
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
         if (res.hasMore) return loadPersons(page + 1);
@@ -227,7 +227,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       setLoadingText('Chargement des familles');
       async function loadGroups(page = 0) {
         const res = await API.get({ path: '/group', query: { ...query, page: String(page) } });
-        if (!res.ok || !res.data.length) return resetLoaderOnError();
+        if (!res.ok) return resetLoaderOnError();
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
         if (res.hasMore) return loadGroups(page + 1);
@@ -242,7 +242,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       setLoadingText('Chargement des comptes-rendus');
       async function loadReports(page = 0) {
         const res = await API.get({ path: '/report', query: { ...query, page: String(page) } });
-        if (!res.ok || !res.data.length) return resetLoaderOnError();
+        if (!res.ok) return resetLoaderOnError();
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
         if (res.hasMore) return loadReports(page + 1);
@@ -257,7 +257,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       setLoadingText('Chargement des passages');
       async function loadPassages(page = 0) {
         const res = await API.get({ path: '/passage', query: { ...query, page: String(page) } });
-        if (!res.ok || !res.data.length) return resetLoaderOnError();
+        if (!res.ok) return resetLoaderOnError();
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
         if (res.hasMore) return loadPassages(page + 1);
@@ -272,7 +272,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       setLoadingText('Chargement des rencontres');
       async function loadRencontres(page = 0) {
         const res = await API.get({ path: '/rencontre', query: { ...query, page: String(page) } });
-        if (!res.ok || !res.data.length) return resetLoaderOnError();
+        if (!res.ok) return resetLoaderOnError();
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
         if (res.hasMore) return loadRencontres(page + 1);
@@ -287,7 +287,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       setLoadingText('Chargement des actions');
       async function loadActions(page = 0) {
         const res = await API.get({ path: '/action', query: { ...query, page: String(page) } });
-        if (!res.ok || !res.data.length) return resetLoaderOnError();
+        if (!res.ok) return resetLoaderOnError();
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
         if (res.hasMore) return loadActions(page + 1);
@@ -302,7 +302,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       setLoadingText('Chargement des territoires');
       async function loadTerritories(page = 0) {
         const res = await API.get({ path: '/territory', query: { ...query, page: String(page) } });
-        if (!res.ok || !res.data.length) return resetLoaderOnError();
+        if (!res.ok) return resetLoaderOnError();
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
         if (res.hasMore) return loadTerritories(page + 1);
@@ -317,7 +317,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       setLoadingText('Chargement des lieux');
       async function loadPlaces(page = 0) {
         const res = await API.get({ path: '/place', query: { ...query, page: String(page) } });
-        if (!res.ok || !res.data.length) return resetLoaderOnError();
+        if (!res.ok) return resetLoaderOnError();
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
         if (res.hasMore) return loadPlaces(page + 1);
@@ -332,7 +332,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       setLoadingText('Chargement des relations personne-lieu');
       async function loadRelPersonPlaces(page = 0) {
         const res = await API.get({ path: '/relPersonPlace', query: { ...query, page: String(page) } });
-        if (!res.ok || !res.data.length) return resetLoaderOnError();
+        if (!res.ok) return resetLoaderOnError();
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
         if (res.hasMore) return loadRelPersonPlaces(page + 1);
@@ -347,7 +347,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       setLoadingText('Chargement des observations de territoire');
       async function loadObservations(page = 0) {
         const res = await API.get({ path: '/territory-observation', query: { ...query, page: String(page) } });
-        if (!res.ok || !res.data.length) return resetLoaderOnError();
+        if (!res.ok) return resetLoaderOnError();
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
         if (res.hasMore) return loadObservations(page + 1);
@@ -362,7 +362,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       setLoadingText('Chargement des commentaires');
       async function loadComments(page = 0) {
         const res = await API.get({ path: '/comment', query: { ...query, page: String(page) } });
-        if (!res.ok || !res.data.length) return resetLoaderOnError();
+        if (!res.ok) return resetLoaderOnError();
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
         if (res.hasMore) return loadComments(page + 1);
@@ -380,7 +380,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
           path: '/consultation',
           query: { ...query, page: String(page), after: isStartingInitialLoad ? 0 : lastLoadValue },
         });
-        if (!res.ok || !res.data.length) return resetLoaderOnError();
+        if (!res.ok) return resetLoaderOnError();
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
         if (res.hasMore) return loadConsultations(page + 1);
@@ -395,7 +395,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       setLoadingText('Chargement des traitements');
       async function loadTreatments(page = 0) {
         const res = await API.get({ path: '/treatment', query: { ...query, page: String(page), after: isStartingInitialLoad ? 0 : lastLoadValue } });
-        if (!res.ok || !res.data.length) return resetLoaderOnError();
+        if (!res.ok) return resetLoaderOnError();
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
         if (res.hasMore) return loadTreatments(page + 1);
@@ -413,7 +413,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
           path: '/medical-file',
           query: { ...query, page: String(page), after: isStartingInitialLoad ? 0 : lastLoadValue },
         });
-        if (!res.ok || !res.data.length) return resetLoaderOnError();
+        if (!res.ok) return resetLoaderOnError();
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
         if (res.hasMore) return loadMedicalFiles(page + 1);
