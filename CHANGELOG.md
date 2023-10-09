@@ -1,3 +1,10 @@
+# [1.287.0](https://github.com/SocialGouv/mano/compare/v1.286.3...v1.287.0) (2023-10-09)
+
+
+### Features
+
+* première connexion ou mot de passe oublié ([#1712](https://github.com/SocialGouv/mano/issues/1712)) ([bf96b93](https://github.com/SocialGouv/mano/commit/bf96b9328621bbe2a0173f1f36adb2172d212c5b))
+
 ## [1.286.3](https://github.com/SocialGouv/mano/compare/v1.286.2...v1.286.3) (2023-10-08)
 
 
