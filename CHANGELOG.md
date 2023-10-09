@@ -1,3 +1,10 @@
+# [1.288.0](https://github.com/SocialGouv/mano/compare/v1.287.0...v1.288.0) (2023-10-09)
+
+
+### Features
+
+* landing iteration 1 ([#1715](https://github.com/SocialGouv/mano/issues/1715)) ([9f856b7](https://github.com/SocialGouv/mano/commit/9f856b740b467f2467355111a4c72a509a572e32))
+
 # [1.287.0](https://github.com/SocialGouv/mano/compare/v1.286.3...v1.287.0) (2023-10-09)
 
 
