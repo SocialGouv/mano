@@ -55,7 +55,7 @@ export default function Index() {
               <div className="text-center grid gap-2">
                 <div>Yoann Kittery</div>
                 <div>
-                  <a href="mailto:m.saiter.mano@gmail.com" className="text-[#00897f] hover:underline">
+                  <a href="mailto:ykittery.mano@gmail.com" className="text-[#00897f] hover:underline">
                     ykittery.mano@gmail.com
                   </a>
                 </div>
