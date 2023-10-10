@@ -105,15 +105,15 @@ const SignIn = () => {
       const { user, token, ok } = authViaCookie ? await API.get({ path: '/user/signin-token' }) : await API.post({ path: '/user/signin', body });
       if (!ok) return setIsSubmitting(false);
       const { organisation } = user;
+      if (organisation._id !== window.localStorage.getItem('mano-organisationId')) {
+        await resetCache();
+      }
       if (!!organisation.encryptionEnabled && !showEncryption && !['superadmin'].includes(user.role)) {
         setShowEncryption(true);
         return setIsSubmitting(false);
       }
       if (token) setToken(token);
       setSessionInitialTimestamp(Date.now());
-      if (organisation._id !== window.localStorage.getItem('mano-organisationId')) {
-        await resetCache();
-      }
       window.localStorage.setItem('mano-organisationId', organisation._id);
       setOrganisation(organisation);
       if (!['superadmin'].includes(user.role) && !!signinForm.orgEncryptionKey) {
