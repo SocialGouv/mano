@@ -15,7 +15,13 @@ const List = ({ territory = {} }) => {
   const [observation, setObservation] = useState({});
   const [openObservationModale, setOpenObservationModale] = useState(null);
 
-  const observations = useMemo(() => territoryObservations.filter((obs) => obs.territory === territory._id), [territory._id, territoryObservations]);
+  const observations = useMemo(
+    () =>
+      territoryObservations
+        .filter((obs) => obs.territory === territory._id)
+        .sort((a, b) => new Date(b.observedAt || b.createdAt) - new Date(a.observedAt || a.createdAt)),
+    [territory._id, territoryObservations]
+  );
 
   if (!observations) return null;
 

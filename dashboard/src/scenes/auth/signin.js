@@ -28,7 +28,7 @@ const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(true);
   const [authViaCookie, setAuthViaCookie] = useState(false);
-  const { load: runDataLoader, isLoading, resetCache } = useDataLoader();
+  const { startInitialLoad, isLoading, resetCache } = useDataLoader();
   const setToken = useSetRecoilState(authTokenState);
 
   const [signinForm, setSigninForm] = useState({ email: '', password: '', orgEncryptionKey: DEFAULT_ORGANISATION_KEY || '' });
@@ -45,7 +45,7 @@ const SignIn = () => {
     }
   }, [history, organisation, isLoading, isDesktop]);
 
-  const onSigninValidated = async () => runDataLoader();
+  const onSigninValidated = () => startInitialLoad();
 
   const onLogout = async () => {
     await API.logout();

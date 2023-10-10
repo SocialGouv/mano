@@ -102,6 +102,7 @@ export const itemsGroupedByPersonSelector = selector({
       originalPersonsObject[person._id] = { name: person.name, _id: person._id };
       personsObject[person._id] = {
         ...person,
+        followedSince: person.followedSince || person.createdAt,
         userPopulated: usersObject[person.user],
         formattedBirthDate: formatBirthDate(person.birthdate),
         age: formatAge(person.birthdate),

@@ -348,7 +348,8 @@ const View = () => {
             { referenceStartDay: dateString, referenceEndDay: dateString },
             currentTeam?.nightSession ? 12 : 0
           );
-        }),
+        })
+        .sort((a, b) => new Date(b.observedAt || b.createdAt) - new Date(a.observedAt || a.createdAt)),
     [dateString, selectedTeamsObject, territoryObservations]
   );
 

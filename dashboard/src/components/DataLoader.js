@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
-import styled from 'styled-components';
-import { atom, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useEffect } from 'react';
+import { atom, selector, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { toast } from 'react-toastify';
 
 import { personsState } from '../recoil/persons';
+import { groupsState } from '../recoil/groups';
 import { treatmentsState } from '../recoil/treatments';
 import { actionsState } from '../recoil/actions';
 import { medicalFileState } from '../recoil/medicalFiles';
@@ -18,370 +18,420 @@ import { consultationsState, formatConsultation } from '../recoil/consultations'
 import { commentsState } from '../recoil/comments';
 import { organisationState, userState } from '../recoil/auth';
 
-import { clearCache, dashboardCurrentCacheKey, getCacheItem, getCacheItemDefaultValue, setCacheItem } from '../services/dataManagement';
+import { clearCache, dashboardCurrentCacheKey, getCacheItemDefaultValue, setCacheItem } from '../services/dataManagement';
 import API from '../services/api';
 import { RandomPicture, RandomPicturePreloader } from './LoaderRandomPicture';
 import ProgressBar from './LoaderProgressBar';
 import useDataMigrator from './DataMigrator';
-import { groupsState } from '../recoil/groups';
 
 // Update to flush cache.
 
-const cacheEffect = ({ onSet }) => {
-  onSet(async (newValue) => {
-    await setCacheItem(dashboardCurrentCacheKey, newValue);
-  });
-};
-
-const loaderTriggerState = atom({ key: 'loaderTriggerState', default: false });
 const isLoadingState = atom({ key: 'isLoadingState', default: false });
-const initialLoadState = atom({ key: 'isInitialLoadState', default: false });
 const fullScreenState = atom({ key: 'fullScreenState', default: true });
-export const lastLoadState = atom({ key: 'lastLoadState', default: null, effects: [cacheEffect] });
-export const initialLoadingTextState = 'En attente de chargement';
+const progressState = atom({ key: 'progressState', default: null });
+const totalState = atom({ key: 'totalState', default: null });
+const initialLoadingTextState = 'En attente de chargement';
 export const loadingTextState = atom({ key: 'loadingTextState', default: initialLoadingTextState });
+export const initialLoadIsDoneState = atom({ key: 'initialLoadIsDoneState', default: false });
+export const lastLoadState = atom({
+  key: 'lastLoadState',
+  default: selector({
+    key: 'lastLoadState/default',
+    get: async () => {
+      const cache = await getCacheItemDefaultValue(dashboardCurrentCacheKey, 0);
+      return cache;
+    },
+  }),
+  effects: [
+    ({ onSet }) => {
+      onSet(async (newValue) => {
+        await setCacheItem(dashboardCurrentCacheKey, newValue);
+      });
+    },
+  ],
+});
 
 export default function DataLoader() {
-  const [user, setUser] = useRecoilState(userState);
+  const isLoading = useRecoilValue(isLoadingState);
+  const fullScreen = useRecoilValue(fullScreenState);
+  const loadingText = useRecoilValue(loadingTextState);
+  const progress = useRecoilValue(progressState);
+  const total = useRecoilValue(totalState);
+
+  if (!isLoading) return <RandomPicturePreloader />;
+  if (!total && !fullScreen) return null;
+
+  if (fullScreen) {
+    return (
+      <div className="tw-absolute tw-inset-0 tw-z-[1000] tw-box-border tw-flex tw-w-full tw-items-center tw-justify-center tw-bg-white">
+        <div className="tw-flex tw-h-[50vh] tw-max-h-[50vw] tw-w-[50vw] tw-max-w-[50vh] tw-flex-col tw-items-center tw-justify-center">
+          <RandomPicture />
+          <ProgressBar progress={progress} total={total} loadingText={loadingText} />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="tw-absolute tw-top-0 tw-left-0 tw-z-[1000] tw-box-border tw-w-full">
+      <ProgressBar progress={progress} total={total} loadingText={loadingText} />
+    </div>
+  );
+}
+
+export function useDataLoader(options = { refreshOnMount: false }) {
+  const [fullScreen, setFullScreen] = useRecoilState(fullScreenState);
+  const [isLoading, setIsLoading] = useRecoilState(isLoadingState);
+  const setLoadingText = useSetRecoilState(loadingTextState);
+  const setInitialLoadIsDone = useSetRecoilState(initialLoadIsDoneState);
+  const [lastLoadValue, setLastLoad] = useRecoilState(lastLoadState);
+  const setProgress = useSetRecoilState(progressState);
+  const setTotal = useSetRecoilState(totalState);
+
+  const setUser = useSetRecoilState(userState);
+  const setOrganisation = useSetRecoilState(organisationState);
   const { migrateData } = useDataMigrator();
 
   const [persons, setPersons] = useRecoilState(personsState);
-  const [actions, setActions] = useRecoilState(actionsState);
-  const [consultations, setConsultations] = useRecoilState(consultationsState);
-  const [treatments, setTreatments] = useRecoilState(treatmentsState);
-  const [medicalFiles, setMedicalFiles] = useRecoilState(medicalFileState);
+  const [groups, setGroups] = useRecoilState(groupsState);
+  const [reports, setReports] = useRecoilState(reportsState);
   const [passages, setPassages] = useRecoilState(passagesState);
   const [rencontres, setRencontres] = useRecoilState(rencontresState);
-  const [reports, setReports] = useRecoilState(reportsState);
+  const [actions, setActions] = useRecoilState(actionsState);
   const [territories, setTerritories] = useRecoilState(territoriesState);
   const [places, setPlaces] = useRecoilState(placesState);
   const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
   const [territoryObservations, setTerritoryObservations] = useRecoilState(territoryObservationsState);
   const [comments, setComments] = useRecoilState(commentsState);
-  const [groups, setGroups] = useRecoilState(groupsState);
+  const [consultations, setConsultations] = useRecoilState(consultationsState);
+  const [treatments, setTreatments] = useRecoilState(treatmentsState);
+  const [medicalFiles, setMedicalFiles] = useRecoilState(medicalFileState);
 
-  const [loaderTrigger, setLoaderTrigger] = useRecoilState(loaderTriggerState);
-  const [lastLoad, setLastLoad] = useRecoilState(lastLoadState);
-  const [isLoading, setIsLoading] = useRecoilState(isLoadingState);
-  const [fullScreen, setFullScreen] = useRecoilState(fullScreenState);
-  const [loadingText, setLoadingText] = useRecoilState(loadingTextState);
-  const initialLoad = useRecoilValue(initialLoadState);
-  const [organisation, setOrganisation] = useRecoilState(organisationState);
-
-  const [loadList, setLoadList] = useState({ list: [], offset: 0 });
-  const [progressBuffer, setProgressBuffer] = useState(null);
-  const [progress, setProgress] = useState(null);
-  const [total, setTotal] = useState(null);
-
-  useEffect(() => {
-    initLoader();
+  useEffect(function refreshOnMountEffect() {
+    if (options.refreshOnMount && !isLoading) loadOrRefreshData(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [progress, total, loaderTrigger, loadList.list.length, isLoading]);
+  }, []);
 
-  useEffect(() => {
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loadList]);
-  useEffect(() => {
-    updateProgress();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [progress, progressBuffer, loadList.list.length]);
+  /*
+  Steps
 
-  const organisationId = organisation?._id;
+  INITIALLY: Recoil takes care of cache reconciliation, so the loader don't have to worry about it
+  - each atom `person`, `action` etc. has an async default value, which is a selector that will get the data from the cache
+  - each of those atoms has an effect that will update the cache when the data is set
 
-  const serverDate = useRef(null);
+  Then, for initial load / refresh, the loader will:
+  1. Start the UI:
+    - set isLoading to true
+    - set fullScreen to true if it's the initial load
+    - set loadingText to 'Chargement des données' if it's the initial load, 'Mise à jour des données' otherwise
+  2. Get the latest organisation, in order to get the latest migrations data, and updated custom fields
+  3. Get the latest user, in order to get the latest user roles
+  4. Get the latest stats, in order to know what data to download, with the following parameters
+    - after lastLoadValue, which is a date provided by the server, and is the last time the data was downloaded
+    - withDeleted, to get the data deleted from other users, so that we can filter it out in here
+    - withAllMedicalData, only on initial load because medical data is never saved in cache
+    The stats will be used for
+    - knowing the total items count, and setting the progress bar
+    - knowing what data to download
+  5. Get the server date, in order to know when the data was last updated
+  6. Download all the data, with the following parameters
+    - withDeleted, to get the data deleted from other users, so that we can filter it out in here
+    - after lastLoadValue, which is a date provided by the server, and is the last time the data was downloaded
 
-  // Loader initialization: get data from cache, check stats, init recoils states, and start loader.
-  function initLoader() {
-    if (loadList.list.length > 0) return;
+  */
+  async function loadOrRefreshData(isStartingInitialLoad) {
+    setIsLoading(true);
+    setFullScreen(isStartingInitialLoad);
+    setLoadingText(isStartingInitialLoad ? 'Chargement des données' : 'Mise à jour des données');
 
-    const shouldStart = progress === null && total === null && loaderTrigger && isLoading;
-    const shouldStop = progress !== null && total !== null && isLoading;
+    /*
+    Refresh organisation (and user), to get the latest organisation fields
+    and the latest user roles
+  */
+    const userResponse = await API.get({ path: '/user/me' });
+    if (!userResponse.ok) return resetLoaderOnError();
+    const latestOrganisation = userResponse.user.organisation;
+    const latestUser = userResponse.user;
+    const organisationId = latestOrganisation._id;
+    setOrganisation(latestOrganisation);
+    setUser(latestUser);
+    if (isStartingInitialLoad) {
+      const migrationIsSuccessful = await migrateData(latestOrganisation);
+      if (!migrationIsSuccessful) return resetLoaderOnError();
+    }
 
-    if (shouldStart) {
-      Promise.resolve()
-        .then(async () => {
-          /*
-            Refresh organisation (and user), to get the latest organisation fields
-            and the latest user roles
-          */
-          const userResponse = await API.get({ path: '/user/me' });
-          if (!userResponse.ok) return resetLoaderOnError();
-          setOrganisation(userResponse.user.organisation);
-          setUser(userResponse.user);
-          // Get date from server at the very beginning of the loader.
-          const serverDateResponse = await API.get({ path: '/now' });
-          serverDate.current = serverDateResponse.data;
-        })
-        .then(() => (initialLoad ? migrateData() : Promise.resolve()))
-        .then(() => getCacheItem(dashboardCurrentCacheKey))
-        .then((lastLoadValue) => {
-          setLastLoad(lastLoadValue || 0);
-          API.get({
-            path: '/organisation/stats',
-            query: {
-              organisation: organisationId,
-              after: lastLoadValue || 0,
-              withDeleted: true,
-              // Medical data is never saved in cache so we always have to download all at every page reload.
-              withAllMedicalData: initialLoad,
-            },
-          }).then(({ data: stats }) => {
-            if (!stats) return;
-            const newList = [];
-            let itemsCount =
-              0 +
-              stats.persons +
-              stats.consultations +
-              stats.actions +
-              stats.treatments +
-              stats.medicalFiles +
-              stats.passages +
-              stats.rencontres +
-              stats.reports +
-              stats.territories +
-              stats.places +
-              stats.relsPersonPlace +
-              stats.territoryObservations +
-              stats.comments +
-              stats.groups;
+    const statsResponse = await API.get({
+      path: '/organisation/stats',
+      query: {
+        organisation: organisationId,
+        after: lastLoadValue,
+        withDeleted: true,
+        // Medical data is never saved in cache so we always have to download all at every page reload.
+        withAllMedicalData: isStartingInitialLoad,
+      },
+    });
 
-            if (stats.persons) newList.push('person');
-            if (stats.groups) newList.push('group');
-            if (stats.consultations) newList.push('consultation');
-            if (['admin', 'normal'].includes(user.role)) {
-              if (stats.treatments) newList.push('treatment');
-              if (stats.medicalFiles) newList.push('medicalFile');
-            }
-            if (stats.reports) newList.push('report');
-            if (stats.passages) newList.push('passage');
-            if (stats.rencontres) newList.push('rencontre');
-            if (stats.actions) newList.push('action');
-            if (stats.territories) newList.push('territory');
-            if (stats.places) newList.push('place');
-            if (stats.relsPersonPlace) newList.push('relsPersonPlace');
-            if (stats.territoryObservations) newList.push('territoryObservation');
-            if (stats.comments) newList.push('comment');
+    if (!statsResponse.ok) return false;
 
-            // In case this is not the initial load, we don't have to load from cache again.
-            if (!initialLoad) {
-              startLoader(newList, itemsCount);
-              return;
-            }
+    // Get date from server just after getting all the stats
+    // We'll set the `lastLoadValue` to this date after all the data is downloaded
+    const serverDateResponse = await API.get({ path: '/now' });
+    const serverDate = serverDateResponse.data;
 
-            setLoadingText('Récupération des données dans le cache');
-            Promise.resolve()
-              .then(() => getCacheItemDefaultValue('person', []))
-              .then((persons) => setPersons([...persons]))
-              .then(() => getCacheItemDefaultValue('group', []))
-              .then((groups) => setGroups([...groups]))
-              .then(() => getCacheItemDefaultValue('report', []))
-              .then((reports) => setReports([...reports]))
-              .then(() => getCacheItemDefaultValue('passage', []))
-              .then((passages) => setPassages([...passages]))
-              .then(() => getCacheItemDefaultValue('rencontre', []))
-              .then((rencontres) => setRencontres([...rencontres]))
-              .then(() => getCacheItemDefaultValue('action', []))
-              .then((actions) => setActions([...actions]))
-              .then(() => getCacheItemDefaultValue('territory', []))
-              .then((territories) => setTerritories([...territories]))
-              .then(() => getCacheItemDefaultValue('place', []))
-              .then((places) => setPlaces([...places]))
-              .then(() => getCacheItemDefaultValue('relPersonPlace', []))
-              .then((relsPersonPlace) => setRelsPersonPlace([...relsPersonPlace]))
-              .then(() => getCacheItemDefaultValue('territory-observation', []))
-              .then((territoryObservations) => setTerritoryObservations([...territoryObservations]))
-              .then(() => getCacheItemDefaultValue('comment', []))
-              .then((comments) => setComments([...comments]))
-              .then(() => startLoader(newList, itemsCount));
-          });
-        });
-    } else if (shouldStop) stopLoader();
-  }
+    const stats = statsResponse.data;
+    let itemsCount =
+      0 +
+      stats.persons +
+      stats.groups +
+      stats.reports +
+      stats.passages +
+      stats.rencontres +
+      stats.actions +
+      stats.territories +
+      stats.places +
+      stats.relsPersonPlace +
+      stats.territoryObservations +
+      stats.comments +
+      stats.consultations;
 
-  // Fetch data from API, handle loader progress.
-  async function fetchData() {
-    if (loadList.list.length === 0) return;
+    if (['admin', 'normal'].includes(latestUser.role)) {
+      itemsCount += stats.treatments + stats.medicalFiles;
+    }
 
-    const [current] = loadList.list;
+    setProgress(0);
+    setTotal(itemsCount);
+
     const query = {
       organisation: organisationId,
       limit: String(10000),
-      page: String(loadList.offset),
-      after: lastLoad,
-      withDeleted: Boolean(lastLoad),
+      after: lastLoadValue,
+      withDeleted: true,
     };
 
-    function handleMore(hasMore) {
-      if (hasMore) setLoadList({ list: loadList.list, offset: loadList.offset + 1 });
-      else setLoadList({ list: loadList.list.slice(1), offset: 0 });
-    }
-
-    if (current === 'person') {
+    if (stats.persons > 0) {
+      let newItems = [];
       setLoadingText('Chargement des personnes');
-      const res = await API.get({ path: '/person', query });
-      if (!res.data) return resetLoaderOnError();
-      setPersons(
-        res.hasMore
-          ? mergeItems(persons, res.decryptedData)
-          : mergeItems(persons, res.decryptedData)
-              .map((p) => ({ ...p, followedSince: p.followedSince || p.createdAt }))
-              .sort((p1, p2) => (p1.name || '').localeCompare(p2.name || ''))
-      );
-      handleMore(res.hasMore);
-      setProgressBuffer(res.data.length);
-    } else if (current === 'group') {
-      setLoadingText('Chargement des familles');
-      const res = await API.get({ path: '/group', query });
-      if (!res.data) return resetLoaderOnError();
-      setGroups(() => {
-        const mergedItems = mergeItems(groups, res.decryptedData);
-        if (res.hasMore) return mergedItems;
-        if (mergedItems.length > groups.length) {
-          return mergedItems.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        }
-        return mergedItems;
-      });
-      handleMore(res.hasMore);
-      setProgressBuffer(res.data.length);
-    } else if (current === 'consultation') {
-      setLoadingText('Chargement des consultations');
-      const res = await API.get({ path: '/consultation', query: { ...query, after: initialLoad ? 0 : lastLoad } });
-      if (!res.data) return resetLoaderOnError();
-      setConsultations(
-        res.hasMore ? mergeItems(consultations, res.decryptedData) : mergeItems(consultations, res.decryptedData).map(formatConsultation)
-      );
-      handleMore(res.hasMore);
-      setProgressBuffer(res.data.length);
-    } else if (current === 'treatment') {
-      setLoadingText('Chargement des traitements');
-      const res = await API.get({ path: '/treatment', query: { ...query, after: initialLoad ? 0 : lastLoad } });
-      if (!res.data) return resetLoaderOnError();
-      setTreatments(mergeItems(treatments, res.decryptedData));
-      handleMore(res.hasMore);
-      setProgressBuffer(res.data.length);
-    } else if (current === 'medicalFile') {
-      setLoadingText('Chargement des fichiers médicaux');
-      const res = await API.get({ path: '/medical-file', query: { ...query, after: initialLoad ? 0 : lastLoad } });
-      if (!res.data) return resetLoaderOnError();
-      setMedicalFiles(mergeItems(medicalFiles, res.decryptedData));
-      handleMore(res.hasMore);
-      setProgressBuffer(res.data.length);
-    } else if (current === 'report') {
-      setLoadingText('Chargement des rapports');
-      const res = await API.get({ path: '/report', query });
-      if (!res.data) return resetLoaderOnError();
-      setReports(
-        res.hasMore
-          ? mergeItems(reports, res.decryptedData)
-          : mergeItems(reports, res.decryptedData)
-              // This line should be removed when `clean-reports-with-no-team-nor-date` migration has run on all organisations.
-              .filter((r) => !!r.team && !!r.date)
-      );
-      handleMore(res.hasMore);
-      setProgressBuffer(res.data.length);
-    } else if (current === 'passage') {
-      setLoadingText('Chargement des passages');
-      const res = await API.get({ path: '/passage', query });
-      if (!res.data) return resetLoaderOnError();
-      setPassages(() => {
-        const mergedItems = mergeItems(passages, res.decryptedData);
-        if (res.hasMore) return mergedItems;
-        return mergedItems.sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
-      });
-      handleMore(res.hasMore);
-      setProgressBuffer(res.data.length);
-    } else if (current === 'rencontre') {
-      setLoadingText('Chargement des rencontres');
-      const res = await API.get({ path: '/rencontre', query });
-      if (!res.data) return resetLoaderOnError();
-      setRencontres(() => {
-        const mergedItems = mergeItems(rencontres, res.decryptedData);
-        if (res.hasMore) return mergedItems;
-        return mergedItems.sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
-      });
-      handleMore(res.hasMore);
-      setProgressBuffer(res.data.length);
-    } else if (current === 'action') {
-      setFullScreen(false);
-      setLoadingText('Chargement des actions');
-      const res = await API.get({ path: '/action', query });
-      if (!res.data) return resetLoaderOnError();
-      setActions(mergeItems(actions, res.decryptedData));
-      handleMore(res.hasMore);
-      setProgressBuffer(res.data.length);
-    } else if (current === 'territory') {
-      setLoadingText('Chargement des territoires');
-      const res = await API.get({ path: '/territory', query });
-      if (!res.data) return resetLoaderOnError();
-      setTerritories(() => {
-        const mergedItems = mergeItems(territories, res.decryptedData);
-        if (res.hasMore) return mergedItems;
-        return mergedItems.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      });
-      handleMore(res.hasMore);
-      setProgressBuffer(res.data.length);
-    } else if (current === 'place') {
-      setLoadingText('Chargement des lieux');
-      const res = await API.get({ path: '/place', query });
-      if (!res.data) return resetLoaderOnError();
-      setPlaces(() => {
-        const mergedItems = mergeItems(places, res.decryptedData);
-        if (res.hasMore) return mergedItems;
-        return mergedItems.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      });
-      handleMore(res.hasMore);
-      setProgressBuffer(res.data.length);
-    } else if (current === 'relsPersonPlace') {
-      setLoadingText('Chargement des relations personne-lieu');
-      const res = await API.get({ path: '/relPersonPlace', query });
-      if (!res.data) return resetLoaderOnError();
-      setRelsPersonPlace(() => {
-        const mergedItems = mergeItems(relsPersonPlace, res.decryptedData);
-        if (res.hasMore) return mergedItems;
-        return mergedItems.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      });
-      handleMore(res.hasMore);
-      setProgressBuffer(res.data.length);
-    } else if (current === 'territoryObservation') {
-      setLoadingText('Chargement des observations de territoire');
-      const res = await API.get({ path: '/territory-observation', query });
-      if (!res.data) return resetLoaderOnError();
-      setTerritoryObservations(() => {
-        const mergedItems = mergeItems(territoryObservations, res.decryptedData);
-        if (res.hasMore) return mergedItems;
-        return mergedItems.sort((a, b) => new Date(b.observedAt || b.createdAt) - new Date(a.observedAt || a.createdAt));
-      });
-      handleMore(res.hasMore);
-      setProgressBuffer(res.data.length);
-    } else if (current === 'comment') {
-      setLoadingText('Chargement des commentaires');
-      const res = await API.get({ path: '/comment', query });
-      if (!res.data) return resetLoaderOnError();
-      setComments(() => {
-        const mergedItems = mergeItems(comments, res.decryptedData);
-        if (res.hasMore) return mergedItems;
-        return mergedItems.sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
-      });
-      handleMore(res.hasMore);
-      setProgressBuffer(res.data.length);
+      async function loadPersons(page = 0) {
+        const res = await API.get({ path: '/person', query: { ...query, page: String(page) } });
+        if (!res.ok) return resetLoaderOnError();
+        setProgress((p) => p + res.data.length);
+        newItems.push(...res.decryptedData);
+        if (res.hasMore) return loadPersons(page + 1);
+        setPersons(mergeItems(persons, newItems));
+        return true;
+      }
+      const personSuccess = await loadPersons(0);
+      if (!personSuccess) return false;
     }
-  }
+    if (stats.groups > 0) {
+      let newItems = [];
+      setLoadingText('Chargement des familles');
+      async function loadGroups(page = 0) {
+        const res = await API.get({ path: '/group', query: { ...query, page: String(page) } });
+        if (!res.ok) return resetLoaderOnError();
+        setProgress((p) => p + res.data.length);
+        newItems.push(...res.decryptedData);
+        if (res.hasMore) return loadGroups(page + 1);
+        setGroups(mergeItems(groups, newItems));
+        return true;
+      }
+      const groupsSuccess = await loadGroups(0);
+      if (!groupsSuccess) return false;
+    }
+    if (stats.reports > 0) {
+      let newItems = [];
+      setLoadingText('Chargement des comptes-rendus');
+      async function loadReports(page = 0) {
+        const res = await API.get({ path: '/report', query: { ...query, page: String(page) } });
+        if (!res.ok) return resetLoaderOnError();
+        setProgress((p) => p + res.data.length);
+        newItems.push(...res.decryptedData);
+        if (res.hasMore) return loadReports(page + 1);
+        setReports(mergeItems(reports, newItems, { filterNewItemsFunction: (r) => !!r.team && !!r.date }));
+        return true;
+      }
+      const reportsSuccess = await loadReports(0);
+      if (!reportsSuccess) return false;
+    }
+    if (stats.passages > 0) {
+      let newItems = [];
+      setLoadingText('Chargement des passages');
+      async function loadPassages(page = 0) {
+        const res = await API.get({ path: '/passage', query: { ...query, page: String(page) } });
+        if (!res.ok) return resetLoaderOnError();
+        setProgress((p) => p + res.data.length);
+        newItems.push(...res.decryptedData);
+        if (res.hasMore) return loadPassages(page + 1);
+        setPassages(mergeItems(passages, newItems));
+        return true;
+      }
+      const passagesSuccess = await loadPassages(0);
+      if (!passagesSuccess) return false;
+    }
+    if (stats.rencontres > 0) {
+      let newItems = [];
+      setLoadingText('Chargement des rencontres');
+      async function loadRencontres(page = 0) {
+        const res = await API.get({ path: '/rencontre', query: { ...query, page: String(page) } });
+        if (!res.ok) return resetLoaderOnError();
+        setProgress((p) => p + res.data.length);
+        newItems.push(...res.decryptedData);
+        if (res.hasMore) return loadRencontres(page + 1);
+        setRencontres(mergeItems(rencontres, newItems));
+        return true;
+      }
+      const rencontresSuccess = await loadRencontres(0);
+      if (!rencontresSuccess) return false;
+    }
+    if (stats.actions > 0) {
+      let newItems = [];
+      setLoadingText('Chargement des actions');
+      async function loadActions(page = 0) {
+        const res = await API.get({ path: '/action', query: { ...query, page: String(page) } });
+        if (!res.ok) return resetLoaderOnError();
+        setProgress((p) => p + res.data.length);
+        newItems.push(...res.decryptedData);
+        if (res.hasMore) return loadActions(page + 1);
+        setActions(mergeItems(actions, newItems));
+        return true;
+      }
+      const actionsSuccess = await loadActions(0);
+      if (!actionsSuccess) return false;
+    }
+    if (stats.territories > 0) {
+      let newItems = [];
+      setLoadingText('Chargement des territoires');
+      async function loadTerritories(page = 0) {
+        const res = await API.get({ path: '/territory', query: { ...query, page: String(page) } });
+        if (!res.ok) return resetLoaderOnError();
+        setProgress((p) => p + res.data.length);
+        newItems.push(...res.decryptedData);
+        if (res.hasMore) return loadTerritories(page + 1);
+        setTerritories(mergeItems(territories, newItems));
+        return true;
+      }
+      const territoriesSuccess = await loadTerritories(0);
+      if (!territoriesSuccess) return false;
+    }
+    if (stats.places > 0) {
+      let newItems = [];
+      setLoadingText('Chargement des lieux');
+      async function loadPlaces(page = 0) {
+        const res = await API.get({ path: '/place', query: { ...query, page: String(page) } });
+        if (!res.ok) return resetLoaderOnError();
+        setProgress((p) => p + res.data.length);
+        newItems.push(...res.decryptedData);
+        if (res.hasMore) return loadPlaces(page + 1);
+        setPlaces(mergeItems(places, newItems));
+        return true;
+      }
+      const placesSuccess = await loadPlaces(0);
+      if (!placesSuccess) return false;
+    }
+    if (stats.relsPersonPlace > 0) {
+      let newItems = [];
+      setLoadingText('Chargement des relations personne-lieu');
+      async function loadRelPersonPlaces(page = 0) {
+        const res = await API.get({ path: '/relPersonPlace', query: { ...query, page: String(page) } });
+        if (!res.ok) return resetLoaderOnError();
+        setProgress((p) => p + res.data.length);
+        newItems.push(...res.decryptedData);
+        if (res.hasMore) return loadRelPersonPlaces(page + 1);
+        setRelsPersonPlace(mergeItems(relsPersonPlace, newItems));
+        return true;
+      }
+      const relsPersonPlacesSuccess = await loadRelPersonPlaces(0);
+      if (!relsPersonPlacesSuccess) return false;
+    }
+    if (stats.territoryObservations > 0) {
+      let newItems = [];
+      setLoadingText('Chargement des observations de territoire');
+      async function loadObservations(page = 0) {
+        const res = await API.get({ path: '/territory-observation', query: { ...query, page: String(page) } });
+        if (!res.ok) return resetLoaderOnError();
+        setProgress((p) => p + res.data.length);
+        newItems.push(...res.decryptedData);
+        if (res.hasMore) return loadObservations(page + 1);
+        setTerritoryObservations(mergeItems(territoryObservations, newItems));
+        return true;
+      }
+      const territoryObservationsSuccess = await loadObservations(0);
+      if (!territoryObservationsSuccess) return false;
+    }
+    if (stats.comments > 0) {
+      let newItems = [];
+      setLoadingText('Chargement des commentaires');
+      async function loadComments(page = 0) {
+        const res = await API.get({ path: '/comment', query: { ...query, page: String(page) } });
+        if (!res.ok) return resetLoaderOnError();
+        setProgress((p) => p + res.data.length);
+        newItems.push(...res.decryptedData);
+        if (res.hasMore) return loadComments(page + 1);
+        setComments(mergeItems(comments, newItems));
+        return true;
+      }
+      const commentsSuccess = await loadComments(0);
+      if (!commentsSuccess) return false;
+    }
+    if (stats.consultations > 0) {
+      let newItems = [];
+      setLoadingText('Chargement des consultations');
+      async function loadConsultations(page = 0) {
+        const res = await API.get({
+          path: '/consultation',
+          query: { ...query, page: String(page), after: isStartingInitialLoad ? 0 : lastLoadValue },
+        });
+        if (!res.ok) return resetLoaderOnError();
+        setProgress((p) => p + res.data.length);
+        newItems.push(...res.decryptedData);
+        if (res.hasMore) return loadConsultations(page + 1);
+        setConsultations(mergeItems(consultations, newItems, { formatNewItemsFunction: formatConsultation }));
+        return true;
+      }
+      const consultationsSuccess = await loadConsultations(0);
+      if (!consultationsSuccess) return false;
+    }
+    if (['admin', 'normal'].includes(latestUser.role) && stats.treatments > 0) {
+      let newItems = [];
+      setLoadingText('Chargement des traitements');
+      async function loadTreatments(page = 0) {
+        const res = await API.get({ path: '/treatment', query: { ...query, page: String(page), after: isStartingInitialLoad ? 0 : lastLoadValue } });
+        if (!res.ok) return resetLoaderOnError();
+        setProgress((p) => p + res.data.length);
+        newItems.push(...res.decryptedData);
+        if (res.hasMore) return loadTreatments(page + 1);
+        setTreatments(mergeItems(treatments, newItems));
+        return true;
+      }
+      const treatmentsSuccess = await loadTreatments(0);
+      if (!treatmentsSuccess) return false;
+    }
+    if (['admin', 'normal'].includes(latestUser.role) && stats.medicalFiles > 0) {
+      let newItems = [];
+      setLoadingText('Chargement des fichiers médicaux');
+      async function loadMedicalFiles(page = 0) {
+        const res = await API.get({
+          path: '/medical-file',
+          query: { ...query, page: String(page), after: isStartingInitialLoad ? 0 : lastLoadValue },
+        });
+        if (!res.ok) return resetLoaderOnError();
+        setProgress((p) => p + res.data.length);
+        newItems.push(...res.decryptedData);
+        if (res.hasMore) return loadMedicalFiles(page + 1);
+        setMedicalFiles(mergeItems(medicalFiles, newItems));
+        return true;
+      }
+      const medicalFilesSuccess = await loadMedicalFiles(0);
+      if (!medicalFilesSuccess) return false;
+    }
 
-  function startLoader(list, itemsCount) {
-    setLoadList({ list, offset: 0 });
-    setLoaderTrigger(false);
-    setProgress(0);
-    setTotal(itemsCount);
-  }
-
-  function stopLoader() {
     setIsLoading(false);
-    setLastLoad(serverDate.current);
-    setLoadingText('En attente de chargement');
-    setProgressBuffer(null);
+    setLastLoad(serverDate);
+    setLoadingText('En attente de rafraichissement');
     setProgress(null);
     setTotal(null);
+    setInitialLoadIsDone(true);
+    return true;
   }
 
   async function resetLoaderOnError() {
@@ -393,64 +443,7 @@ export default function DataLoader() {
       onClose: () => window.location.replace('/auth'),
       autoClose: 5000,
     });
-  }
-
-  function updateProgress() {
-    if (!loadList.list.length) return;
-
-    if (progressBuffer !== null) {
-      setProgress((progress || 0) + progressBuffer);
-      setProgressBuffer(null);
-    }
-  }
-
-  if (!isLoading) return <RandomPicturePreloader />;
-  if (!total && !fullScreen) return null;
-
-  if (fullScreen) {
-    return (
-      <FullScreenContainer>
-        <InsideContainer>
-          <RandomPicture />
-          <ProgressBar progress={progress} total={total} loadingText={loadingText} />
-        </InsideContainer>
-      </FullScreenContainer>
-    );
-  }
-
-  return (
-    <Container>
-      <ProgressBar progress={progress} total={total} loadingText={loadingText} />
-    </Container>
-  );
-}
-
-export function useDataLoader(options = { refreshOnMount: false }) {
-  const [fullScreen, setFullScreen] = useRecoilState(fullScreenState);
-  const [isLoading, setIsLoading] = useRecoilState(isLoadingState);
-  const setLoaderTrigger = useSetRecoilState(loaderTriggerState);
-  const setInitialLoad = useSetRecoilState(initialLoadState);
-  const setLoadingText = useSetRecoilState(loadingTextState);
-  const setLastLoad = useSetRecoilState(lastLoadState);
-
-  useEffect(function refreshOnMountEffect() {
-    if (options.refreshOnMount && !isLoading) refresh();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  function refresh() {
-    setIsLoading(true);
-    setFullScreen(false);
-    setInitialLoad(false);
-    setLoaderTrigger(true);
-    setLoadingText('Mise à jour des données');
-  }
-  function load() {
-    setIsLoading(true);
-    setFullScreen(true);
-    setInitialLoad(true);
-    setLoaderTrigger(true);
-    setLoadingText('Chargement des données');
+    return false;
   }
 
   async function resetCache() {
@@ -459,54 +452,38 @@ export function useDataLoader(options = { refreshOnMount: false }) {
   }
 
   return {
-    refresh,
-    load,
+    refresh: () => loadOrRefreshData(false),
+    startInitialLoad: () => loadOrRefreshData(true),
     resetCache,
     isLoading: Boolean(isLoading),
     isFullScreen: Boolean(fullScreen),
   };
 }
 
-export const mergeItems = (oldItems, newItems = []) => {
+export function mergeItems(oldItems, newItems = [], { formatNewItemsFunction, filterNewItemsFunction } = {}) {
+  const newItemsCleanedAndFormatted = [];
   const newItemIds = {};
+
   for (const newItem of newItems) {
     newItemIds[newItem._id] = true;
+    if (newItem.deletedAt) continue;
+    if (filterNewItemsFunction) {
+      if (!filterNewItemsFunction(newItem)) continue;
+    }
+    if (formatNewItemsFunction) {
+      newItemsCleanedAndFormatted.push(formatNewItemsFunction(newItem));
+    } else {
+      newItemsCleanedAndFormatted.push(newItem);
+    }
   }
-  const oldItemsPurged = oldItems.filter((item) => !newItemIds[item._id] && !item.deletedAt);
-  return [...oldItemsPurged, ...newItems.filter((item) => !item.deletedAt)];
-};
 
-const FullScreenContainer = styled.div`
-  width: 100%;
-  z-index: 1000;
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  box-sizing: border-box;
-  background-color: #fff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
+  const oldItemsPurged = [];
+  for (const oldItem of oldItems) {
+    if (oldItem.deletedAt) continue;
+    if (!newItemIds[oldItem._id]) {
+      oldItemsPurged.push(oldItem);
+    }
+  }
 
-const InsideContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 50vw;
-  max-width: 50vh;
-  height: 50vh;
-  max-height: 50vw;
-  justify-content: center;
-  align-items: center;
-`;
-
-const Container = styled.div`
-  width: 100%;
-  z-index: 1000;
-  position: absolute;
-  top: 0;
-  left: 0;
-  box-sizing: border-box;
-`;
+  return [...oldItemsPurged, ...newItemsCleanedAndFormatted];
+}

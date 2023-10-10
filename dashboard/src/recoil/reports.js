@@ -1,4 +1,4 @@
-import { setCacheItem } from '../services/dataManagement';
+import { getCacheItemDefaultValue, setCacheItem } from '../services/dataManagement';
 import { atom, selector } from 'recoil';
 import { capture } from '../services/sentry';
 import { organisationState } from './auth';
@@ -8,7 +8,13 @@ import { toast } from 'react-toastify';
 const collectionName = 'report';
 export const reportsState = atom({
   key: collectionName,
-  default: [],
+  default: selector({
+    key: 'report/default',
+    get: async () => {
+      const cache = await getCacheItemDefaultValue('report', []);
+      return cache;
+    },
+  }),
   effects: [
     ({ onSet }) =>
       onSet(async (newValue) => {

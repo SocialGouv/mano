@@ -37,8 +37,6 @@ router.get(
   passport.authenticate("user", { session: false }),
   validateUser(["superadmin", "admin", "normal", "restricted-access"]),
   catchErrors(async (req, res, next) => {
-    const startLoadingDate = Date.now();
-
     try {
       z.object({
         organisation: z.string().regex(looseUuidRegex),
@@ -77,7 +75,7 @@ router.get(
     // Medical data is never saved in cache so we always have to download all at every page reload.
     // In other words "after" param is intentionnaly ignored for consultations, treatments and medical files.
     const medicalDataQuery =
-      withAllMedicalData !== "true" ? query : { where: { organisation: req.query.organisation }, paranoid: withDeleted === "true" };
+      withAllMedicalData !== "true" ? query : { where: { organisation: req.query.organisation }, paranoid: withDeleted === "true" ? false : true };
     const consultations = await Consultation.count(medicalDataQuery);
     const medicalFiles = await MedicalFile.count(medicalDataQuery);
     const treatments = await Treatment.count(medicalDataQuery);
@@ -85,20 +83,20 @@ router.get(
     return res.status(200).send({
       ok: true,
       data: {
-        actions,
-        consultations,
-        treatments,
-        comments,
-        passages,
-        rencontres,
-        medicalFiles,
         persons,
         groups,
+        reports,
+        passages,
+        rencontres,
+        actions,
+        territories,
         places,
         relsPersonPlace,
-        territories,
         territoryObservations,
-        reports,
+        comments,
+        consultations,
+        treatments,
+        medicalFiles,
       },
     });
   })
