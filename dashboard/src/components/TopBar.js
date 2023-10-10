@@ -83,8 +83,11 @@ const TopBar = () => {
               <DropdownItem tag="a" href="/charte.pdf" target="_blank" rel="noreferrer">
                 Charte des Utilisateurs <OpenNewWindowIcon />
               </DropdownItem>
-              <DropdownItem tag="a" href="/legal-site.pdf" target="_blank" rel="noreferrer">
+              <DropdownItem tag="a" href="/legal.pdf" target="_blank" rel="noreferrer">
                 Mentions Légales <OpenNewWindowIcon />
+              </DropdownItem>
+              <DropdownItem tag="a" href="/cgu.pdf" target="_blank" rel="noreferrer">
+                Conditions générales d'utilisation <OpenNewWindowIcon />
               </DropdownItem>
               <DropdownItem tag="a" href="/privacy.pdf" target="_blank" rel="noreferrer">
                 Politique de Confidentialité <OpenNewWindowIcon />

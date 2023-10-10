@@ -81,24 +81,33 @@ export default function Footer({ skipFirstParagraph }) {
       </section>
 
       <section className="bg-shamrock-500">
-        <div className="flex flex-col items-center justify-center p-8 md:container md:flex-row md:justify-between">
+        <div className="flex flex-col items-center justify-center p-4 md:container md:flex-row md:justify-between">
           <a className="w-20 mb-10 md:mb-0" href="/">
             <img className="object-contain w-full h-full" src="/logo-white.png" alt="" />
           </a>
-          <p className="text-xs text-white">
-            <Link href="/legal">Accessibilité : non conforme</Link>
+          <p className="text-xs text-white hover:underline">
+            <Link href="https://dashboard-mano.fabrique.social.gouv.fr/legal.pdf" target="_blank">
+              Accessibilité : non conforme
+            </Link>
           </p>
-          <p className="text-xs text-white opacity-40">
-            <Link href="/legal">Mentions légales</Link>
+          <p className="text-xs text-white hover:underline">
+            <Link href="https://dashboard-mano.fabrique.social.gouv.fr/legal.pdf" target="_blank">
+              Mentions légales
+            </Link>
           </p>
-          <p className="text-xs text-white opacity-40">
+          <p className="text-xs text-white hover:underline">
+            <Link href="https://dashboard-mano.fabrique.social.gouv.fr/cgu.pdf" target="_blank">
+              Conditions générales d'utilisation
+            </Link>
+          </p>
+          <p className="text-xs text-white hover:underline">
             <Link href="/stats">Statistiques</Link>
           </p>
-          <p className="text-xs text-white opacity-40">
-            <Link href="/privacy.pdf">Politique de confidentialité</Link>
+          <p className="text-xs text-white hover:underline">
+            <Link href="https://dashboard-mano.fabrique.social.gouv.fr/privacy.pdf">Politique de confidentialité</Link>
           </p>
-          <p className="text-xs text-white opacity-40">&copy; 2021-{year} Mano - Tous droits réservés</p>
         </div>
+        <p className="pb-8 text-center text-xs text-white hover:underline">&copy; 2021-{year} Mano - Tous droits réservés</p>
       </section>
     </>
   );
