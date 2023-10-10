@@ -1,3 +1,10 @@
+# [1.289.0](https://github.com/SocialGouv/mano/compare/v1.288.5...v1.289.0) (2023-10-10)
+
+
+### Features
+
+* **dashboard:** person list ([#1682](https://github.com/SocialGouv/mano/issues/1682)) ([342716c](https://github.com/SocialGouv/mano/commit/342716c0dc4a46a6573695449410d83274697690))
+
 ## [1.288.5](https://github.com/SocialGouv/mano/compare/v1.288.4...v1.288.5) (2023-10-10)
 
 
