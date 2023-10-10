@@ -141,7 +141,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
   */
   async function loadOrRefreshData(isStartingInitialLoad) {
     setIsLoading(true);
-    setFullScreen(isStartingInitialLoad ? true : false);
+    setFullScreen(isStartingInitialLoad);
     setLoadingText(isStartingInitialLoad ? 'Chargement des données' : 'Mise à jour des données');
 
     /*
