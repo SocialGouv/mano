@@ -1,3 +1,10 @@
+## [1.289.5](https://github.com/SocialGouv/mano/compare/v1.289.4...v1.289.5) (2023-10-10)
+
+
+### Bug Fixes
+
+* un zero s'afichait et générait une erreur en console quand il n'y a pas de données ([124ff8f](https://github.com/SocialGouv/mano/commit/124ff8fa0c11d318a597031b72a041413f070b87))
+
 ## [1.289.4](https://github.com/SocialGouv/mano/compare/v1.289.3...v1.289.4) (2023-10-10)
 
 
