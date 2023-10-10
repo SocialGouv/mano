@@ -539,7 +539,7 @@ function CommentModal({
                         name="comment"
                         placeholder="Tapez votre commentaire ici..."
                         value={values.comment || ''}
-                        rows={3}
+                        rows={7}
                         onChange={(e) => {
                           window.sessionStorage.setItem('currentComment', e.target.value);
                           handleChange(e);
