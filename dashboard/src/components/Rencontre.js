@@ -142,14 +142,16 @@ const Rencontre = ({ rencontre, personId, onFinished }) => {
                     <Col md={12}>
                       <FormGroup>
                         <Label htmlFor="update-rencontre-comment">Commentaire</Label>
-                        <AutoResizeTextarea
-                          id="update-rencontre-comment"
-                          name="comment"
-                          placeholder="Tapez votre commentaire ici..."
-                          value={values.comment}
-                          rows={5}
-                          onChange={handleChange}
-                        />
+                        <div className="tw-rounded tw-border tw-border-gray-300">
+                          <AutoResizeTextarea
+                            id="update-rencontre-comment"
+                            name="comment"
+                            placeholder="Tapez votre commentaire ici..."
+                            value={values.comment}
+                            rows={7}
+                            onChange={handleChange}
+                          />
+                        </div>
                       </FormGroup>
                     </Col>
                     <Col md={6}>
