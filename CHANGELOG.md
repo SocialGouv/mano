@@ -1,3 +1,10 @@
+## [1.289.3](https://github.com/SocialGouv/mano/compare/v1.289.2...v1.289.3) (2023-10-10)
+
+
+### Bug Fixes
+
+* ajout des cgu, maj des mentions legales, accessibles sur app-dashboard-site ([#1718](https://github.com/SocialGouv/mano/issues/1718)) ([3024f98](https://github.com/SocialGouv/mano/commit/3024f98ef5f5d6099c689335ce0535b8c0b50174))
+
 ## [1.289.2](https://github.com/SocialGouv/mano/compare/v1.289.1...v1.289.2) (2023-10-10)
 
 
