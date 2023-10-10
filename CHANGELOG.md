@@ -1,3 +1,10 @@
+## [1.289.1](https://github.com/SocialGouv/mano/compare/v1.289.0...v1.289.1) (2023-10-10)
+
+
+### Bug Fixes
+
+* **dashboard:** reset all atoms on organisation change ([#1717](https://github.com/SocialGouv/mano/issues/1717)) ([6b0c9f8](https://github.com/SocialGouv/mano/commit/6b0c9f8b4089479116a1539c3121f82373f4ea6e))
+
 # [1.289.0](https://github.com/SocialGouv/mano/compare/v1.288.5...v1.289.0) (2023-10-10)
 
 
