@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Input, Col, Row, ModalHeader, ModalBody, FormGroup, Label } from 'reactstrap';
+import { Modal, Col, Row, ModalHeader, ModalBody, FormGroup, Label } from 'reactstrap';
 import { toast } from 'react-toastify';
 import { Formik } from 'formik';
 import ButtonCustom from './ButtonCustom';
