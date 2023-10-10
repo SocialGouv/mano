@@ -1,3 +1,10 @@
+## [1.288.5](https://github.com/SocialGouv/mano/compare/v1.288.4...v1.288.5) (2023-10-10)
+
+
+### Bug Fixes
+
+* **dashboard:** nouveau DataLoader ([#1692](https://github.com/SocialGouv/mano/issues/1692)) ([fa8c753](https://github.com/SocialGouv/mano/commit/fa8c753a65e0f3576dd00f73f1aa10e7a391c742))
+
 ## [1.288.4](https://github.com/SocialGouv/mano/compare/v1.288.3...v1.288.4) (2023-10-10)
 
 
