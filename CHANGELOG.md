@@ -1,3 +1,10 @@
+## [1.289.2](https://github.com/SocialGouv/mano/compare/v1.289.1...v1.289.2) (2023-10-10)
+
+
+### Bug Fixes
+
+* auto redimensionnement des boites de textes passages et rencontres ([#1716](https://github.com/SocialGouv/mano/issues/1716)) ([6a63f9a](https://github.com/SocialGouv/mano/commit/6a63f9a6f0c1d52306ff95084c07b2a73adfe966))
+
 ## [1.289.1](https://github.com/SocialGouv/mano/compare/v1.289.0...v1.289.1) (2023-10-10)
 
 
