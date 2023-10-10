@@ -1,0 +1,21 @@
+{
+  "name": "Mano",
+  "short_name": "Mano",
+  "theme_color": "#008e7f",
+  "background_color": "#008e7f",
+  "display": "fullscreen",
+  "scope": "./",
+  "start_url": "./",
+  "icons": [
+    {
+      "src": "icon_1024.png",
+      "type": "image/png",
+      "sizes": "1024x1024"
+    },
+    {
+      "src": "icon_512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}

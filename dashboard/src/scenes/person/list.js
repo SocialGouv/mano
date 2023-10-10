@@ -26,6 +26,7 @@ import useSearchParamState from '../../services/useSearchParamState';
 import { useDataLoader } from '../../components/DataLoader';
 import ExclamationMarkButton from '../../components/tailwind/ExclamationMarkButton';
 import { customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
+import useMinimumWidth from '../../services/useMinimumWidth';
 
 const limit = 20;
 
@@ -92,6 +93,7 @@ const filterPersonsWithAllFieldsSelector = selector({
 const List = () => {
   useTitle('Personnes');
   useDataLoader({ refreshOnMount: true });
+  const isDesktop = useMinimumWidth('sm');
   const filterPersonsWithAllFields = useRecoilValue(filterPersonsWithAllFieldsSelector);
 
   const [search, setSearch] = useSearchParamState('search', '');
@@ -135,65 +137,109 @@ const List = () => {
           </>
         }
       />
-      <div className="tw-flex tw-flex-wrap">
+      <div className="tw-hidden tw-flex-wrap sm:tw-flex">
         <div className="tw-relative tw-w-full tw-max-w-full tw-grow tw-basis-0">
           <div className="tw-mb-8 tw-flex tw-w-full tw-justify-end">
             <CreatePerson refreshable />
           </div>
         </div>
       </div>
-      <div className="tw-mb-5 tw-flex tw-flex-wrap">
-        <div className="tw-mb-5 tw-flex tw-w-full tw-items-start tw-justify-start">
-          <label htmlFor="search" className="tw-mr-5 tw-shrink-0 tw-basis-40">
-            Recherche :{' '}
-          </label>
-          <div className="tw-flex-grow-1 tw-flex-col tw-items-stretch tw-gap-2">
-            <Search
-              placeholder="Par mot clé, présent dans le nom, la description, un commentaire, une action, ..."
-              value={search}
-              onChange={(value) => {
-                if (page) {
-                  setPage(0);
-                  setSearch(value, { sideEffect: ['page', 0] });
-                } else {
-                  setSearch(value);
-                }
-              }}
-            />
-            <div className="tw-flex tw-w-full tw-items-center">
-              <label htmlFor="viewAllOrganisationData">
-                <input
-                  type="checkbox"
-                  id="viewAllOrganisationData"
-                  className="tw-mr-2.5"
-                  checked={viewAllOrganisationData}
-                  value={viewAllOrganisationData}
-                  onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
-                />
-                Afficher les personnes de toute l'organisation
-              </label>
-            </div>
-            <div className="tw-flex tw-w-full tw-items-center">
-              <label htmlFor="alertness">
-                <input
-                  type="checkbox"
-                  className="tw-mr-2.5"
-                  id="alertness"
-                  checked={alertness}
-                  value={alertness}
-                  onChange={() => setFilterAlertness(!alertness)}
-                />
-                N'afficher que les personnes vulnérables où ayant besoin d'une attention particulière
-              </label>
+      <details open={isDesktop} className="[&_summary]:open:tw-opacity-10">
+        <summary className="tw-my-2 tw-mx-4">Recherche et filtres...</summary>
+        <div className="tw-mb-5 tw-flex tw-flex-wrap ">
+          <div className="tw-mb-5 tw-flex tw-w-full tw-items-start tw-justify-start">
+            <label htmlFor="search" className="tw-mr-5 tw-shrink-0 tw-basis-40">
+              Recherche :{' '}
+            </label>
+            <div className="tw-flex-grow-1 tw-flex-col tw-items-stretch tw-gap-2">
+              <Search
+                placeholder="Par mot clé, présent dans le nom, la description, un commentaire, une action, ..."
+                value={search}
+                onChange={(value) => {
+                  if (page) {
+                    setPage(0);
+                    setSearch(value, { sideEffect: ['page', 0] });
+                  } else {
+                    setSearch(value);
+                  }
+                }}
+              />
+              <div className="tw-flex tw-w-full tw-items-center">
+                <label htmlFor="viewAllOrganisationData">
+                  <input
+                    type="checkbox"
+                    id="viewAllOrganisationData"
+                    className="tw-mr-2.5"
+                    checked={viewAllOrganisationData}
+                    value={viewAllOrganisationData}
+                    onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
+                  />
+                  Afficher les personnes de toute l'organisation
+                </label>
+              </div>
+              <div className="tw-flex tw-w-full tw-items-center">
+                <label htmlFor="alertness">
+                  <input
+                    type="checkbox"
+                    className="tw-mr-2.5"
+                    id="alertness"
+                    checked={alertness}
+                    value={alertness}
+                    onChange={() => setFilterAlertness(!alertness)}
+                  />
+                  N'afficher que les personnes vulnérables où ayant besoin d'une attention particulière
+                </label>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <Filters base={filterPersonsWithAllFields} filters={filters} onChange={setFilters} title="Autres filtres : " saveInURLParams />
+        <Filters base={filterPersonsWithAllFields} filters={filters} onChange={setFilters} title="Autres filtres : " saveInURLParams />
+      </details>
       <Table
         data={data}
         rowKey={'_id'}
         onRowClick={(p) => history.push(`/person/${p._id}`)}
+        renderCellSmallDevices={(p) => {
+          return (
+            <tr className="tw-my-3 tw-block tw-rounded-md tw-bg-[#f4f5f8] tw-p-4 tw-px-2">
+              <td className="tw-flex tw-flex-col tw-items-start tw-gap-1">
+                <div className="tw-flex tw-items-center tw-gap-x-2">
+                  {!!p.group && (
+                    <span aria-label="Personne avec des liens familiaux" title="Personne avec des liens familiaux">
+                      👪
+                    </span>
+                  )}
+                  {!!p.alertness && (
+                    <ExclamationMarkButton
+                      aria-label="Personne très vulnérable, ou ayant besoin d'une attention particulière"
+                      title="Personne très vulnérable, ou ayant besoin d'une attention particulière"
+                    />
+                  )}
+                  {p.outOfActiveList ? (
+                    <div className="tw-max-w-md tw-text-black50">
+                      <div className="tw-flex tw-items-center tw-gap-1 tw-font-bold [overflow-wrap:anywhere]">
+                        {p.name}
+                        {p.otherNames ? <small className="tw-text-main75"> - {p.otherNames}</small> : null}
+                      </div>
+                      <div>Sortie de file active : {p.outOfActiveListReasons?.join(', ')}</div>
+                    </div>
+                  ) : (
+                    <div className="tw-flex tw-max-w-md tw-items-center tw-gap-1 tw-font-bold [overflow-wrap:anywhere]">
+                      {p.name}
+                      {p.otherNames ? <small className="tw-text-main75"> - {p.otherNames}</small> : null}
+                    </div>
+                  )}
+                </div>
+                <span className="tw-opacity-50">{p.formattedBirthDate}</span>
+                <div className="tw-flex tw-w-full tw-flex-wrap tw-gap-2">
+                  {p.assignedTeams?.map((teamId) => (
+                    <TagTeam key={teamId} teamId={teamId} />
+                  ))}
+                </div>
+              </td>
+            </tr>
+          );
+        }}
         columns={[
           {
             title: '',
