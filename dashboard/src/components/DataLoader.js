@@ -449,6 +449,20 @@ export function useDataLoader(options = { refreshOnMount: false }) {
   async function resetCache() {
     await clearCache();
     setLastLoad(0);
+    setPersons([]);
+    setGroups([]);
+    setReports([]);
+    setPassages([]);
+    setRencontres([]);
+    setActions([]);
+    setTerritories([]);
+    setPlaces([]);
+    setRelsPersonPlace([]);
+    setTerritoryObservations([]);
+    setComments([]);
+    setConsultations([]);
+    setTreatments([]);
+    setMedicalFiles([]);
   }
 
   return {
