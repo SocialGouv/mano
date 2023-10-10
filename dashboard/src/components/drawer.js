@@ -136,11 +136,15 @@ const Drawer = () => {
             </>
           )}
         </div>
-        <div className="tw-mt-auto tw-mb-4 tw-flex tw-flex-col tw-justify-between tw-text-[0.65rem] tw-text-main">
+        <div className="tw-mt-auto tw-mb-4 tw-flex tw-flex-col tw-justify-between tw-text-[0.65rem] tw-text-gray-600">
           <p className="m-0">Version&nbsp;: {packageInfo.version}</p>
           <p className="m-0">Accessibilité&nbsp;: partielle</p>
+          <div>
+            <NavLink to="/mentions-legales">Mentions légales</NavLink>
+          </div>
           <SessionCountDownLimiter />
         </div>
+
         <button
           type="button"
           aria-label="Cacher la navigation latérale"

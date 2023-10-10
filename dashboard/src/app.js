@@ -42,6 +42,7 @@ import DuplicatedReportsTestChecker from './components/DuplicatedReportsTestChec
 import ConsultationModal from './components/ConsultationModal';
 import TreatmentModal from './scenes/person/components/TreatmentModal';
 import BottomBar from './components/BottomBar';
+import MentionsLegales from './scenes/mentions-legales';
 
 RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = process.env.REACT_APP_DISABLE_RECOIL_DUPLICATE_ATOM_KEY_CHECKING ? false : true;
 
@@ -131,6 +132,7 @@ const App = ({ resetRecoil }) => {
         <ScrollToTop />
         <Switch>
           <SentryRoute path="/auth" component={Auth} />
+          <RestrictedRoute path="/mentions-legales" component={MentionsLegales} />
           <RestrictedRoute path="/charte" component={Charte} />
           <RestrictedRoute path="/account" component={Account} />
           <RestrictedRoute path="/user" component={User} />
