@@ -308,6 +308,7 @@ router.post(
     try {
       z.object({
         name: z.string().optional(),
+        phone: z.string().optional(),
         email: z.preprocess((email) => email.trim().toLowerCase(), z.string().email().optional().or(z.literal(""))),
         healthcareProfessional: z.boolean(),
         team: z.array(z.string().regex(looseUuidRegex)),
@@ -319,10 +320,11 @@ router.post(
       return next(error);
     }
 
-    const { name, email, role, team, healthcareProfessional } = req.body;
+    const { name, email, role, team, healthcareProfessional, phone } = req.body;
     const token = crypto.randomBytes(20).toString("hex");
     const newUser = {
       name: sanitizeAll(name),
+      phone: sanitizeAll(phone) || null,
       role,
       healthcareProfessional: role === "restricted-access" ? false : healthcareProfessional,
       email: sanitizeAll(email.trim().toLowerCase()),
@@ -376,6 +378,7 @@ Guillaume Demirhan, porteur du projet: g.demirhan@aurore.asso.fr - +33 7 66 56 1
       data: {
         _id: data._id,
         name: data.name,
+        phone: data.phone,
         email: data.email,
         role: data.role,
         healthcareProfessional: data.healthcareProfessional,
@@ -432,6 +435,7 @@ router.post(
       user: {
         _id: userWithoutPassword._id,
         name: userWithoutPassword.name,
+        phone: userWithoutPassword.phone,
         email: userWithoutPassword.email,
         createdAt: userWithoutPassword.createdAt,
         updatedAt: userWithoutPassword.updatedAt,
@@ -469,6 +473,7 @@ router.get(
       data: {
         _id: user._id,
         name: user.name,
+        phone: user.phone,
         email: user.email,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
@@ -511,6 +516,7 @@ router.get(
       data.push({
         _id: user._id,
         name: user.name,
+        phone: user.phone,
         email: user.email,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
@@ -535,6 +541,7 @@ router.put(
     try {
       z.object({
         name: z.optional(z.string().min(1)),
+        phone: z.string().optional(),
         email: z.preprocess((email) => email.trim().toLowerCase(), z.string().email().optional().or(z.literal(""))),
         password: z.optional(z.string().min(1)),
         gaveFeedbackEarly2023: z.optional(z.boolean()),
@@ -548,12 +555,13 @@ router.put(
     }
 
     const _id = req.user._id;
-    const { name, email, password, team, termsAccepted, gaveFeedbackEarly2023 } = req.body;
+    const { name, email, password, team, termsAccepted, gaveFeedbackEarly2023, phone } = req.body;
 
     const user = await User.findOne({ where: { _id } });
     if (!user) return res.status(404).send({ ok: false, error: "Utilisateur non trouvé" });
 
     if (name) user.set({ name: sanitizeAll(name) });
+    if (phone) user.set({ phone: sanitizeAll(phone) });
     if (email) user.set({ email: sanitizeAll(email.trim().toLowerCase()) });
     if (termsAccepted) user.set({ termsAccepted: termsAccepted });
     if (password) {
@@ -579,6 +587,7 @@ router.put(
       user: {
         _id: user._id,
         name: user.name,
+        phone: user.phone,
         email: user.email,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
@@ -604,6 +613,7 @@ router.put(
         }),
         body: z.object({
           name: z.optional(z.string().min(1)),
+          phone: z.string().optional(),
           email: z.optional(z.preprocess((email) => email.trim().toLowerCase(), z.string().email().optional().or(z.literal("")))),
           password: z.optional(z.string().min(1)),
           team: z.optional(z.array(z.string().regex(looseUuidRegex))),
@@ -617,12 +627,13 @@ router.put(
     }
 
     const _id = req.params._id;
-    const { name, email, team, role, healthcareProfessional } = req.body;
+    const { name, email, team, role, healthcareProfessional, phone } = req.body;
 
     const user = await User.findOne({ where: { _id, organisation: req.user.organisation } });
     if (!user) return res.status(404).send({ ok: false, error: "Not Found" });
 
     if (name) user.name = sanitizeAll(name);
+    if (phone) user.phone = sanitizeAll(phone);
     if (email) user.email = sanitizeAll(email.trim().toLowerCase());
 
     if (healthcareProfessional !== undefined) user.set({ healthcareProfessional });
@@ -647,6 +658,7 @@ router.put(
       user: {
         _id: user._id,
         name: user.name,
+        phone: user.phone,
         email: user.email,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
