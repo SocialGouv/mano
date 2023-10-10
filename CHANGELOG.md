@@ -1,3 +1,10 @@
+## [1.288.4](https://github.com/SocialGouv/mano/compare/v1.288.3...v1.288.4) (2023-10-10)
+
+
+### Bug Fixes
+
+* **dashboard:** sentry back to pipeline ([#1714](https://github.com/SocialGouv/mano/issues/1714)) ([4bf65bd](https://github.com/SocialGouv/mano/commit/4bf65bd504d3f00085e47e30fa20562695e2c358))
+
 ## [1.288.3](https://github.com/SocialGouv/mano/compare/v1.288.2...v1.288.3) (2023-10-09)
 
 
