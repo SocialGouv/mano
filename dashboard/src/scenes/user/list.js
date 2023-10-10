@@ -131,7 +131,7 @@ const List = () => {
             render: (i) => formatDateWithFullMonth(i.createdAt),
           },
           {
-            title: 'Dernière connection le',
+            title: 'Dernière connexion le',
             dataKey: 'lastLoginAt',
             onSortOrder: setSortOrder,
             onSortBy: setSortBy,
