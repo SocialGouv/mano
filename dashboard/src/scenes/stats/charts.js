@@ -147,7 +147,7 @@ export const CustomResponsiveBar = ({
                 {total ? <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center tw-font-bold ">100%</td> : <></>}
               </tr>
             )}
-            {!!isMultiChoice && totalForMultiChoice && (
+            {Boolean(isMultiChoice) && Boolean(totalForMultiChoice) && (
               <tr>
                 <td className="tw-border tw-border-zinc-400 tw-p-1">{totalTitleForMultiChoice}</td>
                 <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center tw-font-bold">{totalForMultiChoice}</td>
