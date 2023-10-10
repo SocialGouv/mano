@@ -50,6 +50,7 @@ const Menu = ({ navigation }) => {
         <Row withNextButton caption="Télécharger Mano" onPress={() => Linking.openURL(MANO_DOWNLOAD_URL)} />
         <Spacer height={30} />
         <Row withNextButton caption="Charte des utilisateurs" onPress={() => navigation.navigate('Charte')} />
+        <Row withNextButton caption="Conditions générales d'utilisation" onPress={() => navigation.navigate('Cgu')} />
         <Row withNextButton caption="Mentions Légales" onPress={() => navigation.navigate('Legal')} />
         <Row withNextButton caption="Politique de Confidentialité" onPress={() => navigation.navigate('Privacy')} />
         <Spacer height={30} />

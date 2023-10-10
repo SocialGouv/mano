@@ -29,6 +29,7 @@ import NewPlaceForm from './scenes/Places/NewPlaceForm';
 import Menu from './scenes/Menu/Menu';
 import Legal from './scenes/Menu/Legal';
 import Privacy from './scenes/Menu/Privacy';
+import Cgu from './scenes/Menu/Cgu';
 import colors from './utils/colors';
 import { TeamSelection, ChangeTeam } from './scenes/Login/TeamSelection';
 import ActionsTabNavigator from './scenes/Actions/ActionsTabNavigator';
@@ -182,6 +183,7 @@ const MenuNavigator = () => {
       <MenuStack.Screen name="ChangeTeam" component={ChangeTeam} />
       <MenuStack.Screen name="Legal" component={Legal} />
       <MenuStack.Screen name="Privacy" component={Privacy} />
+      <MenuStack.Screen name="Cgu" component={Cgu} />
       <MenuStack.Screen name="Charte" component={Charte} />
     </MenuStack.Navigator>
   );
