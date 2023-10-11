@@ -6,8 +6,6 @@ import { personsObjectSelector } from '../recoil/selectors';
 export default function PersonName({ item, onClick = null, redirectToTab = 'Résumé' }) {
   const history = useHistory();
   const persons = useRecoilValue(personsObjectSelector);
-  // TODO: enquêter pourquoi certaines personnes sont undefined.
-  // cf: MANO-16A sur sentry. On ne le remarquait pas avant à cause du "?" mais c'est antérieur.
   const person = item?.personPopulated ?? persons[item.person];
   return (
     <span
