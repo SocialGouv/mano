@@ -34,7 +34,7 @@ export default function Index() {
         <h1 className="my-16 text-2xl font-semibold text-black">Faciliter notre travail pour mieux agir auprès de nos publics précaires.</h1>
 
         <div className="text-gray-600 max-w-3xl mx-auto">
-          <h2 className="text-xl mb-4">Contatez-nous</h2>
+          <h2 className="text-xl mb-4">Contactez-nous</h2>
           <div>
             Pour toutes questions sur les fonctionnalités de MANO, pour une présentation complète en présentiel ou commencer à utiliser l'outil&nbsp;:
             écrivez à <b className="font-medium">Mélissa et Yoann, chargés de déploiement.</b>
