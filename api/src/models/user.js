@@ -5,6 +5,7 @@ module.exports = (sequelize, DataTypes) => {
   const schema = {
     _id: { type: DataTypes.UUID, allowNull: false, defaultValue: DataTypes.UUIDV4, primaryKey: true },
     name: DataTypes.TEXT,
+    phone: DataTypes.TEXT,
     email: { type: DataTypes.TEXT, allowNull: false },
     password: { type: DataTypes.TEXT, allowNull: false },
     organisation: { type: DataTypes.UUID, references: { model: "Organisation", key: "_id", deferrable: Deferrable.INITIALLY_IMMEDIATE } },

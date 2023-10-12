@@ -55,6 +55,7 @@ const View = () => {
         initialValues={{
           name: localUser.name,
           email: localUser.email,
+          phone: localUser.phone,
           team: localUser.team,
           role: localUser.role,
           healthcareProfessional: localUser.healthcareProfessional,
@@ -64,6 +65,7 @@ const View = () => {
           try {
             if (!body.team?.length) return toast.error('Au moins une équipe est obligatoire');
             if (body.email && !emailRegex.test(body.email)) return toast.error('Email invalide');
+            if (!body.name) return toast.error('Le nom doit faire au moins un caractère');
             body.organisation = organisation._id;
             const res = await API.put({ path: `/user/${id}`, body });
             if (!res.ok) return actions.setSubmitting(false);
@@ -87,10 +89,17 @@ const View = () => {
                   <Input name="name" id="name" value={values.name} onChange={handleChange} />
                 </FormGroup>
               </Col>
+
               <Col md={6}>
                 <FormGroup>
                   <Label htmlFor="email">Email</Label>
                   <Input name="email" id="email" value={values.email} onChange={handleChange} />
+                </FormGroup>
+              </Col>
+              <Col md={6}>
+                <FormGroup>
+                  <Label htmlFor="phone">Téléphone</Label>
+                  <Input name="phone" id="phone" value={values.phone} onChange={handleChange} />
                 </FormGroup>
               </Col>
               <Col md={6}>

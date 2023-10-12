@@ -93,6 +93,14 @@ const List = () => {
             sortBy,
           },
           {
+            title: 'Téléphone',
+            dataKey: 'phone',
+            onSortOrder: setSortOrder,
+            onSortBy: setSortBy,
+            sortOrder,
+            sortBy,
+          },
+          {
             title: 'Rôle',
             dataKey: 'role',
             onSortOrder: setSortOrder,
@@ -121,6 +129,7 @@ const List = () => {
               );
             },
           },
+
           {
             title: 'Créé le',
             dataKey: 'createdAt',
@@ -154,6 +163,7 @@ const Create = ({ onChange, users }) => {
     return {
       name: '',
       email: '',
+      phone: '',
       role: 'normal',
       team: teams.map((t) => t._id),
       healthcareProfessional: false,
@@ -225,6 +235,10 @@ const Create = ({ onChange, users }) => {
               <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
                 <label htmlFor="email">Email</label>
                 <input className="tailwindui" placeholder="email@truc.fr" name="email" id="email" value={data.email} onChange={handleChange} />
+              </div>
+              <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
+                <label htmlFor="phone">Téléphone</label>
+                <input className="tailwindui" placeholder="0612345678" name="phone" id="phone" value={data.phone} onChange={handleChange} />
               </div>
               <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
                 <label htmlFor="role">Role</label>
