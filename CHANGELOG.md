@@ -1,3 +1,10 @@
+## [1.289.8](https://github.com/SocialGouv/mano/compare/v1.289.7...v1.289.8) (2023-10-12)
+
+
+### Bug Fixes
+
+* nouveau champ numéro de téléphone pour les utilisateurs ([#1719](https://github.com/SocialGouv/mano/issues/1719)) ([b632f8c](https://github.com/SocialGouv/mano/commit/b632f8c582d64d3f5579076cc20ad665006839b0))
+
 ## [1.289.7](https://github.com/SocialGouv/mano/compare/v1.289.6...v1.289.7) (2023-10-12)
 
 
