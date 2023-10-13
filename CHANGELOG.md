@@ -1,3 +1,10 @@
+## [1.289.9](https://github.com/SocialGouv/mano/compare/v1.289.8...v1.289.9) (2023-10-13)
+
+
+### Bug Fixes
+
+* **pi:** increase api db pool size ([2664e01](https://github.com/SocialGouv/mano/commit/2664e01e6ea81cfc4d950d6a874eca6bda71136c))
+
 ## [1.289.8](https://github.com/SocialGouv/mano/compare/v1.289.7...v1.289.8) (2023-10-12)
 
 
