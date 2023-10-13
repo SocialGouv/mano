@@ -15,6 +15,10 @@ const defaultConfig = {
     createdAt: "createdAt",
     updatedAt: "updatedAt",
   },
+  pool: {
+    max: 20, // default: 5
+    min: 5,  // default: 0
+  }
 };
 
 module.exports = {
