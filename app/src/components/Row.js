@@ -27,6 +27,7 @@ const Caption = styled(MyText)`
   margin-left: 15px;
   font-size: 20px;
   font-weight: bold;
+  max-width: 90%;
   ${(props) => props.loading && loaderCss}
   color: ${(props) => props.color};
 `;
