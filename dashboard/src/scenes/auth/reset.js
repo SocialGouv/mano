@@ -29,6 +29,7 @@ const Reset = () => {
       )}
       <ChangePassword
         onSubmit={({ newPassword }) => {
+          API.logout(false);
           return API.post({
             path: '/user/forgot_password_reset',
             body: {

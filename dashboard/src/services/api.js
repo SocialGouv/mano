@@ -136,10 +136,10 @@ const reset = () => {
   AppSentry.setTag('organisationId', '');
 };
 
-const logout = async () => {
+const logout = async (reloadAfterLogout = true) => {
   await post({ path: '/user/logout' });
   reset();
-  window.location.reload();
+  if (reloadAfterLogout) window.location.reload();
 };
 
 // Upload a file to a path.
