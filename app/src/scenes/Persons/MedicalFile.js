@@ -41,12 +41,12 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
   const allTreatments = useRecoilValue(treatmentsState);
   const setAllMedicalFiles = useSetRecoilState(medicalFileState);
 
-  const consultations = useMemo(() => (allConsultations || []).filter((c) => c.person === personDB._id), [allConsultations, personDB._id]);
+  const consultations = useMemo(() => (allConsultations || []).filter((c) => c.person === personDB?._id), [allConsultations, personDB?._id]);
 
-  const treatments = useMemo(() => (allTreatments || []).filter((t) => t.person === personDB._id), [allTreatments, personDB._id]);
+  const treatments = useMemo(() => (allTreatments || []).filter((t) => t.person === personDB?._id), [allTreatments, personDB?._id]);
 
   const populatedPersons = useRecoilValue(itemsGroupedByPersonSelector);
-  const populatedPerson = useMemo(() => populatedPersons[personDB?._id] || {}, [populatedPersons, personDB._id]);
+  const populatedPerson = useMemo(() => populatedPersons[personDB?._id] || {}, [populatedPersons, personDB?._id]);
 
   const medicalFileDB = populatedPerson.medicalFile;
   const [medicalFile, setMedicalFile] = useState(populatedPerson.medicalFile);
@@ -57,7 +57,7 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
       (async () => {
         const response = await API.post({
           path: '/medical-file',
-          body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({ person: personDB._id, documents: [], organisation: organisation._id }),
+          body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({ person: personDB?._id, documents: [], organisation: organisation._id }),
         });
         if (!response.ok) return;
         setAllMedicalFiles((medicalFiles) => [...medicalFiles, response.decryptedData]);
@@ -414,7 +414,7 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
         data={allMedicalDocuments}
         renderItem={(medicalDocument) => (
           <DocumentRow key={medicalDocument.name}>
-            <Document document={medicalDocument} personId={personDB._id} />
+            <Document document={medicalDocument} personId={personDB?._id} />
           </DocumentRow>
         )}
         ifEmpty="Pas encore de document médical">

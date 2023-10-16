@@ -363,7 +363,7 @@ const Consultation = ({ navigation, route }) => {
             showTime
             withTime
           />
-          {consultationDB.user === user._id ? (
+          {consultationDB?.user === user._id ? (
             <CheckboxLabelled
               label="Seulement visible par moi"
               alone

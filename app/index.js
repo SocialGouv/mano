@@ -21,6 +21,7 @@ import { SENTRY_XXX } from './src/config';
 Sentry.init({
   dsn: SENTRY_XXX,
   environment: 'app',
+  release: version,
   ignoreErrors: [
     'Network request failed',
     'Failed to fetch',
