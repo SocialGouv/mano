@@ -1,3 +1,10 @@
+## [1.289.12](https://github.com/SocialGouv/mano/compare/v1.289.11...v1.289.12) (2023-10-17)
+
+
+### Bug Fixes
+
+* add cal com ([#1730](https://github.com/SocialGouv/mano/issues/1730)) ([c4c3d07](https://github.com/SocialGouv/mano/commit/c4c3d075c0e4a56c3bc7160eb0593e48c12605e3))
+
 ## [1.289.11](https://github.com/SocialGouv/mano/compare/v1.289.10...v1.289.11) (2023-10-16)
 
 
