@@ -1,3 +1,11 @@
+## [1.289.15](https://github.com/SocialGouv/mano/compare/v1.289.14...v1.289.15) (2023-10-17)
+
+
+### Bug Fixes
+
+* **api:** impossible de supprimer une équipe si des utilisateurs n'ont que cette équipe ([#1725](https://github.com/SocialGouv/mano/issues/1725)) ([db4e4b9](https://github.com/SocialGouv/mano/commit/db4e4b9504d7d04b8dbf0e3e31e0ec0bd39f234f))
+* **api,dashboard:** déconnecte avant de changer un mot de passe ([#1726](https://github.com/SocialGouv/mano/issues/1726)) ([435a896](https://github.com/SocialGouv/mano/commit/435a896ce99633eeb7a6132cce4dcf9fcd0d958c))
+
 ## [1.289.14](https://github.com/SocialGouv/mano/compare/v1.289.13...v1.289.14) (2023-10-17)
 
 
