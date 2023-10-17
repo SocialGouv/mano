@@ -12,8 +12,6 @@ api:
 
 jobs:
   runs:
-    db:
-      use: create-db
     seed:
       ~needs: [db]
       use: seed-db
