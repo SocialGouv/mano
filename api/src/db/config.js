@@ -33,7 +33,7 @@ module.exports = {
     dialectOptions: {
       ssl: {
         require: process.env.NODE_ENV !== "development",
-        rejectUnauthorized: process.env.NODE_ENV !== "development",
+        rejectUnauthorized: false, // For self-signed certificates used in CNPG
       },
     },
   },
