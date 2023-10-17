@@ -1,3 +1,10 @@
+## [1.289.14](https://github.com/SocialGouv/mano/compare/v1.289.13...v1.289.14) (2023-10-17)
+
+
+### Bug Fixes
+
+* **cnpg:** main app is migrated to cnpg ([1eb0b80](https://github.com/SocialGouv/mano/commit/1eb0b807dc59fc955e8781f55bf5c66dbfdced8c))
+
 ## [1.289.13](https://github.com/SocialGouv/mano/compare/v1.289.12...v1.289.13) (2023-10-17)
 
 
