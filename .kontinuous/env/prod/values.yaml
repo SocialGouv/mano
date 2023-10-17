@@ -15,7 +15,15 @@ api:
     - secretRef:
         name: azure-mano-volume
     - secretRef:
-        name: "{{ .Values.global.pgSecretName }}"
+        name: pg-user # temporary
+
+pg:
+  cnpg-cluster:
+    resources:
+      requests:
+        memory: 256Mi
+      limits:
+        memory: 3Gi
 
 dashboard:
   host: "dashboard-mano.fabrique.social.gouv.fr"
