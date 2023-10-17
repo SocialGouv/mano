@@ -1,3 +1,10 @@
+## [1.289.13](https://github.com/SocialGouv/mano/compare/v1.289.12...v1.289.13) (2023-10-17)
+
+
+### Bug Fixes
+
+* use cnpg to improve sql perf ([#1729](https://github.com/SocialGouv/mano/issues/1729)) ([165f8dd](https://github.com/SocialGouv/mano/commit/165f8dd1d7433af7ff5bc36044b189fa5c9a0279))
+
 ## [1.289.12](https://github.com/SocialGouv/mano/compare/v1.289.11...v1.289.12) (2023-10-17)
 
 
