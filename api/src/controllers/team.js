@@ -4,7 +4,7 @@ const passport = require("passport");
 const { z } = require("zod");
 const { looseUuidRegex } = require("../utils");
 const { catchErrors } = require("../errors");
-const { Team, RelUserTeam } = require("../db/sequelize");
+const { Team, RelUserTeam, sequelize } = require("../db/sequelize");
 const validateUser = require("../middleware/validateUser");
 
 router.post(
@@ -106,6 +106,17 @@ router.delete(
       const error = new Error(`Invalid request in team delete: ${e}`);
       error.status = 400;
       return next(error);
+    }
+    const usersWithOnlyThisTeam = await RelUserTeam.findAll({
+      attributes: [
+        [sequelize.fn("COUNT", sequelize.col("team")), "teamCount"],
+        ["user", "user"],
+      ],
+      group: ["user"],
+      having: sequelize.literal(`COUNT(team) = 1 AND bool_or(team = '${req.params._id}')`),
+    });
+    if (usersWithOnlyThisTeam.length > 0) {
+      return res.status(400).send({ ok: false, error: "Impossible de supprimer l'équipe car certains utilisateurs n'ont que cette équipe." });
     }
     await RelUserTeam.destroy({ where: { team: req.params._id } });
     await Team.destroy({ where: { _id: req.params._id, organisation: req.user.organisation } });
