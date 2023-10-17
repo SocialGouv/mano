@@ -15,7 +15,7 @@ api:
     - secretRef:
         name: azure-mano-volume
     - secretRef:
-        name: pg-user # temporary
+        name: pg-app
 
 pg:
   cnpg-cluster:
