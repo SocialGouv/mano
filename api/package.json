@@ -5,9 +5,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "NODE_ENV=development npx sequelize-cli db:migrate && NODE_ENV=development nodemon ./src/index.js",
-    "start": "NODE_ENV=production npx sequelize-cli db:migrate && NODE_ENV=production node ./src/index.js",
-    "start:test": "NODE_ENV=test npx sequelize-cli db:migrate && NODE_ENV=test node ./src/index.js"
+    "dev": "NODE_ENV=development sequelize-cli db:migrate && NODE_ENV=development nodemon ./src/index.js",
+    "start": "NODE_ENV=production sequelize-cli db:migrate && NODE_ENV=production node ./src/index.js",
+    "start:test": "NODE_ENV=test sequelize-cli db:migrate && NODE_ENV=test node ./src/index.js"
   },
   "author": "",
   "license": "Apache-2.0",
@@ -33,6 +33,7 @@
     "pg-hstore": "^2.3.3",
     "sanitize-html": "^2.7.0",
     "sequelize": "^6.28.0",
+    "sequelize-cli": "^6.6.1",
     "zod": "^3.13.4"
   },
   "devDependencies": {
