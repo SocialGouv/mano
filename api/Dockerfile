@@ -8,6 +8,7 @@ COPY api/. .
 RUN yarn --frozen-lockfile
 
 RUN chown -R node:node /app
+RUN chown -R node:node /tmp
 
 USER 1000
 
