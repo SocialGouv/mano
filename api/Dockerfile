@@ -2,11 +2,12 @@ FROM node:16-alpine
 
 WORKDIR /app
 
-RUN chown node:node /app
 
 COPY api/. .
 
 RUN yarn --frozen-lockfile
+
+RUN chown -R node:node /app
 
 USER 1000
 
