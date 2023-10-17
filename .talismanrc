@@ -1,6 +1,6 @@
 fileignoreconfig:
 - filename: api/yarn.lock
-  checksum: 5d7b4cacad0bfd374905d91c8149b1bf543fea97c9dd73ba3cc41f09c1ad9148
+  checksum: 49a103a8c95426c1130039aa1d06d6ce25dbdc1b5c3d1639540cb46e50ee3781
 - filename: app/ios/Podfile.lock
   checksum: dcaf6d48f6e5fbd5e1eba52c4ddcdbb058170b00612ab4aeb862beeb5941d6a9
 - filename: app/yarn.lock

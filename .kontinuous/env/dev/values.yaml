@@ -12,10 +12,9 @@ api:
 
 jobs:
   runs:
-    db:
-      use: create-db
     seed:
-      ~needs: [db]
+      ~needs: [pg]
       use: seed-db
       with:
         seedPath: api/mocked-db.sql
+        pgSecretName: pg-app

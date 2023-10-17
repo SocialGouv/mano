@@ -15,7 +15,7 @@ www:
 
 api:
   ~chart: app
-  ~needs: [build-api]
+  ~needs: [build-api, pg]
   host: "{{ .Values.global.host }}"
   enabled: true
   containerPort: 3000
@@ -26,7 +26,7 @@ api:
       value: "/mnt/files"
   envFrom:
     - secretRef:
-        name: "{{ .Values.global.pgSecretName }}"
+        name: pg-app
 
 dashboard:
   ~chart: app
@@ -43,6 +43,9 @@ metabase:
 oauth2-proxy:
   ~chart: oauth2-proxy
   enabled: false
+
+pg:
+  ~chart: pg
 
 jobs:
   ~chart: jobs
