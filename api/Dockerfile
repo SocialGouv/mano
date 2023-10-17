@@ -8,7 +8,7 @@ COPY api/. .
 
 RUN yarn --frozen-lockfile
 
-USER node
+USER 1000
 
 ENV NODE_ENV=production
 
