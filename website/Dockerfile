@@ -10,7 +10,7 @@ COPY website/yarn.lock website/.yarnrc.yml ./
 COPY --chown=1000:1000 website/.yarn .yarn
 RUN yarn fetch --immutable
 
-COPY website/. .
+COPY --chown=1000:1000 website/. .
 
 ENV NODE_ENV=production
 
