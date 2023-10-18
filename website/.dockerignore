@@ -1,6 +1,6 @@
 node_modules
-build
 Dockerfile
 .dockerignore
 .gitignore
 .vscode
+README.md

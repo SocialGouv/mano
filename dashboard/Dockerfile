@@ -2,14 +2,13 @@ FROM node:20-alpine as builder
 
 RUN apk add --no-cache gcc autoconf automake build-base libpng-dev nasm
 
+RUN mkdir /app && chown 1000:1000 /app && chown 1000:1000 /tmp
 WORKDIR /app
+USER 1000
 
-RUN chown node:node /app
-
-COPY dashboard/package.json .
-COPY dashboard/yarn.lock .
-
-RUN yarn --frozen-lockfile
+COPY yarn.lock .yarnrc.yml ./
+COPY --chown=1000:100 .yarn .yarn
+RUN yarn fetch --immutable
 
 COPY dashboard/. .
 
