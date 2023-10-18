@@ -7,7 +7,7 @@ WORKDIR /app
 USER 1000
 
 COPY website/yarn.lock website/.yarnrc.yml ./
-COPY --chown=1000:100 website/.yarn .yarn
+COPY --chown=1000:1000 website/.yarn .yarn
 RUN yarn fetch --immutable
 
 COPY --chown=1000:1000 dashboard/. .
