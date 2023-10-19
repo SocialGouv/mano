@@ -8,8 +8,8 @@ RUN mkdir /app && chown 1000:1000 /app \
 WORKDIR /app
 USER 1000
 
-COPY website/yarn.lock website/.yarnrc.yml ./
-COPY --chown=1000:1000 website/.yarn .yarn
+COPY dashboard/yarn.lock dashboard/.yarnrc.yml ./
+COPY --chown=1000:1000 dashboard/.yarn .yarn
 RUN yarn fetch --immutable
 
 COPY --chown=1000:1000 dashboard/. .
@@ -22,7 +22,6 @@ RUN --mount=type=secret,id=sentry_auth_token \
         export SENTRY_AUTH_TOKEN=$(cat /run/secrets/sentry_auth_token); \
         yarn sentry:sourcemaps; \
     fi
-
 
 FROM ghcr.io/socialgouv/docker/nginx4spa:7.0.1
 
