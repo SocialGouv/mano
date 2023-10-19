@@ -1,6 +1,8 @@
 FROM node:20-alpine
 
-RUN mkdir /app && chown 1000:1000 /app && chown 1000:1000 /tmp
+RUN mkdir /app && chown 1000:1000 /app \
+  && chown 1000:1000 /tmp && \
+  mkdir /home/node/.yarn && chown 1000:1000 /home/node/.yarn
 WORKDIR /app
 USER 1000
 
