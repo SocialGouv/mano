@@ -1,3 +1,10 @@
+## [1.289.16](https://github.com/SocialGouv/mano/compare/v1.289.15...v1.289.16) (2023-10-19)
+
+
+### Bug Fixes
+
+* ajout du bouton un bug ([90c49c6](https://github.com/SocialGouv/mano/commit/90c49c6bcb1f66cee7baa0c8c0032362cadefa62))
+
 ## [1.289.15](https://github.com/SocialGouv/mano/compare/v1.289.14...v1.289.15) (2023-10-17)
 
 
