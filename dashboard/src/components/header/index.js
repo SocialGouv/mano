@@ -53,7 +53,7 @@ export const UnBugButton = () => {
                 l'étape suivante&nbsp;;
               </li>
               <li>
-                Contactez votre chargé de déploiement :
+                Si le problème persiste, contactez votre chargé de déploiement :
                 <ul className="tw-list-disc">
                   <li>Yoann - ykittery.mano@gmail.com (06&nbsp;83&nbsp;98&nbsp;29&nbsp;66)</li>
                   <li>Melissa - m.saiter.mano@gmail.com (06&nbsp;13&nbsp;23&nbsp;33&nbsp;45)</li>
