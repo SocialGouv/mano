@@ -1,3 +1,10 @@
+## [1.289.26](https://github.com/SocialGouv/mano/compare/v1.289.25...v1.289.26) (2023-10-20)
+
+
+### Bug Fixes
+
+* télécharger les observations de territoire depuis les stats ([611d253](https://github.com/SocialGouv/mano/commit/611d2533d625371ce33df8dee370147ffb629980))
+
 ## [1.289.25](https://github.com/SocialGouv/mano/compare/v1.289.24...v1.289.25) (2023-10-20)
 
 
