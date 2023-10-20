@@ -8,7 +8,7 @@ import { teamsState, userState } from '../../recoil/auth';
 import API from '../../services/api';
 
 // Source: https://tailwindui.com/components/application-ui/elements/dropdowns
-export default function ExportFormattedData({ personCreated, personUpdated, actions }) {
+export default function ExportFormattedData({ personCreated, personUpdated, actions, rencontres, passages }) {
   const teams = useRecoilValue(teamsState);
   const persons = useRecoilValue(personsState);
   const user = useRecoilValue(userState);
@@ -70,6 +70,34 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
     };
   };
 
+  const transformRencontre = (loadedUsers) => (rencontre) => {
+    return {
+      id: rencontre._id,
+      'Personne suivie - Nom': persons.find((p) => p._id === rencontre.person)?.name,
+      'Personne suivie - id': persons.find((p) => p._id === rencontre.person)?._id,
+      Équipe: rencontre.team ? teams.find((t) => t._id === rencontre.team)?.name : '',
+      Date: dayjsInstance(rencontre.date).format('YYYY-MM-DD'),
+      Commentaire: rencontre.comment,
+      'Créée par': loadedUsers.find((u) => u._id === rencontre.user)?.name,
+      'Créée le': dayjsInstance(rencontre.createdAt).format('YYYY-MM-DD'),
+      'Mise à jour le': dayjsInstance(rencontre.updatedAt).format('YYYY-MM-DD'),
+    };
+  };
+
+  const transformPassage = (loadedUsers) => (passage) => {
+    return {
+      id: passage._id,
+      'Personne suivie - Nom': persons.find((p) => p._id === passage.person)?.name,
+      'Personne suivie - id': persons.find((p) => p._id === passage.person)?._id,
+      Équipe: passage.team ? teams.find((t) => t._id === passage.team)?.name : '',
+      Date: dayjsInstance(passage.date).format('YYYY-MM-DD'),
+      Commentaire: passage.comment,
+      'Créée par': loadedUsers.find((u) => u._id === passage.user)?.name,
+      'Créée le': dayjsInstance(passage.createdAt).format('YYYY-MM-DD'),
+      'Mise à jour le': dayjsInstance(passage.updatedAt).format('YYYY-MM-DD'),
+    };
+  };
+
   async function exportXlsx(name, json) {
     const wb = utils.book_new();
     const ws = utils.json_to_sheet(json);
@@ -126,6 +154,20 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
                     }, [])
                     .map(transformAction(loadedUsers))
                 );
+              }}
+            />
+            <MenuItem
+              text="Rencontres"
+              onClick={async () => {
+                const loadedUsers = await fetchUsers();
+                exportXlsx('Rencontres', rencontres.map(transformRencontre(loadedUsers)));
+              }}
+            />
+            <MenuItem
+              text="Passages"
+              onClick={async () => {
+                const loadedUsers = await fetchUsers();
+                exportXlsx('Passages', passages.map(transformPassage(loadedUsers)));
               }}
             />
           </div>
