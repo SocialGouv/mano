@@ -76,7 +76,7 @@ router.put(
               })
             ).parse(req.body.actionsToUpdate);
           } catch (e) {
-            const error = new Error(`Invalid request in reports-from-real-date-to-date-id migration: ${e}`);
+            const error = new Error(`Invalid request in integrate-comments-in-actions-history migration: ${e}`);
             error.status = 400;
             throw error;
           }
