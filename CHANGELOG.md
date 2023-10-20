@@ -1,3 +1,10 @@
+## [1.289.23](https://github.com/SocialGouv/mano/compare/v1.289.22...v1.289.23) (2023-10-20)
+
+
+### Bug Fixes
+
+* **app:** ajout des rencontres dans les rapports ([678b424](https://github.com/SocialGouv/mano/commit/678b4246a9f9c03d5b98f7856dad84c92bc8100b))
+
 ## [1.289.22](https://github.com/SocialGouv/mano/compare/v1.289.21...v1.289.22) (2023-10-20)
 
 
