@@ -389,7 +389,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
             />
           )}
           <div
-            className={['tw-flex tw-w-full tw-flex-wrap tw-overflow-y-auto tw-p-4 sm:tw-h-[90vh]', activeTab !== 'Informations' && 'tw-hidden']
+            className={['tw-flex tw-w-full tw-flex-wrap tw-p-4 sm:tw-h-[90vh]', activeTab !== 'Informations' && 'tw-hidden']
               .filter(Boolean)
               .join(' ')}>
             <div className="tw-flex tw-w-full tw-flex-col tw-text-left sm:tw-flex-row">

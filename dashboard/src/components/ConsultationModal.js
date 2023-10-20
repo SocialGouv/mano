@@ -288,9 +288,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
           />
           <form
             id="add-consultation-form"
-            className={['tw-flex tw-h-[90vh] tw-w-full tw-flex-wrap tw-overflow-y-auto tw-p-4', activeTab !== 'Informations' && 'tw-hidden']
-              .filter(Boolean)
-              .join(' ')}
+            className={['tw-flex tw-h-[90vh] tw-w-full tw-flex-wrap tw-p-4', activeTab !== 'Informations' && 'tw-hidden'].filter(Boolean).join(' ')}
             onSubmit={(e) => {
               e.preventDefault();
               handleSubmit({ closeOnSubmit: true });
