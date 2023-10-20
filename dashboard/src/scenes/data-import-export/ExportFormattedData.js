@@ -6,13 +6,17 @@ import { utils, writeFile } from 'xlsx';
 import { dayjsInstance } from '../../services/date';
 import { teamsState, userState } from '../../recoil/auth';
 import API from '../../services/api';
+import { customFieldsObsSelector } from '../../recoil/territoryObservations';
+import { territoriesState } from '../../recoil/territory';
 
 // Source: https://tailwindui.com/components/application-ui/elements/dropdowns
-export default function ExportFormattedData({ personCreated, personUpdated, actions, rencontres, passages }) {
+export default function ExportFormattedData({ personCreated, personUpdated, actions, rencontres, passages, observations }) {
   const teams = useRecoilValue(teamsState);
   const persons = useRecoilValue(personsState);
+  const territories = useRecoilValue(territoriesState);
   const user = useRecoilValue(userState);
   const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
+  const customFieldsObs = useRecoilValue(customFieldsObsSelector);
   const [users, setUsers] = useState([]);
 
   async function fetchUsers() {
@@ -98,6 +102,28 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
     };
   };
 
+  const transformObservation = (loadedUsers) => (observation) => {
+    console.log(observation, customFieldsObs);
+    return {
+      id: observation._id,
+      'Territoire - Nom': territories.find((t) => t._id === observation.territory)?.name,
+      'Observé le': dayjsInstance(observation.date).format('YYYY-MM-DD'),
+      Équipe: observation.team ? teams.find((t) => t._id === observation.team)?.name : '',
+      ...customFieldsObs.reduce((fields, field) => {
+        if (['date', 'date-with-time'].includes(field.type))
+          fields[field.label || field.name] = observation[field.name] ? dayjsInstance(observation[field.name]).format('YYYY-MM-DD') : '';
+        else if (['boolean'].includes(field.type)) fields[field.label || field.name] = observation[field.name] ? 'Oui' : 'Non';
+        else if (['yes-no'].includes(field.type)) fields[field.label || field.name] = observation[field.name];
+        else if (Array.isArray(observation[field.name])) fields[field.label || field.name] = observation[field.name].join(', ');
+        else fields[field.label || field.name] = observation[field.name];
+        return fields;
+      }, {}),
+      'Créée par': loadedUsers.find((u) => u._id === observation.user)?.name,
+      'Créée le': dayjsInstance(observation.createdAt).format('YYYY-MM-DD'),
+      'Mise à jour le': dayjsInstance(observation.updatedAt).format('YYYY-MM-DD'),
+    };
+  };
+
   async function exportXlsx(name, json) {
     const wb = utils.book_new();
     const ws = utils.json_to_sheet(json);
@@ -125,7 +151,7 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
         leave="tw-transition tw-ease-in tw-duration-75"
         leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
         leaveTo="tw-transform tw-opacity-0 tw-scale-95">
-        <Menu.Items className="tw-absolute tw-right-0 tw-z-10 tw-mt-2 tw-w-56 tw-origin-top-right tw-rounded-md tw-bg-white tw-shadow-lg tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none">
+        <Menu.Items className="tw-absolute tw-right-0 tw-z-50 tw-mt-2 tw-w-56 tw-origin-top-right tw-rounded-md tw-bg-white tw-shadow-lg tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none">
           <div className="tw-py-1">
             <MenuItem
               text="Personnes suivies"
@@ -168,6 +194,13 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
               onClick={async () => {
                 const loadedUsers = await fetchUsers();
                 exportXlsx('Passages', passages.map(transformPassage(loadedUsers)));
+              }}
+            />
+            <MenuItem
+              text="Observations"
+              onClick={async () => {
+                const loadedUsers = await fetchUsers();
+                exportXlsx('Observations', observations.map(transformObservation(loadedUsers)));
               }}
             />
           </div>

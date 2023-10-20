@@ -522,6 +522,7 @@ const Stats = () => {
         <div className="tw-flex tw-basis-2/3 tw-items-center tw-justify-end">
           <ButtonCustom color="link" title="Imprimer" onClick={window.print} />
           <ExportFormattedData
+            observations={observations}
             passages={passagesFilteredByPersons}
             rencontres={rencontresFilteredByPersons}
             personCreated={personsCreated}
