@@ -24,6 +24,7 @@ import {
   commentsForReport,
   currentTeamReportsSelector,
   observationsForReport,
+  rencontresForReport,
 } from './selectors';
 import { getPeriodTitle } from './utils';
 
@@ -77,6 +78,7 @@ const Report = ({ navigation, route }) => {
   const actionsCompleted = useRecoilValue(actionsCompletedOrCanceledForReport({ date: day, status: DONE }));
   const actionsCanceled = useRecoilValue(actionsCompletedOrCanceledForReport({ date: day, status: CANCEL }));
   const comments = useRecoilValue(commentsForReport({ date: day }));
+  const rencontres = useRecoilValue(rencontresForReport({ date: day }));
   const observations = useRecoilValue(observationsForReport({ date: day }));
   const organisation = useRecoilValue(organisationState);
 
@@ -108,6 +110,7 @@ const Report = ({ navigation, route }) => {
     const freshReport = teamsReports.find((r) => r._id === reportDB?._id);
     setReportDB(freshReport);
     setReport(castToReport(freshReport));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     isFocused,
     reportDB?._id,
@@ -117,6 +120,7 @@ const Report = ({ navigation, route }) => {
     actionsCanceled.length,
     comments.length,
     observations.length,
+    day,
   ]);
 
   const [updating, setUpdating] = useState(false);
@@ -259,6 +263,13 @@ const Report = ({ navigation, route }) => {
           caption={`Commentaires (${comments.length})`}
           onPress={() => navigation.navigate('CommentsForReport', { date: reportDB?.date })}
           disabled={!comments.length}
+        />
+        <Spacer height={30} />
+        <Row
+          withNextButton
+          caption={`Rencontres (${rencontres.length})`}
+          onPress={() => navigation.navigate('RencontresForReport', { date: reportDB?.date })}
+          disabled={!rencontres.length}
         />
         {!!organisation.territoriesEnabled && (
           <>

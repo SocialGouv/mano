@@ -6,6 +6,7 @@ import { reportsState } from '../../recoil/reports';
 import { actionsObjectSelector, itemsGroupedByPersonSelector } from '../../recoil/selectors';
 import { territoryObservationsState } from '../../recoil/territoryObservations';
 import { getIsDayWithinHoursOffsetOfDay } from '../../services/dateDayjs';
+import { rencontresState } from '../../recoil/rencontres';
 
 export const currentTeamReportsSelector = selector({
   key: 'currentTeamReportsSelector',
@@ -57,7 +58,6 @@ export const commentsForReport = selectorFamily({
   get:
     ({ date }) =>
     ({ get }) => {
-      const now = Date.now();
       const actions = get(actionsObjectSelector);
       const persons = get(itemsGroupedByPersonSelector);
       const comments = get(commentsState);
@@ -94,6 +94,19 @@ export const observationsForReport = selectorFamily({
       const territoryObservations = get(territoryObservationsState);
       const currentTeam = get(currentTeamState);
       return territoryObservations
+        .filter((o) => o.team === currentTeam._id)
+        .filter((o) => getIsDayWithinHoursOffsetOfDay(o.observedAt || o.createdAt, date, currentTeam?.nightSession ? 12 : 0));
+    },
+});
+
+export const rencontresForReport = selectorFamily({
+  key: 'rencontresForReport',
+  get:
+    ({ date }) =>
+    ({ get }) => {
+      const rencontres = get(rencontresState);
+      const currentTeam = get(currentTeamState);
+      return rencontres
         .filter((o) => o.team === currentTeam._id)
         .filter((o) => getIsDayWithinHoursOffsetOfDay(o.observedAt || o.createdAt, date, currentTeam?.nightSession ? 12 : 0));
     },
