@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import dayjs from 'dayjs';
 import { View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
@@ -13,13 +12,28 @@ import colors from '../../utils/colors';
 import { useRecoilValue } from 'recoil';
 import { organisationState, userState } from '../../recoil/auth';
 
-export const PersonName = ({ person: { name, outOfActiveList, outOfActiveListReasons } }) => {
+export const PersonName = ({ person: { name, outOfActiveList, outOfActiveListReasons, otherNames } }) => {
   if (outOfActiveList) {
     return (
       <OutOfActiveListContainer>
-        <NameMuted>{name}</NameMuted>
+        {Boolean(otherNames) ? (
+          <PseudoNameContainer>
+            <NameMuted>{name}</NameMuted>
+            <PseudoMuted>{otherNames}</PseudoMuted>
+          </PseudoNameContainer>
+        ) : (
+          <NameMuted>{name}</NameMuted>
+        )}
         <ActiveListReasonText>Sortie de file active : {outOfActiveListReasons?.join(', ')}</ActiveListReasonText>
       </OutOfActiveListContainer>
+    );
+  }
+  if (otherNames) {
+    return (
+      <PseudoNameContainer>
+        <Name>{name}</Name>
+        <Pseudo>{otherNames}</Pseudo>
+      </PseudoNameContainer>
     );
   }
   return <Name>{name}</Name>;
@@ -126,6 +140,21 @@ const Name = styled(MyText)`
   font-size: 20px;
   flex-grow: 1;
   flex-shrink: 1;
+`;
+
+const Pseudo = styled(MyText)`
+  color: #666;
+  font-size: 16px;
+  flex-grow: 1;
+  flex-shrink: 1;
+`;
+
+const PseudoMuted = styled(Pseudo)`
+  color: #aaa;
+`;
+
+const PseudoNameContainer = styled.View`
+  flex-direction: col;
 `;
 
 const NameMuted = styled(Name)`
