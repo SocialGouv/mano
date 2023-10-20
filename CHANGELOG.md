@@ -1,3 +1,10 @@
+## [1.289.24](https://github.com/SocialGouv/mano/compare/v1.289.23...v1.289.24) (2023-10-20)
+
+
+### Bug Fixes
+
+* suppression des doubles barres de défilement pour actions et consultations ([c21d026](https://github.com/SocialGouv/mano/commit/c21d026191166ed8e462a52edde46a28250db5d0))
+
 ## [1.289.23](https://github.com/SocialGouv/mano/compare/v1.289.22...v1.289.23) (2023-10-20)
 
 
