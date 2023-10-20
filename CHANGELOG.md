@@ -1,3 +1,10 @@
+## [1.289.19](https://github.com/SocialGouv/mano/compare/v1.289.18...v1.289.19) (2023-10-20)
+
+
+### Bug Fixes
+
+* track les click sur cal.com sur matomo ([a15c560](https://github.com/SocialGouv/mano/commit/a15c560f204483fa8c70dc35640ae301302fc23f))
+
 ## [1.289.18](https://github.com/SocialGouv/mano/compare/v1.289.17...v1.289.18) (2023-10-20)
 
 
