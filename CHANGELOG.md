@@ -1,3 +1,10 @@
+## [1.289.18](https://github.com/SocialGouv/mano/compare/v1.289.17...v1.289.18) (2023-10-20)
+
+
+### Bug Fixes
+
+* oops ([6b686a9](https://github.com/SocialGouv/mano/commit/6b686a90045261f8d0ad3cc64a963335bc434734))
+
 ## [1.289.17](https://github.com/SocialGouv/mano/compare/v1.289.16...v1.289.17) (2023-10-19)
 
 
