@@ -1,3 +1,10 @@
+## [1.289.25](https://github.com/SocialGouv/mano/compare/v1.289.24...v1.289.25) (2023-10-20)
+
+
+### Bug Fixes
+
+* export des passages et rencontres depuis la page d'accueil ([a85637e](https://github.com/SocialGouv/mano/commit/a85637e2156db0c11aeaf148066a581eef6dfc1b))
+
 ## [1.289.24](https://github.com/SocialGouv/mano/compare/v1.289.23...v1.289.24) (2023-10-20)
 
 
