@@ -1,3 +1,10 @@
+## [1.289.22](https://github.com/SocialGouv/mano/compare/v1.289.21...v1.289.22) (2023-10-20)
+
+
+### Bug Fixes
+
+* suppression d'un message obsolète sur mobile qui empeche d'accéder aux rapport ([898b5bb](https://github.com/SocialGouv/mano/commit/898b5bb7e60065cbb800d7a60a5c57d8763efdf5))
+
 ## [1.289.21](https://github.com/SocialGouv/mano/compare/v1.289.20...v1.289.21) (2023-10-20)
 
 
