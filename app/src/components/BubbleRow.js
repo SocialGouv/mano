@@ -61,7 +61,6 @@ const CommentStyled = styled(MyText)`
   margin-bottom: 5px;
   flex-grow: 1;
   color: rgba(30, 36, 55, 0.75);
-  text-align: justify;
 `;
 
 const CreationDate = styled(MyText)`
