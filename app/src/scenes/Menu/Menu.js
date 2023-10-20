@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, Linking, TouchableWithoutFeedback } from 'react-native';
+import { Linking, TouchableWithoutFeedback } from 'react-native';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
 import Row from '../../components/Row';
@@ -30,13 +30,6 @@ const Menu = ({ navigation }) => {
           withNextButton
           caption={`Comptes-rendus de l'équipe ${currentTeam?.name}`}
           onPress={() => {
-            if (!organisation.migrations.includes('reports-from-real-date-to-date-id')) {
-              return Alert.alert(
-                "Veuillez d'abord vous connecter une fois sur votre navigateur Web",
-                "Une mise à jour des comptes-rendus doit avoir lieu pour les rendre compatible avec l'app Mano." +
-                  " Une fois que c'est réalisé, vous pouvez relancer l'app et accéder aux comptes-rendus."
-              );
-            }
             navigation.navigate('Reports');
           }}
         />
