@@ -1,3 +1,10 @@
+## [1.289.20](https://github.com/SocialGouv/mano/compare/v1.289.19...v1.289.20) (2023-10-20)
+
+
+### Bug Fixes
+
+* **app:** pseudo affiché sur mobile ([82c9f63](https://github.com/SocialGouv/mano/commit/82c9f637dfd9577264b51302369ca9b3bd84025b))
+
 ## [1.289.19](https://github.com/SocialGouv/mano/compare/v1.289.18...v1.289.19) (2023-10-20)
 
 
