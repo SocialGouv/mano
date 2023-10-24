@@ -247,10 +247,10 @@ const BlockCreatedAt = ({ persons }) => {
       const startFollowedDate = Date.parse(person.followedSince || person.createdAt);
 
       // Si outOfActiveList est à true et que outOfActiveListDate est disponible, on utilise cette date, sinon on utilise la date actuelle
-      const endFollowedDate = person.outOfActiveList && person.outOfActiveListDate ? Date.parse(person.outOfActiveListDate) : Date.now();
+      const endFollowedDate = person.outOfActiveList && person.outOfActiveListDate ? Date.parse(new Date(person.outOfActiveListDate)) : Date.now();
 
-      // On renvoie la différence entre les deux dates
-      return total + (endFollowedDate - startFollowedDate);
+      // On renvoie la différence entre les deux dates (et pour éviter les nombres négatifs, on renvoie 0 si la différence est négative)
+      return total + (endFollowedDate - startFollowedDate > 0 ? endFollowedDate - startFollowedDate : 0);
     }, 0) / (persons.length || 1); // On divise par le nombre de personnes pour obtenir la moyenne
 
   const [count, unit] = getDuration(averageFollowedTime);
