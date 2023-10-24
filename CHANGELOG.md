@@ -1,3 +1,10 @@
+## [1.289.27](https://github.com/SocialGouv/mano/compare/v1.289.26...v1.289.27) (2023-10-24)
+
+
+### Bug Fixes
+
+* nouveau calcul pour temps de suivi en prenant en compte la sortie de file active ([#1742](https://github.com/SocialGouv/mano/issues/1742)) ([a216e6f](https://github.com/SocialGouv/mano/commit/a216e6f4465afa9386795e12fc698696abc2d0e8))
+
 ## [1.289.26](https://github.com/SocialGouv/mano/compare/v1.289.25...v1.289.26) (2023-10-20)
 
 
