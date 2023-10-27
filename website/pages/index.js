@@ -45,7 +45,7 @@ export default function Index() {
     <div>
       <Header />
       <div className="container px-8 lg:mx-auto">
-        <h1 className="my-16 text-2xl font-semibold text-black">Test: Faciliter notre travail pour mieux agir auprès de nos publics précaires.</h1>
+        <h1 className="my-16 text-2xl font-semibold text-black">Faciliter notre travail pour mieux agir auprès de nos publics précaires.</h1>
 
         <div className="text-gray-600 max-w-3xl mx-auto">
           <h2 className="text-xl mb-4">Contactez-nous</h2>
