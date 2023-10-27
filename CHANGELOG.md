@@ -1,3 +1,10 @@
+## [1.289.28](https://github.com/SocialGouv/mano/compare/v1.289.27...v1.289.28) (2023-10-27)
+
+
+### Bug Fixes
+
+* release mail images ([7511309](https://github.com/SocialGouv/mano/commit/75113093e7bb72ff53fd14ca7ac7b3381c045d0a))
+
 ## [1.289.27](https://github.com/SocialGouv/mano/compare/v1.289.26...v1.289.27) (2023-10-24)
 
 
