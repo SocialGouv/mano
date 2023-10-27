@@ -1,3 +1,10 @@
+## [1.289.29](https://github.com/SocialGouv/mano/compare/v1.289.28...v1.289.29) (2023-10-27)
+
+
+### Bug Fixes
+
+* nouveau message de bienvenue de mano ([f7ca517](https://github.com/SocialGouv/mano/commit/f7ca5174db3ba1f7fd12e52f181a1bf68a50894e))
+
 ## [1.289.28](https://github.com/SocialGouv/mano/compare/v1.289.27...v1.289.28) (2023-10-27)
 
 
