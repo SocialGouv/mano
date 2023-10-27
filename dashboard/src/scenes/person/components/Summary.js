@@ -10,6 +10,7 @@ import PassagesRencontres from './PassagesRencontres';
 import OutOfActiveList from '../OutOfActiveList';
 import MergeTwoPersons from '../MergeTwoPersons';
 import { customFieldsPersonsSelector } from '../../../recoil/persons';
+import { SummaryPrint } from './SummaryPrint';
 
 export default function Summary({ person }) {
   const user = useRecoilValue(userState);
@@ -18,7 +19,8 @@ export default function Summary({ person }) {
 
   return (
     <>
-      <div className="tw-grid tw-grid-cols-12 tw-gap-4 tw-pt-4">
+      {!process.env.REACT_APP_TEST_PLAYWRIGHT && <SummaryPrint person={person} />}
+      <div className="noprint tw-grid tw-grid-cols-12 tw-gap-4 tw-pt-4">
         <div className="tw-col-span-3">
           <InfosMain person={person} />
         </div>
@@ -32,7 +34,7 @@ export default function Summary({ person }) {
       </div>
       {!['restricted-access'].includes(user.role) && (
         <>
-          <div className="tw-grid tw-grid-cols-12 tw-gap-4 tw-pt-4">
+          <div className="noprint tw-grid tw-grid-cols-12 tw-gap-4 tw-pt-4">
             <div className="tw-col-span-8 tw-flex tw-flex-col tw-gap-4">
               {customFieldsPersons.map(({ name, fields }) => {
                 return <PersonCustomFields key={name} person={person} sectionName={name} fields={fields} />;
@@ -50,7 +52,7 @@ export default function Summary({ person }) {
               </div>
             </div>
           </div>
-          <div className="tw-mt-4 tw-flex tw-justify-end tw-gap-2">
+          <div className="noprint tw-mt-4 tw-flex tw-justify-end tw-gap-2">
             <MergeTwoPersons person={person} />
             <OutOfActiveList person={person} />
             <DeletePersonButton person={person} />
