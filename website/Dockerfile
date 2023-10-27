@@ -2,6 +2,8 @@ FROM node:20-alpine as builder
 
 RUN apk add --no-cache gcc autoconf automake build-base libpng-dev nasm
 
+ENV NEXT_TELEMETRY_DISABLED=1 
+
 WORKDIR /app
 
 RUN chown node:node /app

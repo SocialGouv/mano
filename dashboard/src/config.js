@@ -23,7 +23,7 @@ const getHost = () => {
   if (process.env.NODE_ENV !== 'production' || process.env.REACT_APP_TEST === 'true') {
     return process.env.REACT_APP_HOST;
   }
-  if (window.location.host.includes('dev')) {
+  if (window.location.host.includes('.ovh.')) {
     return window.location.host.replace('dashboard-', '');
   }
   return 'mano.fabrique.social.gouv.fr';
