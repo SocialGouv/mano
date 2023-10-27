@@ -1,3 +1,10 @@
+## [1.289.30](https://github.com/SocialGouv/mano/compare/v1.289.29...v1.289.30) (2023-10-27)
+
+
+### Bug Fixes
+
+* on utilise la base de données de preview en preview ([#1746](https://github.com/SocialGouv/mano/issues/1746)) ([2120b99](https://github.com/SocialGouv/mano/commit/2120b995c90d0ed06f56269f98f9a81dd2b7a3de))
+
 ## [1.289.29](https://github.com/SocialGouv/mano/compare/v1.289.28...v1.289.29) (2023-10-27)
 
 
