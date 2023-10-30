@@ -29,6 +29,7 @@ const { looseUuidRegex, customFieldSchema, positiveIntegerRegex } = require("../
 const { capture } = require("../sentry");
 const { serializeOrganisation } = require("../utils/data-serializer");
 const { defaultSocialCustomFields, defaultMedicalCustomFields } = require("../utils/custom-fields/person");
+const { mailBienvenueHtml } = require("../utils/mail-bienvenue");
 
 const JWT_MAX_AGE = 60 * 60 * 3; // 3 hours in s
 
@@ -154,31 +155,7 @@ router.post(
       },
       { returning: true }
     );
-
-    const subject = "Bienvenue dans Mano 👋";
-    const body = `Bonjour ${adminUser.name} !
-
-Un compte Mano pour votre organisation ${organisation.name} vient d'être créé.
-
-Votre identifiant pour vous connecter à Mano est ${adminUser.email}.
-Vous pouvez dès à présent vous connecter pour choisir votre mot de passe ici:
-https://dashboard-mano.fabrique.social.gouv.fr/auth/reset?token=${token}&newUser=true
-
-Vous pourrez ensuite paramétrer votre organisation et commencer à utiliser Mano en suivant ce lien:
-https://dashboard-mano.fabrique.social.gouv.fr/
-
-Enfin, vous pourrez télécharger l'application sur votre téléphone Android en suivant ce lien:
-https://mano-app.fabrique.social.gouv.fr/download
-
-Toute l'équipe Mano vous souhaite la bienvenue !
-
-Si vous avez des questions n'hésitez pas à nous contacter:
-
-Melissa Saiter, chargée de déploiement Mano m.saiter.mano@gmail.com - +33 6 13 23 33 45
-Yoann Kittery, chargé de déploiement Mano ykittery.mano@gmail.com - +33 6 83 98 29 66
-Guillaume Demirhan, porteur du projet: g.demirhan@aurore.asso.fr - +33 7 66 56 19 96
-`;
-    await mailservice.sendEmail(adminUser.email, subject, body);
+    await mailservice.sendEmail(adminUser.email, "Bienvenue dans Mano", null, mailBienvenueHtml(adminUser.name, adminUser.email, token));
 
     return res.status(200).send({ ok: true });
   })

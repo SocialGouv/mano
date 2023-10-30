@@ -15,6 +15,7 @@ const validateUser = require("../middleware/validateUser");
 const { capture } = require("../sentry");
 const { ExtractJwt } = require("passport-jwt");
 const { serializeUserWithTeamsAndOrganisation, serializeTeam } = require("../utils/data-serializer");
+const { mailBienvenueHtml } = require("../utils/mail-bienvenue");
 
 const EMAIL_OR_PASSWORD_INVALID = "EMAIL_OR_PASSWORD_INVALID";
 const PASSWORD_NOT_VALIDATED = "PASSWORD_NOT_VALIDATED";
@@ -348,29 +349,7 @@ router.post(
     await tx.commit();
     await user.save({ transaction: tx });
 
-    const subject = "Bienvenue dans Mano 👋";
-    const body = `Bonjour ${data.name} !
-
-Votre identifiant pour vous connecter à Mano est ${data.email}.
-Vous pouvez dès à présent vous connecter pour choisir votre nom d'utilisateur et mot de passe ici:
-https://dashboard-mano.fabrique.social.gouv.fr/auth/reset?token=${token}&newUser=true
-NOTE: si le lien ci-dessus est expiré, vous pouvez demander une nouvelle réinitialisation de mot de passe ici: https://dashboard-mano.fabrique.social.gouv.fr
-
-Vous pourrez ensuite commencer à utiliser Mano en suivant ce lien:
-https://dashboard-mano.fabrique.social.gouv.fr/
-
-Et vous pourrez télécharger l'application sur votre téléphone Android en suivant cet autre lien:
-https://mano-app.fabrique.social.gouv.fr/download
-
-Toute l'équipe Mano vous souhaite la bienvenue !
-
-Si vous avez des questions n'hésitez pas à nous contacter:
-
-Melissa Saiter, chargée de déploiement Mano m.saiter.mano@gmail.com - +33 6 13 23 33 45
-Yoann Kittery, chargé de déploiement Mano ykittery.mano@gmail.com - +33 6 83 98 29 66
-Guillaume Demirhan, porteur du projet: g.demirhan@aurore.asso.fr - +33 7 66 56 19 96
-`;
-    await mailservice.sendEmail(data.email, subject, body);
+    await mailservice.sendEmail(data.email, "Bienvenue dans Mano", null, mailBienvenueHtml(data.name, data.email, token));
 
     return res.status(200).send({
       ok: true,

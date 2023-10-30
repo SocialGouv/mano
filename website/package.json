@@ -1,6 +1,6 @@
 {
   "name": "website",
-  "version": "1.289.26",
+  "version": "1.289.30",
   "mobileAppVersion": "2.37.4",
   "private": true,
   "engines": {
@@ -17,14 +17,14 @@
   "dependencies": {
     "@headlessui/react": "^1.7.3",
     "@socialgouv/matomo-next": "^1.4.0",
-    "next": "^13.1.6",
+    "next": "13.5.6",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-icons": "^4.6.0"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.0",
-    "eslint": "8.45.0",
+    "eslint": "8.52.0",
     "eslint-config-next": "13.5.6",
     "postcss": "^8.4.5",
     "tailwindcss": "^3.0.7"

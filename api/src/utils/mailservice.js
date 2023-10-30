@@ -2,7 +2,7 @@ const fetch = require("node-fetch");
 const { capture } = require("../sentry");
 const { X_TIPIMAIL_APIUSER, X_TIPIMAIL_APIKEY } = require("../config");
 
-const sendEmail = async (address, subject, text) => {
+const sendEmail = async (address, subject, text, html) => {
   if (process.env.NODE_ENV === "test") return;
   if (process.env.NODE_ENV === "development") {
     address = process.env.EMAIL_DEV || "arnaud@ambroselli.io";
@@ -27,7 +27,8 @@ const sendEmail = async (address, subject, text) => {
           personalName: "App Mano",
         },
         subject,
-        text,
+        ...(text ? { text } : {}),
+        ...(html ? { html } : {}),
       },
     }),
   });

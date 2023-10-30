@@ -1,3 +1,31 @@
+## [1.289.30](https://github.com/SocialGouv/mano/compare/v1.289.29...v1.289.30) (2023-10-27)
+
+
+### Bug Fixes
+
+* on utilise la base de données de preview en preview ([#1746](https://github.com/SocialGouv/mano/issues/1746)) ([2120b99](https://github.com/SocialGouv/mano/commit/2120b995c90d0ed06f56269f98f9a81dd2b7a3de))
+
+## [1.289.29](https://github.com/SocialGouv/mano/compare/v1.289.28...v1.289.29) (2023-10-27)
+
+
+### Bug Fixes
+
+* nouveau message de bienvenue de mano ([f7ca517](https://github.com/SocialGouv/mano/commit/f7ca5174db3ba1f7fd12e52f181a1bf68a50894e))
+
+## [1.289.28](https://github.com/SocialGouv/mano/compare/v1.289.27...v1.289.28) (2023-10-27)
+
+
+### Bug Fixes
+
+* release mail images ([7511309](https://github.com/SocialGouv/mano/commit/75113093e7bb72ff53fd14ca7ac7b3381c045d0a))
+
+## [1.289.27](https://github.com/SocialGouv/mano/compare/v1.289.26...v1.289.27) (2023-10-24)
+
+
+### Bug Fixes
+
+* nouveau calcul pour temps de suivi en prenant en compte la sortie de file active ([#1742](https://github.com/SocialGouv/mano/issues/1742)) ([a216e6f](https://github.com/SocialGouv/mano/commit/a216e6f4465afa9386795e12fc698696abc2d0e8))
+
 ## [1.289.26](https://github.com/SocialGouv/mano/compare/v1.289.25...v1.289.26) (2023-10-20)
 
 

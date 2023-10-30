@@ -240,10 +240,20 @@ const BlockCreatedAt = ({ persons }) => {
       </div>
     );
   }
-  const averageFollowedSince =
-    persons.reduce((total, person) => total + Date.parse(person.followedSince || person.createdAt), 0) / (persons.length || 1);
-  const durationFromNowToAverage = Date.now() - averageFollowedSince;
-  const [count, unit] = getDuration(durationFromNowToAverage);
+
+  const averageFollowedTime =
+    persons.reduce((total, person) => {
+      // On utilise followedSince si disponible, sinon createdAt
+      const startFollowedDate = Date.parse(person.followedSince || person.createdAt);
+
+      // Si outOfActiveList est à true et que outOfActiveListDate est disponible, on utilise cette date, sinon on utilise la date actuelle
+      const endFollowedDate = person.outOfActiveList && person.outOfActiveListDate ? Date.parse(new Date(person.outOfActiveListDate)) : Date.now();
+
+      // On renvoie la différence entre les deux dates (et pour éviter les nombres négatifs, on renvoie 0 si la différence est négative)
+      return total + (endFollowedDate - startFollowedDate > 0 ? endFollowedDate - startFollowedDate : 0);
+    }, 0) / (persons.length || 1); // On divise par le nombre de personnes pour obtenir la moyenne
+
+  const [count, unit] = getDuration(averageFollowedTime);
 
   return (
     <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">
