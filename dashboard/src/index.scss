@@ -25,7 +25,7 @@
 }
 
 .button-link {
-  @apply tw-inline-flex tw-w-full tw-cursor-pointer tw-justify-center tw-rounded-md tw-border tw-border-transparent tw-px-4 tw-py-2 tw-font-normal tw-text-main75 hover:tw-underline focus:tw-underline focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-main25 focus:tw-ring-offset-2 disabled:tw-cursor-not-allowed disabled:tw-opacity-30 sm:tw-ml-3 sm:tw-w-auto;
+  @apply tw-inline-flex tw-w-full tw-cursor-pointer tw-justify-center tw-rounded-md tw-border tw-border-transparent tw-px-4 tw-py-2 tw-font-semibold tw-text-main hover:tw-underline focus:tw-underline focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-main25 focus:tw-ring-offset-2 disabled:tw-cursor-not-allowed disabled:tw-opacity-30 sm:tw-ml-3 sm:tw-w-auto;
 }
 
 .button-cancel,
