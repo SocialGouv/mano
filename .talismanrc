@@ -18,7 +18,7 @@ fileignoreconfig:
 - filename: website/.yarnrc.yml
   checksum: 67aa1e699cae0e970cd67128e0d83e792c2d589d96df8a1d2dd5e6cc8d40b64d
 - filename: website/yarn.lock
-  checksum: 4bf7fa50e92d07239ce49ded23921b1883f151c120bb9e3d8678f82cb3bd07b8
+  checksum: 71f4250fc9456bc4ab1a46ca213e271346cce308ae0271ded80edf4bf26d1414
 - filename: yarn.lock
   checksum: f13434ac6f4d814b23e9eb7527c61e5acced02134a1eb6eed6a961f8b3dc63db
 threshold: high
