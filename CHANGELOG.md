@@ -1,3 +1,10 @@
+# [1.291.0](https://github.com/SocialGouv/mano/compare/v1.290.3...v1.291.0) (2023-11-06)
+
+
+### Features
+
+* **dashoard:** possibilité de filtrer par équipe dans les actions visibles via le dossier social de la personne suivie ([3461ff1](https://github.com/SocialGouv/mano/commit/3461ff1f693f879610145e619a45c6defac3c99f))
+
 ## [1.290.3](https://github.com/SocialGouv/mano/compare/v1.290.2...v1.290.3) (2023-11-06)
 
 
