@@ -29,8 +29,9 @@ router.get("/version", async (req, res) => {
       `La nouvelle version ${MOBILE_APP_VERSION} de Mano est disponible !`,
       `Vous avez la version ${req.headers.version} actuellement sur votre téléphone.
 Cette nouvelle version :
-- Fixe un clash entre suppression d'une personne suivie et visualisation de son dossier médical au même moment
-- Met à jour les Conditions Générales d'Utilisation, Chartes et Mentions Légales
+- Affiche les Rencontres dans les comptes-rendus
+- Affiche les pseudonymes dans la liste des personnes suivies
+- Vous oriente mieux lorsque vous souhaitez lire un fichier non reconnu
 `,
       [
         { text: "Télécharger", link: `https://mano-app.fabrique.social.gouv.fr/download?ts=${Date.now()}` },
