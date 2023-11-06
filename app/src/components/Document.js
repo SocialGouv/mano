@@ -57,6 +57,14 @@ const Document = ({ personId, document, onDelete }) => {
               setIsDownloading(false);
             })
             .catch((error) => {
+              if (error.toString()?.includes('No app associated')) {
+                Alert.alert(
+                  'Mano ne peut pas ouvrir seul ce type de fichier',
+                  `Vous pouvez chercher une application sur le store pour ouvrir les fichiers de type .${path
+                    .split('.')
+                    .at(-1)}, et Mano l'ouvrira automatiquement la prochaine fois.`
+                );
+              }
               setIsDownloading(false);
             });
         });
