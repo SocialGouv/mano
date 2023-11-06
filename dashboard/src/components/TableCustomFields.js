@@ -435,7 +435,14 @@ export const EditCustomField = ({ open, onDelete, data, editingField, onClose, o
         </form>
       </ModalBody>
       <ModalFooter>
-        <button type="button" name="cancel" className="button-cancel" onClick={onClose}>
+        <button
+          type="button"
+          name="cancel"
+          className="button-cancel"
+          onClick={() => {
+            setField(editingField || newCustomField());
+            onClose();
+          }}>
           Annuler
         </button>
         {!isNewField && !onlyOptionsEditable && (
