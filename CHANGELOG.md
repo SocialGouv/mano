@@ -1,3 +1,10 @@
+# [1.292.0](https://github.com/SocialGouv/mano/compare/v1.291.0...v1.292.0) (2023-11-06)
+
+
+### Features
+
+* **dashboard:** possibilité de télécharger un  export des consultations depuis les stats ([e135eba](https://github.com/SocialGouv/mano/commit/e135ebad0f3ecf5fa255bf7f73f4835c7f2720d8))
+
 # [1.291.0](https://github.com/SocialGouv/mano/compare/v1.290.3...v1.291.0) (2023-11-06)
 
 
