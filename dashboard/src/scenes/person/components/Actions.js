@@ -15,14 +15,16 @@ import { FullScreenIcon } from './FullScreenIcon';
 import UserName from '../../../components/UserName';
 import { itemsGroupedByPersonSelector } from '../../../recoil/selectors';
 import DescriptionIcon from '../../../components/DescriptionIcon';
+import SelectTeamMultiple from '../../../components/SelectTeamMultiple';
 
 const filteredPersonActionsSelector = selectorFamily({
   key: 'filteredPersonActionsSelector',
   get:
-    ({ personId, filterCategories, filterStatus }) =>
+    ({ personId, filterCategories, filterStatus, filterTeamIds }) =>
     ({ get }) => {
       const person = get(itemsGroupedByPersonSelector)[personId];
       let actionsToSet = person?.actions || [];
+
       if (filterCategories.length) {
         actionsToSet = actionsToSet.filter((a) =>
           filterCategories.some((c) => (c === '-- Aucune --' ? a.categories?.length === 0 : a.categories?.includes(c)))
@@ -30,6 +32,16 @@ const filteredPersonActionsSelector = selectorFamily({
       }
       if (filterStatus.length) {
         actionsToSet = actionsToSet.filter((a) => filterStatus.some((s) => a.status === s));
+      }
+      if (filterTeamIds.length) {
+        actionsToSet = actionsToSet.filter((action) => {
+          if (Array.isArray(action.teams)) {
+            if (!filterTeamIds.some((t) => action.teams.includes(t))) return false;
+          } else {
+            if (!filterTeamIds.includes(action.team)) return false;
+          }
+          return true;
+        });
       }
       return [...actionsToSet]
         .sort((p1, p2) => ((p1.completedAt || p1.dueAt) > (p2.completedAt || p2.dueAt) ? -1 : 1))
@@ -42,11 +54,12 @@ export const Actions = ({ person }) => {
   const [fullScreen, setFullScreen] = useState(false);
   const [filterCategories, setFilterCategories] = useState([]);
   const [filterStatus, setFilterStatus] = useState([]);
-  const filteredData = useRecoilValue(filteredPersonActionsSelector({ personId: person._id, filterCategories, filterStatus }));
+  const [filterTeamIds, setFilterTeamIds] = useState([]);
+  const filteredData = useRecoilValue(filteredPersonActionsSelector({ personId: person._id, filterCategories, filterStatus, filterTeamIds }));
   const history = useHistory();
 
   return (
-    <section title="Actions de la personne suivie" className="tw-relative">
+    <section title="Actions de la personne suivie" className="tw-relative tw-overflow-x-hidden">
       <div className="tw-sticky tw-top-0 tw-z-10 tw-flex tw-bg-white tw-p-3 tw-shadow-sm">
         <h4 className="tw-flex-1 tw-text-xl">Actions {filteredData.length ? `(${filteredData.length})` : ''}</h4>
         <div className="flex-col tw-flex tw-items-center tw-gap-2">
@@ -73,22 +86,24 @@ export const Actions = ({ person }) => {
       </div>
       <ActionsFilters
         data={data}
-        filteredData={filteredData}
-        filterCategories={filterCategories}
         setFilterCategories={setFilterCategories}
+        filterCategories={filterCategories}
         setFilterStatus={setFilterStatus}
         filterStatus={filterStatus}
+        setFilterTeamIds={setFilterTeamIds}
+        filterTeamIds={filterTeamIds}
       />
       <ModalContainer open={!!fullScreen} className="" size="prose" onClose={() => setFullScreen(false)}>
         <ModalHeader title={`Actions de  ${person?.name} (${filteredData.length})`}>
           <div className="tw-mt-2 tw-w-full tw-max-w-2xl">
             <ActionsFilters
               data={data}
-              filteredData={filteredData}
-              filterCategories={filterCategories}
               setFilterCategories={setFilterCategories}
+              filterCategories={filterCategories}
               setFilterStatus={setFilterStatus}
               filterStatus={filterStatus}
+              setFilterTeamIds={setFilterTeamIds}
+              filterTeamIds={filterTeamIds}
             />
           </div>
         </ModalHeader>
@@ -116,7 +131,7 @@ export const Actions = ({ person }) => {
   );
 };
 
-const ActionsFilters = ({ data, filteredData, setFilterCategories, setFilterStatus, filterStatus, filterCategories }) => {
+const ActionsFilters = ({ data, setFilterCategories, setFilterTeamIds, setFilterStatus, filterStatus, filterTeamIds, filterCategories }) => {
   const categories = useRecoilValue(flattenedActionsCategoriesSelector);
 
   const catsSelect = ['-- Aucune --', ...(categories || [])];
@@ -124,22 +139,28 @@ const ActionsFilters = ({ data, filteredData, setFilterCategories, setFilterStat
   return (
     <>
       {data.length ? (
-        <div className="tw-mb-4 tw-flex tw-basis-full tw-justify-between tw-gap-2 tw-px-3">
-          <div className="tw-shrink-0 tw-flex-grow">
+        <div className="tw-mb-4 tw-flex tw-justify-between">
+          <div className="tw-shrink-0 tw-grow tw-basis-1/3 tw-pl-2 tw-pr-1">
             <label htmlFor="action-select-categories-filter">Filtrer par catégorie</label>
-            <SelectCustom
-              options={catsSelect.map((_option) => ({ value: _option, label: _option }))}
-              value={filterCategories?.map((_option) => ({ value: _option, label: _option })) || []}
-              getOptionValue={(i) => i.value}
-              getOptionLabel={(i) => i.label}
-              onChange={(values) => setFilterCategories(values.map((v) => v.value))}
-              inputId="action-select-categories-filter"
-              name="categories"
-              isClearable
-              isMulti
-            />
+            <div className="tw-max-w-full">
+              <SelectCustom
+                options={catsSelect.map((_option) => ({ value: _option, label: _option }))}
+                value={filterCategories?.map((_option) => ({ value: _option, label: _option })) || []}
+                getOptionValue={(i) => i.value}
+                getOptionLabel={(i) => i.label}
+                onChange={(values) => setFilterCategories(values.map((v) => v.value))}
+                inputId="action-select-categories-filter"
+                name="categories"
+                isClearable
+                isMulti
+              />
+            </div>
           </div>
-          <div className="tw-shrink-0 tw-flex-grow">
+          <div className="tw-shrink-0 tw-grow tw-basis-1/3 tw-px-1">
+            <label htmlFor="action-select-categories-filter">Filtrer par équipe</label>
+            <SelectTeamMultiple onChange={(teamIds) => setFilterTeamIds(teamIds)} value={filterTeamIds} colored inputId="action-team-select" />
+          </div>
+          <div className="tw-shrink-0 tw-grow tw-basis-1/3 tw-pl-1 tw-pr-2">
             <label htmlFor="action-select-status-filter">Filtrer par statut</label>
             <SelectCustom
               inputId="action-select-status-filter"

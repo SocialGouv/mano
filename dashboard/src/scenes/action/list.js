@@ -271,9 +271,7 @@ const List = () => {
             <label htmlFor="action-select-categories-filter">Filtrer par équipe&nbsp;:</label>
             <div className="tw-w-full">
               <SelectTeamMultiple
-                onChange={(teamIds) => {
-                  setSelectedTeamIds(teamIds);
-                }}
+                onChange={setSelectedTeamIds}
                 value={selectedTeamIds}
                 colored
                 isDisabled={viewAllOrganisationData || viewNoTeamData}

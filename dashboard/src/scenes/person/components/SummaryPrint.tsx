@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useRecoilValue } from 'recoil';
 import { customFieldsPersonsSelector } from '../../../recoil/persons';
 import { currentTeamAuthentifiedState, teamsState, userState, usersState } from '../../../recoil/auth';
@@ -62,7 +62,7 @@ export function SummaryPrint({ person }: { person: PersonPopulated }) {
       {customFieldsPersons.map(({ name, fields }) => {
         const enabledFields = fields.filter((f) => f.enabled || f.enabledTeams?.includes(team._id));
         return (
-          <>
+          <React.Fragment key={name}>
             <div className="tw-mx-0 tw-mt-16 tw-mb-5 tw-flex tw-items-center">
               <h2 className="tw-flex tw-justify-between tw-text-xl tw-font-extrabold">{name}</h2>
             </div>
@@ -75,7 +75,7 @@ export function SummaryPrint({ person }: { person: PersonPopulated }) {
                 );
               })}
             </div>
-          </>
+          </React.Fragment>
         );
       })}
       <hr className="tw-my-8" />
