@@ -61,7 +61,17 @@ const SelectDraggableAndEditable = ({ onChange, classNamePrefix, value, onEditCh
                     aria-label={`Modifier le choix ${props.children}`}
                     title={`Modifier le choix ${props.children}`}
                     className={`tw-ml-2 ${classNamePrefix}__multi-value__edit tw-rounded-sm tw-px-1 hover:tw-bg-[#FFBDAD] hover:tw-text-[#DE350B]`}
-                    onClick={() => setEditingChoice(props.children)}
+                    onMouseDown={(e) => {
+                      // Prevent propagation to parent components
+                      e.stopPropagation();
+                      // Explicitly blur the Select input
+                      document.querySelector(`.${classNamePrefix}__input`).blur();
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      setEditingChoice(props.children);
+                    }}
                     type="button">
                     &#9998;
                   </button>
