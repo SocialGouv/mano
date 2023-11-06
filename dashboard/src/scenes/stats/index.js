@@ -528,6 +528,7 @@ const Stats = () => {
             personCreated={personsCreated}
             personUpdated={personsUpdated}
             actions={actionsWithDetailedGroupAndCategories}
+            consultations={consultationsFilteredByPersons}
           />
         </div>
       </div>

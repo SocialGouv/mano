@@ -8,15 +8,17 @@ import { teamsState, userState } from '../../recoil/auth';
 import API from '../../services/api';
 import { customFieldsObsSelector } from '../../recoil/territoryObservations';
 import { territoriesState } from '../../recoil/territory';
+import { flattenedCustomFieldsConsultationsSelector } from '../../recoil/consultations';
 
 // Source: https://tailwindui.com/components/application-ui/elements/dropdowns
-export default function ExportFormattedData({ personCreated, personUpdated, actions, rencontres, passages, observations }) {
+export default function ExportFormattedData({ personCreated, personUpdated, actions, rencontres, passages, observations, consultations }) {
   const teams = useRecoilValue(teamsState);
   const persons = useRecoilValue(personsState);
   const territories = useRecoilValue(territoriesState);
   const user = useRecoilValue(userState);
   const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
+  const consultationsFields = useRecoilValue(flattenedCustomFieldsConsultationsSelector);
   const [users, setUsers] = useState([]);
 
   async function fetchUsers() {
@@ -65,7 +67,7 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
       Groupe: action.group,
       Structure: action.structure,
       'Avec heure': action.withTime ? 'Oui' : 'Non',
-      Équipe: action.teams?.length ? action.teams.map((t) => teams.find((action) => action._id === t)?.name).join(', ') : action.team,
+      Équipe: action.teams?.length ? action.teams.map((t) => teams.find((team) => team._id === t)?.name).join(', ') : action.team,
       Urgent: action.urgent ? 'Oui' : 'Non',
       Statut: action.status,
       'Complétée le': action.completedAt ? dayjsInstance(action.completedAt).format('YYYY-MM-DD HH:mm') : '',
@@ -73,6 +75,32 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
       'Créée par': loadedUsers.find((u) => u._id === action.user)?.name,
       'Créée le': dayjsInstance(action.createdAt).format('YYYY-MM-DD HH:mm'),
       'Mise à jour le': dayjsInstance(action.updatedAt).format('YYYY-MM-DD HH:mm'),
+    };
+  };
+
+  const transformConsultation = (loadedUsers) => (consultation) => {
+    return {
+      id: consultation._id,
+      Équipe: consultation.teams?.length ? consultation.teams.map((t) => teams.find((team) => team._id === t)?.name).join(', ') : consultation.team,
+      'Avec heure': consultation.withTime ? 'Oui' : 'Non',
+      Statut: consultation.status,
+      'Personne suivie - Nom': persons.find((p) => p._id === consultation.person)?.name,
+      'Personne suivie - id': persons.find((p) => p._id === consultation.person)?._id,
+      Type: consultation.type,
+      ...consultationsFields.reduce((fields, field) => {
+        if (['date', 'date-with-time'].includes(field.type))
+          fields[field.label || field.name] = consultation[field.name]
+            ? dayjsInstance(consultation[field.name]).format(field.type === 'date' ? 'YYYY-MM-DD' : 'YYYY-MM-DD HH:mm')
+            : '';
+        else if (['boolean'].includes(field.type)) fields[field.label || field.name] = consultation[field.name] ? 'Oui' : 'Non';
+        else if (['yes-no'].includes(field.type)) fields[field.label || field.name] = consultation[field.name];
+        else if (Array.isArray(consultation[field.name])) fields[field.label || field.name] = consultation[field.name].join(', ');
+        else fields[field.label || field.name] = consultation[field.name];
+        return fields;
+      }, {}),
+      'Créée par': loadedUsers.find((u) => u._id === consultation.user)?.name,
+      'Créée le': dayjsInstance(consultation.createdAt).format('YYYY-MM-DD HH:mm'),
+      'Mise à jour le': dayjsInstance(consultation.updatedAt).format('YYYY-MM-DD HH:mm'),
     };
   };
 
@@ -105,7 +133,6 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
   };
 
   const transformObservation = (loadedUsers) => (observation) => {
-    console.log(observation, customFieldsObs);
     return {
       id: observation._id,
       'Territoire - Nom': territories.find((t) => t._id === observation.territory)?.name,
@@ -184,6 +211,13 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
                     }, [])
                     .map(transformAction(loadedUsers))
                 );
+              }}
+            />
+            <MenuItem
+              text="Consultations"
+              onClick={async () => {
+                const loadedUsers = await fetchUsers();
+                exportXlsx('Consultations', consultations.map(transformConsultation(loadedUsers)));
               }}
             />
             <MenuItem
