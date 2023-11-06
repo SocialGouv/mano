@@ -1,3 +1,10 @@
+## [1.289.31](https://github.com/SocialGouv/mano/compare/v1.289.30...v1.289.31) (2023-11-06)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @react-native-community/netinfo to v11 ([#1754](https://github.com/SocialGouv/mano/issues/1754)) ([4917567](https://github.com/SocialGouv/mano/commit/49175679119251666c4f8a66c7d3f0c0bc397560))
+
 ## [1.289.30](https://github.com/SocialGouv/mano/compare/v1.289.29...v1.289.30) (2023-10-27)
 
 
