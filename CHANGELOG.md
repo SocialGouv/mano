@@ -1,3 +1,11 @@
+## [1.290.1](https://github.com/SocialGouv/mano/compare/v1.290.0...v1.290.1) (2023-11-06)
+
+
+### Bug Fixes
+
+* **dashboard:** l'ordre d'affichage de chaque champ dans les stats suit l'ordre avec lequel on a fait le paramétrage ([#1733](https://github.com/SocialGouv/mano/issues/1733)) ([1794bb8](https://github.com/SocialGouv/mano/commit/1794bb8bd1e2691d638b263091108b2d5c1f4bc1))
+* **dashboard:** quand on supprime un choix d'une liste de champ, et qu'on annule, et qu'on va remodifier cette liste, le champ est toujours disparu alors qu'il devrait être là - c'est corrigé ([#1756](https://github.com/SocialGouv/mano/issues/1756)) ([3c6cfdc](https://github.com/SocialGouv/mano/commit/3c6cfdccc72026b1c532d26cd42065003b5335a7))
+
 # [1.290.0](https://github.com/SocialGouv/mano/compare/v1.289.31...v1.290.0) (2023-11-06)
 
 
