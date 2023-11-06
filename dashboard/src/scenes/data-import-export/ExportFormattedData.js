@@ -39,7 +39,9 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
             fields[field.label] = (person[field.name] || []).map((t) => teams.find((person) => person._id === t)?.name)?.join(', ');
           } else if (field.name === 'user') {
           } else if (['date', 'date-with-time'].includes(field.type))
-            fields[field.label || field.name] = person[field.name] ? dayjsInstance(person[field.name]).format('YYYY-MM-DD') : '';
+            fields[field.label || field.name] = person[field.name]
+              ? dayjsInstance(person[field.name]).format(field.type === 'date' ? 'YYYY-MM-DD' : 'YYYY-MM-DD HH:mm')
+              : '';
           else if (['boolean'].includes(field.type)) fields[field.label || field.name] = person[field.name] ? 'Oui' : 'Non';
           else if (['yes-no'].includes(field.type)) fields[field.label || field.name] = person[field.name];
           else if (Array.isArray(person[field.name])) fields[field.label || field.name] = person[field.name].join(', ');
@@ -47,8 +49,8 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
           return fields;
         }, {}),
       'Créée par': loadedUsers.find((u) => u._id === person.user)?.name,
-      'Créée le': dayjsInstance(person.createdAt).format('YYYY-MM-DD'),
-      'Mise à jour le': dayjsInstance(person.updatedAt).format('YYYY-MM-DD'),
+      'Créée le': dayjsInstance(person.createdAt).format('YYYY-MM-DD HH:mm'),
+      'Mise à jour le': dayjsInstance(person.updatedAt).format('YYYY-MM-DD HH:mm'),
     };
   };
 
@@ -66,11 +68,11 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
       Équipe: action.teams?.length ? action.teams.map((t) => teams.find((action) => action._id === t)?.name).join(', ') : action.team,
       Urgent: action.urgent ? 'Oui' : 'Non',
       Statut: action.status,
-      'Complétée le': action.completedAt ? dayjsInstance(action.completedAt).format('YYYY-MM-DD') : '',
+      'Complétée le': action.completedAt ? dayjsInstance(action.completedAt).format('YYYY-MM-DD HH:mm') : '',
       'À faire le': action.dueAt ? dayjsInstance(action.dueAt).format(action.withTime ? 'YYYY-MM-DD HH:mm' : 'YYYY-MM-DD') : '',
       'Créée par': loadedUsers.find((u) => u._id === action.user)?.name,
-      'Créée le': dayjsInstance(action.createdAt).format('YYYY-MM-DD'),
-      'Mise à jour le': dayjsInstance(action.updatedAt).format('YYYY-MM-DD'),
+      'Créée le': dayjsInstance(action.createdAt).format('YYYY-MM-DD HH:mm'),
+      'Mise à jour le': dayjsInstance(action.updatedAt).format('YYYY-MM-DD HH:mm'),
     };
   };
 
@@ -80,11 +82,11 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
       'Personne suivie - Nom': persons.find((p) => p._id === rencontre.person)?.name,
       'Personne suivie - id': persons.find((p) => p._id === rencontre.person)?._id,
       Équipe: rencontre.team ? teams.find((t) => t._id === rencontre.team)?.name : '',
-      Date: dayjsInstance(rencontre.date).format('YYYY-MM-DD'),
+      Date: dayjsInstance(rencontre.date).format('YYYY-MM-DD HH:mm'),
       Commentaire: rencontre.comment,
       'Créée par': loadedUsers.find((u) => u._id === rencontre.user)?.name,
-      'Créée le': dayjsInstance(rencontre.createdAt).format('YYYY-MM-DD'),
-      'Mise à jour le': dayjsInstance(rencontre.updatedAt).format('YYYY-MM-DD'),
+      'Créée le': dayjsInstance(rencontre.createdAt).format('YYYY-MM-DD HH:mm'),
+      'Mise à jour le': dayjsInstance(rencontre.updatedAt).format('YYYY-MM-DD HH:mm'),
     };
   };
 
@@ -94,11 +96,11 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
       'Personne suivie - Nom': persons.find((p) => p._id === passage.person)?.name,
       'Personne suivie - id': persons.find((p) => p._id === passage.person)?._id,
       Équipe: passage.team ? teams.find((t) => t._id === passage.team)?.name : '',
-      Date: dayjsInstance(passage.date).format('YYYY-MM-DD'),
+      Date: dayjsInstance(passage.date).format('YYYY-MM-DD HH:mm'),
       Commentaire: passage.comment,
       'Créée par': loadedUsers.find((u) => u._id === passage.user)?.name,
-      'Créée le': dayjsInstance(passage.createdAt).format('YYYY-MM-DD'),
-      'Mise à jour le': dayjsInstance(passage.updatedAt).format('YYYY-MM-DD'),
+      'Créée le': dayjsInstance(passage.createdAt).format('YYYY-MM-DD HH:mm'),
+      'Mise à jour le': dayjsInstance(passage.updatedAt).format('YYYY-MM-DD HH:mm'),
     };
   };
 
@@ -107,11 +109,13 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
     return {
       id: observation._id,
       'Territoire - Nom': territories.find((t) => t._id === observation.territory)?.name,
-      'Observé le': dayjsInstance(observation.date).format('YYYY-MM-DD'),
+      'Observé le': dayjsInstance(observation.date).format('YYYY-MM-DD HH:mm'),
       Équipe: observation.team ? teams.find((t) => t._id === observation.team)?.name : '',
       ...customFieldsObs.reduce((fields, field) => {
         if (['date', 'date-with-time'].includes(field.type))
-          fields[field.label || field.name] = observation[field.name] ? dayjsInstance(observation[field.name]).format('YYYY-MM-DD') : '';
+          fields[field.label || field.name] = observation[field.name]
+            ? dayjsInstance(observation[field.name]).format(field.type === 'date' ? 'YYYY-MM-DD' : 'YYYY-MM-DD HH:mm')
+            : '';
         else if (['boolean'].includes(field.type)) fields[field.label || field.name] = observation[field.name] ? 'Oui' : 'Non';
         else if (['yes-no'].includes(field.type)) fields[field.label || field.name] = observation[field.name];
         else if (Array.isArray(observation[field.name])) fields[field.label || field.name] = observation[field.name].join(', ');
@@ -119,8 +123,8 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
         return fields;
       }, {}),
       'Créée par': loadedUsers.find((u) => u._id === observation.user)?.name,
-      'Créée le': dayjsInstance(observation.createdAt).format('YYYY-MM-DD'),
-      'Mise à jour le': dayjsInstance(observation.updatedAt).format('YYYY-MM-DD'),
+      'Créée le': dayjsInstance(observation.createdAt).format('YYYY-MM-DD HH:mm'),
+      'Mise à jour le': dayjsInstance(observation.updatedAt).format('YYYY-MM-DD HH:mm'),
     };
   };
 
