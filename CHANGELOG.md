@@ -1,3 +1,10 @@
+# [1.290.0](https://github.com/SocialGouv/mano/compare/v1.289.31...v1.290.0) (2023-11-06)
+
+
+### Features
+
+* impression du dossier social ([#1749](https://github.com/SocialGouv/mano/issues/1749)) ([9f684b0](https://github.com/SocialGouv/mano/commit/9f684b01f52616963792a6767066290488d3d853))
+
 ## [1.289.31](https://github.com/SocialGouv/mano/compare/v1.289.30...v1.289.31) (2023-11-06)
 
 
