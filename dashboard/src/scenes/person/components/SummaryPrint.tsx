@@ -31,8 +31,6 @@ export function SummaryPrint({ person }: { person: PersonPopulated }) {
     [person]
   );
 
-  console.log(actions);
-
   return (
     <div className="printonly">
       <h1>Dossier social de {person?.name}</h1>
