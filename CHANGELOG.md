@@ -1,3 +1,10 @@
+## [1.290.2](https://github.com/SocialGouv/mano/compare/v1.290.1...v1.290.2) (2023-11-06)
+
+
+### Bug Fixes
+
+* **dashboard:** quand on renomme un champ dans une liste de champs très longue, ça jump et c'est frustrant - c'est fixé ([#1757](https://github.com/SocialGouv/mano/issues/1757)) ([84c7e10](https://github.com/SocialGouv/mano/commit/84c7e1015a5dabd9c3e4f0a78f7a29e30ab25ad8))
+
 ## [1.290.1](https://github.com/SocialGouv/mano/compare/v1.290.0...v1.290.1) (2023-11-06)
 
 
