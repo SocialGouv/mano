@@ -48,11 +48,9 @@ export function InfosMain({ person, isMedicalFile }) {
             </div>
           </div>
           <div className="tw-mt-4 tw-flex tw-flex-row tw-items-center tw-justify-center tw-gap-2">
-            {!!isMedicalFile && (
-              <button className="tw-block tw-px-2 tw-py-1 tw-text-sm tw-text-white tw-underline tw-opacity-80" onClick={() => window.print()}>
-                Imprimer
-              </button>
-            )}
+            <button className="tw-block tw-px-2 tw-py-1 tw-text-sm tw-text-white tw-underline tw-opacity-80" onClick={() => window.print()}>
+              Imprimer
+            </button>
             <button
               className={['tw-block tw-rounded tw-bg-white tw-px-2 tw-py-1 tw-text-sm', isMedicalFile ? '!tw-text-blue-900' : '!tw-text-main'].join(
                 ' '
