@@ -1,3 +1,10 @@
+## [1.290.3](https://github.com/SocialGouv/mano/compare/v1.290.2...v1.290.3) (2023-11-06)
+
+
+### Bug Fixes
+
+* **dashboard:** rajout de l'heure aux dates dans l'export des données ([#1759](https://github.com/SocialGouv/mano/issues/1759)) ([18d675c](https://github.com/SocialGouv/mano/commit/18d675cceabca70cc03adbdb714b72e37bf52eaa))
+
 ## [1.290.2](https://github.com/SocialGouv/mano/compare/v1.290.1...v1.290.2) (2023-11-06)
 
 
