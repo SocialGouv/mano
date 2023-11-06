@@ -65,7 +65,7 @@ const PersonStats = ({
     <>
       <h3 className="tw-my-5 tw-text-xl">Statistiques des {title}</h3>
       <Filters base={filterBase} filters={filterPersons} onChange={setFilterPersons} />
-      <div className="-tw-mx-4 tw-flex tw-flex-wrap">
+      <div className="-tw-mx-4 tw-flex tw-flex-wrap tw-justify-around">
         <Block data={personsForStats} title={`Nombre de ${title}`} help={firstBlockHelp} />
         <BlockCreatedAt persons={personsForStats} />
         <BlockWanderingAt persons={personsForStats} />
