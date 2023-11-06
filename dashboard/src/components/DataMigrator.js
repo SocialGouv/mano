@@ -27,9 +27,11 @@ export default function useDataMigrator() {
     migrateData: async (organisation) => {
       const organisationId = organisation?._id;
       let migrationLastUpdateAt = organisation.migrationLastUpdateAt;
+      const migrationsAvailable = await API.get({ path: '/migration/migrations-available' }).then((res) => res.data || {});
+
       /*
       // Example of migration:
-      if (!organisation.migrations?.includes('migration-name')) {
+      if (!organisation.migrations?.includes('migration-name') && migrationsAvailable['migration-name']) {
         setLoadingText(LOADING_TEXT);
         const somethingRes = await API.get({
           path: '/something-to-update',
@@ -49,14 +51,17 @@ export default function useDataMigrator() {
         if (response.ok) {
           setOrganisation(response.organisation);
           migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
-        else {
+        } else {
           return false;
         }
       }
       // End of example of migration.
       */
 
-      if (!organisation.migrations?.includes('integrate-comments-in-actions-history')) {
+      if (
+        !organisation.migrations?.includes('integrate-comments-in-actions-history') &&
+        migrationsAvailable['integrate-comments-in-actions-history']
+      ) {
         setLoadingText(LOADING_TEXT);
         const comments = await API.get({
           path: '/comment',
