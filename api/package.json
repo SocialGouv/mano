@@ -40,5 +40,6 @@
     "@types/jsonwebtoken": "^9.0.0",
     "cross-env": "^7.0.3",
     "nodemon": "^2.0.15"
-  }
+  },
+  "packageManager": "yarn@4.0.1"
 }
