@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { CustomResponsivePie } from './charts';
 import { getPieData } from './utils';
-import { AgeRangeBar } from './Persons';
+import { AgeRangeBar } from './PersonsStats';
 import Filters from '../../components/Filters';
 
 const PassagesStats = ({

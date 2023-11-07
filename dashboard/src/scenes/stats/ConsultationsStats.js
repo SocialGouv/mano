@@ -7,7 +7,7 @@ import { Block } from './Blocks';
 import CustomFieldsStats from './CustomFieldsStats';
 import Filters from '../../components/Filters';
 
-const ConsultationsStats = ({ consultations, personsWithConsultations, filterBase, filterPersons, setFilterPersons }) => {
+export default function ConsultationsStats({ consultations, personsWithConsultations, filterBase, filterPersons, setFilterPersons }) {
   const organisation = useRecoilValue(organisationState);
 
   const filterTitle = useMemo(() => {
@@ -35,7 +35,15 @@ const ConsultationsStats = ({ consultations, personsWithConsultations, filterBas
       <div className="tw-flex tw-basis-full tw-items-center">
         <Filters title={filterTitle} base={filterBase} filters={filterPersons} onChange={setFilterPersons} />
       </div>
-      <details open>
+      <details
+        open={window.localStorage.getItem('consultations-stats-general-open') === 'true'}
+        onToggle={(e) => {
+          if (e.target.open) {
+            window.localStorage.setItem('consultations-stats-general-open', 'true');
+          } else {
+            window.localStorage.removeItem('consultations-stats-general-open');
+          }
+        }}>
         <summary className="tw-my-8 tw-mx-0">
           <h4 className="tw-inline tw-text-xl tw-text-black75">Global</h4>
         </summary>
@@ -59,7 +67,16 @@ const ConsultationsStats = ({ consultations, personsWithConsultations, filterBas
       </details>
       {organisation.consultations.map((c) => {
         return (
-          <details key={c.name}>
+          <details
+            open={window.localStorage.getItem(`person-stats-${c.name.replace(' ', '-').toLocaleLowerCase()}-open`) === 'true'}
+            onToggle={(e) => {
+              if (e.target.open) {
+                window.localStorage.setItem(`person-stats-${c.name.replace(' ', '-').toLocaleLowerCase()}-open`, 'true');
+              } else {
+                window.localStorage.removeItem(`person-stats-${c.name.replace(' ', '-').toLocaleLowerCase()}-open`);
+              }
+            }}
+            key={c.name}>
             <summary className="tw-my-8 tw-mx-0">
               <h4 className="tw-inline tw-text-xl tw-text-black75">
                 Statistiques des consultations de type « {c.name} » ({consultationsByType[c.name]?.length ?? 0})
@@ -76,6 +93,4 @@ const ConsultationsStats = ({ consultations, personsWithConsultations, filterBas
       })}
     </>
   );
-};
-
-export default ConsultationsStats;
+}

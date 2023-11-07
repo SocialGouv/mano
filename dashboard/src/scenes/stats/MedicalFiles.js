@@ -3,7 +3,7 @@ import { CustomResponsivePie } from './charts';
 import { getPieData } from './utils';
 import CustomFieldsStats from './CustomFieldsStats';
 import Filters from '../../components/Filters';
-import { AgeRangeBar } from './Persons';
+import { AgeRangeBar } from './PersonsStats';
 
 const MedicalFilesStats = ({ filterBase, filterPersons, setFilterPersons, personsForStats, customFieldsMedicalFile, personFields, title }) => {
   return (
