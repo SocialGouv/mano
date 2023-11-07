@@ -28,16 +28,18 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 20
+          cache: yarn
+          cache-dependency-path: "**/yarn.lock"
       - name: Install dependencies
         run: yarn
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
       - name: Install dashboard dependencies
-        run: yarn --cwd ./dashboard
+        run: cd ./dashboard && yarn --immutable
 
       - name: Install api dependencies
-        run: yarn --cwd ./api
+        run: cd ./api && yarn --immutable
 
       - name: Init DB
         run: yarn test:init-db
