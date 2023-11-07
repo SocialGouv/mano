@@ -1,3 +1,10 @@
+## [1.292.1](https://github.com/SocialGouv/mano/compare/v1.292.0...v1.292.1) (2023-11-07)
+
+
+### Bug Fixes
+
+* yarn berry + fetch + docker opti ([#1735](https://github.com/SocialGouv/mano/issues/1735)) ([2e386c7](https://github.com/SocialGouv/mano/commit/2e386c781d394263888f81d7c81118abf93bbe7f))
+
 # [1.292.0](https://github.com/SocialGouv/mano/compare/v1.291.0...v1.292.0) (2023-11-06)
 
 
