@@ -1,3 +1,10 @@
+## [1.292.3](https://github.com/SocialGouv/mano/compare/v1.292.2...v1.292.3) (2023-11-07)
+
+
+### Bug Fixes
+
+* re-enable sentry ([#1765](https://github.com/SocialGouv/mano/issues/1765)) ([83dc0aa](https://github.com/SocialGouv/mano/commit/83dc0aa941b3d1c3e88ec9c3dee7dcc4f4d2396c))
+
 ## [1.292.2](https://github.com/SocialGouv/mano/compare/v1.292.1...v1.292.2) (2023-11-07)
 
 
