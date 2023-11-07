@@ -1,3 +1,10 @@
+## [1.293.2](https://github.com/SocialGouv/mano/compare/v1.293.1...v1.293.2) (2023-11-07)
+
+
+### Bug Fixes
+
+* clean docker secret mode to uid ([#1767](https://github.com/SocialGouv/mano/issues/1767)) ([114e990](https://github.com/SocialGouv/mano/commit/114e990a6f4551b20062491fe5ed78ad7ba60431))
+
 ## [1.293.1](https://github.com/SocialGouv/mano/compare/v1.293.0...v1.293.1) (2023-11-07)
 
 
