@@ -1,3 +1,10 @@
+# [1.293.0](https://github.com/SocialGouv/mano/compare/v1.292.3...v1.293.0) (2023-11-07)
+
+
+### Features
+
+* **dashboard:** regroupe les statistiques des personnes suivies par section ([#1762](https://github.com/SocialGouv/mano/issues/1762)) ([bc64506](https://github.com/SocialGouv/mano/commit/bc64506ece9fbf319888ec500b3c40921436dae0))
+
 ## [1.292.3](https://github.com/SocialGouv/mano/compare/v1.292.2...v1.292.3) (2023-11-07)
 
 
