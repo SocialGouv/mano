@@ -48,7 +48,7 @@ jobs:
           PGBASEURL: postgres://postgres:postgres@localhost:5432
 
       - name: Run Playwright tests
-        run: yarn playwright test --verbose
+        run: yarn playwright test
         env:
           PGBASEURL: postgres://postgres:postgres@localhost:5432
           PGHOST: localhost
