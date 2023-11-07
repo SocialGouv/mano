@@ -16,7 +16,7 @@ COPY --chown=1000:1000 dashboard/. .
 
 ENV NODE_ENV=production
 
-RUN --mount=type=secret,id=sentry_auth_token \
+RUN --mount=type=secret,id=sentry_auth_token,mode=0444 \
     yarn build; \
     if [ -f "/run/secrets/sentry_auth_token" ]; then \
         export SENTRY_AUTH_TOKEN=$(cat /run/secrets/sentry_auth_token); \
