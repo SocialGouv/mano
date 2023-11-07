@@ -14,6 +14,7 @@ test.beforeAll(async () => {
 });
 
 test("Create action with comments", async ({ page }) => {
+  console.log("BUENNNOOOO");
   const person1Name = "personne 1";
   const person2Name = "personne 2";
   const actionFor2PersonName = nanoid();
@@ -34,6 +35,8 @@ test("Create action with comments", async ({ page }) => {
   await page.getByText("Commentaire prioritaire Ce commentaire sera mis en avant par rapport aux autres").click();
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Commentaire enregistré").click();
+
+  console.log("BUENNNIII");
 
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await expect(page).toHaveURL("http://localhost:8090/person");
