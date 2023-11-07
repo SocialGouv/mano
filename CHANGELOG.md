@@ -1,3 +1,10 @@
+## [1.293.1](https://github.com/SocialGouv/mano/compare/v1.293.0...v1.293.1) (2023-11-07)
+
+
+### Bug Fixes
+
+* sentry_auth_token mode ([#1766](https://github.com/SocialGouv/mano/issues/1766)) ([e426dba](https://github.com/SocialGouv/mano/commit/e426dba242117e2bc57953450cd41855d66c48f2))
+
 # [1.293.0](https://github.com/SocialGouv/mano/compare/v1.292.3...v1.293.0) (2023-11-07)
 
 
