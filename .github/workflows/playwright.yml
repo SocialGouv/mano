@@ -36,10 +36,10 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Install dashboard dependencies
-        run: cd ./dashboard && yarn --immutable
+        run: yarn --cwd ./dashboard
 
       - name: Install api dependencies
-        run: cd ./api && yarn --immutable
+        run: yarn --cwd ./api
 
       - name: Init DB
         run: yarn test:init-db
