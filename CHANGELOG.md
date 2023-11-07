@@ -1,3 +1,10 @@
+## [1.292.2](https://github.com/SocialGouv/mano/compare/v1.292.1...v1.292.2) (2023-11-07)
+
+
+### Bug Fixes
+
+* **dashboard:** retire la bannière ([#1763](https://github.com/SocialGouv/mano/issues/1763)) ([bbb3af3](https://github.com/SocialGouv/mano/commit/bbb3af39532c2a04c5f55086e33be5cb3d907fbe))
+
 ## [1.292.1](https://github.com/SocialGouv/mano/compare/v1.292.0...v1.292.1) (2023-11-07)
 
 
