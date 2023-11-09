@@ -43,7 +43,7 @@
     "fast-text-encoding": "^1.0.3",
     "fetch-retry": "^5.0.3",
     "javascript-time-ago": "^2.5.9",
-    "nativewind": "^2.0.11",
+    "nativewind": "^4.0.0",
     "prop-types": "^15.7.2",
     "react": "^18.2.0",
     "react-native": "^0.72.5",
