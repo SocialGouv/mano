@@ -1,25 +1,17 @@
+scopeconfig:
+- scope: node
 fileignoreconfig:
 - filename: CHANGELOG.md
   checksum: 3a76813c359d2cf2af2bdb5db40c4ccbc1f8a8ea00e0a1a9e51411f7d0534cb9
 - filename: api/.yarnrc.yml
   checksum: 99a0c6990e8edd0215ff7c4fcf69591c70ef19f2c83e412a599292ac357708cd
-- filename: api/yarn.lock
-  checksum: 49a103a8c95426c1130039aa1d06d6ce25dbdc1b5c3d1639540cb46e50ee3781
 - filename: app/ios/Podfile.lock
   checksum: dcaf6d48f6e5fbd5e1eba52c4ddcdbb058170b00612ab4aeb862beeb5941d6a9
-- filename: app/yarn.lock
-  checksum: f7c860d62847a8afae591234deb2d27d16c5d7426ec13232af43b86c857ac8a0
 - filename: dashboard/.yarnrc.yml
   checksum: 6b12c3fee90382d0b475cdd6e33b78871ba826a1e50564ee3ef4e2ab4100c3f6
 - filename: dashboard/src/components/drawer.js
   checksum: fb4bb430f0756b68a9be72fc54e29bfbcd8a22a5a87661fd9cc033f4632dd254
-- filename: dashboard/yarn.lock
-  checksum: 322b61343eb3804fad4090ba0c31f95b0f1e396cbc26f46246e0cffb41530c2e
 - filename: website/.yarnrc.yml
   checksum: 67aa1e699cae0e970cd67128e0d83e792c2d589d96df8a1d2dd5e6cc8d40b64d
-- filename: website/yarn.lock
-  checksum: 71f4250fc9456bc4ab1a46ca213e271346cce308ae0271ded80edf4bf26d1414
-- filename: yarn.lock
-  checksum: f13434ac6f4d814b23e9eb7527c61e5acced02134a1eb6eed6a961f8b3dc63db
 threshold: high
 version: "1.0"
