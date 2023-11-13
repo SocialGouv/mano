@@ -1,12 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import styled from 'styled-components';
 import { ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import logo from '../assets/logo-green.png';
-import { UnBugButton } from '../components/header';
 import SelectTeam from './SelectTeam';
-
-import { theme } from '../config';
 
 import { currentTeamState, organisationState, teamsState, userState } from '../recoil/auth';
 import API from '../services/api';
@@ -15,6 +11,7 @@ import Notification from './Notification';
 import { useDataLoader } from './DataLoader';
 import OpenNewWindowIcon from './OpenNewWindowIcon';
 import ColorHeaderBand from './ColorHeaderBand';
+import UnBugButton from './UnBugButton';
 
 const TopBar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -23,7 +20,7 @@ const TopBar = () => {
   const teams = useRecoilValue(teamsState);
   const [currentTeam, setCurrentTeam] = useRecoilState(currentTeamState);
 
-  const { resetCache } = useDataLoader();
+  const { resetCache, refresh, isLoading } = useDataLoader();
 
   return (
     <div className="tw-hidden tw-w-full sm:tw-block">
@@ -45,25 +42,29 @@ const TopBar = () => {
           )}
         </div>
         <div className="tw-hidden tw-flex-1 lg:tw-flex">
-          <div
-            className="tw-mx-auto tw-my-0 tw-h-9 tw-w-14 tw-bg-cover tw-bg-center tw-bg-no-repeat"
+          <button
+            className="tw-mx-auto tw-my-0 tw-h-9 tw-w-14 tw-bg-cover tw-bg-center tw-bg-no-repeat disabled:tw-opacity-30"
+            type="button"
+            title="Cliquez ici pour rafraîchir les données"
+            onClick={refresh}
+            disabled={isLoading}
             style={{
               backgroundImage: `url(${logo})`,
             }}
           />
         </div>
-        <div className="tw-flex tw-flex-1 tw-justify-end [&_.dropdown-menu.show]:tw-z-20">
+        <div className="tw-flex tw-flex-1 tw-justify-end tw-gap-x-4 [&_.dropdown-menu.show]:tw-z-20">
           <Notification />
           <UnBugButton />
           <ButtonDropdown direction="down" isOpen={dropdownOpen} toggle={() => setDropdownOpen(!dropdownOpen)}>
-            <DropdownToggleStyled>
-              {user?.name}
-              <div className="tw-ml-2.5 tw-flex tw-h-3 tw-w-3 tw-flex-1 tw-flex-col tw-justify-between">
+            <DropdownToggle className="tw-ml-2.5 !tw-inline-flex tw-flex-1 tw-items-center tw-justify-between tw-gap-x-2.5 !tw-rounded-full tw-border-main tw-bg-main tw-py-1 !tw-px-4 tw-text-xs">
+              <span>{user?.name}</span>
+              <div className="tw-inline-flex tw-h-3 tw-w-3 tw-flex-1 tw-flex-col tw-justify-between">
                 <div className="tw-block tw-h-px tw-w-full tw-bg-white" />
                 <div className="tw-block tw-h-px tw-w-full tw-bg-white" />
                 <div className="tw-block tw-h-px tw-w-full tw-bg-white" />
               </div>
-            </DropdownToggleStyled>
+            </DropdownToggle>
             <DropdownMenu>
               <DropdownItem header disabled>
                 {user?.name} - {user.role}
@@ -120,18 +121,5 @@ const TopBar = () => {
     </div>
   );
 };
-
-const DropdownToggleStyled = styled(DropdownToggle)`
-  border-radius: 40px !important;
-  padding: 4px 16px;
-  display: flex;
-  font-size: 12px;
-  flex: 1;
-  justify-content: space-between;
-  align-items: center;
-  background-color: ${theme.main};
-  border-color: ${theme.main};
-  margin: 0 0 0 1rem;
-`;
 
 export default TopBar;
