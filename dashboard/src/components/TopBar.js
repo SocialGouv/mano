@@ -42,8 +42,12 @@ const TopBar = () => {
           )}
         </div>
         <div className="tw-hidden tw-flex-1 lg:tw-flex">
-          <div
-            className="tw-mx-auto tw-my-0 tw-h-9 tw-w-14 tw-bg-cover tw-bg-center tw-bg-no-repeat"
+          <button
+            className="tw-mx-auto tw-my-0 tw-h-9 tw-w-14 tw-bg-cover tw-bg-center tw-bg-no-repeat disabled:tw-opacity-30"
+            type="button"
+            title="Cliquez ici pour rafraîchir les données"
+            onClick={refresh}
+            disabled={isLoading}
             style={{
               backgroundImage: `url(${logo})`,
             }}
@@ -51,9 +55,7 @@ const TopBar = () => {
         </div>
         <div className="tw-flex tw-flex-1 tw-justify-end tw-gap-x-4 [&_.dropdown-menu.show]:tw-z-20">
           <Notification />
-          <button type="button" className="button-link !tw-ml-0" disabled={isLoading} onClick={refresh}>
-            Rafraichir
-          </button>
+          <UnBugButton />
           <ButtonDropdown direction="down" isOpen={dropdownOpen} toggle={() => setDropdownOpen(!dropdownOpen)}>
             <DropdownToggle className="tw-ml-2.5 !tw-inline-flex tw-flex-1 tw-items-center tw-justify-between tw-gap-x-2.5 !tw-rounded-full tw-border-main tw-bg-main tw-py-1 !tw-px-4 tw-text-xs">
               <span>{user?.name}</span>
@@ -111,7 +113,6 @@ const TopBar = () => {
               </DropdownItem>
             </DropdownMenu>
           </ButtonDropdown>
-          <UnBugButton />
         </div>
       </aside>
       <div className="tw-w-full">
