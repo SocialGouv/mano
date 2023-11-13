@@ -5,12 +5,13 @@
  * @param {string} token
  * @returns {string}
  */
-function mailBienvenueHtml(name, email, token) {
+function mailBienvenueHtml(name, email, organisationName, token) {
   return `<img src="https://dashboard-mano.fabrique.social.gouv.fr/banner-top.png" width="700" alt="Mano" style="magin-bottom: 16px;" />
 <div style="max-width: 700px; padding: 8px">
 <p>👋 Bonjour${name ? " " + name : ""},</p>
 <p>Nous vous souhaitons la bienvenue sur Mano !<br />
-Pour accéder à votre compte, vous devez créer votre mot de passe de connexion.<br />
+Pour accéder à votre compte sur l'organisation ${organisationName},
+vous devez utiliser votre identifiant <b>${email}</b> et créer votre mot de passe de connexion.<br />
 Suivez les étapes ci-dessous pour définir votre mot de passe et accéder à votre compte en toute sécurité.</p>
 <br />
 <p><b>Étape 1&nbsp;: Créer votre mot de passe</b></p>
@@ -52,6 +53,11 @@ Reservez un temps de présentation de l’outil MANO (Yoann)
 </a>
 </li>
 </ul>
+<br />
+<a href="https://mano-app.fabrique.social.gouv.fr/download">
+Pour télécharger l’application, c’est PAR ICI !
+</a>
+<br />
 <p>Nous vous remercions de rejoindre la communauté Mano et espérons répondre à vos besoins pour accompagner au mieux votre public.</p>
 <p>Cordialement,</p>
 <p>Toute l'équipe Mano</p>
