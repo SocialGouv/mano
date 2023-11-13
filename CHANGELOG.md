@@ -1,3 +1,10 @@
+## [1.293.5](https://github.com/SocialGouv/mano/compare/v1.293.4...v1.293.5) (2023-11-13)
+
+
+### Bug Fixes
+
+* email avec lien vers app + email dedans ([304cb27](https://github.com/SocialGouv/mano/commit/304cb274839bffa9f84330b598ee96e932a140f4))
+
 ## [1.293.4](https://github.com/SocialGouv/mano/compare/v1.293.3...v1.293.4) (2023-11-13)
 
 
