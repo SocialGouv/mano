@@ -15,7 +15,7 @@ const migrationsAvailable = {
 };
 
 // why this route ?
-// because we deplpy the dashboard BEFORE the backend
+// because we deploy the dashboard BEFORE the backend
 // so if the dashboard wants to do a migration and the backend is not deployed yet
 // the dashboard would spend time and ressource to prepare a migration
 // that the backend would ignore because it doesn't know it yet
