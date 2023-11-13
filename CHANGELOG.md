@@ -1,3 +1,10 @@
+## [1.293.3](https://github.com/SocialGouv/mano/compare/v1.293.2...v1.293.3) (2023-11-13)
+
+
+### Bug Fixes
+
+* app up yarn.lock ([#1770](https://github.com/SocialGouv/mano/issues/1770)) ([0dfe4b7](https://github.com/SocialGouv/mano/commit/0dfe4b7f31edac883df41943299cdbd143b961bf))
+
 ## [1.293.2](https://github.com/SocialGouv/mano/compare/v1.293.1...v1.293.2) (2023-11-07)
 
 
