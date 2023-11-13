@@ -1,3 +1,10 @@
+# [1.294.0](https://github.com/SocialGouv/mano/compare/v1.293.5...v1.294.0) (2023-11-13)
+
+
+### Features
+
+* message 'les équipes de mano ne connaissent pas votre clé ([#1772](https://github.com/SocialGouv/mano/issues/1772)) ([019a922](https://github.com/SocialGouv/mano/commit/019a922668d30f25a46062e62427709a652a5273))
+
 ## [1.293.5](https://github.com/SocialGouv/mano/compare/v1.293.4...v1.293.5) (2023-11-13)
 
 
