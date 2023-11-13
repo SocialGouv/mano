@@ -68,4 +68,12 @@ android/sentry.properties
 ios/sentry.properties
 
 # Temporary files created by Metro to check the health of the file watcher
-63	.metro-health-check*
+63  .metro-health-check*
+
+# Yarn Berry
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
