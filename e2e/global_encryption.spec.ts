@@ -38,7 +38,11 @@ test("test", async ({ page }) => {
   await page.getByLabel("Clé de chiffrement d'organisation").click();
   await page.getByLabel("Clé de chiffrement d'organisation").fill("plouf");
   await page.getByRole("button", { name: "Se connecter" }).click();
-  await page.getByText("La clé de chiffrement ne semble pas être correcte, veuillez réessayer.").click();
+  await page
+    .getByText(
+      "La clé de chiffrement ne semble pas être correcte, veuillez réessayer ou demander à un membre de votre organisation de vous aider (les équipes ne mano ne la connaissent pas)"
+    )
+    .click();
   await page.getByLabel("Clé de chiffrement d'organisation").click();
   await page.getByLabel("Clé de chiffrement d'organisation").fill("nouvelle");
   await page.getByRole("button", { name: "Se connecter" }).click();

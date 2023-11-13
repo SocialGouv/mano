@@ -16,7 +16,9 @@ API.handleLogoutError = () => {
 API.handleError = (error, subtitle) => Alert.alert(error?.toString(), subtitle);
 
 API.handleWrongKey = () => {
-  Alert.alert('La clé de chiffrement ne semble pas être correcte, veuillez réessayer.');
+  Alert.alert(
+    'La clé de chiffrement ne semble pas être correcte, veuillez réessayer ou demander à un membre de votre organisation de vous aider (les équipes ne mano ne la connaissent pas)'
+  );
 };
 
 API.handleNewVersion = (message) =>

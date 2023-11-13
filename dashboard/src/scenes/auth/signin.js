@@ -243,6 +243,9 @@ const SignIn = () => {
               />
               <label htmlFor="orgEncryptionKey">Clé de chiffrement d'organisation</label>
             </div>
+            <p className="tw-text-xs">
+              Votre clé de chiffrement est uniquement connue par les membres de votre organisation, les équipes de Mano ne la connaissent pas
+            </p>
             {!!showErrors && <p className="tw-text-xs tw-text-red-500">{signinFormErrors.orgEncryptionKey}</p>}
           </div>
         )}

@@ -28,7 +28,9 @@ export const setOrgEncryptionKey = async (orgEncryptionKey, { encryptedVerificat
   if (!!encryptedVerificationKey) {
     const encryptionKeyIsValid = await checkEncryptedVerificationKey(encryptedVerificationKey, newHashedOrgEncryptionKey);
     if (!encryptionKeyIsValid) {
-      toast.error('La clé de chiffrement ne semble pas être correcte, veuillez réessayer.');
+      toast.error(
+        'La clé de chiffrement ne semble pas être correcte, veuillez réessayer ou demander à un membre de votre organisation de vous aider (les équipes ne mano ne la connaissent pas)'
+      );
       return false;
     }
   }
