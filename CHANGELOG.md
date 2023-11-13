@@ -1,3 +1,11 @@
+## [1.293.4](https://github.com/SocialGouv/mano/compare/v1.293.3...v1.293.4) (2023-11-13)
+
+
+### Bug Fixes
+
+* **api,dashboard:** déploiement du dashboard avant l'api pour éviter que la bannière 'Rafraichissez svp' ne soit inutile ([#1761](https://github.com/SocialGouv/mano/issues/1761)) ([0da83b4](https://github.com/SocialGouv/mano/commit/0da83b45825bbcac0c1e4b259fb3b4b8fbfc057e))
+* **dashboard:** rajout du bouton Rafraichir ([#1760](https://github.com/SocialGouv/mano/issues/1760)) ([07eeacb](https://github.com/SocialGouv/mano/commit/07eeacbada948185c52d6115c717735b35e96f84))
+
 ## [1.293.3](https://github.com/SocialGouv/mano/compare/v1.293.2...v1.293.3) (2023-11-13)
 
 
