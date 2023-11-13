@@ -86,13 +86,13 @@ router.put(
           for (const { _id, encrypted, encryptedEntityKey } of req.body.actionsToUpdate) {
             await Action.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx, paranoid: false });
           }
+          organisation.set({
+            migrations: [...(organisation.migrations || []), req.params.migrationName],
+            migrationLastUpdateAt: new Date(),
+          });
         }
 
-        organisation.set({
-          migrations: [...(organisation.migrations || []), req.params.migrationName],
-          migrating: false,
-          migrationLastUpdateAt: new Date(),
-        });
+        organisation.set({ migrating: false });
         await organisation.save({ transaction: tx });
       });
     } catch (e) {

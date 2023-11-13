@@ -49,7 +49,7 @@ export default function useDataMigrator() {
         if (response.ok) {
           setOrganisation(response.organisation);
           migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
-        else {
+        } else {
           return false;
         }
       }

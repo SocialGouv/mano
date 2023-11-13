@@ -15,7 +15,7 @@ www:
 
 api:
   ~chart: app
-  ~needs: [build-api, pg]
+  ~needs: [build-api, pg, dashboard]
   host: "{{ .Values.global.host }}"
   enabled: true
   containerPort: 3000

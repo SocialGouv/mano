@@ -7,8 +7,6 @@ export default function VersionOutdatedAlert() {
   const apiVersion = useRecoilValue(apiVersionState);
   const minimumDashboardVersion = useRecoilValue(minimumDashboardVersionState);
 
-  return null;
-
   if (!apiVersion || (compare(apiVersion, VERSION, '<=') && (!minimumDashboardVersion || compare(minimumDashboardVersion, VERSION, '<=')))) {
     return null;
   }
