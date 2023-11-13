@@ -10,29 +10,6 @@ const validateUser = require("../middleware/validateUser");
 const { serializeOrganisation } = require("../utils/data-serializer");
 const { Organisation, Person, Action, Comment, Report, Team, Service, sequelize, Group } = require("../db/sequelize");
 
-const migrationsAvailable = {
-  "integrate-comments-in-actions-history": true,
-};
-
-// why this route ?
-// because we deploy the dashboard BEFORE the backend
-// so if the dashboard wants to do a migration and the backend is not deployed yet
-// the dashboard would spend time and ressource to prepare a migration
-// that the backend would ignore because it doesn't know it yet
-router.get(
-  "/migrations-available",
-  passport.authenticate("user", { session: false }),
-  validateUser(["admin", "normal", "restricted-access"]),
-  catchErrors(async (req, res) => {
-    const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
-    if (!organisation) return res.status(404).send({ ok: false, error: "Not Found" });
-    return res.status(200).send({
-      ok: true,
-      data: migrationsAvailable,
-    });
-  })
-);
-
 router.put(
   "/:migrationName",
   passport.authenticate("user", { session: false }),
