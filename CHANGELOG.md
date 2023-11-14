@@ -1,3 +1,10 @@
+## [1.294.2](https://github.com/SocialGouv/mano/compare/v1.294.1...v1.294.2) (2023-11-14)
+
+
+### Bug Fixes
+
+* emphasize app link ([5e0c049](https://github.com/SocialGouv/mano/commit/5e0c0493a81ceb47b55c780443e5a6136b31e8bf))
+
 ## [1.294.1](https://github.com/SocialGouv/mano/compare/v1.294.0...v1.294.1) (2023-11-14)
 
 
