@@ -1,3 +1,10 @@
+## [1.294.1](https://github.com/SocialGouv/mano/compare/v1.294.0...v1.294.1) (2023-11-14)
+
+
+### Bug Fixes
+
+* email organisation name ([b465d61](https://github.com/SocialGouv/mano/commit/b465d61aa928d6f42d58169625d6d950fce5490a))
+
 # [1.294.0](https://github.com/SocialGouv/mano/compare/v1.293.5...v1.294.0) (2023-11-13)
 
 
