@@ -54,7 +54,8 @@ Reservez un temps de présentation de l’outil MANO (Yoann)
 </li>
 </ul>
 <br />
-<a href="https://mano-app.fabrique.social.gouv.fr/download">
+<p><b>Étape 4&nbsp;: Téléchargez l'app 📲</b></p>
+<p><a href="https://mano-app.fabrique.social.gouv.fr/download">
 Pour télécharger l’application, c’est PAR ICI !
 </a>
 <br />
