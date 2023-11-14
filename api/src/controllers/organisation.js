@@ -155,7 +155,12 @@ router.post(
       },
       { returning: true }
     );
-    await mailservice.sendEmail(adminUser.email, "Bienvenue dans Mano", null, mailBienvenueHtml(adminUser.name, adminUser.email, token));
+    await mailservice.sendEmail(
+      adminUser.email,
+      "Bienvenue dans Mano",
+      null,
+      mailBienvenueHtml(adminUser.name, adminUser.email, organisation.name, token)
+    );
 
     return res.status(200).send({ ok: true });
   })

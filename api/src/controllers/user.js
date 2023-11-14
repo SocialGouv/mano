@@ -16,6 +16,7 @@ const { capture } = require("../sentry");
 const { ExtractJwt } = require("passport-jwt");
 const { serializeUserWithTeamsAndOrganisation, serializeTeam } = require("../utils/data-serializer");
 const { mailBienvenueHtml } = require("../utils/mail-bienvenue");
+const organisation = require("../models/organisation");
 
 const EMAIL_OR_PASSWORD_INVALID = "EMAIL_OR_PASSWORD_INVALID";
 const PASSWORD_NOT_VALIDATED = "PASSWORD_NOT_VALIDATED";
@@ -349,7 +350,7 @@ router.post(
     await tx.commit();
     await user.save({ transaction: tx });
 
-    await mailservice.sendEmail(data.email, "Bienvenue dans Mano", null, mailBienvenueHtml(data.name, data.email, token));
+    await mailservice.sendEmail(data.email, "Bienvenue dans Mano", null, mailBienvenueHtml(data.name, data.email, data.organisation.name, token));
 
     return res.status(200).send({
       ok: true,
