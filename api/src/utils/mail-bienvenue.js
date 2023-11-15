@@ -29,6 +29,14 @@ Si le lien ci-dessus ne fonctionne pas, vous pouvez cliquer sur le lien suivant&
 <p>Pour vous connecter, cliquez sur le lien suivant&nbsp;:</p>
 <p><a href="https://dashboard-mano.fabrique.social.gouv.fr/">👉 Me connecter à Mano 👈</a></p>
 <br />
+<p><b>Étape 4&nbsp;: Téléchargez l'app 📲</b></p>
+<p><a href="https://mano-app.fabrique.social.gouv.fr/download">
+Pour télécharger l’application, c’est PAR ICI !
+</a>
+<br />
+<br />
+<br />
+<br />
 <p>Si vous avez des questions ou avez besoin d'assistance, n'hésitez pas à nous contacter votre chargé·e de déploiement&nbsp;:</p>
 <p>Melissa Saiter&nbsp;:<br />
 m.saiter.mano@gmail.com - +33 6 13 23 33 45<br />
@@ -53,11 +61,6 @@ Reservez un temps de présentation de l’outil MANO (Yoann)
 </a>
 </li>
 </ul>
-<br />
-<p><b>Étape 4&nbsp;: Téléchargez l'app 📲</b></p>
-<p><a href="https://mano-app.fabrique.social.gouv.fr/download">
-Pour télécharger l’application, c’est PAR ICI !
-</a>
 <br />
 <p>Nous vous remercions de rejoindre la communauté Mano et espérons répondre à vos besoins pour accompagner au mieux votre public.</p>
 <p>Cordialement,</p>

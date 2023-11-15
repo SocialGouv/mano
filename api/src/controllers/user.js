@@ -10,7 +10,7 @@ const { validatePassword, looseUuidRegex, jwtRegex, sanitizeAll, headerJwtRegex 
 const mailservice = require("../utils/mailservice");
 const config = require("../config");
 const { comparePassword } = require("../utils");
-const { User, RelUserTeam, Team } = require("../db/sequelize");
+const { User, RelUserTeam, Team, Organisation } = require("../db/sequelize");
 const validateUser = require("../middleware/validateUser");
 const { capture } = require("../sentry");
 const { ExtractJwt } = require("passport-jwt");
@@ -350,7 +350,8 @@ router.post(
     await tx.commit();
     await user.save({ transaction: tx });
 
-    await mailservice.sendEmail(data.email, "Bienvenue dans Mano", null, mailBienvenueHtml(data.name, data.email, data.organisation.name, token));
+    const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
+    await mailservice.sendEmail(data.email, "Bienvenue dans Mano", null, mailBienvenueHtml(data.name, data.email, organisation.name, token));
 
     return res.status(200).send({
       ok: true,

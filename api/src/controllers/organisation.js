@@ -155,6 +155,7 @@ router.post(
       },
       { returning: true }
     );
+    console.log(organisation.name);
     await mailservice.sendEmail(
       adminUser.email,
       "Bienvenue dans Mano",
