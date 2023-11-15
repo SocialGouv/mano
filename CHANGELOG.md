@@ -1,3 +1,10 @@
+## [1.294.4](https://github.com/SocialGouv/mano/compare/v1.294.3...v1.294.4) (2023-11-15)
+
+
+### Bug Fixes
+
+* **dahsboard:** le champs description prends désormais en compte les sauts de ligne ([050b73e](https://github.com/SocialGouv/mano/commit/050b73e06d5ca6489aec91703cf29047b542e847))
+
 ## [1.294.3](https://github.com/SocialGouv/mano/compare/v1.294.2...v1.294.3) (2023-11-15)
 
 
