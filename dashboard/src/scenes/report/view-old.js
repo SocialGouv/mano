@@ -414,79 +414,415 @@ const View = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
-  return (
-    <>
-      {process.env.REACT_APP_TEST === 'true' && (
-        <div className="printonly">
-          <div className="tw-py-4 tw-px-8 tw-text-2xl tw-font-bold">
-            {getPeriodTitle(dateString, allSelectedTeamsAreNightSession)}
-            <br />
-            Compte rendu {viewAllOrganisationData ? <>de toutes les équipes</> : <>{selectedTeamIds.length > 1 ? 'des équipes ' : "de l'équipe "}</>}
-            {selectedTeams.map((t) => t.name).join(', ')}
-          </div>
-          {!['restricted-access'].includes(user.role) && (
-            <DescriptionAndCollaborations reports={selectedTeamsReports} selectedTeamsObject={selectedTeamsObject} dateString={dateString} />
-          )}
-          {!!organisation.services && !!organisation.receptionEnabled && (
-            <Reception reports={selectedTeamsReports} selectedTeamsObject={selectedTeamsObject} dateString={dateString} />
-          )}
-          {!['restricted-access'].includes(user.role) && (
-            <>
-              <ActionCompletedAt
+  const renderPrintOnly = () => {
+    if (process.env.REACT_APP_TEST === 'true') return null;
+    return (
+      <div className="printonly">
+        <div className="tw-py-4 tw-px-8 tw-text-2xl tw-font-bold">
+          {getPeriodTitle(dateString, allSelectedTeamsAreNightSession)}
+          <br />
+          Compte rendu {viewAllOrganisationData ? <>de toutes les équipes</> : <>{selectedTeamIds.length > 1 ? 'des équipes ' : "de l'équipe "}</>}
+          {selectedTeams.map((t) => t.name).join(', ')}
+        </div>
+        {!['restricted-access'].includes(user.role) && (
+          <DescriptionAndCollaborations reports={selectedTeamsReports} selectedTeamsObject={selectedTeamsObject} dateString={dateString} />
+        )}
+        {!!organisation.services && !!organisation.receptionEnabled && (
+          <Reception reports={selectedTeamsReports} selectedTeamsObject={selectedTeamsObject} dateString={dateString} />
+        )}
+        {!['restricted-access'].includes(user.role) && (
+          <>
+            <ActionCompletedAt
+              date={dateString}
+              status={DONE}
+              actions={actionsDone}
+              setSortOrder={setActionsSortOrder}
+              setSortBy={setActionsSortBy}
+              sortBy={actionsSortBy}
+              sortOrder={actionsSortOrder}
+            />
+            <ActionCreatedAt
+              date={dateString}
+              actions={actionsCreatedAt}
+              setSortOrder={setActionsSortOrder}
+              setSortBy={setActionsSortBy}
+              sortBy={actionsSortBy}
+              sortOrder={actionsSortOrder}
+            />
+            <ActionCompletedAt
+              date={dateString}
+              status={CANCEL}
+              actions={actionsCancel}
+              setSortOrder={setActionsSortOrder}
+              setSortBy={setActionsSortBy}
+              sortBy={actionsSortBy}
+              sortOrder={actionsSortOrder}
+            />
+            <CommentCreatedAt date={dateString} comments={comments} />
+            {!!user.healthcareProfessional && <CommentCreatedAt date={dateString} comments={commentsMedical} medical />}
+          </>
+        )}
+        <PassagesCreatedAt date={dateString} passages={passages} />
+        <RencontresCreatedAt date={dateString} rencontres={rencontres} />
+        <PersonCreatedAt
+          date={dateString}
+          reports={selectedTeamsReports}
+          persons={persons}
+          setSortBy={setPersonSortBy}
+          setSortOrder={setPersonSortOrder}
+          sortBy={personSortBy}
+          sortOrder={personSortOrder}
+        />
+        {!['restricted-access'].includes(user.role) && (
+          <>
+            <TerritoryObservationsCreatedAt date={dateString} observations={observations} />
+            {!!user.healthcareProfessional && (
+              <Consultations
                 date={dateString}
-                status={DONE}
-                actions={actionsDone}
-                setSortOrder={setActionsSortOrder}
-                setSortBy={setActionsSortBy}
-                sortBy={actionsSortBy}
-                sortOrder={actionsSortOrder}
+                consultations={consultationsDone}
+                setSortOrder={setConsultationsSortOrder}
+                setSortBy={setConsultationsSortBy}
+                sortBy={consultationsSortBy}
+                sortOrder={consultationsSortOrder}
               />
-              <ActionCreatedAt
+            )}
+            {!!user.healthcareProfessional && (
+              <ConsultationsCreatedAt
                 date={dateString}
-                actions={actionsCreatedAt}
-                setSortOrder={setActionsSortOrder}
-                setSortBy={setActionsSortBy}
-                sortBy={actionsSortBy}
-                sortOrder={actionsSortOrder}
+                consultations={consultationsCreatedAt}
+                setSortOrder={setConsultationsSortOrder}
+                setSortBy={setConsultationsSortBy}
+                sortBy={consultationsSortBy}
+                sortOrder={consultationsSortOrder}
               />
-              <ActionCompletedAt
+            )}
+            {!!user.healthcareProfessional && (
+              <Consultations
                 date={dateString}
                 status={CANCEL}
-                actions={actionsCancel}
-                setSortOrder={setActionsSortOrder}
-                setSortBy={setActionsSortBy}
-                sortBy={actionsSortBy}
-                sortOrder={actionsSortOrder}
+                consultations={consultationsCancel}
+                setSortOrder={setConsultationsSortOrder}
+                setSortBy={setConsultationsSortBy}
+                sortBy={consultationsSortBy}
+                sortOrder={consultationsSortOrder}
               />
-              <CommentCreatedAt date={dateString} comments={comments} />
-              {!!user.healthcareProfessional && <CommentCreatedAt date={dateString} comments={commentsMedical} medical />}
-            </>
+            )}
+          </>
+        )}
+      </div>
+    );
+  };
+
+  const renderScreenOnly = () => (
+    <div
+      className="noprint"
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        margin: '-1rem -3rem -3rem',
+        height: 'calc(100% + 4rem)',
+        overflow: 'hidden',
+      }}>
+      <HeaderStyled style={{ padding: 0 }}>
+        <div style={{ minWidth: '100%', width: '100%' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+            <div style={{ display: 'flex' }}>
+              <BackButton />
+              <BackButtonWrapper caption="Imprimer" onClick={window.print} />
+              {!['restricted-access'].includes(user.role) && <BackButtonWrapper disabled={isReadOnly} caption="Supprimer" onClick={deleteData} />}
+            </div>
+            <p style={{ margin: 0 }}>{getPeriodTitle(dateString, allSelectedTeamsAreNightSession)}</p>
+            <div style={{ display: 'flex' }}>
+              <ButtonCustom color="link" className="noprint" title="Précédent" onClick={onPreviousReportRequest} />
+              <ButtonCustom
+                color="link"
+                className="noprint"
+                title="Suivant"
+                disabled={dateString === dayjs().format('YYYY-MM-DD')}
+                onClick={onNextReportRequest}
+              />
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexGrow: '1', padding: '0 2rem', fontWeight: '400' }}>
+            <HeaderTitle style={{ fontWeight: '400', flexShrink: 0 }}>
+              <span>
+                Compte rendu{' '}
+                {viewAllOrganisationData ? <>de toutes les équipes</> : <>{selectedTeamIds.length > 1 ? 'des équipes' : "de l'équipe"}</>}
+              </span>
+            </HeaderTitle>
+            <div className="tw-ml-4">
+              <SelectTeamMultiple
+                inputId="report-select-teams"
+                classNamePrefix="report-select-teams"
+                onChange={(teamIds) => {
+                  setSelectedTeamIds(teamIds);
+                }}
+                value={selectedTeamIds}
+                key={selectedTeamIds}
+                colored
+                isDisabled={viewAllOrganisationData}
+              />
+              {teams.length > 1 && (
+                <label htmlFor="viewAllOrganisationData" className="tw-flex tw-items-center tw-text-sm">
+                  <input
+                    id="viewAllOrganisationData"
+                    type="checkbox"
+                    className="tw-mr-2.5"
+                    onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
+                    checked={viewAllOrganisationData}
+                  />
+                  Comptes rendus de toutes les équipes
+                </label>
+              )}
+            </div>
+          </div>
+          {selectedTeams.length > 1 && selectedTeams.filter((t) => t.nightSession).length > 0 && (
+            <details style={{ padding: '0 2rem', fontWeight: '400' }}>
+              <summary style={{ fontSize: 12 }}>
+                Certaines équipes travaillent de nuit 🌒, <u>cliquez ici</u> pour savoir la période concernée par chacune
+              </summary>
+              {selectedTeams.map((team) => (
+                <p key={team._id} style={{ fontSize: 12, marginLeft: 20, margin: 0 }}>
+                  <b>
+                    {team.nightSession ? '🌒' : '☀️'} {team?.name || ''}
+                  </b>{' '}
+                  - {getPeriodTitle(dateString, team?.nightSession)}
+                </p>
+              ))}
+            </details>
           )}
-          <PassagesCreatedAt date={dateString} passages={passages} />
-          <RencontresCreatedAt date={dateString} rencontres={rencontres} />
-          <PersonCreatedAt
-            date={dateString}
-            reports={selectedTeamsReports}
-            persons={persons}
-            setSortBy={setPersonSortBy}
-            setSortOrder={setPersonSortOrder}
-            sortBy={personSortBy}
-            sortOrder={personSortOrder}
-          />
-          {!['restricted-access'].includes(user.role) && (
-            <>
-              <TerritoryObservationsCreatedAt date={dateString} observations={observations} />
-              {!!user.healthcareProfessional && (
+        </div>
+      </HeaderStyled>
+      <div
+        className={[
+          'noprint tw-mt-4 tw-h-full tw-flex-1 tw-overflow-hidden tw-border-t tw-border-gray-200',
+          viewAllOrganisationData || selectedTeamIds.length ? 'tw-flex' : 'tw-hidden',
+        ].join(' ')}>
+        <div className="tw-flex tw-flex-1 tw-overflow-hidden">
+          <nav
+            className="tw-flex tw-h-full tw-w-56 tw-shrink-0 tw-flex-col tw-items-start tw-overflow-auto tw-bg-main tw-bg-opacity-10 tw-pt-5 tw-pl-2.5 [&_button]:tw-text-left [&_hr]:tw-mb-0 [&_hr]:tw-mt-4"
+            title="Navigation dans les catégories du compte-rendu">
+            {!['restricted-access'].includes(user.role) && (
+              <>
+                <DrawerLink id="report-button-resume" className={activeTab === 'resume' ? 'active' : ''} onClick={() => setActiveTab('resume')}>
+                  Résumé
+                </DrawerLink>
+                <hr />
+              </>
+            )}
+            {!!organisation.services && !!organisation.receptionEnabled && (
+              <>
+                <DrawerLink
+                  id="report-button-reception"
+                  className={activeTab === 'reception' ? 'active' : ''}
+                  onClick={() => setActiveTab('reception')}>
+                  Accueil
+                </DrawerLink>
+                <hr />
+              </>
+            )}
+
+            <DrawerLink
+              id="report-button-action-completed"
+              className={activeTab === 'action-completed' ? 'active' : ''}
+              onClick={() => setActiveTab('action-completed')}>
+              Actions complétées ({actionsDone.length})
+            </DrawerLink>
+            <DrawerLink
+              id="report-button-action-created"
+              className={activeTab === 'action-created' ? 'active' : ''}
+              onClick={() => setActiveTab('action-created')}>
+              Actions créées ({actionsCreatedAt.length})
+            </DrawerLink>
+            <DrawerLink
+              id="report-button-action-cancelled"
+              className={activeTab === 'action-cancelled' ? 'active' : ''}
+              onClick={() => setActiveTab('action-cancelled')}>
+              Actions annulées ({actionsCancel.length})
+            </DrawerLink>
+            <hr />
+            {!['restricted-access'].includes(user.role) && (
+              <>
+                <DrawerLink
+                  id="report-button-comment-created"
+                  className={activeTab === 'comment-created' ? 'active' : ''}
+                  onClick={() => setActiveTab('comment-created')}>
+                  Commentaires ({comments.length})
+                </DrawerLink>
+                {!!user.healthcareProfessional && (
+                  <DrawerLink
+                    id="report-button-comment-medical-created"
+                    className={activeTab === 'comment-medical-created' ? 'active' : ''}
+                    onClick={() => setActiveTab('comment-medical-created')}>
+                    Commentaires médicaux ({commentsMedical.length})
+                  </DrawerLink>
+                )}
+                <hr />
+              </>
+            )}
+            {!!organisation.passagesEnabled && (
+              <>
+                <DrawerLink id="report-button-passages" className={activeTab === 'passages' ? 'active' : ''} onClick={() => setActiveTab('passages')}>
+                  Passages ({passages.length})
+                </DrawerLink>
+              </>
+            )}
+            {!!organisation.rencontresEnabled && (
+              <>
+                <DrawerLink
+                  id="report-button-rencontres"
+                  className={activeTab === 'rencontres' ? 'active' : ''}
+                  onClick={() => setActiveTab('rencontres')}>
+                  Rencontres ({rencontres.length})
+                </DrawerLink>
+              </>
+            )}
+            <hr />
+            {!!organisation.territoriesEnabled && (
+              <DrawerLink
+                id="report-button-territory-observations"
+                className={activeTab === 'territory-observations' ? 'active' : ''}
+                onClick={() => setActiveTab('territory-observations')}>
+                Observations ({observations.length})
+              </DrawerLink>
+            )}
+            {!['restricted-access'].includes(user.role) && (
+              <>
+                <hr />
+                <DrawerLink
+                  id="report-button-persons-created"
+                  className={activeTab === 'persons-created' ? 'active' : ''}
+                  onClick={() => setActiveTab('persons-created')}>
+                  Personnes créées ({persons.length})
+                </DrawerLink>
+              </>
+            )}
+            {!!user.healthcareProfessional && (
+              <>
+                <hr />
+                <DrawerLink
+                  id="report-button-consultations"
+                  className={activeTab === 'consultations' ? 'active' : ''}
+                  onClick={() => setActiveTab('consultations')}>
+                  Consultations faites ({consultationsDone.length})
+                </DrawerLink>
+                <DrawerLink
+                  id="report-button-consultations-created"
+                  className={activeTab === 'consultations-created' ? 'active' : ''}
+                  onClick={() => setActiveTab('consultations-created')}>
+                  Consultations créées ({consultationsCreatedAt.length})
+                </DrawerLink>
+                <DrawerLink
+                  id="report-button-consultations-cancelled"
+                  className={activeTab === 'consultations-cancelled' ? 'active' : ''}
+                  onClick={() => setActiveTab('consultations-cancelled')}>
+                  Consultations annulées ({consultationsCancel.length})
+                </DrawerLink>
+              </>
+            )}
+          </nav>
+          <div ref={scrollContainer} className="tw-flex tw-h-full tw-w-full tw-flex-1 tw-overflow-auto tw-bg-white tw-px-6 tw-pt-4 tw-pb-0">
+            {activeTab === 'resume' && (
+              <div className="tw-min-h-full tw-w-full tw-overflow-auto">
+                <DescriptionAndCollaborations reports={selectedTeamsReports} selectedTeamsObject={selectedTeamsObject} dateString={dateString} />
+              </div>
+            )}
+            {activeTab === 'reception' && !!organisation.services && !!organisation.receptionEnabled && (
+              <div className="tw-min-h-full tw-w-full tw-overflow-auto">
+                <Reception reports={selectedTeamsReports} dateString={dateString} selectedTeamsObject={selectedTeamsObject} />
+              </div>
+            )}
+            {activeTab === 'action-completed' && (
+              <div className="tw-min-h-full tw-w-full tw-overflow-auto">
+                <ActionCompletedAt
+                  date={dateString}
+                  status={DONE}
+                  actions={actionsDone}
+                  setSortOrder={setActionsSortOrder}
+                  setSortBy={setActionsSortBy}
+                  sortBy={actionsSortBy}
+                  sortOrder={actionsSortOrder}
+                />
+              </div>
+            )}
+            {activeTab === 'action-created' && (
+              <div className="tw-min-h-full tw-w-full tw-overflow-auto">
+                <ActionCreatedAt
+                  date={dateString}
+                  actions={actionsCreatedAt}
+                  setSortOrder={setActionsSortOrder}
+                  setSortBy={setActionsSortBy}
+                  sortBy={actionsSortBy}
+                  sortOrder={actionsSortOrder}
+                />
+              </div>
+            )}
+            {activeTab === 'action-cancelled' && (
+              <div className="tw-min-h-full tw-w-full tw-overflow-auto">
+                <ActionCompletedAt
+                  date={dateString}
+                  status={CANCEL}
+                  actions={actionsCancel}
+                  setSortOrder={setActionsSortOrder}
+                  setSortBy={setActionsSortBy}
+                  sortBy={actionsSortBy}
+                  sortOrder={actionsSortOrder}
+                />
+              </div>
+            )}
+            {activeTab === 'comment-created' && (
+              <div className="tw-min-h-full tw-w-full tw-overflow-auto">
+                <CommentCreatedAt date={dateString} comments={comments} />
+              </div>
+            )}
+            {activeTab === 'comment-medical-created' && (
+              <div className="tw-min-h-full tw-w-full tw-overflow-auto">
+                <CommentCreatedAt date={dateString} comments={commentsMedical} medical />
+              </div>
+            )}
+            {activeTab === 'passages' && (
+              <div className="tw-min-h-full tw-w-full tw-overflow-auto">
+                <PassagesCreatedAt date={dateString} passages={passages} selectedTeams={selectedTeams} />
+              </div>
+            )}
+            {activeTab === 'rencontres' && (
+              <div className="tw-min-h-full tw-w-full tw-overflow-auto">
+                <RencontresCreatedAt date={dateString} rencontres={rencontres} selectedTeams={selectedTeams} />
+              </div>
+            )}
+            {activeTab === 'territory-observations' && (
+              <div className="tw-min-h-full tw-w-full tw-overflow-auto">
+                <TerritoryObservationsCreatedAt date={dateString} reports={selectedTeamsReports} observations={observations} />
+              </div>
+            )}
+            {activeTab === 'persons-created' && (
+              <div className="tw-min-h-full tw-w-full tw-overflow-auto">
+                <PersonCreatedAt
+                  date={dateString}
+                  reports={selectedTeamsReports}
+                  persons={persons}
+                  setSortBy={setPersonSortBy}
+                  setSortOrder={setPersonSortOrder}
+                  sortBy={personSortBy}
+                  sortOrder={personSortOrder}
+                />
+              </div>
+            )}
+            {activeTab === 'consultations' && (
+              <div className="tw-min-h-full tw-w-full tw-overflow-auto">
                 <Consultations
                   date={dateString}
+                  status={DONE}
                   consultations={consultationsDone}
                   setSortOrder={setConsultationsSortOrder}
                   setSortBy={setConsultationsSortBy}
                   sortBy={consultationsSortBy}
                   sortOrder={consultationsSortOrder}
                 />
-              )}
-              {!!user.healthcareProfessional && (
+              </div>
+            )}
+            {activeTab === 'consultations-created' && (
+              <div className="tw-min-h-full tw-w-full tw-overflow-auto">
                 <ConsultationsCreatedAt
                   date={dateString}
                   consultations={consultationsCreatedAt}
@@ -495,8 +831,10 @@ const View = () => {
                   sortBy={consultationsSortBy}
                   sortOrder={consultationsSortOrder}
                 />
-              )}
-              {!!user.healthcareProfessional && (
+              </div>
+            )}
+            {activeTab === 'consultations-cancelled' && (
+              <div className="tw-min-h-full tw-w-full tw-overflow-auto">
                 <Consultations
                   date={dateString}
                   status={CANCEL}
@@ -506,108 +844,18 @@ const View = () => {
                   sortBy={consultationsSortBy}
                   sortOrder={consultationsSortOrder}
                 />
-              )}
-            </>
-          )}
-        </div>
-      )}
-      <div className="noprint tw-h-[calc(100% + 4rem)] -tw-mx-12 tw-mb-12 tw-mt-4 tw-flex tw-flex-col tw-overflow-hidden">
-        <HeaderStyled className="!tw-p-0">
-          <div className="tw-w-full tw-min-w-full">
-            <div className="tw-flex tw-w-full tw-items-center tw-justify-between">
-              <div className="tw-flex">
-                <BackButton />
-                <BackButtonWrapper caption="Imprimer" onClick={window.print} />
-                {!['restricted-access'].includes(user.role) && <BackButtonWrapper disabled={isReadOnly} caption="Supprimer" onClick={deleteData} />}
               </div>
-              <p className="tw-m-0">{getPeriodTitle(dateString, allSelectedTeamsAreNightSession)}</p>
-              <div className="tw-flex">
-                <ButtonCustom color="link" className="noprint" title="Précédent" onClick={onPreviousReportRequest} />
-                <ButtonCustom
-                  color="link"
-                  className="noprint"
-                  title="Suivant"
-                  disabled={dateString === dayjs().format('YYYY-MM-DD')}
-                  onClick={onNextReportRequest}
-                />
-              </div>
-            </div>
-            <div className="tw-flex tw-grow tw-py-0 tw-px-8 tw-font-normal">
-              <HeaderTitle className="tw-shrink-0 tw-font-normal">
-                <span>
-                  Compte rendu{' '}
-                  {viewAllOrganisationData ? <>de toutes les équipes</> : <>{selectedTeamIds.length > 1 ? 'des équipes' : "de l'équipe"}</>}
-                </span>
-              </HeaderTitle>
-              <div className="tw-ml-4">
-                <SelectTeamMultiple
-                  inputId="report-select-teams"
-                  classNamePrefix="report-select-teams"
-                  onChange={(teamIds) => {
-                    setSelectedTeamIds(teamIds);
-                  }}
-                  value={selectedTeamIds}
-                  key={selectedTeamIds}
-                  colored
-                  isDisabled={viewAllOrganisationData}
-                />
-                {teams.length > 1 && (
-                  <label htmlFor="viewAllOrganisationData" className="tw-flex tw-items-center tw-text-sm">
-                    <input
-                      id="viewAllOrganisationData"
-                      type="checkbox"
-                      className="tw-mr-2.5"
-                      onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
-                      checked={viewAllOrganisationData}
-                    />
-                    Comptes rendus de toutes les équipes
-                  </label>
-                )}
-              </div>
-            </div>
-            {selectedTeams.length > 1 && selectedTeams.filter((t) => t.nightSession).length > 0 && (
-              <details className="tw-py-0 tw-px-8 tw-font-normal">
-                <summary className="tw-text-xs">
-                  Certaines équipes travaillent de nuit 🌒, <u>cliquez ici</u> pour savoir la période concernée par chacune
-                </summary>
-                {selectedTeams.map((team) => (
-                  <p key={team._id} className="tw-ml-5 tw-mb-0 tw-text-xs">
-                    <b>
-                      {team.nightSession ? '🌒' : '☀️'} {team?.name || ''}
-                    </b>{' '}
-                    - {getPeriodTitle(dateString, team?.nightSession)}
-                  </p>
-                ))}
-              </details>
             )}
-          </div>
-        </HeaderStyled>
-        <div
-          className={[
-            'noprint tw-mt-4 tw-h-full tw-flex-1 tw-overflow-hidden tw-border-t tw-border-gray-200',
-            viewAllOrganisationData || selectedTeamIds.length ? 'tw-flex' : 'tw-hidden',
-          ].join(' ')}>
-          <div className="tw-flex tw-flex-1 tw-overflow-hidden">
-            <div ref={scrollContainer} className="tw-flex tw-h-full tw-w-full tw-flex-1 tw-overflow-auto tw-bg-white tw-px-6 tw-pt-4 tw-pb-0">
-              {/* <div className="[overflow-wrap:anywhere]">
-          <ActionsSortableList data={dataConsolidated} limit={20} />
-        </div> */}
-              {/* <div className="noprint tw-grid tw-grid-cols-12 tw-gap-4 tw-pt-4">
-        <div className="tw-col-span-3">
-          <InfosMain person={person} />
-        </div>
-        <div className="tw-col-span-5 tw-h-0 tw-min-h-full tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
-          <Actions person={person} />
-        </div>
-
-        <div className="tw-col-span-4 tw-h-0 tw-min-h-full tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
-          {['restricted-access'].includes(user.role) ? <PassagesRencontres person={person} /> : <Comments person={person} />}
-        </div>
-      </div> */}
-            </div>
           </div>
         </div>
       </div>
+    </div>
+  );
+
+  return (
+    <>
+      {renderPrintOnly()}
+      {renderScreenOnly()}
     </>
   );
 };
@@ -1125,15 +1373,6 @@ const Consultations = ({ date, status, consultations, setSortOrder, setSortBy, s
               sortOrder,
               render: (consultation) => <ActionStatus status={consultation.status} />,
             },
-            {
-              title: 'Équipe(s) en charge',
-              dataKey: 'team',
-              render: (a) => (
-                <div className="px-2 tw-flex tw-flex-shrink-0 tw-flex-col tw-gap-px">
-                  {Array.isArray(a?.teams) ? a.teams.map((e) => <TagTeam key={e} teamId={e} />) : <TagTeam teamId={a?.team} />}
-                </div>
-              ),
-            },
           ]}
         />
       </StyledBox>
@@ -1191,15 +1430,6 @@ const ConsultationsCreatedAt = ({ date, consultations }) => {
               render: (action) => <PersonName showOtherNames item={action} />,
             },
             { title: 'Statut', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
-            {
-              title: 'Équipe(s) en charge',
-              dataKey: 'team',
-              render: (a) => (
-                <div className="px-2 tw-flex tw-flex-shrink-0 tw-flex-col tw-gap-px">
-                  {Array.isArray(a?.teams) ? a.teams.map((e) => <TagTeam key={e} teamId={e} />) : <TagTeam teamId={a?.team} />}
-                </div>
-              ),
-            },
           ]}
         />
       </StyledBox>
