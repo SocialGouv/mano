@@ -37,7 +37,11 @@ export default function PersonCustomFields({ person, sectionName, fields, colspa
           </button>
         </div>
       </div>
-      {sectionName === 'Informations sociales' && !!person.description && <div className="my-4">{person.description}</div>}
+      {sectionName === 'Informations sociales' && !!person.description && (
+        <div className="my-4">
+          <CustomFieldDisplay type="textarea" value={person.description} />
+        </div>
+      )}
       <Row>
         {enabledFields.map((field, i) => {
           return (
