@@ -15,8 +15,8 @@ module.exports = {
         "debugApp" jsonb,
         "debugDashboard" jsonb,
         PRIMARY KEY (_id),
-        CONSTRAINT "UserLog_organisation_fkey" FOREIGN KEY (organisation) REFERENCES mano."Organisation"(_id),
-        CONSTRAINT "UserLog_user_fkey" FOREIGN KEY ("user") REFERENCES mano."User"(_id)
+        CONSTRAINT "UserLog_organisation_fkey" FOREIGN KEY (organisation) REFERENCES mano."Organisation"(_id) ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE,
+        CONSTRAINT "UserLog_user_fkey" FOREIGN KEY ("user") REFERENCES mano."User"(_id) ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE
       );
       CREATE INDEX "UserLog_organisation_idx" ON mano."UserLog" USING btree (organisation);
       CREATE INDEX "UserLog_user_idx" ON mano."UserLog" USING btree ("user");
