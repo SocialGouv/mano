@@ -10,7 +10,7 @@ const { validatePassword, looseUuidRegex, jwtRegex, sanitizeAll, headerJwtRegex 
 const mailservice = require("../utils/mailservice");
 const config = require("../config");
 const { comparePassword } = require("../utils");
-const { User, RelUserTeam, Team, Organisation } = require("../db/sequelize");
+const { User, RelUserTeam, Team, Organisation, UserLog } = require("../db/sequelize");
 const validateUser = require("../middleware/validateUser");
 const { capture } = require("../sentry");
 const { ExtractJwt } = require("passport-jwt");
@@ -43,7 +43,7 @@ function logoutCookieOptions() {
   }
 }
 
-function updateUserDebugInfos(req, user) {
+function createUserLog(req, user) {
   if (req.headers.platform === "android") {
     try {
       z.object({
@@ -72,30 +72,35 @@ function updateUserDebugInfos(req, user) {
       capture(e, { extra: { body: req.body }, user });
       return;
     }
-    user.debugApp = {
-      version: req.headers.version,
-      apilevel: req.body.apilevel,
-      brand: req.body.brand,
-      carrier: req.body.carrier,
-      device: req.body.device,
-      deviceid: req.body.deviceid,
-      freediskstorage: req.body.freediskstorage,
-      hardware: req.body.hardware,
-      manufacturer: req.body.manufacturer,
-      maxmemory: req.body.maxmemory,
-      model: req.body.model,
-      product: req.body.product,
-      readableversion: req.body.readableversion,
-      systemname: req.body.systemname,
-      systemversion: req.body.systemversion,
-      buildid: req.body.buildid,
-      totaldiskcapacity: req.body.totaldiskcapacity,
-      totalmemory: req.body.totalmemory,
-      useragent: req.body.useragent,
-      tablet: req.body.tablet,
-    };
-  }
-  if (req.headers.platform === "dashboard") {
+    UserLog.create({
+      user: user._id,
+      organisation: user.organisation,
+      platform: "app",
+      action: "login",
+      debugApp: {
+        version: req.headers.version,
+        apilevel: req.body.apilevel,
+        brand: req.body.brand,
+        carrier: req.body.carrier,
+        device: req.body.device,
+        deviceid: req.body.deviceid,
+        freediskstorage: req.body.freediskstorage,
+        hardware: req.body.hardware,
+        manufacturer: req.body.manufacturer,
+        maxmemory: req.body.maxmemory,
+        model: req.body.model,
+        product: req.body.product,
+        readableversion: req.body.readableversion,
+        systemname: req.body.systemname,
+        systemversion: req.body.systemversion,
+        buildid: req.body.buildid,
+        totaldiskcapacity: req.body.totaldiskcapacity,
+        totalmemory: req.body.totalmemory,
+        useragent: req.body.useragent,
+        tablet: req.body.tablet,
+      },
+    });
+  } else if (req.headers.platform === "dashboard") {
     try {
       z.object({
         body: z.object({
@@ -112,13 +117,26 @@ function updateUserDebugInfos(req, user) {
       capture(e, { extra: { body: req.body }, user });
       return;
     }
-    user.debugDashboard = {
-      browserType: req.body.browsertype,
-      browserName: req.body.browsername,
-      browserVersion: req.body.browserversion,
-      browserOs: req.body.browseros,
-      version: req.headers.version,
-    };
+    UserLog.create({
+      user: user._id,
+      organisation: user.organisation,
+      platform: "dashboard",
+      action: "login",
+      debugDashboard: {
+        browserType: req.body.browsertype,
+        browserName: req.body.browsername,
+        browserVersion: req.body.browserversion,
+        browserOs: req.body.browseros,
+        version: req.headers.version,
+      },
+    });
+  } else {
+    UserLog.create({
+      user: user._id,
+      organisation: user.organisation,
+      platform: "unknown",
+      action: "login",
+    });
   }
 }
 
@@ -141,7 +159,13 @@ router.post(
   "/logout",
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal", "superadmin", "restricted-access"]),
-  catchErrors(async (_req, res) => {
+  catchErrors(async (req, res) => {
+    UserLog.create({
+      organisation: req.user.organisation,
+      user: req.user._id,
+      platform: req.headers.platform === "android" ? "app" : req.headers.platform === "dashboard" ? "dashboard" : "unknown",
+      action: "logout",
+    });
     res.clearCookie("jwt", logoutCookieOptions());
     return res.status(200).send({ ok: true });
   })
@@ -174,7 +198,7 @@ router.post(
     if (!match) return res.status(403).send({ ok: false, error: "E-mail ou mot de passe incorrect", code: EMAIL_OR_PASSWORD_INVALID });
     user.lastLoginAt = new Date();
 
-    updateUserDebugInfos(req, user);
+    createUserLog(req, user);
 
     await user.save();
     // restricted-access users cannot acces the app
@@ -224,6 +248,8 @@ router.get(
     const orgTeams = await Team.findAll({ where: { organisation: organisation._id } });
     const userTeams = await RelUserTeam.findAll({ where: { user: user._id, team: { [Op.in]: orgTeams.map((t) => t._id) } } });
     const teams = userTeams.map((rel) => orgTeams.find((t) => t._id === rel.team));
+
+    createUserLog(req, user);
 
     return res.status(200).send({ ok: true, token, user: serializeUserWithTeamsAndOrganisation(user, teams, organisation) });
   })
