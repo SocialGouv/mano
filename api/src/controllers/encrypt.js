@@ -20,6 +20,7 @@ const {
   Report,
   TerritoryObservation,
   sequelize,
+  UserLog,
 } = require("../db/sequelize");
 
 const { capture } = require("../sentry");
@@ -89,6 +90,13 @@ router.post(
     }
     organisation.set({ encrypting: true });
     await organisation.save();
+
+    UserLog.create({
+      organisation: req.user.organisation,
+      user: req.user._id,
+      platform: req.headers.platform === "android" ? "app" : req.headers.platform === "dashboard" ? "dashboard" : "unknown",
+      action: "change-encryption-key",
+    });
 
     try {
       await sequelize.transaction(async (tx) => {
