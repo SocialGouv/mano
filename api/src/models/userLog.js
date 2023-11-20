@@ -11,12 +11,7 @@ module.exports = (sequelize, DataTypes) => {
     debugDashboard: DataTypes.JSONB,
   };
 
-  class UserLog extends Model {
-    static associate({ Organisation, User }) {
-      Organisation.hasMany(UserLog, { foreignKey: { type: DataTypes.UUID, name: "organisation", field: "organisation" } });
-      User.hasMany(UserLog, { foreignKey: { type: DataTypes.UUID, name: "organisation", field: "organisation" } });
-    }
-  }
+  class UserLog extends Model {}
 
   UserLog.init(schema, { sequelize, modelName: "UserLog", freezeTableName: true, timestamps: true });
 
