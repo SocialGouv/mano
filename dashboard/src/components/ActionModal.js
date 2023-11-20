@@ -249,6 +249,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
     const searchParams = new URLSearchParams(history.location.search);
     searchParams.set('actionId', response.decryptedData._id);
     history.push(`?${searchParams.toString()}`);
+    setIsSubmitting(false);
     refresh();
   };
 
@@ -698,8 +699,6 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
 function ActionHistory({ action }) {
   const history = useMemo(() => [...(action?.history || [])].reverse(), [action?.history]);
   const teams = useRecoilValue(teamsState);
-
-  console.log({ action });
 
   return (
     <div>
