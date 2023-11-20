@@ -69,7 +69,7 @@ export function SummaryPrint({ person }: { person: PersonPopulated }) {
             <div>
               {enabledFields.map((field) => {
                 return (
-                  <div>
+                  <div key={field.label}>
                     {field.label} : {person[field.name]}
                   </div>
                 );
@@ -116,7 +116,7 @@ export function SummaryPrint({ person }: { person: PersonPopulated }) {
                     action.teams.map((e: string) => {
                       const team = teams.find((u) => u._id === e);
                       return (
-                        <div style={{ marginLeft: '20px' }} key={team?.name}>
+                        <div className="tw-ml-5" key={team?.name}>
                           {team?.name}
                         </div>
                       );
