@@ -257,7 +257,10 @@ router.get(
 
 router.post(
   "/forgot_password",
-  catchErrors(async ({ body: { email } }, res) => {
+  catchErrors(async (req, res) => {
+    const {
+      body: { email },
+    } = req;
     try {
       z.string()
         .email()
@@ -269,9 +272,8 @@ router.post(
     }
 
     UserLog.create({
-      user: email,
       platform: req.headers.platform === "android" ? "app" : req.headers.platform === "dashboard" ? "dashboard" : "unknown",
-      action: "forgot-password",
+      action: `forgot-password-${email}`,
     });
 
     if (!email) return res.status(403).send({ ok: false, error: "Veuillez fournir un email", code: EMAIL_OR_PASSWORD_INVALID });
@@ -323,9 +325,8 @@ router.post(
 
     if (!user) {
       UserLog.create({
-        user: token,
         platform: req.headers.platform === "android" ? "app" : req.headers.platform === "dashboard" ? "dashboard" : "unknown",
-        action: "forgot-password-reset-failed",
+        action: `forgot-password-reset-failed-${token}`,
       });
       return res.status(400).send({ ok: false, error: "Le lien est non valide ou expiré" });
     }
