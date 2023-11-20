@@ -1,3 +1,10 @@
+## [1.295.3](https://github.com/SocialGouv/mano/compare/v1.295.2...v1.295.3) (2023-11-20)
+
+
+### Bug Fixes
+
+* **dashboard:** action modal layout ([#1782](https://github.com/SocialGouv/mano/issues/1782)) ([d0f3e3c](https://github.com/SocialGouv/mano/commit/d0f3e3c7679ac9bd8b51f84686bc7266919f08e5))
+
 ## [1.295.2](https://github.com/SocialGouv/mano/compare/v1.295.1...v1.295.2) (2023-11-20)
 
 
