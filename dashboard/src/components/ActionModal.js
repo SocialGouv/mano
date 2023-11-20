@@ -389,12 +389,15 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
             />
           )}
           <div
-            className={['tw-flex tw-w-full tw-flex-wrap tw-p-4 sm:tw-h-[90vh]', activeTab !== 'Informations' && 'tw-hidden']
+            className={[
+              'tw-flex tw-w-full tw-flex-wrap tw-overflow-hidden sm:tw-h-[60vh] sm:tw-min-h-min',
+              activeTab !== 'Informations' && 'tw-hidden',
+            ]
               .filter(Boolean)
               .join(' ')}>
-            <div className="tw-flex tw-w-full tw-flex-col tw-text-left sm:tw-flex-row">
-              <div className="tw-flex tw-flex-[2] tw-basis-2/3 tw-flex-col">
-                <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
+            <div className="tw-flex tw-h-full tw-w-full tw-flex-col tw-items-stretch tw-py-4 tw-text-left sm:tw-flex-row">
+              <div className="tw-flex tw-flex-[2] tw-basis-2/3 tw-flex-col tw-overflow-y-auto tw-pl-4 tw-pr-8">
+                <div className="tw-mb-4 tw-flex tw-flex-col tw-items-start tw-justify-start">
                   <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="name">
                     Nom de l'action
                   </label>
@@ -410,7 +413,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                     <CustomFieldDisplay value={data.name} type="textarea" />
                   )}
                 </div>
-                <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
+                <div className="tw-mb-4 tw-flex tw-flex-col tw-items-start tw-justify-start">
                   <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="person">
                     {isMulti ? 'Personne(s) suivie(s)' : 'Personne suivie'}
                   </label>
@@ -422,7 +425,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                     <PersonName item={data} />
                   )}
                 </div>
-                <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
+                <div className="tw-mb-4 tw-flex tw-flex-col tw-items-start tw-justify-start">
                   <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="categories">
                     Catégorie(s)
                   </label>
@@ -515,11 +518,11 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                   )}
                 </div>
               </div>
-              <div className="tw-flex tw-shrink-0 tw-flex-col tw-px-4">
+              <div className="tw-flex tw-shrink-0 tw-flex-col">
                 <hr className="tw-m-0 tw-w-px tw-shrink-0 tw-basis-full tw-border tw-bg-gray-300" />
               </div>
-              <div className="tw-flex tw-flex-[1] tw-basis-1/3 tw-flex-col">
-                <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
+              <div className="tw-flex tw-flex-[1] tw-basis-1/3 tw-flex-col tw-overflow-y-auto tw-pr-4 tw-pl-8">
+                <div className="tw-mb-4 tw-flex tw-flex-col tw-items-start tw-justify-start">
                   <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="dueAt">
                     À faire le
                   </label>
@@ -544,7 +547,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                     <CustomFieldDisplay value={data.dueAt} type={data.withTime ? 'date-with-time' : 'date'} />
                   )}
                 </div>
-                <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
+                <div className="tw-mb-4 tw-flex tw-flex-col tw-items-start tw-justify-start">
                   <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="team">
                     Équipe(s) en charge
                   </label>
@@ -566,7 +569,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                     </div>
                   )}
                 </div>
-                <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
+                <div className="tw-mb-4 tw-flex tw-flex-col tw-items-start tw-justify-start">
                   <label htmlFor="create-action-urgent">
                     <input
                       type="checkbox"
@@ -582,7 +585,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                     <small className="text-muted">Cette action sera mise en avant par rapport aux autres</small>
                   </label>
                 </div>
-                <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
+                <div className="tw-mb-4 tw-flex tw-flex-col tw-items-start tw-justify-start">
                   <label htmlFor="update-action-select-status">Statut</label>
                   <div className="tw-w-full">
                     <SelectStatus
