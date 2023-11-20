@@ -1,3 +1,10 @@
+## [1.295.1](https://github.com/SocialGouv/mano/compare/v1.295.0...v1.295.1) (2023-11-20)
+
+
+### Bug Fixes
+
+* **api:** drop constraint user/organisation on userlog ([#1780](https://github.com/SocialGouv/mano/issues/1780)) ([a0f3f39](https://github.com/SocialGouv/mano/commit/a0f3f393ba7f1945f3ce1c990f7fa6fd38547b81))
+
 # [1.295.0](https://github.com/SocialGouv/mano/compare/v1.294.4...v1.295.0) (2023-11-17)
 
 
