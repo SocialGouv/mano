@@ -1,3 +1,10 @@
+## [1.295.2](https://github.com/SocialGouv/mano/compare/v1.295.1...v1.295.2) (2023-11-20)
+
+
+### Bug Fixes
+
+* **dashboard:** action dupliquée ne peut pas être sauvegaredée ([13f85df](https://github.com/SocialGouv/mano/commit/13f85df43c483eaf73269b1d5890f0e9bfda9921))
+
 ## [1.295.1](https://github.com/SocialGouv/mano/compare/v1.295.0...v1.295.1) (2023-11-20)
 
 
