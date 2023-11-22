@@ -248,7 +248,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
     }
     const searchParams = new URLSearchParams(history.location.search);
     searchParams.set('actionId', response.decryptedData._id);
-    history.push(`?${searchParams.toString()}`);
+    history.replace(`?${searchParams.toString()}`);
     setIsSubmitting(false);
     refresh();
   };
