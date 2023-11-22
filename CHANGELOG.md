@@ -1,3 +1,15 @@
+# [1.297.0](https://github.com/SocialGouv/mano/compare/v1.296.0...v1.297.0) (2023-11-22)
+
+
+### Bug Fixes
+
+* **dashboard:** l'action annulée dupliquée réapparaissait après fermeture du duplicata, elle ne réapparait plus ([#1784](https://github.com/SocialGouv/mano/issues/1784)) ([ad44b76](https://github.com/SocialGouv/mano/commit/ad44b760f829674535293552c35026ec97e087e9))
+
+
+### Features
+
+* **dashboard:** export des observations avec la bonne date de création ([6ecad00](https://github.com/SocialGouv/mano/commit/6ecad0030f01a0e1d57adab5601f09611b382b4c))
+
 # [1.296.0](https://github.com/SocialGouv/mano/compare/v1.295.3...v1.296.0) (2023-11-22)
 
 
