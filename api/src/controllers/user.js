@@ -257,7 +257,10 @@ router.get(
 
 router.post(
   "/forgot_password",
-  catchErrors(async ({ body: { email } }, res) => {
+  catchErrors(async (req, res) => {
+    const {
+      body: { email },
+    } = req;
     try {
       z.string()
         .email()
@@ -267,6 +270,12 @@ router.post(
       error.status = 400;
       return next(error);
     }
+
+    UserLog.create({
+      platform: req.headers.platform === "android" ? "app" : req.headers.platform === "dashboard" ? "dashboard" : "unknown",
+      action: `forgot-password-${email}`,
+    });
+
     if (!email) return res.status(403).send({ ok: false, error: "Veuillez fournir un email", code: EMAIL_OR_PASSWORD_INVALID });
 
     const user = await User.findOne({ where: { email } });
@@ -314,7 +323,19 @@ router.post(
     if (!validatePassword(password)) return res.status(400).send({ ok: false, error: passwordCheckError, code: PASSWORD_NOT_VALIDATED });
     const user = await User.findOne({ where: { forgotPasswordResetToken: token, forgotPasswordResetExpires: { [Op.gte]: new Date() } } });
 
-    if (!user) return res.status(400).send({ ok: false, error: "Le lien est non valide ou expiré" });
+    if (!user) {
+      UserLog.create({
+        platform: req.headers.platform === "android" ? "app" : req.headers.platform === "dashboard" ? "dashboard" : "unknown",
+        action: `forgot-password-reset-failed-${token}`,
+      });
+      return res.status(400).send({ ok: false, error: "Le lien est non valide ou expiré" });
+    }
+    UserLog.create({
+      organisation: user.organisation,
+      user: user.id,
+      platform: req.headers.platform === "android" ? "app" : req.headers.platform === "dashboard" ? "dashboard" : "unknown",
+      action: "forgot-password-reset",
+    });
     user.set({
       password: password,
       forgotPasswordResetToken: null,
@@ -360,6 +381,13 @@ router.post(
       forgotPasswordResetToken: token,
       forgotPasswordResetExpires: new Date(Date.now() + 60 * 60 * 24 * 30 * 1000), // 30 days
     };
+
+    UserLog.create({
+      organisation: req.user.organisation,
+      user: req.user.id,
+      platform: req.headers.platform === "android" ? "app" : req.headers.platform === "dashboard" ? "dashboard" : "unknown",
+      action: `create-user-${sanitizeAll(email.trim().toLowerCase())}`,
+    });
 
     const prevUser = await User.findOne({ where: { email: newUser.email } });
     if (prevUser) return res.status(400).send({ ok: false, error: "Un utilisateur existe déjà avec cet email" });
@@ -694,6 +722,14 @@ router.delete(
     }
 
     const userId = req.params._id;
+
+    UserLog.create({
+      organisation: req.user.organisation,
+      user: req.user._id,
+      platform: req.headers.platform === "android" ? "app" : req.headers.platform === "dashboard" ? "dashboard" : "unknown",
+      action: `delete-user-${userId}`,
+    });
+
     const query = { where: { _id: userId, organisation: req.user.organisation } };
 
     let user = await User.findOne(query);

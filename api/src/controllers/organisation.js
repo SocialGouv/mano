@@ -22,6 +22,7 @@ const {
   Report,
   User,
   TerritoryObservation,
+  UserLog,
 } = require("../db/sequelize");
 const mailservice = require("../utils/mailservice");
 const validateUser = require("../middleware/validateUser");
@@ -363,6 +364,13 @@ router.delete(
       error.status = 400;
       return next(error);
     }
+    UserLog.create({
+      organisation: req.user.organisation,
+      user: req.user._id,
+      platform: req.headers.platform === "android" ? "app" : req.headers.platform === "dashboard" ? "dashboard" : "unknown",
+      action: `delete-organisation-${req.params._id}`,
+    });
+
     // Super admin can delete any organisation. Admin can delete only their organisation.
     const canDelete = req.user.role === "superadmin" || (req.user.role === "admin" && req.user.organisation === req.params._id);
     if (!canDelete) return res.status(403).send({ ok: false, error: "Forbidden" });
