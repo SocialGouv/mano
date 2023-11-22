@@ -136,7 +136,7 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
     return {
       id: observation._id,
       'Territoire - Nom': territories.find((t) => t._id === observation.territory)?.name,
-      'Observé le': dayjsInstance(observation.date).format('YYYY-MM-DD HH:mm'),
+      'Observé le': dayjsInstance(observation.observedAt).format('YYYY-MM-DD HH:mm'),
       Équipe: observation.team ? teams.find((t) => t._id === observation.team)?.name : '',
       ...customFieldsObs.reduce((fields, field) => {
         if (['date', 'date-with-time'].includes(field.type))
