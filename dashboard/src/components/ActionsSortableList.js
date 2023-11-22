@@ -18,6 +18,7 @@ import { useLocalStorage } from '../services/useLocalStorage';
 import Page from './pagination';
 import useSearchParamState from '../services/useSearchParamState';
 import DescriptionIcon from './DescriptionIcon';
+import { AgendaMutedIcon } from '../assets/icons/AgendaMutedIcon';
 
 const ActionsSortableList = ({ data, limit }) => {
   useTitle('Agenda');
@@ -43,6 +44,15 @@ const ActionsSortableList = ({ data, limit }) => {
   }, [dataSorted, page, limit]);
 
   const total = data.length;
+
+  if (total <= 0) {
+    return (
+      <div className="tw-mt-8 tw-w-full tw-text-center tw-text-gray-300">
+        <AgendaMutedIcon />
+        Aucun élément pour le moment
+      </div>
+    );
+  }
 
   return (
     <>

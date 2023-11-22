@@ -361,7 +361,7 @@ export const itemsGroupedByPersonSelector = selector({
   },
 });
 
-const arrayOfitemsGroupedByPersonSelector = selector({
+export const arrayOfitemsGroupedByPersonSelector = selector({
   key: 'arrayOfitemsGroupedByPersonSelector',
   get: ({ get }) => {
     const itemsGroupedByPerson = get(itemsGroupedByPersonSelector);

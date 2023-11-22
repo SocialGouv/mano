@@ -1,17 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Col, Row, FormGroup, Label, Spinner } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Formik } from 'formik';
-import {
-  addOneDay,
-  dayjsInstance,
-  formatDateWithFullMonth,
-  formatDateWithNameOfDay,
-  formatTime,
-  getIsDayWithinHoursOffsetOfPeriod,
-} from '../../services/date';
+import { addOneDay, dayjsInstance, formatDateWithFullMonth, formatDateWithNameOfDay, formatTime } from '../../services/date';
 import DateBloc from '../../components/DateBloc';
 import { HeaderStyled, Title as HeaderTitle } from '../../components/header';
 import BackButton, { BackButtonWrapper } from '../../components/backButton';
@@ -20,8 +13,7 @@ import ActionStatus from '../../components/ActionStatus';
 import Table from '../../components/table';
 import Observation from '../territory-observations/view';
 import dayjs from 'dayjs';
-import { CANCEL, DONE, sortActionsOrConsultations } from '../../recoil/actions';
-import { territoryObservationsState } from '../../recoil/territoryObservations';
+import { CANCEL, DONE, TODO } from '../../recoil/actions';
 import { capture } from '../../services/sentry';
 import UserName from '../../components/UserName';
 import ButtonCustom from '../../components/ButtonCustom';
@@ -31,16 +23,13 @@ import SelectAndCreateCollaboration from './SelectAndCreateCollaboration';
 import ActionOrConsultationName from '../../components/ActionOrConsultationName';
 import ReportDescriptionModale from '../../components/ReportDescriptionModale';
 import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
-import { commentsState } from '../../recoil/comments';
-import { personsState, sortPersons } from '../../recoil/persons';
 import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import { territoriesState } from '../../recoil/territory';
 import PersonName from '../../components/PersonName';
-import { selector, useRecoilValue, useSetRecoilState } from 'recoil';
+import { selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
 import IncrementorSmall from '../../components/IncrementorSmall';
 import API from '../../services/api';
 import { passagesState } from '../../recoil/passages';
-import { rencontresState } from '../../recoil/rencontres';
 import Passage from '../../components/Passage';
 import ExclamationMarkButton from '../../components/tailwind/ExclamationMarkButton';
 import useTitle from '../../services/useTitle';
@@ -54,10 +43,10 @@ import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import TagTeam from '../../components/TagTeam';
 import ReceptionService from '../../components/ReceptionService';
 import { useLocalStorage } from '../../services/useLocalStorage';
-import { arrayOfitemsGroupedByActionSelector, arrayOfitemsGroupedByConsultationSelector, personsObjectSelector } from '../../recoil/selectors';
-import { treatmentsState } from '../../recoil/treatments';
-import { medicalFileState } from '../../recoil/medicalFiles';
+import { arrayOfitemsGroupedByPersonSelector, onlyFilledObservationsTerritories } from '../../recoil/selectors';
 import DescriptionIcon from '../../components/DescriptionIcon';
+import ActionsSortableList from '../../components/ActionsSortableList';
+import { ActionsOrConsultations } from './components/ActionsReport';
 
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithNameOfDay(date)}`;
@@ -74,32 +63,138 @@ const getPeriodTitle = (date, nightSession) => {
   );
 };
 
-const commentsMedicalSelector = selector({
-  key: 'commentsMedicalSelector',
-  get: ({ get }) => {
-    const consultations = get(arrayOfitemsGroupedByConsultationSelector);
-    const treatments = get(treatmentsState);
-    const medicalFiles = get(medicalFileState);
-    const allPersonsAsObject = get(personsObjectSelector);
+const itemsForReportsSelector = selectorFamily({
+  key: 'itemsForReportsSelector',
+  get:
+    ({ period, selectedTeamsObject, viewAllOrganisationData, allSelectedTeamsAreNightSession }) =>
+    ({ get }) => {
+      const filterItemByTeam = (item, key) => {
+        if (viewAllOrganisationData) return true;
+        if (Array.isArray(item[key])) {
+          for (const team of item[key]) {
+            if (selectedTeamsObject[team]) return true;
+          }
+        }
+        return !!selectedTeamsObject[item[key]];
+      };
 
-    const comments = [];
-    for (const consultation of consultations) {
-      for (const comment of consultation.comments || []) {
-        comments.push({ ...comment, type: 'consultation', consultation: consultation, person: allPersonsAsObject[consultation.person] });
+      const allPersons = get(arrayOfitemsGroupedByPersonSelector);
+      const allObservations = get(onlyFilledObservationsTerritories);
+      const allPassages = get(passagesState);
+
+      const offsetHours = allSelectedTeamsAreNightSession ? 12 : 0;
+      // if no date chosen, it's today
+
+      const isoStartDate = dayjs(period.startDate ?? undefined)
+        .startOf('day')
+        .add(offsetHours, 'hour')
+        .toISOString();
+      const isoEndDate = dayjs(period.endDate ?? undefined)
+        .startOf('day')
+        .add(1, 'day')
+        .add(offsetHours, 'hour')
+        .toISOString();
+
+      const personsCreated = {};
+      const personsUpdated = {};
+      const actions = {};
+      const consultations = {};
+      const comments = {};
+      const commentsMedical = {};
+      const passages = {};
+      const rencontres = {};
+      const observations = {};
+
+      for (let person of allPersons) {
+        // get persons for reports for period
+        const createdDate = person.followedSince || person.createdAt;
+
+        if (filterItemByTeam(person, 'assignedTeams')) {
+          if (createdDate >= isoStartDate && createdDate < isoEndDate) {
+            personsCreated[person._id] = person;
+            personsUpdated[person._id] = person;
+          }
+          for (const date of person.interactions) {
+            if (date < isoStartDate) continue;
+            if (date >= isoEndDate) continue;
+            personsUpdated[person._id] = person;
+            break;
+          }
+        }
+        // get actions for stats for period
+        for (const action of person.actions || []) {
+          if (!filterItemByTeam(action, 'teams')) continue;
+          if (action.completedAt >= isoStartDate && action.completedAt < isoEndDate) {
+            actions[action._id] = action;
+            continue;
+          }
+          if (action.status !== TODO) continue;
+          if (action.dueAt >= isoStartDate && action.dueAt < isoEndDate) {
+            actions[action._id] = action;
+          }
+        }
+        for (const consultation of person.consultations || []) {
+          if (!filterItemByTeam(consultation, 'teams')) continue;
+          if (consultation.completedAt >= isoStartDate && consultation.completedAt < isoEndDate) {
+            consultations[consultation._id] = consultation;
+            continue;
+          }
+          if (consultation.status !== TODO) continue;
+          if (consultation.dueAt >= isoStartDate && consultation.dueAt < isoEndDate) {
+            consultations[consultation._id] = consultation;
+          }
+        }
+        for (const rencontre of person.rencontres || []) {
+          if (!filterItemByTeam(rencontre, 'team')) continue;
+          const date = rencontre.date;
+          if (date < isoStartDate) continue;
+          if (date >= isoEndDate) continue;
+          rencontres[rencontre._id] = rencontre;
+        }
+        for (const commentMedical of person.commentsMedical || []) {
+          if (!filterItemByTeam(commentMedical, 'team')) continue;
+          const date = commentMedical.date;
+          if (date < isoStartDate) continue;
+          if (date >= isoEndDate) continue;
+          commentsMedical[commentMedical._id] = commentMedical;
+        }
+        for (const comment of person.comments || []) {
+          if (!filterItemByTeam(comment, 'team')) continue;
+          const date = comment.date;
+          if (date < isoStartDate) continue;
+          if (date >= isoEndDate) continue;
+          comments[comment._id] = comment;
+        }
       }
-    }
-    for (const treatment of treatments) {
-      for (const comment of treatment.comments || []) {
-        comments.push({ ...comment, type: 'treatment', treatment: treatment, person: allPersonsAsObject[treatment.person] });
+
+      for (const passage of allPassages) {
+        if (!filterItemByTeam(passage, 'team')) continue;
+        const date = passage.date;
+        if (date < isoStartDate) continue;
+        if (date >= isoEndDate) continue;
+        passages[passage._id] = passage;
       }
-    }
-    for (const medicalFile of medicalFiles) {
-      for (const comment of medicalFile.comments || []) {
-        comments.push({ ...comment, type: 'medical-file', person: allPersonsAsObject[medicalFile.person] });
+
+      for (const observation of allObservations) {
+        if (!filterItemByTeam(observation, 'team')) continue;
+        const date = observation.observedAt;
+        if (date < isoStartDate) continue;
+        if (date >= isoEndDate) continue;
+        observations[observation._id] = observation;
       }
-    }
-    return comments.sort((a, b) => new Date(a.date) - new Date(b.date));
-  },
+
+      return {
+        personsCreated: Object.values(personsCreated),
+        personsUpdated: Object.values(personsUpdated),
+        actions: Object.values(actions),
+        consultations: Object.values(consultations),
+        comments: Object.values(comments),
+        commentsMedical: Object.values(commentsMedical),
+        passages: Object.values(passages),
+        rencontres: Object.values(rencontres),
+        observations: Object.values(observations),
+      };
+    },
 });
 
 const View = () => {
@@ -107,10 +202,6 @@ const View = () => {
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
-  const allComments = useRecoilValue(commentsState);
-  const allCommentsMedical = useRecoilValue(commentsMedicalSelector);
-  const allPersons = useRecoilValue(personsState);
-  const allPersonsAsObject = useRecoilValue(personsObjectSelector);
   const teams = useRecoilValue(teamsState);
   const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('reports-allOrg', teams.length === 1);
   const [selectedTeamIds, setSelectedTeamIds] = useLocalStorage('reports-teams', [currentTeam._id]);
@@ -145,13 +236,16 @@ const View = () => {
   const history = useHistory();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const [activeTab, setActiveTab] = useState(['restricted-access'].includes(user.role) ? 'reception' : 'resume');
-  const searchParamTab = searchParams.get('tab');
-  useEffect(() => {
-    if (searchParamTab) {
-      setActiveTab(searchParamTab);
-    }
-  }, [searchParamTab]);
+  const [period] = useLocalStorage('period', { startDate: null, endDate: null });
+
+  const { personsCreated, personsUpdated, actions, consultations, comments, commentsMedical, passages, rencontres, observations } = useRecoilValue(
+    itemsForReportsSelector({
+      period,
+      selectedTeamsObject,
+      viewAllOrganisationData,
+      allSelectedTeamsAreNightSession,
+    })
+  );
 
   const { refresh } = useDataLoader();
 
@@ -168,211 +262,8 @@ const View = () => {
     return selectedTeamsReports[0];
   }, [isSingleTeam, selectedTeamsReports]);
 
-  const allPassages = useRecoilValue(passagesState);
-  const passages = useMemo(
-    () =>
-      allPassages
-        .filter((p) => !!selectedTeamsObject[p.team])
-        .filter((p) => {
-          const currentTeam = selectedTeamsObject[p.team];
-          return getIsDayWithinHoursOffsetOfPeriod(
-            p.date,
-            { referenceStartDay: dateString, referenceEndDay: dateString },
-            currentTeam?.nightSession ? 12 : 0
-          );
-        })
-        .sort((a, b) => new Date(a.date || a.createdAt) - new Date(b.date || b.createdAt)),
-    [allPassages, dateString, selectedTeamsObject]
-  );
-
-  const allActions = useRecoilValue(arrayOfitemsGroupedByActionSelector);
-  const [actionsSortBy, setActionsSortBy] = useLocalStorage('actions-consultations-sortBy', 'dueAt');
-  const [actionsSortOrder, setActionsSortOrder] = useLocalStorage('actions-consultations-sortOrder', 'ASC');
-
-  const actionsCallback = useCallback(
-    (status) =>
-      allActions
-        .filter((a) => (Array.isArray(a.teams) ? a.teams.some((teamId) => !!selectedTeamsObject[teamId]) : !!selectedTeamsObject[a.team]))
-        .filter((a) => a.status === status)
-        .filter((a) => {
-          const isNightSession = Array.isArray(a.teams)
-            ? a.teams.every((teamId) => selectedTeamsObject[teamId]?.nightSession)
-            : selectedTeamsObject[a.team]?.nightSession;
-          return getIsDayWithinHoursOffsetOfPeriod(
-            a.completedAt,
-            { referenceStartDay: dateString, referenceEndDay: dateString },
-            isNightSession ? 12 : 0
-          );
-        })
-        .sort(sortActionsOrConsultations(actionsSortBy, actionsSortOrder)),
-    [allActions, selectedTeamsObject, dateString, actionsSortBy, actionsSortOrder]
-  );
-  const actionsDone = useMemo(() => actionsCallback(DONE), [actionsCallback]);
-  const actionsCancel = useMemo(() => actionsCallback(CANCEL), [actionsCallback]);
-
-  const actionsCreatedAt = useMemo(
-    () =>
-      allActions
-        .filter((a) => (Array.isArray(a.teams) ? a.teams.some((teamId) => !!selectedTeamsObject[teamId]) : !!selectedTeamsObject[a.team]))
-        .filter((a) => {
-          const isNightSession = Array.isArray(a.teams)
-            ? a.teams.every((teamId) => selectedTeamsObject[teamId]?.nightSession)
-            : selectedTeamsObject[a.team]?.nightSession;
-          return getIsDayWithinHoursOffsetOfPeriod(
-            a.createdAt,
-            { referenceStartDay: dateString, referenceEndDay: dateString },
-            isNightSession ? 12 : 0
-          );
-        })
-        .filter((a) => {
-          const isNightSession = Array.isArray(a.teams)
-            ? a.teams.every((teamId) => selectedTeamsObject[teamId]?.nightSession)
-            : selectedTeamsObject[a.team]?.nightSession;
-          return !getIsDayWithinHoursOffsetOfPeriod(
-            a.completedAt,
-            { referenceStartDay: dateString, referenceEndDay: dateString },
-            isNightSession ? 12 : 0
-          );
-        })
-        .sort(sortActionsOrConsultations(actionsSortBy, actionsSortOrder)),
-    [allActions, dateString, selectedTeamsObject, actionsSortBy, actionsSortOrder]
-  );
-
-  const allConsultations = useRecoilValue(arrayOfitemsGroupedByConsultationSelector);
-  const [consultationsSortBy, setConsultationsSortBy] = useLocalStorage('consultations-sortBy', 'dueAt');
-  const [consultationsSortOrder, setConsultationsSortOrder] = useLocalStorage('consultations-sortOrder', 'ASC');
-
-  const consultations = useCallback(
-    (status) =>
-      allConsultations
-        .filter((c) => c.status === status)
-        .filter((a) => {
-          return getIsDayWithinHoursOffsetOfPeriod(a.completedAt, { referenceStartDay: dateString, referenceEndDay: dateString }, 0);
-        })
-        .map((a) => ({ ...a, style: { backgroundColor: '#DDF4FF99' } }))
-        .sort(sortActionsOrConsultations(consultationsSortBy, consultationsSortOrder)),
-    [allConsultations, dateString, consultationsSortBy, consultationsSortOrder]
-  );
-  const consultationsDone = useMemo(() => consultations(DONE), [consultations]);
-  const consultationsCancel = useMemo(() => consultations(CANCEL), [consultations]);
-
-  const consultationsCreatedAt = useMemo(
-    () =>
-      allConsultations
-        .filter((a) => {
-          return getIsDayWithinHoursOffsetOfPeriod(a.createdAt, { referenceStartDay: dateString, referenceEndDay: dateString }, 0);
-        })
-        .map((a) => ({ ...a, style: { backgroundColor: '#DDF4FF99' } }))
-        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)),
-    [allConsultations, dateString]
-  );
-
-  const comments = useMemo(
-    () =>
-      allComments
-        .filter((c) => !!selectedTeamsObject[c.team])
-        .filter((c) => {
-          const currentTeam = selectedTeamsObject[c.team];
-          return getIsDayWithinHoursOffsetOfPeriod(
-            c.date || c.createdAt,
-            { referenceStartDay: dateString, referenceEndDay: dateString },
-            currentTeam?.nightSession ? 12 : 0
-          );
-        })
-        .map((comment) => {
-          const commentPopulated = { ...comment };
-          if (comment.person) {
-            const personId = comment?.person;
-            commentPopulated.person = allPersonsAsObject[personId];
-            commentPopulated.type = 'person';
-          }
-          if (comment.action) {
-            const actionId = comment?.action;
-            const action = allActions.find((p) => p._id === actionId);
-            commentPopulated.action = action;
-            commentPopulated.person = allPersonsAsObject[action?.person];
-            commentPopulated.type = 'action';
-          }
-          return commentPopulated;
-        })
-        .filter((c) => c.action || c.person)
-        .map((a) => {
-          if (a.urgent) return { ...a, style: { backgroundColor: '#fecaca99' } };
-          return a;
-        })
-        .sort((a, b) => new Date(a.date || a.createdAt) - new Date(b.date || b.createdAt)),
-    [allComments, selectedTeamsObject, dateString, allActions, allPersonsAsObject]
-  );
-
-  const commentsMedical = useMemo(
-    () =>
-      allCommentsMedical
-        ?.filter((c) => !!selectedTeamsObject[c.team])
-        .filter((c) => {
-          const currentTeam = selectedTeamsObject[c.team];
-          return getIsDayWithinHoursOffsetOfPeriod(
-            c.date,
-            { referenceStartDay: dateString, referenceEndDay: dateString },
-            currentTeam?.nightSession ? 12 : 0
-          );
-        }),
-    [allCommentsMedical, selectedTeamsObject, dateString]
-  );
-
-  const allRencontres = useRecoilValue(rencontresState);
-  const rencontres = useMemo(
-    () =>
-      allRencontres
-        .filter((p) => !!selectedTeamsObject[p.team])
-        .filter((p) => {
-          const currentTeam = selectedTeamsObject[p.team];
-          return getIsDayWithinHoursOffsetOfPeriod(
-            p.date,
-            { referenceStartDay: dateString, referenceEndDay: dateString },
-            currentTeam?.nightSession ? 12 : 0
-          );
-        })
-        .sort((a, b) => new Date(a.date || a.createdAt) - new Date(b.date || b.createdAt)),
-    [allRencontres, dateString, selectedTeamsObject]
-  );
-
-  const territoryObservations = useRecoilValue(territoryObservationsState);
-  const observations = useMemo(
-    () =>
-      territoryObservations
-        .filter((o) => !!selectedTeamsObject[o.team])
-        .filter((o) => {
-          const currentTeam = selectedTeamsObject[o.team];
-          return getIsDayWithinHoursOffsetOfPeriod(
-            o.observedAt || o.createdAt,
-            { referenceStartDay: dateString, referenceEndDay: dateString },
-            currentTeam?.nightSession ? 12 : 0
-          );
-        })
-        .sort((a, b) => new Date(b.observedAt || b.createdAt) - new Date(a.observedAt || a.createdAt)),
-    [dateString, selectedTeamsObject, territoryObservations]
-  );
-
   const [personSortBy, setPersonSortBy] = useLocalStorage('person-sortBy', 'name');
   const [personSortOrder, setPersonSortOrder] = useLocalStorage('person-sortOrder', 'ASC');
-  const persons = useMemo(
-    () =>
-      allPersons
-        .filter((p) => {
-          if (viewAllOrganisationData) return true;
-          return (p.assignedTeams || []).some((teamId) => selectedTeamsObject[teamId]);
-        })
-        .filter((p) => {
-          const currentTeam = selectedTeamsObject[p.team];
-          return getIsDayWithinHoursOffsetOfPeriod(
-            p.createdAt,
-            { referenceStartDay: dateString, referenceEndDay: dateString },
-            currentTeam?.nightSession ? 12 : 0
-          );
-        })
-        .sort(sortPersons(personSortBy, personSortOrder)),
-    [allPersons, selectedTeamsObject, dateString, viewAllOrganisationData, personSortBy, personSortOrder]
-  );
 
   useTitle(`${dayjs(dateString).format('DD-MM-YYYY')} - Compte rendu`);
 
@@ -407,110 +298,8 @@ const View = () => {
     };
   });
 
-  const scrollContainer = useRef(null);
-  useEffect(() => {
-    refresh();
-    scrollContainer.current.scrollTo({ top: 0 });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab]);
-
   return (
     <>
-      {process.env.REACT_APP_TEST === 'true' && (
-        <div className="printonly">
-          <div className="tw-py-4 tw-px-8 tw-text-2xl tw-font-bold">
-            {getPeriodTitle(dateString, allSelectedTeamsAreNightSession)}
-            <br />
-            Compte rendu {viewAllOrganisationData ? <>de toutes les équipes</> : <>{selectedTeamIds.length > 1 ? 'des équipes ' : "de l'équipe "}</>}
-            {selectedTeams.map((t) => t.name).join(', ')}
-          </div>
-          {!['restricted-access'].includes(user.role) && (
-            <DescriptionAndCollaborations reports={selectedTeamsReports} selectedTeamsObject={selectedTeamsObject} dateString={dateString} />
-          )}
-          {!!organisation.services && !!organisation.receptionEnabled && (
-            <Reception reports={selectedTeamsReports} selectedTeamsObject={selectedTeamsObject} dateString={dateString} />
-          )}
-          {!['restricted-access'].includes(user.role) && (
-            <>
-              <ActionCompletedAt
-                date={dateString}
-                status={DONE}
-                actions={actionsDone}
-                setSortOrder={setActionsSortOrder}
-                setSortBy={setActionsSortBy}
-                sortBy={actionsSortBy}
-                sortOrder={actionsSortOrder}
-              />
-              <ActionCreatedAt
-                date={dateString}
-                actions={actionsCreatedAt}
-                setSortOrder={setActionsSortOrder}
-                setSortBy={setActionsSortBy}
-                sortBy={actionsSortBy}
-                sortOrder={actionsSortOrder}
-              />
-              <ActionCompletedAt
-                date={dateString}
-                status={CANCEL}
-                actions={actionsCancel}
-                setSortOrder={setActionsSortOrder}
-                setSortBy={setActionsSortBy}
-                sortBy={actionsSortBy}
-                sortOrder={actionsSortOrder}
-              />
-              <CommentCreatedAt date={dateString} comments={comments} />
-              {!!user.healthcareProfessional && <CommentCreatedAt date={dateString} comments={commentsMedical} medical />}
-            </>
-          )}
-          <PassagesCreatedAt date={dateString} passages={passages} />
-          <RencontresCreatedAt date={dateString} rencontres={rencontres} />
-          <PersonCreatedAt
-            date={dateString}
-            reports={selectedTeamsReports}
-            persons={persons}
-            setSortBy={setPersonSortBy}
-            setSortOrder={setPersonSortOrder}
-            sortBy={personSortBy}
-            sortOrder={personSortOrder}
-          />
-          {!['restricted-access'].includes(user.role) && (
-            <>
-              <TerritoryObservationsCreatedAt date={dateString} observations={observations} />
-              {!!user.healthcareProfessional && (
-                <Consultations
-                  date={dateString}
-                  consultations={consultationsDone}
-                  setSortOrder={setConsultationsSortOrder}
-                  setSortBy={setConsultationsSortBy}
-                  sortBy={consultationsSortBy}
-                  sortOrder={consultationsSortOrder}
-                />
-              )}
-              {!!user.healthcareProfessional && (
-                <ConsultationsCreatedAt
-                  date={dateString}
-                  consultations={consultationsCreatedAt}
-                  setSortOrder={setConsultationsSortOrder}
-                  setSortBy={setConsultationsSortBy}
-                  sortBy={consultationsSortBy}
-                  sortOrder={consultationsSortOrder}
-                />
-              )}
-              {!!user.healthcareProfessional && (
-                <Consultations
-                  date={dateString}
-                  status={CANCEL}
-                  consultations={consultationsCancel}
-                  setSortOrder={setConsultationsSortOrder}
-                  setSortBy={setConsultationsSortBy}
-                  sortBy={consultationsSortBy}
-                  sortOrder={consultationsSortOrder}
-                />
-              )}
-            </>
-          )}
-        </div>
-      )}
       <div className="noprint tw-h-[calc(100% + 4rem)] -tw-mx-12 tw-mb-12 tw-mt-4 tw-flex tw-flex-col tw-overflow-hidden">
         <HeaderStyled className="!tw-p-0">
           <div className="tw-w-full tw-min-w-full">
@@ -588,22 +377,19 @@ const View = () => {
             viewAllOrganisationData || selectedTeamIds.length ? 'tw-flex' : 'tw-hidden',
           ].join(' ')}>
           <div className="tw-flex tw-flex-1 tw-overflow-hidden">
-            <div ref={scrollContainer} className="tw-flex tw-h-full tw-w-full tw-flex-1 tw-overflow-auto tw-bg-white tw-px-6 tw-pt-4 tw-pb-0">
-              {/* <div className="[overflow-wrap:anywhere]">
-          <ActionsSortableList data={dataConsolidated} limit={20} />
-        </div> */}
-              {/* <div className="noprint tw-grid tw-grid-cols-12 tw-gap-4 tw-pt-4">
-        <div className="tw-col-span-3">
-          <InfosMain person={person} />
-        </div>
-        <div className="tw-col-span-5 tw-h-0 tw-min-h-full tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
-          <Actions person={person} />
-        </div>
+            <div className="tw-flex tw-h-full tw-w-full tw-flex-1 tw-overflow-auto tw-bg-white tw-px-6 tw-pt-4 tw-pb-0">
+              <div className="noprint tw-grid tw-h-full tw-min-h-1/2 tw-w-full tw-grid-cols-12 tw-gap-4">
+                <div className="tw-col-span-5 tw-h-0 tw-min-h-full tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+                  <ActionsOrConsultations actions={actions} consultations={consultations} />
+                </div>
+                <div className="tw-col-span-4 tw-h-0 tw-min-h-full tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+                  {/* <ActionsOrConsultations person={person} /> */}
+                </div>
 
-        <div className="tw-col-span-4 tw-h-0 tw-min-h-full tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
-          {['restricted-access'].includes(user.role) ? <PassagesRencontres person={person} /> : <Comments person={person} />}
-        </div>
-      </div> */}
+                <div className="tw-col-span-3 tw-h-0 tw-min-h-full tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+                  {/* {['restricted-access'].includes(user.role) ? <PassagesRencontres person={person} /> : <Comments person={person} />} */}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1832,25 +1618,6 @@ const DescriptionBox = styled(StyledBox)`
     ${(props) => props.report?.description?.length < 1 && props.report?.collaborations?.length < 1 && 'display: none !important;'}
     margin-bottom: 40px;
     page-break-inside: avoid;
-  }
-`;
-
-const DrawerLink = styled.a`
-  text-decoration: none;
-  cursor: pointer;
-  padding: 0px;
-  display: block;
-  border-radius: 8px;
-  color: #565a5b;
-  font-style: normal;
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 24px;
-  margin: 2px 0;
-  border: none;
-  background: none;
-  &.active {
-    color: ${theme.main};
   }
 `;
 

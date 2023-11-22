@@ -10,8 +10,8 @@ import TagTeam from '../../../components/TagTeam';
 import ActionOrConsultationName from '../../../components/ActionOrConsultationName';
 import { formatDateWithNameOfDay, formatTime } from '../../../services/date';
 import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from '../../../components/tailwind/Modal';
-import { AgendaMutedIcon } from './AgendaMutedIcon';
-import { FullScreenIcon } from './FullScreenIcon';
+import { AgendaMutedIcon } from '../../../assets/icons/AgendaMutedIcon';
+import { FullScreenIcon } from '../../../assets/icons/FullScreenIcon';
 import UserName from '../../../components/UserName';
 import { itemsGroupedByPersonSelector } from '../../../recoil/selectors';
 import DescriptionIcon from '../../../components/DescriptionIcon';
@@ -140,22 +140,6 @@ const ActionsFilters = ({ data, setFilterCategories, setFilterTeamIds, setFilter
     <>
       {data.length ? (
         <div className="tw-mb-4 tw-flex tw-justify-between">
-          <div className="tw-shrink-0 tw-grow tw-basis-1/3 tw-pl-2 tw-pr-1">
-            <label htmlFor="action-select-categories-filter">Filtrer par catégorie</label>
-            <div className="tw-max-w-full">
-              <SelectCustom
-                options={catsSelect.map((_option) => ({ value: _option, label: _option }))}
-                value={filterCategories?.map((_option) => ({ value: _option, label: _option })) || []}
-                getOptionValue={(i) => i.value}
-                getOptionLabel={(i) => i.label}
-                onChange={(values) => setFilterCategories(values.map((v) => v.value))}
-                inputId="action-select-categories-filter"
-                name="categories"
-                isClearable
-                isMulti
-              />
-            </div>
-          </div>
           <div className="tw-shrink-0 tw-grow tw-basis-1/3 tw-px-1">
             <label htmlFor="action-select-categories-filter">Filtrer par équipe</label>
             <SelectTeamMultiple onChange={(teamIds) => setFilterTeamIds(teamIds)} value={filterTeamIds} colored inputId="action-team-select" />

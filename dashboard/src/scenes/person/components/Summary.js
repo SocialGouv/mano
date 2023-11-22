@@ -1,6 +1,6 @@
 import { useRecoilValue } from 'recoil';
 import { userState, organisationState } from '../../../recoil/auth';
-import { Actions } from './Actions';
+import { Actions } from './ActionsPerson';
 import { InfosMain } from './InfosMain';
 import PersonDocuments from './PersonDocuments';
 import PersonCustomFields from './PersonCustomFields';
