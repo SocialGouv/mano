@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { selectorFamily, useRecoilValue } from 'recoil';
 import { useLocalStorage } from '../../services/useLocalStorage';
 import {
@@ -73,13 +73,15 @@ with StatsLoader:
 */
 const StatsLoader = () => {
   const { isLoading } = useDataLoader({ refreshOnMount: true });
-  const hasStartLoaded = useRef(false);
+  const [hasStartLoaded, setHasStartLoaded] = useState(false);
 
   useEffect(() => {
-    if (!isLoading) hasStartLoaded.current = true;
-  }, [isLoading]);
+    if (!isLoading && !hasStartLoaded) {
+      setHasStartLoaded(true);
+    }
+  }, [isLoading, hasStartLoaded]);
 
-  if (isLoading || !hasStartLoaded.current) return <Loading />;
+  if (!hasStartLoaded) return <Loading />;
   return <Stats />;
 };
 
