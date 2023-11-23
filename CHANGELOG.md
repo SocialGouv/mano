@@ -1,3 +1,10 @@
+## [1.297.1](https://github.com/SocialGouv/mano/compare/v1.297.0...v1.297.1) (2023-11-23)
+
+
+### Bug Fixes
+
+* **dashboard:** meilleure UX quand on recharge les données pour les stats ([#1783](https://github.com/SocialGouv/mano/issues/1783)) ([857738b](https://github.com/SocialGouv/mano/commit/857738beb2ff25b2cb9d2a1fb77177fa2387d66d))
+
 # [1.297.0](https://github.com/SocialGouv/mano/compare/v1.296.0...v1.297.0) (2023-11-22)
 
 
