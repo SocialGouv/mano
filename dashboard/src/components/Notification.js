@@ -223,13 +223,13 @@ const Comments = ({ setShowModal, comments }) => {
             title: 'Date',
             dataKey: 'date',
             render: (comment) => {
-              return <DateBloc date={comment.date || comment.createdAt} />;
+              return (
+                <>
+                  <DateBloc date={comment.date || comment.createdAt} />
+                  <span className="tw-block tw-w-full tw-text-center tw-opacity-50">{dayjs(comment.date || comment.createdAt).format('HH:mm')}</span>
+                </>
+              );
             },
-          },
-          {
-            title: 'Heure',
-            dataKey: '_id',
-            render: (comment) => <span>{dayjs(comment.date || comment.createdAt).format('HH:mm')}</span>,
           },
           {
             title: 'Utilisateur',
@@ -237,66 +237,54 @@ const Comments = ({ setShowModal, comments }) => {
             render: (comment) => <UserName id={comment.user} />,
           },
           {
-            title: 'Type',
-            dataKey: 'type',
-            render: (comment) => <span>{comment.type === 'action' ? 'Action' : 'Personne suivie'}</span>,
-          },
-          {
-            title: 'Nom',
-            dataKey: 'person',
-            render: (comment) => (
-              <>
-                {comment.type === 'action' && (
-                  <>
-                    <b>{comment.actionPopulated?.name}</b>
-                    <br />
-                    <i>
-                      (pour{' '}
-                      <PersonName
-                        item={comment}
-                        onClick={() => {
-                          setShowModal(false);
-                          history.push(`/person/${comment.personPopulated._id}?tab=Résumé`);
-                        }}
-                      />
-                      )
-                    </i>
-                  </>
-                )}
-                {comment.type === 'person' && (
-                  <b>
-                    {
-                      <PersonName
-                        onClick={() => {
-                          setShowModal(false);
-                          history.push(`/person/${comment.person}?tab=Résumé`);
-                        }}
-                        item={comment}
-                      />
-                    }
-                  </b>
-                )}
-              </>
-            ),
-          },
-          {
             title: 'Commentaire',
             dataKey: 'comment',
             render: (comment) => {
               return (
-                <p>
-                  {comment.comment
-                    ? comment.comment.split('\n').map((c, i, a) => {
-                        if (i === a.length - 1) return c;
-                        return (
-                          <React.Fragment key={i}>
-                            {c}
-                            <br />
-                          </React.Fragment>
-                        );
-                      })
-                    : ''}
-                </p>
+                <>
+                  {comment.type === 'action' && (
+                    <p>
+                      Action <b>{comment.actionPopulated?.name} </b>
+                      pour{' '}
+                      <b>
+                        <PersonName
+                          item={comment}
+                          onClick={() => {
+                            setShowModal(false);
+                            history.push(`/person/${comment.personPopulated._id}?tab=Résumé`);
+                          }}
+                        />
+                      </b>
+                    </p>
+                  )}
+                  {comment.type === 'person' && (
+                    <p>
+                      Personne suivie:{' '}
+                      <b>
+                        <PersonName
+                          onClick={() => {
+                            setShowModal(false);
+                            history.push(`/person/${comment.person}?tab=Résumé`);
+                          }}
+                          item={comment}
+                        />
+                      </b>
+                    </p>
+                  )}
+                  <p>
+                    {comment.comment
+                      ? comment.comment.split('\n').map((c, i, a) => {
+                          if (i === a.length - 1) return c;
+                          return (
+                            <React.Fragment key={i}>
+                              {c}
+                              <br />
+                            </React.Fragment>
+                          );
+                        })
+                      : ''}
+                  </p>
+                </>
               );
             },
           },
