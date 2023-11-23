@@ -1,3 +1,10 @@
+## [1.297.4](https://github.com/SocialGouv/mano/compare/v1.297.3...v1.297.4) (2023-11-23)
+
+
+### Bug Fixes
+
+* **dashboard:** stats ne plantent plus même si une personne na pas dequipe assignée ([36d425f](https://github.com/SocialGouv/mano/commit/36d425f3d3904ed8ffc622f8d2ce1c327ae9da82))
+
 ## [1.297.3](https://github.com/SocialGouv/mano/compare/v1.297.2...v1.297.3) (2023-11-23)
 
 
