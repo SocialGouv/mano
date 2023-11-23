@@ -1,3 +1,10 @@
+## [1.297.2](https://github.com/SocialGouv/mano/compare/v1.297.1...v1.297.2) (2023-11-23)
+
+
+### Bug Fixes
+
+* **dashboard:** statistiques pour plusieurs équipes prend en compte si chaque équipe est de nuit ou pas ([#1787](https://github.com/SocialGouv/mano/issues/1787)) ([341d86b](https://github.com/SocialGouv/mano/commit/341d86b673fbb2d96caf29d9210d8a9248bdd425))
+
 ## [1.297.1](https://github.com/SocialGouv/mano/compare/v1.297.0...v1.297.1) (2023-11-23)
 
 
