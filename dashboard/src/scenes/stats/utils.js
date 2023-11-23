@@ -1,34 +1,3 @@
-import dayjs from 'dayjs';
-import { filterData } from '../../components/Filters';
-
-export const getDataForPeriod = (
-  data,
-  { startDate, endDate },
-  { filters = [], field = 'createdAt', backupField = 'createdAt', allSelectedTeamsAreNightSession } = {},
-  callback = null
-) => {
-  if (!!filters?.filter((f) => Boolean(f?.value)).length) data = filterData(data, filters);
-  if (!startDate || !endDate) {
-    return data;
-  }
-
-  if (callback) {
-    return callback(data);
-  }
-
-  const offsetHours = allSelectedTeamsAreNightSession ? 12 : 0;
-
-  const isoStartDate = dayjs(startDate).startOf('day').add(offsetHours, 'hour').toISOString();
-  const isoEndDate = dayjs(endDate).startOf('day').add(1, 'day').add(offsetHours, 'hour').toISOString();
-
-  return data.filter((item) => {
-    const date = item[field] || item[backupField] || item.createdAt;
-    if (date < isoStartDate) return false;
-    if (date > isoEndDate) return false;
-    return true;
-  });
-};
-
 export const getDuration = (timestampFromNow) => {
   const inDays = Math.round(timestampFromNow / 1000 / 60 / 60 / 24);
   if (inDays < 90) return [inDays, 'jours'];
