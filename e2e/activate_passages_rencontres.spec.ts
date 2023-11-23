@@ -80,7 +80,7 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Passages" }).click();
   await expect(page.getByText("Nombre de passages ?Non-anonyme375%Anonyme125%Total4100%AnonymeNon-anonyme1 (25%")).toBeVisible();
 
-  await expect(page.getByRole("button", { name: "Rencontres" })).not.toBeVisible();
+  await expect(page.getByRole("button", { name: "Rencontres", exact: true })).not.toBeVisible();
 
   /* ***** delog ***** */
 
@@ -155,7 +155,7 @@ test("test", async ({ page }) => {
   /* ***** statistiques ***** */
 
   await page.getByRole("link", { name: "Statistiques" }).click();
-  await page.getByRole("button", { name: "Rencontres" }).filter({ hasText: "Rencontres" }).click();
+  await page.getByRole("button", { name: "Rencontres", exact: true }).filter({ hasText: "Rencontres" }).click();
   await page.getByText("Nombre de rencontres ?2").click();
 
   await expect(page.getByRole("button", { name: "Passages" })).not.toBeVisible();
@@ -207,15 +207,15 @@ test("test", async ({ page }) => {
   await page.getByRole("link", { name: "Comptes rendus" }).click();
   await page.getByRole("button", { name: today }).click();
 
-  await expect(page.getByRole("button", { name: "Rencontres" })).not.toBeVisible();
+  await expect(page.getByRole("button", { name: "Rencontres", exact: true })).not.toBeVisible();
   await expect(page.getByRole("button", { name: "Passages" })).not.toBeVisible();
 
   /* ***** statistiques ***** */
 
   await page.getByRole("link", { name: "Statistiques" }).click();
 
-  await expect(page.getByRole("button", { name: "Passages" })).not.toBeVisible();
-  await expect(page.getByRole("button", { name: "Rencontres" })).not.toBeVisible();
+  await expect(page.getByRole("button", { name: "Passages", exact: true })).not.toBeVisible();
+  await expect(page.getByRole("button", { name: "Rencontres", exact: true })).not.toBeVisible();
 
   await expect(page.getByText("Nombre de passages ?0")).not.toBeVisible();
 
@@ -262,6 +262,6 @@ test("test", async ({ page }) => {
   /* ***** statistiques ***** */
 
   await page.getByRole("link", { name: "Statistiques" }).click();
-  await page.getByRole("button", { name: "Rencontres" }).filter({ hasText: "Rencontres" }).click();
+  await page.getByRole("button", { name: "Rencontres", exact: true }).filter({ hasText: "Rencontres" }).click();
   await page.getByRole("button", { name: "Passages" }).click();
 });
