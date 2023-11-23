@@ -1,3 +1,10 @@
+## [1.297.3](https://github.com/SocialGouv/mano/compare/v1.297.2...v1.297.3) (2023-11-23)
+
+
+### Bug Fixes
+
+* **dashboard:** meilleure organisation du tableau "Commentaires urgents et vigilance" avec seulement trois colonnes Date/Utilisateur/Commentaire et donc plus de place pour le commentaire ([#1788](https://github.com/SocialGouv/mano/issues/1788)) ([d91fc5d](https://github.com/SocialGouv/mano/commit/d91fc5d5dd62c00ed08673115978dcee5dd92640))
+
 ## [1.297.2](https://github.com/SocialGouv/mano/compare/v1.297.1...v1.297.2) (2023-11-23)
 
 
