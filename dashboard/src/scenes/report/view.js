@@ -247,8 +247,6 @@ const View = () => {
     })
   );
 
-  const { refresh } = useDataLoader();
-
   const selectedTeamsReports = useMemo(() => {
     return selectedTeams.map((team) => {
       const report = reportsFromDay.find((rep) => rep.team === team._id);

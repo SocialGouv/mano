@@ -18,7 +18,6 @@ import SelectTeamMultiple from '../../../components/SelectTeamMultiple';
 import ActionsSortableList from '../../../components/ActionsSortableList';
 import TabsNav from '../../../components/tailwind/TabsNav';
 
-const availableTabs = ['Actions', 'Consultations'];
 export const ActionsOrConsultations = ({ actions, consultations }) => {
   const [activeTab, setActiveTab] = useState('Actions');
   const [fullScreen, setFullScreen] = useState(false);
@@ -28,6 +27,7 @@ export const ActionsOrConsultations = ({ actions, consultations }) => {
   const data = activeTab.includes('Actions') ? actions : consultations;
   const filteredData = activeTab.includes('Actions') ? filteredActions : filteredConsultations;
   const history = useHistory();
+  const tabs = [`Actions (${filteredActions.length})`, `Consultations (${filteredConsultations.length})`];
 
   return (
     <>
@@ -36,9 +36,9 @@ export const ActionsOrConsultations = ({ actions, consultations }) => {
           <div className="tw-flex tw-flex-1 tw-flex-col">
             <TabsNav
               className="tw-m-0 tw-flex-wrap tw-justify-start tw-border-b-0 tw-py-0.5 tw-pl-0"
-              tabs={availableTabs}
+              tabs={tabs}
               onClick={(tabCaption) => setActiveTab(tabCaption)}
-              activeTabIndex={availableTabs.findIndex((tab) => tab === activeTab)}
+              activeTabIndex={activeTab.includes('Actions') ? 0 : 1}
             />
           </div>
           <ActionsOrConsultationsFilters setFilterStatus={setFilterStatus} filterStatus={filterStatus} disabled={!data.length} />
