@@ -117,6 +117,10 @@ const itemsForStatsSelector = selectorFamily({
       const personsWithRencontres = {};
       const personsInRencontresBeforePeriod = {};
       const noPeriodSelected = !period.startDate || !period.endDate;
+      const defaultIsoDates = {
+        isoStartDate: period.startDate ? dayjs(period.startDate).startOf('day').toISOString() : null,
+        isoEndDate: period.endDate ? dayjs(period.endDate).startOf('day').add(1, 'day').toISOString() : null,
+      };
       for (let person of allPersons) {
         // get the persons concerned by filters
         if (!filterItem(filtersExceptOutOfActiveList)(person)) continue;
@@ -130,7 +134,7 @@ const itemsForStatsSelector = selectorFamily({
             personsUpdated[person._id] = person;
             personsCreated[person._id] = person;
           } else {
-            const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[person.assignedTeams];
+            const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[person.assignedTeams] ?? defaultIsoDates;
             if (createdDate >= isoStartDate && createdDate < isoEndDate) {
               personsCreated[person._id] = person;
               personsUpdated[person._id] = person;
@@ -155,7 +159,7 @@ const itemsForStatsSelector = selectorFamily({
           if (Array.isArray(action.teams)) {
             let isIncluded = false;
             for (const team of action.teams) {
-              const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[team];
+              const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[team] ?? defaultIsoDates;
               if (date < isoStartDate) continue;
               if (date >= isoEndDate) continue;
               isIncluded = true;
@@ -176,7 +180,7 @@ const itemsForStatsSelector = selectorFamily({
           if (Array.isArray(consultation.teams)) {
             let isIncluded = false;
             for (const team of consultation.teams) {
-              const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[team];
+              const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[team] ?? defaultIsoDates;
               if (date < isoStartDate) continue;
               if (date >= isoEndDate) continue;
               isIncluded = true;
@@ -195,7 +199,7 @@ const itemsForStatsSelector = selectorFamily({
               continue;
             }
             const date = passage.date;
-            const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[passage.team];
+            const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[passage.team] ?? defaultIsoDates;
             if (date < isoStartDate) continue;
             if (date >= isoEndDate) continue;
             passagesFilteredByPersons.push(passage);
@@ -214,7 +218,7 @@ const itemsForStatsSelector = selectorFamily({
               continue;
             }
             const date = rencontre.date;
-            const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[rencontre.team];
+            const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[rencontre.team] ?? defaultIsoDates;
             if (date < isoStartDate) continue;
             if (date >= isoEndDate) continue;
             rencontresFilteredByPersons.push(rencontre);
@@ -306,7 +310,11 @@ const Stats = () => {
       };
     }
     return teamsIdsObject;
-  }, [selectedTeams, period]);
+  }, [selectedTeams, viewAllOrganisationData, period]);
+  const defaultIsoDates = {
+    isoStartDate: period.startDate ? dayjs(period.startDate).startOf('day').toISOString() : null,
+    isoEndDate: period.endDate ? dayjs(period.endDate).startOf('day').add(1, 'day').toISOString() : null,
+  };
   /*
    *
     FILTERS THE PERSONS
@@ -405,7 +413,7 @@ const Stats = () => {
       if (!viewAllOrganisationData) {
         if (!selectedTeamsObjectWithOwnPeriod[passage.team]) continue;
       }
-      const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[passage.team];
+      const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[passage.team] ?? defaultIsoDates;
       const date = passage.date ?? passage.createdAt;
       if (date < isoStartDate) continue;
       if (date >= isoEndDate) continue;
@@ -423,7 +431,7 @@ const Stats = () => {
       if (!!selectedTerritories.length) {
         if (!selectedTerritories.some((t) => t._id === observation.territory)) continue;
       }
-      const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[observation.team];
+      const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[observation.team] ?? defaultIsoDates;
       const date = observation.observedAt ?? observation.createdAt;
       if (date < isoStartDate) continue;
       if (date >= isoEndDate) continue;
@@ -438,7 +446,7 @@ const Stats = () => {
       if (!viewAllOrganisationData) {
         if (!selectedTeamsObjectWithOwnPeriod[report.team]) continue;
       }
-      const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[report.team];
+      const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[report.team] ?? defaultIsoDates;
       const date = report.date;
       if (date < isoStartDate) continue;
       if (date >= isoEndDate) continue;
