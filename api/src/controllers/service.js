@@ -65,6 +65,50 @@ router.get(
 );
 
 router.get(
+  "/for-reports",
+  passport.authenticate("user", { session: false }),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.object({
+        teamIds: z
+          .string()
+          .transform((val) => val.split(","))
+          .array(z.string().regex(looseUuidRegex)),
+        startDate: z.string().regex(dateRegex),
+        endDate: z.string().regex(dateRegex),
+      }).parse(req.params);
+    } catch (e) {
+      const error = new Error(`Invalid request in service count get: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+
+    const organisation = req.user.organisation;
+
+    Service.findAll({
+      where: {
+        team: {
+          [sequelize.Op.in]: req.params.teamIds.split(","),
+        },
+        date: {
+          // between is inclusive.
+          [sequelize.Op.between]: [req.params.startDate, req.params.endDate],
+        },
+        organisation,
+      },
+    }).then((data) => {
+      const allServicesMergedByTeam = {};
+      for (const serviceRow of data) {
+        allServicesMergedByTeam[serviceRow.team] = allServicesMergedByTeam[serviceRow.team] || {};
+        allServicesMergedByTeam[serviceRow.team][serviceRow.service] =
+          (allServicesMergedByTeam[serviceRow.team][serviceRow.service] || 0) + serviceRow.count;
+      }
+      return res.status(200).send({ ok: true, data: allServicesMergedByTeam });
+    });
+  })
+);
+
+router.get(
   "/all",
   passport.authenticate("user", { session: false }),
   catchErrors(async (req, res, next) => {

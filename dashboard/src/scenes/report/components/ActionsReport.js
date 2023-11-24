@@ -32,16 +32,13 @@ export const ActionsOrConsultations = ({ actions, consultations }) => {
   return (
     <>
       <section title={activeTab} className="tw-relative tw-flex tw-h-full tw-flex-col tw-overflow-hidden">
-        <div className="tw-flex tw-items-center tw-border-b tw-border-main tw-border-opacity-20 tw-bg-white tw-px-3 tw-pt-1 tw-pb-3">
-          <div className="tw-flex tw-flex-1 tw-flex-col">
-            <TabsNav
-              className="tw-m-0 tw-flex-wrap tw-justify-start tw-border-b-0 tw-py-0.5 tw-pl-0"
-              tabs={tabs}
-              onClick={(tabCaption) => setActiveTab(tabCaption)}
-              activeTabIndex={activeTab.includes('Actions') ? 0 : 1}
-            />
-          </div>
-          <ActionsOrConsultationsFilters setFilterStatus={setFilterStatus} filterStatus={filterStatus} disabled={!data.length} />
+        <div className="tw-flex tw-items-center tw-bg-white tw-px-3 tw-pt-1 tw-pb-3">
+          <TabsNav
+            className="tw-m-0 tw-flex-wrap tw-justify-start tw-border-b-0 tw-py-0.5 tw-pl-0"
+            tabs={tabs}
+            onClick={(tabCaption) => setActiveTab(tabCaption)}
+            activeTabIndex={activeTab.includes('Actions') ? 0 : 1}
+          />
           <div className="flex-col tw-flex tw-items-center tw-gap-2">
             <button
               aria-label="Ajouter une action"
@@ -61,6 +58,9 @@ export const ActionsOrConsultations = ({ actions, consultations }) => {
               <FullScreenIcon />
             </button>
           </div>
+        </div>
+        <div className="tw-max-w-lg tw-border-b tw-border-main tw-border-opacity-20 tw-bg-white tw-px-7 tw-pt-1 tw-pb-3">
+          <ActionsOrConsultationsFilters setFilterStatus={setFilterStatus} filterStatus={filterStatus} disabled={!data.length} />
         </div>
         <div className="tw-grow tw-overflow-y-auto">
           <ActionsSortableList data={filteredData} />

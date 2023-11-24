@@ -15,7 +15,7 @@ import { territoriesState } from '../../recoil/territory';
 import { customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
 import { personsForStatsSelector, populatedPassagesSelector } from '../../recoil/selectors';
 import useTitle from '../../services/useTitle';
-import DateRangePickerWithPresets, { formatPeriod } from '../../components/DateRangePickerWithPresets';
+import DateRangePickerWithPresets, { formatPeriod, statsPresets } from '../../components/DateRangePickerWithPresets';
 import { useDataLoader } from '../../components/DataLoader';
 import { HeaderStyled, Title as HeaderTitle } from '../../components/header';
 import Loading from '../../components/loading';
@@ -549,7 +549,14 @@ const Stats = () => {
       </HeaderStyled>
       <div className="noprint date-picker-container tw-mb-5 tw-flex tw-flex-wrap tw-items-center">
         <div className="tw-min-w-[15rem] tw-shrink-0 tw-basis-1/3 tw-p-0">
-          <DateRangePickerWithPresets period={period} setPeriod={setPeriod} preset={preset} setPreset={setPreset} removePreset={removePreset} />
+          <DateRangePickerWithPresets
+            presets={statsPresets}
+            period={period}
+            setPeriod={setPeriod}
+            preset={preset}
+            setPreset={setPreset}
+            removePreset={removePreset}
+          />
         </div>
         <div className="tw-flex tw-basis-2/3 tw-items-center tw-justify-end">
           <ButtonCustom color="link" title="Imprimer" onClick={window.print} />

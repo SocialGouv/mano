@@ -8,8 +8,7 @@ import View from './view';
 const Router = () => {
   return (
     <Switch>
-      <SentryRoute path="/report/:dateString" component={View} />
-      <SentryRoute path="/" component={List} />
+      <SentryRoute path="/" component={View} />
     </Switch>
   );
 };
