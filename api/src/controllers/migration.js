@@ -65,33 +65,6 @@ router.put(
         // End of example of migration.
          */
 
-        if (req.params.migrationName === "integrate-comments-in-actions-history") {
-          try {
-            z.array(z.string().regex(looseUuidRegex)).parse(req.body.commentIdsToDelete);
-            z.array(
-              z.object({
-                _id: z.string().regex(looseUuidRegex),
-                encrypted: z.string(),
-                encryptedEntityKey: z.string(),
-              })
-            ).parse(req.body.actionsToUpdate);
-          } catch (e) {
-            const error = new Error(`Invalid request in integrate-comments-in-actions-history migration: ${e}`);
-            error.status = 400;
-            throw error;
-          }
-          for (const _id of req.body.commentIdsToDelete) {
-            await Comment.destroy({ where: { _id, organisation: req.user.organisation }, transaction: tx });
-          }
-          for (const { _id, encrypted, encryptedEntityKey } of req.body.actionsToUpdate) {
-            await Action.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx, paranoid: false });
-          }
-          organisation.set({
-            migrations: [...(organisation.migrations || []), req.params.migrationName],
-            migrationLastUpdateAt: new Date(),
-          });
-        }
-
         organisation.set({ migrating: false });
         await organisation.save({ transaction: tx });
       });
