@@ -1,3 +1,10 @@
+## [1.297.5](https://github.com/SocialGouv/mano/compare/v1.297.4...v1.297.5) (2023-11-28)
+
+
+### Bug Fixes
+
+* **dashboard:** dates 'À faire le' et 'Complétée le' dispo pour les consultations exportées en fichier excel ([3014293](https://github.com/SocialGouv/mano/commit/301429387cbc6c8bd24713bfcbafe47f4b15f64b))
+
 ## [1.297.4](https://github.com/SocialGouv/mano/compare/v1.297.3...v1.297.4) (2023-11-23)
 
 
