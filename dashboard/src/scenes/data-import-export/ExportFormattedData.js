@@ -98,6 +98,8 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
         else fields[field.label || field.name] = consultation[field.name];
         return fields;
       }, {}),
+      'Complétée le': consultation.completedAt ? dayjsInstance(consultation.completedAt).format('YYYY-MM-DD HH:mm') : '',
+      'À faire le': consultation.dueAt ? dayjsInstance(consultation.dueAt).format(consultation.withTime ? 'YYYY-MM-DD HH:mm' : 'YYYY-MM-DD') : '',
       'Créée par': loadedUsers.find((u) => u._id === consultation.user)?.name,
       'Créée le': dayjsInstance(consultation.createdAt).format('YYYY-MM-DD HH:mm'),
       'Mise à jour le': dayjsInstance(consultation.updatedAt).format('YYYY-MM-DD HH:mm'),
