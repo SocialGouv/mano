@@ -165,6 +165,11 @@ const itemsForStatsSelector = selectorFamily({
               isIncluded = true;
             }
             if (!isIncluded) continue;
+          } else {
+            console.log('action.team', action.team);
+            const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[action.team] ?? defaultIsoDates;
+            if (date < isoStartDate) continue;
+            if (date >= isoEndDate) continue;
           }
           actionsFilteredByPersons[action._id] = action;
           personsWithActions[person._id] = person;
@@ -186,6 +191,10 @@ const itemsForStatsSelector = selectorFamily({
               isIncluded = true;
             }
             if (!isIncluded) continue;
+          } else {
+            const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[consultation.team] ?? defaultIsoDates;
+            if (date < isoStartDate) continue;
+            if (date >= isoEndDate) continue;
           }
           consultationsFilteredByPersons.push(consultation);
           personsWithConsultations[person._id] = person;
