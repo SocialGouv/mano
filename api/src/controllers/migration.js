@@ -8,7 +8,7 @@ const { looseUuidRegex, dateRegex } = require("../utils");
 const { capture } = require("../sentry");
 const validateUser = require("../middleware/validateUser");
 const { serializeOrganisation } = require("../utils/data-serializer");
-const { Organisation, Person, Action, Comment, Report, Team, Service, sequelize, Group } = require("../db/sequelize");
+const { Organisation, Person, Action, Comment, Report, Team, Service, sequelize, Group, Consultation } = require("../db/sequelize");
 
 router.put(
   "/:migrationName",
@@ -64,6 +64,25 @@ router.put(
         }
         // End of example of migration.
          */
+
+        if (req.params.migrationName === "add-team-to-consultation") {
+          try {
+            z.array(
+              z.object({
+                _id: z.string().regex(looseUuidRegex),
+                encrypted: z.string(),
+                encryptedEntityKey: z.string(),
+              })
+            ).parse(req.body.encryptedConsultationsToUpdate);
+          } catch (e) {
+            const error = new Error(`Invalid request in add-team-to-consultation: ${e}`);
+            error.status = 400;
+            throw error;
+          }
+          for (const { _id, encrypted, encryptedEntityKey } of req.body.encryptedConsultationsToUpdate) {
+            await Consultation.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx, paranoid: false });
+          }
+        }
 
         organisation.set({ migrating: false });
         await organisation.save({ transaction: tx });
