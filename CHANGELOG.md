@@ -1,3 +1,10 @@
+## [1.297.6](https://github.com/SocialGouv/mano/compare/v1.297.5...v1.297.6) (2023-11-28)
+
+
+### Bug Fixes
+
+* **dashboard:** les stats de consultation incluaient tout le temps les consultations sans équipe lorsqu'on cliquait sur 'visualiser les données de toute l'organisation', c'est corrigé ([bf9e278](https://github.com/SocialGouv/mano/commit/bf9e2786ce62eee5b6e75f98fbf578718cb8425f))
+
 ## [1.297.5](https://github.com/SocialGouv/mano/compare/v1.297.4...v1.297.5) (2023-11-28)
 
 
