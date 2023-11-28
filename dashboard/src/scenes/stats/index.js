@@ -307,6 +307,7 @@ const Stats = () => {
     if (viewAllOrganisationData) return teams;
     return manuallySelectedTeams;
   }, [manuallySelectedTeams, viewAllOrganisationData, teams]);
+
   const selectedTeamsObjectWithOwnPeriod = useMemo(() => {
     const teamsIdsObject = {};
     for (const team of selectedTeams) {
@@ -319,11 +320,15 @@ const Stats = () => {
       };
     }
     return teamsIdsObject;
-  }, [selectedTeams, viewAllOrganisationData, period]);
-  const defaultIsoDates = {
-    isoStartDate: period.startDate ? dayjs(period.startDate).startOf('day').toISOString() : null,
-    isoEndDate: period.endDate ? dayjs(period.endDate).startOf('day').add(1, 'day').toISOString() : null,
-  };
+  }, [selectedTeams, period]);
+
+  const defaultIsoDates = useMemo(
+    () => ({
+      isoStartDate: period.startDate ? dayjs(period.startDate).startOf('day').toISOString() : null,
+      isoEndDate: period.endDate ? dayjs(period.endDate).startOf('day').add(1, 'day').toISOString() : null,
+    }),
+    [period]
+  );
   /*
    *
     FILTERS THE PERSONS
@@ -429,7 +434,7 @@ const Stats = () => {
       passagesFiltered.push(passage);
     }
     return passagesFiltered;
-  }, [allPassagesPopulated, passagesFilteredByPersons, filterPersons, selectedTeamsObjectWithOwnPeriod, viewAllOrganisationData]);
+  }, [allPassagesPopulated, defaultIsoDates, passagesFilteredByPersons, filterPersons, selectedTeamsObjectWithOwnPeriod, viewAllOrganisationData]);
 
   const observations = useMemo(() => {
     const observationsFiltered = [];
@@ -447,7 +452,7 @@ const Stats = () => {
       observationsFiltered.push(observation);
     }
     return observationsFiltered;
-  }, [allObservations, selectedTerritories, selectedTeamsObjectWithOwnPeriod, viewAllOrganisationData]);
+  }, [allObservations, selectedTerritories, defaultIsoDates, selectedTeamsObjectWithOwnPeriod, viewAllOrganisationData]);
 
   const reports = useMemo(() => {
     const reportsFiltered = [];
@@ -462,7 +467,7 @@ const Stats = () => {
       reportsFiltered.push(report);
     }
     return reportsFiltered;
-  }, [allreports, selectedTeamsObjectWithOwnPeriod, viewAllOrganisationData]);
+  }, [allreports, defaultIsoDates, selectedTeamsObjectWithOwnPeriod, viewAllOrganisationData]);
 
   const filterPersonsBase = useRecoilValue(filterPersonsBaseSelector);
   // Add enabled custom fields in filters.
