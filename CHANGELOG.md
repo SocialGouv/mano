@@ -1,3 +1,10 @@
+## [1.297.7](https://github.com/SocialGouv/mano/compare/v1.297.6...v1.297.7) (2023-11-28)
+
+
+### Bug Fixes
+
+* ajout des équipes dans les consultations d'une organisation ([#1790](https://github.com/SocialGouv/mano/issues/1790)) ([cdb503f](https://github.com/SocialGouv/mano/commit/cdb503f34a6f6bedbd7213a88685ddcfc0d57d3e))
+
 ## [1.297.6](https://github.com/SocialGouv/mano/compare/v1.297.5...v1.297.6) (2023-11-28)
 
 
