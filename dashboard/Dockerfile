@@ -20,11 +20,6 @@ RUN --mount=type=secret,id=sentry_auth_token,uid=1000 \
     --mount=type=secret,id=react_app_org_id_for_migration,uid=1000 \
     --mount=type=secret,id=react_app_team_1,uid=1000 \
     --mount=type=secret,id=react_app_team_2,uid=1000 \
-    yarn build; \
-    if [ -f "/run/secrets/sentry_auth_token" ]; then \
-        export SENTRY_AUTH_TOKEN=$(cat /run/secrets/sentry_auth_token); \
-        yarn sentry:sourcemaps; \
-    fi; \
     if [ -f "/run/secrets/react_app_org_id_for_migration" ]; then \
         export REACT_APP_ORG_ID_FOR_MIGRATION=$(cat /run/secrets/react_app_org_id_for_migration); \
     fi; \
@@ -33,6 +28,11 @@ RUN --mount=type=secret,id=sentry_auth_token,uid=1000 \
     fi; \
     if [ -f "/run/secrets/react_app_team_2" ]; then \
         export REACT_APP_TEAM_2=$(cat /run/secrets/react_app_team_2); \
+    fi; \
+    yarn build; \
+    if [ -f "/run/secrets/sentry_auth_token" ]; then \
+        export SENTRY_AUTH_TOKEN=$(cat /run/secrets/sentry_auth_token); \
+        yarn sentry:sourcemaps; \
     fi
 
 
