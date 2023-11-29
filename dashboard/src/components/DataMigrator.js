@@ -104,6 +104,8 @@ export default function useDataMigrator() {
           reports: await getItems('/report'),
         };
 
+        setLoadingText('Truplication en cours: duplication des données pour la première organisation…');
+
         const duplicateEncryptedDataOrganisation1 = await duplicateDecryptedData({
           nextOrganisationId: process.env.REACT_APP_ORG_DUPLICATED_1_ID,
           nextOrganisationName: process.env.REACT_APP_ORG_DUPLICATED_1_NAME,
@@ -111,12 +113,16 @@ export default function useDataMigrator() {
           ...dataToDuplicated,
         });
 
+        setLoadingText('Truplication en cours: duplication des données pour la deuxième organisation…');
+
         const duplicateEncryptedDataOrganisation2 = await duplicateDecryptedData({
           nextOrganisationId: process.env.REACT_APP_ORG_DUPLICATED_2_ID,
           nextOrganisationName: process.env.REACT_APP_ORG_DUPLICATED_2_NAME,
           preparePersonForEncryption,
           ...dataToDuplicated,
         });
+
+        setLoadingText('Truplication en cours: enregistrement des organisations fraichement créées');
 
         const response = await API.put({
           path: `/migration/truplicate-organisations`,
