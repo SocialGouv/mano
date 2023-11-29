@@ -57,8 +57,8 @@ export default function useDataMigrator() {
       // End of example of migration.
       */
 
-      console.log('mgration', process.env.REACT_APP_ORG_IF_FOR_MIGRATION);
-      if (organisation._id === process.env.REACT_APP_ORG_IF_FOR_MIGRATION && !organisation.migrations?.includes('add-team-to-consultation')) {
+      console.log('mgration', process.env.REACT_APP_ORG_ID_FOR_MIGRATION);
+      if (organisation._id === process.env.REACT_APP_ORG_ID_FOR_MIGRATION && !organisation.migrations?.includes('add-team-to-consultation')) {
         setLoadingText('Ajout des équipes dans vos consultations');
         const consultationsRes = await API.get({
           path: '/consultation',
