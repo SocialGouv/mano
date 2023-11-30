@@ -1,3 +1,10 @@
+## [1.297.10](https://github.com/SocialGouv/mano/compare/v1.297.9...v1.297.10) (2023-11-30)
+
+
+### Bug Fixes
+
+* remove migration consultation team ([#1793](https://github.com/SocialGouv/mano/issues/1793)) ([8ff1499](https://github.com/SocialGouv/mano/commit/8ff149960a57f2bd159ebcd644dcaeaf0c37144e))
+
 ## [1.297.9](https://github.com/SocialGouv/mano/compare/v1.297.8...v1.297.9) (2023-11-29)
 
 
