@@ -62,12 +62,3 @@ jobs:
           sentry_auth_token:
             secretName: dashboard
             secretKey: SENTRY_AUTH_TOKEN
-          react_app_org_id_for_migration:
-            secretName: dashboard
-            secretKey: REACT_APP_ORG_ID_FOR_MIGRATION
-          react_app_team_1:
-            secretName: dashboard
-            secretKey: REACT_APP_TEAM_1
-          react_app_team_2:
-            secretName: dashboard
-            secretKey: REACT_APP_TEAM_2
