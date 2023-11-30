@@ -1,14 +1,35 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
+const crypto = require("crypto");
 const { z } = require("zod");
 const { catchErrors } = require("../errors");
 const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
-const { looseUuidRegex, dateRegex } = require("../utils");
+const { looseUuidRegex, isoDateRegex } = require("../utils");
 const { capture } = require("../sentry");
 const validateUser = require("../middleware/validateUser");
 const { serializeOrganisation } = require("../utils/data-serializer");
-const { Organisation, Person, Action, Comment, Report, Team, User, RelUserTeam, RelPersonPlace, sequelize, Group } = require("../db/sequelize");
+const {
+  Organisation,
+  Person,
+  Action,
+  Comment,
+  Consultation,
+  Treatment,
+  MedicalFile,
+  Place,
+  Report,
+  Team,
+  User,
+  RelUserTeam,
+  RelPersonPlace,
+  Passage,
+  TerritoryObservation,
+  Territory,
+  Rencontre,
+  sequelize,
+  Group,
+} = require("../db/sequelize");
 
 router.put(
   "/:migrationName",
@@ -61,6 +82,10 @@ router.put(
           for (const { _id, encrypted, encryptedEntityKey } of req.body.thingsToUpdate) {
             await Thing.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx, paranoid: false });
           }
+          organisation.set({
+            migrations: [...(organisation.migrations || []), req.params.migrationName],
+            migrationLastUpdateAt: new Date(),
+          });
         }
         // End of example of migration.
          */
@@ -69,9 +94,9 @@ router.put(
             const encryptedItemFields = z.object({
               _id: z.string().regex(looseUuidRegex),
               organisation: z.string().regex(looseUuidRegex),
-              createdAt: z.string().regex(dateRegex),
-              updatedAt: z.string().regex(dateRegex),
-              deletedAt: z.string().regex(dateRegex).nullable(),
+              createdAt: z.string().regex(isoDateRegex),
+              updatedAt: z.string().regex(isoDateRegex),
+              deletedAt: z.string().regex(isoDateRegex).nullable().optional(),
               encrypted: z.string(),
               encryptedEntityKey: z.string(),
             });
@@ -90,21 +115,11 @@ router.put(
                 z.object({
                   _id: z.string().regex(looseUuidRegex),
                   email: z.string().email(),
-                  password: z.string(),
                   organisation: z.string().regex(looseUuidRegex),
-                  role: z.string().min(1),
-                  name: z.string(),
-                  surname: z.string(),
-                  phone: z.string(),
-                  mobile: z.string(),
-                  address: z.string(),
-                  zipCode: z.string(),
-                  city: z.string(),
-                  country: z.string(),
-                  comment: z.string(),
-                  createdAt: z.string().regex(dateRegex),
-                  updatedAt: z.string().regex(dateRegex),
-                  deletedAt: z.string().regex(dateRegex).nullable(),
+                  role: z.enum(["admin", "normal", "restricted-access"]),
+                  name: z.string().optional(),
+                  phone: z.string().optional(),
+                  healthcareProfessional: z.boolean().optional(),
                 })
               ),
               relUserTeams: z.array(
@@ -124,9 +139,9 @@ router.put(
               passages: z.array(encryptedItemFields),
               rencontres: z.array(encryptedItemFields),
               territories: z.array(encryptedItemFields),
-              obs: z.array(encryptedItemFields),
+              observations: z.array(encryptedItemFields),
               places: z.array(encryptedItemFields),
-              relPersonPlaces: z.array(encryptedItemFields),
+              relsPersonPlace: z.array(encryptedItemFields),
               reports: z.array(encryptedItemFields),
             });
 
@@ -142,7 +157,12 @@ router.put(
               await Team.create(item, { transaction: tx });
             }
 
+            const password = crypto.randomBytes(60).toString("hex"); // A useless password.,
+            const forgotPasswordResetExpires = new Date(Date.now() + 60 * 60 * 24 * 30 * 1000); // 30 days
             for (let item of newOrganisation.users) {
+              item.forgotPasswordResetToken = crypto.randomBytes(20).toString("hex");
+              item.forgotPasswordResetExpires = forgotPasswordResetExpires;
+              item.password = password;
               await User.create(item, { transaction: tx });
             }
 
@@ -199,11 +219,11 @@ router.put(
             }
 
             for (let item of newOrganisation.relsPersonPlace) {
-              await RelPersonPlace.update(item, { transaction: tx });
+              await RelPersonPlace.create(item, { transaction: tx });
             }
 
             for (let item of newOrganisation.reports) {
-              await Report.update(item, { transaction: tx });
+              await Report.create(item, { transaction: tx });
             }
           };
 
@@ -212,6 +232,10 @@ router.put(
           if (!organisation1 || !organisation2) return res.status(404).send({ ok: false, error: "Not Found" });
           await saveOrganisation(req.body.organisation1);
           await saveOrganisation(req.body.organisation2);
+          organisation.set({
+            migrations: [...(organisation.migrations || []), req.params.migrationName],
+            migrationLastUpdateAt: new Date(),
+          });
         }
 
         organisation.set({ migrating: false });

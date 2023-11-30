@@ -34,6 +34,7 @@ const positiveIntegerRegex = /^\d+$/;
 const jwtRegex = /^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/;
 const headerJwtRegex = /JWT ^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/;
 const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+const isoDateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{1,3}Z$/;
 
 const customFieldSchema = z
   .object({
@@ -65,6 +66,7 @@ module.exports = {
   jwtRegex,
   headerJwtRegex,
   dateRegex,
+  isoDateRegex,
   customFieldSchema,
   sanitizeAll,
 };

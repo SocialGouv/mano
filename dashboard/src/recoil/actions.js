@@ -65,7 +65,7 @@ export const allowedActionFieldsInHistory = [
 ];
 
 export const prepareActionForEncryption = (action, { checkRequiredFields = true } = {}) => {
-  if (!!checkRequiredFields) {
+  if (!!checkRequiredFields && !action.deletedAt) {
     try {
       if (!looseUuidRegex.test(action.person)) {
         throw new Error('Action is missing person');

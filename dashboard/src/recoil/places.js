@@ -20,7 +20,7 @@ export const placesState = atom({
 const encryptedFields = ['user', 'name'];
 
 export const preparePlaceForEncryption = (place, { checkRequiredFields = true } = {}) => {
-  if (!!checkRequiredFields) {
+  if (!!checkRequiredFields && !place.deletedAt) {
     try {
       if (!place.name) {
         throw new Error('Place is missing name');

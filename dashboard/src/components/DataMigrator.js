@@ -191,9 +191,12 @@ const duplicateDecryptedData = async ({
     };
     newUsers.push(newUser);
     for (const team of user.teams) {
+      if (!teamIdsMapped[team._id]) {
+        continue;
+      }
       newRelUserTeams.push({
         user: newUserId,
-        team: teamIdsMapped[team],
+        team: teamIdsMapped[team._id],
         organisation: nextOrganisationId,
         _id: uuidv4(),
       });
@@ -203,12 +206,15 @@ const duplicateDecryptedData = async ({
   const personIdsMapped = {};
   const newPersons = [];
   for (const person of persons) {
+    if (!person.name && !person.deletedAt) {
+      continue;
+    }
     const newPersonId = uuidv4();
     personIdsMapped[person._id] = newPersonId;
     const newPerson = {
       ...person,
       documents: await recryptPersonRelatedDocuments(person, person._id, newPersonId),
-      assignedTeams: person.assignedTeams.map((t) => teamIdsMapped[t]),
+      assignedTeams: person.assignedTeams?.map((t) => teamIdsMapped[t]).filter(Boolean) ?? [],
       organisation: nextOrganisationId,
       _id: newPersonId,
     };
@@ -217,16 +223,22 @@ const duplicateDecryptedData = async ({
   const consultationIdsMapped = {};
   const newConsultations = [];
   for (const consultation of consultations) {
+    if (!consultation.person && !consultation.deletedAt) {
+      continue;
+    }
     const newConsultationId = uuidv4();
     consultationIdsMapped[consultation._id] = newConsultationId;
     const newConsultation = {
       ...consultation,
       documents: await recryptPersonRelatedDocuments(consultation, consultation.person, personIdsMapped[consultation.person]),
       person: personIdsMapped[consultation.person],
-      teams: consultation.teams.map((t) => teamIdsMapped[t]),
+      teams: consultation.teams?.map((t) => teamIdsMapped[t]).filter(Boolean) ?? [],
       organisation: nextOrganisationId,
       _id: newConsultationId,
     };
+    if (!newConsultation.person && !newConsultation.deletedAt) {
+      continue;
+    }
     newConsultations.push(newConsultation);
   }
   const treatmentIdsMapped = {};
@@ -241,6 +253,9 @@ const duplicateDecryptedData = async ({
       organisation: nextOrganisationId,
       _id: newTreatmentId,
     };
+    if (!newTreatment.person && !newTreatment.deletedAt) {
+      continue;
+    }
     newTreatments.push(newTreatment);
   }
 
@@ -256,6 +271,9 @@ const duplicateDecryptedData = async ({
       organisation: nextOrganisationId,
       _id: newMedicalFileId,
     };
+    if (!newMedicalFile.person && !newMedicalFile.deletedAt) {
+      continue;
+    }
     newMedicalFiles.push(newMedicalFile);
   }
 
@@ -267,10 +285,16 @@ const duplicateDecryptedData = async ({
     const newAction = {
       ...action,
       person: personIdsMapped[action.person],
-      teams: action.teams.map((t) => teamIdsMapped[t]),
+      teams: action.teams?.map((t) => teamIdsMapped[t]).filter(Boolean) ?? [],
       organisation: nextOrganisationId,
       _id: newActionId,
     };
+    if (!newAction.person && !newAction.deletedAt) {
+      continue;
+    }
+    if (!newAction.teams?.length && !newAction.deletedAt) {
+      continue;
+    }
     newActions.push(newAction);
   }
 
@@ -280,13 +304,14 @@ const duplicateDecryptedData = async ({
     const newGroupId = uuidv4();
     groupIdsMapped[group._id] = newGroupId;
     const newGroup = {
-      persons: group.persons.map((p) => personIdsMapped[p]),
-      relations: group.relations.map((r) => {
-        return {
-          ...r,
-          persons: r.persons.map((p) => personIdsMapped[p]),
-        };
-      }),
+      persons: group.persons?.map((p) => personIdsMapped[p]),
+      relations:
+        group.relations?.map((r) => {
+          return {
+            ...r,
+            persons: r.persons?.map((p) => personIdsMapped[p]),
+          };
+        }) ?? [],
       organisation: nextOrganisationId,
       _id: newGroupId,
     };
@@ -358,6 +383,7 @@ const duplicateDecryptedData = async ({
 
   const territoryObservationIdsMapped = {};
   const newObs = [];
+
   for (const territoryObservation of territoryObservations) {
     const newTerritoryObservationId = uuidv4();
     territoryObservationIdsMapped[territoryObservation._id] = newTerritoryObservationId;
@@ -366,6 +392,7 @@ const duplicateDecryptedData = async ({
       territory: territoryIdsMapped[territoryObservation.territory],
       team: teamIdsMapped[territoryObservation.team],
       organisation: nextOrganisationId,
+      observedAt: territoryObservation.deletedAt ? territoryObservation.observedAt : territoryObservation.createdAt,
       _id: newTerritoryObservationId,
     };
     newObs.push(newTerritoryObservation);
@@ -406,12 +433,14 @@ const duplicateDecryptedData = async ({
     reportIdsMapped[report._id] = newReportId;
     const newReport = {
       ...report,
-      tream: teamIdsMapped[report.team],
+      team: teamIdsMapped[report.team],
       organisation: nextOrganisationId,
       _id: newReportId,
     };
     newReports.push(newReport);
   }
+
+  const nextPersons = await Promise.all(newPersons.map(preparePersonForEncryption).map(encryptItem));
 
   return {
     organisationId: nextOrganisationId,
@@ -428,9 +457,9 @@ const duplicateDecryptedData = async ({
     passages: await Promise.all(newPassages.map(preparePassageForEncryption).map(encryptItem)),
     rencontres: await Promise.all(newRencontres.map(prepareRencontreForEncryption).map(encryptItem)),
     territories: await Promise.all(newTerritories.map(prepareTerritoryForEncryption).map(encryptItem)),
-    obs: await Promise.all(newObs.map(prepareObsForEncryption(organisation.customFieldsObs)).map(encryptItem)),
+    observations: await Promise.all(newObs.map(prepareObsForEncryption(organisation.customFieldsObs)).map(encryptItem)),
     places: await Promise.all(newPlaces.map(preparePlaceForEncryption).map(encryptItem)),
-    relPersonPlaces: await Promise.all(newRelPersonPlaces.map(prepareRelPersonPlaceForEncryption).map(encryptItem)),
+    relsPersonPlace: await Promise.all(newRelPersonPlaces.map(prepareRelPersonPlaceForEncryption).map(encryptItem)),
     reports: await Promise.all(newReports.map(prepareReportForEncryption).map(encryptItem)),
   };
 };
@@ -464,7 +493,7 @@ const recryptPersonRelatedDocuments = async (item, oldPersonId, newPersonId) => 
       const recryptedDocument = await changeDocumentPersonId(doc, oldPersonId, newPersonId);
       updatedDocuments.push(recryptedDocument);
     } catch (e) {
-      console.error(e);
+      // console.error(e);
       // we need a temporary hack, for the organisations which already changed their encryption key
       // but not all the documents were recrypted
       // we told them to change back from `newKey` to `oldKey` to retrieve the old documents

@@ -20,7 +20,7 @@ export const commentsState = atom({
 const encryptedFields = ['comment', 'person', 'action', 'group', 'team', 'user', 'date', 'urgent'];
 
 export const prepareCommentForEncryption = (comment, { checkRequiredFields = true } = {}) => {
-  if (!!checkRequiredFields) {
+  if (!!checkRequiredFields && !comment.deletedAt) {
     try {
       if (!looseUuidRegex.test(comment.person) && !looseUuidRegex.test(comment.action)) {
         throw new Error('Comment is missing person or action');
