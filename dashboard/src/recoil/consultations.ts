@@ -65,7 +65,7 @@ export const consultationsFieldsIncludingCustomFieldsSelector = selector({
 export const prepareConsultationForEncryption =
   (customFieldsConsultations: CustomFieldsGroup[]) =>
   (consultation: ConsultationInstance, { checkRequiredFields = true } = {}) => {
-    if (!!checkRequiredFields && !consultation.deletedAt) {
+    if (!!checkRequiredFields) {
       try {
         if (!looseUuidRegex.test(consultation.person)) {
           throw new Error('Consultation is missing person');

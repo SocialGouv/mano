@@ -92,7 +92,7 @@ const compulsoryEncryptedFields = ['territory', 'user', 'team', 'observedAt'];
 export const prepareObsForEncryption =
   (customFields) =>
   (obs, { checkRequiredFields = true } = {}) => {
-    if (!!checkRequiredFields && !obs.deletedAt) {
+    if (!!checkRequiredFields) {
       try {
         if (!looseUuidRegex.test(obs.territory)) {
           throw new Error('Observation is missing territory');

@@ -72,7 +72,7 @@ export const flattenedServicesSelector = selector({
 const encryptedFields = ['description', 'services', 'team', 'date', 'collaborations', 'oldDateSystem'];
 
 export const prepareReportForEncryption = (report, { checkRequiredFields = true } = {}) => {
-  if (!!checkRequiredFields && !report.deletedAt) {
+  if (!!checkRequiredFields) {
     try {
       if (!looseUuidRegex.test(report.team)) {
         throw new Error('Report is missing team');

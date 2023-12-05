@@ -20,7 +20,7 @@ export const rencontresState = atom({
 const encryptedFields = ['person', 'team', 'user', 'date', 'comment'];
 
 export const prepareRencontreForEncryption = (rencontre, { checkRequiredFields = true } = {}) => {
-  if (!!checkRequiredFields && !rencontre.deletedAt) {
+  if (!!checkRequiredFields) {
     try {
       if (!looseUuidRegex.test(rencontre.person)) {
         throw new Error('Rencontre is missing person');

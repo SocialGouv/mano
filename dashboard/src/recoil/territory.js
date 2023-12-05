@@ -20,7 +20,7 @@ export const territoriesState = atom({
 const encryptedFields = ['name', 'perimeter', 'types', 'user'];
 
 export const prepareTerritoryForEncryption = (territory, { checkRequiredFields = true } = {}) => {
-  if (!!checkRequiredFields && !territory.deletedAt) {
+  if (!!checkRequiredFields) {
     try {
       if (!territory.name) {
         throw new Error('Territory is missing name');

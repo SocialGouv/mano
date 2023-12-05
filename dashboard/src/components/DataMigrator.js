@@ -213,6 +213,7 @@ const duplicateDecryptedData = async ({
     personIdsMapped[person._id] = newPersonId;
     const newPerson = {
       ...person,
+      user: userIdsMapped[person.user],
       documents: await recryptPersonRelatedDocuments(person, person._id, newPersonId),
       assignedTeams: person.assignedTeams?.map((t) => teamIdsMapped[t]).filter(Boolean) ?? [],
       organisation: nextOrganisationId,
@@ -230,6 +231,7 @@ const duplicateDecryptedData = async ({
     consultationIdsMapped[consultation._id] = newConsultationId;
     const newConsultation = {
       ...consultation,
+      user: userIdsMapped[consultation.user],
       documents: await recryptPersonRelatedDocuments(consultation, consultation.person, personIdsMapped[consultation.person]),
       person: personIdsMapped[consultation.person],
       teams: consultation.teams?.map((t) => teamIdsMapped[t]).filter(Boolean) ?? [],
@@ -248,6 +250,7 @@ const duplicateDecryptedData = async ({
     treatmentIdsMapped[treatment._id] = newTreatmentId;
     const newTreatment = {
       ...treatment,
+      user: userIdsMapped[treatment.user],
       documents: await recryptPersonRelatedDocuments(treatment, treatment.person, personIdsMapped[treatment.person]),
       person: personIdsMapped[treatment.person],
       organisation: nextOrganisationId,
@@ -266,6 +269,7 @@ const duplicateDecryptedData = async ({
     medicalFileIdsMapped[medicalFile._id] = newMedicalFileId;
     const newMedicalFile = {
       ...medicalFile,
+      user: userIdsMapped[medicalFile.user],
       documents: await recryptPersonRelatedDocuments(medicalFile, medicalFile.person, personIdsMapped[medicalFile.person]),
       person: personIdsMapped[medicalFile.person],
       organisation: nextOrganisationId,
@@ -284,6 +288,7 @@ const duplicateDecryptedData = async ({
     actionIdsMapped[action._id] = newActionId;
     const newAction = {
       ...action,
+      user: userIdsMapped[action.user],
       person: personIdsMapped[action.person],
       teams: action.teams?.map((t) => teamIdsMapped[t]).filter(Boolean) ?? [],
       organisation: nextOrganisationId,
@@ -325,6 +330,7 @@ const duplicateDecryptedData = async ({
     commentIdsMapped[comment._id] = newCommentId;
     const newComment = {
       ...comment,
+      user: userIdsMapped[comment.user],
       team: teamIdsMapped[comment.team],
       organisation: nextOrganisationId,
       _id: newCommentId,
@@ -345,6 +351,7 @@ const duplicateDecryptedData = async ({
     passageIdsMapped[passage._id] = newPassageId;
     const newPassage = {
       ...passage,
+      user: userIdsMapped[passage.user],
       team: teamIdsMapped[passage.team],
       person: personIdsMapped[passage.person],
       organisation: nextOrganisationId,
@@ -360,6 +367,7 @@ const duplicateDecryptedData = async ({
     rencontreIdsMapped[rencontre._id] = newRencontreId;
     const newRencontre = {
       ...rencontre,
+      user: userIdsMapped[rencontre.user],
       team: teamIdsMapped[rencontre.team],
       person: personIdsMapped[rencontre.person],
       organisation: nextOrganisationId,
@@ -375,6 +383,7 @@ const duplicateDecryptedData = async ({
     territoryIdsMapped[territory._id] = newTerritoryId;
     const newTerritory = {
       ...territory,
+      user: userIdsMapped[territory.user],
       organisation: nextOrganisationId,
       _id: newTerritoryId,
     };
@@ -389,10 +398,10 @@ const duplicateDecryptedData = async ({
     territoryObservationIdsMapped[territoryObservation._id] = newTerritoryObservationId;
     const newTerritoryObservation = {
       ...territoryObservation,
+      user: userIdsMapped[territoryObservation.user],
       territory: territoryIdsMapped[territoryObservation.territory],
       team: teamIdsMapped[territoryObservation.team],
       organisation: nextOrganisationId,
-      observedAt: territoryObservation.deletedAt ? territoryObservation.observedAt : territoryObservation.createdAt,
       _id: newTerritoryObservationId,
     };
     newObs.push(newTerritoryObservation);
@@ -405,6 +414,7 @@ const duplicateDecryptedData = async ({
     placeIdsMapped[place._id] = newPlaceId;
     const newPlace = {
       ...place,
+      user: userIdsMapped[place.user],
       organisation: nextOrganisationId,
       _id: newPlaceId,
     };
@@ -418,6 +428,7 @@ const duplicateDecryptedData = async ({
     relPersonPlaceIdsMapped[relPersonPlace._id] = newRelPersonPlaceId;
     const newRelPersonPlace = {
       ...relPersonPlace,
+      user: userIdsMapped[relPersonPlace.user],
       person: personIdsMapped[relPersonPlace.person],
       place: placeIdsMapped[relPersonPlace.place],
       organisation: nextOrganisationId,
@@ -433,6 +444,7 @@ const duplicateDecryptedData = async ({
     reportIdsMapped[report._id] = newReportId;
     const newReport = {
       ...report,
+      user: userIdsMapped[report.user],
       team: teamIdsMapped[report.team],
       organisation: nextOrganisationId,
       _id: newReportId,
@@ -447,20 +459,34 @@ const duplicateDecryptedData = async ({
     teams: newTeams,
     users: newUsers,
     relUserTeams: newRelUserTeams,
-    persons: await Promise.all(newPersons.map(preparePersonForEncryption).map(encryptItem)),
-    consultations: await Promise.all(newConsultations.map(prepareConsultationForEncryption(organisation.consultations)).map(encryptItem)),
-    treatments: await Promise.all(newTreatments.map(prepareTreatmentForEncryption).map(encryptItem)),
-    medicalFiles: await Promise.all(newMedicalFiles.map(prepareMedicalFileForEncryption(organisation.customFieldsMedicalFile)).map(encryptItem)),
-    actions: await Promise.all(newActions.map(prepareActionForEncryption).map(encryptItem)),
-    groups: await Promise.all(newGroups.map(prepareGroupForEncryption).map(encryptItem)),
-    comments: await Promise.all(newComments.map(prepareCommentForEncryption).map(encryptItem)),
-    passages: await Promise.all(newPassages.map(preparePassageForEncryption).map(encryptItem)),
-    rencontres: await Promise.all(newRencontres.map(prepareRencontreForEncryption).map(encryptItem)),
-    territories: await Promise.all(newTerritories.map(prepareTerritoryForEncryption).map(encryptItem)),
-    observations: await Promise.all(newObs.map(prepareObsForEncryption(organisation.customFieldsObs)).map(encryptItem)),
-    places: await Promise.all(newPlaces.map(preparePlaceForEncryption).map(encryptItem)),
-    relsPersonPlace: await Promise.all(newRelPersonPlaces.map(prepareRelPersonPlaceForEncryption).map(encryptItem)),
-    reports: await Promise.all(newReports.map(prepareReportForEncryption).map(encryptItem)),
+    persons: await Promise.all(newPersons.map((item) => preparePersonForEncryption(item, { checkRequiredFields: false })).map(encryptItem)),
+    consultations: await Promise.all(
+      newConsultations
+        .map((item) => prepareConsultationForEncryption(organisation.consultations)(item, { checkRequiredFields: false }))
+        .map(encryptItem)
+    ),
+    treatments: await Promise.all(newTreatments.map((item) => prepareTreatmentForEncryption(item, { checkRequiredFields: false })).map(encryptItem)),
+    medicalFiles: await Promise.all(
+      newMedicalFiles
+        .map((item) => prepareMedicalFileForEncryption(organisation.customFieldsMedicalFile)(item, { checkRequiredFields: false }))
+        .map(encryptItem)
+    ),
+    actions: await Promise.all(newActions.map((item) => prepareActionForEncryption(item, { checkRequiredFields: false })).map(encryptItem)),
+    groups: await Promise.all(newGroups.map((item) => prepareGroupForEncryption(item, { checkRequiredFields: false })).map(encryptItem)),
+    comments: await Promise.all(newComments.map((item) => prepareCommentForEncryption(item, { checkRequiredFields: false })).map(encryptItem)),
+    passages: await Promise.all(newPassages.map((item) => preparePassageForEncryption(item, { checkRequiredFields: false })).map(encryptItem)),
+    rencontres: await Promise.all(newRencontres.map((item) => prepareRencontreForEncryption(item, { checkRequiredFields: false })).map(encryptItem)),
+    territories: await Promise.all(
+      newTerritories.map((item) => prepareTerritoryForEncryption(item, { checkRequiredFields: false })).map(encryptItem)
+    ),
+    observations: await Promise.all(
+      newObs.map((item) => prepareObsForEncryption(organisation.customFieldsObs)(item, { checkRequiredFields: false })).map(encryptItem)
+    ),
+    places: await Promise.all(newPlaces.map((item) => preparePlaceForEncryption(item, { checkRequiredFields: false })).map(encryptItem)),
+    relsPersonPlace: await Promise.all(
+      newRelPersonPlaces.map((item) => prepareRelPersonPlaceForEncryption(item, { checkRequiredFields: false })).map(encryptItem)
+    ),
+    reports: await Promise.all(newReports.map((item) => prepareReportForEncryption(item, { checkRequiredFields: false })).map(encryptItem)),
   };
 };
 

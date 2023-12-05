@@ -20,7 +20,7 @@ export const passagesState = atom({
 const encryptedFields = ['person', 'team', 'user', 'date', 'comment'];
 
 export const preparePassageForEncryption = (passage, { checkRequiredFields = true } = {}) => {
-  if (!!checkRequiredFields && !passage.deletedAt) {
+  if (!!checkRequiredFields) {
     try {
       // we don't check the presence of a person because passage can be anonymous
       if (!looseUuidRegex.test(passage.team)) {
