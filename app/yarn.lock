@@ -6003,14 +6003,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graceful-fs@npm:^4.1.11, graceful-fs@npm:^4.1.2, graceful-fs@npm:^4.1.3, graceful-fs@npm:^4.1.6, graceful-fs@npm:^4.2.0, graceful-fs@npm:^4.2.4, graceful-fs@npm:^4.2.9":
-  version: 4.2.10
-  resolution: "graceful-fs@npm:4.2.10"
-  checksum: 4223a833e38e1d0d2aea630c2433cfb94ddc07dfc11d511dbd6be1d16688c5be848acc31f9a5d0d0ddbfb56d2ee5a6ae0278aceeb0ca6a13f27e06b9956fb952
-  languageName: node
-  linkType: hard
-
-"graceful-fs@npm:^4.2.6":
+"graceful-fs@npm:^4.1.11, graceful-fs@npm:^4.1.2, graceful-fs@npm:^4.1.3, graceful-fs@npm:^4.1.6, graceful-fs@npm:^4.2.0, graceful-fs@npm:^4.2.4, graceful-fs@npm:^4.2.6, graceful-fs@npm:^4.2.9":
   version: 4.2.11
   resolution: "graceful-fs@npm:4.2.11"
   checksum: 386d011a553e02bc594ac2ca0bd6d9e4c22d7fa8cfbfc448a6d148c59ea881b092db9dbe3547ae4b88e55f1b01f7c4a2ecc53b310c042793e63aa44cf6c257f2
@@ -7943,7 +7936,7 @@ __metadata:
     react-native-mmkv: "npm:^2.10.2"
     react-native-pager-view: "npm:^5.4.25"
     react-native-pdf: "npm:^6.6.0"
-    react-native-permissions: "npm:^3.6.1"
+    react-native-permissions: "npm:^4.0.0"
     react-native-reanimated: "npm:^3.5.4"
     react-native-safe-area-context: "npm:^4.4.1"
     react-native-screens: "npm:^3.18.2"
@@ -9767,17 +9760,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-permissions@npm:^3.6.1":
-  version: 3.6.1
-  resolution: "react-native-permissions@npm:3.6.1"
+"react-native-permissions@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "react-native-permissions@npm:4.0.0"
   peerDependencies:
-    react: ">=16.13.1"
-    react-native: ">=0.63.3"
-    react-native-windows: ">=0.62.0"
+    react: ">=18.1.0"
+    react-native: ">=0.70.0"
+    react-native-windows: ">=0.70.0"
   peerDependenciesMeta:
     react-native-windows:
       optional: true
-  checksum: d8dcc578a696f631d89e7df9f9237545fe5db30cbc0f8d6f47a97e78893abc42dee075cb4f78ee98c91c82bb5e5805329eb04ad49cc71ffda21d41937e80fccb
+  checksum: fd2bb413a8549e0f3cdf068da6b95e85ee7c490cf814406df7bd32b4b412bd51d90bca4a8041ba8116daa283ded6320c42d23cf3a907b2f7f4ca1d2ad4f78a53
   languageName: node
   linkType: hard
 
