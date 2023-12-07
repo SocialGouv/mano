@@ -30,6 +30,9 @@ import { useLocalStorage } from '../../services/useLocalStorage';
 import { territoryObservationsState } from '../../recoil/territoryObservations';
 import TabsNav from '../../components/tailwind/TabsNav';
 import DescriptionIcon from '../../components/DescriptionIcon';
+import { consultationsState } from '../../recoil/consultations';
+import { medicalFileState } from '../../recoil/medicalFiles';
+import { treatmentsState } from '../../recoil/treatments';
 
 const personsWithFormattedBirthDateSelector = selector({
   key: 'personsWithFormattedBirthDateSelector',
@@ -56,6 +59,7 @@ const personsFilteredBySearchForSearchSelector = selectorFamily({
       return filterBySearch(search, persons, excludeFields).map((p) => personsPopulated[p._id]);
     },
 });
+
 const actionsObjectSelector = selector({
   key: 'actionsObjectSelector',
   get: ({ get }) => {
@@ -147,23 +151,51 @@ const observationsBySearchSelector = selectorFamily({
     },
 });
 
-const initTabs = ['Actions', 'Personnes', 'Commentaires', 'Lieux', 'Territoires', 'Observations'];
-
 const View = () => {
   useTitle('Recherche');
   useDataLoader({ refreshOnMount: true });
-
+  const user = useRecoilValue(userState);
+  const initTabs = useMemo(() => {
+    const defaultTabs = ['Actions', 'Personnes', 'Commentaires non médicaux', 'Lieux', 'Territoires', 'Observations'];
+    if (!user.healthcareProfessional) return defaultTabs;
+    return [...defaultTabs, 'Consultations', 'Traitements', 'Dossiers médicaux'];
+  }, []);
   const [search, setSearch] = useLocalStorage('fullsearch', '');
   const [activeTab, setActiveTab] = useLocalStorage('fullsearch-tab', 0);
 
   const allActions = useRecoilValue(actionsState);
+  const allConsultations = useRecoilValue(consultationsState);
+  const allMedicalFiles = useRecoilValue(medicalFileState);
+  const allTreatments = useRecoilValue(treatmentsState);
   const allTerritories = useRecoilValue(territoriesState);
   const allPlaces = useRecoilValue(placesState);
+  const personsObject = useRecoilValue(personsObjectSelector);
 
   const actions = useMemo(() => {
     if (!search?.length) return [];
     return filterBySearch(search, allActions);
   }, [search, allActions]);
+
+  const medicalFiles = useMemo(() => {
+    if (!search?.length) return [];
+    return filterBySearch(search, allMedicalFiles).map((f) => personsObject[f.person]);
+  }, [search, allMedicalFiles]);
+
+  const treatments = useMemo(() => {
+    if (!search?.length) return [];
+    return filterBySearch(search, allTreatments);
+  }, [search, allTreatments]);
+
+  const consultations = useMemo(() => {
+    if (!search?.length) return [];
+    return filterBySearch(
+      search,
+      allConsultations.filter((c) => {
+        if (!c.onlyVisibleBy?.length) return true;
+        return c.onlyVisibleBy.includes(user._id);
+      })
+    );
+  }, [search, allConsultations]);
 
   const persons = useRecoilValue(personsFilteredBySearchForSearchSelector({ search }));
   const organisation = useRecoilValue(organisationState);
@@ -192,15 +224,21 @@ const View = () => {
           tabs={[
             `Actions (${actions.length})`,
             `Personnes (${persons.length})`,
-            `Commentaires (${comments.length})`,
+            `Commentaires non médicaux (${comments.length})`,
             `Lieux (${places.length})`,
             !!organisation.territoriesEnabled && `Territoires (${territories.length})`,
             !!organisation.territoriesEnabled && `Observations (${observations.length})`,
+            !!user.healthcareProfessional && `Consultations (${consultations.length})`,
+            !!user.healthcareProfessional && `Traitements (${treatments.length})`,
+            !!user.healthcareProfessional && `Dossiers médicaux (${medicalFiles.length})`,
           ].filter(Boolean)}
           onClick={(tab) => {
             if (tab.includes('Actions')) setActiveTab('Actions');
+            if (tab.includes('Consultations')) setActiveTab('Consultations');
+            if (tab.includes('Traitements')) setActiveTab('Traitements');
             if (tab.includes('Personnes')) setActiveTab('Personnes');
-            if (tab.includes('Commentaires')) setActiveTab('Commentaires');
+            if (tab.includes('Dossiers médicaux')) setActiveTab('Dossiers médicaux');
+            if (tab.includes('Commentaires')) setActiveTab('Commentaires non médicaux');
             if (tab.includes('Lieux')) setActiveTab('Lieux');
             if (tab.includes('Territoires')) setActiveTab('Territoires');
             if (tab.includes('Observations')) setActiveTab('Observations');
@@ -209,7 +247,10 @@ const View = () => {
         />
         <div className="[&_table]:!tw-p0 tw-w-full tw-rounded-lg tw-bg-white tw-py-4 tw-px-8 print:tw-mb-4 [&_.title]:!tw-pb-5">
           {activeTab === 'Actions' && <Actions actions={actions} />}
+          {activeTab === 'Consultations' && <Consultations consultations={consultations} />}
+          {activeTab === 'Traitements' && <Treatments treatments={treatments} />}
           {activeTab === 'Personnes' && <Persons persons={persons} />}
+          {activeTab === 'Dossiers médicaux' && <Persons persons={medicalFiles} />}
           {activeTab === 'Commentaires' && <Comments comments={comments} />}
           {activeTab === 'Lieux' && <Places places={places} />}
           {activeTab === 'Territoires' && <Territories territories={territories} />}
@@ -334,6 +375,170 @@ const Actions = ({ actions }) => {
               {Array.isArray(a?.teams) ? a.teams.map((e) => <TagTeam key={e} teamId={e} />) : <TagTeam teamId={a?.team} />}
             </div>
           ),
+        },
+      ]}
+    />
+  );
+};
+
+const Consultations = ({ consultations }) => {
+  const history = useHistory();
+  const organisation = useRecoilValue(organisationState);
+  const [sortBy, setSortBy] = useLocalStorage('actions-consultations-sortBy', 'dueAt');
+  const [sortOrder, setSortOrder] = useLocalStorage('actions-consultations-sortOrder', 'ASC');
+
+  const data = useMemo(() => {
+    return [...consultations].sort(sortActionsOrConsultations(sortBy, sortOrder));
+  }, [consultations, sortBy, sortOrder]);
+
+  if (!consultations.length) return <div />;
+
+  const moreThanOne = data.length > 1;
+
+  return (
+    <Table
+      className="Table"
+      data={data.map((a) => {
+        if (a.urgent) return { ...a, style: { backgroundColor: '#fecaca' } };
+        return a;
+      })}
+      title={`Consultation${moreThanOne ? 's' : ''} (${data.length})`}
+      noData="Pas de consultation"
+      onRowClick={(consultation) => {
+        const searchParams = new URLSearchParams(history.location.search);
+        searchParams.set('consultationId', consultation._id);
+        history.push(`?${searchParams.toString()}`);
+      }}
+      rowKey="_id"
+      columns={[
+        {
+          title: '',
+          dataKey: 'urgentOrGroupOrConsultation',
+          small: true,
+          onSortOrder: setSortOrder,
+          onSortBy: setSortBy,
+          sortBy,
+          sortOrder,
+          render: (actionOrConsult) => {
+            return (
+              <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
+                {!!actionOrConsult.urgent && <ExclamationMarkButton />}
+                {!!actionOrConsult.description && <DescriptionIcon />}
+                {!!organisation.groupsEnabled && !!actionOrConsult.group && (
+                  <span className="tw-text-3xl" aria-label="Action familiale" title="Action familiale">
+                    👪
+                  </span>
+                )}
+                {!!actionOrConsult.isConsultation && <ConsultationButton />}
+              </div>
+            );
+          },
+        },
+        {
+          title: 'Date',
+          dataKey: 'dueAt',
+          onSortOrder: setSortOrder,
+          onSortBy: setSortBy,
+          sortBy,
+          sortOrder,
+          render: (consult) => <DateBloc date={[DONE, CANCEL].includes(consult.status) ? consult.completedAt : consult.dueAt} />,
+        },
+        {
+          title: 'Heure',
+          dataKey: 'time',
+          render: (consultation) => {
+            if (!consultation.dueAt || !consultation.withTime) return null;
+            return formatTime(consultation.dueAt);
+          },
+        },
+        {
+          title: 'Nom',
+          dataKey: 'name',
+          onSortOrder: setSortOrder,
+          onSortBy: setSortBy,
+          sortBy,
+          sortOrder,
+        },
+        {
+          title: 'Personne suivie',
+          dataKey: 'person',
+          onSortOrder: setSortOrder,
+          onSortBy: setSortBy,
+          sortBy,
+          sortOrder,
+          render: (consultation) => <PersonName item={consultation} />,
+        },
+        {
+          title: 'Statut',
+          dataKey: 'status',
+          onSortOrder: setSortOrder,
+          onSortBy: setSortBy,
+          sortBy,
+          sortOrder,
+          render: (consultation) => <ActionStatus status={consultation.status} />,
+        },
+        {
+          title: 'Équipe(s) en charge',
+          dataKey: 'team',
+          render: (consult) => (
+            <div className="px-2 tw-flex tw-flex-shrink-0 tw-flex-col tw-gap-px">
+              {Array.isArray(consult?.teams) ? consult.teams.map((e) => <TagTeam key={e} teamId={e} />) : <TagTeam teamId={consult?.team} />}
+            </div>
+          ),
+        },
+      ]}
+    />
+  );
+};
+
+const Treatments = ({ treatments }) => {
+  const history = useHistory();
+
+  const moreThanOne = treatments.length > 1;
+
+  return (
+    <Table
+      className="Table"
+      data={treatments}
+      title={`Traitement${moreThanOne ? 's' : ''} (${treatments?.length})`}
+      noData="Pas de traitement"
+      onRowClick={(consultation) => {
+        const searchParams = new URLSearchParams(history.location.search);
+        searchParams.set('consultationId', consultation._id);
+        history.push(`?${searchParams.toString()}`);
+      }}
+      rowKey="_id"
+      columns={[
+        {
+          title: 'Début',
+          dataKey: 'startDate',
+          render: (treatment) => <DateBloc date={treatment.startDate} />,
+        },
+        {
+          title: 'Fin',
+          dataKey: 'endDate',
+          render: (treatment) => <DateBloc date={treatment.endDate} />,
+        },
+        {
+          title: 'Nom',
+          dataKey: 'name',
+        },
+        {
+          title: 'Dosage',
+          dataKey: 'dosage',
+        },
+        {
+          title: 'Fréquence',
+          dataKey: 'frequency',
+        },
+        {
+          title: 'Indication',
+          dataKey: 'indication',
+        },
+        {
+          title: 'Personne suivie',
+          dataKey: 'person',
+          render: (consultation) => <PersonName item={consultation} />,
         },
       ]}
     />
