@@ -11,6 +11,7 @@ import API from '../../../services/api';
 import { theme } from '../../../config';
 import { formatPeriod } from '../../../components/DateRangePickerWithPresets';
 import { servicesSelector } from '../../../recoil/reports';
+import dayjs from 'dayjs';
 
 const ErrorOnGetServices = () => (
   <div>
@@ -24,18 +25,17 @@ export default function ServicesReport({ period, selectedTeamsObject }) {
   const [show, setShow] = useState([]);
   // `service` structure is: { `team-id-xxx`: { `service-name`: 1, ... }, ... }
   const [services, setServices] = useState({});
-  console.log({ period });
 
-  const teamIds = Object.keys(selectedTeamsObject);
   useEffect(() => {
+    const teamIds = Object.keys(selectedTeamsObject);
     setShow([teamIds.length === 1 ? selectedTeamsObject[teamIds[0]] : 'all']);
-  }, [teamIds]);
+  }, [selectedTeamsObject]);
   const isSingleDay = period.startDate === period.endDate;
 
   // Sums of services for all reports, to display the total of services for all teams.
   const serviceSumsForAllReports = useMemo(() => {
     const servicesValues = Object.values(services);
-    if (!servicesValues.length) return null;
+    if (!servicesValues.length) return {};
     return servicesValues.reduce((acc, curr) => {
       return Object.entries(curr).reduce((innerAcc, [key, value]) => {
         innerAcc[key] = (innerAcc[key] || 0) + value;
@@ -57,11 +57,12 @@ export default function ServicesReport({ period, selectedTeamsObject }) {
         path: `/service/for-reports`,
         query: {
           teamIds: Object.keys(selectedTeamsObject).join(','),
-          startDate: period.startDate.slice(0, 10),
-          endDate: period.endDate.slice(0, 10),
+          startDate: dayjs(period.startDate).format('YYYY-MM-DD'),
+          endDate: dayjs(period.endDate).format('YYYY-MM-DD'),
         },
       }).then((res) => {
         if (!res.ok) return toast.error(<ErrorOnGetServices />);
+        console.log(res.data);
         setServices(res.data);
       });
     },
@@ -70,6 +71,8 @@ export default function ServicesReport({ period, selectedTeamsObject }) {
   );
 
   if (!organisation.receptionEnabled || !organisation?.services) return null;
+
+  const teamIds = Object.keys(selectedTeamsObject);
 
   return (
     <StyledBox>
@@ -135,7 +138,7 @@ export default function ServicesReport({ period, selectedTeamsObject }) {
               onUpdateServices={(updated) => setServices((s) => ({ ...s, [teamId]: updated }))}
               team={selectedTeamsObject[teamId]}
               disabled={!isSingleDay}
-              dateString={period.startDate.slice(0, 10)}
+              dateString={dayjs(period.startDate).format('YYYY-MM-DD')}
               dataTestIdPrefix={`${selectedTeamsObject[teamId].name}-`}
             />
           </div>

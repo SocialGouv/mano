@@ -224,6 +224,7 @@ const View = () => {
   const [selectedTeamIds, setSelectedTeamIds] = useLocalStorage('reports-teams', [currentTeam._id]);
   const [preset, setPreset, removePreset] = useLocalStorage('reports-date-preset', "Aujourd'hui");
   let [period, setPeriod] = useLocalStorage('reports-period', { startDate: null, endDate: null });
+  console.log({ preset, period });
   if (!period.startDate || !period.endDate) {
     const presetPeriod = reportsPresets.find((p) => p.label === preset);
     if (presetPeriod) {
@@ -232,6 +233,8 @@ const View = () => {
       period = reportsPresets[0].period;
     }
   }
+
+  console.log({ preset, period });
 
   const selectedTeams = useMemo(
     () => (viewAllOrganisationData ? teams : teams.filter((team) => selectedTeamIds.includes(team._id))),
@@ -388,33 +391,6 @@ const View = () => {
   );
 };
 
-const Title = styled.h3`
-  font-weight: bold;
-  font-size: 24px;
-  line-height: 32px;
-  padding: 20px 0 10px 0;
-  width: 100%;
-
-  button {
-    font-style: italic;
-  }
-`;
-
-const TabTitle = styled.span`
-  caption-side: top;
-  font-weight: bold;
-  font-size: 24px;
-  line-height: 32px;
-  width: 100%;
-  color: #1d2021;
-  text-transform: none;
-  padding: 16px 0;
-  display: block;
-  @media print {
-    display: block !important;
-  }
-`;
-
 const StyledBox = styled(Box)`
   border-radius: 16px;
   padding: 16px 32px;
@@ -424,21 +400,6 @@ const StyledBox = styled(Box)`
 
   .Table {
     padding: 0;
-  }
-`;
-
-const DescriptionBox = styled(StyledBox)`
-  background-color: #f8f8f8;
-  border-radius: 15px;
-  padding: 1rem;
-  @media screen {
-    margin-bottom: 1rem;
-    width: 100%;
-  }
-  @media print {
-    ${(props) => props.report?.description?.length < 1 && props.report?.collaborations?.length < 1 && 'display: none !important;'}
-    margin-bottom: 40px;
-    page-break-inside: avoid;
   }
 `;
 

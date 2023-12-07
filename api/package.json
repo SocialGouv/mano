@@ -34,7 +34,7 @@
     "sanitize-html": "^2.7.0",
     "sequelize": "^6.28.0",
     "sequelize-cli": "^6.6.1",
-    "zod": "^3.13.4"
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.0",
