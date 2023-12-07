@@ -1,3 +1,12 @@
+## [1.297.13](https://github.com/SocialGouv/mano/compare/v1.297.12...v1.297.13) (2023-12-07)
+
+
+### Bug Fixes
+
+* **dashboard:** message d'erreur lorsqu'on veut supprimer une équipe encore active ([#1801](https://github.com/SocialGouv/mano/issues/1801)) ([cdcd212](https://github.com/SocialGouv/mano/commit/cdcd2120407d03376e24fe1f0df18da2f2fd501f))
+* **dashboard:** on peut voir les équipes pour chaque consultation dans les comptes-rendus ([#1800](https://github.com/SocialGouv/mano/issues/1800)) ([769ac1d](https://github.com/SocialGouv/mano/commit/769ac1dedd957afa3ddcf1ff7d60067d0aef1080))
+* **dashboard:** possibilité d'ouvrir les documents en plein écran même quand y'en a pas ([#1802](https://github.com/SocialGouv/mano/issues/1802)) ([f154d4d](https://github.com/SocialGouv/mano/commit/f154d4d5b7138f2985b7e182f23cf03dfe48bfdb))
+
 ## [1.297.12](https://github.com/SocialGouv/mano/compare/v1.297.11...v1.297.12) (2023-12-07)
 
 
