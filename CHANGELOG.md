@@ -1,3 +1,10 @@
+# [1.298.0](https://github.com/SocialGouv/mano/compare/v1.297.13...v1.298.0) (2023-12-07)
+
+
+### Features
+
+* **dashboard:** possibilité de faire une recherche magique dans les consulations, les traitements et les dossiers médicaux ([#1803](https://github.com/SocialGouv/mano/issues/1803)) ([76bccd0](https://github.com/SocialGouv/mano/commit/76bccd0c8f9190b68bf0bd2209a633f097dc0034))
+
 ## [1.297.13](https://github.com/SocialGouv/mano/compare/v1.297.12...v1.297.13) (2023-12-07)
 
 
