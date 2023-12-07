@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FormGroup, Input, Label, Row, Col } from 'reactstrap';
 
 import { useParams, useHistory } from 'react-router-dom';
@@ -11,14 +11,48 @@ import ButtonCustom from '../../components/ButtonCustom';
 import NightSessionModale from '../../components/NightSessionModale';
 import { currentTeamState, teamsState } from '../../recoil/auth';
 import API from '../../services/api';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import useTitle from '../../services/useTitle';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
+import { actionsState } from '../../recoil/actions';
+import { consultationsState } from '../../recoil/consultations';
+import { commentsState } from '../../recoil/comments';
+import { territoryObservationsState } from '../../recoil/territoryObservations';
+import { personsState } from '../../recoil/persons';
+import { passagesState } from '../../recoil/passages';
+import { rencontresState } from '../../recoil/rencontres';
 
 const View = () => {
   const [team, setTeam] = useState(null);
   const { id } = useParams();
   const history = useHistory();
+  const actions = useRecoilValue(actionsState);
+  const consultations = useRecoilValue(consultationsState);
+  const comments = useRecoilValue(commentsState);
+  const observations = useRecoilValue(territoryObservationsState);
+  const persons = useRecoilValue(personsState);
+  const passages = useRecoilValue(passagesState);
+  const rencontres = useRecoilValue(rencontresState);
+
+  const cantDeleteMessage = useMemo(() => {
+    const actionsInTeam = actions.filter((a) => a.teams?.includes(id));
+    const consultationsInTeam = consultations.filter((c) => c.teams?.includes(id));
+    const commentsInTeam = comments.filter((c) => c.team === id);
+    const observationsInTeam = observations.filter((o) => o.team === id);
+    const personsInTeam = persons.filter((p) => p.assignedTeams?.includes(id));
+    const passagesInTeam = passages.filter((p) => p.team === id);
+    const rencontresInTeam = rencontres.filter((r) => r.team === id);
+    let items = [];
+    if (actionsInTeam.length) items.push(`${actionsInTeam.length} actions`);
+    if (consultationsInTeam.length) items.push(`${consultationsInTeam.length} consultations`);
+    if (commentsInTeam.length) items.push(`${commentsInTeam.length} commentaires`);
+    if (observationsInTeam.length) items.push(`${observationsInTeam.length} observations`);
+    if (personsInTeam.length) items.push(`${personsInTeam.length} personnes`);
+    if (passagesInTeam.length) items.push(`${passagesInTeam.length} passages`);
+    if (rencontresInTeam.length) items.push(`${rencontresInTeam.length} rencontres`);
+    return items.length ? `Vous ne pouvez pas supprimer cette équipe, vous avez ${items.join(', ')} qui y sont liées.` : null;
+  }, [actions, consultations, comments, observations, persons, passages, rencontres, id]);
+
   useTitle(`Équipes ${team?.name}`);
 
   const [currentTeam, setCurrentTeam] = useRecoilState(currentTeamState);
@@ -81,24 +115,34 @@ const View = () => {
                 </FormGroup>
               </Col>
             </Row>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
-              <DeleteButtonAndConfirmModal
-                title={`Voulez-vous vraiment supprimer l'équipe ${team.name}`}
-                textToConfirm={team.name}
-                // disabled={teams.length === 1}
-                // disabledTitle="Vous ne pouvez pas supprimer la dernière équipe"
-                onConfirm={async () => {
-                  const res = await API.delete({ path: `/team/${id}` });
-                  if (!res.ok) return;
-                  setTeams(teams.filter((t) => t._id !== id));
-                  toast.success('Suppression réussie');
-                  history.goBack();
-                }}>
-                <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
-                  Cette opération est irréversible
-                  <br />
-                </span>
-              </DeleteButtonAndConfirmModal>
+            <div className="tw-flex tw-justify-end tw-gap-4">
+              {cantDeleteMessage ? (
+                <button
+                  className="button-destructive"
+                  onClick={() => {
+                    toast.error(cantDeleteMessage);
+                  }}>
+                  Supprimer
+                </button>
+              ) : (
+                <DeleteButtonAndConfirmModal
+                  title={`Voulez-vous vraiment supprimer l'équipe ${team.name}`}
+                  textToConfirm={team.name}
+                  // disabled={teams.length === 1}
+                  // disabledTitle="Vous ne pouvez pas supprimer la dernière équipe"
+                  onConfirm={async () => {
+                    const res = await API.delete({ path: `/team/${id}` });
+                    if (!res.ok) return;
+                    setTeams(teams.filter((t) => t._id !== id));
+                    toast.success('Suppression réussie');
+                    history.goBack();
+                  }}>
+                  <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
+                    Cette opération est irréversible
+                    <br />
+                  </span>
+                </DeleteButtonAndConfirmModal>
+              )}
               <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} />
             </div>
           </React.Fragment>
