@@ -1,3 +1,10 @@
+## [1.297.11](https://github.com/SocialGouv/mano/compare/v1.297.10...v1.297.11) (2023-12-07)
+
+
+### Bug Fixes
+
+* average follow time prend en compte sortie de file active ([#1799](https://github.com/SocialGouv/mano/issues/1799)) ([6e28892](https://github.com/SocialGouv/mano/commit/6e28892b6c5860d97b3c26b7918eda5ba19dcfb5))
+
 ## [1.297.10](https://github.com/SocialGouv/mano/compare/v1.297.9...v1.297.10) (2023-11-30)
 
 
