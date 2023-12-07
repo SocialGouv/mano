@@ -1373,6 +1373,15 @@ const Consultations = ({ date, status, consultations, setSortOrder, setSortBy, s
               sortOrder,
               render: (consultation) => <ActionStatus status={consultation.status} />,
             },
+            {
+              title: 'Équipe(s) en charge',
+              dataKey: 'team',
+              render: (a) => (
+                <div className="px-2 tw-flex tw-flex-shrink-0 tw-flex-col tw-gap-px">
+                  {Array.isArray(a?.teams) ? a.teams.map((e) => <TagTeam key={e} teamId={e} />) : <TagTeam teamId={a?.team} />}
+                </div>
+              ),
+            },
           ]}
         />
       </StyledBox>
@@ -1430,6 +1439,15 @@ const ConsultationsCreatedAt = ({ date, consultations }) => {
               render: (action) => <PersonName showOtherNames item={action} />,
             },
             { title: 'Statut', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
+            {
+              title: 'Équipe(s) en charge',
+              dataKey: 'team',
+              render: (a) => (
+                <div className="px-2 tw-flex tw-flex-shrink-0 tw-flex-col tw-gap-px">
+                  {Array.isArray(a?.teams) ? a.teams.map((e) => <TagTeam key={e} teamId={e} />) : <TagTeam teamId={a?.team} />}
+                </div>
+              ),
+            },
           ]}
         />
       </StyledBox>
