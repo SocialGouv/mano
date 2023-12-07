@@ -279,29 +279,15 @@ const BlockCreatedAt = ({ persons }) => {
         totalFollowedTime += Date.now() - followStart;
       } else {
         for (const historyEntry of outOfActiveListEntries) {
-          try {
-            if (historyEntry.data.outOfActiveList.newValue === true) {
-              const outOfActiveListDate = historyEntry.data.outOfActiveListDate.newValue;
-              const formattedDate = typeof outOfActiveListDate === 'number' ? outOfActiveListDate : Date.parse(outOfActiveListDate);
-              if (isNaN(formattedDate)) {
-                console.log('outOfActiveListDate NAN', historyEntry.data.outOfActiveListDate.newValue);
-              } else {
-                console.log('outOfActiveListDate PAS NAN', historyEntry.data.outOfActiveListDate.newValue);
-              }
-              // person became inactive, so calculate followed time
-              totalFollowedTime += formattedDate - followStart;
-              // if (isNaN(totalFollowedTime)) console.log('outOfActiveListDate', outOfActiveListDate);
-              // if (isNaN(totalFollowedTime)) console.log('followStart', followStart);
-              // if (isNaN(totalFollowedTime)) console.log('historyEntry.data', historyEntry.data);
-            } else {
-              // person became active, so update start
-              followStart = Date.parse(historyEntry.date); // assuming that this correctly reflects when the person became active
-              // if (isNaN(followStart)) console.log('followStart', followStart);
-              // if (isNaN(followStart)) console.log('historyEntry.data.outOfActiveListDate', historyEntry.data.outOfActiveListDate);
-            }
-          } catch (error) {
-            console.error(error);
-            console.log('historyEntry', historyEntry);
+          if (historyEntry.data.outOfActiveList.newValue === true) {
+            const outOfActiveListDate = historyEntry.data.outOfActiveListDate.newValue;
+            const formattedDate = typeof outOfActiveListDate === 'number' ? outOfActiveListDate : Date.parse(outOfActiveListDate);
+
+            // person became inactive, so calculate followed time
+            totalFollowedTime += formattedDate - followStart;
+          } else {
+            // person became active, so update start
+            followStart = Date.parse(historyEntry.date); // assuming that this correctly reflects when the person became active
           }
         }
         // if the person is still active, add time from last followStart to now
@@ -311,7 +297,6 @@ const BlockCreatedAt = ({ persons }) => {
       }
 
       if (isNaN(totalFollowedTime)) console.log('person', person);
-      // console.log('totalFollowedTime', totalFollowedTime);
 
       return total + totalFollowedTime;
     }, 0) / (persons.length || 1);
