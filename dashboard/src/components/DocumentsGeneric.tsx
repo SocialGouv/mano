@@ -77,14 +77,12 @@ export function DocumentsModule({
                 ＋
                 <AddDocumentInput onAddDocuments={onAddDocuments} personId={personId} />
               </label>
-              {Boolean(documents.length) && (
-                <button
-                  title="Passer les documents en plein écran"
-                  className={`tw-h-6 tw-w-6 tw-rounded-full tw-text-${color} tw-transition hover:tw-scale-125`}
-                  onClick={() => setFullScreen(true)}>
-                  <FullScreenIcon />
-                </button>
-              )}
+              <button
+                title="Passer les documents en plein écran"
+                className={`tw-h-6 tw-w-6 tw-rounded-full tw-text-${color} tw-transition hover:tw-scale-125`}
+                onClick={() => setFullScreen(true)}>
+                <FullScreenIcon />
+              </button>
             </div>
           </div>
           <DocumentTable
@@ -187,6 +185,34 @@ function DocumentsFullScreen({
     <ModalContainer open={open} size={withDocumentOrganizer ? 'full' : 'prose'} onClose={onClose}>
       <ModalHeader title={title} />
       <ModalBody>
+        {!documents.length && (
+          <div className="tw-flex tw-flex-col tw-items-center tw-gap-6 tw-pb-6">
+            <div className="tw-mt-8 tw-mb-2 tw-w-full tw-text-center tw-text-gray-300">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="tw-mx-auto tw-h-16 tw-w-16 tw-text-gray-200"
+                width={24}
+                height={24}
+                viewBox="0 0 24 24"
+                strokeWidth="2"
+                stroke="currentColor"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
+                />
+              </svg>
+              Aucun document pour le moment
+            </div>
+            <label aria-label="Ajouter des documents" className={`button-submit mb-0 !tw-bg-${color}`}>
+              ＋ Ajouter des documents
+              <AddDocumentInput onAddDocuments={onAddDocuments} personId={personId} />
+            </label>
+          </div>
+        )}
         {withDocumentOrganizer ? (
           <div className="tw-min-h-1/2 ">
             {socialOrMedical === 'social' && (
