@@ -1,3 +1,10 @@
+## [1.297.12](https://github.com/SocialGouv/mano/compare/v1.297.11...v1.297.12) (2023-12-07)
+
+
+### Bug Fixes
+
+* isNan ([be25d7c](https://github.com/SocialGouv/mano/commit/be25d7c5e08f0e59d7d5241e856ce6ce7ed88e78))
+
 ## [1.297.11](https://github.com/SocialGouv/mano/compare/v1.297.10...v1.297.11) (2023-12-07)
 
 
