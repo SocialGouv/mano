@@ -275,22 +275,19 @@ const BlockCreatedAt = ({ persons }) => {
 
       const outOfActiveListEntries = history.filter((hist) => hist.data.outOfActiveListDate);
       if (!outOfActiveListEntries.length) {
-        // person never became inactive, so calculate followed time until now
         totalFollowedTime += Date.now() - followStart;
       } else {
         for (const historyEntry of outOfActiveListEntries) {
           if (historyEntry.data.outOfActiveList.newValue === true) {
             const outOfActiveListDate = historyEntry.data.outOfActiveListDate.newValue;
             const formattedDate = typeof outOfActiveListDate === 'number' ? outOfActiveListDate : Date.parse(outOfActiveListDate);
-
-            // person became inactive, so calculate followed time
-            totalFollowedTime += formattedDate - followStart;
+            if (!isNaN(formattedDate)) {
+              totalFollowedTime += formattedDate - followStart;
+            }
           } else {
-            // person became active, so update start
-            followStart = Date.parse(historyEntry.date); // assuming that this correctly reflects when the person became active
+            followStart = Date.parse(historyEntry.date);
           }
         }
-        // if the person is still active, add time from last followStart to now
         if (!person.outOfActiveList) {
           totalFollowedTime += Date.now() - followStart;
         }
