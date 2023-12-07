@@ -268,15 +268,53 @@ const BlockCreatedAt = ({ persons }) => {
 
   const averageFollowedTime =
     persons.reduce((total, person) => {
-      // On utilise followedSince si disponible, sinon createdAt
-      const startFollowedDate = Date.parse(person.followedSince || person.createdAt);
+      let totalFollowedTime = 0;
+      let followStart = Date.parse(person.followedSince || person.createdAt);
 
-      // Si outOfActiveList est à true et que outOfActiveListDate est disponible, on utilise cette date, sinon on utilise la date actuelle
-      const endFollowedDate = person.outOfActiveList && person.outOfActiveListDate ? Date.parse(new Date(person.outOfActiveListDate)) : Date.now();
+      const history = person.history || [];
 
-      // On renvoie la différence entre les deux dates (et pour éviter les nombres négatifs, on renvoie 0 si la différence est négative)
-      return total + (endFollowedDate - startFollowedDate > 0 ? endFollowedDate - startFollowedDate : 0);
-    }, 0) / (persons.length || 1); // On divise par le nombre de personnes pour obtenir la moyenne
+      const outOfActiveListEntries = history.filter((hist) => hist.data.outOfActiveListDate);
+      if (!outOfActiveListEntries.length) {
+        // person never became inactive, so calculate followed time until now
+        totalFollowedTime += Date.now() - followStart;
+      } else {
+        for (const historyEntry of outOfActiveListEntries) {
+          try {
+            if (historyEntry.data.outOfActiveList.newValue === true) {
+              const outOfActiveListDate = historyEntry.data.outOfActiveListDate.newValue;
+              const formattedDate = typeof outOfActiveListDate === 'number' ? outOfActiveListDate : Date.parse(outOfActiveListDate);
+              if (isNaN(formattedDate)) {
+                console.log('outOfActiveListDate NAN', historyEntry.data.outOfActiveListDate.newValue);
+              } else {
+                console.log('outOfActiveListDate PAS NAN', historyEntry.data.outOfActiveListDate.newValue);
+              }
+              // person became inactive, so calculate followed time
+              totalFollowedTime += formattedDate - followStart;
+              // if (isNaN(totalFollowedTime)) console.log('outOfActiveListDate', outOfActiveListDate);
+              // if (isNaN(totalFollowedTime)) console.log('followStart', followStart);
+              // if (isNaN(totalFollowedTime)) console.log('historyEntry.data', historyEntry.data);
+            } else {
+              // person became active, so update start
+              followStart = Date.parse(historyEntry.date); // assuming that this correctly reflects when the person became active
+              // if (isNaN(followStart)) console.log('followStart', followStart);
+              // if (isNaN(followStart)) console.log('historyEntry.data.outOfActiveListDate', historyEntry.data.outOfActiveListDate);
+            }
+          } catch (error) {
+            console.error(error);
+            console.log('historyEntry', historyEntry);
+          }
+        }
+        // if the person is still active, add time from last followStart to now
+        if (!person.outOfActiveList) {
+          totalFollowedTime += Date.now() - followStart;
+        }
+      }
+
+      if (isNaN(totalFollowedTime)) console.log('person', person);
+      // console.log('totalFollowedTime', totalFollowedTime);
+
+      return total + totalFollowedTime;
+    }, 0) / (persons.length || 1);
 
   const [count, unit] = getDuration(averageFollowedTime);
 
