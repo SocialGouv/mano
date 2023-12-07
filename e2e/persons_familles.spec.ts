@@ -218,7 +218,7 @@ test("Familles", async ({ page }) => {
 
     await page.getByPlaceholder("Par mot clé").fill(comment1Name);
 
-    await page.getByText("Commentaires (1)").click();
+    await page.getByText("Commentaires non médicaux (1)").click();
     await expect(page.locator("tr", { has: page.getByText(comment1Name) }).getByText("👪")).toBeVisible();
 
     await page.getByRole("link", { name: "Comptes rendus" }).click();
