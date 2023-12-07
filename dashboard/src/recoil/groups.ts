@@ -39,6 +39,7 @@ export const prepareGroupForEncryption = (group: GroupInstance) => {
     _id: group._id,
     createdAt: group.createdAt,
     updatedAt: group.updatedAt,
+    deletedAt: group.deletedAt,
     organisation: group.organisation,
 
     decrypted,

@@ -97,6 +97,7 @@ export const prepareConsultationForEncryption =
       organisation: consultation.organisation,
       createdAt: consultation.createdAt,
       updatedAt: consultation.updatedAt,
+      deletedAt: consultation.deletedAt,
 
       completedAt: consultation.completedAt,
       dueAt: consultation.dueAt,

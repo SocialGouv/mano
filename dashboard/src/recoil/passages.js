@@ -48,6 +48,7 @@ export const preparePassageForEncryption = (passage, { checkRequiredFields = tru
     _id: passage._id,
     createdAt: passage.createdAt,
     updatedAt: passage.updatedAt,
+    deletedAt: passage.deletedAt,
     organisation: passage.organisation,
 
     decrypted,

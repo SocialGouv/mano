@@ -44,6 +44,7 @@ export const preparePlaceForEncryption = (place, { checkRequiredFields = true } 
     _id: place._id,
     createdAt: place.createdAt,
     updatedAt: place.updatedAt,
+    deletedAt: place.deletedAt,
     organisation: place.organisation,
 
     decrypted,

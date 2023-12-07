@@ -165,6 +165,7 @@ export const usePreparePersonForEncryption = () => {
       organisation: person.organisation,
       createdAt: person.createdAt,
       updatedAt: person.updatedAt,
+      deletedAt: person.deletedAt,
       outOfActiveList: person.outOfActiveList,
 
       decrypted,

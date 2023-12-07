@@ -48,6 +48,7 @@ export const prepareMedicalFileForEncryption =
       _id: medicalFile._id,
       createdAt: medicalFile.createdAt,
       updatedAt: medicalFile.updatedAt,
+      deletedAt: medicalFile.deletedAt,
       organisation: medicalFile.organisation,
 
       decrypted,

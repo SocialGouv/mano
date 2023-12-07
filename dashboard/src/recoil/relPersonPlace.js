@@ -47,6 +47,7 @@ export const prepareRelPersonPlaceForEncryption = (relPersonPlace, { checkRequir
     _id: relPersonPlace._id,
     createdAt: relPersonPlace.createdAt,
     updatedAt: relPersonPlace.updatedAt,
+    deletedAt: relPersonPlace.deletedAt,
     organisation: relPersonPlace.organisation,
 
     decrypted,

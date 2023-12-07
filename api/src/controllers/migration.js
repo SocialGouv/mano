@@ -160,6 +160,7 @@ router.put(
             const password = crypto.randomBytes(60).toString("hex"); // A useless password.,
             const forgotPasswordResetExpires = new Date(Date.now() + 60 * 60 * 24 * 30 * 1000); // 30 days
             for (let item of newOrganisation.users) {
+              item.email = item.email.toLocaleLowerCase();
               item.forgotPasswordResetToken = crypto.randomBytes(20).toString("hex");
               item.forgotPasswordResetExpires = forgotPasswordResetExpires;
               item.password = password;

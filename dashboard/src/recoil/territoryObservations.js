@@ -123,6 +123,7 @@ export const prepareObsForEncryption =
       _id: obs._id,
       createdAt: obs.createdAt,
       updatedAt: obs.updatedAt,
+      deletedAt: obs.deletedAt,
       organisation: obs.organisation,
 
       decrypted,

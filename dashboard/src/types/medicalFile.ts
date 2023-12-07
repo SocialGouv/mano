@@ -13,6 +13,7 @@ export interface MedicalFileInstance extends AdditionalProps {
   comments: any[];
   createdAt: Date;
   updatedAt: Date;
+  deletedAt?: Date;
 }
 
 export interface NewMedicalFileInstance extends Omit<MedicalFileInstance, '_id' | 'createdAt' | 'updatedAt'> {}

@@ -206,11 +206,11 @@ const duplicateDecryptedData = async ({
   const personIdsMapped = {};
   const newPersons = [];
   for (const person of persons) {
+    const newPersonId = uuidv4();
+    personIdsMapped[person._id] = newPersonId;
     if (!person.name && !person.deletedAt) {
       continue;
     }
-    const newPersonId = uuidv4();
-    personIdsMapped[person._id] = newPersonId;
     const newPerson = {
       ...person,
       user: userIdsMapped[person.user],
@@ -451,8 +451,6 @@ const duplicateDecryptedData = async ({
     };
     newReports.push(newReport);
   }
-
-  const nextPersons = await Promise.all(newPersons.map(preparePersonForEncryption).map(encryptItem));
 
   return {
     organisationId: nextOrganisationId,
