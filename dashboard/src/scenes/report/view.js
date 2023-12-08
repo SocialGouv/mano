@@ -1,72 +1,39 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Col, Row, FormGroup, Label, Spinner } from 'reactstrap';
-import styled from 'styled-components';
-import { useHistory, useLocation, useParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { Formik } from 'formik';
-import { addOneDay, dateForDatePicker, dayjsInstance, formatDateWithFullMonth, formatDateWithNameOfDay, formatTime } from '../../services/date';
-import DateBloc from '../../components/DateBloc';
+import { useEffect, useMemo } from 'react';
+import { useParams } from 'react-router-dom';
+import { addOneDay, dateForDatePicker, formatDateWithNameOfDay } from '../../services/date';
 import { HeaderStyled, Title as HeaderTitle } from '../../components/header';
-import BackButton, { BackButtonWrapper } from '../../components/backButton';
-import Box from '../../components/Box';
-import ActionStatus from '../../components/ActionStatus';
-import Table from '../../components/table';
-import Observation from '../territory-observations/view';
 import dayjs from 'dayjs';
-import { CANCEL, DONE, TODO, actionsState } from '../../recoil/actions';
-import { capture } from '../../services/sentry';
-import UserName from '../../components/UserName';
+import { TODO } from '../../recoil/actions';
 import ButtonCustom from '../../components/ButtonCustom';
-import Card from '../../components/Card';
-import CreateObservation from '../../components/CreateObservation';
-import SelectAndCreateCollaboration from './SelectAndCreateCollaboration';
-import ActionOrConsultationName from '../../components/ActionOrConsultationName';
-import ReportDescriptionModale from '../../components/ReportDescriptionModale';
 import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
-import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
-import { territoriesState } from '../../recoil/territory';
-import PersonName from '../../components/PersonName';
-import { selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
-import IncrementorSmall from '../../components/IncrementorSmall';
-import API from '../../services/api';
+import { reportsState } from '../../recoil/reports';
+import { selectorFamily, useRecoilValue } from 'recoil';
 import { passagesState } from '../../recoil/passages';
-import Passage from '../../components/Passage';
-import ExclamationMarkButton from '../../components/tailwind/ExclamationMarkButton';
 import useTitle from '../../services/useTitle';
-import { theme } from '../../config';
-import ConsultationButton from '../../components/ConsultationButton';
-import { disableConsultationRow } from '../../recoil/consultations';
-import agendaIcon from '../../assets/icons/agenda-icon.svg';
-import { lastLoadState, mergeItems, useDataLoader } from '../../components/DataLoader';
-import Rencontre from '../../components/Rencontre';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
-import TagTeam from '../../components/TagTeam';
-import ReceptionService from '../../components/ReceptionService';
-import { useLocalStorage } from '../../services/useLocalStorage';
 import { arrayOfitemsGroupedByPersonSelector, onlyFilledObservationsTerritories } from '../../recoil/selectors';
-import DescriptionIcon from '../../components/DescriptionIcon';
-import ActionsSortableList from '../../components/ActionsSortableList';
 import { ActionsOrConsultations } from './components/ActionsReport';
 import ServicesReport from './components/ServicesReport';
-import DateRangePickerWithPresets, { formatPeriod, reportsPresets } from '../../components/DateRangePickerWithPresets';
+import DateRangePickerWithPresets, { reportsPresets } from '../../components/DateRangePickerWithPresets';
 import { CommentsSocialAndMedical } from './components/CommentsReport';
 import { PassagesReport } from './components/PassagesReport';
 import { RencontresReport } from './components/RencontresReport';
 import { ObservationsReport } from './components/ObservationsReport';
 import { PersonsReport } from './components/PersonsReport';
 import Transmissions from './components/Transmissions';
+import { useLocalStorage } from '../../services/useLocalStorage';
 
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithNameOfDay(date)}`;
   const nextDay = addOneDay(date);
   return (
     <>
-      <p className="tw-m-0 tw-text-center">
+      <span className="tw-m-0 tw-text-center">
         Nuit du {formatDateWithNameOfDay(date)} au {formatDateWithNameOfDay(nextDay)}
-      </p>
-      <p className="tw-m-0 tw-text-center tw-text-xs tw-opacity-50">
+      </span>
+      <span className="tw-m-0 tw-text-center tw-text-xs tw-opacity-50">
         On affiche les actions faites/à faire entre midi de ce jour et 11h59 du jour suivant
-      </p>
+      </span>
     </>
   );
 };
@@ -211,7 +178,7 @@ const itemsForReportsSelector = selectorFamily({
       for (const report of allReports) {
         if (!filterItemByTeam(report, 'team')) continue;
         const date = report.date;
-        const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[report.team] ?? defaultIsoDates;
+        const { isoStartDate, isoEndDate } = defaultIsoDates;
         if (date < isoStartDate) continue;
         if (date >= isoEndDate) continue;
         reports[report._id] = report;
@@ -243,7 +210,7 @@ const View = () => {
   const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('reports-allOrg', teams.length === 1);
   const [selectedTeamIds, setSelectedTeamIds] = useLocalStorage('reports-teams', [currentTeam._id]);
 
-  const [preset, setPreset, removePreset] = useLocalStorage('reports-date-preset', defaultPreset.label);
+  const [preset, setPreset, removePreset] = useLocalStorage('reports-date-preset', null);
   let [period, setPeriod] = useLocalStorage('reports-period', {
     startDate: dateForDatePicker(defaultPreset.period.startDate),
     endDate: dateForDatePicker(defaultPreset.period.endDate),
@@ -272,16 +239,15 @@ const View = () => {
       };
     }
     return teamsIdsObject;
-  }, [selectedTeams, viewAllOrganisationData, period]);
+  }, [selectedTeams, period]);
 
-  const { personsCreated, personsUpdated, actions, consultations, comments, commentsMedical, passages, rencontres, observations, reports } =
-    useRecoilValue(
-      itemsForReportsSelector({
-        period,
-        viewAllOrganisationData,
-        selectedTeamsObjectWithOwnPeriod,
-      })
-    );
+  const { personsCreated, actions, consultations, comments, commentsMedical, passages, rencontres, observations, reports } = useRecoilValue(
+    itemsForReportsSelector({
+      period,
+      viewAllOrganisationData,
+      selectedTeamsObjectWithOwnPeriod,
+    })
+  );
 
   useTitle(`${dayjs(dateString).format('DD-MM-YYYY')} - Compte rendu`);
 
@@ -373,7 +339,7 @@ const View = () => {
             'noprint tw-mt-4 tw-flex tw-w-full tw-grow tw-basis-full tw-items-start',
             viewAllOrganisationData || selectedTeamIds.length ? 'tw-flex' : 'tw-hidden',
           ].join(' ')}>
-          <div className="tw-min-h-1/2 tw-basis-5/12 tw-overflow-auto">
+          <div className="tw-mb-12 tw-min-h-1/2 tw-basis-5/12 tw-overflow-auto">
             <div className="tw-mb-4 tw-h-[50vh] tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
               <ActionsOrConsultations actions={actions} consultations={consultations} />
             </div>
@@ -381,7 +347,7 @@ const View = () => {
               <CommentsSocialAndMedical comments={comments} commentsMedical={commentsMedical} />
             </div>
           </div>
-          <div className="tw-mx-4 tw-basis-4/12">
+          <div className="tw-mx-4 tw-mb-12 tw-basis-4/12 ">
             <div className="tw-mb-4 tw-flex tw-flex-wrap tw-gap-y-4">
               <div className="tw-basis-1/2">
                 <div className="tw-mr-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow-2xl">
@@ -409,7 +375,7 @@ const View = () => {
             </div>
           </div>
 
-          <div className="tw-mr-2 tw-h-0 tw-min-h-full tw-basis-3/12 tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+          <div className="tw-mr-2 tw-mb-12 tw-h-0 tw-min-h-full tw-basis-3/12 tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow ">
             <Transmissions period={period} selectedTeamsObject={selectedTeamsObject} reports={reports} />
           </div>
         </div>

@@ -159,7 +159,7 @@ const View = () => {
     const defaultTabs = ['Actions', 'Personnes', 'Commentaires non médicaux', 'Lieux', 'Territoires', 'Observations'];
     if (!user.healthcareProfessional) return defaultTabs;
     return [...defaultTabs, 'Consultations', 'Traitements', 'Dossiers médicaux'];
-  }, []);
+  }, [user.healthcareProfessional]);
   const [search, setSearch] = useLocalStorage('fullsearch', '');
   const [activeTab, setActiveTab] = useLocalStorage('fullsearch-tab', 0);
 
@@ -179,7 +179,7 @@ const View = () => {
   const medicalFiles = useMemo(() => {
     if (!search?.length) return [];
     return filterBySearch(search, allMedicalFiles).map((f) => personsObject[f.person]);
-  }, [search, allMedicalFiles]);
+  }, [search, allMedicalFiles, personsObject]);
 
   const treatments = useMemo(() => {
     if (!search?.length) return [];
@@ -195,7 +195,7 @@ const View = () => {
         return c.onlyVisibleBy.includes(user._id);
       })
     );
-  }, [search, allConsultations]);
+  }, [search, allConsultations, user._id]);
 
   const persons = useRecoilValue(personsFilteredBySearchForSearchSelector({ search }));
   const organisation = useRecoilValue(organisationState);

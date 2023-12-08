@@ -4,7 +4,6 @@ import { useRecoilValue } from 'recoil';
 import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from '../../../components/tailwind/Modal';
 import { FullScreenIcon } from '../../../assets/icons/FullScreenIcon';
 import Table from '../../../components/table';
-import UserName from '../../../components/UserName';
 import TagTeam from '../../../components/TagTeam';
 import DateBloc from '../../../components/DateBloc';
 import CreateObservation from '../../../components/CreateObservation';

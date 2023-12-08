@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useRecoilValue, selectorFamily } from 'recoil';
 import { organisationState, userState } from '../../../recoil/auth';
-import { CANCEL, DONE, flattenedActionsCategoriesSelector, mappedIdsToLabels } from '../../../recoil/actions';
+import { CANCEL, DONE, mappedIdsToLabels } from '../../../recoil/actions';
 import { useHistory } from 'react-router-dom';
 import SelectCustom from '../../../components/SelectCustom';
 import ExclamationMarkButton from '../../../components/tailwind/ExclamationMarkButton';
@@ -131,11 +131,7 @@ export const Actions = ({ person }) => {
   );
 };
 
-const ActionsFilters = ({ data, setFilterCategories, setFilterTeamIds, setFilterStatus, filterStatus, filterTeamIds, filterCategories }) => {
-  const categories = useRecoilValue(flattenedActionsCategoriesSelector);
-
-  const catsSelect = ['-- Aucune --', ...(categories || [])];
-
+const ActionsFilters = ({ data, setFilterTeamIds, setFilterStatus, filterStatus, filterTeamIds }) => {
   return (
     <>
       {data.length ? (
