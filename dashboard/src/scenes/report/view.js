@@ -54,6 +54,7 @@ import { PassagesReport } from './components/PassagesReport';
 import { RencontresReport } from './components/RencontresReport';
 import { ObservationsReport } from './components/ObservationsReport';
 import { PersonsReport } from './components/PersonsReport';
+import Transmissions from './components/Transmissions';
 
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithNameOfDay(date)}`;
@@ -88,6 +89,7 @@ const itemsForReportsSelector = selectorFamily({
       const allPersons = get(arrayOfitemsGroupedByPersonSelector);
       const allObservations = get(onlyFilledObservationsTerritories);
       const allPassages = get(passagesState);
+      const allReports = get(reportsState);
 
       const defaultIsoDates = {
         isoStartDate: dayjs(period.startDate).startOf('day').toISOString(),
@@ -103,6 +105,7 @@ const itemsForReportsSelector = selectorFamily({
       const passages = {};
       const rencontres = {};
       const observations = {};
+      const reports = {};
 
       for (let person of allPersons) {
         // get persons for reports for period
@@ -205,6 +208,15 @@ const itemsForReportsSelector = selectorFamily({
         observations[observation._id] = observation;
       }
 
+      for (const report of allReports) {
+        if (!filterItemByTeam(report, 'team')) continue;
+        const date = report.date;
+        const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[report.team] ?? defaultIsoDates;
+        if (date < isoStartDate) continue;
+        if (date >= isoEndDate) continue;
+        reports[report._id] = report;
+      }
+
       return {
         personsCreated: Object.values(personsCreated),
         personsUpdated: Object.values(personsUpdated),
@@ -215,6 +227,7 @@ const itemsForReportsSelector = selectorFamily({
         passages: Object.values(passages),
         rencontres: Object.values(rencontres),
         observations: Object.values(observations),
+        reports: Object.values(reports),
       };
     },
 });
@@ -261,26 +274,14 @@ const View = () => {
     return teamsIdsObject;
   }, [selectedTeams, viewAllOrganisationData, period]);
 
-  const isSingleDay = period.startDate === period.endDate;
-  const allReports = useRecoilValue(reportsState);
-  const reportsFromDay = useMemo(
-    () => (isSingleDay ? allReports.filter((report) => report.date === period.startDate) : []),
-    [isSingleDay, period, allReports]
-  );
-  const history = useHistory();
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-
-  const { personsCreated, personsUpdated, actions, consultations, comments, commentsMedical, passages, rencontres, observations } = useRecoilValue(
-    itemsForReportsSelector({
-      period,
-      viewAllOrganisationData,
-      selectedTeamsObjectWithOwnPeriod,
-    })
-  );
-
-  const [personSortBy, setPersonSortBy] = useLocalStorage('person-sortBy', 'name');
-  const [personSortOrder, setPersonSortOrder] = useLocalStorage('person-sortOrder', 'ASC');
+  const { personsCreated, personsUpdated, actions, consultations, comments, commentsMedical, passages, rencontres, observations, reports } =
+    useRecoilValue(
+      itemsForReportsSelector({
+        period,
+        viewAllOrganisationData,
+        selectedTeamsObjectWithOwnPeriod,
+      })
+    );
 
   useTitle(`${dayjs(dateString).format('DD-MM-YYYY')} - Compte rendu`);
 
@@ -383,22 +384,22 @@ const View = () => {
           <div className="tw-mx-4 tw-basis-4/12">
             <div className="tw-mb-4 tw-flex tw-flex-wrap tw-gap-y-4">
               <div className="tw-basis-1/2">
-                <div className="tw-mr-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+                <div className="tw-mr-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow-2xl">
                   <PassagesReport passages={passages} period={period} selectedTeams={selectedTeams} />
                 </div>
               </div>
               <div className="tw-basis-1/2">
-                <div className="tw-ml-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+                <div className="tw-ml-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow">
                   <RencontresReport rencontres={rencontres} period={period} selectedTeams={selectedTeams} />
                 </div>
               </div>
               <div className="tw-basis-1/2">
-                <div className="tw-mr-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+                <div className="tw-mr-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow">
                   <ObservationsReport observations={observations} period={period} selectedTeams={selectedTeams} />
                 </div>
               </div>
               <div className="tw-basis-1/2">
-                <div className="tw-ml-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+                <div className="tw-ml-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow">
                   <PersonsReport personsCreated={personsCreated} period={period} selectedTeams={selectedTeams} />
                 </div>
               </div>
@@ -409,7 +410,7 @@ const View = () => {
           </div>
 
           <div className="tw-mr-2 tw-h-0 tw-min-h-full tw-basis-3/12 tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
-            {/* {['restricted-access'].includes(user.role) ? <PassagesRencontres person={person} /> : <Comments person={person} />} */}
+            <Transmissions period={period} selectedTeamsObject={selectedTeamsObject} reports={reports} />
           </div>
         </div>
       </div>
