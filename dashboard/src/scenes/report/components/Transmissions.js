@@ -101,7 +101,13 @@ function Transmission({ report, team, day, teamId }) {
             </button>
           </>
         )}
+        <hr />
         <div className="tw-my-2">
+          {!!collaborations.length && (
+            <>
+              <p className="tw-mb-2">Co-interventions avec&nbsp;:</p>
+            </>
+          )}
           <SelectAndCreateCollaboration
             values={collaborations}
             onChange={(e) => {
