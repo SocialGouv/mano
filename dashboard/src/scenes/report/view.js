@@ -53,6 +53,7 @@ import { CommentsSocialAndMedical } from './components/CommentsReport';
 import { PassagesReport } from './components/PassagesReport';
 import { RencontresReport } from './components/RencontresReport';
 import { ObservationsReport } from './components/ObservationsReport';
+import { PersonsReport } from './components/PersonsReport';
 
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithNameOfDay(date)}`;
@@ -392,12 +393,14 @@ const View = () => {
                 </div>
               </div>
               <div className="tw-basis-1/2">
-                <div className="tw-ml-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+                <div className="tw-mr-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
                   <ObservationsReport observations={observations} period={period} selectedTeams={selectedTeams} />
                 </div>
               </div>
               <div className="tw-basis-1/2">
-                <div className="tw-ml-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">{/* <PassagesReport passages={passages} /> */}</div>
+                <div className="tw-ml-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+                  <PersonsReport personsCreated={personsCreated} period={period} selectedTeams={selectedTeams} />
+                </div>
               </div>
             </div>
             <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
@@ -413,17 +416,5 @@ const View = () => {
     </>
   );
 };
-
-const StyledBox = styled(Box)`
-  border-radius: 16px;
-  padding: 16px 32px;
-  @media print {
-    margin-bottom: 15px;
-  }
-
-  .Table {
-    padding: 0;
-  }
-`;
 
 export default View;
