@@ -505,9 +505,14 @@ export const onlyFilledObservationsTerritories = selector({
     return territoryObservations.map((obs) => {
       const obsWithOnlyFilledFields = {};
       for (let key of Object.keys(obs)) {
-        if (obs[key]) obsWithOnlyFilledFields[observationsKeyLabels[key]] = obs[key];
+        if (observationsKeyLabels[key]) {
+          if (obs[key] != null) obsWithOnlyFilledFields[key] = obs[key];
+        } else {
+          obsWithOnlyFilledFields[key] = obs[key];
+        }
       }
-      return { _id: obs._id, territory: obs.territory, ...obsWithOnlyFilledFields };
+      const nextObs = { _id: obs._id, territory: obs.territory, ...obsWithOnlyFilledFields };
+      return nextObs;
     });
   },
 });
