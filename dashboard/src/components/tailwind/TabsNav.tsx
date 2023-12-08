@@ -5,9 +5,10 @@ type TabsNavProps = {
   className?: string;
   onClick: (name: Tab, index: number) => void;
   activeTabIndex?: number;
+  renderTab: (name: Tab) => React.ReactNode;
 };
 
-export default function TabsNav({ tabs, className, onClick, activeTabIndex }: TabsNavProps) {
+export default function TabsNav({ tabs, className, onClick, activeTabIndex, renderTab = (caption) => caption }: TabsNavProps) {
   return (
     <nav className="noprint tw-flex tw-w-full" aria-label="Tabs">
       <ul className={`tw-flex tw-w-full tw-list-none sm:tw-space-x-4 ${className} tw-border-b tw-border-main tw-border-opacity-20`}>
@@ -25,7 +26,7 @@ export default function TabsNav({ tabs, className, onClick, activeTabIndex }: Ta
                 .filter(Boolean)
                 .join(' ')}
               aria-current={activeTabIndex ? 'page' : undefined}>
-              {tab}
+              {renderTab(tab)}
             </button>
           </li>
         ))}

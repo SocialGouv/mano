@@ -1,17 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Spinner } from 'reactstrap';
-import styled from 'styled-components';
 import { toast } from 'react-toastify';
-import Box from '../../../components/Box';
-import { capture } from '../../../services/sentry';
 import { organisationState } from '../../../recoil/auth';
 import { useRecoilValue } from 'recoil';
 import IncrementorSmall from '../../../components/IncrementorSmall';
 import API from '../../../services/api';
-import { theme } from '../../../config';
 import { formatPeriod } from '../../../components/DateRangePickerWithPresets';
 import { servicesSelector } from '../../../recoil/reports';
 import dayjs from 'dayjs';
+import { FullScreenIcon } from '../../../assets/icons/FullScreenIcon';
+import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from '../../../components/tailwind/Modal';
 
 const ErrorOnGetServices = () => (
   <div>
@@ -23,6 +21,7 @@ const ErrorOnGetServices = () => (
 export default function ServicesReport({ period, selectedTeamsObject }) {
   const organisation = useRecoilValue(organisationState);
   const [show, setShow] = useState([]);
+  const [fullScreen, setFullScreen] = useState(false);
   // `service` structure is: { `team-id-xxx`: { `service-name`: 1, ... }, ... }
   const [services, setServices] = useState({});
 
@@ -30,7 +29,6 @@ export default function ServicesReport({ period, selectedTeamsObject }) {
     const teamIds = Object.keys(selectedTeamsObject);
     setShow([teamIds.length === 1 ? selectedTeamsObject[teamIds[0]] : 'all']);
   }, [selectedTeamsObject]);
-  const isSingleDay = period.startDate === period.endDate;
 
   // Sums of services for all reports, to display the total of services for all teams.
   const serviceSumsForAllReports = useMemo(() => {
@@ -75,76 +73,121 @@ export default function ServicesReport({ period, selectedTeamsObject }) {
   const teamIds = Object.keys(selectedTeamsObject);
 
   return (
-    <StyledBox>
-      <TabTitle>Services effectués ce jour</TabTitle>
-      {teamIds.length > 1 && (
-        <ServicesWrapper
-          show={show.includes('all')}
-          showForPrint={window.sessionStorage.getItem(`services-general-${JSON.stringify(period)}`) === 'true'}>
-          <div className="team-name">
-            <p>
-              Services effectués par toutes les équipes sélectionnées
+    <div className="tw-py-2 tw-px-4 print:tw-mb-4">
+      <div className="tw-flex tw-items-center tw-justify-between">
+        <h3 className="tw-w-full tw-px-3 tw-py-2 tw-text-2xl tw-font-medium tw-text-black">Services effectués</h3>
+        <button
+          title="Passer les actions/consultations en plein écran"
+          className="tw-h-6 tw-w-6 tw-rounded-full tw-text-main tw-transition hover:tw-scale-125 disabled:tw-opacity-30"
+          onClick={() => setFullScreen(true)}>
+          <FullScreenIcon />
+        </button>
+      </div>
+      <div className="tw-mb-4 tw-rounded-2xl tw-bg-gray-100 tw-p-4">
+        <div
+          className={['tw-flex tw-items-center tw-justify-between tw-font-medium', show.includes('all') && 'tw-mb-6 tw-border-b-gray-300 tw-pb-2']
+            .filter(Boolean)
+            .join(' ')}>
+          <p className="tw-mb-0">
+            Services effectués par toutes les équipes sélectionnées
+            <>
               <br />
               <small className="tw-opacity-50">
-                Ces données sont en lecture seule. Pour les modifier, vous devez le faire équipe par équipe (ci-dessous)
+                Ces données sont en lecture seule. Pour les modifier, vous devez le faire équipe par équipe en plein écran
               </small>
-            </p>
-            <button
-              className="toggle-show"
-              type="button"
-              onClick={() => setShow(show.includes('all') ? show.filter((e) => e === 'all') : [...show, 'all'])}>
-              {show.includes('all') ? 'Masquer' : 'Afficher'}
-            </button>
-          </div>
-          <div className="services-list">
-            {serviceSumsForAllReports ? (
-              Object.entries(serviceSumsForAllReports).map(([key, value]) => (
-                <IncrementorSmall
-                  dataTestId={`general-${key}-${value || 0}`}
-                  key={`general-${key}-${value || 0}`}
-                  service={key}
-                  count={value || 0}
-                  disabled
-                  className="max-w-[400px] tw-w-full tw-text-neutral-600"
-                />
-              ))
-            ) : (
-              <Spinner />
-            )}
-          </div>
-        </ServicesWrapper>
-      )}
-      {teamIds.map((teamId) => (
-        <ServicesWrapper key={teamId} show={show.includes(teamId)}>
-          {teamIds.length > 1 && (
-            <div className="team-name">
-              <p>
-                <b>
-                  {selectedTeamsObject[teamId].nightSession ? '🌒' : '☀️ '} {selectedTeamsObject[teamId]?.name || ''}
-                </b>{' '}
-                - {formatPeriod({ period })}
-              </p>
-              <button
-                className="toggle-show"
-                type="button"
-                onClick={() => setShow(show.includes(teamId) ? show.filter((e) => e === teamId) : [...show, teamId])}>
-                {show.includes(teamId) ? 'Masquer' : 'Afficher'}
-              </button>
-            </div>
+            </>
+          </p>
+        </div>
+        <div className={['tw-flex-col tw-items-center tw-justify-center print:tw-flex', show.includes('all') ? 'tw-flex' : 'tw-hidden'].join(' ')}>
+          {serviceSumsForAllReports ? (
+            Object.entries(serviceSumsForAllReports).map(([key, value]) => (
+              <IncrementorSmall
+                dataTestId={`general-${key}-${value || 0}`}
+                key={`general-${key}-${value || 0}`}
+                service={key}
+                count={value || 0}
+                disabled
+                className="max-w-[400px] tw-w-full tw-text-neutral-600"
+              />
+            ))
+          ) : (
+            <Spinner />
           )}
-          <div className="services-list">
-            <ServiceByTeam
-              services={services[teamId]}
-              onUpdateServices={(updated) => setServices((s) => ({ ...s, [teamId]: updated }))}
-              team={selectedTeamsObject[teamId]}
-              disabled={!isSingleDay}
-              dateString={dayjs(period.startDate).format('YYYY-MM-DD')}
-              dataTestIdPrefix={`${selectedTeamsObject[teamId].name}-`}
-            />
-          </div>
-        </ServicesWrapper>
-      ))}
-    </StyledBox>
+        </div>
+      </div>
+      <ServicesFullScreen
+        open={fullScreen}
+        onClose={() => setFullScreen(false)}
+        period={period}
+        teamIds={teamIds}
+        setServices={setServices}
+        services={services}
+        serviceSumsForAllReports={serviceSumsForAllReports}
+        selectedTeamsObject={selectedTeamsObject}
+      />
+    </div>
+  );
+}
+
+function ServicesFullScreen({ open, onClose, period, teamIds, services, setServices, serviceSumsForAllReports, selectedTeamsObject }) {
+  const organisation = useRecoilValue(organisationState);
+  const [show, setShow] = useState([]);
+  const isSingleDay = period.startDate === period.endDate;
+  return (
+    <ModalContainer open={!!open} className="" size="prose" onClose={onClose}>
+      <ModalHeader title="Services effectués" onClose={onClose} />
+      <ModalBody>
+        <div className="py-2 tw-px-4 print:tw-mb-4">
+          {teamIds.map((teamId) => (
+            <div key={teamId} className="tw-mb-4 tw-rounded-2xl tw-bg-gray-100 tw-p-4">
+              {teamIds.length > 1 && (
+                <div
+                  className={[
+                    'tw-flex tw-items-center tw-justify-between tw-font-medium',
+                    show.includes(teamId) && 'tw-mb-6 tw-border-b-gray-300 tw-pb-2',
+                    !services[teamId] && 'tw-opacity-50',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}>
+                  <p className="tw-mb-0">
+                    <b>
+                      {selectedTeamsObject[teamId].nightSession ? '🌒' : '☀️ '} {selectedTeamsObject[teamId]?.name || ''}
+                    </b>{' '}
+                    - {formatPeriod({ period })}
+                  </p>
+                  <button
+                    className="tw-ml-auto tw-inline-block tw-rounded-lg tw-border-none tw-bg-none tw-text-sm tw-font-medium tw-text-main disabled:tw-cursor-not-allowed"
+                    type="button"
+                    disabled={!services[teamId]}
+                    title={services[teamId] ? 'Afficher les services' : 'Aucun service effectué'}
+                    onClick={() => setShow(show.includes(teamId) ? show.filter((e) => e !== teamId) : [...show, teamId])}>
+                    {show.includes(teamId) ? 'Masquer' : 'Afficher'}
+                  </button>
+                </div>
+              )}
+              <div
+                className={['tw-flex-col tw-items-center tw-justify-center print:tw-flex', show.includes(teamId) ? 'tw-flex' : 'tw-hidden'].join(
+                  ' '
+                )}>
+                <ServiceByTeam
+                  services={services[teamId]}
+                  onUpdateServices={(updated) => setServices((s) => ({ ...s, [teamId]: updated }))}
+                  team={selectedTeamsObject[teamId]}
+                  disabled={!isSingleDay}
+                  dateString={dayjs(period.startDate).format('YYYY-MM-DD')}
+                  dataTestIdPrefix={`${selectedTeamsObject[teamId].name}-`}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </ModalBody>
+      <ModalFooter>
+        <button type="button" name="cancel" className="button-cancel" onClick={onClose}>
+          Fermer
+        </button>
+      </ModalFooter>
+    </ModalContainer>
   );
 }
 
@@ -193,73 +236,3 @@ const ServiceByTeam = ({ team, disabled, dateString, dataTestIdPrefix = '', serv
     </div>
   );
 };
-
-const ServicesWrapper = styled.div`
-  background-color: #f8f8f8;
-  border-radius: 15px;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  .services-list {
-    display: ${(p) => (p.show ? 'flex' : 'none')};
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    @media print {
-      display: flex;
-    }
-  }
-  .services-incrementators {
-    text-align: left;
-    margin-top: 1rem;
-  }
-  .team-name {
-    font-weight: 600;
-    ${(p) => p.show && 'border-bottom: 1px solid #ddd;'}
-    ${(p) => p.show && 'margin-bottom: 1.5rem;'}
-    ${(p) => p.show && 'padding-bottom: 0.5rem;'}
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    p {
-      margin: 0;
-    }
-  }
-  button.toggle-show {
-    background: none;
-    color: ${theme.main};
-    display: inline-block;
-    font-size: 14px;
-    font-weight: 600;
-    margin-left: auto;
-    border-radius: 8px;
-    cursor: pointer;
-    border: none;
-  }
-`;
-
-const TabTitle = styled.span`
-  caption-side: top;
-  font-weight: bold;
-  font-size: 24px;
-  line-height: 32px;
-  width: 100%;
-  color: #1d2021;
-  text-transform: none;
-  padding: 16px 0;
-  display: block;
-  @media print {
-    display: block !important;
-  }
-`;
-
-const StyledBox = styled(Box)`
-  border-radius: 16px;
-  padding: 16px 32px;
-  @media print {
-    margin-bottom: 15px;
-  }
-
-  .Table {
-    padding: 0;
-  }
-`;

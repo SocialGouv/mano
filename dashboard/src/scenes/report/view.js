@@ -368,7 +368,7 @@ const View = () => {
       <div className="noprint -tw-mx-12 tw-flex tw-h-full tw-flex-col">
         <div
           className={[
-            'noprint tw-mt-4 tw-flex tw-w-full tw-grow tw-basis-full',
+            'noprint tw-mt-4 tw-flex tw-w-full tw-grow tw-basis-full tw-items-start',
             viewAllOrganisationData || selectedTeamIds.length ? 'tw-flex' : 'tw-hidden',
           ].join(' ')}>
           <div className="tw-min-h-1/2 tw-basis-5/12 tw-overflow-auto">
@@ -377,12 +377,12 @@ const View = () => {
             </div>
             <div className="tw-h-[50vh] tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">{/* Comments */}</div>
           </div>
-          <div className="tw-min-h-full tw-basis-4/12 tw-overflow-auto">
+          <div className="tw-mx-4 tw-basis-4/12 tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
             {/* <ActionsOrConsultations person={person} /> */}
             <ServicesReport selectedTeamsObject={selectedTeamsObject} period={period} />
           </div>
 
-          <div className="tw-h-0 tw-min-h-full tw-basis-3/12 tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+          <div className="tw-mr-2 tw-h-0 tw-min-h-full tw-basis-3/12 tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
             {/* {['restricted-access'].includes(user.role) ? <PassagesRencontres person={person} /> : <Comments person={person} />} */}
           </div>
         </div>

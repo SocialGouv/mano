@@ -1,20 +1,9 @@
-import React, { useState } from 'react';
-import { useRecoilValue } from 'recoil';
-import { organisationState, userState } from '../../../recoil/auth';
-import { CANCEL, DONE, flattenedActionsCategoriesSelector, mappedIdsToLabels } from '../../../recoil/actions';
+import { useState } from 'react';
+import { mappedIdsToLabels } from '../../../recoil/actions';
 import { useHistory } from 'react-router-dom';
 import SelectCustom from '../../../components/SelectCustom';
-import ExclamationMarkButton from '../../../components/tailwind/ExclamationMarkButton';
-import ActionStatus from '../../../components/ActionStatus';
-import TagTeam from '../../../components/TagTeam';
-import ActionOrConsultationName from '../../../components/ActionOrConsultationName';
-import { formatDateWithNameOfDay, formatTime } from '../../../services/date';
 import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from '../../../components/tailwind/Modal';
-import { AgendaMutedIcon } from '../../../assets/icons/AgendaMutedIcon';
 import { FullScreenIcon } from '../../../assets/icons/FullScreenIcon';
-import UserName from '../../../components/UserName';
-import DescriptionIcon from '../../../components/DescriptionIcon';
-import SelectTeamMultiple from '../../../components/SelectTeamMultiple';
 import ActionsSortableList from '../../../components/ActionsSortableList';
 import TabsNav from '../../../components/tailwind/TabsNav';
 
@@ -34,9 +23,10 @@ export const ActionsOrConsultations = ({ actions, consultations }) => {
       <section title={activeTab} className="tw-relative tw-flex tw-h-full tw-flex-col tw-overflow-hidden">
         <div className="tw-flex tw-items-center tw-bg-white tw-px-3 tw-pt-1 tw-pb-3">
           <TabsNav
-            className="tw-m-0 tw-flex-wrap tw-justify-start tw-border-b-0 tw-py-0.5 tw-pl-0"
+            className="tw-m-0 tw-flex-wrap tw-justify-start tw-border-b-0 tw-py-0.5 tw-pl-0 [&_button]:tw-text-2xl"
             tabs={tabs}
-            onClick={(tabCaption) => setActiveTab(tabCaption)}
+            renderTab={(caption) => <h3 className="tw-text-2xl tw-font-medium">{caption}</h3>}
+            onClick={(_, index) => setActiveTab(index === 0 ? 'Actions' : 'Consultations')}
             activeTabIndex={activeTab.includes('Actions') ? 0 : 1}
           />
           <div className="flex-col tw-flex tw-items-center tw-gap-2">
