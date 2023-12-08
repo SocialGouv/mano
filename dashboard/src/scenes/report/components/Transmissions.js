@@ -1,8 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { useSetRecoilState } from 'recoil';
 import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
-import { prepareReportForEncryption, reportsState } from '../../../recoil/reports';
+import { prepareReportForEncryption } from '../../../recoil/reports';
 import API from '../../../services/api';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../../components/tailwind/Modal';
 import { useDataLoader } from '../../../components/DataLoader';
