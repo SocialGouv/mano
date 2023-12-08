@@ -173,7 +173,6 @@ function ServicesFullScreen({ open, onClose, period, isSingleDay, teamIds, servi
                     <button
                       className="tw-ml-auto tw-inline-block tw-rounded-lg tw-border-none tw-bg-none tw-text-sm tw-font-medium tw-text-main disabled:tw-cursor-not-allowed"
                       type="button"
-                      disabled={!services[teamId]}
                       title={services[teamId] ? 'Afficher les services' : 'Aucun service effectué'}
                       onClick={() => setShow(show.includes(teamId) ? show.filter((e) => e !== teamId) : [...show, teamId])}>
                       {show.includes(teamId) ? 'Masquer' : 'Afficher'}
@@ -208,13 +207,11 @@ function ServicesFullScreen({ open, onClose, period, isSingleDay, teamIds, servi
   );
 }
 
-const ServiceByTeam = ({ team, disabled, dateString, dataTestIdPrefix = '', services, onUpdateServices: setServices }) => {
+const ServiceByTeam = ({ team, disabled, dateString, dataTestIdPrefix = '', services = {}, onUpdateServices: setServices }) => {
   const groupedServices = useRecoilValue(servicesSelector);
   const [selected, setSelected] = useState(groupedServices[0]?.groupTitle || null);
 
   const selectedServices = groupedServices.find((e) => e.groupTitle === selected)?.services || [];
-
-  if (!services) return;
 
   return (
     <div>
