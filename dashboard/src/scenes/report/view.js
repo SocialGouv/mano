@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Formik } from 'formik';
-import { addOneDay, dayjsInstance, formatDateWithFullMonth, formatDateWithNameOfDay, formatTime } from '../../services/date';
+import { addOneDay, dateForDatePicker, dayjsInstance, formatDateWithFullMonth, formatDateWithNameOfDay, formatTime } from '../../services/date';
 import DateBloc from '../../components/DateBloc';
 import { HeaderStyled, Title as HeaderTitle } from '../../components/header';
 import BackButton, { BackButtonWrapper } from '../../components/backButton';
@@ -50,6 +50,8 @@ import { ActionsOrConsultations } from './components/ActionsReport';
 import ServicesReport from './components/ServicesReport';
 import DateRangePickerWithPresets, { formatPeriod, reportsPresets } from '../../components/DateRangePickerWithPresets';
 import { CommentsSocialAndMedical } from './components/CommentsReport';
+import { PassagesReport } from './components/PassagesReport';
+import { RencontresReport } from './components/RencontresReport';
 
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithNameOfDay(date)}`;
@@ -215,6 +217,8 @@ const itemsForReportsSelector = selectorFamily({
     },
 });
 
+const defaultPreset = reportsPresets[0];
+
 const View = () => {
   const { dateString } = useParams();
   const organisation = useRecoilValue(organisationState);
@@ -223,19 +227,12 @@ const View = () => {
   const teams = useRecoilValue(teamsState);
   const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('reports-allOrg', teams.length === 1);
   const [selectedTeamIds, setSelectedTeamIds] = useLocalStorage('reports-teams', [currentTeam._id]);
-  const [preset, setPreset, removePreset] = useLocalStorage('reports-date-preset', "Aujourd'hui");
-  let [period, setPeriod] = useLocalStorage('reports-period', { startDate: null, endDate: null });
-  console.log({ preset, period });
-  if (!period.startDate || !period.endDate) {
-    const presetPeriod = reportsPresets.find((p) => p.label === preset);
-    if (presetPeriod) {
-      period = presetPeriod.period;
-    } else {
-      period = reportsPresets[0].period;
-    }
-  }
 
-  console.log({ preset, period });
+  const [preset, setPreset, removePreset] = useLocalStorage('reports-date-preset', defaultPreset.label);
+  let [period, setPeriod] = useLocalStorage('reports-period', {
+    startDate: dateForDatePicker(defaultPreset.period.startDate),
+    endDate: dateForDatePicker(defaultPreset.period.endDate),
+  });
 
   const selectedTeams = useMemo(
     () => (viewAllOrganisationData ? teams : teams.filter((team) => selectedTeamIds.includes(team._id))),
@@ -336,6 +333,7 @@ const View = () => {
             preset={preset}
             setPreset={setPreset}
             removePreset={removePreset}
+            defaultPreset={defaultPreset}
           />
         </div>
         {selectedTeams.length > 1 && selectedTeams.filter((t) => t.nightSession).length > 0 && (
@@ -380,8 +378,28 @@ const View = () => {
               <CommentsSocialAndMedical comments={comments} commentsMedical={commentsMedical} />
             </div>
           </div>
-          <div className="tw-mx-4 tw-basis-4/12 tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
-            <ServicesReport selectedTeamsObject={selectedTeamsObject} period={period} />
+          <div className="tw-mx-4 tw-basis-4/12">
+            <div className="tw-mb-4 tw-flex tw-flex-wrap tw-gap-y-4">
+              <div className="tw-basis-1/2">
+                <div className="tw-mr-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+                  <PassagesReport passages={passages} period={period} selectedTeams={selectedTeams} />
+                </div>
+              </div>
+              <div className="tw-basis-1/2">
+                <div className="tw-ml-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+                  <RencontresReport rencontres={rencontres} period={period} selectedTeams={selectedTeams} />
+                </div>
+              </div>
+              <div className="tw-basis-1/2">
+                <div className="tw-mr-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">{/* <PassagesReport passages={passages} /> */}</div>
+              </div>
+              <div className="tw-basis-1/2">
+                <div className="tw-ml-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">{/* <PassagesReport passages={passages} /> */}</div>
+              </div>
+            </div>
+            <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+              <ServicesReport selectedTeamsObject={selectedTeamsObject} period={period} />
+            </div>
           </div>
 
           <div className="tw-mr-2 tw-h-0 tw-min-h-full tw-basis-3/12 tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">

@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import dayjs from 'dayjs';
-import { mappedIdsToLabels } from '../../../recoil/actions';
-import SelectCustom from '../../../components/SelectCustom';
 import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from '../../../components/tailwind/Modal';
 import { FullScreenIcon } from '../../../assets/icons/FullScreenIcon';
-import ActionsSortableList from '../../../components/ActionsSortableList';
 import TabsNav from '../../../components/tailwind/TabsNav';
 import Table from '../../../components/table';
 import ExclamationMarkButton from '../../../components/tailwind/ExclamationMarkButton';
@@ -37,9 +34,8 @@ export const CommentsSocialAndMedical = ({ comments, commentsMedical }) => {
           <div className="flex-col tw-flex tw-items-center tw-gap-2">
             <button
               title="Passer les commentaires en plein écran"
-              className="tw-h-6 tw-w-6 tw-rounded-full tw-text-main tw-transition hover:tw-scale-125 disabled:tw-opacity-30"
               className={[
-                'tw-h-6 tw-w-6 tw-rounded-full tw-transition hover:tw-scale-125 disabled:tw-opacity-30',
+                'tw-h-6 tw-w-6 tw-rounded-full tw-transition hover:tw-scale-125 disabled:tw-cursor-not-allowed disabled:tw-opacity-30',
                 activeTab.includes('Commentaires médicaux') ? 'tw-text-blue-900' : 'tw-text-main',
               ].join(' ')}
               disabled={!data.length}
@@ -104,7 +100,6 @@ const CommentsTable = ({ data, activeTab }) => {
       data={data}
       onRowClick={(comment) => {
         const searchParams = new URLSearchParams(history.location.search);
-        console.log(JSON.stringify(comment, null, 2));
         switch (comment.type) {
           case 'action':
             searchParams.set('actionId', comment.action);

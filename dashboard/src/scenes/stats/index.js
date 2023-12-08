@@ -166,7 +166,6 @@ const itemsForStatsSelector = selectorFamily({
             }
             if (!isIncluded) continue;
           } else {
-            console.log('action.team', action.team);
             const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[action.team] ?? defaultIsoDates;
             if (date < isoStartDate) continue;
             if (date >= isoEndDate) continue;

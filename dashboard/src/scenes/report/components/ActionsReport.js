@@ -47,7 +47,7 @@ export const ActionsOrConsultations = ({ actions, consultations }) => {
             <button
               title="Passer les actions/consultations en plein écran"
               className={[
-                'tw-h-6 tw-w-6 tw-rounded-full tw-transition hover:tw-scale-125 disabled:tw-opacity-30',
+                'tw-h-6 tw-w-6 tw-rounded-full tw-transition hover:tw-scale-125 disabled:tw-cursor-not-allowed disabled:tw-opacity-30',
                 activeTab.includes('Actions') ? 'tw-text-main' : 'tw-text-blue-900',
               ].join(' ')}
               disabled={!data.length}

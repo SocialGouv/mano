@@ -72,6 +72,8 @@ export default function ServicesReport({ period, selectedTeamsObject }) {
 
   const teamIds = Object.keys(selectedTeamsObject);
 
+  const isSingleDay = dayjs(period.startDate).format('YYYY-MM-DD') === dayjs(period.endDate).format('YYYY-MM-DD');
+
   return (
     <div className="tw-py-2 tw-px-4 print:tw-mb-4">
       <div className="tw-flex tw-items-center tw-justify-between">
@@ -83,37 +85,50 @@ export default function ServicesReport({ period, selectedTeamsObject }) {
           <FullScreenIcon />
         </button>
       </div>
-      <div className="tw-mb-4 tw-rounded-2xl tw-bg-gray-100 tw-p-4">
-        <div
-          className={['tw-flex tw-items-center tw-justify-between tw-font-medium', show.includes('all') && 'tw-mb-6 tw-border-b-gray-300 tw-pb-2']
-            .filter(Boolean)
-            .join(' ')}>
-          <p className="tw-mb-0">
-            Services effectués par toutes les équipes sélectionnées
-            <>
-              <br />
-              <small className="tw-opacity-50">
-                Ces données sont en lecture seule. Pour les modifier, vous devez le faire équipe par équipe en plein écran
-              </small>
-            </>
-          </p>
-        </div>
-        <div className={['tw-flex-col tw-items-center tw-justify-center print:tw-flex', show.includes('all') ? 'tw-flex' : 'tw-hidden'].join(' ')}>
-          {serviceSumsForAllReports ? (
-            Object.entries(serviceSumsForAllReports).map(([key, value]) => (
-              <IncrementorSmall
-                dataTestId={`general-${key}-${value || 0}`}
-                key={`general-${key}-${value || 0}`}
-                service={key}
-                count={value || 0}
-                disabled
-                className="max-w-[400px] tw-w-full tw-text-neutral-600"
+      <div className="tw-mb-4 tw-p-4">
+        {!serviceSumsForAllReports ? (
+          <Spinner />
+        ) : Object.entries(serviceSumsForAllReports).length > 0 ? (
+          <div className="tw-flex tw-flex-col tw-items-center tw-justify-center tw-rounded-2xl tw-bg-gray-100 tw-p-4">
+            {teamIds.length > 1 ? (
+              <>
+                <div className="tw-mb-6 tw-flex tw-items-center tw-justify-between tw-border-b-gray-300 tw-pb-2 tw-font-medium">
+                  <p className="tw-mb-0">
+                    Services effectués par toutes les équipes sélectionnées
+                    <>
+                      <br />
+                      <small className="tw-opacity-50">
+                        Ces données sont en lecture seule. Pour les modifier, vous devez le faire équipe par équipe en plein écran
+                      </small>
+                    </>
+                  </p>
+                </div>
+                {Object.entries(serviceSumsForAllReports).map(([key, value]) => (
+                  <IncrementorSmall
+                    dataTestId={`general-${key}-${value || 0}`}
+                    key={`general-${key}-${value || 0}`}
+                    service={key}
+                    count={value || 0}
+                    date={dayjs(period.startDate).format('YYYY-MM-DD')}
+                    disabled
+                    className="max-w-[400px] tw-w-full tw-text-neutral-600"
+                  />
+                ))}
+              </>
+            ) : (
+              <ServiceByTeam
+                services={services[teamIds[0]]}
+                onUpdateServices={(updated) => setServices((s) => ({ ...s, [teamIds[0]]: updated }))}
+                team={selectedTeamsObject[teamIds[0]]}
+                disabled={!isSingleDay}
+                dateString={dayjs(period.startDate).format('YYYY-MM-DD')}
+                dataTestIdPrefix={`${selectedTeamsObject[teamIds[0]].name}-`}
               />
-            ))
-          ) : (
-            <Spinner />
-          )}
-        </div>
+            )}
+          </div>
+        ) : (
+          <span>Pas de service</span>
+        )}
       </div>
       <ServicesFullScreen
         open={fullScreen}
@@ -124,27 +139,27 @@ export default function ServicesReport({ period, selectedTeamsObject }) {
         services={services}
         serviceSumsForAllReports={serviceSumsForAllReports}
         selectedTeamsObject={selectedTeamsObject}
+        isSingleDay={isSingleDay}
       />
     </div>
   );
 }
 
-function ServicesFullScreen({ open, onClose, period, teamIds, services, setServices, serviceSumsForAllReports, selectedTeamsObject }) {
-  const organisation = useRecoilValue(organisationState);
+function ServicesFullScreen({ open, onClose, period, isSingleDay, teamIds, services, setServices, serviceSumsForAllReports, selectedTeamsObject }) {
   const [show, setShow] = useState([]);
-  const isSingleDay = period.startDate === period.endDate;
+  console.log({ services, serviceSumsForAllReports });
   return (
     <ModalContainer open={!!open} className="" size="prose" onClose={onClose}>
       <ModalHeader title="Services effectués" onClose={onClose} />
       <ModalBody>
         <div className="py-2 tw-px-4 print:tw-mb-4">
-          {teamIds.map((teamId) => (
-            <div key={teamId} className="tw-mb-4 tw-rounded-2xl tw-bg-gray-100 tw-p-4">
-              {teamIds.length > 1 && (
+          {teamIds.map((teamId) => {
+            return (
+              <div key={teamId} className="tw-mb-4 tw-rounded-2xl tw-bg-gray-100 tw-p-4">
                 <div
                   className={[
                     'tw-flex tw-items-center tw-justify-between tw-font-medium',
-                    show.includes(teamId) && 'tw-mb-6 tw-border-b-gray-300 tw-pb-2',
+                    (teamIds.length === 1 || show.includes(teamId)) && 'tw-mb-6 tw-border-b-gray-300 tw-pb-2',
                     !services[teamId] && 'tw-opacity-50',
                   ]
                     .filter(Boolean)
@@ -155,31 +170,34 @@ function ServicesFullScreen({ open, onClose, period, teamIds, services, setServi
                     </b>{' '}
                     - {formatPeriod({ period })}
                   </p>
-                  <button
-                    className="tw-ml-auto tw-inline-block tw-rounded-lg tw-border-none tw-bg-none tw-text-sm tw-font-medium tw-text-main disabled:tw-cursor-not-allowed"
-                    type="button"
-                    disabled={!services[teamId]}
-                    title={services[teamId] ? 'Afficher les services' : 'Aucun service effectué'}
-                    onClick={() => setShow(show.includes(teamId) ? show.filter((e) => e !== teamId) : [...show, teamId])}>
-                    {show.includes(teamId) ? 'Masquer' : 'Afficher'}
-                  </button>
+                  {teamIds.length > 1 && (
+                    <button
+                      className="tw-ml-auto tw-inline-block tw-rounded-lg tw-border-none tw-bg-none tw-text-sm tw-font-medium tw-text-main disabled:tw-cursor-not-allowed"
+                      type="button"
+                      disabled={!services[teamId]}
+                      title={services[teamId] ? 'Afficher les services' : 'Aucun service effectué'}
+                      onClick={() => setShow(show.includes(teamId) ? show.filter((e) => e !== teamId) : [...show, teamId])}>
+                      {show.includes(teamId) ? 'Masquer' : 'Afficher'}
+                    </button>
+                  )}
                 </div>
-              )}
-              <div
-                className={['tw-flex-col tw-items-center tw-justify-center print:tw-flex', show.includes(teamId) ? 'tw-flex' : 'tw-hidden'].join(
-                  ' '
-                )}>
-                <ServiceByTeam
-                  services={services[teamId]}
-                  onUpdateServices={(updated) => setServices((s) => ({ ...s, [teamId]: updated }))}
-                  team={selectedTeamsObject[teamId]}
-                  disabled={!isSingleDay}
-                  dateString={dayjs(period.startDate).format('YYYY-MM-DD')}
-                  dataTestIdPrefix={`${selectedTeamsObject[teamId].name}-`}
-                />
+                <div
+                  className={[
+                    'tw-flex-col tw-items-center tw-justify-center print:tw-flex',
+                    teamIds.length === 1 || show.includes(teamId) ? 'tw-flex' : 'tw-hidden',
+                  ].join(' ')}>
+                  <ServiceByTeam
+                    services={services[teamId]}
+                    onUpdateServices={(updated) => setServices((s) => ({ ...s, [teamId]: updated }))}
+                    team={selectedTeamsObject[teamId]}
+                    disabled={!isSingleDay}
+                    dateString={dayjs(period.startDate).format('YYYY-MM-DD')}
+                    dataTestIdPrefix={`${selectedTeamsObject[teamId].name}-`}
+                  />
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </ModalBody>
       <ModalFooter>
@@ -224,7 +242,7 @@ const ServiceByTeam = ({ team, disabled, dateString, dataTestIdPrefix = '', serv
             key={team._id + ' ' + service}
             service={service}
             team={team._id}
-            dateString={dateString}
+            date={dateString}
             disabled={disabled}
             count={services[service] || 0}
             onUpdated={(newCount) => {

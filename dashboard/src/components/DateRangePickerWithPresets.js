@@ -112,7 +112,7 @@ export const formatPeriod = ({ preset, period }) => {
   return `Entre... et le...`;
 };
 // https://reactdatepicker.com/#example-date-range
-const DateRangePickerWithPresets = ({ period, setPeriod, preset, setPreset, removePreset, presets }) => {
+const DateRangePickerWithPresets = ({ period, setPeriod, preset, setPreset, removePreset, presets, defaultPreset }) => {
   const [showDatePicker, setShowDatepicker] = useState(false);
   const [numberOfMonths, setNumberOfMonths] = useState(() => (window.innerWidth < 1100 ? 1 : 2));
 
@@ -133,8 +133,16 @@ const DateRangePickerWithPresets = ({ period, setPeriod, preset, setPreset, remo
     // so we need to reset the period everyday
     const dateOnWhichThePeriodWasSetByTheUser = window.localStorage.getItem('user-set-the-period-on-date');
     if (dateOnWhichThePeriodWasSetByTheUser !== dayjsInstance().format('YYYY-MM-DD')) {
-      setPeriod({ startDate: null, endDate: null });
-      removePreset();
+      if (defaultPreset) {
+        setPreset(defaultPreset.label);
+        setPeriod({
+          startDate: dateForDatePicker(defaultPreset.period.startDate),
+          endDate: dateForDatePicker(defaultPreset.period.endDate),
+        });
+      } else {
+        setPeriod({ startDate: null, endDate: null });
+        removePreset();
+      }
       window.localStorage.setItem('user-set-the-period-on-date', dayjsInstance().format('YYYY-MM-DD'));
     }
   });
