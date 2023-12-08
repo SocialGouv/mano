@@ -49,6 +49,7 @@ import ActionsSortableList from '../../components/ActionsSortableList';
 import { ActionsOrConsultations } from './components/ActionsReport';
 import ServicesReport from './components/ServicesReport';
 import DateRangePickerWithPresets, { formatPeriod, reportsPresets } from '../../components/DateRangePickerWithPresets';
+import { CommentsSocialAndMedical } from './components/CommentsReport';
 
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithNameOfDay(date)}`;
@@ -375,10 +376,11 @@ const View = () => {
             <div className="tw-mb-4 tw-h-[50vh] tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
               <ActionsOrConsultations actions={actions} consultations={consultations} />
             </div>
-            <div className="tw-h-[50vh] tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">{/* Comments */}</div>
+            <div className="tw-h-[50vh] tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+              <CommentsSocialAndMedical comments={comments} commentsMedical={commentsMedical} />
+            </div>
           </div>
           <div className="tw-mx-4 tw-basis-4/12 tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
-            {/* <ActionsOrConsultations person={person} /> */}
             <ServicesReport selectedTeamsObject={selectedTeamsObject} period={period} />
           </div>
 

@@ -6,9 +6,10 @@ import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from '../../../co
 import { FullScreenIcon } from '../../../assets/icons/FullScreenIcon';
 import ActionsSortableList from '../../../components/ActionsSortableList';
 import TabsNav from '../../../components/tailwind/TabsNav';
+import { useLocalStorage } from '../../../services/useLocalStorage';
 
 export const ActionsOrConsultations = ({ actions, consultations }) => {
-  const [activeTab, setActiveTab] = useState('Actions');
+  const [activeTab, setActiveTab] = useLocalStorage('reports-actions-consultation-toggle', 'Actions');
   const [fullScreen, setFullScreen] = useState(false);
   const [filterStatus, setFilterStatus] = useState([]);
   const filteredActions = actions.filter((item) => !filterStatus.length || filterStatus.includes(item.status));
