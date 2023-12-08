@@ -6,6 +6,7 @@ import { prepareReportForEncryption, reportsState } from '../../../recoil/report
 import API from '../../../services/api';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../../components/tailwind/Modal';
 import { useDataLoader } from '../../../components/DataLoader';
+import SelectAndCreateCollaboration from '../SelectAndCreateCollaboration';
 
 export default function Transmissions({ period, selectedTeamsObject, reports }) {
   const days = useMemo(() => {
@@ -47,8 +48,8 @@ export default function Transmissions({ period, selectedTeamsObject, reports }) 
 }
 
 function Transmission({ report, team, day, teamId }) {
-  const setReports = useSetRecoilState(reportsState);
   const [isEditingTransmission, setIsEditingTransmission] = useState(false);
+  const [collaborations, setCollaborations] = useState(report?.collaborations ?? []);
   const { refresh } = useDataLoader();
 
   async function onEditTransmission(event) {
@@ -56,20 +57,25 @@ function Transmission({ report, team, day, teamId }) {
     const form = event.target;
     const formData = new FormData(form);
     const description = formData.get('description');
-    const body = prepareReportForEncryption({
+    onSaveReport({
       ...report,
       description,
       team: teamId,
       date: day,
     });
-    const response = report?._id ? await API.put({ path: `report/${report._id}`, body }) : await API.post({ path: 'report', body });
+  }
+
+  const onSaveReport = async (body) => {
+    const response = report?._id
+      ? await API.put({ path: `report/${report._id}`, body: prepareReportForEncryption(body) })
+      : await API.post({ path: 'report', body: prepareReportForEncryption(body) });
     if (!response.ok) {
       toast.error(response.errorMessage);
       return;
     }
     refresh();
     setIsEditingTransmission(false);
-  }
+  };
 
   return (
     <>
@@ -96,6 +102,21 @@ function Transmission({ report, team, day, teamId }) {
             </button>
           </>
         )}
+        <div className="tw-my-2">
+          <SelectAndCreateCollaboration
+            values={collaborations}
+            onChange={(e) => {
+              const nextCollabs = e.currentTarget.value;
+              setCollaborations(nextCollabs);
+              onSaveReport({
+                ...report,
+                collaborations: nextCollabs,
+                team: teamId,
+                date: day,
+              });
+            }}
+          />
+        </div>
       </div>
       <ModalContainer open={isEditingTransmission} size="prose">
         <ModalHeader title={`Transmission du ${dayjs(day).format('dddd D MMM')} - ${team?.nightSession ? '🌒' : '☀️ '} ${team?.name || ''}`} />
