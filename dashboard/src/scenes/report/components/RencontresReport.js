@@ -86,7 +86,7 @@ const RencontresTable = ({ period, rencontres, selectedTeams }) => {
             rowKey={'_id'}
             columns={[
               {
-                title: 'Heure',
+                title: 'Date',
                 dataKey: 'date',
                 render: (rencontre) => {
                   // anonymous comment migrated from `report.rencontres`

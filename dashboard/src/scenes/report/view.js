@@ -52,6 +52,7 @@ import DateRangePickerWithPresets, { formatPeriod, reportsPresets } from '../../
 import { CommentsSocialAndMedical } from './components/CommentsReport';
 import { PassagesReport } from './components/PassagesReport';
 import { RencontresReport } from './components/RencontresReport';
+import { ObservationsReport } from './components/ObservationsReport';
 
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithNameOfDay(date)}`;
@@ -391,7 +392,9 @@ const View = () => {
                 </div>
               </div>
               <div className="tw-basis-1/2">
-                <div className="tw-mr-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">{/* <PassagesReport passages={passages} /> */}</div>
+                <div className="tw-ml-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+                  <ObservationsReport observations={observations} period={period} selectedTeams={selectedTeams} />
+                </div>
               </div>
               <div className="tw-basis-1/2">
                 <div className="tw-ml-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">{/* <PassagesReport passages={passages} /> */}</div>

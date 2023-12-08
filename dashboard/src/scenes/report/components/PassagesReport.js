@@ -101,7 +101,7 @@ const PassagesTable = ({ period, passages, selectedTeams }) => {
             rowKey={'_id'}
             columns={[
               {
-                title: 'Heure',
+                title: 'Date',
                 dataKey: 'date',
                 render: (passage) => {
                   // anonymous comment migrated from `report.passages`

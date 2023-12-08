@@ -60,7 +60,6 @@ export default function ServicesReport({ period, selectedTeamsObject }) {
         },
       }).then((res) => {
         if (!res.ok) return toast.error(<ErrorOnGetServices />);
-        console.log(res.data);
         setServices(res.data);
       });
     },
@@ -147,7 +146,7 @@ export default function ServicesReport({ period, selectedTeamsObject }) {
 
 function ServicesFullScreen({ open, onClose, period, isSingleDay, teamIds, services, setServices, serviceSumsForAllReports, selectedTeamsObject }) {
   const [show, setShow] = useState([]);
-  console.log({ services, serviceSumsForAllReports });
+
   return (
     <ModalContainer open={!!open} className="" size="prose" onClose={onClose}>
       <ModalHeader title="Services effectués" onClose={onClose} />
