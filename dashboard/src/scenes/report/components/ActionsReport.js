@@ -33,17 +33,23 @@ export const ActionsOrConsultations = ({ actions, consultations }) => {
           <div className="flex-col tw-flex tw-items-center tw-gap-2">
             <button
               aria-label="Ajouter une action"
-              className="tw-text-md tw-h-8 tw-w-8 tw-rounded-full tw-bg-main tw-font-bold tw-text-white tw-transition hover:tw-scale-125"
+              className={[
+                'tw-text-md tw-h-8 tw-w-8 tw-rounded-full tw-font-bold tw-text-white tw-transition hover:tw-scale-125',
+                activeTab.includes('Actions') ? 'tw-bg-main' : 'tw-bg-blue-900',
+              ].join(' ')}
               onClick={() => {
                 const searchParams = new URLSearchParams(history.location.search);
-                searchParams.set('newAction', true);
+                searchParams.set(activeTab.includes('Actions') ? 'newAction' : 'newConsultation', true);
                 history.push(`?${searchParams.toString()}`);
               }}>
               ＋
             </button>
             <button
               title="Passer les actions/consultations en plein écran"
-              className="tw-h-6 tw-w-6 tw-rounded-full tw-text-main tw-transition hover:tw-scale-125 disabled:tw-opacity-30"
+              className={[
+                'tw-h-6 tw-w-6 tw-rounded-full tw-transition hover:tw-scale-125 disabled:tw-opacity-30',
+                activeTab.includes('Actions') ? 'tw-text-main' : 'tw-text-blue-900',
+              ].join(' ')}
               disabled={!data.length}
               onClick={() => setFullScreen(true)}>
               <FullScreenIcon />
@@ -75,7 +81,7 @@ export const ActionsOrConsultations = ({ actions, consultations }) => {
             className="button-submit"
             onClick={() => {
               const searchParams = new URLSearchParams(history.location.search);
-              searchParams.set('newAction', true);
+              searchParams.set(activeTab.includes('Actions') ? 'newAction' : 'newConsultation', true);
               history.push(`?${searchParams.toString()}`);
             }}>
             ＋ Ajouter une action

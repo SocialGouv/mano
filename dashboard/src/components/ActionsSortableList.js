@@ -102,15 +102,14 @@ const ActionsSortableList = ({ data, limit }) => {
             sortBy,
             sortOrder,
             render: (action) => {
-              return <DateBloc date={[DONE, CANCEL].includes(action.status) ? action.completedAt : action.dueAt} />;
-            },
-          },
-          {
-            title: 'Heure',
-            dataKey: '_id',
-            render: (action) => {
-              if (!action.dueAt || !action.withTime) return null;
-              return formatTime(action.dueAt);
+              return (
+                <>
+                  <DateBloc date={[DONE, CANCEL].includes(action.status) ? action.completedAt : action.dueAt} />
+                  <span className="tw-mb-2 tw-block tw-w-full tw-text-center tw-opacity-50">
+                    {!action.dueAt || !action.withTime ? null : formatTime(action.dueAt)}
+                  </span>
+                </>
+              );
             },
           },
           {

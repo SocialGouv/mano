@@ -38,6 +38,10 @@ export const CommentsSocialAndMedical = ({ comments, commentsMedical }) => {
             <button
               title="Passer les commentaires en plein écran"
               className="tw-h-6 tw-w-6 tw-rounded-full tw-text-main tw-transition hover:tw-scale-125 disabled:tw-opacity-30"
+              className={[
+                'tw-h-6 tw-w-6 tw-rounded-full tw-transition hover:tw-scale-125 disabled:tw-opacity-30',
+                activeTab.includes('Commentaires médicaux') ? 'tw-text-blue-900' : 'tw-text-main',
+              ].join(' ')}
               disabled={!data.length}
               onClick={() => setFullScreen(true)}>
               <FullScreenIcon />
@@ -100,13 +104,14 @@ const CommentsTable = ({ data, activeTab }) => {
       data={data}
       onRowClick={(comment) => {
         const searchParams = new URLSearchParams(history.location.search);
+        console.log(JSON.stringify(comment, null, 2));
         switch (comment.type) {
           case 'action':
-            searchParams.set('actionId', comment.action._id);
+            searchParams.set('actionId', comment.action);
             history.push(`?${searchParams.toString()}`);
             break;
           case 'person':
-            history.push(`/person/${comment.person._id}`);
+            history.push(`/person/${comment.person}`);
             break;
           case 'consultation':
             searchParams.set('consultationId', comment.consultation._id);

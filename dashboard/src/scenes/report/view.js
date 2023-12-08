@@ -178,7 +178,7 @@ const itemsForReportsSelector = selectorFamily({
           const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[comment.team] ?? defaultIsoDates;
           if (date < isoStartDate) continue;
           if (date >= isoEndDate) continue;
-          comments[comment._id] = comment;
+          comments[comment._id] = { ...comment, person: person._id };
         }
       }
 
