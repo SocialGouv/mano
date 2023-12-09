@@ -251,7 +251,7 @@ const View = () => {
           {activeTab === 'Traitements' && <Treatments treatments={treatments} />}
           {activeTab === 'Personnes' && <Persons persons={persons} />}
           {activeTab === 'Dossiers médicaux' && <Persons persons={medicalFiles} />}
-          {activeTab === 'Commentaires' && <Comments comments={comments} />}
+          {activeTab === 'Commentaires non médicaux' && <Comments comments={comments} />}
           {activeTab === 'Lieux' && <Places places={places} />}
           {activeTab === 'Territoires' && <Territories territories={territories} />}
           {activeTab === 'Observations' && <TerritoryObservations observations={observations} />}
