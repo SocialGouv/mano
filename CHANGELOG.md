@@ -1,3 +1,10 @@
+# [1.299.0](https://github.com/SocialGouv/mano/compare/v1.298.0...v1.299.0) (2023-12-09)
+
+
+### Features
+
+* **dashboard:** nouveau compte-rendu ([#1785](https://github.com/SocialGouv/mano/issues/1785)) ([9bc9616](https://github.com/SocialGouv/mano/commit/9bc961698cd044c5e25e29a736ff1c4f1c74d3a9))
+
 # [1.298.0](https://github.com/SocialGouv/mano/compare/v1.297.13...v1.298.0) (2023-12-07)
 
 
