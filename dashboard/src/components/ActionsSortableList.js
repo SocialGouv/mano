@@ -18,6 +18,7 @@ import { useLocalStorage } from '../services/useLocalStorage';
 import Page from './pagination';
 import useSearchParamState from '../services/useSearchParamState';
 import DescriptionIcon from './DescriptionIcon';
+import { AgendaMutedIcon } from '../assets/icons/AgendaMutedIcon';
 
 const ActionsSortableList = ({ data, limit }) => {
   useTitle('Agenda');
@@ -43,6 +44,15 @@ const ActionsSortableList = ({ data, limit }) => {
   }, [dataSorted, page, limit]);
 
   const total = data.length;
+
+  if (total <= 0) {
+    return (
+      <div className="tw-mt-8 tw-w-full tw-text-center tw-text-gray-300">
+        <AgendaMutedIcon />
+        Aucun élément pour le moment
+      </div>
+    );
+  }
 
   return (
     <>
@@ -92,15 +102,14 @@ const ActionsSortableList = ({ data, limit }) => {
             sortBy,
             sortOrder,
             render: (action) => {
-              return <DateBloc date={[DONE, CANCEL].includes(action.status) ? action.completedAt : action.dueAt} />;
-            },
-          },
-          {
-            title: 'Heure',
-            dataKey: '_id',
-            render: (action) => {
-              if (!action.dueAt || !action.withTime) return null;
-              return formatTime(action.dueAt);
+              return (
+                <>
+                  <DateBloc date={[DONE, CANCEL].includes(action.status) ? action.completedAt : action.dueAt} />
+                  <span className="tw-mb-2 tw-block tw-w-full tw-text-center tw-opacity-50">
+                    {!action.dueAt || !action.withTime ? null : formatTime(action.dueAt)}
+                  </span>
+                </>
+              );
             },
           },
           {

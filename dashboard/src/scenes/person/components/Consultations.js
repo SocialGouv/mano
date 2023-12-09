@@ -11,9 +11,9 @@ import { formatDateWithNameOfDay, formatTime } from '../../../services/date';
 import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from '../../../components/tailwind/Modal';
 import { arrayOfitemsGroupedByConsultationSelector } from '../../../recoil/selectors';
 import { useLocalStorage } from '../../../services/useLocalStorage';
-import { AgendaMutedIcon } from './AgendaMutedIcon';
+import { AgendaMutedIcon } from '../../../assets/icons/AgendaMutedIcon';
 import { disableConsultationRow } from '../../../recoil/consultations';
-import { FullScreenIcon } from './FullScreenIcon';
+import { FullScreenIcon } from '../../../assets/icons/FullScreenIcon';
 import UserName from '../../../components/UserName';
 import DescriptionIcon from '../../../components/DescriptionIcon';
 

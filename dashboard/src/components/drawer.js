@@ -85,6 +85,15 @@ const Drawer = () => {
               </li>
             </>
           )}
+          {process.env.REACT_APP_TEST_PLAYWRIGHT !== 'true' && ['admin', 'normal', 'restricted-access'].includes(role) && (
+            <>
+              <li>
+                <NavLink to="/report-new" activeClassName="active">
+                  Comptes rendus <span className="tw-rounded-full tw-bg-main tw-px-2 tw-py-1 tw-text-yellow-100">BETA</span>
+                </NavLink>
+              </li>
+            </>
+          )}
           {['admin', 'normal', 'restricted-access'].includes(role) && (
             <>
               <hr />

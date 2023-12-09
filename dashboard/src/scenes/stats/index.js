@@ -15,22 +15,22 @@ import { territoriesState } from '../../recoil/territory';
 import { customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
 import { personsForStatsSelector, populatedPassagesSelector } from '../../recoil/selectors';
 import useTitle from '../../services/useTitle';
-import DateRangePickerWithPresets, { formatPeriod } from '../../components/DateRangePickerWithPresets';
+import DateRangePickerWithPresets, { formatPeriod, statsPresets } from '../../components/DateRangePickerWithPresets';
 import { useDataLoader } from '../../components/DataLoader';
 import { HeaderStyled, Title as HeaderTitle } from '../../components/header';
 import Loading from '../../components/loading';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import ExportFormattedData from '../data-import-export/ExportFormattedData';
-import GeneralStats from './General';
-import ServicesStats from './Services';
-import ActionsStats from './Actions';
+import GeneralStats from './GeneralStats';
+import ServicesStats from './ServicesStats';
+import ActionsStats from './ActionsStats';
 import PersonStats from './PersonsStats';
-import PassagesStats from './Passages';
-import RencontresStats from './Rencontres';
-import ObservationsStats from './Observations';
-import ReportsStats from './Reports';
+import PassagesStats from './PassagesStats';
+import RencontresStats from './RencontresStats';
+import ObservationsStats from './ObservationsStats';
+import ReportsStats from './ReportsStats';
 import ConsultationsStats from './ConsultationsStats';
-import MedicalFilesStats from './MedicalFiles';
+import MedicalFilesStats from './MedicalFilesStats';
 import ButtonCustom from '../../components/ButtonCustom';
 import dayjs from 'dayjs';
 import { filterItem } from '../../components/Filters';
@@ -166,7 +166,6 @@ const itemsForStatsSelector = selectorFamily({
             }
             if (!isIncluded) continue;
           } else {
-            console.log('action.team', action.team);
             const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[action.team] ?? defaultIsoDates;
             if (date < isoStartDate) continue;
             if (date >= isoEndDate) continue;
@@ -549,7 +548,14 @@ const Stats = () => {
       </HeaderStyled>
       <div className="noprint date-picker-container tw-mb-5 tw-flex tw-flex-wrap tw-items-center">
         <div className="tw-min-w-[15rem] tw-shrink-0 tw-basis-1/3 tw-p-0">
-          <DateRangePickerWithPresets period={period} setPeriod={setPeriod} preset={preset} setPreset={setPreset} removePreset={removePreset} />
+          <DateRangePickerWithPresets
+            presets={statsPresets}
+            period={period}
+            setPeriod={setPeriod}
+            preset={preset}
+            setPreset={setPreset}
+            removePreset={removePreset}
+          />
         </div>
         <div className="tw-flex tw-basis-2/3 tw-items-center tw-justify-end">
           <ButtonCustom color="link" title="Imprimer" onClick={window.print} />

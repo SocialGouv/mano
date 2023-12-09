@@ -9,7 +9,7 @@ import { currentTeamState, organisationState, userState, usersState } from '../r
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from './tailwind/Modal';
 import { dayjsInstance, formatDateTimeWithNameOfDay } from '../services/date';
 import SelectUser from './SelectUser';
-import { FullScreenIcon } from '../scenes/person/components/FullScreenIcon';
+import { FullScreenIcon } from '../assets/icons/FullScreenIcon';
 import DatePicker from './DatePicker';
 import { outOfBoundariesDate } from '../services/date';
 import AutoResizeTextarea from './AutoresizeTextArea';

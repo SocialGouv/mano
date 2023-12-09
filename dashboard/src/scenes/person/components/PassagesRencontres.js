@@ -7,7 +7,7 @@ import TagTeam from '../../../components/TagTeam';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../../components/tailwind/Modal';
 import { currentTeamState, usersState, userState, organisationState } from '../../../recoil/auth';
 import { dayjsInstance, formatDateTimeWithNameOfDay } from '../../../services/date';
-import { FullScreenIcon } from './FullScreenIcon';
+import { FullScreenIcon } from '../../../assets/icons/FullScreenIcon';
 
 export default function PassagesRencontres({ person }) {
   const users = useRecoilValue(usersState);

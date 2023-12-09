@@ -49,7 +49,7 @@ const SelectAndCreateCollaboration = ({ values, onChange }) => {
       name="collaborations"
       components={{ NoOptionsMessage }}
       onChange={(v) => onChangeRequest(v.map((v) => v.value))}
-      placeholder={' -- Choisir une collaboration -- '}
+      placeholder={' -- Ajoutez une co-intervention -- '}
       formatOptionLabel={({ value: collab, __isNew__ }) => {
         if (__isNew__) return <span>Créer "{collab}"</span>;
         return <span>{collab}</span>;

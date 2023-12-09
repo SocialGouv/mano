@@ -12,7 +12,7 @@ const Card = ({ title, count, unit, children, countId, dataTestId, help }) => {
             </p>
           </div>
         )}
-        <div className={['flex tw-items-end tw-text-6xl tw-text-main', !!children ? 'tw-mb-4' : ''].join(' ')}>
+        <div className={['tw-flex tw-items-end tw-text-6xl tw-text-main', !!children ? 'tw-mb-4' : ''].join(' ')}>
           <span data-test-id={`${dataTestId}-${count}`} id={countId}>
             {count}
           </span>

@@ -9,7 +9,7 @@ const getOffsetFromToday = (value, unit, end) => {
   return end ? b.endOf('day') : b.startOf('day');
 };
 
-const periods = [
+export const statsPresets = [
   {
     label: 'Toutes les données',
     period: { startDate: null, endDate: null },
@@ -74,6 +74,33 @@ const periods = [
   },
 ];
 
+export const reportsPresets = [
+  {
+    label: "Aujourd'hui",
+    period: { startDate: dayjsInstance().startOf('day'), endDate: dayjsInstance().endOf('day') },
+  },
+  {
+    label: 'Hier',
+    period: { startDate: getOffsetFromToday(1, 'day'), endDate: getOffsetFromToday(1, 'day', true) },
+  },
+  {
+    label: 'Cette semaine',
+    period: { startDate: dayjsInstance().startOf('week'), endDate: dayjsInstance().endOf('week') },
+  },
+  {
+    label: 'La semaine dernière',
+    period: { startDate: dayjsInstance().startOf('week').subtract(1, 'week'), endDate: dayjsInstance().endOf('week').subtract(1, 'week') },
+  },
+  {
+    label: 'Ce mois-ci',
+    period: { startDate: dayjsInstance().startOf('month'), endDate: dayjsInstance().endOf('month') },
+  },
+  {
+    label: 'Le mois dernier',
+    period: { startDate: dayjsInstance().subtract(1, 'month').startOf('month'), endDate: dayjsInstance().subtract(1, 'month').endOf('month') },
+  },
+];
+
 export const formatPeriod = ({ preset, period }) => {
   if (!!preset) return preset;
   if (!!period.startDate && !!period.endDate) {
@@ -85,7 +112,7 @@ export const formatPeriod = ({ preset, period }) => {
   return `Entre... et le...`;
 };
 // https://reactdatepicker.com/#example-date-range
-const DateRangePickerWithPresets = ({ period, setPeriod, preset, setPreset, removePreset }) => {
+const DateRangePickerWithPresets = ({ period, setPeriod, preset, setPreset, removePreset, presets, defaultPreset }) => {
   const [showDatePicker, setShowDatepicker] = useState(false);
   const [numberOfMonths, setNumberOfMonths] = useState(() => (window.innerWidth < 1100 ? 1 : 2));
 
@@ -106,8 +133,16 @@ const DateRangePickerWithPresets = ({ period, setPeriod, preset, setPreset, remo
     // so we need to reset the period everyday
     const dateOnWhichThePeriodWasSetByTheUser = window.localStorage.getItem('user-set-the-period-on-date');
     if (dateOnWhichThePeriodWasSetByTheUser !== dayjsInstance().format('YYYY-MM-DD')) {
-      setPeriod({ startDate: null, endDate: null });
-      removePreset();
+      if (defaultPreset) {
+        setPreset(defaultPreset.label);
+        setPeriod({
+          startDate: dateForDatePicker(defaultPreset.period.startDate),
+          endDate: dateForDatePicker(defaultPreset.period.endDate),
+        });
+      } else {
+        setPeriod({ startDate: null, endDate: null });
+        removePreset();
+      }
       window.localStorage.setItem('user-set-the-period-on-date', dayjsInstance().format('YYYY-MM-DD'));
     }
   });
@@ -156,7 +191,7 @@ const DateRangePickerWithPresets = ({ period, setPeriod, preset, setPreset, remo
         <OutsideClickHandler onOutsideClick={closeDatePicker}>
           <div className="stats-datepicker tw-absolute tw-top-12 tw-z-20 tw-flex tw-flex-nowrap tw-items-center tw-justify-end tw-overflow-x-auto tw-rounded-lg tw-border tw-border-gray-300 tw-bg-white tw-pl-56 lg:tw-min-w-[45rem]">
             <div className="tw-absolute tw-top-0 tw-left-0 tw-bottom-0 tw-ml-2 tw-box-border tw-flex tw-max-h-full tw-w-56 tw-flex-1 tw-flex-col tw-items-start tw-justify-start tw-overflow-y-scroll">
-              {periods.map((p) => (
+              {presets.map((p) => (
                 <button
                   type="button"
                   className="tw-w-full tw-rounded-lg tw-border-0 tw-bg-white tw-p-1 tw-text-center hover:tw-bg-main25"

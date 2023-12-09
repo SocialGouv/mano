@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const { z } = require("zod");
+const { Op } = require("sequelize");
 const { looseUuidRegex, dateRegex } = require("../utils");
 const { catchErrors } = require("../errors");
 const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
@@ -50,7 +51,7 @@ router.get(
         date: z.string().regex(dateRegex),
       }).parse(req.params);
     } catch (e) {
-      const error = new Error(`Invalid request in service count get: ${e}`);
+      const error = new Error(`Invalid request in /team/:team/date/:date: ${e}`);
       error.status = 400;
       return next(error);
     }
@@ -60,6 +61,47 @@ router.get(
 
     Service.findAll({ where: { team, date, organisation } }).then((data) => {
       return res.status(200).send({ ok: true, data });
+    });
+  })
+);
+
+router.get(
+  "/for-reports",
+  passport.authenticate("user", { session: false }),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.object({
+        teamIds: z.string().transform((val) => val.split(",").map((id) => z.string().regex(looseUuidRegex).parse(id))),
+        startDate: z.string().regex(dateRegex),
+        endDate: z.string().regex(dateRegex),
+      }).parse(req.query);
+    } catch (e) {
+      const error = new Error(`Invalid request in service for-reports: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+
+    const organisation = req.user.organisation;
+
+    Service.findAll({
+      where: {
+        team: {
+          [Op.in]: req.query.teamIds.split(","),
+        },
+        date: {
+          // between is inclusive.
+          [Op.between]: [req.query.startDate, req.query.endDate],
+        },
+        organisation,
+      },
+    }).then((data) => {
+      const allServicesMergedByTeam = {};
+      for (const serviceRow of data) {
+        allServicesMergedByTeam[serviceRow.team] = allServicesMergedByTeam[serviceRow.team] || {};
+        allServicesMergedByTeam[serviceRow.team][serviceRow.service] =
+          (allServicesMergedByTeam[serviceRow.team][serviceRow.service] || 0) + serviceRow.count;
+      }
+      return res.status(200).send({ ok: true, data: allServicesMergedByTeam });
     });
   })
 );
@@ -137,7 +179,7 @@ router.get(
         to: z.optional(z.string().regex(dateRegex)),
       }).parse(req.query);
     } catch (e) {
-      const error = new Error(`Invalid request in service count get monthly stats: ${e}`);
+      const error = new Error(`Invalid request in service /team/:team/stats: ${e}`);
       error.status = 400;
       return next(error);
     }

@@ -317,7 +317,7 @@ __metadata:
     sanitize-html: "npm:^2.7.0"
     sequelize: "npm:^6.28.0"
     sequelize-cli: "npm:^6.6.1"
-    zod: "npm:^3.13.4"
+    zod: "npm:^3.22.4"
   languageName: unknown
   linkType: soft
 
@@ -3810,9 +3810,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:^3.13.4":
-  version: 3.13.4
-  resolution: "zod@npm:3.13.4"
-  checksum: 3908503096c33d5e5f01ec52ac442d21d52493d3a0e49fcc3d0ae9b670bd4904f67d4d74318ebca229737a77365fdb59714d880a2ff0c2c5a909af2e719f58d0
+"zod@npm:^3.22.4":
+  version: 3.22.4
+  resolution: "zod@npm:3.22.4"
+  checksum: 73622ca36a916f785cf528fe612a884b3e0f183dbe6b33365a7d0fc92abdbedf7804c5e2bd8df0a278e1472106d46674281397a3dd800fa9031dc3429758c6ac
   languageName: node
   linkType: hard

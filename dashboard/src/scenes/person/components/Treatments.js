@@ -5,8 +5,8 @@ import { userState } from '../../../recoil/auth';
 import { formatDateWithFullMonth } from '../../../services/date';
 import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from '../../../components/tailwind/Modal';
 import { treatmentsState } from '../../../recoil/treatments';
-import { AgendaMutedIcon } from './AgendaMutedIcon';
-import { FullScreenIcon } from './FullScreenIcon';
+import { AgendaMutedIcon } from '../../../assets/icons/AgendaMutedIcon';
+import { FullScreenIcon } from '../../../assets/icons/FullScreenIcon';
 import UserName from '../../../components/UserName';
 
 export const Treatments = ({ person }) => {

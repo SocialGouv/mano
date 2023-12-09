@@ -5,7 +5,7 @@ import { v4 as uuid } from 'uuid';
 import { userState, organisationAuthentifiedState, userAuthentifiedState } from '../recoil/auth';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from './tailwind/Modal';
 import { formatDateTimeWithNameOfDay } from '../services/date';
-import { FullScreenIcon } from '../scenes/person/components/FullScreenIcon';
+import { FullScreenIcon } from '../assets/icons/FullScreenIcon';
 import UserName from './UserName';
 import type { DocumentWithLinkedItem, Document, FileMetadata, FolderWithLinkedItem, Folder } from '../types/document';
 import API from '../services/api';
