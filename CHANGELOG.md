@@ -1,3 +1,10 @@
+## [1.300.1](https://github.com/SocialGouv/mano/compare/v1.300.0...v1.300.1) (2023-12-12)
+
+
+### Bug Fixes
+
+* colors and personname again ([48420da](https://github.com/SocialGouv/mano/commit/48420da9489d40c0f213bd4d45213388ea152072))
+
 # [1.300.0](https://github.com/SocialGouv/mano/compare/v1.299.0...v1.300.0) (2023-12-12)
 
 
