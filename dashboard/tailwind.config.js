@@ -37,10 +37,10 @@ module.exports = {
         },
       },
       colors: {
-        main: '#008e7f', // higher contrast
-        main75: '#49c3a6',
-        main50: '#94c7bf',
-        main25: '#c7e1dd',
+        main: '#226854', // higher contrast
+        main75: '#617e71',
+        main50: '#95a9a0',
+        main25: '#cad4cf',
         black: '#1D2021',
         black75: '#3b3b3b',
         black50: '#777777',

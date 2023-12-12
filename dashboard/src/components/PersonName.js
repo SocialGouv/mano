@@ -16,7 +16,7 @@ export default function PersonName({ item, onClick = null, redirectToTab = 'Rés
         if (item.person) history.push(`/person/${item.person}?tab=${redirectToTab}`);
       }}>
       {person?.name}
-      {person?.otherNames ? <small className="tw-text-main75"> - {person?.otherNames}</small> : null}
+      {person?.otherNames ? <small className="tw-text-main"> - {person?.otherNames}</small> : null}
     </span>
   );
 }
