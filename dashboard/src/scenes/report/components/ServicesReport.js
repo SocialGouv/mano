@@ -74,9 +74,9 @@ export default function ServicesReport({ period, selectedTeamsObject }) {
   const isSingleDay = dayjs(period.startDate).format('YYYY-MM-DD') === dayjs(period.endDate).format('YYYY-MM-DD');
 
   return (
-    <div className="tw-py-2 tw-px-4 print:tw-mb-4">
-      <div className="tw-flex tw-items-center tw-justify-between">
-        <h3 className="tw-w-full tw-px-3 tw-py-2 tw-text-2xl tw-font-medium tw-text-black">Services effectués</h3>
+    <div className="tw-py-2 print:tw-mb-4">
+      <div className="tw-flex tw-items-center tw-justify-between tw-px-3">
+        <h3 className="tw-w-full tw-py-2 tw-text-xl tw-font-medium tw-text-black">Services effectués</h3>
         <button
           title="Passer les actions/consultations en plein écran"
           className="tw-h-6 tw-w-6 tw-rounded-full tw-text-main tw-transition hover:tw-scale-125 disabled:tw-opacity-30"
@@ -84,10 +84,10 @@ export default function ServicesReport({ period, selectedTeamsObject }) {
           <FullScreenIcon />
         </button>
       </div>
-      <div className="tw-mb-4 tw-p-4">
+      <div className="tw-mb-4">
         {!serviceSumsForAllReports ? (
           <Spinner />
-        ) : Object.entries(serviceSumsForAllReports).length > 0 ? (
+        ) : (
           <div className="tw-flex tw-flex-col tw-items-center tw-justify-center tw-rounded-2xl tw-bg-gray-100 tw-p-4">
             {teamIds.length > 1 ? (
               <>
@@ -125,8 +125,6 @@ export default function ServicesReport({ period, selectedTeamsObject }) {
               />
             )}
           </div>
-        ) : (
-          <span>Pas de service</span>
         )}
       </div>
       <ServicesFullScreen

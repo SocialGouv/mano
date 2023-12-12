@@ -293,6 +293,7 @@ const View = () => {
                 Comptes rendus de toute l'organisation
               </label>
             )}
+            {!selectedTeams.length && <p className="tw-mx-auto tw-w-full tw-text-center">Sélectionnez une équipe 👆</p>}
           </div>
         </div>
       </HeaderStyled>
@@ -336,53 +337,55 @@ const View = () => {
           /> */}
         </div>
       </div>
-      <div className="noprint -tw-mx-12 tw-flex tw-h-full tw-flex-col">
-        <div
-          className={[
-            'noprint tw-mt-4 tw-flex tw-w-full tw-grow tw-basis-full tw-items-start',
-            viewAllOrganisationData || selectedTeamIds.length ? 'tw-flex' : 'tw-hidden',
-          ].join(' ')}>
-          <div className="tw-mb-12 tw-min-h-1/2 tw-basis-5/12 tw-overflow-auto">
-            <div className="tw-mb-4 tw-h-[50vh] tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
-              <ActionsOrConsultations actions={actions} consultations={consultations} />
-            </div>
-            <div className="tw-h-[50vh] tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
-              <CommentsSocialAndMedical comments={comments} commentsMedical={commentsMedical} />
-            </div>
-          </div>
-          <div className="tw-mx-4 tw-mb-12 tw-basis-4/12 ">
-            <div className="tw-mb-4 tw-flex tw-flex-wrap tw-gap-y-4">
-              <div className="tw-basis-1/2">
-                <div className="tw-mr-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow-2xl">
-                  <PassagesReport passages={passages} period={period} selectedTeams={selectedTeams} />
-                </div>
+      {!!selectedTeams.length && (
+        <div className="noprint -tw-mx-12 tw-flex tw-h-full tw-flex-col">
+          <div
+            className={[
+              'noprint tw-mt-4 tw-flex tw-w-full tw-grow tw-basis-full tw-items-start',
+              viewAllOrganisationData || selectedTeamIds.length ? 'tw-flex' : 'tw-hidden',
+            ].join(' ')}>
+            <div className="tw-mb-12 tw-min-h-1/2 tw-basis-6/12 tw-overflow-auto">
+              <div className="tw-mb-4 tw-h-[50vh] tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+                <ActionsOrConsultations actions={actions} consultations={consultations} />
               </div>
-              <div className="tw-basis-1/2">
-                <div className="tw-ml-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow">
-                  <RencontresReport rencontres={rencontres} period={period} selectedTeams={selectedTeams} />
-                </div>
-              </div>
-              <div className="tw-basis-1/2">
-                <div className="tw-mr-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow">
-                  <ObservationsReport observations={observations} period={period} selectedTeams={selectedTeams} />
-                </div>
-              </div>
-              <div className="tw-basis-1/2">
-                <div className="tw-ml-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow">
-                  <PersonsReport personsCreated={personsCreated} period={period} selectedTeams={selectedTeams} />
-                </div>
+              <div className="tw-h-[50vh] tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+                <CommentsSocialAndMedical comments={comments} commentsMedical={commentsMedical} />
               </div>
             </div>
-            <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
-              <ServicesReport selectedTeamsObject={selectedTeamsObject} period={period} />
+            <div className="tw-mx-4 tw-mb-12 tw-basis-3/12 ">
+              <div className="tw-mb-4 tw-flex tw-flex-wrap tw-gap-y-4">
+                <div className="tw-basis-1/2">
+                  <div className="tw-mr-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow-2xl">
+                    <PassagesReport passages={passages} period={period} selectedTeams={selectedTeams} />
+                  </div>
+                </div>
+                <div className="tw-basis-1/2">
+                  <div className="tw-ml-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow">
+                    <RencontresReport rencontres={rencontres} period={period} selectedTeams={selectedTeams} />
+                  </div>
+                </div>
+                <div className="tw-basis-1/2">
+                  <div className="tw-mr-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow">
+                    <ObservationsReport observations={observations} period={period} selectedTeams={selectedTeams} />
+                  </div>
+                </div>
+                <div className="tw-basis-1/2">
+                  <div className="tw-ml-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow">
+                    <PersonsReport personsCreated={personsCreated} period={period} selectedTeams={selectedTeams} />
+                  </div>
+                </div>
+              </div>
+              <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-gray-100 tw-shadow">
+                <ServicesReport selectedTeamsObject={selectedTeamsObject} period={period} />
+              </div>
             </div>
-          </div>
 
-          <div className="tw-mr-2 tw-mb-12 tw-h-0 tw-min-h-full tw-basis-3/12 tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow ">
-            <Transmissions period={period} selectedTeamsObject={selectedTeamsObject} reports={reports} />
+            <div className="tw-maxh tw-mr-2 tw-mb-12 tw-basis-3/12 tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow ">
+              <Transmissions period={period} selectedTeamsObject={selectedTeamsObject} reports={reports} />
+            </div>
           </div>
         </div>
-      </div>
+      )}
       <ModalContainer open={showWarning} size="prose" onClose={() => setShowWarning(false)}>
         <ModalHeader title="Comptes-rendus - Version Beta" onClose={() => setShowWarning(false)} />
         <ModalBody className="tw-p-4">

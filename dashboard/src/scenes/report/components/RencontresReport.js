@@ -17,12 +17,12 @@ export const RencontresReport = ({ rencontres, period, selectedTeams }) => {
 
   return (
     <>
-      <section title="Rencontres" className="tw-relative tw-m-2 tw-flex tw-h-full tw-flex-col tw-overflow-hidden tw-bg-main tw-px-3 tw-pt-1 tw-pb-3">
-        <p className="tw-m-0 tw-w-full tw-text-center tw-text-6xl tw-font-bold tw-text-white">{rencontres.length}</p>
-        <p className="tw-m-0 tw-w-full tw-text-center tw-text-xl tw-font-semibold tw-text-white">rencontre{rencontres.length > 1 ? 's' : ''}</p>
+      <section title="Rencontres" className="tw-relative tw-m-2 tw-flex tw-h-full tw-flex-col tw-overflow-hidden tw-bg-main tw-pt-1 tw-pb-3">
+        <p className="tw-m-0 tw-w-full tw-text-center tw-text-3xl tw-font-semibold tw-text-white">{rencontres.length}</p>
+        <p className="tw-m-0 tw-w-full tw-text-center tw-text-lg tw-font-normal tw-text-white">rencontre{rencontres.length > 1 ? 's' : ''}</p>
         <button
           title="Passer les rencontres en plein écran"
-          className="tw-absolute tw-top-2 tw-right-2 tw-h-6 tw-w-6 tw-rounded-full tw-text-white tw-transition hover:tw-scale-125 disabled:tw-cursor-not-allowed disabled:tw-opacity-30"
+          className="tw-absolute tw-top-1 tw-right-1 tw-h-6 tw-w-6 tw-rounded-full tw-text-white tw-transition hover:tw-scale-125 disabled:tw-cursor-not-allowed disabled:tw-opacity-30"
           onClick={() => setFullScreen(true)}>
           <FullScreenIcon />
         </button>
@@ -53,7 +53,7 @@ const RencontresTable = ({ period, rencontres, selectedTeams }) => {
     <>
       <div className="tw-py-2 tw-px-4 print:tw-mb-4">
         <div className="tw-mb-5 tw-flex tw-justify-between">
-          <h3 className="tw-w-full tw-px-3 tw-py-2 tw-text-2xl tw-font-medium tw-text-black">Rencontres</h3>
+          <h3 className="tw-w-full tw-px-3 tw-py-2 tw-text-xl tw-font-medium tw-text-black">Rencontres</h3>
           <button
             type="button"
             className="button-submit tw-ml-auto tw-mb-2.5"

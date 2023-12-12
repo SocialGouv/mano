@@ -26,7 +26,7 @@ export default function Transmissions({ period, selectedTeamsObject, reports }) 
 
   return (
     <div>
-      <h3 className="tw-w-full tw-px-3 tw-py-2 tw-text-center tw-text-2xl tw-font-medium tw-text-black">
+      <h3 className="tw-w-full tw-px-3 tw-py-2 tw-text-center tw-text-xl tw-font-medium tw-text-black">
         👋&nbsp;Comment s'est passée la&nbsp;journée&nbsp;?
       </h3>
       {days.map((day) => {
@@ -123,7 +123,7 @@ function Transmission({ report, team, day, teamId }) {
           />
         </div>
       </div>
-      <ModalContainer open={isEditingTransmission} size="prose">
+      <ModalContainer open={isEditingTransmission} size="3xl">
         <ModalHeader title={`Transmission du ${dayjs(day).format('dddd D MMM')} - ${team?.nightSession ? '🌒' : '☀️ '} ${team?.name || ''}`} />
         <ModalBody className="tw-py-4">
           <form id={`edit-transmission-${day}-${teamId}`} className="tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8" onSubmit={onEditTransmission}>
@@ -132,7 +132,7 @@ function Transmission({ report, team, day, teamId }) {
                 Transmission
               </label>
               <textarea
-                rows={7}
+                rows={27}
                 className="tailwindui"
                 id="description"
                 name="description"
