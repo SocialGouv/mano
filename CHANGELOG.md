@@ -1,3 +1,10 @@
+## [1.301.1](https://github.com/SocialGouv/mano/compare/v1.301.0...v1.301.1) (2023-12-12)
+
+
+### Bug Fixes
+
+* dockerfile ([1ea5f3a](https://github.com/SocialGouv/mano/commit/1ea5f3a2f8aebcdb2deafa4ca5dfb7cfdc93f4ef))
+
 # [1.301.0](https://github.com/SocialGouv/mano/compare/v1.300.3...v1.301.0) (2023-12-12)
 
 
