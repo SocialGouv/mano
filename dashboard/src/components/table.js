@@ -49,7 +49,9 @@ const Table = ({
             </tr>
           )}
           <tr>
-            <td colSpan={columns.length}>{noData}</td>
+            <td colSpan={columns.length}>
+              <p className="tw-m-0 tw-mb-5 tw-text-center">{noData}</p>
+            </td>
           </tr>
         </thead>
       </table>

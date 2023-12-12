@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useRef, useEffect } from 'react';
-import { Col, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
+import { Modal, ModalBody, ModalHeader } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -213,8 +213,8 @@ const Reception = () => {
           </span>
         }
       />
-      <PersonsWrapper>
-        <div style={{ flexGrow: '1' }}>
+      <div className="tw-mb-10 tw-mt-8 tw-flex tw-gap-4">
+        <div className="tw-grow">
           <SelectAndCreatePerson
             value={selectedPersons}
             onChange={onSelectPerson}
@@ -271,25 +271,25 @@ const Reception = () => {
             disabled={addingPassage || !selectedPersons.length}
           />
         )}
-      </PersonsWrapper>
-      <Row style={{ paddingBottom: 20, marginBottom: 20 }}>
-        <Col md={8}>
-          <AgendaWrapper>
-            <div className="agenda-title">Agenda</div>
-            <div className="agenda-status">
+      </div>
+      <div className="tw-mb-5 tw-flex tw-items-start tw-pb-5">
+        <div className="tw-mr-4 tw-flex tw-basis-8/12 tw-flex-col tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+          <div className="tw-mb-8 tw-flex tw-items-center tw-gap-4 tw-px-4 tw-pt-4">
+            <div className="tw-grow tw-text-lg tw-font-bold tw-text-black">Agenda</div>
+            <div className="tw-w-96">
               <SelectStatus onChange={(event) => setStatus(event.target.value)} value={status} />
             </div>
-          </AgendaWrapper>
+          </div>
           <ActionsCalendar
             actions={dataConsolidated}
             columns={['Heure', 'Nom', 'Personne suivie', 'Statut']}
             isNightSession={currentTeam.nightSession}
           />
-        </Col>
-        <Col md={4}>
+        </div>
+        <div className="tw-flex tw-basis-4/12 tw-flex-col">
           {!!organisation.passagesEnabled && (
-            <PassagesWrapper>
-              <h5 id="passages-title">
+            <div className="tw-mb-4 tw-flex tw-flex-col tw-items-center tw-gap-4 tw-rounded-lg tw-bg-gray-100 tw-py-8 tw-px-2 tw-text-center">
+              <h5 id="passages-title" className="tw-text-gray-500">
                 {passages.length} passage{passages.length > 1 ? 's' : ''}
               </h5>
               <ButtonCustom onClick={onAddAnonymousPassage} color="primary" icon={plusIcon} title="Passage anonyme" id="add-anonymous-passage" />
@@ -304,11 +304,11 @@ const Reception = () => {
                   <ButtonCustom onClick={() => setTodaysPassagesOpen(true)} color="link" title="Voir les passages d'aujourd'hui" padding="0px" />
                 </div>
               )}
-            </PassagesWrapper>
+            </div>
           )}
-          <ServicesWrapper>
-            <h5 className="services-title">Services</h5>
-            <div className="services-incrementators">
+          <div className="tw-mb-4 tw-flex tw-flex-col tw-items-center tw-gap-4 tw-rounded-lg tw-bg-gray-100 tw-py-8 tw-px-2 tw-text-center">
+            <h5 className="tw-text-gray-500">Services</h5>
+            <div className="tw-mt-4 tw-text-left">
               <ReceptionService
                 services={services}
                 onUpdateServices={setServices}
@@ -317,9 +317,9 @@ const Reception = () => {
                 dateString={startOfToday().format('YYYY-MM-DD')}
               />
             </div>
-          </ServicesWrapper>
-        </Col>
-      </Row>
+          </div>
+        </div>
+      </div>
       <PassagesToday isOpen={todaysPassagesOpen} setOpen={setTodaysPassagesOpen} passages={passages} />
     </>
   );
@@ -377,51 +377,6 @@ const PersonsWrapper = styled.div`
   gap: 1rem;
   margin-bottom: 5rem;
   margin-top: 2rem;
-`;
-const AgendaWrapper = styled.div`
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  margin-bottom: 2rem;
-  .agenda-status {
-    width: 150px;
-  }
-  .agenda-title {
-    color: ${theme.black};
-    font-weight: bold;
-    font-size: 20px;
-    flex-grow: 1;
-  }
-`;
-const PassagesWrapper = styled.div`
-  text-align: center;
-  background-color: #f8f8f8;
-  border-radius: 5px;
-  padding: 2rem 0.5rem;
-  margin-bottom: 1rem;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  gap: 1rem;
-  #passages-title {
-    color: #555;
-  }
-`;
-const ServicesWrapper = styled.div`
-  text-align: center;
-  background-color: #f8f8f8;
-  overflow-wrap: anywhere;
-  border-radius: 5px;
-  padding: 2rem 1rem;
-  margin-bottom: 1rem;
-  gap: 1rem;
-  .services-title {
-    color: #555;
-  }
-  .services-incrementators {
-    text-align: left;
-    margin-top: 1rem;
-  }
 `;
 
 export default Reception;
