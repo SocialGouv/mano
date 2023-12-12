@@ -1,3 +1,11 @@
+## [1.300.2](https://github.com/SocialGouv/mano/compare/v1.300.1...v1.300.2) (2023-12-12)
+
+
+### Bug Fixes
+
+* fucking black ([988b91a](https://github.com/SocialGouv/mano/commit/988b91a219c2372ada58ede3770337bd7ae0b320))
+* personne créée ([89d4865](https://github.com/SocialGouv/mano/commit/89d4865ca909dd5740d88caf5f94187f104bbb3b))
+
 ## [1.300.1](https://github.com/SocialGouv/mano/compare/v1.300.0...v1.300.1) (2023-12-12)
 
 
