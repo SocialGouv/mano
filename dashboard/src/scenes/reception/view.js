@@ -1,12 +1,10 @@
 import React, { useMemo, useState, useRef, useEffect } from 'react';
 import { Modal, ModalBody, ModalHeader } from 'reactstrap';
-import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { SmallHeader } from '../../components/header';
 import { formatDateWithNameOfDay, getIsDayWithinHoursOffsetOfPeriod, isToday, now, startOfToday } from '../../services/date';
 import { currentTeamReportsSelector } from '../../recoil/selectors';
-import { theme } from '../../config';
 import SelectAndCreatePerson from './SelectAndCreatePerson';
 import ButtonCustom from '../../components/ButtonCustom';
 import ActionsCalendar from '../../components/ActionsCalendar';
@@ -371,12 +369,5 @@ const PassagesToday = ({ passages, isOpen, setOpen }) => {
     </Modal>
   );
 };
-
-const PersonsWrapper = styled.div`
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 5rem;
-  margin-top: 2rem;
-`;
 
 export default Reception;
