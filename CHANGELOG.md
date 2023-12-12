@@ -1,3 +1,11 @@
+## [1.301.4](https://github.com/SocialGouv/mano/compare/v1.301.3...v1.301.4) (2023-12-12)
+
+
+### Bug Fixes
+
+* log all ([8d032ac](https://github.com/SocialGouv/mano/commit/8d032accabcdfe74b51a56326627a7ff8f0b3548))
+* yarn build ([427739f](https://github.com/SocialGouv/mano/commit/427739f15c91efdb069b139d7bf02a1e545026cb))
+
 ## [1.301.3](https://github.com/SocialGouv/mano/compare/v1.301.2...v1.301.3) (2023-12-12)
 
 
