@@ -67,6 +67,10 @@ export default function useDataMigrator() {
       // End of example of migration.
       */
 
+      console.log('process.env.REACT_APP_ORG_ID_FOR_TRUPLICATION');
+      console.log(process.env.REACT_APP_ORG_ID_FOR_TRUPLICATION);
+      console.log('organisation._id');
+      console.log(organisation._id);
       if (organisation._id === process.env.REACT_APP_ORG_ID_FOR_TRUPLICATION && !organisation.migrations?.includes('truplicate-organisations')) {
         setLoadingText("Truplication en cours: récupération des données de l'organisation originale…");
 
