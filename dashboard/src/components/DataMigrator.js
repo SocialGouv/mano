@@ -69,6 +69,14 @@ export default function useDataMigrator() {
 
       console.log('process.env.REACT_APP_ORG_ID_FOR_TRUPLICATION');
       console.log(process.env.REACT_APP_ORG_ID_FOR_TRUPLICATION);
+      console.log('process.env.REACT_APP_ORG_DUPLICATED_1_ID');
+      console.log(process.env.REACT_APP_ORG_DUPLICATED_1_ID);
+      console.log('process.env.REACT_APP_ORG_DUPLICATED_1_NAME');
+      console.log(process.env.REACT_APP_ORG_DUPLICATED_1_NAME);
+      console.log('process.env.REACT_APP_ORG_DUPLICATED_2_ID');
+      console.log(process.env.REACT_APP_ORG_DUPLICATED_2_ID);
+      console.log('process.env.REACT_APP_ORG_DUPLICATED_2_NAME');
+      console.log(process.env.REACT_APP_ORG_DUPLICATED_2_NAME);
       console.log('organisation._id');
       console.log(organisation._id);
       if (organisation._id === process.env.REACT_APP_ORG_ID_FOR_TRUPLICATION && !organisation.migrations?.includes('truplicate-organisations')) {
