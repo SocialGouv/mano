@@ -1,3 +1,18 @@
+# [1.300.0](https://github.com/SocialGouv/mano/compare/v1.299.0...v1.300.0) (2023-12-12)
+
+
+### Bug Fixes
+
+* design accueil ([c6da8fa](https://github.com/SocialGouv/mano/commit/c6da8fac88e3b6110d34b8a596dd49790157d714))
+* design new report ([91370bb](https://github.com/SocialGouv/mano/commit/91370bb52c6dea67f6c2d8f1c79916b3bf0b05bf))
+* fucking beta font ([af043ca](https://github.com/SocialGouv/mano/commit/af043ca201107872716b2d6c0b1dc8ba01833c5b))
+* new green for mano ([e323e01](https://github.com/SocialGouv/mano/commit/e323e01e0a9d150afaa1a1defce39a353f526f0a))
+
+
+### Features
+
+* add email to person fields ([be6b6ac](https://github.com/SocialGouv/mano/commit/be6b6acefb033afed7feb78fa2b0e95fb6a640d3))
+
 # [1.299.0](https://github.com/SocialGouv/mano/compare/v1.298.0...v1.299.0) (2023-12-09)
 
 
