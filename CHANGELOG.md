@@ -1,3 +1,10 @@
+# [1.301.0](https://github.com/SocialGouv/mano/compare/v1.300.3...v1.301.0) (2023-12-12)
+
+
+### Features
+
+* truplicate organisation ([#1791](https://github.com/SocialGouv/mano/issues/1791)) ([1342574](https://github.com/SocialGouv/mano/commit/13425748059f762402b5df7b4b20c292af4529cb))
+
 ## [1.300.3](https://github.com/SocialGouv/mano/compare/v1.300.2...v1.300.3) (2023-12-12)
 
 
