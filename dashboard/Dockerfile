@@ -23,19 +23,19 @@ RUN --mount=type=secret,id=sentry_auth_token,uid=1000 \
     --mount=type=secret,id=react_app_org_duplicated_2_name,uid=1000 \
     --mount=type=secret,id=react_app_org_id_for_truplication,uid=1000 \
     if [ -f "/run/secrets/react_app_org_duplicated_1_id" ]; then \
-        export REACT_APP_ORG_ID_FOR_MIGRATION=$(cat /run/secrets/react_app_org_id_for_migration); \
+        export REACT_APP_ORG_DUPLICATED_1_ID=$(cat /run/secrets/react_app_org_duplicated_1_id); \
     fi; \
     if [ -f "/run/secrets/react_app_org_duplicated_1_name" ]; then \
-        export REACT_APP_ORG_ID_FOR_MIGRATION=$(cat /run/secrets/react_app_org_id_for_migration); \
+        export REACT_APP_ORG_DUPLICATED_1_NAME=$(cat /run/secrets/react_app_org_duplicated_1_name); \
     fi; \
     if [ -f "/run/secrets/react_app_org_duplicated_2_id" ]; then \
-        export REACT_APP_ORG_ID_FOR_MIGRATION=$(cat /run/secrets/react_app_org_id_for_migration); \
+        export REACT_APP_ORG_DUPLICATED_2_ID=$(cat /run/secrets/react_app_org_duplicated_2_id); \
     fi; \
     if [ -f "/run/secrets/react_app_org_duplicated_2_name" ]; then \
-        export REACT_APP_TEAM_1=$(cat /run/secrets/react_app_team_1); \
+        export REACT_APP_ORG_DUPLICATED_2_NAME=$(cat /run/secrets/react_app_org_duplicated_2_name); \
     fi; \
     if [ -f "/run/secrets/react_app_org_id_for_truplication" ]; then \
-        export REACT_APP_TEAM_2=$(cat /run/secrets/react_app_team_2); \
+        export REACT_APP_ORG_ID_FOR_TRUPLICATION=$(cat /run/secrets/react_app_org_id_for_truplication); \
     fi; \
     if [ -f "/run/secrets/sentry_auth_token" ]; then \
         export SENTRY_AUTH_TOKEN=$(cat /run/secrets/sentry_auth_token); \
