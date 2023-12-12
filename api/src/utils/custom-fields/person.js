@@ -16,6 +16,7 @@ const personFields = [
   { name: "alertness", type: "boolean", label: "Personne très vulnérable", encrypted: true, importable: true, filterable: true },
   { name: "wanderingAt", type: "date", label: "En rue depuis le", encrypted: true, importable: true, filterable: true },
   { name: "phone", type: "text", label: "Téléphone", encrypted: true, importable: true, filterable: true },
+  { name: "email", type: "text", label: "Email", encrypted: true, importable: true, filterable: true },
   { name: "assignedTeams", type: "multi-choice", label: "Équipes en charge", encrypted: true, importable: true, filterable: false },
   { name: "_id", label: "", encrypted: false, importable: false, filterable: false },
   { name: "organisation", label: "", encrypted: false, importable: false, filterable: false },

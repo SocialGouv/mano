@@ -168,7 +168,7 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                               </div>
                             </FormGroup>
                           </Col>
-                          <Col md={8}>
+                          <Col md={4}>
                             <FormGroup>
                               <Label htmlFor="person-select-assigned-team">Équipe(s) en charge</Label>
                               <div>
@@ -186,6 +186,12 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                             <FormGroup>
                               <Label htmlFor="phone">Téléphone</Label>
                               <Input name="phone" id="phone" value={values.phone || ''} onChange={handleChange} />
+                            </FormGroup>
+                          </Col>
+                          <Col md={4}>
+                            <FormGroup>
+                              <Label htmlFor="email">Email</Label>
+                              <Input type="email" name="email" id="email" value={values.email || ''} onChange={handleChange} />
                             </FormGroup>
                           </Col>
                           {!['restricted-access'].includes(user.role) && (

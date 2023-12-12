@@ -46,6 +46,14 @@ export function InfosMain({ person, isMedicalFile }) {
               <b>Téléphone : </b>
               {person.phone}
             </div>
+            <div>
+              <b>Email : </b>
+              {person.email ? (
+                <a className="tw-text-white tw-underline" href={`mailto:${person.email}`} target="_blank" rel="noopener noreferrer">
+                  {person.email}
+                </a>
+              ) : null}
+            </div>
           </div>
           <div className="tw-mt-4 tw-flex tw-flex-row tw-items-center tw-justify-center tw-gap-2">
             <button className="tw-block tw-px-2 tw-py-1 tw-text-sm tw-text-white tw-underline tw-opacity-80" onClick={() => window.print()}>
