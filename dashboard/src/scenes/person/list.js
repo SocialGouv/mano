@@ -217,16 +217,16 @@ const List = () => {
                   )}
                   {p.outOfActiveList ? (
                     <div className="tw-max-w-md tw-text-black50">
-                      <div className="tw-flex tw-items-center tw-gap-1 tw-font-bold [overflow-wrap:anywhere]">
+                      <div className="tw-items-center tw-gap-1 tw-font-bold [overflow-wrap:anywhere]">
                         {p.name}
-                        {p.otherNames ? <small className="tw-text-main75"> - {p.otherNames}</small> : null}
+                        {p.otherNames ? <small className="tw-inline tw-text-main"> - {p.otherNames}</small> : null}
                       </div>
                       <div>Sortie de file active : {p.outOfActiveListReasons?.join(', ')}</div>
                     </div>
                   ) : (
-                    <div className="tw-flex tw-max-w-md tw-items-center tw-gap-1 tw-font-bold [overflow-wrap:anywhere]">
+                    <div className="tw-max-w-md tw-items-center tw-gap-1 tw-font-bold [overflow-wrap:anywhere]">
                       {p.name}
-                      {p.otherNames ? <small className="tw-text-main75"> - {p.otherNames}</small> : null}
+                      {p.otherNames ? <small className="tw-inline tw-text-main"> - {p.otherNames}</small> : null}
                     </div>
                   )}
                 </div>
@@ -271,18 +271,18 @@ const List = () => {
               if (p.outOfActiveList)
                 return (
                   <div className="tw-max-w-md tw-text-black50">
-                    <div className="tw-flex tw-items-center tw-gap-1 tw-font-bold [overflow-wrap:anywhere]">
+                    <p className="tw-mb-0 tw-items-center tw-gap-1 tw-font-bold [overflow-wrap:anywhere]">
                       {p.name}
-                      {p.otherNames ? <small className="tw-text-main75"> - {p.otherNames}</small> : null}
-                    </div>
+                      {p.otherNames ? <small className="tw-inline tw-text-main"> - {p.otherNames}</small> : null}
+                    </p>
                     <div>Sortie de file active : {p.outOfActiveListReasons?.join(', ')}</div>
                   </div>
                 );
               return (
-                <div className="tw-flex tw-max-w-md tw-items-center tw-gap-1 tw-font-bold [overflow-wrap:anywhere]">
+                <p className="tw-mb-0 tw-max-w-md tw-items-center tw-gap-1 tw-font-bold [overflow-wrap:anywhere]">
                   {p.name}
-                  {p.otherNames ? <small className="tw-text-main75"> - {p.otherNames}</small> : null}
-                </div>
+                  {p.otherNames ? <small className="tw-inline tw-text-main"> - {p.otherNames}</small> : null}
+                </p>
               );
             },
           },
