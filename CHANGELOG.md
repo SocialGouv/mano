@@ -1,3 +1,10 @@
+## [1.301.3](https://github.com/SocialGouv/mano/compare/v1.301.2...v1.301.3) (2023-12-12)
+
+
+### Bug Fixes
+
+* log org variable ([cda548c](https://github.com/SocialGouv/mano/commit/cda548c6bebb10568a794cc4d039f60a26f3b330))
+
 ## [1.301.2](https://github.com/SocialGouv/mano/compare/v1.301.1...v1.301.2) (2023-12-12)
 
 
