@@ -96,6 +96,7 @@ export const prepareReportForEncryption = (report, { checkRequiredFields = true 
     _id: report._id,
     createdAt: report.createdAt,
     updatedAt: report.updatedAt,
+    deletedAt: report.deletedAt,
     organisation: report.organisation,
     date: report.date,
     team: report.team,

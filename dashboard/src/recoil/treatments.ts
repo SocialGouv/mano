@@ -59,6 +59,7 @@ export const prepareTreatmentForEncryption = (treatment: TreatmentInstance, { ch
     _id: treatment._id,
     createdAt: treatment.createdAt,
     updatedAt: treatment.updatedAt,
+    deletedAt: treatment.deletedAt,
     organisation: treatment.organisation,
 
     decrypted,

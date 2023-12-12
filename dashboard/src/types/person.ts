@@ -12,6 +12,7 @@ export interface PersonInstance {
   organisation: UUIDV4;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt?: Date;
   outOfActiveList: boolean;
   user: UUIDV4;
   name: string;

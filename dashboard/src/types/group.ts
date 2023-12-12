@@ -20,6 +20,7 @@ export interface GroupInstance extends EncryptedGroupFields {
   organisation: UUIDV4;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt?: Date;
   entityKey: string;
 }
 

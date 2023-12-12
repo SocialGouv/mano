@@ -96,6 +96,7 @@ export const prepareActionForEncryption = (action, { checkRequiredFields = true 
     organisation: action.organisation,
     createdAt: action.createdAt,
     updatedAt: action.updatedAt,
+    deletedAt: action.deletedAt,
 
     completedAt: action.completedAt,
     dueAt: action.dueAt,

@@ -47,6 +47,7 @@ export const prepareCommentForEncryption = (comment, { checkRequiredFields = tru
     _id: comment._id,
     createdAt: comment.createdAt,
     updatedAt: comment.updatedAt,
+    deletedAt: comment.deletedAt,
     organisation: comment.organisation,
 
     decrypted,

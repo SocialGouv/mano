@@ -44,6 +44,7 @@ export const prepareTerritoryForEncryption = (territory, { checkRequiredFields =
     _id: territory._id,
     createdAt: territory.createdAt,
     updatedAt: territory.updatedAt,
+    deletedAt: territory.deletedAt,
     organisation: territory.organisation,
 
     decrypted,

@@ -50,6 +50,7 @@ export const prepareRencontreForEncryption = (rencontre, { checkRequiredFields =
     _id: rencontre._id,
     createdAt: rencontre.createdAt,
     updatedAt: rencontre.updatedAt,
+    deletedAt: rencontre.deletedAt,
     organisation: rencontre.organisation,
 
     decrypted,
