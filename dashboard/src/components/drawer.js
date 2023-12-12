@@ -89,7 +89,7 @@ const Drawer = () => {
             <>
               <li>
                 <NavLink to="/report-new" activeClassName="active">
-                  Comptes rendus <span className="tw-rounded-full tw-bg-main tw-px-2 tw-py-1 tw-text-yellow-100">BETA</span>
+                  Comptes rendus <span className="tw-ml-1 tw-rounded-full tw-bg-main tw-px-2 tw-py-1 tw-text-xs tw-text-white">BETA</span>
                 </NavLink>
               </li>
             </>
