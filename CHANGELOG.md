@@ -1,3 +1,10 @@
+## [1.301.2](https://github.com/SocialGouv/mano/compare/v1.301.1...v1.301.2) (2023-12-12)
+
+
+### Bug Fixes
+
+* env ([a9183e0](https://github.com/SocialGouv/mano/commit/a9183e08700474078045893c60bc365a1c99cb0a))
+
 ## [1.301.1](https://github.com/SocialGouv/mano/compare/v1.301.0...v1.301.1) (2023-12-12)
 
 
