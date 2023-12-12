@@ -22,7 +22,6 @@ RUN --mount=type=secret,id=sentry_auth_token,uid=1000 \
     --mount=type=secret,id=react_app_org_duplicated_2_id,uid=1000 \
     --mount=type=secret,id=react_app_org_duplicated_2_name,uid=1000 \
     --mount=type=secret,id=react_app_org_id_for_truplication,uid=1000 \
-    yarn build; \
     if [ -f "/run/secrets/react_app_org_duplicated_1_id" ]; then \
         export REACT_APP_ORG_DUPLICATED_1_ID=$(cat /run/secrets/react_app_org_duplicated_1_id); \
     fi; \
@@ -38,6 +37,7 @@ RUN --mount=type=secret,id=sentry_auth_token,uid=1000 \
     if [ -f "/run/secrets/react_app_org_id_for_truplication" ]; then \
         export REACT_APP_ORG_ID_FOR_TRUPLICATION=$(cat /run/secrets/react_app_org_id_for_truplication); \
     fi; \
+    yarn build; \
     if [ -f "/run/secrets/sentry_auth_token" ]; then \
         export SENTRY_AUTH_TOKEN=$(cat /run/secrets/sentry_auth_token); \
         yarn sentry:sourcemaps; \
