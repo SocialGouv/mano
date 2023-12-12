@@ -1,3 +1,10 @@
+## [1.300.3](https://github.com/SocialGouv/mano/compare/v1.300.2...v1.300.3) (2023-12-12)
+
+
+### Bug Fixes
+
+* style last time report ([bb05eb7](https://github.com/SocialGouv/mano/commit/bb05eb7a37ad2eb626cc564712ffa4fdaeca2271))
+
 ## [1.300.2](https://github.com/SocialGouv/mano/compare/v1.300.1...v1.300.2) (2023-12-12)
 
 
