@@ -33,7 +33,7 @@ export default function Transmissions({ period, selectedTeamsObject, reports }) 
         return (
           <details open={days.length === 1} className="tw-my-2 tw-p-2" key={day}>
             <summary>
-              <h4 className="tw-inline-block tw-capitalize">{dayjs(day).format('dddd D MMM')}</h4>
+              <h4 className="tw-inline-block tw-text-base tw-capitalize">{dayjs(day).format('dddd D MMM')}</h4>
             </summary>
             {Object.keys(selectedTeamsObject).map((teamId) => {
               const report = reports.find((report) => report.team === teamId && report.date === day);

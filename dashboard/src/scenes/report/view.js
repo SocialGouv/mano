@@ -354,24 +354,28 @@ const View = () => {
             </div>
             <div className="tw-mx-4 tw-mb-12 tw-basis-3/12 ">
               <div className="tw-mb-4 tw-flex tw-flex-wrap tw-gap-y-4">
-                <div className="tw-basis-1/2">
-                  <div className="tw-mr-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow-2xl">
-                    <PassagesReport passages={passages} period={period} selectedTeams={selectedTeams} />
+                <div className="tw-flex tw-basis-full">
+                  <div className="tw-basis-1/2">
+                    <div className="tw-mr-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow-2xl">
+                      <PassagesReport passages={passages} period={period} selectedTeams={selectedTeams} />
+                    </div>
+                  </div>
+                  <div className="tw-basis-1/2">
+                    <div className="tw-ml-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow">
+                      <RencontresReport rencontres={rencontres} period={period} selectedTeams={selectedTeams} />
+                    </div>
                   </div>
                 </div>
-                <div className="tw-basis-1/2">
-                  <div className="tw-ml-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow">
-                    <RencontresReport rencontres={rencontres} period={period} selectedTeams={selectedTeams} />
+                <div className="tw-flex tw-basis-full">
+                  <div className="tw-basis-1/2">
+                    <div className="tw-mr-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow">
+                      <ObservationsReport observations={observations} period={period} selectedTeams={selectedTeams} />
+                    </div>
                   </div>
-                </div>
-                <div className="tw-basis-1/2">
-                  <div className="tw-mr-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow">
-                    <ObservationsReport observations={observations} period={period} selectedTeams={selectedTeams} />
-                  </div>
-                </div>
-                <div className="tw-basis-1/2">
-                  <div className="tw-ml-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow">
-                    <PersonsReport personsCreated={personsCreated} period={period} selectedTeams={selectedTeams} />
+                  <div className="tw-basis-1/2">
+                    <div className="tw-ml-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow">
+                      <PersonsReport personsCreated={personsCreated} period={period} selectedTeams={selectedTeams} />
+                    </div>
                   </div>
                 </div>
               </div>
