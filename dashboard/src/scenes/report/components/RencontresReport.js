@@ -19,7 +19,7 @@ export const RencontresReport = ({ rencontres, period, selectedTeams }) => {
     <>
       <section title="Rencontres" className="tw-relative tw-m-2 tw-flex tw-h-full tw-flex-col tw-overflow-hidden tw-bg-main tw-pt-1 tw-pb-3">
         <p className="tw-m-0 tw-w-full tw-text-center tw-text-3xl tw-font-semibold tw-text-white">{rencontres.length}</p>
-        <p className="tw-m-0 tw-w-full tw-text-center tw-text-lg tw-font-normal tw-text-white">rencontre{rencontres.length > 1 ? 's' : ''}</p>
+        <p className="tw-m-0 tw-w-full tw-text-center tw-font-normal tw-text-white">rencontre{rencontres.length > 1 ? 's' : ''}</p>
         <button
           title="Passer les rencontres en plein écran"
           className="tw-absolute tw-top-1 tw-right-1 tw-h-6 tw-w-6 tw-rounded-full tw-text-white tw-transition hover:tw-scale-125 disabled:tw-cursor-not-allowed disabled:tw-opacity-30"

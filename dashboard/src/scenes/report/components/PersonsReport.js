@@ -17,8 +17,8 @@ export const PersonsReport = ({ personsCreated, period, selectedTeams }) => {
     <>
       <section title="Personnes créées" className="tw-relative tw-m-2 tw-flex tw-h-full tw-flex-col tw-overflow-hidden tw-bg-main tw-pt-1 tw-pb-3">
         <p className="tw-m-0 tw-w-full tw-text-center tw-text-3xl tw-font-semibold tw-text-white">{personsCreated.length}</p>
-        <p className="tw-m-0 tw-w-full tw-text-center tw-text-lg tw-font-normal tw-text-white">
-          personne{personsCreated.length > 1 ? 's' : ''} créée{personsCreated.length > 1 ? 's' : ''}
+        <p className="tw-m-0 tw-w-full tw-text-center tw-font-normal tw-text-white">
+          personne{personsCreated.length > 1 ? 's' : ''}&nbsp;créée{personsCreated.length > 1 ? 's' : ''}
         </p>
         <button
           title="Passer les personnes créées en plein écran"
