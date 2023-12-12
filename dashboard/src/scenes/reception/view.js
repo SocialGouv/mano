@@ -289,7 +289,7 @@ const Reception = () => {
         <div className="tw-flex tw-basis-4/12 tw-flex-col">
           {!!organisation.passagesEnabled && (
             <div className="tw-mb-4 tw-flex tw-flex-col tw-items-center tw-gap-4 tw-rounded-lg tw-bg-gray-100 tw-py-8 tw-px-2 tw-text-center">
-              <h5 id="passages-title" className="tw-text-gray-500">
+              <h5 id="passages-title">
                 {passages.length} passage{passages.length > 1 ? 's' : ''}
               </h5>
               <ButtonCustom onClick={onAddAnonymousPassage} color="primary" icon={plusIcon} title="Passage anonyme" id="add-anonymous-passage" />
@@ -307,7 +307,7 @@ const Reception = () => {
             </div>
           )}
           <div className="tw-mb-4 tw-flex tw-flex-col tw-items-center tw-gap-4 tw-rounded-lg tw-bg-gray-100 tw-py-8 tw-px-2 tw-text-center">
-            <h5 className="tw-text-gray-500">Services</h5>
+            <h5>Services</h5>
             <div className="tw-mt-4 tw-text-left">
               <ReceptionService
                 services={services}
