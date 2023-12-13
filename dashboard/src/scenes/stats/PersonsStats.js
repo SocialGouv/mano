@@ -273,7 +273,7 @@ const BlockCreatedAt = ({ persons }) => {
 
       const history = person.history || [];
 
-      const outOfActiveListEntries = history.filter((hist) => hist.data.outOfActiveListDate);
+      const outOfActiveListEntries = history.filter((hist) => !!hist.data.outOfActiveListDate && !!historyEntry.data.outOfActiveList);
       if (!outOfActiveListEntries.length) {
         totalFollowedTime += Date.now() - followStart;
       } else {
