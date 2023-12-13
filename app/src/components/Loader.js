@@ -221,7 +221,7 @@ export const DataLoader = () => {
       Get medicalFiles
       */
     if (response.data.medicalFiles || initialLoad) {
-      setLoading('Chargement des informations médicales');
+      setLoading('Chargement des informations de santé');
       const refreshedMedicalFiles = await getData({
         collectionName: 'medical-file',
         data: medicalFiles,

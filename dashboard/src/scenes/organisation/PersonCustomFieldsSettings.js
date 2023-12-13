@@ -25,7 +25,7 @@ const PersonCustomFieldsSettings = () => {
     return customFieldsPersons.map(({ name, fields }) => ({
       groupTitle: name,
       items: fields,
-      editable: !['Informations sociales', 'Informations médicales'].includes(name),
+      editable: !['Informations sociales', 'Informations de santé'].includes(name),
     }));
   }, [customFieldsPersons]);
 

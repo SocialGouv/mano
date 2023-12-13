@@ -103,7 +103,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("dialog").getByText("Informations sociales").click();
   await page.getByLabel(testPersonSocialField).click();
 
-  await page.getByRole("dialog").getByText("Informations médicales").click();
+  await page.getByRole("dialog").getByText("Informations de santé").click();
   await page.getByLabel(testPersonMedicalField).click();
   await page.getByRole("button", { name: "Annuler" }).click();
 
@@ -216,7 +216,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("button", { name: "Modifier" }).click();
   await page.getByRole("dialog").getByText("Informations sociales").click();
   await page.locator(`data-test-id=${testPersonSocialField}`).click();
-  await page.getByRole("dialog").getByText("Informations médicales").click();
+  await page.getByRole("dialog").getByText("Informations de santé").click();
   await page.locator(`data-test-id=${testPersonMedicalField}`).click();
   await page.getByRole("button", { name: "Annuler" }).click();
 
@@ -254,7 +254,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("button", { name: "Modifier" }).click();
   await page.getByRole("dialog").getByText("Informations sociales").click();
   await expect(page.locator(`data-test-id=${testPersonSocialField}`)).toBeHidden();
-  await page.getByRole("dialog").getByText("Informations médicales").click();
+  await page.getByRole("dialog").getByText("Informations de santé").click();
   await expect(page.locator(`data-test-id=${testPersonMedicalField}`)).toBeHidden();
   await page.getByRole("button", { name: "Annuler" }).click();
 
