@@ -1,3 +1,10 @@
+## [1.301.6](https://github.com/SocialGouv/mano/compare/v1.301.5...v1.301.6) (2023-12-13)
+
+
+### Bug Fixes
+
+* page blanche dans les stats ([32ebc50](https://github.com/SocialGouv/mano/commit/32ebc5088f810cf3466f16ce6b0769cf0b515934))
+
 ## [1.301.5](https://github.com/SocialGouv/mano/compare/v1.301.4...v1.301.5) (2023-12-13)
 
 
