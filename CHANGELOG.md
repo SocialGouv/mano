@@ -1,3 +1,10 @@
+## [1.301.10](https://github.com/SocialGouv/mano/compare/v1.301.9...v1.301.10) (2023-12-14)
+
+
+### Bug Fixes
+
+* fix metabase ([a698de0](https://github.com/SocialGouv/mano/commit/a698de08c0640bbacc287ef0fb924864892b664d))
+
 ## [1.301.9](https://github.com/SocialGouv/mano/compare/v1.301.8...v1.301.9) (2023-12-14)
 
 
