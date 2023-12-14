@@ -1,3 +1,10 @@
+## [1.301.9](https://github.com/SocialGouv/mano/compare/v1.301.8...v1.301.9) (2023-12-14)
+
+
+### Bug Fixes
+
+* use metabase cnpg ([8bec42b](https://github.com/SocialGouv/mano/commit/8bec42b523d132292f9e7a5967b6b9f30ea32b76))
+
 ## [1.301.8](https://github.com/SocialGouv/mano/compare/v1.301.7...v1.301.8) (2023-12-14)
 
 
