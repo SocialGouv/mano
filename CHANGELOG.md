@@ -1,3 +1,10 @@
+## [1.301.11](https://github.com/SocialGouv/mano/compare/v1.301.10...v1.301.11) (2023-12-14)
+
+
+### Bug Fixes
+
+* truplication again ([#1805](https://github.com/SocialGouv/mano/issues/1805)) ([4e97b93](https://github.com/SocialGouv/mano/commit/4e97b93eef16036e65b10b11d9919bb0b4e7d20e)), closes [#1804](https://github.com/SocialGouv/mano/issues/1804)
+
 ## [1.301.10](https://github.com/SocialGouv/mano/compare/v1.301.9...v1.301.10) (2023-12-14)
 
 
