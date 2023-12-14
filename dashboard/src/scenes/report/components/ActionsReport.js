@@ -7,6 +7,8 @@ import { FullScreenIcon } from '../../../assets/icons/FullScreenIcon';
 import ActionsSortableList from '../../../components/ActionsSortableList';
 import TabsNav from '../../../components/tailwind/TabsNav';
 import { useLocalStorage } from '../../../services/useLocalStorage';
+import { useRecoilValue } from 'recoil';
+import { userState } from '../../../recoil/auth';
 
 export const ActionsOrConsultations = ({ actions, consultations }) => {
   const [activeTab, setActiveTab] = useLocalStorage('reports-actions-consultation-toggle', 'Actions');
@@ -17,8 +19,10 @@ export const ActionsOrConsultations = ({ actions, consultations }) => {
   const data = activeTab.includes('Actions') ? actions : consultations;
   const filteredData = activeTab.includes('Actions') ? filteredActions : filteredConsultations;
   const history = useHistory();
-  const tabs = [`Actions (${filteredActions.length})`, `Consultations (${filteredConsultations.length})`];
-
+  const user = useRecoilValue(userState);
+  const tabs = ['admin', 'normal'].includes(user.role)
+    ? [`Actions (${filteredActions.length})`, `Consultations (${filteredConsultations.length})`]
+    : [`Actions (${filteredActions.length})`];
   return (
     <>
       <section title={activeTab} className="tw-relative tw-flex tw-h-full tw-flex-col tw-overflow-hidden">

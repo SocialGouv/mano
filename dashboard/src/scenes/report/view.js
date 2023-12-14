@@ -348,9 +348,11 @@ const View = () => {
               <div className="tw-mb-4 tw-h-[50vh] tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
                 <ActionsOrConsultations actions={actions} consultations={consultations} />
               </div>
-              <div className="tw-h-[50vh] tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
-                <CommentsSocialAndMedical comments={comments} commentsMedical={commentsMedical} />
-              </div>
+              {['admin', 'normal'].includes(user.role) && (
+                <div className="tw-h-[50vh] tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+                  <CommentsSocialAndMedical comments={comments} commentsMedical={commentsMedical} />
+                </div>
+              )}
             </div>
             <div className="tw-mx-4 tw-mb-12 tw-basis-3/12 ">
               <div className="tw-mb-4 tw-flex tw-flex-wrap tw-gap-y-4">
