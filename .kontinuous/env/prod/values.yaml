@@ -70,3 +70,18 @@ jobs:
           sentry_auth_token:
             secretName: dashboard
             secretKey: SENTRY_AUTH_TOKEN
+          react_app_org_duplicated_1_id:
+            secretName: dashboard
+            secretKey: REACT_APP_ORG_DUPLICATED_1_ID
+          react_app_org_duplicated_1_name:
+            secretName: dashboard
+            secretKey: REACT_APP_ORG_DUPLICATED_1_NAME
+          react_app_org_duplicated_2_id:
+            secretName: dashboard
+            secretKey: REACT_APP_ORG_DUPLICATED_2_ID
+          react_app_org_duplicated_2_name:
+            secretName: dashboard
+            secretKey: REACT_APP_ORG_DUPLICATED_2_NAME
+          react_app_org_id_for_truplication:
+            secretName: dashboard
+            secretKey: REACT_APP_ORG_ID_FOR_TRUPLICATION
