@@ -36,11 +36,14 @@ metabase:
   enabled: true
   ingress:
     enabled: false
+  env:
+    - name: MB_DB_CONNECTION_URI
+      value: "postgres://$(PGHOST):5432/$(PGDATABASE)?user=$(PGUSER)&password=$(PGPASSWORD)&ssl=false&sslfactory=org.postgresql.ssl.NonValidatingFactory"
   envFrom:
     - configMapRef:
         name: metabase-configmap
     - secretRef:
-        name: metabase-db-user
+        name: pg-metabase-app
 
 oauth2-proxy:
   host: "metabase-mano.fabrique.social.gouv.fr"
