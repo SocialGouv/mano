@@ -25,6 +25,9 @@ pg:
       limits:
         memory: 3Gi
 
+pg-metabase:
+  ~chart: pg
+
 dashboard:
   host: "dashboard-mano.fabrique.social.gouv.fr"
   certSecretName: dashboard-crt
