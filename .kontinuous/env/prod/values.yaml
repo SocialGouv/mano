@@ -43,6 +43,8 @@ metabase:
     - configMapRef:
         name: metabase-configmap
     - secretRef:
+        name: metabase-db-user
+    - secretRef:
         name: pg-metabase-app
 
 oauth2-proxy:
