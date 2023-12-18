@@ -1,3 +1,10 @@
+## [1.301.13](https://github.com/SocialGouv/mano/compare/v1.301.12...v1.301.13) (2023-12-18)
+
+
+### Bug Fixes
+
+* design fine tuning from the big boss ([5ac9635](https://github.com/SocialGouv/mano/commit/5ac96354b0920853cc2c10277d4cdda5aadc48d9))
+
 ## [1.301.12](https://github.com/SocialGouv/mano/compare/v1.301.11...v1.301.12) (2023-12-18)
 
 
