@@ -6,7 +6,7 @@
     "buildName": "2.37.5"
   },
   "bundle": {
-    "android": "com.mano",
-    "ios": "com.mano"
+    "android": "com.manofabrique",
+    "ios": "com.manofabrique"
   }
 }

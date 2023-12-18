@@ -1,4 +1,4 @@
-package com.mano;
+package com.manofabrique;
 
 import android.app.Application;
 import com.facebook.react.PackageList;

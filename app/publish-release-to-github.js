@@ -8,7 +8,7 @@ const mobileAppVersion = require('./package.json').version;
 
 const publishAppToLatestTag = async () => {
   const result = await exec(
-    `gh release create m${mobileAppVersion} ./android/app/build/outputs/apk/release/app-release.apk ./app.json --target main`
+    `gh release create manofabrique${mobileAppVersion} ./android/app/build/outputs/apk/release/app-release.apk ./app.json --target main`
   );
 
   if (result.stderr?.length) {
@@ -19,7 +19,7 @@ const publishAppToLatestTag = async () => {
     console.log(chalk.green('Success uploading app:'), chalk.green(result.stdout));
   }
 
-  console.log(chalk.yellow('Transfer completed 😬: https://mano-app.fabrique.social.gouv.fr/download'));
+  console.log(chalk.yellow('Transfer completed 😬: https://mano-app.fabrique.social.gouv.fr/download-com.manofabrique'));
 };
 
 publishAppToLatestTag();
