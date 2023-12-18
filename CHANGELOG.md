@@ -1,3 +1,16 @@
+# [1.302.0](https://github.com/SocialGouv/mano/compare/v1.301.14...v1.302.0) (2023-12-18)
+
+
+### Bug Fixes
+
+* correction du filtre par nombre - ça marchait pour l'age mais pas pour d'autres nombres ([#1813](https://github.com/SocialGouv/mano/issues/1813)) ([39fe1da](https://github.com/SocialGouv/mano/commit/39fe1daf50348940628c8ea36dace1e16fb97d86))
+* retour du filtre par catégories dans les acrtions des personnes ([#1812](https://github.com/SocialGouv/mano/issues/1812)) ([724cf47](https://github.com/SocialGouv/mano/commit/724cf478b094ec2461eb02c5b1e8f5a4896803d6))
+
+
+### Features
+
+* possibilité de trier les commentaires par date dans le nouveau CR ([#1814](https://github.com/SocialGouv/mano/issues/1814)) ([bf77874](https://github.com/SocialGouv/mano/commit/bf77874d56f24b3897e69afe287944daf8043d7d))
+
 ## [1.301.14](https://github.com/SocialGouv/mano/compare/v1.301.13...v1.301.14) (2023-12-18)
 
 
