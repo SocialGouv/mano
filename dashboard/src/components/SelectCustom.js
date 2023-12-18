@@ -9,7 +9,7 @@ const SelectCustom = ({ creatable, ...props }) => {
   return (
     <Component
       styles={filterStyles}
-      placeholder="-- Choisir --"
+      placeholder="Choisir..."
       noOptionsMessage={() => 'Aucun résultat'}
       formatCreateLabel={(inputValue) => `Ajouter "${inputValue}"`}
       theme={(defaultTheme) => ({

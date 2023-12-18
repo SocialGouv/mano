@@ -134,7 +134,7 @@ const ActionsCategorySelect = ({ label, values, onChange, id, withMostUsed, isDi
             </button>
           </div>
         ))}
-        {!selected.length && <div className="not-draggable tw-py-0.5 tw-opacity-60">-- Choisir --</div>}
+        {!selected.length && <div className="not-draggable tw-py-0.5 tw-opacity-60">Choisir...</div>}
         <button
           type="button"
           onClick={() => setOpen(true)}

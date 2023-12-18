@@ -121,7 +121,7 @@ const OutOfActiveList = ({ person }) => {
                           inputId="person-select-outOfActiveListReasons"
                           classNamePrefix="person-select-outOfActiveListReasons"
                           value={values.outOfActiveListReasons?.map((_option) => ({ value: _option, label: _option })) || []}
-                          placeholder={' -- Choisir -- '}
+                          placeholder={'Choisir...'}
                           getOptionValue={(i) => i.value}
                           getOptionLabel={(i) => i.label}
                           styles={{ width: '800px' }}

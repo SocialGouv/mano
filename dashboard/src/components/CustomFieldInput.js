@@ -138,7 +138,7 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = null,
               inputId={id}
               classNamePrefix={id}
               value={(typeof values[field.name] === 'string' ? [values[field.name]] : values[field.name])?.map((o) => ({ value: o, label: o }))}
-              placeholder={' -- Choisir -- '}
+              placeholder={'Choisir...'}
               getOptionValue={(i) => i.value}
               getOptionLabel={(i) => i.label}
               isDisabled={disabled}

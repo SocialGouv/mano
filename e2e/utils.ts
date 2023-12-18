@@ -40,7 +40,7 @@ export async function createAction(
   await clickOnEmptyReactSelect(page, "create-action-person-select", personName);
   const { categories = [], group = false } = options;
   if (categories.length > 0) {
-    await page.locator("#categories").getByText("-- Choisir --").click();
+    await page.locator("#categories").getByText("Choisir...").click();
     for (const { group, category } of categories) {
       await page.getByRole("button", { name: `${group} (2)` }).click();
       await page.getByRole("button", { name: category }).click();
