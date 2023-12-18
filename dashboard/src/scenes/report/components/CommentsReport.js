@@ -6,7 +6,7 @@ import { FullScreenIcon } from '../../../assets/icons/FullScreenIcon';
 import TabsNav from '../../../components/tailwind/TabsNav';
 import Table from '../../../components/table';
 import ExclamationMarkButton from '../../../components/tailwind/ExclamationMarkButton';
-import { organisationState } from '../../../recoil/auth';
+import { organisationState, userState } from '../../../recoil/auth';
 import { useRecoilValue } from 'recoil';
 import UserName from '../../../components/UserName';
 import TagTeam from '../../../components/TagTeam';
@@ -17,8 +17,13 @@ import DateBloc from '../../../components/DateBloc';
 export const CommentsSocialAndMedical = ({ comments, commentsMedical }) => {
   const [activeTab, setActiveTab] = useLocalStorage('reports-comments-toggle', 'Commentaires');
   const [fullScreen, setFullScreen] = useState(false);
-  const data = activeTab.includes('Commentaires médicaux') ? commentsMedical : comments;
-  const tabs = [`Commentaires (${comments.length})`, `Commentaires médicaux (${commentsMedical.length})`];
+  const user = useRecoilValue(userState);
+  const canSeeMedicalData = ['admin', 'normal'].includes(user.role) && !!user.healthcareProfessional;
+
+  const data = canSeeMedicalData && activeTab.includes('Commentaires médicaux') ? commentsMedical : comments;
+  const tabs = canSeeMedicalData
+    ? [`Commentaires (${comments.length})`, `Commentaires médicaux (${commentsMedical.length})`]
+    : [`Commentaires (${comments.length})`];
 
   return (
     <>

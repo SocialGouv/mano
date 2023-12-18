@@ -261,7 +261,7 @@ const View = () => {
       document.title = 'Mano - Admin';
     };
   });
-
+  const canSeeComments = ['admin', 'normal'].includes(user.role);
   return (
     <>
       <HeaderStyled className=" !tw-py-4 tw-px-0">
@@ -348,42 +348,42 @@ const View = () => {
               <div className="tw-mb-4 tw-h-[50vh] tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
                 <ActionsOrConsultations actions={actions} consultations={consultations} />
               </div>
-              {['admin', 'normal'].includes(user.role) && (
+              {canSeeComments && (
                 <div className="tw-h-[50vh] tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
                   <CommentsSocialAndMedical comments={comments} commentsMedical={commentsMedical} />
                 </div>
               )}
             </div>
             <div className="tw-mx-4 tw-mb-12 tw-basis-3/12 ">
-              <div className="tw-mb-4 tw-flex tw-flex-wrap tw-gap-y-4">
-                <div className="tw-flex tw-basis-full">
-                  <div className="tw-basis-1/2">
-                    <div className="tw-mr-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow-2xl">
-                      <PassagesReport passages={passages} period={period} selectedTeams={selectedTeams} />
-                    </div>
+              <div
+                style={{
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(40%, 1fr))',
+                }}
+                className="tw-mb-4 tw-grid tw-gap-4">
+                {organisation.passagesEnabled && (
+                  <div className="tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow-2xl">
+                    <PassagesReport passages={passages} period={period} selectedTeams={selectedTeams} />
                   </div>
-                  <div className="tw-basis-1/2">
-                    <div className="tw-ml-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow">
-                      <RencontresReport rencontres={rencontres} period={period} selectedTeams={selectedTeams} />
-                    </div>
+                )}
+                {organisation.rencontresEnabled && (
+                  <div className="tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow">
+                    <RencontresReport rencontres={rencontres} period={period} selectedTeams={selectedTeams} />
                   </div>
-                </div>
-                <div className="tw-flex tw-basis-full">
-                  <div className="tw-basis-1/2">
-                    <div className="tw-mr-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow">
-                      <ObservationsReport observations={observations} period={period} selectedTeams={selectedTeams} />
-                    </div>
+                )}
+                {organisation.territoriesEnabled && (
+                  <div className="tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow">
+                    <ObservationsReport observations={observations} period={period} selectedTeams={selectedTeams} />
                   </div>
-                  <div className="tw-basis-1/2">
-                    <div className="tw-ml-2 tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow">
-                      <PersonsReport personsCreated={personsCreated} period={period} selectedTeams={selectedTeams} />
-                    </div>
-                  </div>
+                )}
+                <div className="tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow">
+                  <PersonsReport personsCreated={personsCreated} period={period} selectedTeams={selectedTeams} />
                 </div>
               </div>
-              <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-gray-100 tw-shadow">
-                <ServicesReport selectedTeamsObject={selectedTeamsObject} period={period} />
-              </div>
+              {organisation.receptionEnabled && (
+                <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-gray-100 tw-shadow">
+                  <ServicesReport selectedTeamsObject={selectedTeamsObject} period={period} />
+                </div>
+              )}
             </div>
 
             <div className="tw-maxh tw-mr-2 tw-mb-12 tw-basis-3/12 tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow ">

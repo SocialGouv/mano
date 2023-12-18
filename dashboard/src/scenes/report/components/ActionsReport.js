@@ -20,9 +20,13 @@ export const ActionsOrConsultations = ({ actions, consultations }) => {
   const filteredData = activeTab.includes('Actions') ? filteredActions : filteredConsultations;
   const history = useHistory();
   const user = useRecoilValue(userState);
-  const tabs = ['admin', 'normal'].includes(user.role)
+
+  const canSeeMedicalData = ['admin', 'normal'].includes(user.role) && !!user.healthcareProfessional;
+
+  const tabs = canSeeMedicalData
     ? [`Actions (${filteredActions.length})`, `Consultations (${filteredConsultations.length})`]
     : [`Actions (${filteredActions.length})`];
+
   return (
     <>
       <section title={activeTab} className="tw-relative tw-flex tw-h-full tw-flex-col tw-overflow-hidden">
