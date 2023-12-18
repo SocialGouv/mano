@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useRecoilValue, selectorFamily } from 'recoil';
 import { organisationState, userState } from '../../../recoil/auth';
-import { CANCEL, DONE, mappedIdsToLabels } from '../../../recoil/actions';
+import { CANCEL, DONE, flattenedActionsCategoriesSelector, mappedIdsToLabels } from '../../../recoil/actions';
 import { useHistory } from 'react-router-dom';
 import SelectCustom from '../../../components/SelectCustom';
 import ExclamationMarkButton from '../../../components/tailwind/ExclamationMarkButton';
@@ -131,17 +131,47 @@ export const Actions = ({ person }) => {
   );
 };
 
-const ActionsFilters = ({ data, setFilterTeamIds, setFilterStatus, filterStatus, filterTeamIds }) => {
+const ActionsFilters = ({ data, setFilterCategories, setFilterTeamIds, setFilterStatus, filterStatus, filterTeamIds, filterCategories }) => {
+  const categories = useRecoilValue(flattenedActionsCategoriesSelector);
+
+  const catsSelect = ['-- Aucune --', ...(categories || [])];
   return (
     <>
       {data.length ? (
         <div className="tw-mb-4 tw-flex tw-justify-between">
+          <div className="tw-shrink-0 tw-grow tw-basis-1/3 tw-pl-2 tw-pr-1">
+            <label htmlFor="action-select-categories-filter" className="tw-text-xs">
+              Filtrer par catégorie
+            </label>
+            <div className="tw-max-w-full">
+              <SelectCustom
+                options={catsSelect.map((_option) => ({ value: _option, label: _option }))}
+                value={filterCategories?.map((_option) => ({ value: _option, label: _option })) || []}
+                getOptionValue={(i) => i.value}
+                getOptionLabel={(i) => i.label}
+                onChange={(values) => setFilterCategories(values.map((v) => v.value))}
+                inputId="action-select-categories-filter"
+                name="categories"
+                isClearable
+                isMulti
+              />
+            </div>
+          </div>
           <div className="tw-shrink-0 tw-grow tw-basis-1/3 tw-px-1">
-            <label htmlFor="action-select-categories-filter">Filtrer par équipe</label>
-            <SelectTeamMultiple onChange={(teamIds) => setFilterTeamIds(teamIds)} value={filterTeamIds} colored inputId="action-team-select" />
+            <label htmlFor="action-select-categories-filter" className="tw-text-xs">
+              Filtrer par équipe
+            </label>
+            <SelectTeamMultiple
+              onChange={(teamIds) => setFilterTeamIds(teamIds)}
+              value={filterTeamIds}
+              colored
+              inputId="action-team-select"
+            />
           </div>
           <div className="tw-shrink-0 tw-grow tw-basis-1/3 tw-pl-1 tw-pr-2">
-            <label htmlFor="action-select-status-filter">Filtrer par statut</label>
+            <label htmlFor="action-select-status-filter" className="tw-text-xs">
+              Filtrer par statut
+            </label>
             <SelectCustom
               inputId="action-select-status-filter"
               options={mappedIdsToLabels}
