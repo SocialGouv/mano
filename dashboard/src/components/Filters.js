@@ -14,34 +14,36 @@ export const filterItem =
       if (!filter.field || !filter.value) continue;
       const itemValue = item[filter.field];
       if (['number'].includes(filter.type)) {
+        const itemNumber = Number(itemValue);
         const { number, number2, comparator } = filter.value;
         if (comparator === 'unfilled') {
-          if (typeof itemValue === 'number') return false;
+          if (typeof itemNumber === 'number') return false;
           continue;
         }
         // be careful:
         // now we want to exclude everything that is not a number
         // BUT we can't use `isNaN` here because if itemValue is `null`, isNaN(null) === false, because `Number(null) === 0`
-        if (typeof itemValue !== 'number') return false;
+        if (typeof itemNumber !== 'number') return false;
         if (comparator === 'between') {
           if (Number(number) < Number(number2)) {
-            if (Number(itemValue) >= Number(number) && Number(itemValue) <= Number(number2)) continue;
+            if (Number(itemNumber) >= Number(number) && Number(itemNumber) <= Number(number2)) continue;
             return false;
           } else {
-            if (Number(itemValue) >= Number(number2) && Number(itemValue) <= Number(number)) continue;
+            if (Number(itemNumber) >= Number(number2) && Number(itemNumber) <= Number(number)) continue;
             return false;
           }
         }
         if (comparator === 'equals') {
-          if (Number(itemValue) === Number(number)) continue;
+          console.log({ itemNumber, number }, Number(itemNumber), Number(number), Number(itemNumber) === Number(number));
+          if (Number(itemNumber) === Number(number)) continue;
           return false;
         }
         if (comparator === 'lower') {
-          if (Number(itemValue) < Number(number)) continue;
+          if (Number(itemNumber) < Number(number)) continue;
           return false;
         }
         if (comparator === 'greater') {
-          if (Number(itemValue) > Number(number)) continue;
+          if (Number(itemNumber) > Number(number)) continue;
           return false;
         }
       }
@@ -115,6 +117,7 @@ export const filterItem =
   };
 
 export const filterData = (data, filters) => {
+  console.log({ filters });
   data = data.map(filterItem(filters)).filter(Boolean);
   return data;
 };
