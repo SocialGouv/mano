@@ -237,9 +237,15 @@ const ActionsCalendar = ({ actions, isNightSession, columns = ['Heure', 'Nom', '
         )}
       </div>
       <div>
-        {activeTabIndex === 1 && <div>{renderActionsTable(theDayBeforeActions, subtractOneDay(currentDate))}</div>}
-        {activeTabIndex === 2 && <div>{renderActionsTable(theCurrentDayActions, currentDate)}</div>}
-        {activeTabIndex === 3 && <div>{renderActionsTable(theDayAfterActions, addOneDay(currentDate))}</div>}
+        {activeTabIndex === 1 && (
+          <div className={!!theDayBeforeActions.length ? 'tw-pb-8' : ''}>{renderActionsTable(theDayBeforeActions, subtractOneDay(currentDate))}</div>
+        )}
+        {activeTabIndex === 2 && (
+          <div className={!!theCurrentDayActions.length ? 'tw-pb-8' : ''}>{renderActionsTable(theCurrentDayActions, currentDate)}</div>
+        )}
+        {activeTabIndex === 3 && (
+          <div className={!!theDayAfterActions.length ? 'tw-pb-8' : ''}>{renderActionsTable(theDayAfterActions, addOneDay(currentDate))}</div>
+        )}
       </div>
     </>
   );
