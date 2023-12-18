@@ -1,3 +1,11 @@
+## [1.301.12](https://github.com/SocialGouv/mano/compare/v1.301.11...v1.301.12) (2023-12-18)
+
+
+### Bug Fixes
+
+* acces to new report ([1d4ffda](https://github.com/SocialGouv/mano/commit/1d4ffdae015ee499680aeb549183c0afcd38a9c0))
+* restricted access new CR ([d171aea](https://github.com/SocialGouv/mano/commit/d171aeaf8c36204f0f43a387b77e9bbd0be3e30d))
+
 ## [1.301.11](https://github.com/SocialGouv/mano/compare/v1.301.10...v1.301.11) (2023-12-14)
 
 
