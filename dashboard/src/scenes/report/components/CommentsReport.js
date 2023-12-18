@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from '../../../components/tailwind/Modal';
@@ -13,6 +13,7 @@ import TagTeam from '../../../components/TagTeam';
 import PersonName from '../../../components/PersonName';
 import { useLocalStorage } from '../../../services/useLocalStorage';
 import DateBloc from '../../../components/DateBloc';
+import { sortComments } from '../../../recoil/comments';
 
 export const CommentsSocialAndMedical = ({ comments, commentsMedical }) => {
   const [activeTab, setActiveTab] = useLocalStorage('reports-comments-toggle', 'Commentaires');
@@ -71,8 +72,13 @@ export const CommentsSocialAndMedical = ({ comments, commentsMedical }) => {
 const CommentsTable = ({ data, activeTab }) => {
   const organisation = useRecoilValue(organisationState);
   const history = useHistory();
+  const [sortOrder, setSortOrder] = useLocalStorage('comments-reports-sortOrder', 'ASC');
+  const [sortBy, setSortBy] = useLocalStorage('comments-reports-sortBy', 'ASC');
+  const dataSorted = useMemo(() => {
+    return [...data].sort(sortComments(sortBy, sortOrder));
+  }, [data, sortBy, sortOrder]);
 
-  if (!data.length) {
+  if (!dataSorted.length) {
     return (
       <div className="tw-flex tw-flex-col tw-items-center tw-gap-6">
         <div className="tw-mt-8 tw-mb-2 tw-w-full tw-text-center tw-text-gray-300">
@@ -102,7 +108,7 @@ const CommentsTable = ({ data, activeTab }) => {
   return (
     <Table
       className={activeTab.includes('Commentaires médicaux') ? 'medical' : ''}
-      data={data}
+      data={dataSorted}
       onRowClick={(comment) => {
         const searchParams = new URLSearchParams(history.location.search);
         switch (comment.type) {
@@ -135,6 +141,10 @@ const CommentsTable = ({ data, activeTab }) => {
           title: 'Date',
           dataKey: 'date',
           className: 'tw-w-24',
+          onSortOrder: setSortOrder,
+          onSortBy: setSortBy,
+          sortBy,
+          sortOrder,
           render: (comment) => {
             return (
               <>

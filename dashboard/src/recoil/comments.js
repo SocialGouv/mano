@@ -54,3 +54,8 @@ export const prepareCommentForEncryption = (comment, { checkRequiredFields = tru
     entityKey: comment.entityKey,
   };
 };
+
+export const sortComments = (sortBy, sortOrder) => (a, b) => {
+  // sortBy is always `date` for now
+  return sortOrder === 'ASC' ? new Date(b.date).getTime() - new Date(a.date).getTime() : new Date(a.date).getTime() - new Date(b.date).getTime();
+};
