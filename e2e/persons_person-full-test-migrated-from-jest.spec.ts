@@ -190,7 +190,7 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Réintégrer dans la file active" }).click();
   await page.getByText(personName + " est réintégré dans la file active").click();
   await page.getByRole("button", { name: "Sortie de file active" }).click();
-  await page.locator('label:has-text("Veuillez préciser le(s) motif(s) de sortie Choisir...") svg').click();
+  await page.locator('label:has-text("Veuillez préciser le(s) motif(s) de sortieChoisir...") svg').click();
   await page.locator("#react-select-outOfActiveListReasons-option-4").click();
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.locator(".alert-warning").getByText("Départ vers autre région").click();
