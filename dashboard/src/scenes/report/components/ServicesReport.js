@@ -76,7 +76,7 @@ export default function ServicesReport({ period, selectedTeamsObject }) {
   return (
     <div className="tw-py-2 print:tw-mb-4">
       <div className="tw-flex tw-items-center tw-justify-between tw-px-3">
-        <h3 className="tw-w-full tw-py-2 tw-text-xl tw-font-medium tw-text-black">Services effectués</h3>
+        <h3 className="tw-w-full tw-py-2 tw-text-base tw-font-medium tw-text-black">Services effectués</h3>
         <button
           title="Passer les actions/consultations en plein écran"
           className="tw-h-6 tw-w-6 tw-rounded-full tw-text-main tw-transition hover:tw-scale-125 disabled:tw-opacity-30"
@@ -88,7 +88,7 @@ export default function ServicesReport({ period, selectedTeamsObject }) {
         {!serviceSumsForAllReports ? (
           <Spinner />
         ) : (
-          <div className="tw-flex tw-flex-col tw-items-center tw-justify-center tw-rounded-2xl tw-bg-gray-100 tw-p-4">
+          <div className="tw-flex tw-flex-col tw-items-center tw-justify-center tw-rounded-2xl tw-py-4">
             {teamIds.length > 1 ? (
               <>
                 <div className="tw-mb-6 tw-flex tw-items-center tw-justify-between tw-border-b-gray-300 tw-pb-2 tw-font-medium">
@@ -152,7 +152,7 @@ function ServicesFullScreen({ open, onClose, period, isSingleDay, teamIds, servi
         <div className="py-2 tw-px-4 print:tw-mb-4">
           {teamIds.map((teamId) => {
             return (
-              <div key={teamId} className="tw-mb-4 tw-rounded-2xl tw-bg-gray-100 tw-p-4">
+              <div key={teamId} className="tw-mb-4 tw-rounded-2xl tw-bg-gray-100 tw-py-4">
                 <div
                   className={[
                     'tw-flex tw-items-center tw-justify-between tw-font-medium',
@@ -213,15 +213,14 @@ const ServiceByTeam = ({ team, disabled, dateString, dataTestIdPrefix = '', serv
 
   return (
     <div>
-      <div className="tw-mb-4 tw-border-b tw-border-slate-300">
+      <div className="tw-mb-4 tw-border-b tw-border-slate-300 tw-px-2">
         {groupedServices.map((group, index) => (
           <button
             key={group + index}
-            className={
-              selected === group.groupTitle
-                ? 'tw-mb-[-1px] tw-rounded-t tw-border tw-border-slate-300 tw-border-b-[#f8f8f8] tw-px-4 tw-py-2'
-                : 'tw-px-4 tw-py-2  tw-text-main tw-outline-slate-300 hover:tw-outline'
-            }
+            className={[
+              selected === group.groupTitle ? 'tw-bg-main/10 tw-text-black' : 'tw-hover:text-gray-700 tw-text-main',
+              'tw-rounded-md tw-px-3 tw-py-2 tw-text-sm tw-font-medium',
+            ].join(' ')}
             onClick={() => setSelected(group.groupTitle)}>
             {group.groupTitle}
           </button>
@@ -229,7 +228,7 @@ const ServiceByTeam = ({ team, disabled, dateString, dataTestIdPrefix = '', serv
       </div>
       {/* This key is used to refresh incrementators on team change. */}
       {/* We could avoid this by mapping on something that actually represents what is displayed (eg: services) */}
-      <div key={team._id}>
+      <div key={team._id} className="tw-px-4">
         {selectedServices.map((service) => (
           <IncrementorSmall
             dataTestId={`${dataTestIdPrefix}${service}-${services[service] || 0}`}

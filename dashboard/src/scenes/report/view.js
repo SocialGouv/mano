@@ -345,11 +345,11 @@ const View = () => {
               viewAllOrganisationData || selectedTeamIds.length ? 'tw-flex' : 'tw-hidden',
             ].join(' ')}>
             <div className="tw-mb-12 tw-min-h-1/2 tw-basis-6/12 tw-overflow-auto">
-              <div className="tw-mb-4 tw-h-[50vh] tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+              <div className="tw-mb-4 tw-h-[60vh] tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
                 <ActionsOrConsultations actions={actions} consultations={consultations} />
               </div>
               {canSeeComments && (
-                <div className="tw-h-[50vh] tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+                <div className="tw-h-[60vh] tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
                   <CommentsSocialAndMedical comments={comments} commentsMedical={commentsMedical} />
                 </div>
               )}
@@ -361,26 +361,26 @@ const View = () => {
                 }}
                 className="tw-mb-4 tw-grid tw-gap-4">
                 {organisation.passagesEnabled && (
-                  <div className="tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow-2xl">
+                  <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow-2xl">
                     <PassagesReport passages={passages} period={period} selectedTeams={selectedTeams} />
                   </div>
                 )}
                 {organisation.rencontresEnabled && (
-                  <div className="tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow">
+                  <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow">
                     <RencontresReport rencontres={rencontres} period={period} selectedTeams={selectedTeams} />
                   </div>
                 )}
                 {organisation.territoriesEnabled && (
-                  <div className="tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow">
+                  <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow">
                     <ObservationsReport observations={observations} period={period} selectedTeams={selectedTeams} />
                   </div>
                 )}
-                <div className="tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow">
+                <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow">
                   <PersonsReport personsCreated={personsCreated} period={period} selectedTeams={selectedTeams} />
                 </div>
               </div>
               {organisation.receptionEnabled && (
-                <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-gray-100 tw-shadow">
+                <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
                   <ServicesReport selectedTeamsObject={selectedTeamsObject} period={period} />
                 </div>
               )}

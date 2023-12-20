@@ -36,12 +36,12 @@ export default function IncrementorSmall({ service, team, date, count: initialVa
         -
       </button>
       <input
-        className="tw-w-12 tw-border-none tw-bg-none tw-text-center tw-text-black75"
+        className="tw-mx-1 tw-w-10 tw-border-none tw-bg-none tw-text-center tw-text-black75"
         aria-label={`Nombre de ${service}`}
         min="0"
         id={`${service}-count`}
         data-test-id={dataTestId || `${service}-count`}
-        type="number"
+        // type="number"
         value={value}
         disabled={disabled}
         onChange={(e) => setValue(Number(e.currentTarget.value))}

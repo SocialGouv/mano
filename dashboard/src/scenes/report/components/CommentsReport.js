@@ -33,7 +33,7 @@ export const CommentsSocialAndMedical = ({ comments, commentsMedical }) => {
           <TabsNav
             className="tw-m-0 tw-flex-wrap tw-justify-start tw-border-b-0 tw-py-0.5 tw-pl-0 [&_button]:tw-text-xl"
             tabs={tabs}
-            renderTab={(caption) => <h3 className="m-0 tw-text-xl tw-font-medium">{caption}</h3>}
+            renderTab={(caption) => <h3 className="m-0 tw-text-base tw-font-medium">{caption}</h3>}
             onClick={(_, index) => setActiveTab(index === 0 ? 'Commentaires' : 'Commentaires médicaux')}
             activeTabIndex={activeTab.includes('Commentaires médicaux') ? 1 : 0}
           />

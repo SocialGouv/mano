@@ -17,12 +17,12 @@ export const PassagesReport = ({ passages, period, selectedTeams }) => {
 
   return (
     <>
-      <section title="Passages" className="tw-relative tw-m-2 tw-flex tw-h-full tw-flex-col tw-overflow-hidden tw-bg-main tw-pt-1 tw-pb-3">
-        <p className="tw-m-0 tw-w-full tw-text-center tw-text-3xl tw-font-semibold tw-text-white">{passages.length}</p>
-        <p className="tw-m-0 tw-w-full tw-text-center tw-font-normal tw-text-white">passage{passages.length > 1 ? 's' : ''}</p>
+      <section title="Passages" className="tw-relative tw-m-2 tw-flex tw-flex-col tw-items-center tw-justify-center tw-bg-main">
+        <p className="tw-m-0 tw-w-full tw-text-center tw-text-2xl tw-font-semibold tw-text-white">{passages.length}</p>
+        <p className="tw-m-0 tw-w-full tw-text-center tw-text-sm tw-font-normal tw-text-white">passage{passages.length > 1 ? 's' : ''}</p>
         <button
           title="Passer les passages en plein écran"
-          className="tw-absolute tw-top-1 tw-right-1 tw-h-6 tw-w-6 tw-rounded-full tw-text-white tw-transition hover:tw-scale-125 disabled:tw-cursor-not-allowed disabled:tw-opacity-30"
+          className="tw-absolute -tw-top-1.5 -tw-right-1.5 tw-h-6 tw-w-6 tw-rounded-full tw-text-white tw-transition hover:tw-scale-125 disabled:tw-cursor-not-allowed disabled:tw-opacity-30"
           onClick={() => setFullScreen(true)}>
           <FullScreenIcon />
         </button>
