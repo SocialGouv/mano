@@ -26,9 +26,7 @@ export default function Transmissions({ period, selectedTeamsObject, reports }) 
 
   return (
     <div>
-      <h3 className="tw-w-full tw-px-3 tw-py-2 tw-text-center tw-text-xl tw-font-medium tw-text-black">
-        👋&nbsp;Comment s'est passée la&nbsp;journée&nbsp;?
-      </h3>
+      <h3 className="tw-w-full tw-px-3 tw-py-2 tw-text-base tw-font-medium tw-text-black">👋&nbsp;Comment s'est passée la&nbsp;journée&nbsp;?</h3>
       {days.map((day) => {
         return (
           <details open={days.length === 1} className="tw-my-2 tw-p-2" key={day}>

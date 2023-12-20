@@ -34,7 +34,7 @@ export const ActionsOrConsultations = ({ actions, consultations }) => {
           <TabsNav
             className="tw-m-0 tw-flex-wrap tw-justify-start tw-border-b-0 tw-py-0.5 tw-pl-0 [&_button]:tw-text-xl"
             tabs={tabs}
-            renderTab={(caption) => <h3 className="tw-m-0 tw-text-xl tw-font-medium">{caption}</h3>}
+            renderTab={(caption) => <h3 className="tw-m-0 tw-text-base tw-font-medium">{caption}</h3>}
             onClick={(_, index) => setActiveTab(index === 0 ? 'Actions' : 'Consultations')}
             activeTabIndex={activeTab.includes('Actions') ? 0 : 1}
           />
@@ -64,7 +64,7 @@ export const ActionsOrConsultations = ({ actions, consultations }) => {
             </button>
           </div>
         </div>
-        <div className="w-full tw-max-w-lg tw-bg-white tw-px-7 tw-pb-3">
+        <div className="w-full tw-max-w-lg tw-bg-white tw-px-7 tw-pb-1">
           <ActionsOrConsultationsFilters setFilterStatus={setFilterStatus} filterStatus={filterStatus} disabled={!data.length} />
         </div>
         <div className="tw-grow tw-overflow-y-auto tw-border-t tw-border-main tw-border-opacity-20">
@@ -104,20 +104,24 @@ const ActionsOrConsultationsFilters = ({ setFilterStatus, filterStatus, disabled
   return (
     <>
       <div className="tw-flex tw-justify-between">
-        <div className="tw-shrink-0 tw-grow tw-pl-1 tw-pr-2">
-          <label htmlFor="action-select-status-filter">Filtrer par statut</label>
-          <SelectCustom
-            inputId="action-select-status-filter"
-            options={mappedIdsToLabels}
-            getOptionValue={(s) => s._id}
-            getOptionLabel={(s) => s.name}
-            name="status"
-            onChange={(s) => setFilterStatus(s.map((s) => s._id))}
-            isClearable
-            isDisabled={disabled}
-            isMulti
-            value={mappedIdsToLabels.filter((s) => filterStatus.includes(s._id))}
-          />
+        <div className="tw-flex tw-w-full tw-shrink-0 tw-grow tw-items-center tw-pl-1 tw-pr-2">
+          <label htmlFor="action-select-status-filter" className="tw-text-xs">
+            Filtrer par statut
+          </label>
+          <div className="tw-w-full">
+            <SelectCustom
+              inputId="action-select-status-filter"
+              options={mappedIdsToLabels}
+              getOptionValue={(s) => s._id}
+              getOptionLabel={(s) => s.name}
+              name="status"
+              onChange={(s) => setFilterStatus(s.map((s) => s._id))}
+              isClearable
+              isDisabled={disabled}
+              isMulti
+              value={mappedIdsToLabels.filter((s) => filterStatus.includes(s._id))}
+            />
+          </div>
         </div>
       </div>
     </>
