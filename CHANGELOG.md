@@ -1,3 +1,10 @@
+## [1.302.1](https://github.com/SocialGouv/mano/compare/v1.302.0...v1.302.1) (2023-12-20)
+
+
+### Bug Fixes
+
+* design fix pour nouveaux comptes-rendus ([#1816](https://github.com/SocialGouv/mano/issues/1816)) ([f723698](https://github.com/SocialGouv/mano/commit/f72369854c19581e13d688f44fb0514b772a36b0))
+
 # [1.302.0](https://github.com/SocialGouv/mano/compare/v1.301.14...v1.302.0) (2023-12-18)
 
 
