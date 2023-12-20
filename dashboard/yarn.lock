@@ -2610,19 +2610,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-hookz/web@npm:^23.0.0":
-  version: 23.0.0
-  resolution: "@react-hookz/web@npm:23.0.0"
+"@react-hookz/web@npm:^24.0.0":
+  version: 24.0.0
+  resolution: "@react-hookz/web@npm:24.0.0"
   dependencies:
     "@react-hookz/deep-equal": "npm:^1.0.4"
   peerDependencies:
-    js-cookie: ^3.0.1
+    js-cookie: ^3.0.5
     react: ^16.8 || ^17 || ^18
     react-dom: ^16.8 || ^17 || ^18
   peerDependenciesMeta:
     js-cookie:
       optional: true
-  checksum: 17db03d1c238483b2efc56dab7a1304cd5c59f68fc521b1f2c103f3c6bf4468e27e6457aff65a1a8bfd6520589a154b4a98d8ccacbdc07e4c2a61d5694076cf4
+  checksum: 85ec7ebecf3a69f098fecb89c1515ffd8c119f29a74521277df34af637059320669cf8ff6273063cec6a4c86cee4849e24fa8772191d08f81b2b88de69749670
   languageName: node
   linkType: hard
 
@@ -6059,7 +6059,7 @@ __metadata:
     "@nivo/bar": "npm:^0.80.0"
     "@nivo/core": "npm:^0.80.0"
     "@nivo/pie": "npm:^0.80.0"
-    "@react-hookz/web": "npm:^23.0.0"
+    "@react-hookz/web": "npm:^24.0.0"
     "@sentry/browser": "npm:^6.17.5"
     "@sentry/cli": "npm:^2.6.0"
     "@sentry/react": "npm:^7.69.0"
