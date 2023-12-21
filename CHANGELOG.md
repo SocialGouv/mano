@@ -1,3 +1,10 @@
+## [1.302.2](https://github.com/SocialGouv/mano/compare/v1.302.1...v1.302.2) (2023-12-21)
+
+
+### Bug Fixes
+
+* increase cnpg prod requests to match limits ([3b21d16](https://github.com/SocialGouv/mano/commit/3b21d164096b7957588cdd8ca0c280238b5330ba))
+
 ## [1.302.1](https://github.com/SocialGouv/mano/compare/v1.302.0...v1.302.1) (2023-12-20)
 
 
