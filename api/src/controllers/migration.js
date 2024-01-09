@@ -72,7 +72,7 @@ router.put(
               })
             ).parse(req.body.thingsToUpdate);
           } catch (e) {
-            const error = new Error(`Invalid request in migration-name: ${e}`);
+            const error = new Error(`Invalid request in ${req.params.migrationName}: ${e}`);
             error.status = 400;
             throw error;
           }
@@ -88,7 +88,29 @@ router.put(
           });
         }
         // End of example of migration.
-         */
+        */
+        if (req.params.migrationName === "reformat-observedAt-observations") {
+          try {
+            z.array(
+              z.object({
+                _id: z.string().regex(looseUuidRegex),
+                encrypted: z.string(),
+                encryptedEntityKey: z.string(),
+              })
+            ).parse(req.body.encryptedObservations);
+          } catch (e) {
+            const error = new Error(`Invalid request in ${req.params.migrationName}: ${e}`);
+            error.status = 400;
+            throw error;
+          }
+          for (const { _id, encrypted, encryptedEntityKey } of req.body.encryptedObservations) {
+            await TerritoryObservation.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx, paranoid: false });
+          }
+          organisation.set({
+            migrations: [...(organisation.migrations || []), req.params.migrationName],
+            migrationLastUpdateAt: new Date(),
+          });
+        }
 
         organisation.set({ migrating: false });
         await organisation.save({ transaction: tx });

@@ -18,7 +18,7 @@ import { prepareMedicalFileForEncryption } from '../recoil/medicalFiles';
 import { preparePassageForEncryption } from '../recoil/passages';
 import { prepareRencontreForEncryption } from '../recoil/rencontres';
 import { prepareTerritoryForEncryption } from '../recoil/territory';
-import { prepareObsForEncryption } from '../recoil/territoryObservations';
+import { customFieldsObsSelector, prepareObsForEncryption } from '../recoil/territoryObservations';
 import { preparePlaceForEncryption } from '../recoil/places';
 import { prepareRelPersonPlaceForEncryption } from '../recoil/relPersonPlace';
 
@@ -29,6 +29,7 @@ export default function useDataMigrator() {
   const setLoadingText = useSetRecoilState(loadingTextState);
   const user = useRecoilValue(userState);
   const setOrganisation = useSetRecoilState(organisationState);
+  const customFieldsObs = useRecoilValue(customFieldsObsSelector);
 
   const preparePersonForEncryption = usePreparePersonForEncryption();
 
@@ -66,7 +67,36 @@ export default function useDataMigrator() {
       }
       // End of example of migration.
       */
+      if (!organisation.migrations?.includes('reformat-observedAt-observations')) {
+        // some observedAt are timestamp, some are date
+        // it messes up the filtering by date in stats
+        setLoadingText(LOADING_TEXT);
+        const observationsRes = await API.get({
+          path: '/territory-observation',
+          query: { organisation: organisationId, after: 0, withDeleted: false },
+        }).then((res) => res.decryptedData || []);
 
+        const newObservations = observationsRes.map((e) => {
+          return {
+            ...e,
+            observedAt: dayjsInstance(e.observedAt ?? e.createdAt),
+          };
+        });
+
+        const encryptedObservations = await Promise.all(newObservations.map(prepareObsForEncryption(customFieldsObs)).map(encryptItem));
+
+        const response = await API.put({
+          path: `/migration/reformat-observedAt-observations`,
+          body: { encryptedObservations },
+          query: { migrationLastUpdateAt },
+        });
+        if (response.ok) {
+          setOrganisation(response.organisation);
+          migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
+        } else {
+          return false;
+        }
+      }
       return true;
     },
   };

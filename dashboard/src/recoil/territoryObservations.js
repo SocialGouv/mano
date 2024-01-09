@@ -22,6 +22,7 @@ export const customFieldsObsSelector = selector({
   key: 'customFieldsObsSelector',
   get: ({ get }) => {
     const organisation = get(organisationState);
+    if (!organisation) return defaultCustomFields;
     if (Array.isArray(organisation.customFieldsObs)) return organisation.customFieldsObs;
     return defaultCustomFields;
   },
