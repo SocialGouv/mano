@@ -77,9 +77,12 @@ export default function useDataMigrator() {
         }).then((res) => res.decryptedData || []);
 
         const newObservations = observationsRes.map((e) => {
+          const observedAt = !isNaN(Number(e.observedAt)) // i.e. is timestamp
+            ? dayjsInstance(Number(e.observedAt)).toISOString()
+            : dayjsInstance(e.observedAt ?? e.createdAt).toISOString();
           return {
             ...e,
-            observedAt: dayjsInstance(e.observedAt ?? e.createdAt),
+            observedAt,
           };
         });
 
