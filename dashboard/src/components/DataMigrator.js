@@ -67,43 +67,43 @@ export default function useDataMigrator() {
       }
       // End of example of migration.
       */
-      if (!organisation.migrations?.includes('reformat-observedAt-observations')) {
-        // some observedAt are timestamp, some are date
-        // it messes up the filtering by date in stats
-        setLoadingText(LOADING_TEXT);
-        const observationsRes = await API.get({
-          path: '/territory-observation',
-          query: { organisation: organisationId, after: 0, withDeleted: false },
-        }).then((res) => res.decryptedData || []);
+      // if (!organisation.migrations?.includes('reformat-observedAt-observations')) {
+      //   // some observedAt are timestamp, some are date
+      //   // it messes up the filtering by date in stats
+      //   setLoadingText(LOADING_TEXT);
+      //   const observationsRes = await API.get({
+      //     path: '/territory-observation',
+      //     query: { organisation: organisationId, after: 0, withDeleted: false },
+      //   }).then((res) => res.decryptedData || []);
 
-        const newObservations = observationsRes.map((obs) => {
-          const observedAt = !isNaN(Number(obs.observedAt)) // i.e. is timestamp
-            ? dayjsInstance(Number(obs.observedAt)).toISOString()
-            : dayjsInstance(obs.observedAt ?? obs.createdAt).toISOString();
-          return {
-            ...obs,
-            user: obs.user ?? user._id, // in case of old observations missing user
-            observedAt,
-          };
-        });
+      //   const newObservations = observationsRes.map((obs) => {
+      //     const observedAt = !isNaN(Number(obs.observedAt)) // i.e. is timestamp
+      //       ? dayjsInstance(Number(obs.observedAt)).toISOString()
+      //       : dayjsInstance(obs.observedAt ?? obs.createdAt).toISOString();
+      //     return {
+      //       ...obs,
+      //       user: obs.user ?? user._id, // in case of old observations missing user
+      //       observedAt,
+      //     };
+      //   });
 
-        const observationIdsToDelete = newObservations.filter((obs) => !obs.territory || !obs.team).map((obs) => obs._id);
-        const observationsWithFullData = newObservations.filter((obs) => !!obs.territory && !!obs.team);
+      //   const observationIdsToDelete = newObservations.filter((obs) => !obs.territory || !obs.team).map((obs) => obs._id);
+      //   const observationsWithFullData = newObservations.filter((obs) => !!obs.territory && !!obs.team);
 
-        const encryptedObservations = await Promise.all(observationsWithFullData.map(prepareObsForEncryption(customFieldsObs)).map(encryptItem));
+      //   const encryptedObservations = await Promise.all(observationsWithFullData.map(prepareObsForEncryption(customFieldsObs)).map(encryptItem));
 
-        const response = await API.put({
-          path: `/migration/reformat-observedAt-observations`,
-          body: { encryptedObservations, observationIdsToDelete },
-          query: { migrationLastUpdateAt },
-        });
-        if (response.ok) {
-          setOrganisation(response.organisation);
-          migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
-        } else {
-          return false;
-        }
-      }
+      //   const response = await API.put({
+      //     path: `/migration/reformat-observedAt-observations`,
+      //     body: { encryptedObservations, observationIdsToDelete },
+      //     query: { migrationLastUpdateAt },
+      //   });
+      //   if (response.ok) {
+      //     setOrganisation(response.organisation);
+      //     migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
+      //   } else {
+      //     return false;
+      //   }
+      // }
       return true;
     },
   };
