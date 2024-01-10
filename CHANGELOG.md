@@ -1,3 +1,10 @@
+## [1.302.3](https://github.com/SocialGouv/mano/compare/v1.302.2...v1.302.3) (2024-01-10)
+
+
+### Bug Fixes
+
+* format observedAt proprement pour éviter un bug de tri dans les statistiques ([#1819](https://github.com/SocialGouv/mano/issues/1819)) ([dd4f90e](https://github.com/SocialGouv/mano/commit/dd4f90ebf6407f3dfc6845a6103001e38948e513))
+
 ## [1.302.2](https://github.com/SocialGouv/mano/compare/v1.302.1...v1.302.2) (2023-12-21)
 
 
