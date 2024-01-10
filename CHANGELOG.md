@@ -1,3 +1,10 @@
+## [1.302.5](https://github.com/SocialGouv/mano/compare/v1.302.4...v1.302.5) (2024-01-10)
+
+
+### Bug Fixes
+
+* remove migration on obs ([ac92226](https://github.com/SocialGouv/mano/commit/ac92226aafb71d680b3b5110ed33d3dbafb8ee97))
+
 ## [1.302.4](https://github.com/SocialGouv/mano/compare/v1.302.3...v1.302.4) (2024-01-10)
 
 
