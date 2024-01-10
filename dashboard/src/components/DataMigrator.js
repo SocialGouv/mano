@@ -76,21 +76,25 @@ export default function useDataMigrator() {
           query: { organisation: organisationId, after: 0, withDeleted: false },
         }).then((res) => res.decryptedData || []);
 
-        const newObservations = observationsRes.map((e) => {
-          const observedAt = !isNaN(Number(e.observedAt)) // i.e. is timestamp
-            ? dayjsInstance(Number(e.observedAt)).toISOString()
-            : dayjsInstance(e.observedAt ?? e.createdAt).toISOString();
+        const newObservations = observationsRes.map((obs) => {
+          const observedAt = !isNaN(Number(obs.observedAt)) // i.e. is timestamp
+            ? dayjsInstance(Number(obs.observedAt)).toISOString()
+            : dayjsInstance(obs.observedAt ?? obs.createdAt).toISOString();
           return {
-            ...e,
+            ...obs,
+            user: obs.user ?? user._id, // in case of old observations missing user
             observedAt,
           };
         });
 
-        const encryptedObservations = await Promise.all(newObservations.map(prepareObsForEncryption(customFieldsObs)).map(encryptItem));
+        const observationIdsToDelete = newObservations.filter((obs) => !obs.territory || !obs.team).map((obs) => obs._id);
+        const observationsWithFullData = newObservations.filter((obs) => !!obs.territory && !!obs.team);
+
+        const encryptedObservations = await Promise.all(observationsWithFullData.map(prepareObsForEncryption(customFieldsObs)).map(encryptItem));
 
         const response = await API.put({
           path: `/migration/reformat-observedAt-observations`,
-          body: { encryptedObservations },
+          body: { encryptedObservations, observationIdsToDelete },
           query: { migrationLastUpdateAt },
         });
         if (response.ok) {

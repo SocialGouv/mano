@@ -98,10 +98,14 @@ router.put(
                 encryptedEntityKey: z.string(),
               })
             ).parse(req.body.encryptedObservations);
+            z.array(z.string().regex(looseUuidRegex)).parse(req.body.observationIdsToDelete);
           } catch (e) {
             const error = new Error(`Invalid request in ${req.params.migrationName}: ${e}`);
             error.status = 400;
             throw error;
+          }
+          for (const _id of req.body.observationIdsToDelete) {
+            await TerritoryObservation.destroy({ where: { _id, organisation: req.user.organisation }, transaction: tx });
           }
           for (const { _id, encrypted, encryptedEntityKey } of req.body.encryptedObservations) {
             await TerritoryObservation.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx, paranoid: false });
