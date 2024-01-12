@@ -37,7 +37,7 @@ const Drawer = () => {
           'noprint tw-max-h-full tw-w-64 tw-min-w-min tw-shrink-0 tw-basis-52 tw-flex-col tw-justify-between tw-overflow-y-auto tw-border-r tw-border-black tw-border-opacity-10 tw-bg-white tw-p-4 tw-drop-shadow-xl sm:!tw-flex sm:tw-drop-shadow-none',
           isOnboarding ? '[&_li:not(#show-on-onboarding)]:tw-pointer-events-none [&_li:not(#show-on-onboarding)]:tw-opacity-20' : '',
         ].join(' ')}>
-        <div className="tw-pl-0 [&_li]:tw-list-none [&_a]:tw-my-0.5 [&_a]:tw-block [&_a]:tw-rounded-lg [&_a]:tw-py-0.5 [&_a]:tw-text-sm [&_a]:tw-font-semibold [&_a]:tw-text-black75 [&_a:hover]:tw-text-main [&_a.active]:tw-text-main50">
+        <div className="tw-pl-0 [&_li]:tw-list-none [&_a]:tw-my-0.5 [&_a]:tw-block [&_a]:tw-rounded-lg [&_a]:tw-py-0.5 [&_a]:tw-text-sm [&_a]:tw-font-semibold [&_a]:tw-text-black75 [&_a:hover]:tw-text-main [&_a.active]:tw-text-main">
           {['admin', 'normal'].includes(role) && isDesktop && (
             <>
               <li>
