@@ -1849,6 +1849,7 @@ const PersonCreatedAt = ({ date, persons, setSortBy, setSortOrder, sortBy, sortO
               onSortBy: setSortBy,
               sortOrder,
               sortBy,
+              render: (p) => <PersonName showOtherNames item={{ person: p._id }} />,
             },
             {
               title: 'Utilisateur (créateur)',
