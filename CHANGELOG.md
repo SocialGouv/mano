@@ -1,3 +1,10 @@
+## [1.302.7](https://github.com/SocialGouv/mano/compare/v1.302.6...v1.302.7) (2024-01-15)
+
+
+### Bug Fixes
+
+* couleur de la pagination ([#1826](https://github.com/SocialGouv/mano/issues/1826)) ([1394504](https://github.com/SocialGouv/mano/commit/139450466ecde104856a51e390cccc5ff9dd5bca))
+
 ## [1.302.6](https://github.com/SocialGouv/mano/compare/v1.302.5...v1.302.6) (2024-01-15)
 
 
