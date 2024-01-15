@@ -19,7 +19,14 @@ const CustomFieldsStats = ({ customFields, data, additionalCols = [], dataTestId
         {additionalCols.map((col) => (
           <div className="tw-basis-1/4 tw-px-4 tw-py-2" key={col.title}>
             {/* TODO: fix alignment. */}
-            <Card title={col.title} count={col.value} children={<div></div>} dataTestId={dataTestId} help={help?.(col.title.capitalize())} />
+            <Card
+              title={col.title}
+              count={col.value}
+              children={<div></div>}
+              dataTestId={dataTestId}
+              help={help?.(col.title.capitalize())}
+              onClick={col.onBlockClick ? col.onBlockClick : null}
+            />
           </div>
         ))}
         {customFieldsInStats.map((field) => {
