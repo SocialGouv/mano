@@ -1,3 +1,10 @@
+## [1.302.6](https://github.com/SocialGouv/mano/compare/v1.302.5...v1.302.6) (2024-01-15)
+
+
+### Bug Fixes
+
+* ajout des pseudo partout dans l'interface web ([#1827](https://github.com/SocialGouv/mano/issues/1827)) ([a5d0464](https://github.com/SocialGouv/mano/commit/a5d046436b633d8dc445d77400365a5ab2f57590))
+
 ## [1.302.5](https://github.com/SocialGouv/mano/compare/v1.302.4...v1.302.5) (2024-01-10)
 
 
