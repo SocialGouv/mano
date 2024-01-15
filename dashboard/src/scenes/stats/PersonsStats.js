@@ -40,6 +40,10 @@ export default function PersonStats({ title, firstBlockHelp, filterBase, filterP
 
   const onSliceClick = (newSlice, fieldName, personConcerned = personsForStats) => {
     const newSlicefield = filterBase.find((f) => f.field === fieldName);
+    if (!newSlicefield) {
+      capture('newSlicefield not found', { fieldName, filterBase });
+      return;
+    }
     setSliceField(newSlicefield);
     setSliceValue(newSlice);
     const slicedData =
