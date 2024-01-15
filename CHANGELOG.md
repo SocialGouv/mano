@@ -1,3 +1,10 @@
+## [1.302.8](https://github.com/SocialGouv/mano/compare/v1.302.7...v1.302.8) (2024-01-15)
+
+
+### Bug Fixes
+
+* MANO-1A7 ([#1830](https://github.com/SocialGouv/mano/issues/1830)) ([07a3d43](https://github.com/SocialGouv/mano/commit/07a3d4386e240b04880299f6717cc7c4fa5d7e5f))
+
 ## [1.302.7](https://github.com/SocialGouv/mano/compare/v1.302.6...v1.302.7) (2024-01-15)
 
 
