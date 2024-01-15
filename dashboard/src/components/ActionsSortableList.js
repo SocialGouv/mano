@@ -81,7 +81,7 @@ const ActionsSortableList = ({ data, limit }) => {
             sortOrder,
             render: (actionOrConsult) => {
               return (
-                <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
+                <div className="tw-flex tw-flex-col tw-items-center tw-justify-center tw-gap-2">
                   {!!actionOrConsult.urgent && <ExclamationMarkButton />}
                   {!!actionOrConsult.description && <DescriptionIcon />}
                   {!!organisation.groupsEnabled && !!actionOrConsult.group && (
@@ -134,6 +134,7 @@ const ActionsSortableList = ({ data, limit }) => {
             title: 'Statut',
             onSortOrder: setSortOrder,
             onSortBy: setSortBy,
+            small: true,
             sortBy,
             sortOrder,
             dataKey: 'status',
