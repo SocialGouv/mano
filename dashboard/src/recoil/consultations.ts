@@ -51,7 +51,7 @@ export const consultationsFieldsIncludingCustomFieldsSelector = selector({
       { name: 'teams', label: ':Equipe(s) en charge' },
       { name: 'completedAt', label: 'Faite le' },
       { name: 'dueAt', label: 'À faire le' },
-      { name: 'status', label: 'Status' },
+      { name: 'status', label: 'Statut' },
       ...flattenedCustomFieldsConsultations.map((f) => {
         return {
           name: f.name,
