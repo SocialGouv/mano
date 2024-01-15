@@ -1,3 +1,10 @@
+## [1.302.10](https://github.com/SocialGouv/mano/compare/v1.302.9...v1.302.10) (2024-01-15)
+
+
+### Bug Fixes
+
+* renommage de informations médicales en informations de santé ([#1806](https://github.com/SocialGouv/mano/issues/1806)) ([2d7f0be](https://github.com/SocialGouv/mano/commit/2d7f0be43f4b23d2eee7defbe25f7a3ce1eb05c1))
+
 ## [1.302.9](https://github.com/SocialGouv/mano/compare/v1.302.8...v1.302.9) (2024-01-15)
 
 
