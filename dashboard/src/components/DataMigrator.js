@@ -18,7 +18,7 @@ import { prepareMedicalFileForEncryption } from '../recoil/medicalFiles';
 import { preparePassageForEncryption } from '../recoil/passages';
 import { prepareRencontreForEncryption } from '../recoil/rencontres';
 import { prepareTerritoryForEncryption } from '../recoil/territory';
-import { customFieldsObsSelector, prepareObsForEncryption } from '../recoil/territoryObservations';
+import { customFieldsObsSelector, defaultCustomFields, prepareObsForEncryption } from '../recoil/territoryObservations';
 import { preparePlaceForEncryption } from '../recoil/places';
 import { prepareRelPersonPlaceForEncryption } from '../recoil/relPersonPlace';
 
@@ -29,7 +29,6 @@ export default function useDataMigrator() {
   const setLoadingText = useSetRecoilState(loadingTextState);
   const user = useRecoilValue(userState);
   const setOrganisation = useSetRecoilState(organisationState);
-  const customFieldsObs = useRecoilValue(customFieldsObsSelector);
 
   const preparePersonForEncryption = usePreparePersonForEncryption();
 
@@ -67,43 +66,51 @@ export default function useDataMigrator() {
       }
       // End of example of migration.
       */
-      // if (!organisation.migrations?.includes('reformat-observedAt-observations')) {
-      //   // some observedAt are timestamp, some are date
-      //   // it messes up the filtering by date in stats
-      //   setLoadingText(LOADING_TEXT);
-      //   const observationsRes = await API.get({
-      //     path: '/territory-observation',
-      //     query: { organisation: organisationId, after: 0, withDeleted: false },
-      //   }).then((res) => res.decryptedData || []);
+      if (!organisation.migrations?.includes('reformat-observedAt-observations-fixed')) {
+        // some observedAt are timestamp, some are date
+        // it messes up the filtering by date in stats
+        setLoadingText(LOADING_TEXT);
+        const observationsRes = await API.get({
+          path: '/territory-observation',
+          query: { organisation: organisationId, after: 0, withDeleted: false },
+        }).then((res) => res.decryptedData || []);
 
-      //   const newObservations = observationsRes.map((obs) => {
-      //     const observedAt = !isNaN(Number(obs.observedAt)) // i.e. is timestamp
-      //       ? dayjsInstance(Number(obs.observedAt)).toISOString()
-      //       : dayjsInstance(obs.observedAt ?? obs.createdAt).toISOString();
-      //     return {
-      //       ...obs,
-      //       user: obs.user ?? user._id, // in case of old observations missing user
-      //       observedAt,
-      //     };
-      //   });
+        const observationIdsToDelete = {}; // we create an object for the loop line 87 to be fast enough
+        for (const observation of observationsRes) {
+          if (!observation.territory || !observation.team) {
+            observationIdsToDelete[observation._id] = true;
+          }
+        }
 
-      //   const observationIdsToDelete = newObservations.filter((obs) => !obs.territory || !obs.team).map((obs) => obs._id);
-      //   const observationsWithFullData = newObservations.filter((obs) => !!obs.territory && !!obs.team);
+        const observationsWithFullData = observationsRes
+          .filter((obs) => !observationIdsToDelete[obs._id])
+          .map((obs) => {
+            const observedAt = !isNaN(Number(obs.observedAt)) // i.e. is timestamp
+              ? dayjsInstance(Number(obs.observedAt)).toISOString()
+              : dayjsInstance(obs.observedAt ?? obs.createdAt).toISOString();
+            return {
+              ...obs,
+              user: typeof obs.user === 'string' ? obs.user : user._id, // sometimes user is an empty {} instead of a uuid
+              observedAt,
+            };
+          });
 
-      //   const encryptedObservations = await Promise.all(observationsWithFullData.map(prepareObsForEncryption(customFieldsObs)).map(encryptItem));
+        const customFieldsObs = Array.isArray(organisation.customFieldsObs) ? organisation.customFieldsObs : defaultCustomFields;
 
-      //   const response = await API.put({
-      //     path: `/migration/reformat-observedAt-observations`,
-      //     body: { encryptedObservations, observationIdsToDelete },
-      //     query: { migrationLastUpdateAt },
-      //   });
-      //   if (response.ok) {
-      //     setOrganisation(response.organisation);
-      //     migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
-      //   } else {
-      //     return false;
-      //   }
-      // }
+        const encryptedObservations = await Promise.all(observationsWithFullData.map(prepareObsForEncryption(customFieldsObs)).map(encryptItem));
+
+        const response = await API.put({
+          path: `/migration/reformat-observedAt-observations-fixed`,
+          body: { encryptedObservations, observationIdsToDelete: Object.keys(observationIdsToDelete) },
+          query: { migrationLastUpdateAt },
+        });
+        if (response.ok) {
+          setOrganisation(response.organisation);
+          migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
+        } else {
+          return false;
+        }
+      }
       return true;
     },
   };

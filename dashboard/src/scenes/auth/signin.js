@@ -69,6 +69,7 @@ const SignIn = () => {
         window.localStorage.setItem('mano-organisationId', organisation._id);
         setOrganisation(organisation);
         setUserName(user.name);
+        setUser(user);
         if (!!organisation.encryptionEnabled && !['superadmin'].includes(user.role)) setShowEncryption(true);
       }
 
@@ -108,6 +109,8 @@ const SignIn = () => {
       if (organisation._id !== window.localStorage.getItem('mano-organisationId')) {
         await resetCache();
       }
+      setOrganisation(organisation);
+      setUser(user);
       if (!!organisation.encryptionEnabled && !showEncryption && !['superadmin'].includes(user.role)) {
         setShowEncryption(true);
         return setIsSubmitting(false);
@@ -115,12 +118,10 @@ const SignIn = () => {
       if (token) setToken(token);
       setSessionInitialTimestamp(Date.now());
       window.localStorage.setItem('mano-organisationId', organisation._id);
-      setOrganisation(organisation);
       if (!['superadmin'].includes(user.role) && !!signinForm.orgEncryptionKey) {
         const encryptionIsValid = await setOrgEncryptionKey(signinForm.orgEncryptionKey.trim(), organisation);
         if (!encryptionIsValid) return setIsSubmitting(false);
       }
-      setUser(user);
       // now login !
       // superadmin
       if (['superadmin'].includes(user.role)) {
