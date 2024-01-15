@@ -1,4 +1,3 @@
-import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { Label } from 'reactstrap';
 import { useRecoilValue } from 'recoil';
@@ -38,13 +37,13 @@ const SelectPerson = ({
           defaultValue != null && isMulti ? persons.filter((i) => defaultValue?.includes(i._id)) : persons.find((i) => i._id === defaultValue)
         }
         getOptionValue={(i) => i._id}
-        getOptionLabel={(i) => i?.name || ''}
+        getOptionLabel={(i) => i?.name}
         formatOptionLabel={(i, options) => {
-          if (options.context === 'menu') return i?.name || '';
           return (
             <div style={{ display: 'flex', alignItems: 'center' }}>
               {i?.name}
-              {!disableAccessToPerson && (
+              {Boolean(i?.otherNames) && <span style={{ marginLeft: '0.5rem', fontSize: '0.8rem', opacity: 0.5 }}>{i?.otherNames}</span>}
+              {!disableAccessToPerson && options.context !== 'menu' && (
                 <ButtonCustom
                   onClick={(e) => {
                     e.preventDefault();
