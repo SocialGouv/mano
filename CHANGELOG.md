@@ -1,3 +1,10 @@
+## [1.302.9](https://github.com/SocialGouv/mano/compare/v1.302.8...v1.302.9) (2024-01-15)
+
+
+### Bug Fixes
+
+* contraste sur les éléments sélectionnés du menu ([#1825](https://github.com/SocialGouv/mano/issues/1825)) ([cbc02a1](https://github.com/SocialGouv/mano/commit/cbc02a1acb3d18223edcb783e3302cb398ff12c3))
+
 ## [1.302.8](https://github.com/SocialGouv/mano/compare/v1.302.7...v1.302.8) (2024-01-15)
 
 
