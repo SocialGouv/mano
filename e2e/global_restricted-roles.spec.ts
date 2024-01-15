@@ -42,7 +42,7 @@ test("test restricted accesses", async ({ page }) => {
     await page.getByLabel("Personne très vulnérable, ou ayant besoin d'une attention particulière").check();
     await page.getByRole("dialog").getByText("Informations sociales").click();
     await clickOnEmptyReactSelect(page, "person-custom-select-situation-personnelle", "Homme isolé");
-    await page.getByRole("dialog").getByText("Informations médicales").click();
+    await page.getByRole("dialog").getByText("Informations de santé").click();
     await clickOnEmptyReactSelect(page, "person-custom-select-couvertures-médicales", "Régime Général");
     await page.getByRole("button", { name: "Enregistrer" }).click();
     await page.getByText("Mis à jour !").click();
@@ -95,7 +95,7 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.getByRole("heading", { name: "Informations sociales" })).toBeVisible();
     await expect(page.getByText("cool man")).toBeVisible();
     await expect(page.getByText("Homme isolé")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Informations Médicales" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Informations de santé" })).toBeVisible();
     await expect(page.getByText("Régime Général")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Documents" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Dossier Médical" })).toBeVisible();
@@ -162,7 +162,7 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.getByRole("heading", { name: "Informations sociales" })).toBeVisible();
     await expect(page.getByText("cool man")).toBeVisible();
     await expect(page.getByText("Homme isolé")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Informations Médicales" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Informations de santé" })).toBeVisible();
     await expect(page.getByText("Régime Général")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Documents" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Dossier Médical" })).toBeVisible();
@@ -230,7 +230,7 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.getByRole("heading", { name: "Informations sociales" })).toBeVisible();
     await expect(page.getByText("cool man")).toBeVisible();
     await expect(page.getByText("Homme isolé")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Informations Médicales" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Informations de santé" })).toBeVisible();
     await expect(page.getByText("Régime Général")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Documents" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Dossier Médical" })).not.toBeVisible();
@@ -290,7 +290,7 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.getByRole("heading", { name: "Informations sociales" })).not.toBeVisible();
     await expect(page.getByText("cool man")).not.toBeVisible();
     await expect(page.getByText("Homme isolé")).not.toBeVisible();
-    await expect(page.getByRole("heading", { name: "Informations Médicales" })).not.toBeVisible();
+    await expect(page.getByRole("heading", { name: "Informations de santé" })).not.toBeVisible();
     await expect(page.getByText("Régime Général")).not.toBeVisible();
     await expect(page.getByRole("heading", { name: "Documents" })).not.toBeVisible();
     await expect(page.getByRole("button", { name: "Dossier Médical" })).not.toBeVisible();

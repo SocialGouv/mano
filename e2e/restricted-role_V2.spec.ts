@@ -175,7 +175,7 @@ test("test", async ({ page }) => {
   await page.getByText("testrestrict").click();
 
   await expect(page.getByRole("heading", { name: "Informations sociales" })).not.toBeVisible();
-  await expect(page.getByRole("heading", { name: "Informations médicales" })).not.toBeVisible();
+  await expect(page.getByRole("heading", { name: "Informations de santé" })).not.toBeVisible();
   await expect(page.getByRole("heading", { name: "Informations administratives" })).not.toBeVisible();
   await expect(page.getByRole("heading", { name: "Commentaires (2)" })).not.toBeVisible();
 

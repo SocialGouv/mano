@@ -135,7 +135,7 @@ router.post(
             fields: defaultSocialCustomFields,
           },
           {
-            name: "Informations médicales",
+            name: "Informations de santé",
             fields: defaultMedicalCustomFields,
           },
         ],

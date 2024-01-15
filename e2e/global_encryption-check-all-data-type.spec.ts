@@ -53,7 +53,7 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Éditer les informations sociales" }).click();
   await page.getByLabel("Structure de suivi social").click();
   await page.getByLabel("Structure de suivi social").fill("SUIVI HOP");
-  await page.getByText("Informations médicales+").click();
+  await page.getByText("Informations de santé+").click();
   await page.getByLabel("Structure de suivi médical").click();
   await page.getByLabel("Structure de suivi médical").fill("MDEIDAL");
   await page.getByRole("button", { name: "Enregistrer" }).click();

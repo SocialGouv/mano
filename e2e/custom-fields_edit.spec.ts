@@ -40,7 +40,7 @@ test("test", async ({ page }) => {
   await page.getByText("Création réussie !").click();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/);
 
-  await page.getByRole("button", { name: "Éditer les informations médicales" }).click();
+  await page.getByRole("button", { name: "Éditer les informations de santé" }).click();
   await clickOnEmptyReactSelect(page, "person-custom-select-champ-utilisé", "choix 1");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Mis à jour !").click();

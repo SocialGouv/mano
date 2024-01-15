@@ -67,7 +67,7 @@ test("Create and modify a person", async ({ page }) => {
   await page.locator(".person-custom-select-motif-de-la-situation-en-rue__value-container").click();
   await page.getByText("Départ de région", { exact: true }).click();
 
-  await page.getByRole("dialog").getByText("Informations médicales").click();
+  await page.getByRole("dialog").getByText("Informations de santé").click();
   await page.getByLabel("Structure de suivi médical").click();
   await page.getByLabel("Structure de suivi médical").fill("fdfdfs");
   await page.locator(".person-custom-select-consommations__value-container").click();
