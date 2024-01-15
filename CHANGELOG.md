@@ -1,3 +1,11 @@
+## [1.302.11](https://github.com/SocialGouv/mano/compare/v1.302.10...v1.302.11) (2024-01-15)
+
+
+### Bug Fixes
+
+* dans les stats d'actions, 'Catégories supprimées' à la place de 'Autres' ([#1831](https://github.com/SocialGouv/mano/issues/1831)) ([91e35ce](https://github.com/SocialGouv/mano/commit/91e35ce4794cea45cccb4ebddd806f42acc0de1f))
+* observations metadata ([#1829](https://github.com/SocialGouv/mano/issues/1829)) ([3952449](https://github.com/SocialGouv/mano/commit/3952449173e6493459f79f18cb0be7c42c97eab1))
+
 ## [1.302.10](https://github.com/SocialGouv/mano/compare/v1.302.9...v1.302.10) (2024-01-15)
 
 
