@@ -89,7 +89,7 @@ router.put(
         }
         // End of example of migration.
         */
-        if (req.params.migrationName === "reformat-observedAt-observations") {
+        if (req.params.migrationName === "reformat-observedAt-observations-fixed") {
           try {
             z.array(
               z.object({
