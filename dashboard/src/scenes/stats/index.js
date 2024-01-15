@@ -396,7 +396,7 @@ const Stats = () => {
           actionsDetailed.push({
             ...action,
             category,
-            categoryGroup: categoriesGroupObject[category] ?? 'Autres',
+            categoryGroup: categoriesGroupObject[category] ?? 'Catégories supprimées',
           });
         }
       } else {
