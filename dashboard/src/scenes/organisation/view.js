@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FormGroup, Input, Label, Row, Col } from 'reactstrap';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
@@ -17,6 +17,7 @@ import { organisationState, userState } from '../../recoil/auth';
 import API, { encryptItem } from '../../services/api';
 import ExportData from '../data-import-export/ExportData';
 import ImportData from '../data-import-export/ImportData';
+import ImportConfig from '../data-import-export/ImportConfig';
 import DownloadExample from '../data-import-export/DownloadExample';
 import useTitle from '../../services/useTitle';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
@@ -46,6 +47,10 @@ const getSettingTitle = (tabId) => {
   if (tabId === 'rencontres-passages') return 'Passages/rencontres';
   return '';
 };
+
+function TabTitle({ children }) {
+  return <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">{children}</h3>;
+}
 
 const View = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
@@ -159,14 +164,21 @@ const View = () => {
           </button>
           <hr />
           <button
-            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'export' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
-            onClick={() => setTab('export')}>
-            Export
-          </button>
-          <button
             className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'import' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
             onClick={() => setTab('import')}>
-            Import
+            Import de personnes suivies
+          </button>
+          <button
+            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'import-configuration' ? 'tw-text-main' : 'tw-text-zinc-600'].join(
+              ' '
+            )}
+            onClick={() => setTab('import-configuration')}>
+            Import de configuration
+          </button>
+          <button
+            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'export' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
+            onClick={() => setTab('export')}>
+            Export des données
           </button>
         </nav>
         <div ref={scrollContainer} className="tw-basis-full tw-overflow-auto tw-py-4 tw-px-6">
@@ -197,7 +209,7 @@ const View = () => {
                 case 'infos':
                   return (
                     <>
-                      <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Informations générales</h3>
+                      <TabTitle>Informations générales</TabTitle>
                       <Row>
                         <Col md={6}>
                           <FormGroup>
@@ -237,7 +249,7 @@ const View = () => {
                 case 'encryption':
                   return (
                     <>
-                      <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Chiffrement</h3>
+                      <TabTitle>Chiffrement</TabTitle>
                       <div className="tw-mb-10 tw-flex tw-justify-around">
                         <EncryptionKey isMain />
                       </div>
@@ -254,7 +266,7 @@ const View = () => {
                 case 'reception':
                   return (
                     <>
-                      <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Accueil de jour</h3>
+                      <TabTitle>Accueil de jour</TabTitle>
                       <div className="tw-flex tw-flex-col">
                         <h4 className="tw-my-8">Activer l'accueil de jour</h4>
                         <FormGroup>
@@ -289,7 +301,7 @@ const View = () => {
                 case 'territories':
                   return (
                     <>
-                      <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Territoires</h3>
+                      <TabTitle>Territoires</TabTitle>
                       <h4 className="tw-my-8">Activer les territoires</h4>
                       <FormGroup>
                         <div className="tw-ml-5 tw-flex tw-w-4/5 tw-items-baseline">
@@ -322,7 +334,7 @@ const View = () => {
                 case 'rencontres-passages':
                   return (
                     <>
-                      <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Passages / rencontres</h3>
+                      <TabTitle>Passages / rencontres</TabTitle>
                       <h4 className="tw-my-8">Activer les passages</h4>
                       <FormGroup>
                         <div className="tw-ml-5 tw-flex tw-w-4/5 tw-items-baseline">
@@ -371,7 +383,7 @@ const View = () => {
                 case 'persons':
                   return (
                     <>
-                      <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Personnes suivies</h3>
+                      <TabTitle>Personnes suivies</TabTitle>
                       {organisation.encryptionEnabled ? (
                         <>
                           <h4 className="tw-my-8">Activer la fonctionnalité Liens familiaux</h4>
@@ -432,7 +444,7 @@ const View = () => {
                 case 'export':
                   return (
                     <>
-                      <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Exporter des données</h3>
+                      <TabTitle>Exporter des données</TabTitle>
                       <Row>
                         <Col md={10}>
                           <p>Vous pouvez exporter l'ensemble de vos données dans un fichier Excel.</p>
@@ -443,17 +455,26 @@ const View = () => {
                       </div>
                     </>
                   );
+                case 'import-configuration':
+                  return (
+                    <>
+                      <TabTitle>Importer une configuration</TabTitle>
+                      <div>
+                        <ImportConfig scrollContainer={scrollContainer} />
+                      </div>
+                    </>
+                  );
                 case 'import':
                   return (
                     <>
-                      <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Importer des personnes suivies</h3>
+                      <TabTitle>Importer des personnes suivies</TabTitle>
                       <Row>
                         <Col md={10}>
                           <p>
                             Vous pouvez importer une liste de personnes suivies depuis un fichier Excel. Ce fichier doit avoir quelques
                             caractéristiques:
                           </p>
-                          <ul>
+                          <ul className="tw-mt-4 tw-list-inside tw-list-disc">
                             <li>
                               avoir un onglet dont le nom contient <code>personne</code>
                             </li>
