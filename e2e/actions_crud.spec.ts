@@ -56,7 +56,7 @@ test("Actions", async ({ page }) => {
     await page.locator(`[data-test-id="Nom de l'action\\: \\"${action1Name}\\" ➔ \\"${action2Name}\\""]`).click();
     await page.locator(`[data-test-id="Description\\: \\"\\" ➔ \\"plouf\\""]`).click();
     await page.locator('[data-test-id="Action urgente\\: \\"\\" ➔ true"]').click();
-    await page.locator('[data-test-id="Status\\: \\"A FAIRE\\" ➔ \\"FAIT\\""]').click();
+    await page.locator('[data-test-id="Statut\\: \\"A FAIRE\\" ➔ \\"FAIT\\""]').click();
 
     await page.getByText("Fermer").click();
 

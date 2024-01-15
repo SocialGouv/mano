@@ -61,7 +61,7 @@ export const allowedActionFieldsInHistory = [
   { name: 'urgent', label: 'Action urgente' },
   { name: 'completedAt', label: 'Faite le' },
   { name: 'dueAt', label: 'À faire le' },
-  { name: 'status', label: 'Status' },
+  { name: 'status', label: 'Statut' },
 ];
 
 export const prepareActionForEncryption = (action, { checkRequiredFields = true } = {}) => {
