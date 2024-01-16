@@ -1,3 +1,10 @@
+## [1.302.12](https://github.com/SocialGouv/mano/compare/v1.302.11...v1.302.12) (2024-01-16)
+
+
+### Bug Fixes
+
+* more debug to observations ([#1836](https://github.com/SocialGouv/mano/issues/1836)) ([a124187](https://github.com/SocialGouv/mano/commit/a12418704e237757a10c5dcd9fdfe2c2aa40c357))
+
 ## [1.302.11](https://github.com/SocialGouv/mano/compare/v1.302.10...v1.302.11) (2024-01-15)
 
 
