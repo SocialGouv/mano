@@ -64,7 +64,12 @@ type WorkbookData = Record<
 
 function trimAllValues<R extends Record<string, string | string[]>>(obj: R): R {
   if (typeof obj !== 'object') return obj;
-  return Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, typeof v === 'string' ? v.trim() : v.map((s) => s.trim())])) as R;
+  return Object.fromEntries(
+    Object.entries(obj).map(([k, v]) => [
+      k,
+      Array.isArray(v) ? v.map((s) => (typeof s === 'string' ? s.trim() : s)) : typeof v === 'string' ? v.trim() : v,
+    ])
+  ) as R;
 }
 
 // Parse le fichier Excel et retourne un objet contenant les données et les erreurs
