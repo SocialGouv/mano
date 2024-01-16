@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import dayjs from 'dayjs';
+import { useState } from 'react';
 import { useRecoilValue } from 'recoil';
+import { utils, writeFile } from 'xlsx';
 import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from '../../../components/tailwind/Modal';
 import { FullScreenIcon } from '../../../assets/icons/FullScreenIcon';
 import Table from '../../../components/table';
@@ -9,6 +9,9 @@ import DateBloc from '../../../components/DateBloc';
 import CreateObservation from '../../../components/CreateObservation';
 import Observation from '../../territory-observations/view';
 import { territoriesState } from '../../../recoil/territory';
+import { dayjsInstance } from '../../../services/date';
+import { teamsState, usersState } from '../../../recoil/auth';
+import { customFieldsObsSelector } from '../../../recoil/territoryObservations';
 
 export const ObservationsReport = ({ observations, period, selectedTeams }) => {
   const [fullScreen, setFullScreen] = useState(false);
@@ -44,18 +47,70 @@ const ObservationsTable = ({ period, observations, selectedTeams }) => {
   const [observationToEdit, setObservationToEdit] = useState({});
   const [openObservationModaleKey, setOpenObservationModaleKey] = useState(0);
   const territories = useRecoilValue(territoriesState);
+  const teams = useRecoilValue(teamsState);
+  const customFieldsObs = useRecoilValue(customFieldsObsSelector);
+  const users = useRecoilValue(usersState);
+
+  const exportXlsx = () => {
+    const wb = utils.book_new();
+    const formattedData = utils.json_to_sheet(
+      observations.map((observation) => {
+        return {
+          id: observation._id,
+          'Territoire - Nom': territories.find((t) => t._id === observation.territory)?.name,
+          'Observé le': dayjsInstance(observation.observedAt).format('YYYY-MM-DD HH:mm'),
+          Équipe: observation.team ? teams.find((t) => t._id === observation.team)?.name : '',
+          ...customFieldsObs.reduce((fields, field) => {
+            if (['date', 'date-with-time'].includes(field.type))
+              fields[field.label || field.name] = observation[field.name]
+                ? dayjsInstance(observation[field.name]).format(field.type === 'date' ? 'YYYY-MM-DD' : 'YYYY-MM-DD HH:mm')
+                : '';
+            else if (['boolean'].includes(field.type)) fields[field.label || field.name] = observation[field.name] ? 'Oui' : 'Non';
+            else if (['yes-no'].includes(field.type)) fields[field.label || field.name] = observation[field.name];
+            else if (Array.isArray(observation[field.name])) fields[field.label || field.name] = observation[field.name].join(', ');
+            else fields[field.label || field.name] = observation[field.name];
+            return fields;
+          }, {}),
+          'Créée par': users.find((u) => u._id === observation.user)?.name,
+          'Créée le': dayjsInstance(observation.createdAt).format('YYYY-MM-DD HH:mm'),
+          'Mise à jour le': dayjsInstance(observation.updatedAt).format('YYYY-MM-DD HH:mm'),
+        };
+      })
+    );
+    utils.book_append_sheet(wb, formattedData, 'Observations de territoires');
+
+    utils.book_append_sheet(wb, utils.json_to_sheet(observations), 'Observations (données brutes)');
+    utils.book_append_sheet(wb, utils.json_to_sheet(territories), 'Territoires (données brutes)');
+    utils.book_append_sheet(wb, utils.json_to_sheet(selectedTeams), 'Filtres (équipes)');
+    const otherFilters = [
+      {
+        'Période - début': period.startDate,
+        'Période - fin': period.endDate,
+      },
+    ];
+    utils.book_append_sheet(wb, utils.json_to_sheet(otherFilters), 'Filtres (autres)');
+    writeFile(
+      wb,
+      `Compte rendu (${dayjsInstance(period.startDate).format('YYYY-MM-DD')} - ${dayjsInstance(period.endDate).format(
+        'YYYY-MM-DD'
+      )}) - Observations de territoires (${observations.length}).xlsx`
+    );
+  };
 
   return (
     <>
       <div className="tw-py-2 tw-px-4 print:tw-mb-4">
         <div className="tw-mb-5 tw-flex tw-justify-between">
           <h3 className="tw-w-full tw-px-3 tw-py-2 tw-text-2xl tw-font-medium tw-text-black">Observations</h3>
+          <button onClick={exportXlsx} className="button-submit tw-ml-auto tw-mr-4">
+            Télécharger un export
+          </button>
           <button
             type="button"
-            className="button-submit tw-ml-auto tw-mb-2.5"
+            className="button-submit"
             onClick={() => {
               setObservationToEdit({
-                date: dayjs(period.startDate),
+                date: dayjsInstance(period.startDate),
                 observations: [],
               });
               setOpenObservationModaleKey((k) => k + 1);
@@ -80,7 +135,7 @@ const ObservationsTable = ({ period, observations, selectedTeams }) => {
                   // anonymous comment migrated from `report.observations`
                   // have no time
                   // have no user assigned either
-                  const time = dayjs(obs.observedAt).format('D MMM HH:mm');
+                  const time = dayjsInstance(obs.observedAt).format('D MMM HH:mm');
                   return (
                     <>
                       <DateBloc date={obs.observedAt} />

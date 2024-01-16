@@ -669,6 +669,13 @@ const Stats = () => {
             setSelectedTerritories={setSelectedTerritories}
             observations={observations}
             customFieldsObs={customFieldsObs}
+            // `allFilters` is for debug purpose only
+            // TODO: remove when debugged
+            allFilters={{
+              selectedTerritories,
+              period,
+              selectedTeams,
+            }}
           />
         )}
         {activeTab === 'Comptes-rendus' && <ReportsStats reports={reports} />}
