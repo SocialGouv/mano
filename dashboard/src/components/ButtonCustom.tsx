@@ -1,11 +1,11 @@
-import React from 'react';
+import { MouseEventHandler } from 'react';
 import styled from 'styled-components';
 import { theme } from '../config';
 import { Spinner } from 'reactstrap';
 
 const ButtonCustom = ({
   color = 'primary',
-  onClick = Function.prototype,
+  onClick = () => {},
   style,
   className = '',
   loading,
@@ -16,6 +16,18 @@ const ButtonCustom = ({
   icon,
   padding = '',
   ...rest
+}: {
+  color?: 'primary' | 'secondary' | 'link' | 'cancel' | 'danger' | 'warning';
+  onClick?: MouseEventHandler<HTMLButtonElement>;
+  style?: any;
+  className?: string;
+  loading?: boolean;
+  title?: string;
+  type?: 'button' | 'submit' | 'reset';
+  width?: number;
+  disabled?: boolean;
+  icon?: string;
+  padding?: string;
 }) => {
   return (
     <ButtonWrapper
@@ -32,7 +44,7 @@ const ButtonCustom = ({
       </SpinnerContainer>
       <Content padding={padding}>
         {!!icon && <Icon color={color} icon={icon} />}
-        <Title transparent={loading}>{title}</Title>
+        <Title transparent={Boolean(loading)}>{title}</Title>
       </Content>
     </ButtonWrapper>
   );
@@ -47,7 +59,10 @@ const STYLES = {
   warning: `background: ${theme.orangeLight}; color: ${theme.orangeDark};`,
 };
 
-const ButtonWrapper = styled.button`
+const ButtonWrapper = styled.button<{
+  color: 'primary' | 'secondary' | 'link' | 'cancel' | 'danger' | 'warning';
+  width?: number;
+}>`
   border-radius: 8px;
   font-size: 14px;
   ${(p) => p.color === 'link' && 'font-weight: 600;'}
@@ -72,7 +87,9 @@ const ButtonWrapper = styled.button`
   }
 `;
 
-const Icon = styled.div`
+const Icon = styled.div<{
+  icon: string;
+}>`
   color: currentColor;
   background-image: url(${(props) => props.icon});
   background-size: 20px;
@@ -82,19 +99,25 @@ const Icon = styled.div`
   margin-right: 7px;
 `;
 
-const Title = styled.p`
+const Title = styled.p<{
+  transparent: boolean;
+}>`
   ${(props) => props.transparent && 'color: transparent'};
   margin-bottom: 0;
 `;
 
-const Content = styled.div`
+const Content = styled.div<{
+  padding: string;
+}>`
   display: flex;
   flex-direction: row;
   align-items: center;
   padding: 8px 15px;
   ${(props) => `padding: ${props.padding}`}
 `;
-const SpinnerContainer = styled.div`
+const SpinnerContainer = styled.div<{
+  visibility: 'visible' | 'hidden';
+}>`
   visibility: ${(props) => props.visibility};
   position: absolute;
   width: 100%;
