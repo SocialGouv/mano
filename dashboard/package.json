@@ -30,7 +30,7 @@
     "localforage": "^1.10.0",
     "page-lifecycle": "^0.1.2",
     "react": "^18.2.0",
-    "react-datepicker": "^4.0.0",
+    "react-datepicker": "^5.0.0",
     "react-dom": "^18.2.0",
     "react-js-pagination": "^3.0.3",
     "react-outside-click-handler": "^1.3.0",

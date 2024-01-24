@@ -1456,12 +1456,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.1.2, @babel/runtime@npm:^7.10.2, @babel/runtime@npm:^7.11.2, @babel/runtime@npm:^7.12.0, @babel/runtime@npm:^7.12.13, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.14.5, @babel/runtime@npm:^7.16.3, @babel/runtime@npm:^7.18.3, @babel/runtime@npm:^7.18.9, @babel/runtime@npm:^7.3.1, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.8.7":
-  version: 7.22.5
-  resolution: "@babel/runtime@npm:7.22.5"
+"@babel/runtime@npm:^7.1.2, @babel/runtime@npm:^7.10.2, @babel/runtime@npm:^7.11.2, @babel/runtime@npm:^7.12.0, @babel/runtime@npm:^7.12.13, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.14.5, @babel/runtime@npm:^7.16.3, @babel/runtime@npm:^7.18.3, @babel/runtime@npm:^7.18.9, @babel/runtime@npm:^7.21.0, @babel/runtime@npm:^7.3.1, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.8.7":
+  version: 7.23.8
+  resolution: "@babel/runtime@npm:7.23.8"
   dependencies:
-    regenerator-runtime: "npm:^0.13.11"
-  checksum: 994898ec8e3c23d941899444bf4b18c61be9c26a12b0e4649d53d72cb6ecce5af2b9db1f405b2f63abb25633def3f8538fe9d0963ae65cf7d47ca3232032e63d
+    regenerator-runtime: "npm:^0.14.0"
+  checksum: ec8f1967a36164da6cac868533ffdff97badd76d23d7d820cc84f0818864accef972f22f9c6a710185db1e3810e353fc18c3da721e5bb3ee8bc61bdbabce03ff
   languageName: node
   linkType: hard
 
@@ -1849,19 +1849,55 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@floating-ui/core@npm:^1.0.4":
-  version: 1.0.4
-  resolution: "@floating-ui/core@npm:1.0.4"
-  checksum: a044e9fff0dd6fe386a87d49c8b31d46ca41ef75627cdebe4d6fef1780fe86be7203a6f9b6ffca3c37ed9bbcbe39108f2181f8cc20ca7fe7ba9d67d3ffc617f4
+"@floating-ui/core@npm:^1.5.3":
+  version: 1.5.3
+  resolution: "@floating-ui/core@npm:1.5.3"
+  dependencies:
+    "@floating-ui/utils": "npm:^0.2.0"
+  checksum: 7d9feaca2565a2a71bf03d23cd292c03def63097d7fde7d62909cdb8ddb84664781f3922086bcf10443f3310cb92381a0ecf745b2774edb917fa74fe61015c56
   languageName: node
   linkType: hard
 
-"@floating-ui/dom@npm:^1.0.1":
-  version: 1.0.9
-  resolution: "@floating-ui/dom@npm:1.0.9"
+"@floating-ui/dom@npm:^1.0.1, @floating-ui/dom@npm:^1.5.4":
+  version: 1.5.4
+  resolution: "@floating-ui/dom@npm:1.5.4"
   dependencies:
-    "@floating-ui/core": "npm:^1.0.4"
-  checksum: 1e24b94cadc055ef3aca710111c8f287dc6f39bab7bcfe8a7ef3a84ccf8d0f41b8ca309fec40f7ed34fc44c6227c32746c6f8290b979d40bff0756453bd444e6
+    "@floating-ui/core": "npm:^1.5.3"
+    "@floating-ui/utils": "npm:^0.2.0"
+  checksum: 3ba02ba2b4227c1e18df6ccdd029a1c100058db2e76ca1dac60a593ec72b2d4d995fa5c2d1639a5c38adb17e12398fbfe4f6cf5fd45f2ee6170ed0cf64acea06
+  languageName: node
+  linkType: hard
+
+"@floating-ui/react-dom@npm:^2.0.6":
+  version: 2.0.6
+  resolution: "@floating-ui/react-dom@npm:2.0.6"
+  dependencies:
+    "@floating-ui/dom": "npm:^1.5.4"
+  peerDependencies:
+    react: ">=16.8.0"
+    react-dom: ">=16.8.0"
+  checksum: 4a3f828370c1b14af0e4d24df18de7b2cfd6695c189532d5949daaa43cba13ce7f231c71783b47e8c54baefcc2542650d82a4a6cebcf3d9091673f2a53d3a2cb
+  languageName: node
+  linkType: hard
+
+"@floating-ui/react@npm:^0.26.2":
+  version: 0.26.6
+  resolution: "@floating-ui/react@npm:0.26.6"
+  dependencies:
+    "@floating-ui/react-dom": "npm:^2.0.6"
+    "@floating-ui/utils": "npm:^0.2.1"
+    tabbable: "npm:^6.0.1"
+  peerDependencies:
+    react: ">=16.8.0"
+    react-dom: ">=16.8.0"
+  checksum: 15085b58e527f9acf617c434f9d3591ee69f039b0ebfb92374a2efdfb67fe5d21c36e4ce70eba13b41cdcfd355618e5bb1465706045f3774e1ce4884bb0c37e1
+  languageName: node
+  linkType: hard
+
+"@floating-ui/utils@npm:^0.2.0, @floating-ui/utils@npm:^0.2.1":
+  version: 0.2.1
+  resolution: "@floating-ui/utils@npm:0.2.1"
+  checksum: 33c9ab346e7b05c5a1e6a95bc902aafcfc2c9d513a147e2491468843bd5607531b06d0b9aa56aa491cbf22a6c2495c18ccfc4c0344baec54a689a7bb8e4898d6
   languageName: node
   linkType: hard
 
@@ -2566,13 +2602,6 @@ __metadata:
     webpack-plugin-serve:
       optional: true
   checksum: be9c3a6339d35320778cfe9e6f35eb98a047a7edb4a8c8678c0fbe10d0b7a038452bdc0ab9e0e3186f707964d14a94411167e3dbe1b3b67b0116878f3a849c26
-  languageName: node
-  linkType: hard
-
-"@popperjs/core@npm:^2.9.2":
-  version: 2.11.6
-  resolution: "@popperjs/core@npm:2.11.6"
-  checksum: 37f5b021d993ae5ad3c3913d6d9b1ab506912b91756ba3ca87bcc0e727b9fd9e1f4c6cf2675aac608aa856c7c5475842df4240770052d6104967c5c6473da7b9
   languageName: node
   linkType: hard
 
@@ -6124,7 +6153,7 @@ __metadata:
     prettier: "npm:^2.7.1"
     prettier-plugin-tailwindcss: "npm:^0.4.0"
     react: "npm:^18.2.0"
-    react-datepicker: "npm:^4.0.0"
+    react-datepicker: "npm:^5.0.0"
     react-dom: "npm:^18.2.0"
     react-js-pagination: "npm:^3.0.3"
     react-outside-click-handler: "npm:^1.3.0"
@@ -6162,10 +6191,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"date-fns@npm:^2.24.0":
-  version: 2.29.3
-  resolution: "date-fns@npm:2.29.3"
-  checksum: 05b6ce6093ed2a09aafe89bb7a6d51ff72971341d7db1e531299d117df305c4a9f408bcdd533687622ae820ba9ea8859437b12074d7043b76325c7828e5d41fc
+"date-fns@npm:^2.30.0":
+  version: 2.30.0
+  resolution: "date-fns@npm:2.30.0"
+  dependencies:
+    "@babel/runtime": "npm:^7.21.0"
+  checksum: 70b3e8ea7aaaaeaa2cd80bd889622a4bcb5d8028b4de9162cbcda359db06e16ff6e9309e54eead5341e71031818497f19aaf9839c87d1aba1e27bb4796e758a9
   languageName: node
   linkType: hard
 
@@ -12262,20 +12293,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-datepicker@npm:^4.0.0":
-  version: 4.8.0
-  resolution: "react-datepicker@npm:4.8.0"
+"react-datepicker@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "react-datepicker@npm:5.0.0"
   dependencies:
-    "@popperjs/core": "npm:^2.9.2"
+    "@floating-ui/react": "npm:^0.26.2"
     classnames: "npm:^2.2.6"
-    date-fns: "npm:^2.24.0"
+    date-fns: "npm:^2.30.0"
     prop-types: "npm:^15.7.2"
-    react-onclickoutside: "npm:^6.12.0"
-    react-popper: "npm:^2.2.5"
+    react-onclickoutside: "npm:^6.13.0"
   peerDependencies:
     react: ^16.9.0 || ^17 || ^18
     react-dom: ^16.9.0 || ^17 || ^18
-  checksum: 3bdc4c591198fb5ce3fd854a364c182c97b964585b3b2e102c5a2d7aa2aa2ace6a73407fd7ce87048ee2e115cc9ea8b0af0aae9907fc64d4e7e9e4461b92e74d
+  checksum: 65df9ded6d13381c5aaec0b7da01cfee2285639834fd9cb4687fe8b555a4b39fabb76fa27e3a84055b771ca32c1e0590316db1fa08706fd020c3349aad87d89f
   languageName: node
   linkType: hard
 
@@ -12337,13 +12367,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-fast-compare@npm:^3.0.1":
-  version: 3.2.0
-  resolution: "react-fast-compare@npm:3.2.0"
-  checksum: 26ed35d425f197f04c85d572eac943d901a2713335b79483d4f3f94ee5caf97f20678f89bedd385ace9b1637890c88fc5442d732bad0871135643d9703312cd7
-  languageName: node
-  linkType: hard
-
 "react-is@npm:^16.13.1, react-is@npm:^16.6.0, react-is@npm:^16.7.0":
   version: 16.13.1
   resolution: "react-is@npm:16.13.1"
@@ -12386,13 +12409,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-onclickoutside@npm:^6.12.0":
-  version: 6.12.2
-  resolution: "react-onclickoutside@npm:6.12.2"
+"react-onclickoutside@npm:^6.13.0":
+  version: 6.13.0
+  resolution: "react-onclickoutside@npm:6.13.0"
   peerDependencies:
     react: ^15.5.x || ^16.x || ^17.x || ^18.x
     react-dom: ^15.5.x || ^16.x || ^17.x || ^18.x
-  checksum: 25c049191fa4989448eaa51efb38141b6de8d9a146504e5e8ee3e6b6a71660bd1c9994a26f614dd64442cf6b20af8ff8e169f06d4a505a508bd3c51f7ca80e24
+  checksum: 4c302e97e7d0009bf06eec35b1cfdb990661bdd144a474f36f29859e43e6c7d9b05e4b13189381e9d1679b83153f4c3d874bcff5a1808390ac4e1c358c92891e
   languageName: node
   linkType: hard
 
@@ -12426,20 +12449,6 @@ __metadata:
   peerDependencies:
     react: 0.14.x || ^15.0.0 || ^16.0.0 || ^17.0.0
   checksum: 1f7115da1dd0fdca1fc266d2cefa79ed00eca560f72399a9149e9a8a4bc3e9d9fe4e2955bbbe2e3326607ceb3bd4a971e501fb0d6bbf57bf492c0072ae39c2c6
-  languageName: node
-  linkType: hard
-
-"react-popper@npm:^2.2.5":
-  version: 2.3.0
-  resolution: "react-popper@npm:2.3.0"
-  dependencies:
-    react-fast-compare: "npm:^3.0.1"
-    warning: "npm:^4.0.2"
-  peerDependencies:
-    "@popperjs/core": ^2.0.0
-    react: ^16.8.0 || ^17 || ^18
-    react-dom: ^16.8.0 || ^17 || ^18
-  checksum: 2afc495479ae4b9e67f9a1642debd7121947fe71a00c5b326301adb8288a18dca53ebd836fe9c3b7a4e2feb838df0abe8e044eb278e89b1c5d50978b0b93d0ac
   languageName: node
   linkType: hard
 
@@ -12850,10 +12859,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"regenerator-runtime@npm:^0.13.11, regenerator-runtime@npm:^0.13.4, regenerator-runtime@npm:^0.13.9":
+"regenerator-runtime@npm:^0.13.4, regenerator-runtime@npm:^0.13.9":
   version: 0.13.11
   resolution: "regenerator-runtime@npm:0.13.11"
   checksum: d493e9e118abef5b099c78170834f18540c4933cedf9bfabc32d3af94abfb59a7907bd7950259cbab0a929ebca7db77301e8024e5121e6482a82f78283dfd20c
+  languageName: node
+  linkType: hard
+
+"regenerator-runtime@npm:^0.14.0":
+  version: 0.14.1
+  resolution: "regenerator-runtime@npm:0.14.1"
+  checksum: 5db3161abb311eef8c45bcf6565f4f378f785900ed3945acf740a9888c792f75b98ecb77f0775f3bf95502ff423529d23e94f41d80c8256e8fa05ed4b07cf471
   languageName: node
   linkType: hard
 
@@ -14118,6 +14134,13 @@ __metadata:
   version: 5.3.3
   resolution: "tabbable@npm:5.3.3"
   checksum: 5da150c9ac7aaed95f901623214794ffac9472a86009a1762c7b436249d33b157b7d86d93610986090d0fb1ef152f5dec2c201552e0b67ca895ba00c145a51c5
+  languageName: node
+  linkType: hard
+
+"tabbable@npm:^6.0.1":
+  version: 6.2.0
+  resolution: "tabbable@npm:6.2.0"
+  checksum: 980fa73476026e99dcacfc0d6e000d41d42c8e670faf4682496d30c625495e412c4369694f2a15cf1e5252d22de3c396f2b62edbe8d60b5dadc40d09e3f2dde3
   languageName: node
   linkType: hard
 
