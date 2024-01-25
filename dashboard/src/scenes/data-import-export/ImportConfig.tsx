@@ -7,7 +7,6 @@ import { customFieldsPersonsSelector } from '../../recoil/persons';
 import { newCustomField, typeOptions } from '../../utils';
 import { customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
 import { organisationState } from '../../recoil/auth';
-import { territoriesState } from '../../recoil/territory';
 import { customFieldsObsSelector } from '../../recoil/territoryObservations';
 import { servicesSelector } from '../../recoil/reports';
 import { actionsCategoriesSelector } from '../../recoil/actions';
@@ -24,7 +23,6 @@ const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HT
   const customFieldsPersons = useRecoilValue(customFieldsPersonsSelector);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
-  const territories = useRecoilValue(territoriesState);
   const groupedServices = useRecoilValue(servicesSelector);
   const actionsGroupedCategories = useRecoilValue(actionsCategoriesSelector);
   const consultationFields = organisation!.consultations;
@@ -66,24 +64,6 @@ const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HT
     } catch (orgUpdateError) {
       console.log('error in updating organisation', orgUpdateError);
       toast.error((orgUpdateError as any)?.message || "Erreur lors de l'import");
-    }
-    // Update territories
-    const sheetData = workbookData['Liste des territoires'];
-    if (sheetData.globalErrors.length > 0) return;
-    const territories = sheetData.data.reduce((acc, curr) => {
-      const territoire = curr.territoire as string;
-      acc.push(territoire);
-      return acc;
-    }, [] as string[]);
-    try {
-      const response = await API.put({ path: `/territory`, body: territories });
-      if (response.ok) {
-        setWorkbookData(null);
-        toast.success('Les territoires ont été mis à jour !');
-      }
-    } catch (territoriesUpdateError) {
-      console.log('error in updating territories', territoriesUpdateError);
-      toast.error((territoriesUpdateError as any)?.message || "Erreur lors de l'import");
     }
   }
 
@@ -168,12 +148,6 @@ const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HT
                     }, [] as string[][]),
                   ]),
                   'Consultation'
-                );
-
-                utils.book_append_sheet(
-                  workbook,
-                  utils.aoa_to_sheet([['Liste des territoires ou structures visitées'], ...territories.map((e: { name: string }) => [e.name])]),
-                  'Liste des territoires'
                 );
 
                 utils.book_append_sheet(
@@ -346,7 +320,6 @@ const sheetNames = [
   'Infos social et médical',
   'Dossier médical',
   'Consultation',
-  'Liste des territoires',
   'Observation de territoire',
   'Liste des services',
   "Catégories d'action",
@@ -357,7 +330,6 @@ const workbookColumns: Record<SheetName, string[]> = {
   'Infos social et médical': ['Rubrique', 'Intitulé du champ', 'Type de champ', 'Choix'],
   'Dossier médical': ['Intitulé du champ', 'Type de champ', 'Choix'],
   Consultation: ['Consultation type pour', 'Intitulé du champ', 'Type de champ', 'Choix'],
-  'Liste des territoires': ['Liste des territoires ou structures visitées'],
   'Observation de territoire': ['Intitulé du champ', 'Type de champ', 'Choix'],
   'Liste des services': ['Liste des services', 'Groupe'],
   "Catégories d'action": ["Liste des catégories d'action", "Groupe d'action"],
@@ -432,12 +404,6 @@ function processConfigWorkbook(workbook: WorkBook): WorkbookData {
           data[sheetName].errors.push({ line: parseInt(key), col: 3, message: `Les choix sont manquants` });
         if (!isTypeOptionLabel(type)) data[sheetName].errors.push({ line: parseInt(key), col: 2, message: `Le type ${type} n'existe pas` });
         data[sheetName].data.push(trimAllValues({ rubrique, intitule, type, choix: choix?.split(',') || [] }));
-      }
-
-      if (sheetName === 'Liste des territoires') {
-        const [territoire] = row;
-        if (!territoire) data[sheetName].errors.push({ line: parseInt(key), col: 0, message: `Le nom du territoire est manquant` });
-        data[sheetName].data.push(trimAllValues({ territoire }));
       }
 
       if (sheetName === 'Observation de territoire') {
