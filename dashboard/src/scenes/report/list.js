@@ -70,6 +70,9 @@ const List = () => {
 
   return (
     <>
+      <div className="tw-mb-8 tw-border-l-4 tw-border-red-500 tw-bg-red-100 tw-p-4 tw-text-red-700" role="alert">
+        Cet affichage des comptes rendus sera supprimé à partir du 1er février 2024. Utilisez l'onglet "Comptes rendus BETA"
+      </div>
       <HeaderStyled style={{ padding: '16px 0' }}>
         <div style={{ display: 'flex', flexGrow: '1' }}>
           <HeaderTitle style={{ fontWeight: '400', flexShrink: 0 }}>
