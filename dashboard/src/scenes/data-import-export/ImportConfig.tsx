@@ -72,10 +72,11 @@ const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HT
       {!workbookData ? (
         <>
           <p>
-            Vous pouvez importer une configuration complète depuis un fichier Excel en téléchargeant la configuration actuelle et en la modifiant. Il
-            est recommandé de faire cette opération en début de paramétrage sur une organisation vide. En cliquant sur importer, vous visualizerez les
-            données qui seront importées, et les erreurs qui ont été trouvées. Cela permet de contrôler que tout est correct avant de valider. Si vous
-            n'avez pas d'erreur, vous pouvez ensuite cliquer sur le bouton "Valider" à l'étape suivante. Les champs attendus sont les suivants:
+            Vous pouvez importer une configuration complète depuis un fichier Excel en téléchargeant la configuration actuelle et en la modifiant.{' '}
+            <b>Il est recommandé de faire cette opération en début de paramétrage sur une organisation vide</b>. En cliquant sur importer, vous
+            visualizerez les données qui seront importées dans un deuxième temps, et les erreurs qui ont été trouvées. Cela permet de contrôler que
+            tout est correct avant de valider. Si vous n'avez pas d'erreur, vous pouvez ensuite cliquer sur le bouton "Valider l'import" à l'étape
+            suivante. Les champs attendus sont les suivants:
           </p>
           <table className="table-sm table" style={{ fontSize: '14px', marginTop: '2rem' }}>
             <thead>
@@ -203,8 +204,8 @@ const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HT
       ) : (
         <div>
           <div className="tw-mb-8 tw-border-l-4 tw-border-blue-500 tw-bg-blue-100 tw-p-4 tw-text-blue-700" role="alert">
-            Le fichier a été analysé. Relisez attentivement les erreurs, et d'ailleurs même si vous n'avez pas d'erreur, relisez quand même. Quand
-            tout vous semble bon, cliquez sur le bouton "Enregistrer" en bas.
+            Le fichier a été analysé. Relisez attentivement le compte rendu pour vérifier que c'est bien ce qui est attendu. Quand tout vous semble
+            bon, cliquez sur le bouton "Valider l'import" en bas (pas de retour arrière possible).
           </div>
           {Object.entries(workbookData).map(([sheetName, { data, globalErrors, errors }]) => (
             <div key={sheetName}>
@@ -483,7 +484,7 @@ function getUpdatedOrganisationFromWorkbookData(organisation: OrganisationInstan
         }
         return acc;
       }, [] as CustomFieldsGroup[]);
-      updatedOrganisation.customFieldsPersons = customFields;
+      if (customFields.length) updatedOrganisation.customFieldsPersons = customFields;
     }
     if (sheetName === 'Dossier médical') {
       const customFields = sheetData.data.reduce((acc, curr) => {
@@ -494,7 +495,7 @@ function getUpdatedOrganisationFromWorkbookData(organisation: OrganisationInstan
         acc.push(mergerFieldWithPrevious({ label: intitule, type: toFieldType(type), options }, previousOrganisationField));
         return acc;
       }, [] as CustomField[]);
-      updatedOrganisation.customFieldsMedicalFile = customFields;
+      if (customFields.length) updatedOrganisation.customFieldsMedicalFile = customFields;
     }
     if (sheetName === 'Consultation') {
       const customFields = sheetData.data.reduce((acc, curr) => {
@@ -525,7 +526,7 @@ function getUpdatedOrganisationFromWorkbookData(organisation: OrganisationInstan
         }
         return acc;
       }, [] as CustomFieldsGroup[]);
-      updatedOrganisation.consultations = customFields;
+      if (customFields.length) updatedOrganisation.consultations = customFields;
     }
 
     if (sheetName === 'Observation de territoire') {
@@ -537,7 +538,7 @@ function getUpdatedOrganisationFromWorkbookData(organisation: OrganisationInstan
         acc.push(mergerFieldWithPrevious({ label: intitule, type: toFieldType(type), options }, previousOrganisationField));
         return acc;
       }, [] as CustomField[]);
-      updatedOrganisation.customFieldsObs = customFields;
+      if (customFields.length) updatedOrganisation.customFieldsObs = customFields;
     }
     if (sheetName === 'Liste des services') {
       const services = sheetData.data.reduce((acc, curr) => {
@@ -552,7 +553,7 @@ function getUpdatedOrganisationFromWorkbookData(organisation: OrganisationInstan
         }
         return acc;
       }, [] as { groupTitle: string; services: string[] }[]);
-      updatedOrganisation.groupedServices = services;
+      if (services.length) updatedOrganisation.groupedServices = services;
     }
     if (sheetName === "Catégories d'action") {
       const categories = sheetData.data.reduce((acc, curr) => {
@@ -567,7 +568,7 @@ function getUpdatedOrganisationFromWorkbookData(organisation: OrganisationInstan
         }
         return acc;
       }, [] as { groupTitle: string; categories: string[] }[]);
-      updatedOrganisation.actionsGroupedCategories = categories;
+      if (categories.length) updatedOrganisation.actionsGroupedCategories = categories;
     }
   }
   return updatedOrganisation;
