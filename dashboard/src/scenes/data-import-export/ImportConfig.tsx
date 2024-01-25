@@ -67,6 +67,8 @@ const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HT
     }
   }
 
+  const workbookHasErrors = workbookData && Object.values(workbookData).some((sheet) => sheet.errors.length > 0 || sheet.globalErrors.length > 0);
+
   return (
     <div>
       {!workbookData ? (
@@ -283,7 +285,11 @@ const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HT
             </div>
           ))}
           <div className="tw-mt-8 tw-flex tw-justify-end tw-gap-4">
-            <ButtonCustom onClick={() => handleImport()} color="primary" title="Valider l'import" padding="12px 24px" />
+            {!workbookHasErrors ? (
+              <ButtonCustom onClick={() => handleImport()} color="primary" title="Valider l'import" padding="12px 24px" />
+            ) : (
+              <ButtonCustom onClick={() => setWorkbookData(null)} color="secondary" title="Annuler, recommencer" padding="12px 24px" />
+            )}
           </div>
         </div>
       )}
