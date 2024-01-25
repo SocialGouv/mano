@@ -9,7 +9,6 @@ interface GroupedServices {
   services: string[];
 }
 
-[{ services: ['Médecine généraliste', 'Médecin spéciliste'], groupTitle: 'Orientations' }];
 export interface OrganisationInstance {
   _id: string;
   name: string;
