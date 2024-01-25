@@ -181,7 +181,7 @@ const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HT
                       return [...acc, ...curr.categories.map((e: string) => [e, curr.groupTitle])];
                     }, [] as string[][]),
                   ]),
-                  "Catégories d'action"
+                  'Catégories d action'
                 );
 
                 // Écriture du fichier XLSX
@@ -329,7 +329,7 @@ const sheetNames = [
   'Consultation',
   'Observation de territoire',
   'Liste des services',
-  "Catégories d'action",
+  'Catégories d action',
 ] as const;
 type SheetName = typeof sheetNames[number];
 
@@ -339,7 +339,7 @@ const workbookColumns: Record<SheetName, string[]> = {
   Consultation: ['Consultation type pour', 'Intitulé du champ', 'Type de champ', 'Choix'],
   'Observation de territoire': ['Intitulé du champ', 'Type de champ', 'Choix'],
   'Liste des services': ['Liste des services', 'Groupe'],
-  "Catégories d'action": ["Liste des catégories d'action", "Groupe d'action"],
+  'Catégories d action': ["Liste des catégories d'action", "Groupe d'action"],
 };
 
 type WorkbookData = Record<
@@ -432,7 +432,7 @@ function processConfigWorkbook(workbook: WorkBook): WorkbookData {
         data[sheetName].data.push(trimAllValues({ service, groupe }));
       }
 
-      if (sheetName === "Catégories d'action") {
+      if (sheetName === 'Catégories d action') {
         const [categorie, groupe] = row;
         if (!categorie) data[sheetName].errors.push({ line: parseInt(key), col: 0, message: `Le nom de la catégorie est manquant` });
         if (!groupe) data[sheetName].errors.push({ line: parseInt(key), col: 1, message: `Le nom du groupe est manquant` });
@@ -563,7 +563,7 @@ function getUpdatedOrganisationFromWorkbookData(organisation: OrganisationInstan
       }, [] as { groupTitle: string; services: string[] }[]);
       if (services.length) updatedOrganisation.groupedServices = services;
     }
-    if (sheetName === "Catégories d'action") {
+    if (sheetName === 'Catégories d action') {
       const categories = sheetData.data.reduce((acc, curr) => {
         const categorie = curr.categorie as string;
         const groupe = curr.groupe as string;
