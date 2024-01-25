@@ -7,7 +7,7 @@
   "license": "MIT",
   "devDependencies": {
     "@playwright/test": "^1.35.1",
-    "husky": "^8.0.1",
+    "husky": "^9.0.0",
     "is-ci": "^3.0.1",
     "node-talisman": "^1.29.3"
   },

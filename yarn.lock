@@ -609,12 +609,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"husky@npm:^8.0.1":
-  version: 8.0.1
-  resolution: "husky@npm:8.0.1"
+"husky@npm:^9.0.0":
+  version: 9.0.1
+  resolution: "husky@npm:9.0.1"
   bin:
-    husky: lib/bin.js
-  checksum: 58c0e87c37f0aaea4e0ea02499444df11adb9ec182fd42735385045b51a55cbdcca48afeea337801e50435fbeb0e77c57c2b430695663774afb279bb0e8aa25f
+    husky: bin.js
+  checksum: d7f3d158fffc8cc91211172637f7069b2173dbf5e732f46596a2a512e5f5f17ddebd895202cc67b0f159b747b698e2cc5601282b198d9cb5d97a5671fcb2afb7
   languageName: node
   linkType: hard
 
@@ -797,7 +797,7 @@ __metadata:
     bcryptjs: "npm:^2.4.3"
     dayjs: "npm:^1.11.6"
     dotenv: "npm:^16.0.3"
-    husky: "npm:^8.0.1"
+    husky: "npm:^9.0.0"
     is-ci: "npm:^3.0.1"
     nanoid: "npm:3.3.4"
     node-talisman: "npm:^1.29.3"
