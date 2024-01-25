@@ -1,3 +1,10 @@
+# [1.303.0](https://github.com/SocialGouv/mano/compare/v1.302.12...v1.303.0) (2024-01-25)
+
+
+### Features
+
+* import/export de configuration (work in progress) ([#1837](https://github.com/SocialGouv/mano/issues/1837)) ([b87e2d4](https://github.com/SocialGouv/mano/commit/b87e2d4c8c78a33f66d1beac43a0580049390101))
+
 ## [1.302.12](https://github.com/SocialGouv/mano/compare/v1.302.11...v1.302.12) (2024-01-16)
 
 
