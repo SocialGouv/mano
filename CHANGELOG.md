@@ -1,3 +1,10 @@
+## [1.303.1](https://github.com/SocialGouv/mano/compare/v1.303.0...v1.303.1) (2024-01-25)
+
+
+### Bug Fixes
+
+* import de config sans apostrophe pour google sheet ([5860694](https://github.com/SocialGouv/mano/commit/586069401749876ec32188eae3044c464488a3dc))
+
 # [1.303.0](https://github.com/SocialGouv/mano/compare/v1.302.12...v1.303.0) (2024-01-25)
 
 
