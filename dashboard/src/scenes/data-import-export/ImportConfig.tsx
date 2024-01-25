@@ -1,169 +1,26 @@
 import { MutableRefObject, useRef, useState } from 'react';
 import { utils, read, writeFile, WorkBook } from 'xlsx';
-import ButtonCustom from '../../components/ButtonCustom';
+import { toast } from 'react-toastify';
 import { useRecoilState, useRecoilValue } from 'recoil';
+import ButtonCustom from '../../components/ButtonCustom';
 import { customFieldsPersonsSelector } from '../../recoil/persons';
-import { typeOptions } from '../../utils';
+import { newCustomField, typeOptions } from '../../utils';
 import { customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
 import { organisationState } from '../../recoil/auth';
 import { territoriesState } from '../../recoil/territory';
 import { customFieldsObsSelector } from '../../recoil/territoryObservations';
 import { servicesSelector } from '../../recoil/reports';
 import { actionsCategoriesSelector } from '../../recoil/actions';
-
-const typeOptionsLabels = [
-  'Texte',
-  'Zone de texte multi-lignes',
-  'Nombre',
-  'Date sans heure',
-  'Date avec heure',
-  'Oui/Non',
-  'Choix dans une liste',
-  'Choix multiple dans une liste',
-  'Case à cocher',
-] as const;
-type TypeOption = typeof typeOptionsLabels[number];
-
-function isTypeOptionLabel(type: string): type is TypeOption {
-  return typeOptionsLabels.includes(type as any);
-}
-
-function requiresOptions(type: TypeOption): boolean {
-  return ['Choix dans une liste', 'Choix multiple dans une liste'].includes(type);
-}
-
-const sheetNames = [
-  'Infos social et médical',
-  'Dossier médical',
-  'Consultation',
-  'Liste des territoires',
-  'Observation de territoire',
-  'Liste des services',
-  "Catégories d'action",
-] as const;
-type SheetName = typeof sheetNames[number];
-
-const workbookColumns: Record<SheetName, string[]> = {
-  'Infos social et médical': ['Rubrique', 'Intitulé du champ', 'Type de champ', 'Choix'],
-  'Dossier médical': ['Intitulé du champ', 'Type de champ', 'Choix'],
-  Consultation: ['Consultation type pour', 'Intitulé du champ', 'Type de champ', 'Choix'],
-  'Liste des territoires': ['Liste des territoires ou structures visitées'],
-  'Observation de territoire': ['Intitulé du champ', 'Type de champ', 'Choix'],
-  'Liste des services': ['Liste des services', 'Groupe'],
-  "Catégories d'action": ["Liste des catégories d'action", "Groupe d'action"],
-};
-
-type WorkbookData = Record<
-  SheetName,
-  {
-    data: Record<string, string | string[]>[];
-    globalErrors: string[];
-    errors: { line: number; col: number; message: string }[];
-  }
->;
-
-function trimAllValues<R extends Record<string, string | string[]>>(obj: R): R {
-  if (typeof obj !== 'object') return obj;
-  return Object.fromEntries(
-    Object.entries(obj).map(([k, v]) => [
-      k,
-      Array.isArray(v) ? v.map((s) => (typeof s === 'string' ? s.trim() : s)) : typeof v === 'string' ? v.trim() : v,
-    ])
-  ) as R;
-}
-
-// Parse le fichier Excel et retourne un objet contenant les données et les erreurs
-function processConfigWorkbook(workbook: WorkBook): WorkbookData {
-  const data: WorkbookData = sheetNames.reduce((acc, sheetName) => {
-    return { ...acc, [sheetName]: { data: [], globalErrors: [], errors: [] } };
-  }, {} as WorkbookData);
-  for (const sheetName of sheetNames) {
-    if (!workbook.SheetNames.includes(sheetName)) {
-      data[sheetName].globalErrors.push(`La feuille ${sheetName} est manquante`);
-      continue;
-    }
-    const sheet = workbook.Sheets[sheetName];
-    const rows = utils.sheet_to_json<string[]>(sheet, { header: 1 });
-    for (const col of workbookColumns[sheetName]) {
-      if (!rows[0].includes(col)) data[sheetName].globalErrors.push(`La colonne ${col} est manquante`);
-    }
-    if (data[sheetName].globalErrors.length > 0) continue;
-
-    const rowsWithoutHeader = rows.slice(1);
-    for (const key in rowsWithoutHeader) {
-      const row = rowsWithoutHeader[key];
-      if (sheetName === 'Infos social et médical') {
-        const [rubrique, intitule, type, choix] = row;
-        if (!rubrique) data[sheetName].errors.push({ line: parseInt(key), col: 0, message: `La rubrique est manquante` });
-        if (!intitule) data[sheetName].errors.push({ line: parseInt(key), col: 1, message: `L'intitulé du champ est manquant` });
-        if (!type) data[sheetName].errors.push({ line: parseInt(key), col: 2, message: `Le type de champ est manquant` });
-        if (requiresOptions(type as TypeOption) && !choix)
-          data[sheetName].errors.push({ line: parseInt(key), col: 3, message: `Les choix sont manquants` });
-        if (!isTypeOptionLabel(type)) data[sheetName].errors.push({ line: parseInt(key), col: 2, message: `Le type ${type} n'existe pas` });
-        data[sheetName].data.push(trimAllValues({ rubrique, intitule, type, choix: choix?.split(',') || [] }));
-      }
-
-      if (sheetName === 'Dossier médical') {
-        const [intitule, type, choix] = row;
-        if (!intitule) data[sheetName].errors.push({ line: parseInt(key), col: 0, message: `L'intitulé du champ est manquant` });
-        if (!type) data[sheetName].errors.push({ line: parseInt(key), col: 1, message: `Le type de champ est manquant` });
-        if (requiresOptions(type as TypeOption) && !choix)
-          data[sheetName].errors.push({ line: parseInt(key), col: 2, message: `Les choix sont manquants` });
-        if (!isTypeOptionLabel(type)) data[sheetName].errors.push({ line: parseInt(key), col: 1, message: `Le type ${type} n'existe pas` });
-        data[sheetName].data.push(trimAllValues({ intitule, type, choix: choix?.split(',') || [] }));
-      }
-
-      if (sheetName === 'Consultation') {
-        const [rubrique, intitule, type, choix] = row;
-        if (!rubrique) data[sheetName].errors.push({ line: parseInt(key), col: 0, message: `La rubrique est manquante` });
-        if (!intitule) data[sheetName].errors.push({ line: parseInt(key), col: 1, message: `L'intitulé du champ est manquant` });
-        if (!type) data[sheetName].errors.push({ line: parseInt(key), col: 2, message: `Le type de champ est manquant` });
-        if (requiresOptions(type as TypeOption) && !choix)
-          data[sheetName].errors.push({ line: parseInt(key), col: 3, message: `Les choix sont manquants` });
-        if (!isTypeOptionLabel(type)) data[sheetName].errors.push({ line: parseInt(key), col: 2, message: `Le type ${type} n'existe pas` });
-        data[sheetName].data.push(trimAllValues({ rubrique, intitule, type, choix: choix?.split(',') || [] }));
-      }
-
-      if (sheetName === 'Liste des territoires') {
-        const [territoire] = row;
-        if (!territoire) data[sheetName].errors.push({ line: parseInt(key), col: 0, message: `Le nom du territoire est manquant` });
-        data[sheetName].data.push(trimAllValues({ territoire }));
-      }
-
-      if (sheetName === 'Observation de territoire') {
-        const [intitule, type, choix] = row;
-        if (!intitule) data[sheetName].errors.push({ line: parseInt(key), col: 0, message: `L'intitulé du champ est manquant` });
-        if (!type) data[sheetName].errors.push({ line: parseInt(key), col: 1, message: `Le type de champ est manquant` });
-        if (requiresOptions(type as TypeOption) && !choix)
-          data[sheetName].errors.push({ line: parseInt(key), col: 2, message: `Les choix sont manquants` });
-        if (!isTypeOptionLabel(type)) data[sheetName].errors.push({ line: parseInt(key), col: 1, message: `Le type ${type} n'existe pas` });
-        data[sheetName].data.push(trimAllValues({ intitule, type, choix: choix?.split(',') || [] }));
-      }
-
-      if (sheetName === 'Liste des services') {
-        const [service, groupe] = row;
-        if (!service) data[sheetName].errors.push({ line: parseInt(key), col: 0, message: `Le nom du service est manquant` });
-        if (!groupe) data[sheetName].errors.push({ line: parseInt(key), col: 1, message: `Le nom du groupe est manquant` });
-        data[sheetName].data.push(trimAllValues({ service, groupe }));
-      }
-
-      if (sheetName === "Catégories d'action") {
-        const [categorie, groupe] = row;
-        if (!categorie) data[sheetName].errors.push({ line: parseInt(key), col: 0, message: `Le nom de la catégorie est manquant` });
-        if (!groupe) data[sheetName].errors.push({ line: parseInt(key), col: 1, message: `Le nom du groupe est manquant` });
-        data[sheetName].data.push(trimAllValues({ categorie, groupe }));
-      }
-    }
-  }
-  return data;
-}
+import API from '../../services/api';
+import { OrganisationInstance } from '../../types/organisation';
+import { CustomField, CustomFieldsGroup, FieldType } from '../../types/field';
 
 const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HTMLDivElement> }) => {
   const fileDialogRef = useRef<HTMLInputElement>(null);
   const [workbookData, setWorkbookData] = useState<WorkbookData | null>(null);
   const [reloadKey, setReloadKey] = useState(0); // because input type 'file' doesn't trigger 'onChange' for uploading twice the same file
 
-  const [organisation] = useRecoilState(organisationState);
+  const [organisation, setOrganisation] = useRecoilState(organisationState);
   const customFieldsPersons = useRecoilValue(customFieldsPersonsSelector);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
@@ -172,7 +29,7 @@ const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HT
   const actionsGroupedCategories = useRecoilValue(actionsCategoriesSelector);
   const consultationFields = organisation!.consultations;
 
-  const handleFileUpload = (e: any) => {
+  const verifyFile = (e: any) => {
     const file = e.target.files[0];
     const reader = new FileReader();
 
@@ -194,6 +51,41 @@ const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HT
 
     reader.readAsBinaryString(file);
   };
+
+  async function handleImport() {
+    if (!workbookData || !organisation) return;
+    // Update organisation
+    const updatedOrganisation = getUpdatedOrganisationFromWorkbookData(organisation, workbookData);
+    try {
+      const response = await API.put({ path: `/organisation/${organisation._id}`, body: updatedOrganisation });
+      if (response.ok) {
+        toast.success("L'organisation a été mise à jour !");
+        setWorkbookData(null);
+        setOrganisation(response.data);
+      }
+    } catch (orgUpdateError) {
+      console.log('error in updating organisation', orgUpdateError);
+      toast.error((orgUpdateError as any)?.message || "Erreur lors de l'import");
+    }
+    // Update territories
+    const sheetData = workbookData['Liste des territoires'];
+    if (sheetData.globalErrors.length > 0) return;
+    const territories = sheetData.data.reduce((acc, curr) => {
+      const territoire = curr.territoire as string;
+      acc.push(territoire);
+      return acc;
+    }, [] as string[]);
+    try {
+      const response = await API.put({ path: `/territory`, body: territories });
+      if (response.ok) {
+        setWorkbookData(null);
+        toast.success('Les territoires ont été mis à jour !');
+      }
+    } catch (territoriesUpdateError) {
+      console.log('error in updating territories', territoriesUpdateError);
+      toast.error((territoriesUpdateError as any)?.message || "Erreur lors de l'import");
+    }
+  }
 
   return (
     <div>
@@ -330,7 +222,7 @@ const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HT
               id="fileDialog"
               accept="csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
               style={{ display: 'none' }}
-              onChange={handleFileUpload}
+              onChange={verifyFile}
             />
           </div>
         </>
@@ -416,12 +308,303 @@ const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HT
             </div>
           ))}
           <div className="tw-mt-8 tw-flex tw-justify-end tw-gap-4">
-            <ButtonCustom onClick={() => alert('todo')} color="primary" title="Valider l'import" padding="12px 24px" />
+            <ButtonCustom onClick={() => handleImport()} color="primary" title="Valider l'import" padding="12px 24px" />
           </div>
         </div>
       )}
     </div>
   );
 };
+
+const typeOptionsLabels = [
+  'Texte',
+  'Zone de texte multi-lignes',
+  'Nombre',
+  'Date sans heure',
+  'Date avec heure',
+  'Oui/Non',
+  'Choix dans une liste',
+  'Choix multiple dans une liste',
+  'Case à cocher',
+] as const;
+type TypeOptionLabel = typeof typeOptionsLabels[number];
+
+function isTypeOptionLabel(type: string): type is TypeOptionLabel {
+  return typeOptionsLabels.includes(type as any);
+}
+
+function toFieldType(label: TypeOptionLabel): FieldType {
+  const item = typeOptions.find((t) => t.label === label);
+  return (item ? item.value : 'text') as FieldType;
+}
+
+function requiresOptions(type: TypeOptionLabel): boolean {
+  return ['Choix dans une liste', 'Choix multiple dans une liste'].includes(type);
+}
+
+const sheetNames = [
+  'Infos social et médical',
+  'Dossier médical',
+  'Consultation',
+  'Liste des territoires',
+  'Observation de territoire',
+  'Liste des services',
+  "Catégories d'action",
+] as const;
+type SheetName = typeof sheetNames[number];
+
+const workbookColumns: Record<SheetName, string[]> = {
+  'Infos social et médical': ['Rubrique', 'Intitulé du champ', 'Type de champ', 'Choix'],
+  'Dossier médical': ['Intitulé du champ', 'Type de champ', 'Choix'],
+  Consultation: ['Consultation type pour', 'Intitulé du champ', 'Type de champ', 'Choix'],
+  'Liste des territoires': ['Liste des territoires ou structures visitées'],
+  'Observation de territoire': ['Intitulé du champ', 'Type de champ', 'Choix'],
+  'Liste des services': ['Liste des services', 'Groupe'],
+  "Catégories d'action": ["Liste des catégories d'action", "Groupe d'action"],
+};
+
+type WorkbookData = Record<
+  SheetName,
+  {
+    data: Record<string, string | string[]>[];
+    globalErrors: string[];
+    errors: { line: number; col: number; message: string }[];
+  }
+>;
+
+function trimAllValues<R extends Record<string, string | string[]>>(obj: R): R {
+  if (typeof obj !== 'object') return obj;
+  return Object.fromEntries(
+    Object.entries(obj).map(([k, v]) => [
+      k,
+      Array.isArray(v) ? v.map((s) => (typeof s === 'string' ? s.trim() : s)) : typeof v === 'string' ? v.trim() : v,
+    ])
+  ) as R;
+}
+
+// Parse le fichier Excel et retourne un objet contenant les données et les erreurs
+function processConfigWorkbook(workbook: WorkBook): WorkbookData {
+  const data: WorkbookData = sheetNames.reduce((acc, sheetName) => {
+    return { ...acc, [sheetName]: { data: [], globalErrors: [], errors: [] } };
+  }, {} as WorkbookData);
+  for (const sheetName of sheetNames) {
+    if (!workbook.SheetNames.includes(sheetName)) {
+      data[sheetName].globalErrors.push(`La feuille ${sheetName} est manquante`);
+      continue;
+    }
+    const sheet = workbook.Sheets[sheetName];
+    const rows = utils.sheet_to_json<string[]>(sheet, { header: 1 });
+    for (const col of workbookColumns[sheetName]) {
+      if (!rows[0].includes(col)) data[sheetName].globalErrors.push(`La colonne ${col} est manquante`);
+    }
+    if (data[sheetName].globalErrors.length > 0) continue;
+
+    const rowsWithoutHeader = rows.slice(1);
+    for (const key in rowsWithoutHeader) {
+      const row = rowsWithoutHeader[key];
+      if (sheetName === 'Infos social et médical') {
+        const [rubrique, intitule, type, choix] = row;
+        if (!rubrique) data[sheetName].errors.push({ line: parseInt(key), col: 0, message: `La rubrique est manquante` });
+        if (!intitule) data[sheetName].errors.push({ line: parseInt(key), col: 1, message: `L'intitulé du champ est manquant` });
+        if (!type) data[sheetName].errors.push({ line: parseInt(key), col: 2, message: `Le type de champ est manquant` });
+        if (requiresOptions(type as TypeOptionLabel) && !choix)
+          data[sheetName].errors.push({ line: parseInt(key), col: 3, message: `Les choix sont manquants` });
+        if (!isTypeOptionLabel(type)) data[sheetName].errors.push({ line: parseInt(key), col: 2, message: `Le type ${type} n'existe pas` });
+        data[sheetName].data.push(trimAllValues({ rubrique, intitule, type, choix: choix?.split(',') || [] }));
+      }
+
+      if (sheetName === 'Dossier médical') {
+        const [intitule, type, choix] = row;
+        if (!intitule) data[sheetName].errors.push({ line: parseInt(key), col: 0, message: `L'intitulé du champ est manquant` });
+        if (!type) data[sheetName].errors.push({ line: parseInt(key), col: 1, message: `Le type de champ est manquant` });
+        if (requiresOptions(type as TypeOptionLabel) && !choix)
+          data[sheetName].errors.push({ line: parseInt(key), col: 2, message: `Les choix sont manquants` });
+        if (!isTypeOptionLabel(type)) data[sheetName].errors.push({ line: parseInt(key), col: 1, message: `Le type ${type} n'existe pas` });
+        data[sheetName].data.push(trimAllValues({ intitule, type, choix: choix?.split(',') || [] }));
+      }
+
+      if (sheetName === 'Consultation') {
+        const [rubrique, intitule, type, choix] = row;
+        if (!rubrique) data[sheetName].errors.push({ line: parseInt(key), col: 0, message: `La rubrique est manquante` });
+        if (!intitule) data[sheetName].errors.push({ line: parseInt(key), col: 1, message: `L'intitulé du champ est manquant` });
+        if (!type) data[sheetName].errors.push({ line: parseInt(key), col: 2, message: `Le type de champ est manquant` });
+        if (requiresOptions(type as TypeOptionLabel) && !choix)
+          data[sheetName].errors.push({ line: parseInt(key), col: 3, message: `Les choix sont manquants` });
+        if (!isTypeOptionLabel(type)) data[sheetName].errors.push({ line: parseInt(key), col: 2, message: `Le type ${type} n'existe pas` });
+        data[sheetName].data.push(trimAllValues({ rubrique, intitule, type, choix: choix?.split(',') || [] }));
+      }
+
+      if (sheetName === 'Liste des territoires') {
+        const [territoire] = row;
+        if (!territoire) data[sheetName].errors.push({ line: parseInt(key), col: 0, message: `Le nom du territoire est manquant` });
+        data[sheetName].data.push(trimAllValues({ territoire }));
+      }
+
+      if (sheetName === 'Observation de territoire') {
+        const [intitule, type, choix] = row;
+        if (!intitule) data[sheetName].errors.push({ line: parseInt(key), col: 0, message: `L'intitulé du champ est manquant` });
+        if (!type) data[sheetName].errors.push({ line: parseInt(key), col: 1, message: `Le type de champ est manquant` });
+        if (requiresOptions(type as TypeOptionLabel) && !choix)
+          data[sheetName].errors.push({ line: parseInt(key), col: 2, message: `Les choix sont manquants` });
+        if (!isTypeOptionLabel(type)) data[sheetName].errors.push({ line: parseInt(key), col: 1, message: `Le type ${type} n'existe pas` });
+        data[sheetName].data.push(trimAllValues({ intitule, type, choix: choix?.split(',') || [] }));
+      }
+
+      if (sheetName === 'Liste des services') {
+        const [service, groupe] = row;
+        if (!service) data[sheetName].errors.push({ line: parseInt(key), col: 0, message: `Le nom du service est manquant` });
+        if (!groupe) data[sheetName].errors.push({ line: parseInt(key), col: 1, message: `Le nom du groupe est manquant` });
+        data[sheetName].data.push(trimAllValues({ service, groupe }));
+      }
+
+      if (sheetName === "Catégories d'action") {
+        const [categorie, groupe] = row;
+        if (!categorie) data[sheetName].errors.push({ line: parseInt(key), col: 0, message: `Le nom de la catégorie est manquant` });
+        if (!groupe) data[sheetName].errors.push({ line: parseInt(key), col: 1, message: `Le nom du groupe est manquant` });
+        data[sheetName].data.push(trimAllValues({ categorie, groupe }));
+      }
+    }
+  }
+  return data;
+}
+
+function mergerFieldWithPrevious(field: Partial<CustomField>, previousField?: CustomField): CustomField {
+  return {
+    ...(newCustomField() as CustomField),
+    ...field,
+    ...(previousField ? { enabled: previousField.enabled } : {}),
+    ...(previousField ? { required: previousField.required } : {}),
+    ...(previousField ? { showInStats: previousField.showInStats } : {}),
+    ...(previousField ? { name: previousField.name } : {}),
+  };
+}
+
+// Importe les données dans l'organisation
+function getUpdatedOrganisationFromWorkbookData(organisation: OrganisationInstance, workbookData: WorkbookData): OrganisationInstance {
+  const updatedOrganisation = { ...organisation };
+
+  for (const sheetName of sheetNames) {
+    const sheetData = workbookData[sheetName];
+    if (sheetData.globalErrors.length > 0) continue;
+    if (sheetName === 'Infos social et médical') {
+      const customFields = sheetData.data.reduce((acc, curr) => {
+        const rubrique = curr.rubrique as string;
+        const intitule = curr.intitule as string;
+        const type = curr.type as TypeOptionLabel;
+        const options = curr.choix as string[];
+        const rubriqueIndex = acc.findIndex((e) => e.name === rubrique);
+
+        const previousOrganisationField = organisation.customFieldsPersons
+          ?.find((e) => e.name === rubrique)
+          ?.fields.find((f) => f.label === intitule);
+
+        if (rubriqueIndex === -1) {
+          acc.push({
+            name: rubrique,
+            fields: [mergerFieldWithPrevious({ label: intitule, type: toFieldType(type), options }, previousOrganisationField)],
+          });
+        } else {
+          acc[rubriqueIndex].fields.push(
+            mergerFieldWithPrevious(
+              {
+                label: intitule,
+                type: toFieldType(type),
+                options,
+              },
+              previousOrganisationField
+            )
+          );
+        }
+        return acc;
+      }, [] as CustomFieldsGroup[]);
+      updatedOrganisation.customFieldsPersons = customFields;
+    }
+    if (sheetName === 'Dossier médical') {
+      const customFields = sheetData.data.reduce((acc, curr) => {
+        const intitule = curr.intitule as string;
+        const type = curr.type as TypeOptionLabel;
+        const options = curr.choix as string[];
+        const previousOrganisationField = organisation.customFieldsMedicalFile?.find((e) => e.label === intitule);
+        acc.push(mergerFieldWithPrevious({ label: intitule, type: toFieldType(type), options }, previousOrganisationField));
+        return acc;
+      }, [] as CustomField[]);
+      updatedOrganisation.customFieldsMedicalFile = customFields;
+    }
+    if (sheetName === 'Consultation') {
+      const customFields = sheetData.data.reduce((acc, curr) => {
+        const rubrique = curr.rubrique as string;
+        const intitule = curr.intitule as string;
+        const type = curr.type as TypeOptionLabel;
+        const options = curr.choix as string[];
+        const rubriqueIndex = acc.findIndex((e) => e.name === rubrique);
+
+        const previousOrganisationField = organisation.consultations?.find((e) => e.name === rubrique)?.fields.find((f) => f.label === intitule);
+
+        if (rubriqueIndex === -1) {
+          acc.push({
+            name: rubrique,
+            fields: [mergerFieldWithPrevious({ label: intitule, type: toFieldType(type), options }, previousOrganisationField)],
+          });
+        } else {
+          acc[rubriqueIndex].fields.push(
+            mergerFieldWithPrevious(
+              {
+                label: intitule,
+                type: toFieldType(type),
+                options,
+              },
+              previousOrganisationField
+            )
+          );
+        }
+        return acc;
+      }, [] as CustomFieldsGroup[]);
+      updatedOrganisation.consultations = customFields;
+    }
+
+    if (sheetName === 'Observation de territoire') {
+      const customFields = sheetData.data.reduce((acc, curr) => {
+        const intitule = curr.intitule as string;
+        const type = curr.type as TypeOptionLabel;
+        const options = curr.choix as string[];
+        const previousOrganisationField = organisation.customFieldsObs?.find((e) => e.label === intitule);
+        acc.push(mergerFieldWithPrevious({ label: intitule, type: toFieldType(type), options }, previousOrganisationField));
+        return acc;
+      }, [] as CustomField[]);
+      updatedOrganisation.customFieldsObs = customFields;
+    }
+    if (sheetName === 'Liste des services') {
+      const services = sheetData.data.reduce((acc, curr) => {
+        const service = curr.service as string;
+        const groupe = curr.groupe as string;
+        const groupeIndex = acc.findIndex((e) => e.groupTitle === groupe);
+
+        if (groupeIndex === -1) {
+          acc.push({ groupTitle: groupe, services: [service] });
+        } else {
+          acc[groupeIndex].services.push(service);
+        }
+        return acc;
+      }, [] as { groupTitle: string; services: string[] }[]);
+      updatedOrganisation.groupedServices = services;
+    }
+    if (sheetName === "Catégories d'action") {
+      const categories = sheetData.data.reduce((acc, curr) => {
+        const categorie = curr.categorie as string;
+        const groupe = curr.groupe as string;
+        const groupeIndex = acc.findIndex((e) => e.groupTitle === groupe);
+
+        if (groupeIndex === -1) {
+          acc.push({ groupTitle: groupe, categories: [categorie] });
+        } else {
+          acc[groupeIndex].categories.push(categorie);
+        }
+        return acc;
+      }, [] as { groupTitle: string; categories: string[] }[]);
+      updatedOrganisation.actionsGroupedCategories = categories;
+    }
+  }
+  return updatedOrganisation;
+}
 
 export default ExcelParser;
