@@ -366,7 +366,9 @@ function processConfigWorkbook(workbook: WorkBook): WorkbookData {
       continue;
     }
     const sheet = workbook.Sheets[sheetName];
-    const rows = utils.sheet_to_json<string[]>(sheet, { header: 1 });
+    const rows = utils
+      .sheet_to_json<string[]>(sheet, { header: 1 })
+      .filter((row) => row.length > 0 && row.some((cell) => cell !== undefined && cell !== null && cell !== ''));
     for (const col of workbookColumns[sheetName]) {
       if (!rows[0].includes(col)) data[sheetName].globalErrors.push(`La colonne ${col} est manquante`);
     }
