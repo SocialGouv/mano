@@ -24,7 +24,7 @@ test("test", async ({ page }) => {
   await test.step("create fields", async () => {
     await page.getByRole("link", { name: "Organisation" }).click();
 
-    await page.getByRole("button", { name: "Personnes suivies" }).click();
+    await page.getByRole("button", { name: "Personnes suivies", exact: true }).click();
     /* personnes infos sociales */
     await page.getByRole("button", { name: "Ajouter un champ" }).nth(0).click();
     await addCustomField(page, "Contrat de travail", "Choix dans une liste", ["CDI merde je me suis trompé", "CDD", "Interim"]);
@@ -142,7 +142,7 @@ test("test", async ({ page }) => {
   await test.step("change choices value", async () => {
     await page.getByRole("link", { name: "Organisation" }).click();
 
-    await page.getByRole("button", { name: "Personnes suivies" }).click();
+    await page.getByRole("button", { name: "Personnes suivies", exact: true }).click();
 
     await page.locator('[data-test-id="Motif\\(s\\) de sortie de file active"]').getByRole("button", { name: "Modifier le champ" }).click();
     await page.getByRole("button", { name: "Modifier le choix Relai vers autre structure" }).click();

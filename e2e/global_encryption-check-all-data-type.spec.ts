@@ -30,7 +30,7 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
   await page.getByRole("link", { name: "Organisation" }).click();
-  await page.getByRole("button", { name: "Personnes suivies" }).click();
+  await page.getByRole("button", { name: "Personnes suivies", exact: true }).click();
   await page
     .getByLabel(
       'Activer la possibilité d\'ajouter des liens familiaux entre personnes. Un onglet "Famille" sera rajouté dans les personnes, et vous pourrez créer des actions, des commentaires et des documents visibles pour toute la famille.'

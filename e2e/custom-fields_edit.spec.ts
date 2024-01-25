@@ -13,7 +13,7 @@ test("test", async ({ page }) => {
   await loginWith(page, "admin1@example.org");
 
   await page.getByRole("link", { name: "Organisation" }).click();
-  await page.getByRole("button", { name: "Personnes suivies" }).click();
+  await page.getByRole("button", { name: "Personnes suivies", exact: true }).click();
   await page.getByRole("button", { name: "Ajouter un champ" }).nth(1).click();
   await page.getByLabel("Nom").fill("Champ non utilisé");
   await page.getByRole("button", { name: "Enregistrer" }).click();
@@ -48,7 +48,7 @@ test("test", async ({ page }) => {
   await page.getByRole("link", { name: "Organisation" }).click();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/organisation\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/);
 
-  await page.getByRole("button", { name: "Personnes suivies" }).click();
+  await page.getByRole("button", { name: "Personnes suivies", exact: true }).click();
 
   await page.hover('[data-test-id="Champ utilisé"]');
   await page

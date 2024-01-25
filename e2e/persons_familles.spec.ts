@@ -27,7 +27,7 @@ test("Familles", async ({ page }) => {
 
   await test.step("Enable familles", async () => {
     await page.getByRole("link", { name: "Organisation" }).click();
-    await page.getByRole("button", { name: "Personnes suivies" }).click();
+    await page.getByRole("button", { name: "Personnes suivies", exact: true }).click();
     await page
       .getByLabel(
         /Activer\s+la\s+possibilité\s+d'ajouter\s+des\s+liens\s+familiaux\s+entre\s+personnes\.\s+Un\s+onglet\s+"Famille"\s+sera\s+rajouté\s+dans\s+les\s+personnes,\s+et\s+vous\s+pourrez\s+créer\s+des\s+actions,\s+des\s+commentaires\s+et\s+des\s+documents\s+visibles\s+pour\s+toute\s+la\s+famille\./
