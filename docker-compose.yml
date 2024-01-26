@@ -10,7 +10,12 @@ services:
       - PORT=8080
 
   dashboard:
-    build: ./dashboard
+    build:
+      context: ./dashboard
+      args:
+        REACT_APP_SCHEME: ${REACT_APP_SCHEME}
+        REACT_APP_HOST: ${REACT_APP_HOST}
+        REACT_APP_USE_HTTP: ${REACT_APP_USE_HTTP}
     volumes:
       - ./dashboard:/app
     environment:
