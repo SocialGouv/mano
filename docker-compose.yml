@@ -22,7 +22,6 @@ services:
       - NODE_ENV=production
       - VIRTUAL_HOST=espace-mano.localhost,espace-mano.test.fabrique.social.gouv.fr,espace-mano.sesan.fr
       - PORT=8083
-      - APP_ENV=production
       - REACT_APP_SCHEME=${REACT_APP_SCHEME}
       - REACT_APP_HOST=${REACT_APP_HOST}
       - REACT_APP_USE_HTTP=${REACT_APP_USE_HTTP}
@@ -35,7 +34,7 @@ services:
     environment:
       NODE_ENV: production
       VIRTUAL_HOST: api-mano.localhost,api-mano.test.fabrique.social.gouv.fr,api-mano.sesan.fr
-      PORT: 4145
+      PORT: 3000
       DEPLOY_KEY_FILE: /run/secrets/deploy_key
       PGHOST: host.docker.internal
       PGUSER_FILE: /run/secrets/pguser

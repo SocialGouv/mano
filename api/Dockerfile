@@ -7,5 +7,5 @@ RUN yarn fetch --immutable
 
 COPY . .
 
-EXPOSE 4145
+EXPOSE 3000
 CMD ["yarn", "start"]
