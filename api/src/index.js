@@ -49,6 +49,19 @@ app.get("/", async (req, res) => {
   res.send(`Hello World at ${now.toISOString()}`);
 });
 
+// Route for deployment
+app.post("/api/deploy", (req, res) => {
+  // check "deploy-key" body parameter and compare it with the one in the .env file
+  if (req.body["deploy-key"] !== process.env.DEPLOY_KEY) {
+    res.status(401).send("Unauthorized");
+    return;
+  }
+  fs.writeFileSync(`${__dirname}/deploy-signal.txt`, "deploy", {
+    flag: "w",
+  });
+  res.send("Déploiement déclenché");
+});
+
 app.set("json replacer", (k, v) => (v === null ? undefined : v));
 app.use(versionCheck);
 

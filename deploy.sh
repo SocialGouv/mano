@@ -4,7 +4,7 @@ if pgrep -x "deploy.sh" > /dev/null; then
     exit 1
 fi
 
-cd /var/opt/mano/test-claranet
+cd /var/opt/mano/mano
 git pull
 
 docker compose build dashboard
