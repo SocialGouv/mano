@@ -27,7 +27,7 @@ if (process.env.PGPASSWORD_FILE && fs.existsSync(process.env.PGPASSWORD_FILE)) {
 }
 let DEPLOY_KEY = null;
 if (process.env.DEPLOY_KEY_FILE && fs.existsSync(process.env.DEPLOY_KEY_FILE)) {
-  DEPLOY_KEY = fs.readFileSync(process.env.DEPLOY_KEY_FILE, "utf8");
+  DEPLOY_KEY = fs.readFileSync(process.env.DEPLOY_KEY_FILE, "utf8").trim().replace(/\n/g, "") || null;
 } else {
   DEPLOY_KEY = process.env.DEPLOY_KEY || null;
 }
