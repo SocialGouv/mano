@@ -49,6 +49,17 @@ app.get("/", async (req, res) => {
   res.send(`Hello World at ${now.toISOString()}`);
 });
 
+app.set("json replacer", (k, v) => (v === null ? undefined : v));
+
+// Pre middleware
+app.use(express.urlencoded({ extended: true }));
+app.use((req, res, next) => {
+  const limitedSize = req.path.startsWith("/encrypt") ? "350mb" : "50mb";
+  express.json({ limit: limitedSize })(req, res, next);
+});
+app.use(helmet());
+app.use(cookieParser());
+
 // Route for deployment
 app.post("/api/deploy", (req, res) => {
   // check "deploy-key" body parameter and compare it with the one in the .env file
@@ -62,20 +73,8 @@ app.post("/api/deploy", (req, res) => {
   res.send("Déploiement déclenché");
 });
 
-app.set("json replacer", (k, v) => (v === null ? undefined : v));
-app.use(versionCheck);
-
-// Pre middleware
-app.use(express.urlencoded({ extended: true }));
-app.use((req, res, next) => {
-  const limitedSize = req.path.startsWith("/encrypt") ? "350mb" : "50mb";
-  express.json({ limit: limitedSize })(req, res, next);
-});
-app.use(helmet());
-app.use(cookieParser());
-
 // Routes
-
+app.use(versionCheck);
 require("./passport")(app);
 
 app.use("/", require("./controllers/utils"));
