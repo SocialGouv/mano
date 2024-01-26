@@ -7,7 +7,7 @@ const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 
-const { PORT } = require("./config");
+const { PORT, DEPLOY_KEY } = require("./config");
 const errors = require("./errors");
 
 const versionCheck = require("./middleware/versionCheck");
@@ -64,7 +64,7 @@ app.use(cookieParser());
 // Route for deployment
 app.post("/api/deploy", (req, res) => {
   // check "deploy-key" body parameter and compare it with the one in the .env file
-  if (req.body["deploy-key"] !== process.env.DEPLOY_KEY) {
+  if (!req.body["deploy-key"] || req.body["deploy-key"] !== DEPLOY_KEY) {
     res.status(401).send("Unauthorized");
     return;
   }
