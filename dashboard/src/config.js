@@ -26,11 +26,21 @@ const getHost = () => {
   if (window.location.host.includes('.ovh.')) {
     return window.location.host.replace('dashboard-', '');
   }
+  if (window.location.host.includes('espace-mano.localhost')) {
+    return 'api-mano.localhost';
+  }
+  if (window.location.host.includes('test.fabrique.social.gouv.fr')) {
+    return 'api-mano.test.fabrique.social.gouv.fr';
+  }
   return 'mano.fabrique.social.gouv.fr';
 };
 
 const HOST = getHost();
-const SCHEME = process.env.NODE_ENV === 'development' || process.env.REACT_APP_TEST === 'true' ? process.env.REACT_APP_SCHEME : 'https';
+console.log(process.env);
+const SCHEME =
+  process.env.NODE_ENV === 'development' || process.env.REACT_APP_TEST === 'true' || process.env.REACT_APP_USE_HTTP === 'true'
+    ? process.env.REACT_APP_SCHEME
+    : 'https';
 const ENV = process.env.NODE_ENV || 'production';
 const VERSION = packageInfo.version;
 const DEFAULT_ORGANISATION_KEY =

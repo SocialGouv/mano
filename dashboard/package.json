@@ -44,6 +44,7 @@
     "recoil": "^0.7.6",
     "recoil-nexus": "^0.4.0",
     "sass": "^1.48.0",
+    "serve": "^14.2.1",
     "sortablejs": "^1.14.0",
     "styled-components": "^5.2.1",
     "urijs": "^1.19.11",
@@ -72,6 +73,7 @@
   },
   "scripts": {
     "dev": "react-scripts start -FAST_REFRESH=true",
+    "start": "serve -s build -l 8083",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",

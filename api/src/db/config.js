@@ -17,8 +17,8 @@ const defaultConfig = {
   },
   pool: {
     max: 20, // default: 5
-    min: 5,  // default: 0
-  }
+    min: 5, // default: 0
+  },
 };
 
 module.exports = {
@@ -30,11 +30,13 @@ module.exports = {
   },
   production: {
     ...defaultConfig,
+    /*
     dialectOptions: {
       ssl: {
         require: process.env.NODE_ENV !== "development",
         rejectUnauthorized: false, // For self-signed certificates used in CNPG
       },
     },
+    */
   },
 };

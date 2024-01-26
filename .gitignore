@@ -8,6 +8,7 @@ test-local.js
 /playwright-report/
 /playwright/.cache/
 .vscode/launch.json
+.secrets
 
 # Yarn Berry
 .yarn/*
