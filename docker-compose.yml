@@ -50,6 +50,7 @@ services:
       - pgpassword
       - pguser
       - secret
+      - database
 
   metabase:
     image: metabase/metabase
