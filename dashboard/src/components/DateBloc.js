@@ -16,7 +16,12 @@ const DateBloc = ({ date }) => {
       <DayNum>{date && date.format('D')}</DayNum>
       <MonthText>
         {date && date.format('MMMM')}
-        {date && date.format('YYYY') !== dayjs.utc().format('YYYY') && ` ${date.format('YYYY')}`}
+        {date && date.format('YYYY') !== dayjs.utc().format('YYYY') && (
+          <>
+            <br />
+            {date.format('YYYY')}
+          </>
+        )}
       </MonthText>
     </Container>
   );
