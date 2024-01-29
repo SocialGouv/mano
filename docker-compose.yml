@@ -6,7 +6,7 @@ services:
     environment:
       - NODE_ENV=production
       - NEXT_TELEMETRY_DISABLED=1
-      - VIRTUAL_HOST=website-mano.localhost,mano.test.fabrique.social.gouv.fr,mano.sesan.fr
+      - VIRTUAL_HOST=website-mano.localhost,mano.test.fabrique.social.gouv.fr,mano.sesan.fr,preprod-mano.sesan.fr
       - PORT=8080
 
   dashboard:
@@ -20,7 +20,7 @@ services:
       - ./dashboard:/app
     environment:
       - NODE_ENV=production
-      - VIRTUAL_HOST=espace-mano.localhost,espace-mano.test.fabrique.social.gouv.fr,espace-mano.sesan.fr
+      - VIRTUAL_HOST=espace-mano.localhost,espace-mano.test.fabrique.social.gouv.fr,espace-mano.sesan.fr,preprod-espace-mano.sesan.fr
       - PORT=8083
       - REACT_APP_SCHEME=${REACT_APP_SCHEME}
       - REACT_APP_HOST=${REACT_APP_HOST}
@@ -33,7 +33,7 @@ services:
       # TODO: add link to storage
     environment:
       NODE_ENV: production
-      VIRTUAL_HOST: api-mano.localhost,api-mano.test.fabrique.social.gouv.fr,api-mano.sesan.fr
+      VIRTUAL_HOST: api-mano.localhost,api-mano.test.fabrique.social.gouv.fr,api-mano.sesan.fr,preprod-api-mano.sesan.fr
       PORT: 3000
       DEPLOY_KEY_FILE: /run/secrets/deploy_key
       PGHOST: host.docker.internal
@@ -54,7 +54,7 @@ services:
   metabase:
     image: metabase/metabase
     environment:
-      - VIRTUAL_HOST=metabase-mano.localhost,metabase-mano.test.fabrique.social.gouv.fr,metabase-mano.sesan.fr
+      - VIRTUAL_HOST=metabase-mano.localhost,metabase-mano.test.fabrique.social.gouv.fr,metabase-mano.sesan.fr,preprod-metabase-mano.sesan.fr
     volumes:
       - ./metabase:/metabase-data
     extra_hosts:

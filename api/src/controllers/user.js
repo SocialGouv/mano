@@ -31,7 +31,7 @@ function cookieOptions() {
   if (config.ENVIRONMENT === "development" || config.ENVIRONMENT === "test") {
     return { maxAge: COOKIE_MAX_AGE, httpOnly: true, secure: true, sameSite: "None" };
   } else {
-    return { maxAge: COOKIE_MAX_AGE, httpOnly: true, secure: true, domain: ".fabrique.social.gouv.fr", sameSite: "Lax" };
+    return { maxAge: COOKIE_MAX_AGE, httpOnly: true, secure: true, domain: ".sesan.fr", sameSite: "Lax" };
   }
 }
 
@@ -39,7 +39,7 @@ function logoutCookieOptions() {
   if (config.ENVIRONMENT === "development" || config.ENVIRONMENT === "test") {
     return { httpOnly: true, secure: true, sameSite: "None" };
   } else {
-    return { httpOnly: true, secure: true, domain: ".fabrique.social.gouv.fr", sameSite: "Lax" };
+    return { httpOnly: true, secure: true, domain: ".sesan.fr", sameSite: "Lax" };
   }
 }
 
