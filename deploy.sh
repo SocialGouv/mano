@@ -4,7 +4,7 @@ if pgrep -x "deploy.sh" > /dev/null; then
     exit 1
 fi
 
-cd /var/opt/mano/mano
+cd /var/mano
 git pull
 
 docker compose build dashboard
