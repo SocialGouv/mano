@@ -4,6 +4,11 @@ if pgrep -x "deploy.sh" > /dev/null; then
     exit 1
 fi
 
+# Ajoute les proxy dans l'environnement
+export no_proxy=ad.sesan.fr,.gcsidf.local,localhost,127.0.0.1
+export https_proxy=http://sesclaprx-vip.grita.fr:3128
+export http_proxy=http://sesclaprx-vip.grita.fr:3128
+
 cd /var/mano
 git pull
 
