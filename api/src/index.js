@@ -1,5 +1,6 @@
 require("dotenv").config({ path: "./.env" });
 const fs = require("fs");
+const path = require("path");
 
 const express = require("express");
 const cors = require("cors");
@@ -68,7 +69,8 @@ app.post("/api/deploy", (req, res) => {
     res.status(401).send("Unauthorized");
     return;
   }
-  fs.writeFileSync(`${__dirname}/deploy-signal.txt`, "deploy", {
+  const deploySignalPath = path.join(__dirname, "..", "deploy-signal.txt");
+  fs.writeFileSync(deploySignalPath, "deploy", {
     flag: "w",
   });
   res.send("Déploiement déclenché");
