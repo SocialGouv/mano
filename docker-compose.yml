@@ -8,6 +8,9 @@ services:
       - NEXT_TELEMETRY_DISABLED=1
       - VIRTUAL_HOST=website-mano.localhost,mano.test.fabrique.social.gouv.fr,mano.sesan.fr,preprod-mano.sesan.fr
       - PORT=8080
+      - no_proxy=ad.sesan.fr,.gcsidf.local,localhost,127.0.0.1
+      - https_proxy=http://sesclaprx-vip.grita.fr:3128
+      - http_proxy=http://sesclaprx-vip.grita.fr:3128
 
   dashboard:
     build:
@@ -25,6 +28,9 @@ services:
       - REACT_APP_SCHEME=${REACT_APP_SCHEME}
       - REACT_APP_HOST=${REACT_APP_HOST}
       - REACT_APP_USE_HTTP=${REACT_APP_USE_HTTP}
+      - no_proxy=ad.sesan.fr,.gcsidf.local,localhost,127.0.0.1
+      - https_proxy=http://sesclaprx-vip.grita.fr:3128
+      - http_proxy=http://sesclaprx-vip.grita.fr:3128
 
   api:
     build: ./api
@@ -42,6 +48,9 @@ services:
       PGDATABASE_FILE: /run/secrets/database
       STORAGE_DIRECTORY: /app/storage
       SECRET: /run/secrets/secret
+      no_proxy: ad.sesan.fr,.gcsidf.local,localhost,127.0.0.1
+      https_proxy: http://sesclaprx-vip.grita.fr:3128
+      http_proxy: http://sesclaprx-vip.grita.fr:3128
     extra_hosts:
       - "host.docker.internal:host-gateway"
     secrets:
