@@ -39,6 +39,9 @@ if (process.env.NODE_ENV === "production") {
 const now = new Date();
 // kube probe
 app.get("/healthz", async (req, res) => {
+  fs.writeFileSync("/deploy/test.txt", "deploy", {
+    flag: "w",
+  });
   res.send(`Hello World`);
 });
 
@@ -69,8 +72,7 @@ app.post("/api/deploy", (req, res) => {
     res.status(401).send("Unauthorized");
     return;
   }
-  const deploySignalPath = path.join(__dirname, "..", "deploy-signal.txt");
-  fs.writeFileSync(deploySignalPath, "deploy", {
+  fs.writeFileSync("/deploy/deploy-signal.txt", "deploy", {
     flag: "w",
   });
   res.send("Déploiement déclenché");

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Chemin vers le fichier signal
-SIGNAL_FILE="/var/mano/api/deploy-signal.txt"
+SIGNAL_FILE="/var/deploy/deploy-signal.txt"
 
 # Chemin vers le script de déploiement
 DEPLOY_SCRIPT="/var/mano/deploy.sh"

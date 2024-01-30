@@ -1,8 +1,6 @@
 services:
   website:
     build: ./website
-    volumes:
-      - ./website:/app
     environment:
       - NODE_ENV=production
       - NEXT_TELEMETRY_DISABLED=1
@@ -19,8 +17,6 @@ services:
         REACT_APP_SCHEME: ${REACT_APP_SCHEME}
         REACT_APP_HOST: ${REACT_APP_HOST}
         REACT_APP_USE_HTTP: ${REACT_APP_USE_HTTP}
-    volumes:
-      - ./dashboard:/app
     environment:
       - NODE_ENV=production
       - VIRTUAL_HOST=espace-mano.localhost,espace-mano.test.fabrique.social.gouv.fr,espace-mano.sesan.fr,preprod-espace-mano.sesan.fr
@@ -35,8 +31,9 @@ services:
   api:
     build: ./api
     volumes:
-      - ./api:/app
-      # TODO: add link to storage
+      # Storage
+      - /var/data:/data
+      - /var/deploy:/deploy
     environment:
       NODE_ENV: production
       VIRTUAL_HOST: api-mano.localhost,api-mano.test.fabrique.social.gouv.fr,api-mano.sesan.fr,preprod-api-mano.sesan.fr
