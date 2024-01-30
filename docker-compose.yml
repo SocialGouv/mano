@@ -56,7 +56,6 @@ services:
       - pguser
       - secret
       - database
-
   metabase:
     image: metabase/metabase
     environment:
@@ -71,6 +70,9 @@ services:
       - ./metabase:/metabase-data
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    secrets:
+      - mb_db_user
+      - mb_db_password
 
   nginx-proxy:
     image: nginxproxy/nginx-proxy
