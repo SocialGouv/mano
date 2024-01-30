@@ -1,3 +1,10 @@
+## [1.303.2](https://github.com/SocialGouv/mano/compare/v1.303.1...v1.303.2) (2024-01-30)
+
+
+### Bug Fixes
+
+* trigger preprod ([441f6e9](https://github.com/SocialGouv/mano/commit/441f6e9c8f15c79cfaf343dc45705aae5b6ff74c))
+
 ## [1.303.1](https://github.com/SocialGouv/mano/compare/v1.303.0...v1.303.1) (2024-01-25)
 
 
