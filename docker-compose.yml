@@ -60,7 +60,13 @@ services:
   metabase:
     image: metabase/metabase
     environment:
-      - VIRTUAL_HOST=metabase-mano.localhost,metabase-mano.test.fabrique.social.gouv.fr,metabase-mano.sesan.fr,preprod-metabase-mano.sesan.fr
+      VIRTUAL_HOST: metabase-mano.localhost,metabase-mano.test.fabrique.social.gouv.fr,metabase-mano.sesan.fr,preprod-metabase-mano.sesan.fr
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: metabaseappdb
+      MB_DB_PORT: 5432
+      MB_DB_USER_FILE: /run/secrets/mb_db_user
+      MB_DB_PASS_FILE: /run/secrets/mb_db_password
+      MB_DB_HOST: host.docker.internal
     volumes:
       - ./metabase:/metabase-data
     extra_hosts:
@@ -84,3 +90,7 @@ secrets:
     file: ./.secrets/secret
   database:
     file: ./.secrets/database
+  mb_db_user:
+    file: ./.secrets/mb_db_user
+  mb_db_password:
+    file: ./.secrets/mb_db_password
