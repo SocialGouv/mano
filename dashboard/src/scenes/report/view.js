@@ -386,7 +386,7 @@ const View = () => {
               )}
             </div>
 
-            <div className="tw-maxh tw-mr-2 tw-mb-12 tw-basis-3/12 tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow ">
+            <div className="tw-mr-2 tw-mb-12 tw-min-h-screen tw-basis-3/12 tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
               <Transmissions period={period} selectedTeamsObject={selectedTeamsObject} reports={reports} />
             </div>
           </div>
