@@ -1,3 +1,10 @@
+## [1.303.5](https://github.com/SocialGouv/mano/compare/v1.303.4...v1.303.5) (2024-02-01)
+
+
+### Bug Fixes
+
+* mise-en-page collabs ([dfc7171](https://github.com/SocialGouv/mano/commit/dfc71713773ed5215661404a53001f82efe99a4f))
+
 ## [1.303.4](https://github.com/SocialGouv/mano/compare/v1.303.3...v1.303.4) (2024-02-01)
 
 
