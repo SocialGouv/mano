@@ -1,3 +1,10 @@
+## [1.303.9](https://github.com/SocialGouv/mano/compare/v1.303.8...v1.303.9) (2024-02-01)
+
+
+### Bug Fixes
+
+* sorting in app ([228d2d7](https://github.com/SocialGouv/mano/commit/228d2d75093288eba9550e8edaeb4655d0344eaf))
+
 ## [1.303.8](https://github.com/SocialGouv/mano/compare/v1.303.7...v1.303.8) (2024-02-01)
 
 
