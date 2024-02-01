@@ -1,6 +1,5 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { Col, FormGroup } from 'reactstrap';
-import styled from 'styled-components';
 import SelectAsInput from './SelectAsInput';
 import SelectCustom from './SelectCustom';
 import { capture } from '../services/sentry';
@@ -173,12 +172,5 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = null,
     </Col>
   );
 };
-
-const CheckboxContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-left: 20px;
-  width: 80%;
-`;
 
 export default CustomFieldInput;
