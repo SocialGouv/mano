@@ -41,6 +41,7 @@ const CreatePerson = ({ refreshable }) => {
             initialValues={{ name: '', assignedTeams: [currentTeam?._id] }}
             onSubmit={async (body, actions) => {
               if (!body.name?.trim()?.length) return toast.error('Une personne doit avoir un nom');
+              if (!body.assignedTeams?.length) return toast.error('Une personne doit être suivie par au moins une équipe');
               const existingPerson = persons.find((p) => p.name === body.name);
               if (existingPerson) return toast.error('Une personne existe déjà à ce nom');
               body.followedSince = dayjs();
