@@ -58,6 +58,7 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
             const existingPerson = persons.find((p) => p.name === body.name && p._id !== person._id);
             if (existingPerson) return toast.error('Une personne existe déjà à ce nom');
             if (!body.followedSince) body.followedSince = person.createdAt;
+            if (!body.assignedTeams?.length) return toast.error('Une personne doit être suivie par au moins une équipe');
             if (outOfBoundariesDate(body.followedSince)) return toast.error('La date de suivi est hors limites (entre 1900 et 2100)');
             if (body.birthdate && outOfBoundariesDate(body.birthdate))
               return toast.error('La date de naissance est hors limites (entre 1900 et 2100)');
