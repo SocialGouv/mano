@@ -19,6 +19,12 @@ const Account = () => {
   return (
     <>
       <Header title={user.name} />
+      <button
+        onClick={() => {
+          console.log(user.something.lol);
+        }}>
+        JE SUIS UN BUG FHFHDFHD
+      </button>
       <Formik
         initialValues={user}
         onSubmit={async (body) => {

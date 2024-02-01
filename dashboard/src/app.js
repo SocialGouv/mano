@@ -59,7 +59,7 @@ const history = createBrowserHistory();
 
 if (ENV === 'production') {
   Sentry.init({
-    dsn: 'https://e3eb487403dd4789b47cf6da857bb4bf@sentry.fabrique.social.gouv.fr/52',
+    dsn: 'https://2e784fe581bff74181600b4460c01955@o4506615228596224.ingest.sentry.io/4506672157229056',
     environment: 'dashboard',
     release: VERSION,
     integrations: [
