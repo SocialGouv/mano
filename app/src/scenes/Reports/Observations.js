@@ -4,7 +4,7 @@ import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
 import { refreshTriggerState } from '../../components/Loader';
 import { FlashListStyled } from '../../components/Lists';
-import { ListNoMoreObservations } from '../../components/ListEmptyContainer';
+import { ListEmptyObservations, ListNoMoreObservations } from '../../components/ListEmptyContainer';
 import { observationsForReport } from './selectors';
 import { getPeriodTitle } from './utils';
 import { currentTeamState } from '../../recoil/auth';
@@ -45,7 +45,7 @@ const Observations = ({ navigation, route }) => {
   };
 
   return (
-    <SceneContainer>
+    <SceneContainer backgroundColor="#fff">
       <ScreenTitle title={`Observations\n${getPeriodTitle(date, currentTeam?.nightSession)}`} onBack={navigation.goBack} />
       <FlashListStyled
         refreshing={refreshTrigger.status}
@@ -56,7 +56,8 @@ const Observations = ({ navigation, route }) => {
         estimatedItemSize={545}
         keyExtractor={keyExtractor}
         onEndReachedThreshold={0.3}
-        ListFooterComponent={ListNoMoreObservations}
+        ListEmptyComponent={ListEmptyObservations}
+        ListFooterComponent={observations.length > 0 ? ListNoMoreObservations : null}
       />
     </SceneContainer>
   );

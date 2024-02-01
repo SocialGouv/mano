@@ -66,7 +66,7 @@ const Actions = ({ route, navigation }) => {
   };
 
   return (
-    <SceneContainer testID="actions-list-for-report">
+    <SceneContainer testID="actions-list-for-report" backgroundColor="#fff">
       <ScreenTitle
         title={`Actions ${status === DONE ? 'faites' : status === CANCEL ? 'annulées' : 'créées'}\n${getPeriodTitle(
           date,
@@ -84,7 +84,7 @@ const Actions = ({ route, navigation }) => {
         keyExtractor={keyExtractor}
         ListEmptyComponent={ListEmptyComponent}
         onEndReachedThreshold={0.3}
-        ListFooterComponent={ListNoMoreActions}
+        ListFooterComponent={actionsToShow.length > 0 ? ListNoMoreActions : null}
       />
       <FloatAddButton onPress={onCreateAction} />
     </SceneContainer>

@@ -4,7 +4,7 @@ import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
 import { refreshTriggerState } from '../../components/Loader';
 import { FlashListStyled } from '../../components/Lists';
-import { ListNoMoreComments } from '../../components/ListEmptyContainer';
+import { ListEmptyRencontres, ListNoMoreRencontres } from '../../components/ListEmptyContainer';
 import { rencontresForReport } from './selectors';
 import { getPeriodTitle } from './utils';
 import { currentTeamState } from '../../recoil/auth';
@@ -14,6 +14,8 @@ const keyExtractor = (item) => item._id;
 const RencontresForReport = ({ navigation, route }) => {
   const date = route?.params?.date;
   const rencontres = useRecoilValue(rencontresForReport({ date }));
+  console.log('date', date);
+  console.log('rencontres', rencontres);
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
   const currentTeam = useRecoilValue(currentTeamState);
 
@@ -32,7 +34,7 @@ const RencontresForReport = ({ navigation, route }) => {
   };
 
   return (
-    <SceneContainer>
+    <SceneContainer backgroundColor="#fff">
       <ScreenTitle title={`Rencontres \n${getPeriodTitle(date, currentTeam?.nightSession)}`} onBack={navigation.goBack} />
       <FlashListStyled
         refreshing={refreshTrigger.status}
@@ -43,7 +45,8 @@ const RencontresForReport = ({ navigation, route }) => {
         renderItem={renderItem}
         keyExtractor={keyExtractor}
         onEndReachedThreshold={0.3}
-        ListFooterComponent={ListNoMoreComments}
+        ListEmptyComponent={ListEmptyRencontres}
+        ListFooterComponent={rencontres.length > 0 ? ListNoMoreRencontres : null}
       />
     </SceneContainer>
   );
