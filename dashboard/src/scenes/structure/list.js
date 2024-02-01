@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { SmallHeader } from '../../components/header';
 import Loading from '../../components/loading';
 import Table from '../../components/table';
@@ -13,6 +13,7 @@ import SelectCustom from '../../components/SelectCustom';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../../recoil/auth';
 import { flattenedStructuresCategoriesSelector } from '../../recoil/structures';
+import { filterBySearch } from '../search/utils';
 
 const List = () => {
   const [structures, setStructures] = useState([]);
@@ -22,10 +23,14 @@ const List = () => {
   const [currentStructure, setCurrentStructure] = useState(null);
   const [currentStructureOpen, setCurrentStructureOpen] = useState(false);
 
+  const filteredStructures = useMemo(() => {
+    return filterBySearch(search, structures);
+  }, [search, structures]);
+
   useTitle('Structures');
 
   const getStructures = async () => {
-    const response = await API.get({ path: '/structure', query: { search } });
+    const response = await API.get({ path: '/structure' });
     if (response.ok) {
       setStructures(response.data);
     }
@@ -34,14 +39,13 @@ const List = () => {
 
   useEffect(() => {
     getStructures();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search]);
+  }, []);
 
   if (isLoading) return <Loading />;
 
   return (
     <>
-      <SmallHeader title={`Structures (${structures?.length})`} />
+      <SmallHeader title={`Structures (${filteredStructures?.length})`} />
       <div className="tw-mb-5 tw-flex tw-flex-row tw-justify-center">
         <div className="noprint tw-flex tw-w-full tw-justify-end tw-gap-3">
           <Structure
@@ -65,11 +69,11 @@ const List = () => {
           <label htmlFor="search" className="tw-mr-5 tw-w-40 tw-shrink-0">
             Recherche&nbsp;:
           </label>
-          <Search placeholder="Par nom de la structure" value={search} onChange={setSearch} />
+          <Search placeholder="Nom, catégorie, ville, etc." value={search} onChange={setSearch} />
         </div>
       </div>
       <Table
-        data={structures}
+        data={filteredStructures}
         rowKey={'_id'}
         onRowClick={(s) => {
           setCurrentStructure(s);
@@ -79,10 +83,10 @@ const List = () => {
           {
             title: 'Nom',
             dataKey: 'name',
-            render: (structures) => {
+            render: (structure) => {
               return (
                 <div className="[overflow-wrap:anywhere]">
-                  <b>{structures.name}</b>
+                  <b>{structure.name}</b>
                 </div>
               );
             },
@@ -91,8 +95,8 @@ const List = () => {
           {
             title: 'Adresse',
             dataKey: 'adresse',
-            render: (structures) => {
-              return <div className="[overflow-wrap:anywhere]">{structures.adresse}</div>;
+            render: (structure) => {
+              return <div className="[overflow-wrap:anywhere]">{structure.adresse}</div>;
             },
           },
           { title: 'Code postal', dataKey: 'postcode' },
