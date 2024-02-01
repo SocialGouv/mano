@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { HiCheckCircle } from "react-icons/hi";
 import Header from "../components/header";
 import Footer from "../components/footer";
-import { push } from "@socialgouv/matomo-next";
 
 const AgendaIcon = ({ size = 30 }) => (
   <svg width={size} height={size} viewBox="0 0 196 200">
@@ -26,6 +25,12 @@ export default function Index() {
     let url = "https://mano.fabrique.social.gouv.fr/public/stats";
     if (window.location.hostname === "localhost") {
       url = "http://localhost:4145/public/stats";
+    }
+    if (window.location.hostname === "preprod-mano.sesan.fr") {
+      url = "https://preprod-api-mano.sesan.fr/public/stats";
+    }
+    if (window.location.hostname === "mano.sesan.fr") {
+      url = "https://api-mano.sesan.fr/public/stats";
     }
 
     const response = await fetch(url, {
@@ -71,9 +76,6 @@ export default function Index() {
                 </div>
                 <div className="py-4">
                   <a
-                    onClick={() => {
-                      push(["trackEvent", "CLICK_LINK_CAL", "MELISSA"]);
-                    }}
                     target="_blank"
                     className="mx-auto p-3 px-4 md:px-8 space-x-2 transition-all bg-shamrock-400/10 hover:bg-shamrock-400 text-[#00897f] hover:text-white border border-shamrock-400 flex-center rounded-xl"
                     href="https://cal.com/m-saiter-mano/je-souhaite-une-demonstration-de-l-outil-mano?duration=60"
@@ -102,9 +104,6 @@ export default function Index() {
                 </div>
                 <div className="py-4">
                   <a
-                    onClick={() => {
-                      push(["trackEvent", "CLICK_LINK_CAL", "YOANN"]);
-                    }}
                     target="_blank"
                     className="mx-auto p-3 px-4 md:px-8 space-x-2 transition-all bg-shamrock-400/10 hover:bg-shamrock-400 text-[#00897f] hover:text-white border border-shamrock-400 flex-center rounded-xl"
                     href="https://cal.com/ykittery-mano/reservez-un-temps-de-presentation-de-l-outil-mano?duration=60"

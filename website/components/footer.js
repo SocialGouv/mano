@@ -12,6 +12,14 @@ export default function Footer({ skipFirstParagraph }) {
 
   const year = new Date().getFullYear();
 
+  let baseUrl = "https://dashboard-mano.fabrique.social.gouv.fr";
+  if (window.location.hostname === "preprod-mano.sesan.fr") {
+    baseUrl = "https://preprod-espace-mano.sesan.fr";
+  }
+  if (window.location.hostname === "mano.sesan.fr") {
+    baseUrl = "https://espace-mano.sesan.fr";
+  }
+
   useEffect(() => {
     setEmailGuillaume(window.atob(guillaume));
     setEmailMelissa(window.atob(melissa));
@@ -86,17 +94,17 @@ export default function Footer({ skipFirstParagraph }) {
             <img className="object-contain w-full h-full" src="/logo-white.png" alt="" />
           </a>
           <p className="text-xs text-white hover:underline">
-            <Link href="https://dashboard-mano.fabrique.social.gouv.fr/legal.pdf" target="_blank">
+            <Link href={baseUrl + "/legal.pdf"} target="_blank">
               Accessibilité : non conforme
             </Link>
           </p>
           <p className="text-xs text-white hover:underline">
-            <Link href="https://dashboard-mano.fabrique.social.gouv.fr/legal.pdf" target="_blank">
+            <Link href={baseUrl + "/legal.pdf"} target="_blank">
               Mentions légales
             </Link>
           </p>
           <p className="text-xs text-white hover:underline">
-            <Link href="https://dashboard-mano.fabrique.social.gouv.fr/cgu.pdf" target="_blank">
+            <Link href={baseUrl + "/cgu.pdf"} target="_blank">
               Conditions générales d'utilisation
             </Link>
           </p>
@@ -104,7 +112,7 @@ export default function Footer({ skipFirstParagraph }) {
             <Link href="/stats">Statistiques</Link>
           </p>
           <p className="text-xs text-white hover:underline">
-            <Link href="https://dashboard-mano.fabrique.social.gouv.fr/privacy.pdf">Politique de confidentialité</Link>
+            <Link href={baseUrl + "/privacy.pdf"}>Politique de confidentialité</Link>
           </p>
         </div>
         <p className="pb-8 text-center text-xs text-white hover:underline">&copy; 2021-{year} Mano - Tous droits réservés</p>
