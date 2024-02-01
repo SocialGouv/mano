@@ -1,3 +1,11 @@
+## [1.303.7](https://github.com/SocialGouv/mano/compare/v1.303.6...v1.303.7) (2024-02-01)
+
+
+### Bug Fixes
+
+* action design ([00f1595](https://github.com/SocialGouv/mano/commit/00f15954c10c395f0e1023a6940a75aa250d3553))
+* sélection de l'équipe des rencontres ([#1850](https://github.com/SocialGouv/mano/issues/1850)) ([07e3203](https://github.com/SocialGouv/mano/commit/07e320345332f8d3306086012e888d9f1fadb170))
+
 ## [1.303.6](https://github.com/SocialGouv/mano/compare/v1.303.5...v1.303.6) (2024-02-01)
 
 
