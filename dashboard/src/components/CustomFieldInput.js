@@ -31,7 +31,7 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = null,
         <FormGroup>
           {!hideLabel && (
             <label className="tw-text-sm tw-font-semibold tw-text-gray-600" data-test-id={field.label} htmlFor={id}>
-              {field.type !== 'boolean' ? field.label : ''}
+              {field.label}
             </label>
           )}
           {!!['text', 'number'].includes(field.type) && (
@@ -88,18 +88,27 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = null,
             </div>
           )}
           {!!['boolean'].includes(field.type) && (
-            <CheckboxContainer>
-              <label htmlFor={id}>{field.label}</label>
-              <input
-                type="checkbox"
-                id={id}
-                required={field.required}
-                name={field.name}
-                checked={values[field.name]}
-                onChange={() => handleChange({ target: { value: !values[field.name], name: field.name } })}
-                disabled={disabled}
-              />
-            </CheckboxContainer>
+            /*
+              display: flex;
+  flex-direction: column;
+  margin-left: 20px;
+  width: 80%;
+            */
+            <div className="tw-basis-full tw-p-4">
+              <label htmlFor={id}>
+                <input
+                  type="checkbox"
+                  id={id}
+                  required={field.required}
+                  name={field.name}
+                  checked={values[field.name]}
+                  onChange={() => handleChange({ target: { value: !values[field.name], name: field.name } })}
+                  disabled={disabled}
+                  className="tw-mr-2"
+                />
+                {field.label}
+              </label>
+            </div>
           )}
           {!!['yes-no'].includes(field.type) && (
             <SelectAsInput
