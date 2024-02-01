@@ -6,7 +6,7 @@ import ScreenTitle from '../../components/ScreenTitle';
 import { refreshTriggerState } from '../../components/Loader';
 import { FlashListStyled } from '../../components/Lists';
 import CommentRow from '../Comments/CommentRow';
-import { ListNoMoreComments } from '../../components/ListEmptyContainer';
+import { ListEmptyComments, ListNoMoreComments } from '../../components/ListEmptyContainer';
 import { commentsForReport } from './selectors';
 import { getPeriodTitle } from './utils';
 import { currentTeamState, organisationState } from '../../recoil/auth';
@@ -105,7 +105,7 @@ const CommentsForReport = ({ navigation, route }) => {
   };
 
   return (
-    <SceneContainer>
+    <SceneContainer backgroundColor="#fff">
       <ScreenTitle title={`Commentaires \n${getPeriodTitle(date, currentTeam?.nightSession)}`} onBack={navigation.goBack} />
       <FlashListStyled
         refreshing={refreshTrigger.status}
@@ -116,7 +116,8 @@ const CommentsForReport = ({ navigation, route }) => {
         renderItem={renderItem}
         keyExtractor={keyExtractor}
         onEndReachedThreshold={0.3}
-        ListFooterComponent={ListNoMoreComments}
+        ListEmptyComponent={ListEmptyComments}
+        ListFooterComponent={comments.length ? ListNoMoreComments : null}
       />
     </SceneContainer>
   );

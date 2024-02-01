@@ -242,33 +242,33 @@ const Report = ({ navigation, route }) => {
         <Row
           withNextButton
           caption={`Actions complétées (${actionsCompleted.length})`}
-          onPress={() => navigation.navigate('Actions', { date: reportDB?.date, status: DONE })}
+          onPress={() => navigation.navigate('Actions', { date: day, status: DONE })}
           disabled={!actionsCompleted.length}
         />
         <Row
           withNextButton
           caption={`Actions créées (${actionsCreated.length})`}
-          onPress={() => navigation.navigate('Actions', { date: reportDB?.date, status: null })}
+          onPress={() => navigation.navigate('Actions', { date: day, status: null })}
           disabled={!actionsCreated.length}
         />
         <Row
           withNextButton
           caption={`Actions annulées (${actionsCanceled.length})`}
-          onPress={() => navigation.navigate('Actions', { date: reportDB?.date, status: CANCEL })}
+          onPress={() => navigation.navigate('Actions', { date: day, status: CANCEL })}
           disabled={!actionsCanceled.length}
         />
         <Spacer height={30} />
         <Row
           withNextButton
           caption={`Commentaires (${comments.length})`}
-          onPress={() => navigation.navigate('CommentsForReport', { date: reportDB?.date })}
+          onPress={() => navigation.navigate('CommentsForReport', { date: day })}
           disabled={!comments.length}
         />
         <Spacer height={30} />
         <Row
           withNextButton
           caption={`Rencontres (${rencontres.length})`}
-          onPress={() => navigation.navigate('RencontresForReport', { date: reportDB?.date })}
+          onPress={() => navigation.navigate('RencontresForReport', { date: day })}
           disabled={!rencontres.length}
         />
         {!!organisation.territoriesEnabled && (
@@ -277,7 +277,7 @@ const Report = ({ navigation, route }) => {
             <Row
               withNextButton
               caption={`Observations (${observations.length})`}
-              onPress={() => navigation.navigate('Observations', { date: reportDB?.date })}
+              onPress={() => navigation.navigate('Observations', { date: day })}
               disabled={!observations.length}
             />
           </>
