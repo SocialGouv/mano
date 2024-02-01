@@ -469,7 +469,7 @@ function AddDocumentInput({ personId, onAddDocuments }: AddDocumentInputProps) {
             file: fileToUpload,
           });
           if (!docResponse.ok || !docResponse.data) {
-            capture('Error uploading document', { extra: { docResponse } });
+            capture('Error uploading document', { extra: { docResponseError: docResponse.error } });
             toast.error(`Une erreur est survenue lors de l'envoi du document ${fileToUpload?.filename}`);
             return;
           }

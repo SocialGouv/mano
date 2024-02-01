@@ -84,7 +84,7 @@ export const prepareReportForEncryption = (report, { checkRequiredFields = true 
       toast.error(
         "Le compte-rendu n'a pas été sauvegardé car son format était incorrect. Vous pouvez vérifier son contenu et tenter de le sauvegarder à nouveau. L'équipe technique a été prévenue et va travailler sur un correctif."
       );
-      capture(error, { extra: { report } });
+      capture(error);
       throw error;
     }
   }

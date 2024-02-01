@@ -30,7 +30,7 @@ export const prepareMedicalFileForEncryption = (customFieldsMedicalFile) => (med
       "Le dossier médical n'a pas été sauvegardé car son format était incorrect.",
       "Vous pouvez vérifier son contenu et tenter de le sauvegarder à nouveau. L'équipe technique a été prévenue et va travailler sur un correctif."
     );
-    capture(error, { extra: { medicalFile } });
+    capture(error);
     throw error;
   }
   const encryptedFieldsIncludingCustom = [...customFieldsMedicalFile.map((f) => f.name), ...encryptedFields];

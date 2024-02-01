@@ -25,7 +25,7 @@ export const prepareTerritoryForEncryption = (territory) => {
       "Le territoire n'a pas été sauvegardé car son format était incorrect.",
       "Vous pouvez vérifier son contenu et tenter de le sauvegarder à nouveau. L'équipe technique a été prévenue et va travailler sur un correctif."
     );
-    capture(error, { extra: { territory } });
+    capture(error);
     throw error;
   }
   const decrypted = {};

@@ -6,7 +6,6 @@ import ActionStatus from '../../components/ActionStatus';
 import Table from '../../components/table';
 import Observation from '../territory-observations/view';
 import dayjs from 'dayjs';
-import { capture } from '../../services/sentry';
 import UserName from '../../components/UserName';
 import Search from '../../components/search';
 import TagTeam from '../../components/TagTeam';
@@ -646,11 +645,7 @@ const Comments = ({ comments }) => {
       data={comments}
       noData="Pas de commentaire"
       onRowClick={(comment) => {
-        try {
-          history.push(`/${comment.type}/${comment[comment.type]._id}`);
-        } catch (errorLoadingComment) {
-          capture(errorLoadingComment, { extra: { message: 'error loading comment from search', comment } });
-        }
+        history.push(`/${comment.type}/${comment[comment.type]._id}`);
       }}
       rowKey="_id"
       columns={[
