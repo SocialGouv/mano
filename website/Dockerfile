@@ -1,5 +1,7 @@
 FROM node:20
 
+ENV NEXT_TELEMETRY_DISABLED 1
+
 WORKDIR /usr/src/app
 COPY yarn.lock .yarnrc.yml ./
 COPY .yarn .yarn

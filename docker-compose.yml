@@ -48,6 +48,7 @@ services:
       PGDATABASE_FILE: /run/secrets/database
       STORAGE_DIRECTORY: /app/storage
       SECRET: /run/secrets/secret
+      MANO_API_IS_PRODUCTION: "true"
       no_proxy: ad.sesan.fr,.gcsidf.local,localhost,127.0.0.1
       https_proxy: http://sesclaprx-vip.grita.fr:3128
       http_proxy: http://sesclaprx-vip.grita.fr:3128
