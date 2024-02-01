@@ -68,7 +68,7 @@ const Rencontre = ({ rencontre, personId, onFinished }) => {
               if (isNew) {
                 const newRencontre = {
                   date: body.date,
-                  team: currentTeam._id,
+                  team: body.team ?? currentTeam._id,
                   user: user._id,
                   person: personId,
                   comment: body.comment,
