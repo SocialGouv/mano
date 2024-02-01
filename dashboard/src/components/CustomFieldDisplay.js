@@ -4,7 +4,7 @@ import { formatDateTimeWithNameOfDay, formatDateWithNameOfDay } from '../service
 const showBoolean = (value) => {
   if (value === null) return '';
   if (value === undefined) return '';
-  if (!value) return 'Non';
+  if (!value) return '';
   return 'Oui';
 };
 
