@@ -1,3 +1,11 @@
+## [1.303.6](https://github.com/SocialGouv/mano/compare/v1.303.5...v1.303.6) (2024-02-01)
+
+
+### Bug Fixes
+
+* ne montre pas 'Non' quand une case à cocher n'est pas cochée ([#1848](https://github.com/SocialGouv/mano/issues/1848)) ([bfebcd2](https://github.com/SocialGouv/mano/commit/bfebcd21b00aa5e6ec0b881f981f3776bbff1653))
+* possibilité de chercher une structure par nom, catégorie, ville, etc. ([#1849](https://github.com/SocialGouv/mano/issues/1849)) ([2113557](https://github.com/SocialGouv/mano/commit/211355730a9db5a671e687e91a59edf0676ffc1b))
+
 ## [1.303.5](https://github.com/SocialGouv/mano/compare/v1.303.4...v1.303.5) (2024-02-01)
 
 
