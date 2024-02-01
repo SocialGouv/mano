@@ -209,6 +209,8 @@ const Report = ({ navigation, route }) => {
     [currentTeam?.name, currentTeam?.nightSession, day]
   );
 
+  console.log(day, { rencontres });
+
   return (
     <SceneContainer>
       <ScreenTitle
