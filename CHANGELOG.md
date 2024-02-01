@@ -1,3 +1,10 @@
+## [1.303.8](https://github.com/SocialGouv/mano/compare/v1.303.7...v1.303.8) (2024-02-01)
+
+
+### Bug Fixes
+
+* une personne doit être suivie par au moins une équipe ([#1851](https://github.com/SocialGouv/mano/issues/1851)) ([5932b49](https://github.com/SocialGouv/mano/commit/5932b49c2667af372e0cf2f180892822d5033acc))
+
 ## [1.303.7](https://github.com/SocialGouv/mano/compare/v1.303.6...v1.303.7) (2024-02-01)
 
 
