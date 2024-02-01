@@ -10,7 +10,7 @@ import { useLocalStorage } from '../../../services/useLocalStorage';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../../../recoil/auth';
 
-export const ActionsOrConsultations = ({ actions, consultations }) => {
+export const ActionsOrConsultationsReport = ({ actions, consultations, period }) => {
   const [activeTab, setActiveTab] = useLocalStorage('reports-actions-consultation-toggle', 'Actions');
   const [fullScreen, setFullScreen] = useState(false);
   const [filterStatus, setFilterStatus] = useState([]);
@@ -48,6 +48,7 @@ export const ActionsOrConsultations = ({ actions, consultations }) => {
               onClick={() => {
                 const searchParams = new URLSearchParams(history.location.search);
                 searchParams.set(activeTab.includes('Actions') ? 'newAction' : 'newConsultation', true);
+                searchParams.set('dueAt', period.startDate);
                 history.push(`?${searchParams.toString()}`);
               }}>
               ＋

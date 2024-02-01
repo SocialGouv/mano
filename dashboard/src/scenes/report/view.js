@@ -14,7 +14,7 @@ import { passagesState } from '../../recoil/passages';
 import useTitle from '../../services/useTitle';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import { arrayOfitemsGroupedByPersonSelector, onlyFilledObservationsTerritories } from '../../recoil/selectors';
-import { ActionsOrConsultations } from './components/ActionsReport';
+import { ActionsOrConsultationsReport } from './components/ActionsOrConsultationsReport';
 import ServicesReport from './components/ServicesReport';
 import DateRangePickerWithPresets, { reportsPresets } from '../../components/DateRangePickerWithPresets';
 import { CommentsSocialAndMedical } from './components/CommentsReport';
@@ -346,7 +346,7 @@ const View = () => {
             ].join(' ')}>
             <div className="tw-mb-12 tw-min-h-1/2 tw-basis-6/12 tw-overflow-auto">
               <div className="tw-mb-4 tw-h-[60vh] tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
-                <ActionsOrConsultations actions={actions} consultations={consultations} />
+                <ActionsOrConsultationsReport actions={actions} consultations={consultations} period={period} />
               </div>
               {canSeeComments && (
                 <div className="tw-h-[60vh] tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
