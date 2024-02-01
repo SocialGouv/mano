@@ -55,14 +55,33 @@ export const refreshTriggerState = atom({
   },
 });
 
-export const mergeItems = (oldItems, newItems = []) => {
+export function mergeItems(oldItems, newItems = [], { formatNewItemsFunction, filterNewItemsFunction } = {}) {
+  const newItemsCleanedAndFormatted = [];
   const newItemIds = {};
+
   for (const newItem of newItems) {
     newItemIds[newItem._id] = true;
+    if (newItem.deletedAt) continue;
+    if (filterNewItemsFunction) {
+      if (!filterNewItemsFunction(newItem)) continue;
+    }
+    if (formatNewItemsFunction) {
+      newItemsCleanedAndFormatted.push(formatNewItemsFunction(newItem));
+    } else {
+      newItemsCleanedAndFormatted.push(newItem);
+    }
   }
-  const oldItemsPurged = oldItems.filter((item) => !newItemIds[item._id] && !item.deletedAt);
-  return [...oldItemsPurged, ...newItems.filter((item) => !item.deletedAt)];
-};
+
+  const oldItemsPurged = [];
+  for (const oldItem of oldItems) {
+    if (oldItem.deletedAt) continue;
+    if (!newItemIds[oldItem._id]) {
+      oldItemsPurged.push(oldItem);
+    }
+  }
+
+  return [...oldItemsPurged, ...newItemsCleanedAndFormatted];
+}
 
 export const DataLoader = () => {
   const [lastRefresh, setLastRefresh] = useMMKVNumber(appCurrentCacheKey);
@@ -199,7 +218,7 @@ export const DataLoader = () => {
         lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
       });
       if (refreshedConsultations) {
-        setConsultations((oldConsultations) => mergeItems(oldConsultations, refreshedConsultations.map(formatConsultation)));
+        setConsultations((oldConsultations) => mergeItems(oldConsultations, refreshedConsultations, { formatNewItemsFunction: formatConsultation }));
       }
     }
     /*
@@ -373,7 +392,7 @@ export const DataLoader = () => {
         lastRefresh,
       });
       if (refreshedReports) {
-        setReports((oldReports) => mergeItems(oldReports, refreshedReports).filter((r) => !!r.team && !!r.date));
+        setReports((oldReports) => mergeItems(oldReports, refreshedReports, { filterNewItemsFunction: (r) => !!r.team && !!r.date }));
       }
     }
 

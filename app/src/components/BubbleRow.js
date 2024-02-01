@@ -4,6 +4,7 @@ import { TouchableOpacity } from 'react-native';
 import colors from '../utils/colors';
 import { MyText } from './MyText';
 import UserName from './UserName';
+import dayjs from 'dayjs';
 const hitSlop = {
   top: 20,
   left: 20,
@@ -11,6 +12,14 @@ const hitSlop = {
   bottom: 20,
 };
 
+function formatDateConditionally(date) {
+  const formatString =
+    dayjs(date).year() === dayjs().year()
+      ? 'dddd D MMMM à HH:mm' // Omit year if current year
+      : 'dddd D MMMM YYYY à HH:mm'; // Include year if not current year
+
+  return dayjs(date).format(formatString);
+}
 const BubbleRow = ({ onMorePress, caption, date, user, metaCaption, urgent, group, itemName, onItemNamePress }) => (
   <Container urgent={urgent}>
     <CaptionsContainer>
@@ -25,7 +34,9 @@ const BubbleRow = ({ onMorePress, caption, date, user, metaCaption, urgent, grou
       <CreationDate>
         {!!user && <UserName caption={metaCaption} id={user?._id || user} />}
         {'\u000A'}
-        {new Date(date).getLocaleDateAndTime('fr')}
+
+        {/* show year if different than current year */}
+        {formatDateConditionally(date)}
       </CreationDate>
     </CaptionsContainer>
     {!!onMorePress && (

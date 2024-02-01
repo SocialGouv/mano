@@ -85,6 +85,15 @@ const PersonSummary = ({
   const { actions, comments, rencontres, relsPersonPlace } = populatedPerson;
 
   const sortedActions = useMemo(() => [...(actions || [])].sort((p1, p2) => (p1.dueAt > p2.dueAt ? -1 : 1)), [actions]);
+  const sortedComments = useMemo(
+    () => [...(comments || [])].sort((c1, c2) => ((c1.date || c1.createdAt) > (c2.date || c2.createdAt) ? -1 : 1)),
+    [comments]
+  );
+  const sortedRencontres = useMemo(() => [...(rencontres || [])].sort((r1, r2) => (r1.date > r2.date ? -1 : 1)), [rencontres]);
+  const sortedRelPersonPlace = useMemo(
+    () => [...(relsPersonPlace || [])].sort((r1, r2) => (r1.createdAt > r2.createdAt ? -1 : 1)),
+    [relsPersonPlace]
+  );
 
   const allPlaces = useRecoilValue(placesState);
   const places = useMemo(() => {
@@ -262,7 +271,7 @@ const PersonSummary = ({
       />
       <SubList
         label="Commentaires"
-        data={comments}
+        data={sortedComments}
         renderItem={(comment) => (
           <CommentRow
             key={comment._id}
@@ -323,6 +332,7 @@ const PersonSummary = ({
               return;
             }
 
+            console.log('response', response);
             setComments((comments) => [response.decryptedData, ...comments]);
             await createReportAtDateIfNotExist(response.decryptedData.date);
           }}
@@ -332,7 +342,7 @@ const PersonSummary = ({
         <SubList
           label="Rencontres"
           onAdd={onAddRencontre}
-          data={rencontres}
+          data={sortedRencontres}
           renderItem={(rencontre) => <RencontreRow key={rencontre._id} rencontre={rencontre} onUpdate={() => onUpdateRencontre(rencontre)} />}
           ifEmpty="Pas de rencontres"
         />
@@ -340,7 +350,7 @@ const PersonSummary = ({
       <SubList
         label="Lieux fréquentés"
         onAdd={onAddPlaceRequest}
-        data={relsPersonPlace}
+        data={sortedRelPersonPlace}
         renderItem={(relPersonPlace, index) => {
           const place = places.find((pl) => pl._id === relPersonPlace.place);
           return <PlaceRow key={index} place={place} relPersonPlace={relPersonPlace} personDB={personDB} />;

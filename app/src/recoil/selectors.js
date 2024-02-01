@@ -99,6 +99,8 @@ export const itemsGroupedByPersonSelector = selector({
     const rencontres = get(rencontresState);
     const groups = get(groupsState);
 
+    console.log(JSON.stringify(comments, null, 2));
+
     for (const group of groups) {
       for (const person of group.persons) {
         if (!personsObject[person]) continue;
@@ -137,9 +139,15 @@ export const itemsGroupedByPersonSelector = selector({
         }
       }
     }
-    for (const comment of comments) {
+    for (const [index, comment] of Object.entries(comments)) {
+      // comment 9ff915fa-9e39-4f37-a760-f658345e52e4
+      // person ffd41d5a-c273-4548-b94b-750354ff3aff
       if (!personsObject[comment.person]) continue;
       personsObject[comment.person].comments = personsObject[comment.person].comments || [];
+      if (comment._id === '9ff915fa-9e39-4f37-a760-f658345e52e4') {
+        console.log(`itemsGroupedByPersonSelector comment at index ${index}`);
+        console.log('already existing comments', personsObject[comment.person].comments.length);
+      }
       personsObject[comment.person].comments.push(comment);
       if (!!comment.group) {
         const group = personsObject[comment.person].group;
@@ -311,7 +319,7 @@ const formatData = (data) => {
     return [
       ...actions,
       { type: 'title', title: section.title, _id: section.title },
-      ...section.data.sort((a, b) => dayjs(a.dueAt).diff(dayjs(b.dueAt))),
+      ...section.data.sort((a, b) => new Date(b.dueAt) - new Date(a.dueAt)),
     ];
   }, []);
 };
