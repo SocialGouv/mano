@@ -396,95 +396,95 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
             ]
               .filter(Boolean)
               .join(' ')}>
-            <div className="tw-flex tw-h-full tw-w-full tw-flex-col tw-items-stretch tw-py-4 tw-text-left sm:tw-flex-row">
-              <div className="tw-flex tw-flex-[2] tw-basis-2/3 tw-flex-col tw-overflow-y-auto tw-pl-4 tw-pr-8">
-                <div className="tw-mb-4 tw-flex tw-flex-col tw-items-start tw-justify-start">
-                  <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="name">
-                    Nom de l'action
-                  </label>
-                  {isEditing ? (
-                    <textarea
-                      name="name"
-                      id="name"
-                      value={data.name}
-                      onChange={handleChange}
-                      className="tw-w-full tw-rounded tw-border tw-border-gray-300 tw-py-1.5 tw-px-3 tw-text-base tw-transition-all"
-                    />
-                  ) : (
-                    <CustomFieldDisplay value={data.name} type="textarea" />
-                  )}
-                </div>
-                <div className="tw-mb-4 tw-flex tw-flex-col tw-items-start tw-justify-start">
-                  <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="person">
-                    {isMulti ? 'Personne(s) suivie(s)' : 'Personne suivie'}
-                  </label>
-                  {isEditing ? (
-                    <div className="tw-w-full">
-                      <SelectPerson noLabel value={data.person} onChange={handleChange} isMulti={isMulti} inputId="create-action-person-select" />
-                    </div>
-                  ) : (
-                    <PersonName item={data} />
-                  )}
-                </div>
-                <div className="tw-mb-4 tw-flex tw-flex-col tw-items-start tw-justify-start">
-                  <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="categories">
-                    Catégorie(s)
-                  </label>
-                  {isEditing ? (
-                    <div className="tw-w-full">
-                      <ActionsCategorySelect
-                        values={data.categories}
-                        id="categories"
-                        onChange={(v) => handleChange({ currentTarget: { value: v, name: 'categories' } })}
-                        withMostUsed
-                      />
-                    </div>
-                  ) : (
-                    <CustomFieldDisplay value={data.categories?.join(', ')} type="text" />
-                  )}
-                </div>
-                {!['restricted-access'].includes(user.role) && (
-                  <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
-                    <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="description">
-                      Description
+            <div className="tw-flex tw-h-full tw-w-full tw-flex-col tw-overflow-y-auto tw-py-4 tw-text-left sm:tw-flex-row ">
+              <div id="right" className="tw-grid tw-min-h-full tw-flex-[2] tw-basis-2/3 tw-grid-cols-[1fr_2px] tw-pl-4 tw-pr-8">
+                <div className="tw-flex tw-flex-col tw-pr-8">
+                  <div className="tw-mb-4 tw-flex tw-flex-col tw-items-start tw-justify-start">
+                    <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="name">
+                      Nom de l'action
                     </label>
                     {isEditing ? (
-                      <div className="tw-block tw-w-full tw-overflow-hidden tw-rounded tw-border tw-border-gray-300 tw-text-base tw-transition-all">
-                        <AutoResizeTextarea name="description" id="description" value={data.description} onChange={handleChange} rows={4} />
-                      </div>
+                      <textarea
+                        name="name"
+                        id="name"
+                        value={data.name}
+                        onChange={handleChange}
+                        className="tw-w-full tw-rounded tw-border tw-border-gray-300 tw-py-1.5 tw-px-3 tw-text-base tw-transition-all"
+                      />
                     ) : (
-                      <CustomFieldDisplay value={data.description} type="textarea" />
+                      <CustomFieldDisplay value={data.name} type="textarea" />
                     )}
                   </div>
-                )}
-                {!!canToggleGroupCheck && (
-                  <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
-                    <label htmlFor="create-action-for-group">
-                      {isEditing ? (
-                        <>
-                          <input
-                            type="checkbox"
-                            className="tw-mr-2"
-                            id="create-action-for-group"
-                            name="group"
-                            checked={data.group}
-                            onChange={() => {
-                              handleChange({ target: { name: 'group', checked: Boolean(!data.group), value: Boolean(!data.group) } });
-                            }}
-                          />
-                          Action familiale <br />
-                          <small className="text-muted">Cette action sera à effectuer pour toute la famille</small>
-                        </>
-                      ) : data.group ? (
-                        <>
-                          Action familiale <br />
-                          <small className="text-muted">Cette action sera à effectuer pour toute la famille</small>
-                        </>
-                      ) : null}
+                  <div className="tw-mb-4 tw-flex tw-flex-col tw-items-start tw-justify-start">
+                    <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="person">
+                      {isMulti ? 'Personne(s) suivie(s)' : 'Personne suivie'}
                     </label>
+                    {isEditing ? (
+                      <div className="tw-w-full">
+                        <SelectPerson noLabel value={data.person} onChange={handleChange} isMulti={isMulti} inputId="create-action-person-select" />
+                      </div>
+                    ) : (
+                      <PersonName item={data} />
+                    )}
                   </div>
-                )}
-                <div>
+                  <div className="tw-mb-4 tw-flex tw-flex-col tw-items-start tw-justify-start">
+                    <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="categories">
+                      Catégorie(s)
+                    </label>
+                    {isEditing ? (
+                      <div className="tw-w-full">
+                        <ActionsCategorySelect
+                          values={data.categories}
+                          id="categories"
+                          onChange={(v) => handleChange({ currentTarget: { value: v, name: 'categories' } })}
+                          withMostUsed
+                        />
+                      </div>
+                    ) : (
+                      <CustomFieldDisplay value={data.categories?.join(', ')} type="text" />
+                    )}
+                  </div>
+                  {!['restricted-access'].includes(user.role) && (
+                    <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
+                      <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="description">
+                        Description
+                      </label>
+                      {isEditing ? (
+                        <div className="tw-block tw-w-full tw-overflow-hidden tw-rounded tw-border tw-border-gray-300 tw-text-base tw-transition-all">
+                          <AutoResizeTextarea name="description" id="description" value={data.description} onChange={handleChange} rows={4} />
+                        </div>
+                      ) : (
+                        <CustomFieldDisplay value={data.description} type="textarea" />
+                      )}
+                    </div>
+                  )}
+                  {!!canToggleGroupCheck && (
+                    <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
+                      <label htmlFor="create-action-for-group">
+                        {isEditing ? (
+                          <>
+                            <input
+                              type="checkbox"
+                              className="tw-mr-2"
+                              id="create-action-for-group"
+                              name="group"
+                              checked={data.group}
+                              onChange={() => {
+                                handleChange({ target: { name: 'group', checked: Boolean(!data.group), value: Boolean(!data.group) } });
+                              }}
+                            />
+                            Action familiale <br />
+                            <small className="text-muted">Cette action sera à effectuer pour toute la famille</small>
+                          </>
+                        ) : data.group ? (
+                          <>
+                            Action familiale <br />
+                            <small className="text-muted">Cette action sera à effectuer pour toute la famille</small>
+                          </>
+                        ) : null}
+                      </label>
+                    </div>
+                  )}
                   {!!isNewAction && !['restricted-access'].includes(user.role) && (
                     <>
                       <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
@@ -518,11 +518,11 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                     </>
                   )}
                 </div>
+                <div id="separator" className="tw-flex tw-w-2 tw-shrink-0 tw-flex-col tw-pb-4">
+                  <hr className="tw-m-0 tw-w-px tw-shrink-0 tw-basis-full tw-border tw-bg-gray-300" />
+                </div>
               </div>
-              <div className="tw-flex tw-shrink-0 tw-flex-col">
-                <hr className="tw-m-0 tw-w-px tw-shrink-0 tw-basis-full tw-border tw-bg-gray-300" />
-              </div>
-              <div className="tw-flex tw-flex-[1] tw-basis-1/3 tw-flex-col tw-overflow-y-auto tw-pr-4 tw-pl-8">
+              <div id="left" className="tw-flex tw-flex-[1] tw-basis-1/3 tw-flex-col tw-pr-4">
                 <div className="tw-mb-4 tw-flex tw-flex-col tw-items-start tw-justify-start">
                   <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="dueAt">
                     À faire le
