@@ -13,7 +13,6 @@ import { FullScreenIcon } from '../assets/icons/FullScreenIcon';
 import DatePicker from './DatePicker';
 import { outOfBoundariesDate } from '../services/date';
 import AutoResizeTextarea from './AutoresizeTextArea';
-import { capture } from '../services/sentry';
 import UserName from './UserName';
 import CustomFieldDisplay from './CustomFieldDisplay';
 
@@ -229,14 +228,6 @@ function CommentsTable({ comments, onDisplayComment, onEditComment, onAddComment
         <tbody className="small">
           {(comments || []).map((comment, i) => {
             if (!comment.type) throw new Error('type is required');
-            if (comment.type === 'person' && !comment.person) {
-              capture(new Error('person is required'), { extra: { comment } });
-              return null;
-            }
-            if (comment.type === 'action' && !comment.action) {
-              capture(new Error('action is required'), { extra: { comment } });
-              return null;
-            }
             return (
               <tr key={comment._id} className={[`tw-bg-${color} tw-w-full`, i % 2 ? 'tw-bg-opacity-0' : 'tw-bg-opacity-5'].join(' ')}>
                 <td
@@ -298,38 +289,34 @@ function CommentsTable({ comments, onDisplayComment, onEditComment, onAddComment
                           className="tw-ml-auto tw-block"
                           onClick={(e) => {
                             e.stopPropagation();
-                            try {
-                              const searchParams = new URLSearchParams(location.search);
-                              switch (comment.type) {
-                                case 'action':
-                                  searchParams.set('actionId', comment.action);
-                                  history.push(`?${searchParams.toString()}`);
-                                  break;
-                                case 'person':
-                                  history.push(`/person/${comment.person}`);
-                                  break;
-                                case 'passage':
-                                  history.push(`/person/${comment.person}?passageId=${comment.passage}`);
-                                  break;
-                                case 'rencontre':
-                                  history.push(`/person/${comment.person}?rencontreId=${comment.rencontre}`);
-                                  break;
-                                case 'consultation':
-                                  searchParams.set('consultationId', comment.consultation._id);
-                                  history.push(`?${searchParams.toString()}`);
-                                  break;
-                                case 'treatment':
-                                  searchParams.set('treatmentId', comment.treatment._id);
-                                  history.push(`?${searchParams.toString()}`);
-                                  break;
-                                case 'medical-file':
-                                  history.push(`/person/${comment.person}?tab=Dossier+Médical`);
-                                  break;
-                                default:
-                                  break;
-                              }
-                            } catch (errorLoadingComment) {
-                              capture(errorLoadingComment, { extra: { message: 'error loading comment tag button', comment } });
+                            const searchParams = new URLSearchParams(location.search);
+                            switch (comment.type) {
+                              case 'action':
+                                searchParams.set('actionId', comment.action);
+                                history.push(`?${searchParams.toString()}`);
+                                break;
+                              case 'person':
+                                history.push(`/person/${comment.person}`);
+                                break;
+                              case 'passage':
+                                history.push(`/person/${comment.person}?passageId=${comment.passage}`);
+                                break;
+                              case 'rencontre':
+                                history.push(`/person/${comment.person}?rencontreId=${comment.rencontre}`);
+                                break;
+                              case 'consultation':
+                                searchParams.set('consultationId', comment.consultation._id);
+                                history.push(`?${searchParams.toString()}`);
+                                break;
+                              case 'treatment':
+                                searchParams.set('treatmentId', comment.treatment._id);
+                                history.push(`?${searchParams.toString()}`);
+                                break;
+                              case 'medical-file':
+                                history.push(`/person/${comment.person}?tab=Dossier+Médical`);
+                                break;
+                              default:
+                                break;
                             }
                           }}>
                           <div className="tw-rounded tw-border tw-border-blue-900 tw-bg-blue-900/10 tw-px-1">

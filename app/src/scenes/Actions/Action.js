@@ -232,7 +232,7 @@ const Action = ({ navigation, route }) => {
       if (!!newAction.completedAt) await createReportAtDateIfNotExist(newAction.completedAt);
       return response;
     } catch (error) {
-      capture(error, { extra: { message: 'error in updating action', action } });
+      capture(error, { extra: { message: 'error in updating action' } });
       return { ok: false, error: error.message };
     }
   };

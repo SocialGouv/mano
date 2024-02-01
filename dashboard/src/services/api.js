@@ -58,7 +58,7 @@ export const encryptItem = async (item) => {
       decryptDBItem({ encryptedContent, encryptedEntityKey }, hashedOrgEncryptionKey);
     } catch (e) {
       // TODO: remove when debug is done
-      capture('error decrypting item after encrypting', { extra: { e, item } });
+      capture('error decrypting item after encrypting', { extra: { e, item: item._id } });
     }
 
     item.encrypted = encryptedContent;

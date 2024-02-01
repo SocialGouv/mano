@@ -82,7 +82,7 @@ export const prepareConsultationForEncryption =
         toast.error(
           "La consultation n'a pas été sauvegardée car son format était incorrect. Vous pouvez vérifier son contenu et tenter de la sauvegarder à nouveau. L'équipe technique a été prévenue et va travailler sur un correctif."
         );
-        capture(error, { extra: { consultation } });
+        capture(error);
         throw error;
       }
     }

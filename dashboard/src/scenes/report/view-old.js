@@ -1454,32 +1454,28 @@ const CommentCreatedAt = ({ date, comments, medical }) => {
           data={data}
           noData="Pas de commentaire ajouté ce jour"
           onRowClick={(comment) => {
-            try {
-              const searchParams = new URLSearchParams(history.location.search);
-              switch (comment.type) {
-                case 'action':
-                  searchParams.set('actionId', comment.action._id);
-                  history.push(`?${searchParams.toString()}`);
-                  break;
-                case 'person':
-                  history.push(`/person/${comment.person._id}`);
-                  break;
-                case 'consultation':
-                  searchParams.set('consultationId', comment.consultation._id);
-                  history.push(`?${searchParams.toString()}`);
-                  break;
-                case 'treatment':
-                  searchParams.set('treatmentId', comment.treatment._id);
-                  history.push(`?${searchParams.toString()}`);
-                  break;
-                case 'medical-file':
-                  history.push(`/person/${comment.person._id}?tab=Dossier+Médical`);
-                  break;
-                default:
-                  break;
-              }
-            } catch (errorLoadingComment) {
-              capture(errorLoadingComment, { extra: { message: 'error loading comment from report', comment, date } });
+            const searchParams = new URLSearchParams(history.location.search);
+            switch (comment.type) {
+              case 'action':
+                searchParams.set('actionId', comment.action._id);
+                history.push(`?${searchParams.toString()}`);
+                break;
+              case 'person':
+                history.push(`/person/${comment.person._id}`);
+                break;
+              case 'consultation':
+                searchParams.set('consultationId', comment.consultation._id);
+                history.push(`?${searchParams.toString()}`);
+                break;
+              case 'treatment':
+                searchParams.set('treatmentId', comment.treatment._id);
+                history.push(`?${searchParams.toString()}`);
+                break;
+              case 'medical-file':
+                history.push(`/person/${comment.person._id}?tab=Dossier+Médical`);
+                break;
+              default:
+                break;
             }
           }}
           rowKey="_id"

@@ -153,7 +153,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
             return true;
           } else {
             toast.error('Erreur lors de la suppression du document, vous pouvez contactez le support');
-            capture('Error while deleting treatment document', { treatment, document, treatmentResponse });
+            capture('Error while deleting treatment document', { treatmentResponse });
           }
         }
         if (documentOrFolder.linkedItem.type === 'consultation') {
@@ -178,7 +178,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
             return true;
           } else {
             toast.error('Erreur lors de la suppression du document, vous pouvez contactez le support');
-            capture('Error while deleting consultation document', { consultation, document, consultationResponse });
+            capture('Error while deleting consultation document', { consultationResponse });
           }
         }
         if (documentOrFolder.linkedItem.type === 'medical-file') {
@@ -202,7 +202,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
             return true;
           } else {
             toast.error('Erreur lors de la suppression du document, vous pouvez contactez le support');
-            capture('Error while deleting medical file document', { medicalFile, document, medicalFileResponse });
+            capture('Error while deleting medical file document', { medicalFileResponse });
           }
         }
         return false;
@@ -237,7 +237,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
             toast.success('Document mis à jour');
           } else {
             toast.error('Erreur lors de la mise à jour du document, vous pouvez contactez le support');
-            capture('Error while updating treatment document', { treatment, document, treatmentResponse });
+            capture('Error while updating treatment document', { treatmentResponse });
           }
         }
         if (documentOrFolder.linkedItem.type === 'consultation') {
@@ -269,7 +269,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
             toast.success('Document mis à jour');
           } else {
             toast.error('Erreur lors de la mise à jour du document, vous pouvez contactez le support');
-            capture('Error while updating consultation document', { consultation, document, consultationResponse });
+            capture('Error while updating consultation document', { consultationResponse });
           }
         }
         if (documentOrFolder.linkedItem.type === 'medical-file') {
@@ -300,7 +300,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
             toast.success('Document mis à jour');
           } else {
             toast.error('Erreur lors de la mise à jour du document, vous pouvez contactez le support');
-            capture('Error while updating medical file document', { medicalFile, document, medicalFileResponse });
+            capture('Error while updating medical file document', { medicalFileResponse });
           }
         }
       }}
@@ -365,12 +365,12 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
             return true;
           } else {
             toast.error('Erreur lors de la mise à jour des documents, vous pouvez contactez le support');
-            capture('Error while updating medical file documents reorder', { nextDocuments, medicalDocumentsResponse });
+            capture('Error while updating medical file documents reorder', { medicalDocumentsResponse });
           }
           return false;
         } catch (e) {
           toast.error('Erreur lors de la mise à jour des documents, vous pouvez contactez le support');
-          capture(e, { nextDocuments, message: 'Error while updating documents order' });
+          capture(e, { message: 'Error while updating documents order' });
         }
         return false;
       }}

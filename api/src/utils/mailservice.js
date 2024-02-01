@@ -33,7 +33,7 @@ const sendEmail = async (address, subject, text, html) => {
     }),
   });
   if (!emailSentResponse.ok) {
-    capture(new Error("Email not sent"), { extra: { address, subject, text, response: emailSentResponse } });
+    capture(new Error("Email not sent"), { extra: { address, subject, response: emailSentResponse } });
   }
   return emailSentResponse;
 };

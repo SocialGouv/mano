@@ -1,5 +1,4 @@
 import { getDuration } from './utils';
-import { capture } from '../../services/sentry';
 import Card from '../../components/Card';
 
 export const Block = ({ data, title = 'Nombre de personnes suivies', help = null }) => (
@@ -24,28 +23,23 @@ export const BlockDateWithTime = ({ data, field, help }) => {
 const twoDecimals = (number) => Math.round(number * 100) / 100;
 
 export const BlockTotal = ({ title, unit, data, field, help }) => {
-  try {
-    if (!data.length) {
-      return <Card title={title} unit={unit} count={0} help={help} />;
-    }
-    const dataWithOnlyNumbers = data.filter((item) => Boolean(item[field])).filter((e) => !isNaN(Number(e[field])));
-    const total = dataWithOnlyNumbers.reduce((total, item) => total + Number(item[field]), 0);
-    const avg = total / dataWithOnlyNumbers.length;
-    return (
-      <Card
-        title={title}
-        unit={unit}
-        count={twoDecimals(total)}
-        help={help}
-        children={
-          <span className="font-weight-normal">
-            Moyenne: <strong>{isNaN(avg) ? '-' : twoDecimals(avg)}</strong>
-          </span>
-        }
-      />
-    );
-  } catch (errorBlockTotal) {
-    capture('error block total', errorBlockTotal, { title, unit, data, field });
+  if (!data.length) {
+    return <Card title={title} unit={unit} count={0} help={help} />;
   }
-  return null;
+  const dataWithOnlyNumbers = data.filter((item) => Boolean(item[field])).filter((e) => !isNaN(Number(e[field])));
+  const total = dataWithOnlyNumbers.reduce((total, item) => total + Number(item[field]), 0);
+  const avg = total / dataWithOnlyNumbers.length;
+  return (
+    <Card
+      title={title}
+      unit={unit}
+      count={twoDecimals(total)}
+      help={help}
+      children={
+        <span className="font-weight-normal">
+          Moyenne: <strong>{isNaN(avg) ? '-' : twoDecimals(avg)}</strong>
+        </span>
+      }
+    />
+  );
 };

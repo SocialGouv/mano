@@ -110,7 +110,7 @@ export const prepareObsForEncryption =
         toast.error(
           "L'observation n'a pas été sauvegardée car son format était incorrect. Vous pouvez vérifier son contenu et tenter de la sauvegarder à nouveau. L'équipe technique a été prévenue et va travailler sur un correctif."
         );
-        capture(error, { extra: { obs } });
+        capture(error);
         throw error;
       }
     }

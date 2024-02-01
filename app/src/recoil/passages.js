@@ -29,7 +29,7 @@ export const preparePassageForEncryption = (passage) => {
       "Le passage n'a pas été sauvegardé car son format était incorrect.",
       "Vous pouvez vérifier son contenu et tenter de le sauvegarder à nouveau. L'équipe technique a été prévenue et va travailler sur un correctif."
     );
-    capture(error, { extra: { passage } });
+    capture(error);
     throw error;
   }
   const decrypted = {};
