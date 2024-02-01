@@ -27,7 +27,6 @@ const {
 const mailservice = require("../utils/mailservice");
 const validateUser = require("../middleware/validateUser");
 const { looseUuidRegex, customFieldSchema, positiveIntegerRegex } = require("../utils");
-const { capture } = require("../sentry");
 const { serializeOrganisation } = require("../utils/data-serializer");
 const { defaultSocialCustomFields, defaultMedicalCustomFields } = require("../utils/custom-fields/person");
 const { mailBienvenueHtml } = require("../utils/mail-bienvenue");

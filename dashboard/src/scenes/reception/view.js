@@ -196,7 +196,7 @@ const Reception = () => {
       }
       setAddingPassage(false);
     } catch (e) {
-      capture(e, { extra: { selectedPersons, currentTeam }, user });
+      capture(e, { extra: { selectedPersons: selectedPersons.map((p) => p._id), currentTeam }, user });
       toast.error("Désolé une erreur est survenue, l'équipe technique est prévenue");
     }
   };
