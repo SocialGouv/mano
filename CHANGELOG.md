@@ -1,3 +1,10 @@
+## [1.303.3](https://github.com/SocialGouv/mano/compare/v1.303.2...v1.303.3) (2024-02-01)
+
+
+### Bug Fixes
+
+* message d'abandon du compte rendu ancien ([#1842](https://github.com/SocialGouv/mano/issues/1842)) ([0edd40f](https://github.com/SocialGouv/mano/commit/0edd40fbd9be20694ea6042a798b827e9c3bd302))
+
 ## [1.303.2](https://github.com/SocialGouv/mano/compare/v1.303.1...v1.303.2) (2024-01-30)
 
 
