@@ -1,3 +1,10 @@
+## [1.303.4](https://github.com/SocialGouv/mano/compare/v1.303.3...v1.303.4) (2024-02-01)
+
+
+### Bug Fixes
+
+* une nouvelle action créée depuis le CR aura comme data la date de démarrage du CR ([#1846](https://github.com/SocialGouv/mano/issues/1846)) ([334a470](https://github.com/SocialGouv/mano/commit/334a4704509fed3851e5ddeb853f1e118ddb39f5))
+
 ## [1.303.3](https://github.com/SocialGouv/mano/compare/v1.303.2...v1.303.3) (2024-02-01)
 
 
