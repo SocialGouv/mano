@@ -115,6 +115,7 @@ const PersonCustomFieldsSettings = () => {
       data={dataFormatted}
       addButtonCaption="Ajouter un groupe de champs personnalisés"
       onAddGroup={onAddGroup}
+      sectionId="customFieldsPersons"
       onGroupTitleChange={onGroupTitleChange}
       dataItemKey={(cat) => cat.name}
       ItemComponent={ConsultationCustomField}

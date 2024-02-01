@@ -193,11 +193,22 @@ const Group = ({
     setIsEditingGroupTitle(false);
   };
 
+  const isOpened = useMemo(() => {
+    return window.sessionStorage.getItem(`drag-and-drop-setting-${sectionId}-${groupTitle}-open`) === 'true';
+  });
+
   return (
     <>
       <div className={['tw-min-h-full tw-break-all tw-p-1 ', isAlone ? '' : 'tw-basis-1/2 xl:tw-basis-1/3'].join(' ')}>
         <details
-          open
+          open={!!isOpened}
+          onToggle={(e) => {
+            if (e.target.open) {
+              window.sessionStorage.setItem(`drag-and-drop-setting-${sectionId}-${groupTitle}-open`, 'true');
+            } else {
+              window.sessionStorage.removeItem(`drag-and-drop-setting-${sectionId}-${groupTitle}-open`);
+            }
+          }}
           key={groupTitle}
           id={groupTitle}
           data-group={groupTitle}

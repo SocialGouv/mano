@@ -125,6 +125,7 @@ const ConsultationsSettings = () => {
     <DragAndDropSettings
       title={<h3 className="tw-mb-0 tw-text-xl tw-font-extrabold">Consultations</h3>}
       data={dataFormatted}
+      sectionId="consultations"
       addButtonCaption="Ajouter un type de consultations"
       onAddGroup={onAddConsultationType}
       onGroupTitleChange={onConsultationTypeChange}

@@ -100,6 +100,7 @@ const ActionCategoriesSettings = () => {
       title={<h3 className="tw-mb-0 tw-text-xl tw-font-extrabold">Catégories d'action</h3>}
       data={dataFormatted}
       addButtonCaption="Ajouter un groupe"
+      sectionId='action-categories'
       onAddGroup={onAddGroup}
       onGroupTitleChange={onGroupTitleChange}
       dataItemKey={(cat) => cat}
