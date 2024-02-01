@@ -1,16 +1,21 @@
+import { useEffect, useState } from "react";
 import Dropdown from "./dropdown";
 import Embed from "./embed";
 
 const Mobile = () => {
-  let baseUrl = "https://mano-app.fabrique.social.gouv.fr/download";
-  if (typeof window !== "undefined") {
-    if (window.location.hostname === "preprod-mano.sesan.fr") {
-      baseUrl = "https://preprod-mano.sesan.fr/download";
+  const [baseUrl, setBaseUrl] = useState("https://mano-app.fabrique.social.gouv.fr/download");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      if (window.location.hostname === "preprod-mano.sesan.fr") {
+        setBaseUrl("https://preprod-mano.sesan.fr/download");
+      }
+      if (window.location.hostname === "mano.sesan.fr") {
+        setBaseUrl("https://mano.sesan.fr/download");
+      }
     }
-    if (window.location.hostname === "mano.sesan.fr") {
-      baseUrl = "https://mano.sesan.fr/download";
-    }
-  }
+  }, []);
+
   return (
     <div className="space-y-2">
       <Dropdown title="Comment MANO peut-il répondre aux besoins d'équipes si différentes, dont la mienne ?" defaultOpen={false}>

@@ -1,16 +1,19 @@
+import { useEffect, useState } from "react";
 import Dropdown from "./dropdown";
 import Embed from "./embed";
 
 const Web = () => {
-  let baseUrl = "https://dashboard-mano.fabrique.social.gouv.fr";
-  if (typeof window !== "undefined") {
-    if (window.location.hostname === "preprod-mano.sesan.fr") {
-      baseUrl = "https://preprod-espace-mano.sesan.fr";
+  const [baseUrl, setBaseUrl] = useState("https://dashboard-mano.fabrique.social.gouv.fr");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      if (window.location.hostname === "preprod-mano.sesan.fr") {
+        setBaseUrl("https://preprod-espace-mano.sesan.fr");
+      } else if (window.location.hostname === "mano.sesan.fr") {
+        setBaseUrl("https://espace-mano.sesan.fr");
+      }
     }
-    if (window.location.hostname === "mano.sesan.fr") {
-      baseUrl = "https://espace-mano.sesan.fr";
-    }
-  }
+  }, []);
 
   return (
     <div className="space-y-2">

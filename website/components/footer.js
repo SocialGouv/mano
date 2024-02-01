@@ -9,18 +9,19 @@ export default function Footer({ skipFirstParagraph }) {
   const [emailGuillaume, setEmailGuillaume] = useState("");
   const [emailMelissa, setEmailMelissa] = useState("");
   const [emailYoann, setEmailYoann] = useState("");
+  const [baseUrl, setBaseUrl] = useState("https://dashboard-mano.fabrique.social.gouv.fr");
 
   const year = new Date().getFullYear();
 
-  let baseUrl = "https://dashboard-mano.fabrique.social.gouv.fr";
-  if (typeof window !== "undefined") {
-    if (window.location.hostname === "preprod-mano.sesan.fr") {
-      baseUrl = "https://preprod-espace-mano.sesan.fr";
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      if (window.location.hostname === "preprod-mano.sesan.fr") {
+        setBaseUrl("https://preprod-espace-mano.sesan.fr");
+      } else if (window.location.hostname === "mano.sesan.fr") {
+        setBaseUrl("https://espace-mano.sesan.fr");
+      }
     }
-    if (window.location.hostname === "mano.sesan.fr") {
-      baseUrl = "https://espace-mano.sesan.fr";
-    }
-  }
+  }, []);
 
   useEffect(() => {
     setEmailGuillaume(window.atob(guillaume));

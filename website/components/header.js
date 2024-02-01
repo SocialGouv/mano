@@ -6,20 +6,21 @@ import { HiMenu } from "react-icons/hi";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const [connexionUrl, setConnexionUrl] = useState("https://dashboard-mano.fabrique.social.gouv.fr/auth");
 
   useEffect(() => {
     document.body.addEventListener("click", () => setIsOpen(false));
   });
 
-  let connexionUrl = "https://dashboard-mano.fabrique.social.gouv.fr/auth";
-  if (typeof window !== "undefined") {
-    if (window.location.hostname === "preprod-mano.sesan.fr") {
-      connexionUrl = "https://preprod-espace-mano.sesan.fr/auth";
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      if (window.location.hostname === "preprod-mano.sesan.fr") {
+        setConnexionUrl("https://preprod-espace-mano.sesan.fr/auth");
+      } else if (window.location.hostname === "mano.sesan.fr") {
+        setConnexionUrl("https://espace-mano.sesan.fr/auth");
+      }
     }
-    if (window.location.hostname === "mano.sesan.fr") {
-      connexionUrl = "https://espace-mano.sesan.fr/auth";
-    }
-  }
+  }, []);
 
   return (
     <>
