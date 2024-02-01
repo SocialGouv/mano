@@ -33,7 +33,6 @@ if (process.env.DEPLOY_KEY_FILE && fs.existsSync(process.env.DEPLOY_KEY_FILE)) {
 }
 const VERSION = version;
 const MOBILE_APP_VERSION = mobileAppVersion;
-const SENTRY_KEY = process.env.SENTRY_KEY || "https://e3eb487403dd4789b47cf6da857bb4bf@sentry.fabrique.social.gouv.fr/52";
 
 const STORAGE_DIRECTORY = process.env.STORAGE_DIRECTORY;
 
@@ -52,7 +51,6 @@ module.exports = {
   PGPASSWORD,
   PGDATABASE,
   DEPLOY_KEY,
-  SENTRY_KEY,
   VERSION,
   MOBILE_APP_VERSION,
   X_TIPIMAIL_APIUSER,

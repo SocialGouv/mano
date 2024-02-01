@@ -7,7 +7,7 @@ const sentryEnabled = ENVIRONMENT !== "development" && ENVIRONMENT !== "test" &&
 const SentryInit = (app) => {
   if (!sentryEnabled) return;
   Sentry.init({
-    dsn: "https://e3eb487403dd4789b47cf6da857bb4bf@sentry.fabrique.social.gouv.fr/52",
+    dsn: "https://704920eb243783ea03b6a448928aeb41@o4506615228596224.ingest.sentry.io/4506672054140928",
     environment: `api-${ENVIRONMENT}`,
     integrations: [
       // enable HTTP calls tracing
