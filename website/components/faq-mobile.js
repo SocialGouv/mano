@@ -3,11 +3,13 @@ import Embed from "./embed";
 
 const Mobile = () => {
   let baseUrl = "https://mano-app.fabrique.social.gouv.fr/download";
-  if (window.location.hostname === "preprod-mano.sesan.fr") {
-    baseUrl = "https://preprod-mano.sesan.fr/download";
-  }
-  if (window.location.hostname === "mano.sesan.fr") {
-    baseUrl = "https://mano.sesan.fr/download";
+  if (typeof window !== "undefined") {
+    if (window.location.hostname === "preprod-mano.sesan.fr") {
+      baseUrl = "https://preprod-mano.sesan.fr/download";
+    }
+    if (window.location.hostname === "mano.sesan.fr") {
+      baseUrl = "https://mano.sesan.fr/download";
+    }
   }
   return (
     <div className="space-y-2">

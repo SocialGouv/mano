@@ -3,11 +3,13 @@ import Embed from "./embed";
 
 const Web = () => {
   let baseUrl = "https://dashboard-mano.fabrique.social.gouv.fr";
-  if (window.location.hostname === "preprod-mano.sesan.fr") {
-    baseUrl = "https://preprod-espace-mano.sesan.fr";
-  }
-  if (window.location.hostname === "mano.sesan.fr") {
-    baseUrl = "https://espace-mano.sesan.fr";
+  if (typeof window !== "undefined") {
+    if (window.location.hostname === "preprod-mano.sesan.fr") {
+      baseUrl = "https://preprod-espace-mano.sesan.fr";
+    }
+    if (window.location.hostname === "mano.sesan.fr") {
+      baseUrl = "https://espace-mano.sesan.fr";
+    }
   }
 
   return (

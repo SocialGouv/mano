@@ -12,11 +12,13 @@ export default function Header() {
   });
 
   let connexionUrl = "https://dashboard-mano.fabrique.social.gouv.fr/auth";
-  if (window.location.hostname === "preprod-mano.sesan.fr") {
-    connexionUrl = "https://preprod-espace-mano.sesan.fr/auth";
-  }
-  if (window.location.hostname === "mano.sesan.fr") {
-    connexionUrl = "https://espace-mano.sesan.fr/auth";
+  if (typeof window !== "undefined") {
+    if (window.location.hostname === "preprod-mano.sesan.fr") {
+      connexionUrl = "https://preprod-espace-mano.sesan.fr/auth";
+    }
+    if (window.location.hostname === "mano.sesan.fr") {
+      connexionUrl = "https://espace-mano.sesan.fr/auth";
+    }
   }
 
   return (
