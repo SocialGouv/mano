@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Redirect, useLocation } from 'react-router-dom';
-import packageInfo from '../../../package.json';
 import ChangePassword from '../../components/ChangePassword';
 import API from '../../services/api';
+import { useRecoilValue } from 'recoil';
+import { deploymentCommitState } from '../../recoil/version';
 
 const Reset = () => {
   const [redirect, setRedirect] = useState(false);
+  const deploymentCommit = useRecoilValue(deploymentCommitState);
 
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -43,7 +45,7 @@ const Reset = () => {
         withCurrentPassword={false}
         centerButton
       />
-      <p className="tw-mx-auto tw-mt-5 tw-mb-0 tw-block tw-text-center tw-text-xs tw-text-gray-500">Version&nbsp;: {packageInfo.version}</p>
+      <p className="tw-mx-auto tw-mt-5 tw-mb-0 tw-block tw-text-center tw-text-xs tw-text-gray-500">Version&nbsp;: {deploymentCommit}</p>
     </div>
   );
 };

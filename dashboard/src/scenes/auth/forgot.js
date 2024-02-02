@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import validator from 'validator';
 import { toast } from 'react-toastify';
-import packageInfo from '../../../package.json';
 import ButtonCustom from '../../components/ButtonCustom';
 import API from '../../services/api';
+import { useRecoilValue } from 'recoil';
+import { deploymentCommitState } from '../../recoil/version';
 
 const View = () => {
   const [done, setDone] = useState(false);
+  const deploymentCommit = useRecoilValue(deploymentCommitState);
 
   const [resetForm, setResetForm] = useState({
     email: '',
@@ -51,7 +53,7 @@ const View = () => {
           Si l'adresse de courriel que vous avez saisie correspond effectivement à un compte utilisateur(rice) MANO, alors un lien pour réinitialiser
           le mot de passe de ce compte a été envoyé à l'instant à cette adresse.
         </p>
-        <p className="tw-mx-auto tw-mt-5 tw-mb-0 tw-block tw-text-center tw-text-xs tw-text-gray-500">Version&nbsp;: {packageInfo.version}</p>
+        <p className="tw-mx-auto tw-mt-5 tw-mb-0 tw-block tw-text-center tw-text-xs tw-text-gray-500">Version&nbsp;: {deploymentCommit}</p>
       </div>
     );
   }
@@ -87,7 +89,7 @@ const View = () => {
           onClick={handleSubmit}
           className="tw-m-auto !tw-mt-8 !tw-w-56 tw-font-[Helvetica] !tw-text-base tw-font-medium"
         />
-        <p className="tw-mx-auto tw-mt-5 tw-mb-0 tw-block tw-text-center tw-text-xs tw-text-gray-500">Version&nbsp;: {packageInfo.version}</p>
+        <p className="tw-mx-auto tw-mt-5 tw-mb-0 tw-block tw-text-center tw-text-xs tw-text-gray-500">Version&nbsp;: {deploymentCommit}</p>
       </form>
     </div>
   );

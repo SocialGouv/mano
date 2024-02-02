@@ -1,10 +1,10 @@
 import { NavLink } from 'react-router-dom';
 import { atom, useRecoilState, useRecoilValue } from 'recoil';
-import packageInfo from '../../package.json';
 import { organisationState, teamsState, userState } from '../recoil/auth';
 import OpenNewWindowIcon from './OpenNewWindowIcon';
 import SessionCountDownLimiter from './SessionCountDownLimiter';
 import useMinimumWidth from '../services/useMinimumWidth';
+import { deploymentCommitState } from '../recoil/version';
 
 export const showDrawerState = atom({
   key: 'showDrawerState',
@@ -15,6 +15,7 @@ const Drawer = () => {
   const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
   const teams = useRecoilValue(teamsState);
+  const deploymentCommit = useRecoilValue(deploymentCommitState);
 
   const onboardingForEncryption = !organisation.encryptionEnabled;
   const onboardingForTeams = !teams.length;
@@ -146,7 +147,7 @@ const Drawer = () => {
           )}
         </div>
         <div className="tw-mt-auto tw-mb-4 tw-flex tw-flex-col tw-justify-between tw-text-[0.65rem] tw-text-main">
-          <p className="m-0">Version&nbsp;: {packageInfo.version}</p>
+          <p className="m-0">Version&nbsp;: {deploymentCommit}</p>
           <p className="m-0">Accessibilité&nbsp;: partielle</p>
           <SessionCountDownLimiter />
         </div>

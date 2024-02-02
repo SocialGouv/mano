@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import validator from 'validator';
 import { Link, useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { detect } from 'detect-browser';
-import packageInfo from '../../../package.json';
 import ButtonCustom from '../../components/ButtonCustom';
 import { DEFAULT_ORGANISATION_KEY } from '../../config';
 import PasswordInput from '../../components/PasswordInput';
@@ -12,6 +11,7 @@ import { currentTeamState, organisationState, sessionInitialDateTimestamp, teams
 import API, { setOrgEncryptionKey, authTokenState } from '../../services/api';
 import { useDataLoader } from '../../components/DataLoader';
 import useMinimumWidth from '../../services/useMinimumWidth';
+import { deploymentCommitState } from '../../recoil/version';
 
 const SignIn = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
@@ -30,6 +30,7 @@ const SignIn = () => {
   const [authViaCookie, setAuthViaCookie] = useState(false);
   const { startInitialLoad, isLoading, resetCache } = useDataLoader();
   const setToken = useSetRecoilState(authTokenState);
+  const deploymentCommit = useRecoilValue(deploymentCommitState);
 
   const [signinForm, setSigninForm] = useState({ email: '', password: '', orgEncryptionKey: DEFAULT_ORGANISATION_KEY || '' });
   const [signinFormErrors, setSigninFormErrors] = useState({ email: '', password: '', orgEncryptionKey: '' });
@@ -267,7 +268,7 @@ const SignIn = () => {
             className="tw-m-auto tw-font-[Helvetica] !tw-text-base !tw-font-normal"
           />
         )}
-        <p className="tw-mx-auto tw-mt-5 tw-mb-0 tw-block tw-text-center tw-text-xs tw-text-gray-500">Version&nbsp;: {packageInfo.version}</p>
+        <p className="tw-mx-auto tw-mt-5 tw-mb-0 tw-block tw-text-center tw-text-xs tw-text-gray-500">Version&nbsp;: {deploymentCommit}</p>
       </form>
     </div>
   );

@@ -8,7 +8,7 @@ import { HOST, SCHEME } from '../config';
 import { organisationState } from '../recoil/auth';
 import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey, encryptFile, decryptFile } from './encryption';
 import { AppSentry, capture } from './sentry';
-import { apiVersionState, minimumDashboardVersionState } from '../recoil/version';
+import { deploymentCommitState, deploymentDateState } from '../recoil/version';
 const fetch = fetchRetry(window.fetch);
 
 const getUrl = (path, query = {}) => {
@@ -239,11 +239,17 @@ const execute = async ({ method, path = '', body = null, query = {}, headers = {
 
     const url = getUrl(path, query);
     const response = await fetch(url, options);
-    if (response.headers.has('x-api-version')) {
-      setRecoil(apiVersionState, response.headers.get('x-api-version'));
+    if (response.headers.has('x-api-deployment-commit')) {
+      setRecoil(deploymentCommitState, response.headers.get('x-api-deployment-commit'));
+      if (!window.localStorage.getItem('deploymentCommit')) {
+        window.localStorage.setItem('deploymentCommit', response.headers.get('x-api-deployment-commit'));
+      }
     }
-    if (response.headers.has('x-minimum-dashboard-version')) {
-      setRecoil(minimumDashboardVersionState, response.headers.get('x-minimum-dashboard-version'));
+    if (response.headers.has('x-api-deployment-date')) {
+      setRecoil(deploymentDateState, response.headers.get('x-api-deployment-date'));
+      if (!window.localStorage.getItem('deploymentDate')) {
+        window.localStorage.setItem('deploymentDate', response.headers.get('x-api-deployment-date'));
+      }
     }
 
     if (!response.ok && response.status === 401) {

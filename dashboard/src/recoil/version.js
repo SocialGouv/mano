@@ -1,11 +1,11 @@
 import { atom } from 'recoil';
 
-export const apiVersionState = atom({
-  key: 'apiVersionState',
+export const deploymentDateState = atom({
+  key: 'deploymentDateState',
   default: null,
 });
 
-export const minimumDashboardVersionState = atom({
-  key: 'minimumDashboardVersionState',
-  default: null,
+export const deploymentCommitState = atom({
+  key: 'deploymentCommitState',
+  default: '-',
 });

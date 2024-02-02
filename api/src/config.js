@@ -1,5 +1,5 @@
 const fs = require("fs");
-const { version, mobileAppVersion } = require("../package.json");
+const { mobileAppVersion } = require("../package.json");
 
 const PORT = process.env.PORT || 3000;
 const SECRET = process.env.SECRET || "not_so_secret_4";
@@ -31,15 +31,13 @@ if (process.env.DEPLOY_KEY_FILE && fs.existsSync(process.env.DEPLOY_KEY_FILE)) {
 } else {
   DEPLOY_KEY = process.env.DEPLOY_KEY || null;
 }
-const VERSION = version;
+
 const MOBILE_APP_VERSION = mobileAppVersion;
 
 const STORAGE_DIRECTORY = process.env.STORAGE_DIRECTORY;
 
 const X_TIPIMAIL_APIUSER = process.env.X_TIPIMAIL_APIUSER || "";
 const X_TIPIMAIL_APIKEY = process.env.X_TIPIMAIL_APIKEY || "";
-
-const MINIMUM_DASHBOARD_VERSION = "1.261.10";
 
 module.exports = {
   PORT,
@@ -51,10 +49,8 @@ module.exports = {
   PGPASSWORD,
   PGDATABASE,
   DEPLOY_KEY,
-  VERSION,
   MOBILE_APP_VERSION,
   X_TIPIMAIL_APIUSER,
   X_TIPIMAIL_APIKEY,
   STORAGE_DIRECTORY,
-  MINIMUM_DASHBOARD_VERSION,
 };

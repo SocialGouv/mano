@@ -10,11 +10,12 @@ const { sequelize } = require("./db/sequelize");
 const { PORT, DEPLOY_KEY } = require("./config");
 const errors = require("./errors");
 
-const versionCheck = require("./middleware/versionCheck");
 const { SentryInit, capture } = require("./sentry");
 const Sentry = require("@sentry/node");
 
 require("./db/sequelize");
+
+const versionCheck = require("./middleware/versionCheck");
 
 // Put together a schema
 const app = express();
@@ -72,7 +73,7 @@ app.post("/api/deploy", (req, res) => {
     return;
   }
   if (!fs.existsSync("/deploy/deploy-signal.txt")) {
-    sequelize.query(`INSERT INTO "mano".deployments (commit) VALUES (?)`, {
+    sequelize.query(`insert into "mano"."Deployment" (commit) values (?)`, {
       replacements: [req.body.commit],
     });
     fs.writeFileSync("/deploy/deploy-signal.txt", "deploy", {
