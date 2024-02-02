@@ -87,7 +87,7 @@ const StatsLoader = () => {
 const itemsForStatsSelector = selectorFamily({
   key: 'itemsForStatsSelector',
   get:
-    ({ period, filterPersons, selectedTeamsObjectWithOwnPeriod, viewAllOrganisationData }) =>
+    ({ period, filterPersons, selectedTeamsObjectWithOwnPeriod, viewAllOrganisationData, evolutivesStatsActivated }) =>
     ({ get }) => {
       const activeFilters = filterPersons.filter((f) => f.value);
       const filterItemByTeam = (item, key) => {
@@ -289,6 +289,8 @@ const Stats = () => {
   const [actionsCategoriesGroups, setActionsCategoriesGroups] = useLocalStorage('stats-catGroups', []);
   const [actionsCategories, setActionsCategories] = useLocalStorage('stats-categories', []);
 
+  const [evolutivesStatsActivated, setEvolutivesStatsActivated] = useLocalStorage('stats-evolutivesStatsActivated', false);
+
   useTitle(`${activeTab} - Statistiques`);
 
   /*
@@ -369,6 +371,7 @@ const Stats = () => {
       filterPersons,
       selectedTeamsObjectWithOwnPeriod,
       viewAllOrganisationData,
+      evolutivesStatsActivated,
     })
   );
 
@@ -557,7 +560,19 @@ const Stats = () => {
             removePreset={removePreset}
           />
         </div>
-        <div className="tw-flex tw-basis-2/3 tw-items-center tw-justify-end">
+        <div className="tw-min-w-[15rem] tw-basis-1/3 tw-p-0">
+          {activeTab.includes('Personnes') && (
+            <button
+              type="button"
+              className={!evolutivesStatsActivated ? 'button-classic' : 'button-submit'}
+              onClick={() => {
+                setEvolutivesStatsActivated(!evolutivesStatsActivated);
+              }}>
+              Affichage évolutif {evolutivesStatsActivated ? 'activé' : 'désactivé'}
+            </button>
+          )}
+        </div>
+        <div className="tw-ml-auto tw-flex tw-basis-1/3 tw-items-center tw-justify-end">
           <ButtonCustom color="link" title="Imprimer" onClick={window.print} />
           <ExportFormattedData
             observations={observations}
@@ -624,6 +639,7 @@ const Stats = () => {
             personsForStats={personsCreated}
             personFields={personFields}
             flattenedCustomFieldsPersons={flattenedCustomFieldsPersons}
+            evolutivesStatsActivated={evolutivesStatsActivated}
           />
         )}
         {activeTab === 'Personnes suivies' && (
@@ -637,6 +653,7 @@ const Stats = () => {
             filterBase={filterPersonsWithAllFields()}
             filterPersons={filterPersons}
             setFilterPersons={setFilterPersons}
+            evolutivesStatsActivated={evolutivesStatsActivated}
           />
         )}
         {!!organisation.passagesEnabled && activeTab === 'Passages' && (
