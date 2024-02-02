@@ -193,9 +193,9 @@ const itemsForReportsSelector = selectorFamily({
         consultations: Object.values(consultations),
         comments: Object.values(comments),
         commentsMedical: Object.values(commentsMedical),
-        passages: Object.values(passages),
-        rencontres: Object.values(rencontres),
-        observations: Object.values(observations),
+        passages: Object.values(passages).sort((a, b) => (a.date >= b.date ? -1 : 1)),
+        rencontres: Object.values(rencontres).sort((a, b) => (a.date >= b.date ? -1 : 1)),
+        observations: Object.values(observations).sort((a, b) => (a.date >= b.date ? -1 : 1)),
         reports: Object.values(reports),
       };
     },
