@@ -39,4 +39,4 @@ jobs:
         env:
           DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
         run: |
-          curl -X POST -H "Content-Type: application/json" -d '{"deploy-key":"'"$DEPLOY_KEY"'"}' https://preprod-api-mano.sesan.fr/api/deploy
+          curl -f -X POST -H "Content-Type: application/json" -d '{"deploy-key":"'"$DEPLOY_KEY"'", "commit":"'"${{ github.sha }}"'"}' https://preprod-api-mano.sesan.fr/api/deploy

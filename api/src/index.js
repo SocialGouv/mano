@@ -1,13 +1,12 @@
 require("dotenv").config({ path: "./.env" });
 const fs = require("fs");
-const path = require("path");
 
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
-
+const { sequelize } = require("./db/sequelize");
 const { PORT, DEPLOY_KEY } = require("./config");
 const errors = require("./errors");
 
@@ -39,9 +38,6 @@ if (process.env.NODE_ENV === "production") {
 const now = new Date();
 // kube probe
 app.get("/healthz", async (req, res) => {
-  fs.writeFileSync("/deploy/test.txt", "deploy", {
-    flag: "w",
-  });
   res.send(`Hello World`);
 });
 
@@ -67,14 +63,22 @@ app.use(cookieParser());
 
 // Route for deployment
 app.post("/api/deploy", (req, res) => {
-  // check "deploy-key" body parameter and compare it with the one in the .env file
   if (!req.body["deploy-key"] || req.body["deploy-key"] !== DEPLOY_KEY) {
     res.status(401).send("Unauthorized");
     return;
   }
-  fs.writeFileSync("/deploy/deploy-signal.txt", "deploy", {
-    flag: "w",
-  });
+  if (!req.body.commit) {
+    res.status(400).send("Bad Request");
+    return;
+  }
+  if (!fs.existsSync("/deploy/deploy-signal.txt")) {
+    sequelize.query(`INSERT INTO "mano".deployments (commit) VALUES (?)`, {
+      replacements: [req.body.commit],
+    });
+    fs.writeFileSync("/deploy/deploy-signal.txt", "deploy", {
+      flag: "w",
+    });
+  }
   res.send("Déploiement déclenché");
 });
 
