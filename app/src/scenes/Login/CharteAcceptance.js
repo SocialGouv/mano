@@ -45,7 +45,7 @@ const CharteAcceptance = ({ navigation }) => {
           </Container>
           <PdfContainer>
             <PdfViewer
-              source={{ uri: 'https://dashboard-mano.fabrique.social.gouv.fr/charte.pdf' }}
+              source={{ uri: 'https://espace-mano.sesan.fr/charte.pdf' }}
               onPressLink={(url) => {
                 if (Linking.canOpenURL(url)) Linking.openURL(url);
               }}

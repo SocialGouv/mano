@@ -34,7 +34,7 @@ Cette nouvelle version :
 - Vous oriente mieux lorsque vous souhaitez lire un fichier non reconnu
 `,
       [
-        { text: "Télécharger", link: `https://mano-app.fabrique.social.gouv.fr/download?ts=${Date.now()}` },
+        { text: "Télécharger", link: `https://mano.sesan.fr/download?ts=${Date.now()}` },
         { text: "Plus tard", style: "cancel" },
       ],
       { cancelable: true },

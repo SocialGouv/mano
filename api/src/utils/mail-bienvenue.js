@@ -6,7 +6,7 @@
  * @returns {string}
  */
 function mailBienvenueHtml(name, email, organisationName, token) {
-  return `<img src="https://dashboard-mano.fabrique.social.gouv.fr/banner-top.png" width="700" alt="Mano" style="magin-bottom: 16px;" />
+  return `<img src="https://espace-mano.sesan.fr/banner-top.png" width="700" alt="Mano" style="magin-bottom: 16px;" />
 <div style="max-width: 700px; padding: 8px">
 <p>👋 Bonjour${name ? " " + name : ""},</p>
 <p>Nous vous souhaitons la bienvenue sur Mano !<br />
@@ -16,21 +16,21 @@ Suivez les étapes ci-dessous pour définir votre mot de passe et accéder à vo
 <br />
 <p><b>Étape 1&nbsp;: Créer votre mot de passe</b></p>
 <p>Cliquez sur le lien ci-dessous pour accéder à la page de création de mot de passe&nbsp;:</p>
-<p><a href="https://dashboard-mano.fabrique.social.gouv.fr/auth/reset?token=${token}&newUser=true">👉 Créer votre mot de passe 👈</a></p>
+<p><a href="https://espace-mano.sesan.fr/auth/reset?token=${token}&newUser=true">👉 Créer votre mot de passe 👈</a></p>
 <p>Vous serez redirigé vers une page où vous pourrez définir votre mot de passe. Assurez-vous de choisir un mot de passe fort, composé d'au moins huit caractères, comprenant des lettres majuscules et minuscules, des chiffres et des caractères spéciaux pour garantir la sécurité de votre compte.</p>
 <br />
 <p><b>Étape 2&nbsp;: Si le lien ne fonctionne pas</b></p>
 <p>Note&nbsp;: Le lien de création de mot de passe est valable pendant 24 heures. Si vous ne créez pas votre mot de passe dans ce délai, vous devrez demander un nouveau lien de réinitialisation.<br />
 Si le lien ci-dessus ne fonctionne pas, vous pouvez cliquer sur le lien suivant&nbsp;:</p>
-<p><a href="https://dashboard-mano.fabrique.social.gouv.fr/auth/forgot">👉 Je clique ici si le lien précédent ne fonctionne pas 👈</a></p>
+<p><a href="https://espace-mano.sesan.fr/auth/forgot">👉 Je clique ici si le lien précédent ne fonctionne pas 👈</a></p>
 <br />
 <p><b>Étape 3&nbsp;: Se connecter à Mano ! 🤗</b></p>
 <p>Ça y est ! Une fois votre mot de passe créé avec succès, vous pourrez accéder à votre compte en utilisant votre adresse e-mail (${email}), le mot de passe que vous avez défini ET la clé de chiffrement que votre équipe vous a communiquée. Si vous ne la connaissez pas, demandez aux autres membres de votre équipe qui utilisent déjà l'outil.</p>
 <p>Pour vous connecter, cliquez sur le lien suivant&nbsp;:</p>
-<p><a href="https://dashboard-mano.fabrique.social.gouv.fr/">👉 Me connecter à Mano 👈</a></p>
+<p><a href="https://espace-mano.sesan.fr/">👉 Me connecter à Mano 👈</a></p>
 <br />
 <p><b>Étape 4&nbsp;: Téléchargez l'app 📲</b></p>
-<p><a href="https://mano-app.fabrique.social.gouv.fr/download">
+<p><a href="https://mano.sesan.fr/download">
 Pour télécharger l’application, c’est PAR ICI !
 </a>
 <br />
@@ -65,8 +65,8 @@ Reservez un temps de présentation de l’outil MANO (Yoann)
 <p>Nous vous remercions de rejoindre la communauté Mano et espérons répondre à vos besoins pour accompagner au mieux votre public.</p>
 <p>Cordialement,</p>
 <p>Toute l'équipe Mano</p>
-<a href="https://dashboard-mano.fabrique.social.gouv.fr/" style="magin-top: 16px;">
-<img src="https://dashboard-mano.fabrique.social.gouv.fr/banner-bottom.png" width="700" alt="Mano" />
+<a href="https://espace-mano.sesan.fr/" style="magin-top: 16px;">
+<img src="https://espace-mano.sesan.fr/banner-bottom.png" width="700" alt="Mano" />
 </a>
 </div>
 `;

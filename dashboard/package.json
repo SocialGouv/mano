@@ -75,8 +75,7 @@
     "start": "serve -s build -l 8083",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org incubateur --project mano ./build && sentry-cli --url https://sentry.fabrique.social.gouv.fr/ sourcemaps upload --org incubateur --project mano ./build --log-level=debug  --release $npm_package_version"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [

@@ -11,7 +11,8 @@ const Stats = () => {
         setSrc("https://preprod-metabase-mano.sesan.fr/public/dashboard/d30b0c39-6e14-4bbb-9e64-a367a6fdb073");
       }
       if (window.location.hostname === "mano.sesan.fr") {
-        setSrc("TODO");
+        // TODO: replace me
+        setSrc("https://preprod-metabase-mano.sesan.fr/public/dashboard/d30b0c39-6e14-4bbb-9e64-a367a6fdb073");
       }
     }
   }, []);

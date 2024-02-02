@@ -70,7 +70,7 @@ const TopBar = () => {
                 {user?.name} - {user.role}
               </DropdownItem>
               <DropdownItem divider />
-              <DropdownItem tag="a" href="https://mano-app.fabrique.social.gouv.fr/faq/" target="_blank" rel="noreferrer">
+              <DropdownItem tag="a" href="https://mano.sesan.fr/faq/" target="_blank" rel="noreferrer">
                 Besoin d'aide ? <OpenNewWindowIcon />
               </DropdownItem>
               <DropdownItem divider />

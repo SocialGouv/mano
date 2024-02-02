@@ -1,14 +1,13 @@
 # Mano
 
 ![Mobile version](https://img.shields.io/badge/mobile%20app%20version-2.37.5-blue)
-[![Maintainability](https://api.codeclimate.com/v1/badges/223e4185a3e13f1ef5d0/maintainability)](https://codeclimate.com/github/SocialGouv/mano/maintainability)
 
-Code source de [Mano](https://mano-app.fabrique.social.gouv.fr/), organisé en plusieurs services :
+Code source de [Mano](https://mano.sesan.fr/), organisé en plusieurs services :
 
-- [Application mobile](https://github.com/SocialGouv/mano/tree/main/app)
-- [Interface de gestion](https://github.com/SocialGouv/mano/tree/main/dashboard)
-- [API](https://github.com/SocialGouv/mano/tree/main/api)
-- [Site](https://github.com/SocialGouv/mano/tree/main/website)
+- [Application mobile](https://github.com/mano-sesan/mano/tree/main/app)
+- [Interface de gestion](https://github.com/mano-sesan/mano/tree/main/dashboard)
+- [API](https://github.com/mano-sesan/mano/tree/main/api)
+- [Site](https://github.com/mano-sesan/mano/tree/main/website)
 
 Il est conseillé de lire le fichier `README.md` de chacun de ces services.
 

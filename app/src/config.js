@@ -4,7 +4,7 @@ import { version } from '../package.json';
 const SCHEME = envConfig.SCHEME;
 const HOST = envConfig.HOST;
 const APP_ENV = envConfig.APP_ENV;
-const MANO_DOWNLOAD_URL = 'https://mano-app.fabrique.social.gouv.fr/download';
+const MANO_DOWNLOAD_URL = 'https://mano.sesan.fr/download';
 const MANO_TEST_ORGANISATION_ID = envConfig.MANO_TEST_ORGANISATION_ID;
 const MATOMO_SITE_ID = envConfig.MATOMO_SITE_ID;
 const MATOMO_URL = envConfig.MATOMO_URL;

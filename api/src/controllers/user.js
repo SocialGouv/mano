@@ -288,7 +288,7 @@ router.post(
     user.forgotPasswordResetToken = token;
     user.forgotPasswordResetExpires = new Date(Date.now() + 60 * 60 * 24 * 30 * 1000); // 30 days
 
-    const link = `https://dashboard-mano.fabrique.social.gouv.fr/auth/reset?token=${token}`;
+    const link = `https://espace-mano.sesan.fr/auth/reset?token=${token}`;
 
     await user.save();
 

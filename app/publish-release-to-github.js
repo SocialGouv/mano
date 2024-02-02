@@ -19,7 +19,7 @@ const publishAppToLatestTag = async () => {
     console.log(chalk.green('Success uploading app:'), chalk.green(result.stdout));
   }
 
-  console.log(chalk.yellow('Transfer completed 😬: https://mano-app.fabrique.social.gouv.fr/download'));
+  console.log(chalk.yellow('Transfer completed 😬: https://mano.sesan.fr/download'));
 };
 
 publishAppToLatestTag();
