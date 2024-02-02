@@ -4,7 +4,7 @@ import { organisationState, teamsState, userState } from '../recoil/auth';
 import OpenNewWindowIcon from './OpenNewWindowIcon';
 import SessionCountDownLimiter from './SessionCountDownLimiter';
 import useMinimumWidth from '../services/useMinimumWidth';
-import { deploymentCommitState } from '../recoil/version';
+import { deploymentShortCommitSHAState } from '../recoil/version';
 
 export const showDrawerState = atom({
   key: 'showDrawerState',
@@ -15,7 +15,7 @@ const Drawer = () => {
   const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
   const teams = useRecoilValue(teamsState);
-  const deploymentCommit = useRecoilValue(deploymentCommitState);
+  const deploymentCommit = useRecoilValue(deploymentShortCommitSHAState);
 
   const onboardingForEncryption = !organisation.encryptionEnabled;
   const onboardingForTeams = !teams.length;

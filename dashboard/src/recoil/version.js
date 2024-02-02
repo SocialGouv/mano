@@ -1,4 +1,4 @@
-import { atom } from 'recoil';
+import { atom, selector } from 'recoil';
 
 export const deploymentDateState = atom({
   key: 'deploymentDateState',
@@ -8,4 +8,12 @@ export const deploymentDateState = atom({
 export const deploymentCommitState = atom({
   key: 'deploymentCommitState',
   default: '-',
+});
+
+export const deploymentShortCommitSHAState = selector({
+  key: 'shortCommitSHAState',
+  get: ({ get }) => {
+    const fullSHA = get(deploymentCommitState);
+    return fullSHA.substring(0, 7);
+  },
 });

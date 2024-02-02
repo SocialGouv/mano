@@ -11,7 +11,7 @@ import { currentTeamState, organisationState, sessionInitialDateTimestamp, teams
 import API, { setOrgEncryptionKey, authTokenState } from '../../services/api';
 import { useDataLoader } from '../../components/DataLoader';
 import useMinimumWidth from '../../services/useMinimumWidth';
-import { deploymentCommitState } from '../../recoil/version';
+import { deploymentShortCommitSHAState } from '../../recoil/version';
 
 const SignIn = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
@@ -30,7 +30,7 @@ const SignIn = () => {
   const [authViaCookie, setAuthViaCookie] = useState(false);
   const { startInitialLoad, isLoading, resetCache } = useDataLoader();
   const setToken = useSetRecoilState(authTokenState);
-  const deploymentCommit = useRecoilValue(deploymentCommitState);
+  const deploymentCommit = useRecoilValue(deploymentShortCommitSHAState);
 
   const [signinForm, setSigninForm] = useState({ email: '', password: '', orgEncryptionKey: DEFAULT_ORGANISATION_KEY || '' });
   const [signinFormErrors, setSigninFormErrors] = useState({ email: '', password: '', orgEncryptionKey: '' });

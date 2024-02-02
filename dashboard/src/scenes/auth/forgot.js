@@ -4,11 +4,11 @@ import { toast } from 'react-toastify';
 import ButtonCustom from '../../components/ButtonCustom';
 import API from '../../services/api';
 import { useRecoilValue } from 'recoil';
-import { deploymentCommitState } from '../../recoil/version';
+import { deploymentShortCommitSHAState } from '../../recoil/version';
 
 const View = () => {
   const [done, setDone] = useState(false);
-  const deploymentCommit = useRecoilValue(deploymentCommitState);
+  const deploymentCommit = useRecoilValue(deploymentShortCommitSHAState);
 
   const [resetForm, setResetForm] = useState({
     email: '',

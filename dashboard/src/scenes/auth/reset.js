@@ -3,11 +3,11 @@ import { Redirect, useLocation } from 'react-router-dom';
 import ChangePassword from '../../components/ChangePassword';
 import API from '../../services/api';
 import { useRecoilValue } from 'recoil';
-import { deploymentCommitState } from '../../recoil/version';
+import { deploymentShortCommitSHAState } from '../../recoil/version';
 
 const Reset = () => {
   const [redirect, setRedirect] = useState(false);
-  const deploymentCommit = useRecoilValue(deploymentCommitState);
+  const deploymentCommit = useRecoilValue(deploymentShortCommitSHAState);
 
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
