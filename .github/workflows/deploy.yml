@@ -14,8 +14,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "yarn"
-          cache-dependency-path: "**/yarn.lock"
       # On vérifie si le dossier website a été modifié pour faire un build
       - name: Check for changes in website directory
         id: check_changes
