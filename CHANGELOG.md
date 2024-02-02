@@ -1,3 +1,10 @@
+## [1.303.11](https://github.com/SocialGouv/mano/compare/v1.303.10...v1.303.11) (2024-02-02)
+
+
+### Bug Fixes
+
+* tri des rencontres/passages/observations par défaut par date de la plus récente à la plus ancienne dans le nouveau compte-rendu ([7d51774](https://github.com/SocialGouv/mano/commit/7d51774b73efc7c52aa91c662a55a2abefd075e2))
+
 ## [1.303.10](https://github.com/SocialGouv/mano/compare/v1.303.9...v1.303.10) (2024-02-01)
 
 
