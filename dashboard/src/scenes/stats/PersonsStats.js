@@ -26,6 +26,8 @@ export default function PersonStats({
   filterBase,
   filterPersons,
   setFilterPersons,
+  evolutiveStatsIndicators,
+  setEvolutiveStatsIndicators,
   personsForStats,
   personFields,
   evolutivesStatsActivated,
@@ -74,8 +76,12 @@ export default function PersonStats({
       <Filters base={filterBase} filters={filterPersons} onChange={setFilterPersons} />
       {evolutivesStatsActivated ? (
         <>
-          <h4 className="tw-inline tw-text-lg tw-text-black75">Évolution des indicateurs</h4>
-          <EvolutiveStatsSelector base={filterBase} onChange={setFilterPersons} selection={filterPersons} />
+          <EvolutiveStatsSelector
+            title={<h4 className="tw-inline tw-text-lg tw-text-black75">Évolution des indicateurs</h4>}
+            base={filterBase}
+            selection={evolutiveStatsIndicators}
+            onChange={setEvolutiveStatsIndicators}
+          />
         </>
       ) : (
         <>

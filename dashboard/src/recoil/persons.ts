@@ -105,6 +105,7 @@ export const filterPersonsBaseSelector = selector({
     for (const field of personFields) {
       if (!field.filterable) continue;
       filterPersonsBase.push({
+        // why ? IDK
         field: field.name,
         ...field,
       });

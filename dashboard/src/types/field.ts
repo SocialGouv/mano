@@ -30,3 +30,18 @@ export interface CustomFieldsGroup {
   name: string;
   fields: CustomField[];
 }
+
+export interface UndefinedFilterField {
+  field?: string;
+  name?: string;
+  label?: string;
+  type?: FieldType;
+  options?: string[];
+}
+export interface FilterField {
+  field: string;
+  name: string;
+  label: string;
+  type: FieldType;
+  options: string[];
+}
