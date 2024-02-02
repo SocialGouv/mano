@@ -18,8 +18,18 @@ import Table from '../../components/table';
 import { dayjsInstance, formatDateWithFullMonth } from '../../services/date';
 import CustomFieldDisplay from '../../components/CustomFieldDisplay';
 import { groupsState } from '../../recoil/groups';
+import EvolutiveStatsSelector from '../../components/EvolutiveStatsSelector';
 
-export default function PersonStats({ title, firstBlockHelp, filterBase, filterPersons, setFilterPersons, personsForStats, personFields }) {
+export default function PersonStats({
+  title,
+  firstBlockHelp,
+  filterBase,
+  filterPersons,
+  setFilterPersons,
+  personsForStats,
+  personFields,
+  evolutivesStatsActivated,
+}) {
   const allGroups = useRecoilValue(groupsState);
   const customFieldsPersons = useRecoilValue(customFieldsPersonsSelector);
 
@@ -59,130 +69,140 @@ export default function PersonStats({ title, firstBlockHelp, filterBase, filterP
   };
   return (
     <>
+      {!evolutivesStatsActivated && <h3 className="tw-my-5 tw-text-xl">Statistiques des {title}</h3>}
       <h3 className="tw-my-5 tw-text-xl">Statistiques des {title}</h3>
       <Filters base={filterBase} filters={filterPersons} onChange={setFilterPersons} />
-      <details
-        open={process.env.REACT_APP_TEST_PLAYWRIGHT === 'true' || window.localStorage.getItem('person-stats-general-open') === 'true'}
-        onToggle={(e) => {
-          if (e.target.open) {
-            window.localStorage.setItem('person-stats-general-open', 'true');
-          } else {
-            window.localStorage.removeItem('person-stats-general-open');
-          }
-        }}>
-        <summary className="tw-my-8 tw-mx-0">
-          <h4 className="tw-inline tw-text-xl tw-text-black75">Général</h4>
-        </summary>
-        <div className="-tw-mx-4 tw-flex tw-flex-wrap tw-justify-around">
-          <Block data={personsForStats} title={`Nombre de ${title}`} help={firstBlockHelp} />
-          <BlockCreatedAt persons={personsForStats} />
-          <BlockWanderingAt persons={personsForStats} />
-          <BlockGroup groups={groupsForPersons} title={`Nombre de familles dans lesquelles se trouvent des ${title}`} />
-        </div>
-        <CustomResponsivePie
-          title="Genre"
-          field="gender"
-          onItemClick={(newSlice) => {
-            onSliceClick(newSlice, 'gender');
-          }}
-          data={getPieData(personsForStats, 'gender', { options: personFields.find((f) => f.name === 'gender').options })}
-          help={`Genre des ${title} dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
-        />
-        <AgeRangeBar
-          persons={personsForStats}
-          onItemClick={(newSlice, data) => {
-            setSliceField(personFields.find((f) => f.name === 'birthdate'));
-            setSliceValue(newSlice);
-            setSlicedData(data);
-            setPersonsModalOpened(true);
-          }}
-        />
-        <StatsCreatedAtRangeBar
-          persons={personsForStats}
-          onItemClick={(newSlice, data) => {
-            setSliceField(personFields.find((f) => f.name === 'followedSince'));
-            setSliceValue(newSlice);
-            setSlicedData(data);
-            setPersonsModalOpened(true);
-          }}
-        />
-        <StatsWanderingAtRangeBar
-          persons={personsForStats}
-          onItemClick={(newSlice, data) => {
-            setSliceField(personFields.find((f) => f.name === 'wanderingAt'));
-            setSliceValue(newSlice);
-            setSlicedData(data);
-            setPersonsModalOpened(true);
-          }}
-        />
-        <CustomResponsivePie
-          title="Personnes très vulnérables"
-          field="alertness"
-          onItemClick={(newSlice) => {
-            onSliceClick(newSlice, 'alertness');
-          }}
-          data={getPieData(personsForStats, 'alertness', { isBoolean: true })}
-          help={`${title.capitalize()} vulnérables dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
-        />
-        <CustomResponsivePie
-          title="Sortie de file active"
-          field="outOfActiveList"
-          onItemClick={(newSlice) => {
-            onSliceClick(newSlice, 'outOfActiveList');
-          }}
-          data={getPieData(personsForStats, 'outOfActiveList', { isBoolean: true })}
-          help={`${title} dans la période définie, sorties de la file active. La date de sortie de la file active n'est pas nécessairement dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
-        />
-        <CustomResponsiveBar
-          title="Raison de sortie de file active"
-          help={`Raisons de sortie de file active des ${title} dans la période définie, sorties de la file active. La date de sortie de la file active n'est pas nécessairement dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
-          onItemClick={(newSlice) => {
-            onSliceClick(
-              newSlice,
-              'outOfActiveListReasons',
-              personsForStats.filter((p) => !!p.outOfActiveList)
-            );
-          }}
-          axisTitleY="File active"
-          axisTitleX="Raison de sortie de file active"
-          isMultiChoice
-          totalForMultiChoice={personsForStats.filter((p) => !!p.outOfActiveList).length}
-          totalTitleForMultiChoice={<span className="tw-font-bold">Nombre de personnes concernées</span>}
-          data={getMultichoiceBarData(
-            personsForStats.filter((p) => !!p.outOfActiveList),
-            'outOfActiveListReasons'
-          )}
-        />
-      </details>
-      {customFieldsPersons.map((section) => {
-        return (
+      {evolutivesStatsActivated ? (
+        <>
+          <h4 className="tw-inline tw-text-lg tw-text-black75">Évolution des indicateurs</h4>
+          <EvolutiveStatsSelector base={filterBase} onChange={setFilterPersons} selection={filterPersons} />
+        </>
+      ) : (
+        <>
           <details
-            open={
-              process.env.REACT_APP_TEST_PLAYWRIGHT === 'true' ||
-              window.localStorage.getItem(`person-stats-${section.name.replace(' ', '-').toLocaleLowerCase()}-open`) === 'true'
-            }
+            open={process.env.REACT_APP_TEST_PLAYWRIGHT === 'true' || window.localStorage.getItem('person-stats-general-open') === 'true'}
             onToggle={(e) => {
               if (e.target.open) {
-                window.localStorage.setItem(`person-stats-${section.name.replace(' ', '-').toLocaleLowerCase()}-open`, 'true');
+                window.localStorage.setItem('person-stats-general-open', 'true');
               } else {
-                window.localStorage.removeItem(`person-stats-${section.name.replace(' ', '-').toLocaleLowerCase()}-open`);
+                window.localStorage.removeItem('person-stats-general-open');
               }
             }}>
             <summary className="tw-my-8 tw-mx-0">
-              <h4 className="tw-inline tw-text-xl tw-text-black75">{section.name}</h4>
+              <h4 className="tw-inline tw-text-xl tw-text-black75">Général</h4>
             </summary>
-            <CustomFieldsStats
-              data={personsForStats}
-              customFields={section.fields}
-              onSliceClick={onSliceClick}
-              help={(label) =>
-                `${label.capitalize()} des ${title} dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`
-              }
+            <div className="-tw-mx-4 tw-flex tw-flex-wrap tw-justify-around">
+              <Block data={personsForStats} title={`Nombre de ${title}`} help={firstBlockHelp} />
+              <BlockCreatedAt persons={personsForStats} />
+              <BlockWanderingAt persons={personsForStats} />
+              <BlockGroup groups={groupsForPersons} title={`Nombre de familles dans lesquelles se trouvent des ${title}`} />
+            </div>
+            <CustomResponsivePie
+              title="Genre"
+              field="gender"
+              onItemClick={(newSlice) => {
+                onSliceClick(newSlice, 'gender');
+              }}
+              data={getPieData(personsForStats, 'gender', { options: personFields.find((f) => f.name === 'gender').options })}
+              help={`Genre des ${title} dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
+            />
+            <AgeRangeBar
+              persons={personsForStats}
+              onItemClick={(newSlice, data) => {
+                setSliceField(personFields.find((f) => f.name === 'birthdate'));
+                setSliceValue(newSlice);
+                setSlicedData(data);
+                setPersonsModalOpened(true);
+              }}
+            />
+            <StatsCreatedAtRangeBar
+              persons={personsForStats}
+              onItemClick={(newSlice, data) => {
+                setSliceField(personFields.find((f) => f.name === 'followedSince'));
+                setSliceValue(newSlice);
+                setSlicedData(data);
+                setPersonsModalOpened(true);
+              }}
+            />
+            <StatsWanderingAtRangeBar
+              persons={personsForStats}
+              onItemClick={(newSlice, data) => {
+                setSliceField(personFields.find((f) => f.name === 'wanderingAt'));
+                setSliceValue(newSlice);
+                setSlicedData(data);
+                setPersonsModalOpened(true);
+              }}
+            />
+            <CustomResponsivePie
+              title="Personnes très vulnérables"
+              field="alertness"
+              onItemClick={(newSlice) => {
+                onSliceClick(newSlice, 'alertness');
+              }}
+              data={getPieData(personsForStats, 'alertness', { isBoolean: true })}
+              help={`${title.capitalize()} vulnérables dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
+            />
+            <CustomResponsivePie
+              title="Sortie de file active"
+              field="outOfActiveList"
+              onItemClick={(newSlice) => {
+                onSliceClick(newSlice, 'outOfActiveList');
+              }}
+              data={getPieData(personsForStats, 'outOfActiveList', { isBoolean: true })}
+              help={`${title} dans la période définie, sorties de la file active. La date de sortie de la file active n'est pas nécessairement dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
+            />
+            <CustomResponsiveBar
+              title="Raison de sortie de file active"
+              help={`Raisons de sortie de file active des ${title} dans la période définie, sorties de la file active. La date de sortie de la file active n'est pas nécessairement dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
+              onItemClick={(newSlice) => {
+                onSliceClick(
+                  newSlice,
+                  'outOfActiveListReasons',
+                  personsForStats.filter((p) => !!p.outOfActiveList)
+                );
+              }}
+              axisTitleY="File active"
+              axisTitleX="Raison de sortie de file active"
+              isMultiChoice
+              totalForMultiChoice={personsForStats.filter((p) => !!p.outOfActiveList).length}
               totalTitleForMultiChoice={<span className="tw-font-bold">Nombre de personnes concernées</span>}
+              data={getMultichoiceBarData(
+                personsForStats.filter((p) => !!p.outOfActiveList),
+                'outOfActiveListReasons'
+              )}
             />
           </details>
-        );
-      })}
+          {customFieldsPersons.map((section) => {
+            return (
+              <details
+                open={
+                  process.env.REACT_APP_TEST_PLAYWRIGHT === 'true' ||
+                  window.localStorage.getItem(`person-stats-${section.name.replace(' ', '-').toLocaleLowerCase()}-open`) === 'true'
+                }
+                onToggle={(e) => {
+                  if (e.target.open) {
+                    window.localStorage.setItem(`person-stats-${section.name.replace(' ', '-').toLocaleLowerCase()}-open`, 'true');
+                  } else {
+                    window.localStorage.removeItem(`person-stats-${section.name.replace(' ', '-').toLocaleLowerCase()}-open`);
+                  }
+                }}>
+                <summary className="tw-my-8 tw-mx-0">
+                  <h4 className="tw-inline tw-text-xl tw-text-black75">{section.name}</h4>
+                </summary>
+                <CustomFieldsStats
+                  data={personsForStats}
+                  customFields={section.fields}
+                  onSliceClick={onSliceClick}
+                  help={(label) =>
+                    `${label.capitalize()} des ${title} dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`
+                  }
+                  totalTitleForMultiChoice={<span className="tw-font-bold">Nombre de personnes concernées</span>}
+                />
+              </details>
+            );
+          })}
+        </>
+      )}
       <SelectedPersonsModal
         open={personsModalOpened}
         onClose={() => {
