@@ -290,6 +290,7 @@ const Stats = () => {
   const [actionsCategories, setActionsCategories] = useLocalStorage('stats-categories', []);
 
   const [evolutivesStatsActivated, setEvolutivesStatsActivated] = useLocalStorage('stats-evolutivesStatsActivated', false);
+  const [evolutiveStatsIndicators, setEvolutiveStatsIndicators] = useLocalStorage('stats-evolutivesStatsIndicators', false);
 
   useTitle(`${activeTab} - Statistiques`);
 
@@ -591,7 +592,7 @@ const Stats = () => {
         onClick={(tabCaption) => setActiveTab(tabCaption)}
         activeTabIndex={availableTabs.findIndex((tab) => tab === activeTab)}
       />
-      <div className="print:tw-flex print:tw-flex-col print:tw-px-8 print:tw-py-4">
+      <div className="tw-pb-[75vh] print:tw-flex print:tw-flex-col print:tw-px-8 print:tw-py-4">
         {activeTab === 'Général' && (
           <GeneralStats
             personsCreated={personsCreated}
@@ -640,6 +641,8 @@ const Stats = () => {
             personFields={personFields}
             flattenedCustomFieldsPersons={flattenedCustomFieldsPersons}
             evolutivesStatsActivated={evolutivesStatsActivated}
+            evolutiveStatsIndicators={evolutiveStatsIndicators}
+            setEvolutiveStatsIndicators={setEvolutiveStatsIndicators}
           />
         )}
         {activeTab === 'Personnes suivies' && (
@@ -654,6 +657,8 @@ const Stats = () => {
             filterPersons={filterPersons}
             setFilterPersons={setFilterPersons}
             evolutivesStatsActivated={evolutivesStatsActivated}
+            evolutiveStatsIndicators={evolutiveStatsIndicators}
+            setEvolutiveStatsIndicators={setEvolutiveStatsIndicators}
           />
         )}
         {!!organisation.passagesEnabled && activeTab === 'Passages' && (
