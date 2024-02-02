@@ -44,7 +44,6 @@ const getHost = () => {
 };
 
 const HOST = getHost();
-console.log(process.env);
 const SCHEME =
   process.env.NODE_ENV === 'development' || process.env.REACT_APP_TEST === 'true' || process.env.REACT_APP_USE_HTTP === 'true'
     ? process.env.REACT_APP_SCHEME
