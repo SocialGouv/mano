@@ -46,7 +46,7 @@ services:
       PGUSER_FILE: /run/secrets/pguser
       PGPASSWORD_FILE: /run/secrets/pgpassword
       PGDATABASE_FILE: /run/secrets/database
-      STORAGE_DIRECTORY: /app/storage
+      STORAGE_DIRECTORY: /data
       SECRET: /run/secrets/secret
       MANO_API_IS_PRODUCTION: "true"
       no_proxy: ad.sesan.fr,.gcsidf.local,localhost,127.0.0.1
