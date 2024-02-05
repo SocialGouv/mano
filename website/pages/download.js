@@ -12,7 +12,8 @@ export default function Download() {
         <a
           className="mx-auto py-4 px-12 space-x-2 text-white transition-all bg-shamrock-400 rounded-xl bg-opacity-100 hover:bg-opacity-30 inline-flex justify-between items-center text-center"
           download
-          href={`https://github.com/SocialGouv/mano/releases/download/m${mobileAppVersion}/app-release.apk`}>
+          href={`https://github.com/mano-sesan/mano/releases/download/m${mobileAppVersion}/app-release.apk`}
+        >
           <HiOutlineDownload className="text-lg mr-4 block" />
           <span suppressHydrationWarning className="text-base font-medium">
             Télécharger

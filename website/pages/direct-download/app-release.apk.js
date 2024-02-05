@@ -5,7 +5,7 @@ import { mobileAppVersion } from "../../package.json";
 import { useEffect } from "react";
 
 export default function Download() {
-  const url = `https://github.com/SocialGouv/mano/releases/download/m${mobileAppVersion}/app-release.apk`;
+  const url = `https://github.com/mano-sesan/mano/releases/download/m${mobileAppVersion}/app-release.apk`;
 
   useEffect(() => {
     const a = document.createElement("a");
