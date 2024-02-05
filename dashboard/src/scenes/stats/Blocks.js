@@ -1,9 +1,8 @@
-import React from 'react';
 import { getDuration } from './utils';
 import { capture } from '../../services/sentry';
 import Card from '../../components/Card';
 
-export const Block = ({ data, title = 'Nombre de personnes suivies', help }) => (
+export const Block = ({ data, title = 'Nombre de personnes suivies', help = null }) => (
   <div className="tw-px-4 tw-py-2 md:tw-basis-1/2 lg:tw-basis-1/3">
     <Card title={title} count={Array.isArray(data) ? String(data.length) : data} help={help} />
   </div>

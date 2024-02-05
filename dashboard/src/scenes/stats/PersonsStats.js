@@ -19,6 +19,7 @@ import { dayjsInstance, formatDateWithFullMonth } from '../../services/date';
 import CustomFieldDisplay from '../../components/CustomFieldDisplay';
 import { groupsState } from '../../recoil/groups';
 import EvolutiveStatsSelector from '../../components/EvolutiveStatsSelector';
+import EvolutiveStatsViewer from '../../components/EvolutiveStatsViewer';
 
 export default function PersonStats({
   title,
@@ -82,6 +83,7 @@ export default function PersonStats({
             selection={evolutiveStatsIndicators}
             onChange={setEvolutiveStatsIndicators}
           />
+          <EvolutiveStatsViewer />
         </>
       ) : (
         <>
