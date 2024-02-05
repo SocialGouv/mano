@@ -1,30 +1,15 @@
-const { QueryTypes } = require("sequelize");
-const { sequelize } = require("../db/sequelize");
+const { VERSION, MINIMUM_DASHBOARD_VERSION } = require("../config");
 
-let deploymentCommit = null;
-let deploymentDate = null;
+const MINIMUM_MOBILE_APP_VERSION = [2, 37, 0];
 
-module.exports = async ({ headers: { version, platform } }, res, next) => {
+module.exports = ({ headers: { version, platform } }, res, next) => {
   if (platform === "website") return next();
   if (platform === "dashboard") {
-    if (deploymentCommit === null) {
-      try {
-        const [deployment] = await sequelize.query(`select commit, "createdAt" from mano."Deployment" order by "createdAt" desc limit 1`, {
-          type: QueryTypes.SELECT,
-        });
-        if (deployment) {
-          deploymentCommit = deployment.commit;
-          deploymentDate = deployment.createdAt.toISOString();
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    console.log(deploymentDate, typeof deploymentDate);
-    res.header("X-API-DEPLOYMENT-COMMIT", deploymentCommit);
-    res.header("X-API-DEPLOYMENT-DATE", deploymentDate);
+    // Add header with API version to compare with client.
+    res.header("X-API-VERSION", VERSION);
+    res.header("X-MINIMUM-DASHBOARD-VERSION", MINIMUM_DASHBOARD_VERSION);
     // See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Expose-Headers
-    res.header("Access-Control-Expose-Headers", "X-API-DEPLOYMENT-COMMIT, X-API-DEPLOYMENT-DATE");
+    res.header("Access-Control-Expose-Headers", "X-API-VERSION, X-MINIMUM-DASHBOARD-VERSION");
     return next();
   }
 
