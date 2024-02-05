@@ -1,5 +1,5 @@
 import { currentTeamState, userState, usersState } from './auth';
-import { allowedPersonFieldsForEvolutiveStatsSelector, personsState } from './persons';
+import { personsState } from './persons';
 import { placesState } from './places';
 import { relsPersonPlaceState } from './relPersonPlace';
 import { reportsState } from './reports';
@@ -98,19 +98,9 @@ export const itemsGroupedByPersonSelector = selector({
     const personsObject = {};
     const user = get(userState);
     const usersObject = get(usersObjectSelector);
-
-    // const allPersonFieldsInHistory = get(allowedPersonFieldsForEvolutiveStatsSelector);
-    // const personsFieldsInHistoryObject = {};
-    // for (const field of allPersonFieldsInHistory) {
-    //   const options = get(customFieldsObsSelector);
-    //   personsFieldsInHistoryObject[field] = {
-    //     __init: [],
-    //   };
-    // }
-
     for (const person of persons) {
       originalPersonsObject[person._id] = { name: person.name, _id: person._id };
-      const formattedPerson = {
+      personsObject[person._id] = {
         ...person,
         followedSince: person.followedSince || person.createdAt,
         userPopulated: usersObject[person.user],
@@ -124,25 +114,9 @@ export const itemsGroupedByPersonSelector = selector({
         // This was causing a bug in the "person suivies" stats, where people who were not out of active list were counted as out of active list.
         outOfActiveListDate: person.outOfActiveList ? person.outOfActiveListDate : null,
       };
-      personsObject[person._id] = formattedPerson;
       if (!person.history?.length) continue;
-      const updatedFields = {};
       for (const historyEntry of person.history) {
-        // we suppose history is sorted by date ascending (oldest first)
-        // if history date is same as followedSince, we don't add it to interactions
-        if (dayjsInstance(historyEntry.date).format('YYYY-MM-DD') === dayjsInstance(formattedPerson.followedSince).format('YYYY-MM-DD')) continue;
         personsObject[person._id].interactions.push(historyEntry.date);
-        // for (const field in Object.keys(historyEntry.data)) {
-        //   const oldValue = historyEntry.data[field].oldValue;
-        //   const newValue = historyEntry.data[field].newValue;
-        //   if (!personsFieldsInHistoryObject[field]) continue;
-        //   if (!updatedFields[field]) {
-        //     personsFieldsInHistoryObject[field].__init.push(oldValue);
-        //     updatedFields[field] = true;
-        //   } else {
-        //     updatedFields[field] = [];
-        //   }
-        // }
       }
     }
     const actions = Object.values(get(actionsWithCommentsSelector));
