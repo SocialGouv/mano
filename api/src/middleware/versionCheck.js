@@ -19,6 +19,7 @@ module.exports = ({ headers: { version, platform } }, res, next) => {
     message: "Veuillez mettre à jour votre application!",
     inAppMessage: [
       `Mano a quitté la fabrique pour rejoindre le groupement d'intérêt public SESAN. Pour continuer à utiliser Mano, vous devez mettre à jour votre application mobile.`,
+      [{ text: "Télécharger la dernière version", link: `https://mano.sesan.fr/download?ts=${Date.now()}` }],
     ],
   });
 };
