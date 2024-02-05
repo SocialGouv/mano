@@ -1,7 +1,7 @@
 import React from 'react';
 import HelpButtonAndModal from './HelpButtonAndModal';
 
-const Card = ({ title, count, unit, children, countId, dataTestId, help, onClick = null }) => {
+const Card = ({ title, count, unit, children, countId, dataTestId, help = null, onClick = null }) => {
   const Component = !!onClick ? 'button' : 'div';
   const props = !!onClick ? { onClick, type: 'button', name: 'card', className: 'button-cancel' } : {};
   return (

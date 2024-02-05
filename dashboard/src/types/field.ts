@@ -26,6 +26,8 @@ export interface PredefinedField {
   filterable?: boolean;
 }
 
+export interface CustomOrPredefinedField extends PredefinedField {}
+
 export interface CustomFieldsGroup {
   name: string;
   fields: CustomField[];
