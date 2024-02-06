@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import SelectCustom from './SelectCustom';
 import { dayjsInstance } from '../services/date';
-import DatePicker from './DatePicker';
 import type { FilterField } from '../types/field';
 import type { IndicatorValue, IndicatorsSelection, IndicatorsBase } from '../types/evolutivesStats';
 import { useRecoilValue } from 'recoil';
@@ -181,9 +180,14 @@ const EvolutiveStatsSelector = ({ onChange, selection, title = '', saveInURLPara
         <div className="tw-flex tw-w-full">
           <button
             type="button"
-            className="tw-h-full tw-rounded tw-text-main disabled:tw-opacity-20"
+            className={[
+              'tw-h-full tw-rounded tw-text-main',
+              'tw-hidden', // FIXME
+              selection.find((f) => f.fieldName === null || f.toValue === null || f.fromValue === null) ? 'tw-opacity-0' : '',
+            ].join(' ')}
             onClick={onAddIndicator}
-            disabled={!!selection.find((f) => !f.fieldName)}>
+            // disabled={!!selection.find((f) => !f.fieldName)}
+            disabled>
             + Ajouter un indicateur
           </button>
         </div>
@@ -191,25 +195,6 @@ const EvolutiveStatsSelector = ({ onChange, selection, title = '', saveInURLPara
     </>
   );
 };
-
-const dateOptions = [
-  {
-    label: 'Avant',
-    value: 'before',
-  },
-  {
-    label: 'Après',
-    value: 'after',
-  },
-  {
-    label: 'Date exacte',
-    value: 'equals',
-  },
-  {
-    label: 'Non renseigné',
-    value: 'unfilled',
-  },
-];
 
 const numberOptions = [
   {
@@ -248,49 +233,6 @@ const ValueSelector = ({ fieldName, indicatorValues, value, onChangeValue, base 
   const current = base.find((field) => field.name === fieldName);
   if (!current) return <></>;
   const { type, name } = current;
-
-  if (['text', 'textarea'].includes(type)) {
-    return (
-      <input
-        name={name}
-        className="tailwindui !tw-mt-0"
-        type="text"
-        value={value || ''}
-        onChange={(e) => {
-          e.preventDefault();
-          onChangeValue(e.target.value);
-        }}
-      />
-    );
-  }
-
-  if (['date-with-time', 'date'].includes(type)) {
-    return (
-      <div className="tw-flex tw-gap-x-2">
-        <div className="tw-grow">
-          <SelectCustom
-            options={dateOptions}
-            value={dateOptions.find((opt) => opt.value === value?.comparator)}
-            isClearable={!value}
-            onChange={(option) => {
-              if (!option) return setComparator(null);
-              setComparator(option.value);
-              onChangeValue({ date: value?.date, comparator: option.value });
-            }}
-          />
-        </div>
-        {value?.comparator !== 'unfilled' && (
-          <div className="tw-grow">
-            <DatePicker
-              id={name}
-              defaultValue={value?.date ? new Date(value?.date) : null}
-              onChange={(date) => onChangeValue({ date: date.target.value, comparator })}
-            />
-          </div>
-        )}
-      </div>
-    );
-  }
 
   if (['number'].includes(type)) {
     return (
@@ -357,7 +299,7 @@ const ValueSelector = ({ fieldName, indicatorValues, value, onChangeValue, base 
           getOptionLabel={(f) => f.label}
           getOptionValue={(f) => f.value}
           onChange={(newValue) => onChangeValue(newValue?.value)}
-          isClearable={!value?.length}
+          isClearable
         />
       );
     } catch (e) {
@@ -373,7 +315,7 @@ const ValueSelector = ({ fieldName, indicatorValues, value, onChangeValue, base 
       getOptionLabel={(f) => f.label}
       getOptionValue={(f) => f.value}
       onChange={(option) => onChangeValue(option?.value)}
-      isClearable={!value}
+      isClearable
     />
   );
 };
