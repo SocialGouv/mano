@@ -1,4 +1,4 @@
-client_max_body_size 50m
+client_max_body_size 50m;
 
 location /encrypt {
   client_max_body_size 350m;
