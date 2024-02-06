@@ -135,6 +135,16 @@ export const evolutiveStatsPersonSelector = selectorFamily({
       evolutiveStatsIndicators: IndicatorsSelection;
     }) =>
     ({ get }) => {
+      // concepts:
+      // we select "indicators" (for now only one by one is possible) that are fields of the person
+      // we want to see the evolution of the number of persons for each value of each indicator
+      // one indicator is: one `field`, one `fromValue` and one `toValue`
+      // if only `field` is defined, we present a chart with the evolution of number of persons for each value of the field
+      // if `fromValue` is defined, we present the same chart filtere with the persons that have this value for the field at the beginning of the history
+      // if `toValue` is defined, we also filter the persons that have this value for the field at the end of the history, so that we present two numbers only
+      // how do we calculate ?
+      // we start by the most recent version of the person, and we go back in time, day by day, to the beginning of the history
+
       const indicatorsBase = get(evolutiveStatsIndicatorsBaseSelector);
       const fieldsMap: FieldsMap = indicatorsBase.reduce((acc, field) => {
         acc[field.name] = field;
