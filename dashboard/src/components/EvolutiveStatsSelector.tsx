@@ -4,37 +4,28 @@ import { components } from 'react-select';
 import { dayjsInstance } from '../services/date';
 import DatePicker from './DatePicker';
 import type { FilterField } from '../types/field';
-
-type IndicatorValue = any;
-
-type Indicator = {
-  field: string | null;
-  fromValue: IndicatorValue;
-  toValue: IndicatorValue;
-  type: string | null;
-};
-
-type Selection = Array<Indicator>;
-
-type IndicatorsBase = Array<FilterField>;
+import type { IndicatorValue, IndicatorsSelection, IndicatorsBase } from '../types/evolutivesStats';
+import { useRecoilValue } from 'recoil';
+import { evolutiveStatsIndicatorsBaseSelector } from '../recoil/evolutiveStats';
 
 interface EvolutiveStatsSelectorProps {
-  onChange: (selection: Selection, saveInURLParams: boolean) => void;
-  base: IndicatorsBase;
-  selection: Selection;
+  onChange: (selection: IndicatorsSelection, saveInURLParams: boolean) => void;
+  selection: IndicatorsSelection;
   title?: string;
   saveInURLParams?: boolean;
 }
 
-const emptySelection = { field: null, type: null, fromValue: null, toValue: null };
-const EvolutiveStatsSelector = ({ onChange, base, selection, title = '', saveInURLParams = false }: EvolutiveStatsSelectorProps) => {
+const emptySelection = { fieldName: null, type: null, fromValue: null, toValue: null };
+const EvolutiveStatsSelector = ({ onChange, selection, title = '', saveInURLParams = false }: EvolutiveStatsSelectorProps) => {
+  const indicatorsBase = useRecoilValue(evolutiveStatsIndicatorsBaseSelector);
+
   selection = !!selection.length ? selection : [emptySelection];
   const onAddIndicator = () => onChange([...selection, emptySelection], saveInURLParams);
-  const selectCustomOptions = base.map((_indicator) => ({ label: _indicator.label, value: _indicator.field })) || [];
+  const selectCustomOptions = indicatorsBase.map((_indicator) => ({ label: _indicator.label, value: _indicator.name })) || [];
 
-  function getFilterOptionsByField(field: FilterField['field'] | null, base: IndicatorsBase, index: number) {
-    if (!field) return [];
-    let current = base.find((indicator) => indicator.field === field);
+  function getFilterOptionsByField(fieldName: FilterField['name'] | null, base: IndicatorsBase, index: number) {
+    if (!fieldName) return [];
+    let current = base.find((field) => field.name === fieldName);
     if (!current) {
       onChange(
         selection.filter((_f, i) => i !== index),
@@ -44,8 +35,14 @@ const EvolutiveStatsSelector = ({ onChange, base, selection, title = '', saveInU
     }
     if (['yes-no'].includes(current.type)) return ['Oui', 'Non', 'Non renseigné'];
     if (['boolean'].includes(current.type)) return ['Oui', 'Non'];
-    if (current?.field === 'outOfActiveList') return current.options;
-    if (current?.options?.length) return [...current?.options, 'Non renseigné'];
+    if (current?.name === 'outOfActiveList') return current.options || [];
+    if (current?.options?.length) {
+      return [...current?.options, 'Non renseigné'].filter((option) => {
+        if (!option) return false;
+        if (option.includes('Choisissez un genre')) return false;
+        return true;
+      });
+    }
     return ['Non renseigné'];
   }
 
@@ -79,8 +76,8 @@ const EvolutiveStatsSelector = ({ onChange, base, selection, title = '', saveInU
         {title}
         <ul>
           {selection.map((indicator, index) => {
-            if (!indicator?.field) return null;
-            const current = base.find((_indicator) => _indicator.field === indicator.field);
+            if (!indicator?.fieldName) return null;
+            const current = indicatorsBase.find((field) => field.name === indicator.fieldName);
             if (!current) return null;
             const indicatorFromValue = getIndicatorValue(indicator.fromValue);
             if (!indicatorFromValue) return null;
@@ -101,7 +98,7 @@ const EvolutiveStatsSelector = ({ onChange, base, selection, title = '', saveInU
         <div className="tw-grid tw-w-full tw-grid-cols-[2fr_5fr_1fr_5fr_1fr_5fr_2fr] tw-gap-x-1 tw-gap-y-2">
           {selection.map((indicator, index) => {
             // indicator: field, value, type
-            const indicatorValues = getFilterOptionsByField(indicator.field, base, index);
+            const indicatorValues = getFilterOptionsByField(indicator.fieldName, indicatorsBase, index);
             const onChangeFromValue = (newValue: any) => {
               onChange(
                 selection.map((f, i) => (i === index ? { ...f, fromValue: newValue } : f)),
@@ -121,10 +118,10 @@ const EvolutiveStatsSelector = ({ onChange, base, selection, title = '', saveInU
               );
             };
 
-            const value = selectCustomOptions.find((opt) => opt.value === indicator.field);
+            const value = selectCustomOptions.find((opt) => opt.value === indicator.fieldName);
 
             return (
-              <React.Fragment key={`${indicator.field || 'empty'}${index}`}>
+              <React.Fragment key={`${indicator.fieldName || 'empty'}${index}`}>
                 <div className="tw-grow tw-items-center tw-self-center">
                   <p className="tw-m-0 tw-w-full tw-pr-4 tw-text-right">{index === 0 ? 'Indicateur' : 'ET'}</p>
                 </div>
@@ -133,11 +130,11 @@ const EvolutiveStatsSelector = ({ onChange, base, selection, title = '', saveInU
                     options={selectCustomOptions}
                     value={value}
                     onChange={(option) => {
-                      const newField = base.find((_indicator) => _indicator.field === option?.value);
+                      const newField = indicatorsBase.find((field) => field.name === option?.value);
                       if (!newField) return;
                       onChange(
                         selection.map((_indicator, i) =>
-                          i === index ? { field: newField.field, fromValue: null, toValue: null, type: newField.type } : _indicator
+                          i === index ? { fieldName: newField.name, fromValue: null, toValue: null, type: newField.type } : _indicator
                         ),
                         saveInURLParams
                       );
@@ -149,10 +146,10 @@ const EvolutiveStatsSelector = ({ onChange, base, selection, title = '', saveInU
                 </div>
                 <div>
                   <ValueSelector
-                    field={indicator.field}
+                    fieldName={indicator.fieldName}
                     indicatorValues={indicatorValues}
                     value={indicator.fromValue}
-                    base={base}
+                    base={indicatorsBase}
                     onChangeValue={onChangeFromValue}
                   />
                 </div>
@@ -161,15 +158,15 @@ const EvolutiveStatsSelector = ({ onChange, base, selection, title = '', saveInU
                 </div>
                 <div>
                   <ValueSelector
-                    field={indicator.field}
+                    fieldName={indicator.fieldName}
                     indicatorValues={indicatorValues}
                     value={indicator.toValue}
-                    base={base}
+                    base={indicatorsBase}
                     onChangeValue={onChangeToValue}
                   />
                 </div>
                 <div>
-                  {!!selection.filter((_indicator) => Boolean(_indicator.field)).length && (
+                  {!!selection.filter((_indicator) => Boolean(_indicator.fieldName)).length && (
                     <button
                       type="button"
                       className="tw-h-full tw-w-full tw-rounded tw-border tw-border-gray-300 tw-bg-white tw-text-red-500"
@@ -187,7 +184,7 @@ const EvolutiveStatsSelector = ({ onChange, base, selection, title = '', saveInU
             type="button"
             className="tw-h-full tw-rounded tw-text-main disabled:tw-opacity-20"
             onClick={onAddIndicator}
-            disabled={!!selection.find((f) => !f.field)}>
+            disabled={!!selection.find((f) => !f.fieldName)}>
             + Ajouter un indicateur
           </button>
         </div>
@@ -239,19 +236,19 @@ const numberOptions = [
 ];
 
 interface ValueSelectorProps {
-  field: string | null;
+  fieldName: string | null;
   indicatorValues: Array<string>;
   value: any;
   onChangeValue: (newValue: any) => void;
   base: IndicatorsBase;
 }
 
-const ValueSelector = ({ field, indicatorValues, value, onChangeValue, base }: ValueSelectorProps) => {
+const ValueSelector = ({ fieldName, indicatorValues, value, onChangeValue, base }: ValueSelectorProps) => {
   const [comparator, setComparator] = useState<string | null>(null);
-  if (!field) return <></>;
-  const current = base.find((indicator) => indicator.field === field);
+  if (!fieldName) return <></>;
+  const current = base.find((field) => field.name === fieldName);
   if (!current) return <></>;
-  const { type, field: name } = current;
+  const { type, name } = current;
 
   if (['text', 'textarea'].includes(type)) {
     return (
@@ -357,27 +354,11 @@ const ValueSelector = ({ field, indicatorValues, value, onChangeValue, base }: V
       return (
         <SelectCustom
           options={indicatorValues.map((_value) => ({ label: _value, value: _value }))}
-          value={value?.map((_value: any) => ({ label: _value, value: _value })) || []}
+          value={{ label: value, value }}
           getOptionLabel={(f) => f.label}
           getOptionValue={(f) => f.value}
-          onChange={(newValue) => onChangeValue(newValue?.map((option) => option.value))}
+          onChange={(newValue) => onChangeValue(newValue?.value)}
           isClearable={!value?.length}
-          isMulti
-          components={{
-            MultiValueContainer: (props) => {
-              if (props.selectProps?.value?.length <= 1) {
-                return <components.MultiValueContainer {...props} />;
-              }
-              const lastValue = props.selectProps?.value?.[props.selectProps?.value?.length - 1]?.value;
-              const isLastValue = props?.data?.value === lastValue;
-              return (
-                <>
-                  <components.MultiValueLabel {...props} />
-                  {!isLastValue && <span className="tw-mr-2 tw-ml-1 tw-inline-block">OU</span>}
-                </>
-              );
-            },
-          }}
         />
       );
     } catch (e) {

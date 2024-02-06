@@ -5,8 +5,6 @@ import { toast } from 'react-toastify';
 import { capture } from '../services/sentry';
 import type { PersonInstance } from '../types/person';
 import type { PredefinedField, CustomField, CustomOrPredefinedField } from '../types/field';
-import type { EvolutiveStatsPersonFields, EvolutiveStatOption, EvolutiveStatDateYYYYMMDD } from '../types/evolutivesStats';
-import { dayjsInstance } from '../services/date';
 
 const collectionName = 'person';
 export const personsState = atom<PersonInstance[]>({
@@ -98,107 +96,6 @@ export const allowedPersonFieldsInHistorySelector = selector({
   get: ({ get }) => {
     const allFields = get(personFieldsIncludingCustomFieldsSelector);
     return allFields.map((f) => f.name).filter((f) => f !== 'history');
-  },
-});
-
-export const evolutiveStatsPersonSelector = selector({
-  key: 'evolutiveStatsPersonSelector',
-  get: ({ get }) => {
-    const allFields = get(personFieldsIncludingCustomFieldsSelector);
-    const fields = allFields.filter((f) => {
-      if (f.name === 'history') return false;
-      if (['text', 'textarea', 'number', 'date', 'date-with-time'].includes(f.type)) return false;
-      // remains 'yes-no' | 'enum' | 'multi-choice' | 'boolean'
-      return f.filterable;
-    });
-    const personsFieldsInHistoryObject: EvolutiveStatsPersonFields = {};
-    const persons = get(personsState);
-
-    function getValuesOptionsByField(field: CustomOrPredefinedField): Array<EvolutiveStatOption> {
-      if (!field) return [];
-      const current = fields.find((_field) => _field.name === field.name);
-      if (!current) return [];
-      if (['yes-no'].includes(current.type)) return ['Oui', 'Non', 'Non renseigné'];
-      if (['boolean'].includes(current.type)) return ['Oui', 'Non'];
-      if (current?.name === 'outOfActiveList') return current.options ?? ['Oui', 'Non'];
-      if (current?.options?.length) return [...current?.options, 'Non renseigné'];
-      return ['Non renseigné'];
-    }
-
-    // we take the years since the history began, let's say early 2023
-    const dates: Record<EvolutiveStatDateYYYYMMDD, number> = {};
-    let date = dayjsInstance('2023-01-01').format('YYYYMMDD');
-    const today = dayjsInstance().format('YYYYMMDD');
-    while (date !== today) {
-      dates[date] = 0;
-      date = dayjsInstance(date).add(1, 'day').format('YYYYMMDD');
-    }
-
-    for (const field of fields) {
-      const options = getValuesOptionsByField(field);
-      personsFieldsInHistoryObject[field.name] = {};
-      for (const option of options) {
-        personsFieldsInHistoryObject[field.name][option] = {
-          ...dates,
-        };
-      }
-    }
-
-    for (const person of persons) {
-      const minimumDate = dayjsInstance(person.followedSince || person.createdAt).format('YYYYMMDD');
-      let currentDate = today;
-      let currentPerson = structuredClone(person);
-      for (const field of fields) {
-        const value = currentPerson[field.name];
-        if (value == null || value === '') {
-          // we cover the case of undefined, null, empty string
-          continue;
-        }
-        personsFieldsInHistoryObject[field.name][value][currentDate]++;
-      }
-      const history = person.history;
-      if (!!history?.length) {
-        const reversedHistory = [...history].reverse();
-        for (const historyItem of reversedHistory) {
-          let historyDate = dayjsInstance(historyItem.date).format('YYYYMMDD');
-          while (currentDate !== historyDate) {
-            currentDate = dayjsInstance(currentDate).subtract(1, 'day').format('YYYYMMDD');
-            for (const field of fields) {
-              const value = currentPerson[field.name];
-              if (value == null || value === '') {
-                // we cover the case of undefined, null, empty string
-                continue;
-              }
-              personsFieldsInHistoryObject[field.name][value][currentDate]++;
-            }
-          }
-          for (const historyChangeField of Object.keys(historyItem.data)) {
-            const oldValue = historyItem.data[historyChangeField].oldValue;
-            if (historyItem.data[historyChangeField].newValue !== currentPerson[historyChangeField]) {
-              capture(new Error('Incoherent history'), {
-                extra: {
-                  person,
-                  historyItem,
-                  historyChangeField,
-                },
-              });
-            }
-            currentPerson[historyChangeField] = oldValue;
-          }
-        }
-      }
-      while (currentDate !== minimumDate) {
-        currentDate = dayjsInstance(currentDate).subtract(1, 'day').format('YYYYMMDD');
-        for (const field of fields) {
-          const value = currentPerson[field.name];
-          if (value == null || value === '') {
-            // we cover the case of undefined, null, empty string
-            continue;
-          }
-          personsFieldsInHistoryObject[field.name][value][currentDate]++;
-        }
-      }
-    }
   },
 });
 

@@ -27,11 +27,12 @@ export default function PersonStats({
   filterBase,
   filterPersons,
   setFilterPersons,
-  evolutiveStatsIndicators,
-  setEvolutiveStatsIndicators,
   personsForStats,
   personFields,
+  period,
   evolutivesStatsActivated,
+  evolutiveStatsIndicators,
+  setEvolutiveStatsIndicators,
 }) {
   const allGroups = useRecoilValue(groupsState);
   const customFieldsPersons = useRecoilValue(customFieldsPersonsSelector);
@@ -83,7 +84,7 @@ export default function PersonStats({
             selection={evolutiveStatsIndicators}
             onChange={setEvolutiveStatsIndicators}
           />
-          <EvolutiveStatsViewer />
+          <EvolutiveStatsViewer evolutiveStatsIndicators={evolutiveStatsIndicators} period={period} persons={personsForStats} />
         </>
       ) : (
         <>
@@ -183,6 +184,7 @@ export default function PersonStats({
           {customFieldsPersons.map((section) => {
             return (
               <details
+                key={section.name}
                 open={
                   process.env.REACT_APP_TEST_PLAYWRIGHT === 'true' ||
                   window.localStorage.getItem(`person-stats-${section.name.replace(' ', '-').toLocaleLowerCase()}-open`) === 'true'
