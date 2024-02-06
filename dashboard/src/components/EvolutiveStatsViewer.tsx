@@ -40,11 +40,6 @@ export default function EvolutiveStatsViewer({ evolutiveStatsIndicators, period,
 
   const field = indicatorsBase.find((field) => field.name === indicator.fieldName);
 
-  console.log({
-    fieldStart,
-    fieldEnd,
-    evolutiveStatsPerson,
-  });
   if (fieldEnd == null) {
     return (
       <>
@@ -64,14 +59,6 @@ export default function EvolutiveStatsViewer({ evolutiveStatsIndicators, period,
 
   const valueStart = evolutiveStatsPerson[indicator.fieldName][fieldStart][startDateFormatted.format('YYYYMMDD')];
   const valueEnd = evolutiveStatsPerson[indicator.fieldName][fieldEnd][endDateFormatted.format('YYYYMMDD')];
-
-  console.log({
-    fieldStart,
-    fieldEnd,
-    valueStart,
-    valueEnd,
-    evolutiveStatsPerson,
-  });
 
   return (
     <div className="tw-flex tw-w-full tw-justify-around">
