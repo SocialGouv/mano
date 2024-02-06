@@ -51,8 +51,15 @@ jobs:
           yarn
           yarn build
       # TODO pour plus tard, on pourrait deploy seulement le dossier qui a été modifié
-      - name: Trigger deployment
+      - name: Trigger deployment preprod
         env:
           DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
         run: |
           curl -f -X POST -H "Content-Type: application/json" -d '{"deploy-key":"'"$DEPLOY_KEY"'", "commit":"'"${{ github.sha }}"'"}' https://preprod-api-mano.sesan.fr/api/deploy
+      # TODO pour plus tard : on pourrait faire un déploiement en prod à part qui ne se lance que manuellement
+      # Cela permet de faire une communication par jour pour les déploiements en prod, à rediscuter avec Arnaud.
+      - name: Trigger deployment prod
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+        run: |
+          curl -f -X POST -H "Content-Type: application/json" -d '{"deploy-key":"'"$DEPLOY_KEY"'", "commit":"'"${{ github.sha }}"'"}' https://api-mano.sesan.fr/api/deploy
