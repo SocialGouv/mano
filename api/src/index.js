@@ -9,6 +9,7 @@ const logger = require("morgan");
 const { sequelize } = require("./db/sequelize");
 const { PORT, DEPLOY_KEY } = require("./config");
 const errors = require("./errors");
+const { sendEmail } = require("./utils/mailservice");
 
 const { SentryInit, capture } = require("./sentry");
 const Sentry = require("@sentry/node");
@@ -45,6 +46,15 @@ app.get("/healthz", async (req, res) => {
 app.get("/sentry-check", async (req, res) => {
   capture("sentry-check");
   res.send(`Sentry checked!`);
+});
+
+app.get("/mail-check", async (req, res) => {
+  try {
+    await sendEmail("raph@selego.co", "Test", "Test", "<h1>Test</h1>");
+  } catch (e) {
+    console.error(e);
+    return res.status(500).send(`Error: ${e.message}`);
+  }
 });
 
 app.get("/", async (req, res) => {

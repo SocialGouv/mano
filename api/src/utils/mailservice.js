@@ -1,40 +1,27 @@
-const fetch = require("node-fetch");
-const { capture } = require("../sentry");
-const { X_TIPIMAIL_APIUSER, X_TIPIMAIL_APIKEY } = require("../config");
+const nodemailer = require("nodemailer");
+
+const transporter = nodemailer.createTransport({
+  host: "mail-sesan.grita.fr",
+  port: 25,
+  // secure: true,
+});
 
 const sendEmail = async (address, subject, text, html) => {
   if (process.env.NODE_ENV === "test") return;
   if (process.env.NODE_ENV === "development") {
     address = process.env.EMAIL_DEV || "arnaud@ambroselli.io";
   }
-  const emailSentResponse = await fetch("https://api.tipimail.com/v1/messages/send", {
-    method: "POST",
-    headers: {
-      "X-Tipimail-ApiUser": X_TIPIMAIL_APIUSER,
-      "X-Tipimail-ApiKey": X_TIPIMAIL_APIKEY,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      apiKey: X_TIPIMAIL_APIKEY,
-      to: [
-        {
-          address,
-        },
-      ],
-      msg: {
-        from: {
-          address: "admin@manoapp.fr",
-          personalName: "App Mano",
-        },
-        subject,
-        ...(text ? { text } : {}),
-        ...(html ? { html } : {}),
-      },
-    }),
+
+  // send mail with defined transport object
+  const info = await transporter.sendMail({
+    from: `"App Mano" <no-reply@mano.sesan.fr>`,
+    to: address,
+    subject, // Subject line
+    ...(text ? { text } : {}),
+    ...(html ? { html } : {}),
   });
-  if (!emailSentResponse.ok) {
-    capture(new Error("Email not sent"), { extra: { address, subject, text, response: emailSentResponse } });
-  }
+
+  console.log("Message sent: %s", info.messageId);
   return emailSentResponse;
 };
 

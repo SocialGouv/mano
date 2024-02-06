@@ -308,6 +308,7 @@ __metadata:
     morgan: "npm:^1.10.0"
     multer: "npm:^1.4.4"
     node-fetch: "npm:^2.6.1"
+    nodemailer: "npm:^6.9.9"
     nodemon: "npm:^2.0.15"
     passport: "npm:^0.6.0"
     passport-jwt: "npm:^4.0.0"
@@ -2397,6 +2398,13 @@ __metadata:
   bin:
     node-gyp: bin/node-gyp.js
   checksum: e8dfbe2b02f23d056f69e01c409381963e92c71cafba6c9cfbf63b038f65ca19ab8183bb6891d080e59c4eb2cc425fc736f42e90afc0f0030ecd97bfc64fb7ad
+  languageName: node
+  linkType: hard
+
+"nodemailer@npm:^6.9.9":
+  version: 6.9.9
+  resolution: "nodemailer@npm:6.9.9"
+  checksum: ba72da4ca8a003921c86f3d132d64d9bb86c1a3d79d248664b3de28f6a7a621f0476273ad7cf3ecc48d3b78a66ae4ec62b7c4c8ab6f07d9ca26d4bad4d08802e
   languageName: node
   linkType: hard
 
