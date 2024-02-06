@@ -87,7 +87,7 @@ const StatsLoader = () => {
 const itemsForStatsSelector = selectorFamily({
   key: 'itemsForStatsSelector',
   get:
-    ({ period, filterPersons, selectedTeamsObjectWithOwnPeriod, viewAllOrganisationData, evolutivesStatsActivated }) =>
+    ({ period, filterPersons, selectedTeamsObjectWithOwnPeriod, viewAllOrganisationData }) =>
     ({ get }) => {
       const activeFilters = filterPersons.filter((f) => f.value);
       const filterItemByTeam = (item, key) => {
@@ -372,7 +372,6 @@ const Stats = () => {
       filterPersons,
       selectedTeamsObjectWithOwnPeriod,
       viewAllOrganisationData,
-      evolutivesStatsActivated,
     })
   );
 
@@ -641,6 +640,7 @@ const Stats = () => {
             personFields={personFields}
             flattenedCustomFieldsPersons={flattenedCustomFieldsPersons}
             evolutivesStatsActivated={evolutivesStatsActivated}
+            period={period}
             evolutiveStatsIndicators={evolutiveStatsIndicators}
             setEvolutiveStatsIndicators={setEvolutiveStatsIndicators}
           />
@@ -657,6 +657,7 @@ const Stats = () => {
             filterPersons={filterPersons}
             setFilterPersons={setFilterPersons}
             evolutivesStatsActivated={evolutivesStatsActivated}
+            period={period}
             evolutiveStatsIndicators={evolutiveStatsIndicators}
             setEvolutiveStatsIndicators={setEvolutiveStatsIndicators}
           />
