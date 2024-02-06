@@ -10,7 +10,7 @@ module.exports = {
         "createdAt" timestamp with time zone not null default now(),
         "updatedAt" timestamp with time zone not null default now()
       );`);
-    await queryInterface.sequelize.query(`create index "Deployment_createdAt_idx" on mano."Deployment" using btree ("createdAt");`);
+    await queryInterface.sequelize.query(`create index if not exists "Deployment_createdAt_idx" on mano."Deployment" using btree ("createdAt");`);
   },
 
   async down() {},
