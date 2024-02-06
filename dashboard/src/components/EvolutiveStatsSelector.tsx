@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import SelectCustom from './SelectCustom';
-import { components } from 'react-select';
 import { dayjsInstance } from '../services/date';
 import DatePicker from './DatePicker';
 import type { FilterField } from '../types/field';

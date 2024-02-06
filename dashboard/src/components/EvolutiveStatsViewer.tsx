@@ -1,5 +1,5 @@
 import { useRecoilValue } from 'recoil';
-import { evolutiveStatsIndicatorsBaseSelector, evolutiveStatsPersonSelector } from '../recoil/evolutiveStats';
+import { evolutiveStatsIndicatorsBaseSelector, evolutiveStatsPersonSelector, startHistoryFeatureDate } from '../recoil/evolutiveStats';
 import type { PersonPopulated } from '../types/person';
 import type { IndicatorsSelection } from '../types/evolutivesStats';
 import { dayjsInstance } from '../services/date';
@@ -25,24 +25,21 @@ export default function EvolutiveStatsViewer({ evolutiveStatsIndicators, period,
     })
   );
   const indicatorsBase = useRecoilValue(evolutiveStatsIndicatorsBaseSelector);
+  if (!evolutiveStatsIndicators.length) return null;
+  const indicator = evolutiveStatsIndicators[0];
+
   console.log({
     evolutiveStatsPerson,
     startDate,
     endDate,
     evolutiveStatsIndicators,
+    indicator,
   });
 
-  if (!evolutiveStatsIndicators.length) return null;
-
-  const indicator = evolutiveStatsIndicators[0];
-
   if (!indicator.fieldName) return null;
-  if (!startDate) return null;
-  if (!endDate) return null;
-  if (!endDate) return null;
 
-  const startDateFormatted = dayjsInstance(startDate);
-  const endDateFormatted = dayjsInstance(endDate);
+  const startDateFormatted = dayjsInstance(startDate ?? startHistoryFeatureDate);
+  const endDateFormatted = endDate ? dayjsInstance(endDate) : dayjsInstance();
 
   if (startDateFormatted.isSame(endDateFormatted)) return null;
 
@@ -114,7 +111,7 @@ function MyResponsiveStream({ indicator, evolutiveStatsPerson, startDateFormatte
     const legend = [];
     const fieldData = evolutiveStatsPerson[indicator.fieldName];
     const daysDiff = endDateFormatted.diff(startDateFormatted, 'days');
-    const spacing = Math.round(Math.max(1, daysDiff / 12));
+    const spacing = Math.floor(Math.max(1, daysDiff / 12));
     for (let i = 0; i < daysDiff; i += spacing) {
       const date = startDateFormatted.add(i, 'days');
       legend.push(date.format('DD/MM/YYYY'));

@@ -374,7 +374,6 @@ const Stats = () => {
       viewAllOrganisationData,
     })
   );
-
   const filterableActionsCategories = useMemo(() => {
     if (!actionsCategoriesGroups.length) return ['-- Aucune --', ...allCategories];
     return groupsCategories
