@@ -4,12 +4,11 @@ import type { PersonInstance } from '../types/person';
 import type { CustomOrPredefinedField } from '../types/field';
 import type { EvolutiveStatsPersonFields, EvolutiveStatOption, EvolutiveStatDateYYYYMMDD } from '../types/evolutivesStats';
 import { dayjsInstance } from '../services/date';
-import { personFieldsIncludingCustomFieldsSelector, personsState } from './persons';
+import { personFieldsIncludingCustomFieldsSelector } from './persons';
 
 export const evolutiveStatsIndicatorsBaseSelector = selector({
   key: 'evolutiveStatsIndicatorsBaseSelector',
   get: ({ get }) => {
-    const now = Date.now();
     const allFields = get(personFieldsIncludingCustomFieldsSelector);
     const indicatorsBase = allFields.filter((f) => {
       if (f.name === 'history') return false;
@@ -17,14 +16,14 @@ export const evolutiveStatsIndicatorsBaseSelector = selector({
       switch (f.type) {
         case 'text':
         case 'textarea':
-        case 'number':
         case 'date':
         case 'date-with-time':
-        case 'multi-choice':
-        case 'boolean':
           return false;
+        case 'multi-choice':
+        case 'number':
         case 'yes-no':
         case 'enum':
+        case 'boolean':
         default:
           return f.filterable;
       }
@@ -33,6 +32,8 @@ export const evolutiveStatsIndicatorsBaseSelector = selector({
     return indicatorsBase;
   },
 });
+
+export const startHistoryFeatureDate = '2022-09-23';
 
 export const evolutiveStatsPersonSelector = selectorFamily({
   key: 'evolutiveStatsPersonSelector',
@@ -63,7 +64,7 @@ export const evolutiveStatsPersonSelector = selectorFamily({
         return ['Non renseigné'];
       }
 
-      function getValueByField(fieldName: CustomOrPredefinedField['name'], value: any): string {
+      function getValueByField(fieldName: CustomOrPredefinedField['name'], value: any): string | Array<string> {
         if (!fieldName) return '';
         const current = fieldsMap[fieldName];
         if (!current) return '';
@@ -72,21 +73,24 @@ export const evolutiveStatsPersonSelector = selectorFamily({
           return 'Non';
         }
         if (['boolean'].includes(current.type)) {
-          if (value === true) return 'Oui';
+          if (value === true || value === 'Oui') return 'Oui';
           return 'Non';
         }
         if (current?.name === 'outOfActiveList') {
           if (value === true) return 'Oui';
           return 'Non';
         }
-        if (value == null || value === '') return 'Non renseigné'; // we cover the case of undefined, null, empty string
+        if (value == null || value === '') {
+          if (current.type === 'multi-choice') return [];
+          return 'Non renseigné'; // we cover the case of undefined, null, empty string
+        }
         if (value.includes('Choisissez un genre')) return 'Non renseigné';
         return value;
       }
 
       // we take the years since the history began, let's say early 2023
       const dates: Record<EvolutiveStatDateYYYYMMDD, number> = {};
-      const minimumDateForEvolutiveStats = dayjsInstance(startDate ?? '2022-09-23').format('YYYYMMDD');
+      const minimumDateForEvolutiveStats = dayjsInstance(startDate ?? startHistoryFeatureDate).format('YYYYMMDD');
       let date = minimumDateForEvolutiveStats;
       const today = dayjsInstance().format('YYYYMMDD');
       while (date !== today) {
@@ -104,22 +108,27 @@ export const evolutiveStatsPersonSelector = selectorFamily({
         }
       }
 
-      for (const person of persons) {
+      for (const [index, person] of Object.entries(persons)) {
         const followedSince = dayjsInstance(person.followedSince || person.createdAt).format('YYYYMMDD');
         const minimumDate = followedSince < minimumDateForEvolutiveStats ? minimumDateForEvolutiveStats : followedSince;
         let currentDate = today;
         let currentPerson = structuredClone(person);
         for (const field of indicatorsBase) {
-          const value = getValueByField(field.name, currentPerson[field.name]);
-          if (value === '') continue;
-          try {
-            if (!personsFieldsInHistoryObject[field.name][value][currentDate]) {
-              personsFieldsInHistoryObject[field.name][value][currentDate] = 0;
+          const rawValue = getValueByField(field.name, currentPerson[field.name]);
+          if (rawValue === '') continue;
+          const valueToLoop = Array.isArray(rawValue) ? rawValue : [rawValue];
+          for (const value of valueToLoop) {
+            try {
+              if (!personsFieldsInHistoryObject[field.name][value]) {
+                personsFieldsInHistoryObject[field.name][value] = { ...dates };
+              }
+              if (!personsFieldsInHistoryObject[field.name][value][currentDate]) {
+                personsFieldsInHistoryObject[field.name][value][currentDate] = 0;
+              }
+              personsFieldsInHistoryObject[field.name][value][currentDate]++;
+            } catch (error) {
+              capture(error, { extra: { person, field, value, currentDate } });
             }
-            personsFieldsInHistoryObject[field.name][value][currentDate]++;
-          } catch (error) {
-            capture(error, { extra: { person, field, value, currentDate } });
-            return personsFieldsInHistoryObject;
           }
         }
         const history = person.history;
@@ -130,19 +139,29 @@ export const evolutiveStatsPersonSelector = selectorFamily({
             while (currentDate > historyDate && currentDate > minimumDate) {
               currentDate = dayjsInstance(currentDate).subtract(1, 'day').format('YYYYMMDD');
               for (const field of indicatorsBase) {
-                const value = getValueByField(field.name, currentPerson[field.name]);
-                if (value === '') continue;
-                if (!personsFieldsInHistoryObject[field.name][value][currentDate]) {
-                  personsFieldsInHistoryObject[field.name][value][currentDate] = 0;
+                const rawValue = getValueByField(field.name, currentPerson[field.name]);
+                if (rawValue === '') continue;
+                const valueToLoop = Array.isArray(rawValue) ? rawValue : [rawValue];
+                for (const value of valueToLoop) {
+                  try {
+                    if (!personsFieldsInHistoryObject[field.name][value]) {
+                      personsFieldsInHistoryObject[field.name][value] = { ...dates };
+                    }
+                    if (!personsFieldsInHistoryObject[field.name][value][currentDate]) {
+                      personsFieldsInHistoryObject[field.name][value][currentDate] = 0;
+                    }
+                    personsFieldsInHistoryObject[field.name][value][currentDate]++;
+                  } catch (error) {
+                    capture(error, { extra: { person, field, value, currentDate } });
+                  }
                 }
-                personsFieldsInHistoryObject[field.name][value][currentDate]++;
               }
             }
             for (const historyChangeField of Object.keys(historyItem.data)) {
               const oldValue = getValueByField(historyChangeField, historyItem.data[historyChangeField].oldValue);
               const historyNewValue = getValueByField(historyChangeField, historyItem.data[historyChangeField].newValue);
               const currentPersonValue = getValueByField(historyChangeField, currentPerson[historyChangeField]);
-              if (historyNewValue !== currentPersonValue) {
+              if (JSON.stringify(historyNewValue) !== JSON.stringify(currentPersonValue)) {
                 capture(new Error('Incoherent history'), {
                   extra: {
                     person,
@@ -163,12 +182,22 @@ export const evolutiveStatsPersonSelector = selectorFamily({
         while (currentDate >= minimumDate) {
           currentDate = dayjsInstance(currentDate).subtract(1, 'day').format('YYYYMMDD');
           for (const field of indicatorsBase) {
-            const value = getValueByField(field.name, currentPerson[field.name]);
-            if (value === '') continue;
-            if (!personsFieldsInHistoryObject[field.name][value][currentDate]) {
-              personsFieldsInHistoryObject[field.name][value][currentDate] = 0;
+            const rawValue = getValueByField(field.name, currentPerson[field.name]);
+            if (rawValue === '') continue;
+            const valueToLoop = Array.isArray(rawValue) ? rawValue : [rawValue];
+            for (const value of valueToLoop) {
+              try {
+                if (!personsFieldsInHistoryObject[field.name][value]) {
+                  personsFieldsInHistoryObject[field.name][value] = { ...dates };
+                }
+                if (!personsFieldsInHistoryObject[field.name][value][currentDate]) {
+                  personsFieldsInHistoryObject[field.name][value][currentDate] = 0;
+                }
+                personsFieldsInHistoryObject[field.name][value][currentDate]++;
+              } catch (error) {
+                capture(error, { extra: { person, field, value, currentDate } });
+              }
             }
-            personsFieldsInHistoryObject[field.name][value][currentDate]++;
           }
         }
       }
