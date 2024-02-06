@@ -135,7 +135,6 @@ export const evolutiveStatsPersonSelector = selectorFamily({
       evolutiveStatsIndicators: IndicatorsSelection;
     }) =>
     ({ get }) => {
-      const now = Date.now();
       const indicatorsBase = get(evolutiveStatsIndicatorsBaseSelector);
       const fieldsMap: FieldsMap = indicatorsBase.reduce((acc, field) => {
         acc[field.name] = field;
@@ -269,7 +268,6 @@ export const evolutiveStatsPersonSelector = selectorFamily({
           }
         }
       }
-      console.log('finito evolutiveStatsPersonSelector', Date.now() - now, 'ms');
       return personsFieldsInHistoryObject;
     },
 });
