@@ -86,6 +86,7 @@ services:
       - "80:80"
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./.server/vhost:/etc/nginx/vhost.d
 
 secrets:
   deploy_key:
