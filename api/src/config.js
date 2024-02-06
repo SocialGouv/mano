@@ -36,9 +36,6 @@ const MOBILE_APP_VERSION = mobileAppVersion;
 
 const STORAGE_DIRECTORY = process.env.STORAGE_DIRECTORY;
 
-const X_TIPIMAIL_APIUSER = process.env.X_TIPIMAIL_APIUSER || "";
-const X_TIPIMAIL_APIKEY = process.env.X_TIPIMAIL_APIKEY || "";
-
 module.exports = {
   PORT,
   ENVIRONMENT,
@@ -50,7 +47,5 @@ module.exports = {
   PGDATABASE,
   DEPLOY_KEY,
   MOBILE_APP_VERSION,
-  X_TIPIMAIL_APIUSER,
-  X_TIPIMAIL_APIKEY,
   STORAGE_DIRECTORY,
 };

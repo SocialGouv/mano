@@ -22,7 +22,7 @@ const sendEmail = async (address, subject, text, html) => {
   });
 
   console.log("Message sent: %s", info.messageId);
-  return emailSentResponse;
+  return info;
 };
 
 module.exports = {

@@ -48,15 +48,6 @@ app.get("/sentry-check", async (req, res) => {
   res.send(`Sentry checked!`);
 });
 
-app.get("/mail-check", async (req, res) => {
-  try {
-    await sendEmail("raph@selego.co", "Test", "Test", "<h1>Test</h1>");
-  } catch (e) {
-    console.error(e);
-    return res.status(500).send(`Error: ${e.message}`);
-  }
-});
-
 app.get("/", async (req, res) => {
   res.send(`Hello World at ${now.toISOString()}`);
 });
