@@ -560,7 +560,7 @@ const Stats = () => {
           />
         </div>
         <div className="tw-min-w-[15rem] tw-basis-1/3 tw-p-0">
-          {activeTab.includes('Personnes') && (
+          {activeTab.includes('Personnes') && organisation._id === '00000000-5f5a-89e2-2e60-88fa20cc50bf' && (
             <button
               type="button"
               className={!evolutivesStatsActivated ? 'button-classic' : 'button-submit'}
