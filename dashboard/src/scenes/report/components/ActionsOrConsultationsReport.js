@@ -9,6 +9,7 @@ import TabsNav from '../../../components/tailwind/TabsNav';
 import { useLocalStorage } from '../../../services/useLocalStorage';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../../../recoil/auth';
+import { dayjsInstance } from '../../../services/date';
 
 export const ActionsOrConsultationsReport = ({ actions, consultations, period }) => {
   const [activeTab, setActiveTab] = useLocalStorage('reports-actions-consultation-toggle', 'Actions');
@@ -49,6 +50,7 @@ export const ActionsOrConsultationsReport = ({ actions, consultations, period })
                 const searchParams = new URLSearchParams(history.location.search);
                 searchParams.set(activeTab.includes('Actions') ? 'newAction' : 'newConsultation', true);
                 searchParams.set('dueAt', period.startDate);
+                searchParams.set('completedAt', dayjsInstance(period.startDate).set('hour', 12));
                 history.push(`?${searchParams.toString()}`);
               }}>
               ＋
