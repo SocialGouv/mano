@@ -1,3 +1,14 @@
+# [1.304.0](https://github.com/SocialGouv/mano/compare/v1.303.11...v1.304.0) (2024-02-07)
+
+
+### Features
+
+* ca marche de ouf ([6329302](https://github.com/SocialGouv/mano/commit/632930273a5a66705cff09be118946620b3c6195))
+* can see chart ([985e899](https://github.com/SocialGouv/mano/commit/985e8993eb3dbc8db2c71298c02c6015bfefcc5d))
+* evolutiveStatsPersonSelector ([c2f83f6](https://github.com/SocialGouv/mano/commit/c2f83f65f6dd93ca7768d05948db939a5851364a))
+* stats evolutives ([32b2807](https://github.com/SocialGouv/mano/commit/32b28072ab4bb6d347044ca8ed7d967cdbd919c0))
+* stats évolutives - sélection des indicateurs ([dd71a5f](https://github.com/SocialGouv/mano/commit/dd71a5f46205e6408aab0c750c4bf32831fb96de))
+
 ## [1.303.11](https://github.com/SocialGouv/mano/compare/v1.303.10...v1.303.11) (2024-02-02)
 
 
