@@ -1,3 +1,10 @@
+## [1.304.1](https://github.com/SocialGouv/mano/compare/v1.304.0...v1.304.1) (2024-02-07)
+
+
+### Bug Fixes
+
+* fucking bug ([951c338](https://github.com/SocialGouv/mano/commit/951c338bcd1e10c23d7eefc8165f1314dc65ac42))
+
 # [1.304.0](https://github.com/SocialGouv/mano/compare/v1.303.11...v1.304.0) (2024-02-07)
 
 
