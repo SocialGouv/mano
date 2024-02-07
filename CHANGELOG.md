@@ -1,3 +1,10 @@
+## [1.304.2](https://github.com/SocialGouv/mano/compare/v1.304.1...v1.304.2) (2024-02-07)
+
+
+### Bug Fixes
+
+* nouvelle action depuis le nouveau CR est FAITE ([4106e9b](https://github.com/SocialGouv/mano/commit/4106e9b2ae0cb37f5dc5af8abe0c32d142fc9e3a))
+
 ## [1.304.1](https://github.com/SocialGouv/mano/compare/v1.304.0...v1.304.1) (2024-02-07)
 
 
