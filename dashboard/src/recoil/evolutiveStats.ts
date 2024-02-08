@@ -70,8 +70,17 @@ function getValueByField(fieldName: CustomOrPredefinedField['name'], fieldsMap: 
     if (value === true) return 'Oui';
     return 'Non';
   }
+  if (current.type === 'multi-choice') {
+    if (Array.isArray(value)) {
+      if (value.length === 0) return ['Non renseigné'];
+      return value;
+    }
+    if (value == null || value === '') {
+      return ['Non renseigné'];
+    }
+    return [value];
+  }
   if (value == null || value === '') {
-    if (current.type === 'multi-choice') return [];
     return 'Non renseigné'; // we cover the case of undefined, null, empty string
   }
   if (value.includes('Choisissez un genre')) return 'Non renseigné';
@@ -145,7 +154,10 @@ export const evolutiveStatsPersonSelector = selectorFamily({
       // how do we calculate ?
       // we start by the most recent version of the person, and we go back in time, day by day, to the beginning of the history
 
-      const indicatorsBase = get(evolutiveStatsIndicatorsBaseSelector);
+      const indicatorsBase = get(evolutiveStatsIndicatorsBaseSelector).filter((f) => {
+        if (evolutiveStatsIndicators.find((i) => i.fieldName === f.name)) return true;
+        return false;
+      });
       const fieldsMap: FieldsMap = indicatorsBase.reduce((acc, field) => {
         acc[field.name] = field;
         return acc;
@@ -178,7 +190,8 @@ export const evolutiveStatsPersonSelector = selectorFamily({
         persons = persons.filter((p) => {
           const snapshot = getPersonSnapshotAtDate({ person: p, snapshotDate: minimumDateForEvolutiveStats, fieldsMap });
           if (!snapshot) return false;
-          return getValueByField(indicatorFieldName, fieldsMap, p[indicatorFieldName]).includes(indicator.fromValue);
+          const isGood = getValueByField(indicatorFieldName, fieldsMap, snapshot[indicatorFieldName]).includes(indicator.fromValue);
+          return isGood;
         });
       }
 
