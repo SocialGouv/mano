@@ -69,27 +69,32 @@ export default function EvolutiveStatsViewer({ evolutiveStatsIndicators, period,
           <p>{fieldStart}</p>
         </div>
       </div>
-      <div className="tw-flex tw-basis-1/2 tw-flex-col tw-items-center tw-justify-end tw-gap-y-4">
-        <div className="tw-flex tw-flex-col tw-items-center tw-justify-around tw-p-4">
-          <p className="tw-text-6xl tw-font-bold tw-text-main">{Math.round((valueEnd / valueStart) * 1000) / 10}%</p>
-          <p className="tw-m-0 tw-text-center">
-            des{' '}
-            <strong>
-              {field?.label}: {fieldStart}
-            </strong>{' '}
-            au {startDateFormatted.format('DD/MM/YYYY')}
-            <br />
-            ont évolué vers <strong>{fieldEnd}</strong> au {endDateFormatted.format('DD/MM/YYYY')}
-          </p>
-        </div>
-      </div>
-      <div className="tw-flex tw-shrink-0 tw-basis-1/4 tw-flex-col tw-items-center tw-justify-end tw-gap-y-4">
-        <h5>Au {endDateFormatted.format('DD/MM/YYYY')}</h5>
-        <div className="tw-flex tw-w-full tw-flex-col tw-items-center tw-justify-around tw-rounded-lg tw-border tw-p-4">
-          <p className="tw-text-6xl tw-font-bold tw-text-main">{valueEnd}</p>
-          <p>{fieldEnd}</p>
-        </div>
-      </div>
+      {valueStart !== 0 && (
+        <>
+          <div className="tw-flex tw-basis-1/2 tw-flex-col tw-items-center tw-justify-end tw-gap-y-4">
+            <div className="tw-flex tw-flex-col tw-items-center tw-justify-around tw-p-4">
+              <p className="tw-text-6xl tw-font-bold tw-text-main">{Math.round((valueEnd / valueStart) * 1000) / 10}%</p>
+              <p className="tw-m-0 tw-text-center">
+                des{' '}
+                <strong>
+                  {field?.label}: {fieldStart}
+                </strong>{' '}
+                au {startDateFormatted.format('DD/MM/YYYY')}
+                <br />
+                {fieldStart === fieldEnd ? ' sont restés à ' : ' ont évolué vers '}
+                <strong>{fieldEnd}</strong> au {endDateFormatted.format('DD/MM/YYYY')}
+              </p>
+            </div>
+          </div>
+          <div className="tw-flex tw-shrink-0 tw-basis-1/4 tw-flex-col tw-items-center tw-justify-end tw-gap-y-4">
+            <h5>Au {endDateFormatted.format('DD/MM/YYYY')}</h5>
+            <div className="tw-flex tw-w-full tw-flex-col tw-items-center tw-justify-around tw-rounded-lg tw-border tw-p-4">
+              <p className="tw-text-6xl tw-font-bold tw-text-main">{valueEnd}</p>
+              <p>{fieldEnd}</p>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
