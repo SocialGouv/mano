@@ -1,3 +1,10 @@
+## [1.304.3](https://github.com/SocialGouv/mano/compare/v1.304.2...v1.304.3) (2024-02-08)
+
+
+### Bug Fixes
+
+* stats évolutives - on gère les cas 0 et infini + bug fix du multi-choix 'Non renseigné' ([a7c38b2](https://github.com/SocialGouv/mano/commit/a7c38b2cbab29c3cbc1692854c86d21d2548d695))
+
 ## [1.304.2](https://github.com/SocialGouv/mano/compare/v1.304.1...v1.304.2) (2024-02-07)
 
 
