@@ -1,3 +1,11 @@
+## [1.304.5](https://github.com/SocialGouv/mano/compare/v1.304.4...v1.304.5) (2024-02-08)
+
+
+### Bug Fixes
+
+* remove too much context on user ([c9044e6](https://github.com/SocialGouv/mano/commit/c9044e62fdb0a7804e9c4eb029aff74237e96e3d))
+* retire les données potentiellement sensibles de sentry ([08ff510](https://github.com/SocialGouv/mano/commit/08ff5105cb29e5a0748d56b483626414fe65c4d7))
+
 ## [1.304.4](https://github.com/SocialGouv/mano/compare/v1.304.3...v1.304.4) (2024-02-08)
 
 
