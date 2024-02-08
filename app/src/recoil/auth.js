@@ -4,7 +4,15 @@ import { atom } from 'recoil';
 export const userState = atom({
   key: 'userState',
   default: null,
-  effects: [({ onSet }) => onSet((user) => Sentry.setUser(user))],
+  effects: [
+    ({ onSet }) =>
+      onSet((user) =>
+        Sentry.setUser({
+          id: user?._id,
+          email: user?.email,
+        })
+      ),
+  ],
 });
 
 export const organisationState = atom({
@@ -26,5 +34,5 @@ export const usersState = atom({
 export const currentTeamState = atom({
   key: 'currentTeamState',
   default: null,
-  effects: [({ onSet }) => onSet((currentTeam) => Sentry.setContext('currentTeam', currentTeam))],
+  effects: [({ onSet }) => onSet((currentTeam) => Sentry.setTag('currentTeam', currentTeam?._id ?? ''))],
 });

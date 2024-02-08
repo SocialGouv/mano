@@ -7,7 +7,15 @@ import type { TeamInstance } from '../types/team';
 export const userState = atom<UserInstance | null>({
   key: 'userState',
   default: null,
-  effects: [({ onSet }) => onSet((user) => AppSentry.setUser(user))],
+  effects: [
+    ({ onSet }) =>
+      onSet((user) =>
+        AppSentry.setUser({
+          id: user?._id,
+          email: user?.email,
+        })
+      ),
+  ],
 });
 
 export const userAuthentifiedState = selector<UserInstance>({
@@ -52,6 +60,7 @@ export const usersState = atom<UserInstance[]>({
 export const currentTeamState = atom<TeamInstance | null>({
   key: 'currentTeamState',
   default: null,
+  effects: [({ onSet }) => onSet((currentTeam) => AppSentry.setTag('currentTeam', currentTeam?._id ?? ''))],
 });
 
 export const currentTeamAuthentifiedState = selector<TeamInstance>({
