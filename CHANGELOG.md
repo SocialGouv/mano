@@ -1,3 +1,10 @@
+## [1.304.4](https://github.com/SocialGouv/mano/compare/v1.304.3...v1.304.4) (2024-02-08)
+
+
+### Bug Fixes
+
+* feature flag pour une autre ([e880ad2](https://github.com/SocialGouv/mano/commit/e880ad2318f74fa67a4dc06ad38bc94ff2356cc9))
+
 ## [1.304.3](https://github.com/SocialGouv/mano/compare/v1.304.2...v1.304.3) (2024-02-08)
 
 
