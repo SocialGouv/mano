@@ -1,3 +1,10 @@
+## [1.304.6](https://github.com/SocialGouv/mano/compare/v1.304.5...v1.304.6) (2024-02-09)
+
+
+### Bug Fixes
+
+* eveolutive stats indicators default value ([30b90fd](https://github.com/SocialGouv/mano/commit/30b90fd12b541c9f8af94bf1470406e5dc1a377b))
+
 ## [1.304.5](https://github.com/SocialGouv/mano/compare/v1.304.4...v1.304.5) (2024-02-08)
 
 
