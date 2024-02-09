@@ -290,7 +290,7 @@ const Stats = () => {
   const [actionsCategories, setActionsCategories] = useLocalStorage('stats-categories', []);
 
   const [evolutivesStatsActivated, setEvolutivesStatsActivated] = useLocalStorage('stats-evolutivesStatsActivated', false);
-  const [evolutiveStatsIndicators, setEvolutiveStatsIndicators] = useLocalStorage('stats-evolutivesStatsIndicators', false);
+  const [evolutiveStatsIndicators, setEvolutiveStatsIndicators] = useLocalStorage('stats-evolutivesStatsIndicatorsArray', []);
 
   useTitle(`${activeTab} - Statistiques`);
 
