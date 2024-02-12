@@ -14,6 +14,6 @@ export const deploymentShortCommitSHAState = selector({
   key: 'shortCommitSHAState',
   get: ({ get }) => {
     const fullSHA = get(deploymentCommitState);
-    return fullSHA.substring(0, 7);
+    return (fullSHA || '-').substring(0, 7);
   },
 });
