@@ -14,7 +14,7 @@ const sendEmail = async (address, subject, text, html) => {
 
   // send mail with defined transport object
   const info = await transporter.sendMail({
-    from: `"App Mano" <no-reply@mano.sesan.fr>`,
+    from: `"App Mano" <no-reply-mano@sesan.fr>`,
     to: address,
     subject, // Subject line
     ...(text ? { text } : {}),
