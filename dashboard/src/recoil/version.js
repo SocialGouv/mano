@@ -7,7 +7,7 @@ export const deploymentDateState = atom({
 
 export const deploymentCommitState = atom({
   key: 'deploymentCommitState',
-  default: '-',
+  default: null,
 });
 
 export const deploymentShortCommitSHAState = selector({

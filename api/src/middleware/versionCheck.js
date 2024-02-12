@@ -22,11 +22,12 @@ module.exports = async ({ headers: { version, platform } }, res, next) => {
         console.error(e);
       }
     }
-    console.log(deploymentDate, typeof deploymentDate);
-    res.header("X-API-DEPLOYMENT-COMMIT", deploymentCommit);
-    res.header("X-API-DEPLOYMENT-DATE", deploymentDate);
-    // See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Expose-Headers
-    res.header("Access-Control-Expose-Headers", "X-API-DEPLOYMENT-COMMIT, X-API-DEPLOYMENT-DATE");
+    if (deploymentCommit && deploymentDate) {
+      res.header("X-API-DEPLOYMENT-COMMIT", deploymentCommit);
+      res.header("X-API-DEPLOYMENT-DATE", deploymentDate);
+      // See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Expose-Headers
+      res.header("Access-Control-Expose-Headers", "X-API-DEPLOYMENT-COMMIT, X-API-DEPLOYMENT-DATE");
+    }
     return next();
   }
 
