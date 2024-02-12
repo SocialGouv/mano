@@ -131,6 +131,8 @@ function getPersonSnapshotAtDate({
   return snapshot;
 }
 
+console.log('loaded stats');
+
 export const evolutiveStatsPersonSelector = selectorFamily({
   key: 'evolutiveStatsPersonSelector',
   get:
