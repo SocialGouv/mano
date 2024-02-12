@@ -1,4 +1,4 @@
-name: Deploy (preprod)
+name: Deploy
 
 on:
   push:
