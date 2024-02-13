@@ -12,7 +12,7 @@ export const CustomResponsivePie = ({ data = [], title, onItemClick, help }) => 
   };
 
   return (
-    <div className="tw-my-4 tw-mx-0 tw-flex tw-w-full tw-break-inside-avoid tw-flex-wrap tw-items-center tw-justify-between tw-rounded-2xl tw-border tw-border-main25 tw-bg-white tw-p-4">
+    <div className="tw-my-4 tw-mx-0 tw-flex tw-w-full tw-flex-wrap  tw-items-center tw-justify-between tw-rounded-2xl tw-border tw-border-main25 tw-bg-white tw-p-4 print:tw-break-before-all print:tw-break-inside-avoid print:tw-flex-col">
       <div
         className={[
           'tw-relative tw-mt-4 tw-mb-12 tw-flex tw-basis-full tw-justify-center',
@@ -51,7 +51,7 @@ export const CustomResponsivePie = ({ data = [], title, onItemClick, help }) => 
       </div>
       <div
         className={[
-          'tw-flex tw-h-80 tw-max-w-[50%] tw-basis-1/2 tw-items-center tw-justify-center tw-font-bold print:tw-w-[600px] print:tw-max-w-[55%] print:!tw-grow print:!tw-basis-0',
+          'tw-flex tw-h-80 tw-max-w-[50%] tw-basis-1/2 tw-items-center tw-justify-center tw-font-bold print:tw-order-2 print:tw-mt-4 print:tw-max-w-none print:!tw-grow print:!tw-basis-0',
           onItemClick ? '[&_path]:tw-cursor-pointer' : '',
         ].join(' ')}>
         <ResponsivePie
@@ -122,8 +122,8 @@ export const CustomResponsiveBar = ({
   };
 
   return (
-    <div className="tw-my-4 tw-mx-0 tw-flex tw-w-full tw-break-inside-avoid tw-flex-wrap tw-items-center tw-justify-between tw-rounded-2xl tw-border tw-border-main25 tw-bg-white tw-p-4">
-      <div className="avoid tw-relative tw-mt-4 tw-mb-12 tw-flex tw-basis-full tw-justify-center">
+    <div className="tw-my-4 tw-mx-0 tw-flex tw-w-full tw-flex-wrap tw-items-center tw-justify-between tw-rounded-2xl tw-border tw-border-main25 tw-bg-white tw-p-4  print:tw-break-before-all print:tw-break-inside-avoid print:tw-flex-col">
+      <div className="tw-relative tw-mt-4 tw-mb-12 tw-flex tw-basis-full tw-justify-center print:tw-basis-0">
         <p className="tw-m-0 tw-inline-block tw-text-center tw-text-lg tw-font-medium tw-text-black">
           {title} {!!help && <HelpButtonAndModal title={title} help={help} />}
         </p>
@@ -159,7 +159,7 @@ export const CustomResponsiveBar = ({
       </div>
       <div
         className={[
-          'tw-relative tw-flex tw-h-80 tw-max-w-[50%] tw-basis-1/2 tw-items-center tw-justify-center tw-font-bold print:tw-w-[600px] print:tw-max-w-[60%] print:!tw-grow print:!tw-basis-0',
+          'tw-relative tw-flex tw-h-80 tw-max-w-[50%] tw-basis-1/2 tw-items-center tw-justify-center tw-font-bold print:tw-order-2 print:tw-mt-4 print:!tw-max-w-none print:!tw-basis-0',
           !!onItemClick ? '[&_rect]:tw-cursor-pointer' : '',
         ].join(' ')}>
         {!!showWarning && (
