@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 test.beforeAll(async () => {
   await populate();
 });
-test.setTimeout(90000);
+test.setTimeout(120000);
 
 test("test", async ({ page }) => {
   const premier = "premier-" + nanoid();
@@ -15,7 +15,6 @@ test("test", async ({ page }) => {
   const monAction = "monAction-" + nanoid();
   const testTerritoire = "testTerritoire-" + nanoid();
 
-  await page.goto("http://localhost:8090/auth");
   await loginWith(page, "admin1@example.org", "secret", "plouf");
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();

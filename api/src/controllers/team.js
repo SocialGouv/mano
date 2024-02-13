@@ -113,7 +113,8 @@ router.delete(
         ["user", "user"],
       ],
       group: ["user"],
-      having: sequelize.literal(`COUNT(team) = 1 AND bool_or(team = '${req.params._id}')`),
+      having: sequelize.literal("COUNT(team) = 1 AND bool_or(team = :teamId)"),
+      replacements: { teamId: req.params._id },
     });
     if (usersWithOnlyThisTeam.length > 0) {
       return res.status(400).send({ ok: false, error: "Impossible de supprimer l'équipe car certains utilisateurs n'ont que cette équipe." });
