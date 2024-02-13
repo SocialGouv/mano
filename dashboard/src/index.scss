@@ -324,11 +324,6 @@ hr {
     page-break-before: auto;
     display: none;
   }
-  @page {
-    margin: 1cm;
-    margin-top: 50px;
-    margin-bottom: 30mm !important;
-  }
 }
 @media screen {
   .printonly {
