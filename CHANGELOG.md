@@ -1,3 +1,10 @@
+## [1.304.7](https://github.com/SocialGouv/mano/compare/v1.304.6...v1.304.7) (2024-02-13)
+
+
+### Bug Fixes
+
+* print stats ([#1860](https://github.com/SocialGouv/mano/issues/1860)) ([1933a24](https://github.com/SocialGouv/mano/commit/1933a240c9311d2d9252e23a21cd91b570315fbe))
+
 ## [1.304.6](https://github.com/SocialGouv/mano/compare/v1.304.5...v1.304.6) (2024-02-09)
 
 
