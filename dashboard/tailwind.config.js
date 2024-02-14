@@ -36,6 +36,9 @@ module.exports = {
           '20%': { transform: 'rotate(0deg)' },
         },
       },
+      gridTemplateColumns: {
+        "new-report-squares": 'repeat(auto-fit, minmax(40%, 1fr))'
+      },
       colors: {
         main: '#226854', // higher contrast
         main75: '#617e71',

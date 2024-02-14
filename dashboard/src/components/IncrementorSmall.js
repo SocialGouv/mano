@@ -22,7 +22,7 @@ export default function IncrementorSmall({ service, team, date, count: initialVa
     [value]
   );
   return (
-    <div className={['tw-mb-2.5 tw-flex tw-gap-0.5', className].join(' ')}>
+    <div className={['tw-mb-2.5 tw-flex tw-gap-0.5 print:tw-max-w-sm', className].join(' ')}>
       <p id={`${service}-title`} className="tw-m-0 tw-flex-grow tw-text-black75">
         {service}
       </p>
