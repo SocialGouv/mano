@@ -1,3 +1,10 @@
+# [1.305.0](https://github.com/SocialGouv/mano/compare/v1.304.7...v1.305.0) (2024-02-14)
+
+
+### Features
+
+* print new report ([#1861](https://github.com/SocialGouv/mano/issues/1861)) ([c98d280](https://github.com/SocialGouv/mano/commit/c98d28078b5095895d01ec87a73648f814eac541))
+
 ## [1.304.7](https://github.com/SocialGouv/mano/compare/v1.304.6...v1.304.7) (2024-02-13)
 
 
