@@ -30,7 +30,7 @@ export const ActionsOrConsultationsReport = ({ actions, consultations, period })
 
   return (
     <>
-      <section title={activeTab} className="tw-relative tw-flex tw-h-full tw-flex-col tw-overflow-hidden">
+      <section title={activeTab} className="noprint tw-relative tw-flex tw-h-full tw-flex-col tw-overflow-hidden">
         <div className="tw-flex tw-items-center tw-bg-white tw-px-3 tw-py-3">
           <TabsNav
             className="tw-m-0 tw-flex-wrap tw-justify-start tw-border-b-0 tw-py-0.5 tw-pl-0 [&_button]:tw-text-xl"
@@ -72,6 +72,44 @@ export const ActionsOrConsultationsReport = ({ actions, consultations, period })
         </div>
         <div className="tw-grow tw-overflow-y-auto tw-border-t tw-border-main tw-border-opacity-20">
           <ActionsSortableList data={filteredData} />
+        </div>
+      </section>
+      <section
+        aria-hidden="true"
+        className="printonly tw-flex tw-h-full tw-flex-col tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+        <div className="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-px-3 tw-py-3">
+          <h3 className="tw-m-0 tw-text-base tw-font-medium">Actions ({filteredActions.length})</h3>
+          {filterStatus.length > 0 && (
+            <h4 className="tw-m-0 tw-text-base tw-font-medium">
+              Filtrées par status:{' '}
+              {mappedIdsToLabels
+                .filter((s) => filterStatus.includes(s._id))
+                .map((status) => status.name)
+                .join(', ')}
+            </h4>
+          )}
+        </div>
+        <div className="tw-grow tw-overflow-y-auto tw-border-t tw-border-main tw-border-opacity-20">
+          <ActionsSortableList data={filteredActions} />
+        </div>
+      </section>
+      <section
+        aria-hidden="true"
+        className="printonly tw-mt-12 tw-flex tw-h-full tw-flex-col tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+        <div className="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-px-3 tw-py-3">
+          <h3 className="tw-m-0 tw-text-base tw-font-medium">Consultations ({filteredConsultations.length})</h3>
+          {filterStatus.length > 0 && (
+            <h4 className="tw-m-0 tw-text-base tw-font-medium">
+              Filtrées par status:{' '}
+              {mappedIdsToLabels
+                .filter((s) => filterStatus.includes(s._id))
+                .map((status) => status.name)
+                .join(', ')}
+            </h4>
+          )}
+        </div>
+        <div className="tw-grow tw-overflow-y-auto tw-border-t tw-border-main tw-border-opacity-20">
+          <ActionsSortableList data={filteredConsultations} />
         </div>
       </section>
       <ModalContainer open={!!fullScreen} className="" size="full" onClose={() => setFullScreen(false)}>

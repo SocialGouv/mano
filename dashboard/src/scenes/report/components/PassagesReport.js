@@ -17,7 +17,7 @@ export const PassagesReport = ({ passages, period, selectedTeams }) => {
 
   return (
     <>
-      <section title="Passages" className="tw-relative tw-m-2 tw-flex tw-flex-col tw-items-center tw-justify-center tw-bg-main">
+      <section title="Passages" className="noprint tw-relative tw-m-2 tw-flex tw-flex-col tw-items-center tw-justify-center tw-bg-main">
         <p className="tw-m-0 tw-w-full tw-text-center tw-text-2xl tw-font-semibold tw-text-white">{passages.length}</p>
         <p className="tw-m-0 tw-w-full tw-text-center tw-text-sm tw-font-normal tw-text-white">passage{passages.length > 1 ? 's' : ''}</p>
         <button
@@ -26,6 +26,16 @@ export const PassagesReport = ({ passages, period, selectedTeams }) => {
           onClick={() => setFullScreen(true)}>
           <FullScreenIcon />
         </button>
+      </section>
+      <section
+        aria-hidden="true"
+        className="printonly tw-mt-12 tw-flex tw-h-full tw-flex-col tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+        <div className="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-px-3 tw-py-3">
+          <h3 className="tw-m-0 tw-text-base tw-font-medium">Passages ({passages.length})</h3>
+        </div>
+        <div className="tw-grow tw-overflow-y-auto tw-border-t tw-border-main tw-border-opacity-20">
+          <PassagesTable passages={passages} period={period} selectedTeams={selectedTeams} />
+        </div>
       </section>
       <ModalContainer open={!!fullScreen} className="" size="full" onClose={() => setFullScreen(false)}>
         <ModalHeader title={`Passages (${passages.length})`} onClose={() => setFullScreen(false)} />
@@ -52,8 +62,8 @@ const PassagesTable = ({ period, passages, selectedTeams }) => {
 
   return (
     <>
-      <div className="tw-py-2 tw-px-4 print:tw-mb-4">
-        <div className="tw-mb-5 tw-flex tw-justify-between">
+      <div className="tw-py-2 tw-px-4 print:tw-mb-4 print:tw-px-0">
+        <div className="noprint tw-mb-5 tw-flex tw-justify-between">
           <h3 className="tw-w-full tw-px-3 tw-py-2 tw-text-xl tw-font-medium tw-text-black">Passages</h3>
           <button
             type="button"

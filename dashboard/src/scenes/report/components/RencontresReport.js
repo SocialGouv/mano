@@ -17,7 +17,7 @@ export const RencontresReport = ({ rencontres, period, selectedTeams }) => {
 
   return (
     <>
-      <section title="Rencontres" className="tw-relative tw-m-2 tw-flex tw-flex-col tw-items-center tw-justify-center tw-bg-main">
+      <section title="Rencontres" className="noprint tw-relative tw-m-2 tw-flex tw-flex-col tw-items-center tw-justify-center tw-bg-main">
         <p className="tw-m-0 tw-w-full tw-text-center tw-text-2xl tw-font-semibold tw-text-white">{rencontres.length}</p>
         <p className="tw-m-0 tw-w-full tw-text-center tw-text-sm tw-font-normal tw-text-white">rencontre{rencontres.length > 1 ? 's' : ''}</p>
         <button
@@ -26,6 +26,16 @@ export const RencontresReport = ({ rencontres, period, selectedTeams }) => {
           onClick={() => setFullScreen(true)}>
           <FullScreenIcon />
         </button>
+      </section>
+      <section
+        aria-hidden="true"
+        className="printonly tw-mt-12 tw-flex tw-h-full tw-flex-col tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+        <div className="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-px-3 tw-py-3">
+          <h3 className="tw-m-0 tw-text-base tw-font-medium">Rencontres ({rencontres.length})</h3>
+        </div>
+        <div className="tw-grow tw-overflow-y-auto tw-border-t tw-border-main tw-border-opacity-20">
+          <RencontresTable rencontres={rencontres} period={period} selectedTeams={selectedTeams} />
+        </div>
       </section>
       <ModalContainer open={!!fullScreen} className="" size="full" onClose={() => setFullScreen(false)}>
         <ModalHeader title={`Rencontres (${rencontres.length})`} onClose={() => setFullScreen(false)} />
@@ -51,8 +61,8 @@ const RencontresTable = ({ period, rencontres, selectedTeams }) => {
 
   return (
     <>
-      <div className="tw-py-2 tw-px-4 print:tw-mb-4">
-        <div className="tw-mb-5 tw-flex tw-justify-between">
+      <div className="tw-py-2 tw-px-4 print:tw-mb-4 print:tw-px-0">
+        <div className="noprint tw-mb-5 tw-flex tw-justify-between">
           <h3 className="tw-w-full tw-px-3 tw-py-2 tw-text-xl tw-font-medium tw-text-black">Rencontres</h3>
           <button
             type="button"
@@ -67,7 +77,7 @@ const RencontresTable = ({ period, rencontres, selectedTeams }) => {
             Ajouter une rencontre
           </button>
         </div>
-        <div className="tw-mb-4 tw-flex tw-justify-around">
+        <div className="noprint tw-mb-4 tw-flex tw-justify-around">
           <div className="tw-basis-1/4">
             <Card
               countId="report-rencontres-non-anonymous-count"

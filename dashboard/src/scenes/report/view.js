@@ -15,7 +15,7 @@ import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import { arrayOfitemsGroupedByPersonSelector, onlyFilledObservationsTerritories } from '../../recoil/selectors';
 import { ActionsOrConsultationsReport } from './components/ActionsOrConsultationsReport';
 import ServicesReport from './components/ServicesReport';
-import DateRangePickerWithPresets, { reportsPresets } from '../../components/DateRangePickerWithPresets';
+import DateRangePickerWithPresets, { formatPeriod, reportsPresets } from '../../components/DateRangePickerWithPresets';
 import { CommentsSocialAndMedical } from './components/CommentsReport';
 import { PassagesReport } from './components/PassagesReport';
 import { RencontresReport } from './components/RencontresReport';
@@ -263,6 +263,17 @@ const View = () => {
   return (
     <>
       <HeaderStyled className=" !tw-py-4 tw-px-0">
+        <div className="printonly tw-py-4 tw-px-8 tw-text-2xl tw-font-bold" aria-hidden>
+          Compte-rendu{' '}
+          {viewAllOrganisationData ? (
+            <>global</>
+          ) : (
+            <>
+              {selectedTeams.length > 1 ? 'des équipes' : "de l'équipe"} {selectedTeams.map((t) => t.name).join(', ')}
+            </>
+          )}{' '}
+          - {formatPeriod({ period, preset })}
+        </div>
         <div className="noprint tw-flex tw-grow">
           <HeaderTitle className="tw-w-96 tw-font-normal">
             <span>
@@ -336,59 +347,56 @@ const View = () => {
         </div>
       </div>
       {!!selectedTeams.length && (
-        <div className="noprint -tw-mx-12 tw-flex tw-h-full tw-flex-col">
-          <div
-            className={[
-              'noprint tw-mt-4 tw-flex tw-w-full tw-grow tw-basis-full tw-items-start',
-              viewAllOrganisationData || selectedTeamIds.length ? 'tw-flex' : 'tw-hidden',
-            ].join(' ')}>
-            <div className="tw-mb-12 tw-min-h-1/2 tw-basis-6/12 tw-overflow-auto">
-              <div className="tw-mb-4 tw-h-[60vh] tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
-                <ActionsOrConsultationsReport actions={actions} consultations={consultations} period={period} />
+        <>
+          <div className="-tw-mx-12 tw-flex tw-h-full tw-flex-col print:tw-mx-0">
+            <div
+              className={[
+                'tw-mt-4 tw-flex tw-w-full tw-grow tw-basis-full tw-items-start print:tw-flex-wrap print:tw-items-stretch',
+                viewAllOrganisationData || selectedTeamIds.length ? 'tw-flex' : 'tw-hidden',
+              ].join(' ')}>
+              <div className="tw-mb-12 tw-min-h-1/2 tw-basis-6/12 tw-overflow-auto print:tw-min-h-0 print:tw-basis-full">
+                <div className="tw-mb-4 tw-h-[60vh] tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow print:tw-h-auto print:tw-border-none print:tw-shadow-none">
+                  <ActionsOrConsultationsReport actions={actions} consultations={consultations} period={period} />
+                </div>
+                {canSeeComments && (
+                  <div className="tw-mb-4 tw-h-[60vh] tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow print:tw-h-auto print:tw-border-none print:tw-shadow-none">
+                    <CommentsSocialAndMedical comments={comments} commentsMedical={commentsMedical} />
+                  </div>
+                )}
               </div>
-              {canSeeComments && (
-                <div className="tw-h-[60vh] tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
-                  <CommentsSocialAndMedical comments={comments} commentsMedical={commentsMedical} />
+              <div className="tw-mx-4 tw-mb-12 tw-basis-3/12 print:tw-basis-full">
+                <div className="tw-mb-4 tw-grid tw-grid-cols-new-report-squares tw-gap-4 print:tw-flex print:tw-flex-col">
+                  {organisation.passagesEnabled && (
+                    <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow-2xl print:tw-border-none print:tw-bg-transparent print:tw-shadow-none">
+                      <PassagesReport passages={passages} period={period} selectedTeams={selectedTeams} />
+                    </div>
+                  )}
+                  {organisation.rencontresEnabled && (
+                    <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow-2xl print:tw-border-none print:tw-bg-transparent print:tw-shadow-none">
+                      <RencontresReport rencontres={rencontres} period={period} selectedTeams={selectedTeams} />
+                    </div>
+                  )}
+                  {organisation.territoriesEnabled && (
+                    <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow-2xl print:tw-border-none print:tw-bg-transparent print:tw-shadow-none">
+                      <ObservationsReport observations={observations} period={period} selectedTeams={selectedTeams} />
+                    </div>
+                  )}
+                  <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow-2xl print:tw-border-none print:tw-bg-transparent print:tw-shadow-none">
+                    <PersonsReport personsCreated={personsCreated} period={period} selectedTeams={selectedTeams} />
+                  </div>
                 </div>
-              )}
-            </div>
-            <div className="tw-mx-4 tw-mb-12 tw-basis-3/12 ">
-              <div
-                style={{
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(40%, 1fr))',
-                }}
-                className="tw-mb-4 tw-grid tw-gap-4">
-                {organisation.passagesEnabled && (
-                  <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow-2xl">
-                    <PassagesReport passages={passages} period={period} selectedTeams={selectedTeams} />
+                {organisation.receptionEnabled && (
+                  <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-white tw-shadow-2xl print:tw-border-none print:tw-bg-transparent print:tw-shadow-none">
+                    <ServicesReport selectedTeamsObject={selectedTeamsObject} period={period} />
                   </div>
                 )}
-                {organisation.rencontresEnabled && (
-                  <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow">
-                    <RencontresReport rencontres={rencontres} period={period} selectedTeams={selectedTeams} />
-                  </div>
-                )}
-                {organisation.territoriesEnabled && (
-                  <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow">
-                    <ObservationsReport observations={observations} period={period} selectedTeams={selectedTeams} />
-                  </div>
-                )}
-                <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow">
-                  <PersonsReport personsCreated={personsCreated} period={period} selectedTeams={selectedTeams} />
-                </div>
               </div>
-              {organisation.receptionEnabled && (
-                <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
-                  <ServicesReport selectedTeamsObject={selectedTeamsObject} period={period} />
-                </div>
-              )}
-            </div>
-
-            <div className="tw-mr-2 tw-mb-12 tw-min-h-screen tw-basis-3/12 tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
-              <Transmissions period={period} selectedTeamsObject={selectedTeamsObject} reports={reports} />
+              <div className="tw-mr-2 tw-mb-12 tw-min-h-screen tw-basis-3/12 tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow print:tw-basis-full print:tw-border-none print:tw-shadow-none">
+                <Transmissions period={period} selectedTeamsObject={selectedTeamsObject} reports={reports} />
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
     </>
   );

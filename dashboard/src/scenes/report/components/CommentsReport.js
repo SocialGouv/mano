@@ -28,7 +28,7 @@ export const CommentsSocialAndMedical = ({ comments, commentsMedical }) => {
 
   return (
     <>
-      <section title={activeTab} className="tw-relative tw-flex tw-h-full tw-flex-col tw-overflow-hidden">
+      <section title={activeTab} className="noprint tw-relative tw-flex tw-h-full tw-flex-col tw-overflow-hidden">
         <div className="tw-flex tw-items-center tw-bg-white tw-px-3 tw-py-3">
           <TabsNav
             className="tw-m-0 tw-flex-wrap tw-justify-start tw-border-b-0 tw-py-0.5 tw-pl-0 [&_button]:tw-text-xl"
@@ -54,6 +54,28 @@ export const CommentsSocialAndMedical = ({ comments, commentsMedical }) => {
           <CommentsTable data={data} activeTab={activeTab} />
         </div>
       </section>
+      <section
+        aria-hidden="true"
+        className="printonly tw-flex tw-h-full tw-flex-col tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+        <div className="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-px-3 tw-py-3">
+          <h3 className="tw-m-0 tw-text-base tw-font-medium">Commentaires ({comments.length})</h3>
+        </div>
+        <div className="tw-grow tw-overflow-y-auto tw-border-t tw-border-main tw-border-opacity-20">
+          <CommentsTable data={comments} activeTab="Commentaires" />
+        </div>
+      </section>
+      {!!canSeeMedicalData && (
+        <section
+          aria-hidden="true"
+          className="printonly tw-mt-12 tw-flex tw-h-full tw-flex-col tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+          <div className="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-px-3 tw-py-3">
+            <h3 className="tw-m-0 tw-text-base tw-font-medium">Commentaires médicaux ({commentsMedical.length})</h3>
+          </div>
+          <div className="tw-grow tw-overflow-y-auto tw-border-t tw-border-main tw-border-opacity-20">
+            <CommentsTable data={commentsMedical} activeTab="Commentaires médicaux" />
+          </div>
+        </section>
+      )}
       <ModalContainer open={!!fullScreen} className="" size="full" onClose={() => setFullScreen(false)}>
         <ModalHeader title={`${activeTab} (${data.length})`} onClose={() => setFullScreen(false)} />
         <ModalBody>

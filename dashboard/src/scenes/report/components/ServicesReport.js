@@ -74,59 +74,61 @@ export default function ServicesReport({ period, selectedTeamsObject }) {
   const isSingleDay = dayjs(period.startDate).format('YYYY-MM-DD') === dayjs(period.endDate).format('YYYY-MM-DD');
 
   return (
-    <div className="tw-py-2 print:tw-mb-4">
-      <div className="tw-flex tw-items-center tw-justify-between tw-px-3">
-        <h3 className="tw-w-full tw-py-2 tw-text-base tw-font-medium tw-text-black">Services effectués</h3>
-        <button
-          title="Passer les actions/consultations en plein écran"
-          className="tw-h-6 tw-w-6 tw-rounded-full tw-text-main tw-transition hover:tw-scale-125 disabled:tw-opacity-30"
-          onClick={() => setFullScreen(true)}>
-          <FullScreenIcon />
-        </button>
-      </div>
-      <div className="tw-mb-4">
-        {!serviceSumsForAllReports ? (
-          <Spinner />
-        ) : (
-          <div className="tw-flex tw-flex-col tw-items-center tw-justify-center tw-rounded-2xl tw-py-4">
-            {teamIds.length > 1 ? (
-              <>
-                <div className="tw-mb-6 tw-flex tw-items-center tw-justify-between tw-border-b-gray-300 tw-pb-2 tw-font-medium">
-                  <p className="tw-mb-0">
-                    Services effectués par toutes les équipes sélectionnées
-                    <>
-                      <br />
-                      <small className="tw-opacity-50">
-                        Ces données sont en lecture seule. Pour les modifier, vous devez le faire équipe par équipe en plein écran
-                      </small>
-                    </>
-                  </p>
-                </div>
-                {Object.entries(serviceSumsForAllReports).map(([key, value]) => (
-                  <IncrementorSmall
-                    dataTestId={`general-${key}-${value || 0}`}
-                    key={`general-${key}-${value || 0}`}
-                    service={key}
-                    count={value || 0}
-                    date={dayjs(period.startDate).format('YYYY-MM-DD')}
-                    disabled
-                    className="max-w-[400px] tw-w-full tw-text-neutral-600"
-                  />
-                ))}
-              </>
-            ) : (
-              <ServiceByTeam
-                services={services[teamIds[0]]}
-                onUpdateServices={(updated) => setServices((s) => ({ ...s, [teamIds[0]]: updated }))}
-                team={selectedTeamsObject[teamIds[0]]}
-                disabled={!isSingleDay}
-                dateString={dayjs(period.startDate).format('YYYY-MM-DD')}
-                dataTestIdPrefix={`${selectedTeamsObject[teamIds[0]].name}-`}
-              />
-            )}
-          </div>
-        )}
-      </div>
+    <>
+      <section className="noprint tw-py-2 print:tw-mb-4">
+        <div className="tw-flex tw-items-center tw-justify-between tw-px-3">
+          <h3 className="tw-w-full tw-py-2 tw-text-base tw-font-medium tw-text-black">Services effectués</h3>
+          <button
+            title="Passer les actions/consultations en plein écran"
+            className="tw-h-6 tw-w-6 tw-rounded-full tw-text-main tw-transition hover:tw-scale-125 disabled:tw-opacity-30"
+            onClick={() => setFullScreen(true)}>
+            <FullScreenIcon />
+          </button>
+        </div>
+        <div className="tw-mb-4">
+          {!serviceSumsForAllReports ? (
+            <Spinner />
+          ) : (
+            <div className="tw-flex tw-flex-col tw-items-center tw-justify-center tw-rounded-2xl tw-py-4">
+              {teamIds.length > 1 ? (
+                <>
+                  <div className="tw-mb-6 tw-flex tw-items-center tw-justify-between tw-border-b-gray-300 tw-pb-2 tw-font-medium print:tw-justify-start">
+                    <p className="tw-mb-0">
+                      Services effectués par toutes les équipes sélectionnées
+                      <>
+                        <br />
+                        <small className="noprint tw-opacity-50">
+                          Ces données sont en lecture seule. Pour les modifier, vous devez le faire équipe par équipe en plein écran
+                        </small>
+                      </>
+                    </p>
+                  </div>
+                  {Object.entries(serviceSumsForAllReports).map(([key, value]) => (
+                    <IncrementorSmall
+                      dataTestId={`general-${key}-${value || 0}`}
+                      key={`general-${key}-${value || 0}`}
+                      service={key}
+                      count={value || 0}
+                      date={dayjs(period.startDate).format('YYYY-MM-DD')}
+                      disabled
+                      className="max-w-[400px] tw-w-full tw-text-neutral-600"
+                    />
+                  ))}
+                </>
+              ) : (
+                <ServiceByTeam
+                  services={services[teamIds[0]]}
+                  onUpdateServices={(updated) => setServices((s) => ({ ...s, [teamIds[0]]: updated }))}
+                  team={selectedTeamsObject[teamIds[0]]}
+                  disabled={!isSingleDay}
+                  dateString={dayjs(period.startDate).format('YYYY-MM-DD')}
+                  dataTestIdPrefix={`${selectedTeamsObject[teamIds[0]].name}-`}
+                />
+              )}
+            </div>
+          )}
+        </div>
+      </section>
       <ServicesFullScreen
         open={fullScreen}
         onClose={() => setFullScreen(false)}
@@ -138,7 +140,27 @@ export default function ServicesReport({ period, selectedTeamsObject }) {
         selectedTeamsObject={selectedTeamsObject}
         isSingleDay={isSingleDay}
       />
-    </div>
+      <section
+        aria-hidden="true"
+        className="printonly tw-mt-12 tw-flex tw-h-full tw-flex-col tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+        <div className="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-px-3 tw-py-3">
+          <h3 className="tw-m-0 tw-text-base tw-font-medium">Services effectués {teamIds.length > 1 && ' par toutes les équipes sélectionnées'}</h3>
+        </div>
+        <div className="tw-grow tw-overflow-y-auto tw-border-t tw-border-main tw-border-opacity-20 tw-p-4">
+          {Object.entries(serviceSumsForAllReports).map(([key, value]) => (
+            <IncrementorSmall
+              dataTestId={`general-${key}-${value || 0}`}
+              key={`general-${key}-${value || 0}`}
+              service={key}
+              count={value || 0}
+              date={dayjs(period.startDate).format('YYYY-MM-DD')}
+              disabled
+              className="max-w-[400px] tw-w-full tw-text-neutral-600"
+            />
+          ))}
+        </div>
+      </section>
+    </>
   );
 }
 
