@@ -11,7 +11,7 @@ const NoOptionsMessage = () => (
   </span>
 );
 
-const SelectAndCreateCollaboration = ({ values, onChange }) => {
+const SelectAndCreateCollaboration = ({ values, onChange, className = '' }) => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
 
   const onChangeRequest = (newCollabs) => {
@@ -47,6 +47,7 @@ const SelectAndCreateCollaboration = ({ values, onChange }) => {
       isSearchable
       isMulti
       name="collaborations"
+      className={className}
       components={{ NoOptionsMessage }}
       onChange={(v) => onChangeRequest(v.map((v) => v.value))}
       placeholder={' -- Ajoutez une co-intervention -- '}
