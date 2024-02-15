@@ -42,6 +42,7 @@ import DuplicatedReportsTestChecker from './components/DuplicatedReportsTestChec
 import ConsultationModal from './components/ConsultationModal';
 import TreatmentModal from './scenes/person/components/TreatmentModal';
 import BottomBar from './components/BottomBar';
+import FinDeManoFabrique from './components/FinDeManoFabrique';
 
 RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = process.env.REACT_APP_DISABLE_RECOIL_DUPLICATE_ATOM_KEY_CHECKING ? false : true;
 
@@ -183,6 +184,7 @@ const RestrictedRoute = ({ component: Component, _isLoggedIn, ...rest }) => {
     overflow: initial;
         */}
         <main className="tw-relative tw-flex tw-grow tw-basis-full tw-flex-col tw-overflow-auto tw-overflow-x-hidden tw-overflow-y-scroll tw-px-2 print:!tw-ml-0 print:tw-h-auto print:tw-max-w-full print:tw-overflow-visible print:tw-p-0 sm:tw-px-12 sm:tw-pt-4 sm:tw-pb-12">
+          <FinDeManoFabrique />
           <SentryRoute {...rest} render={(props) => (user ? <Component {...props} /> : <Redirect to={{ pathname: '/auth' }} />)} />
         </main>
       </div>
