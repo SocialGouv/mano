@@ -11,14 +11,46 @@ import { useRecoilValue } from 'recoil';
 import { userState } from '../../../recoil/auth';
 import { dayjsInstance } from '../../../services/date';
 
-export const ActionsOrConsultationsReport = ({ actions, consultations, period }) => {
+const formatEcheanceLabelPeriod = (period) => {
+  if (!!period.startDate && !!period.endDate) {
+    const start = dayjsInstance(period.startDate);
+    const end = dayjsInstance(period.endDate);
+    const today = dayjsInstance();
+    const showYear = start.year() !== end.year() || start.year() !== today.year();
+    const startFormatted = dayjsInstance(period.startDate).format(showYear ? 'D MMM YYYY' : 'D MMM');
+    const endFormatted = dayjsInstance(period.endDate).format(showYear ? 'D MMM YYYY' : 'D MMM');
+    if (startFormatted === endFormatted) return `le ${startFormatted}`;
+    return `entre le ${startFormatted} et le ${endFormatted}`;
+  }
+  return '';
+};
+
+export const ActionsOrConsultationsReport = ({
+  actionsDueOrCompletedAt,
+  actionsCreatedAt,
+  consultationsDueOrCompletedAt,
+  consultationsCreatedAt,
+  period,
+}) => {
   const [activeTab, setActiveTab] = useLocalStorage('reports-actions-consultation-toggle', 'Actions');
   const [fullScreen, setFullScreen] = useState(false);
-  const [filterStatus, setFilterStatus] = useState([]);
-  const filteredActions = actions.filter((item) => !filterStatus.length || filterStatus.includes(item.status));
-  const filteredConsultations = consultations.filter((item) => !filterStatus.length || filterStatus.includes(item.status));
+  const [switchCreatedAt, setSwitchCreatedAt] = useLocalStorage('reports-actions-switch-created-at', 'dueOrCompletedAt'); // 'createdAt' or 'dueOrCompletedAt'
+  const [filterStatus, setFilterStatus] = useLocalStorage('reports-actions-filter-status', []);
+
+  const actions = switchCreatedAt === 'createdAt' ? actionsCreatedAt : actionsDueOrCompletedAt;
+  const consultations = switchCreatedAt === 'createdAt' ? consultationsCreatedAt : consultationsDueOrCompletedAt;
   const data = activeTab.includes('Actions') ? actions : consultations;
+
+  const filteredActionsDueOrCompletedAt = actionsDueOrCompletedAt.filter((item) => !filterStatus.length || filterStatus.includes(item.status));
+  const filteredActionsCreatedAt = actionsCreatedAt.filter((item) => !filterStatus.length || filterStatus.includes(item.status));
+  const filteredConsultationsDueOrCompletedAt = consultationsDueOrCompletedAt.filter(
+    (item) => !filterStatus.length || filterStatus.includes(item.status)
+  );
+  const filteredConsultationsCreatedAt = consultationsCreatedAt.filter((item) => !filterStatus.length || filterStatus.includes(item.status));
+  const filteredActions = switchCreatedAt === 'createdAt' ? filteredActionsCreatedAt : filteredActionsDueOrCompletedAt;
+  const filteredConsultations = switchCreatedAt === 'createdAt' ? filteredConsultationsCreatedAt : filteredConsultationsDueOrCompletedAt;
   const filteredData = activeTab.includes('Actions') ? filteredActions : filteredConsultations;
+
   const history = useHistory();
   const user = useRecoilValue(userState);
 
@@ -67,8 +99,15 @@ export const ActionsOrConsultationsReport = ({ actions, consultations, period })
             </button>
           </div>
         </div>
-        <div className="w-full tw-max-w-lg tw-bg-white tw-px-7 tw-pb-1">
-          <ActionsOrConsultationsFilters setFilterStatus={setFilterStatus} filterStatus={filterStatus} disabled={!data.length} />
+        <div className="w-full tw-max-w-3xl tw-bg-white tw-px-7 tw-pb-1">
+          <ActionsOrConsultationsFilters
+            switchCreatedAt={switchCreatedAt}
+            setSwitchCreatedAt={setSwitchCreatedAt}
+            setFilterStatus={setFilterStatus}
+            filterStatus={filterStatus}
+            disabled={!data.length}
+            period={period}
+          />
         </div>
         <div className="tw-grow tw-overflow-y-auto tw-border-t tw-border-main tw-border-opacity-20">
           <ActionsSortableList data={filteredData} />
@@ -78,7 +117,9 @@ export const ActionsOrConsultationsReport = ({ actions, consultations, period })
         aria-hidden="true"
         className="printonly tw-flex tw-h-full tw-flex-col tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
         <div className="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-px-3 tw-py-3">
-          <h3 className="tw-m-0 tw-text-base tw-font-medium">Actions ({filteredActions.length})</h3>
+          <h3 className="tw-m-0 tw-text-base tw-font-medium">
+            Actions À FAIRE/FAITE/ANNULÉE {formatEcheanceLabelPeriod(period)} ({filteredActionsDueOrCompletedAt.length})
+          </h3>
           {filterStatus.length > 0 && (
             <h4 className="tw-m-0 tw-text-base tw-font-medium">
               Filtrées par status:{' '}
@@ -90,14 +131,16 @@ export const ActionsOrConsultationsReport = ({ actions, consultations, period })
           )}
         </div>
         <div className="tw-grow tw-overflow-y-auto tw-border-t tw-border-main tw-border-opacity-20">
-          <ActionsSortableList data={filteredActions} />
+          <ActionsSortableList data={filteredActionsDueOrCompletedAt} showCreatedAt />
         </div>
       </section>
       <section
         aria-hidden="true"
         className="printonly tw-mt-12 tw-flex tw-h-full tw-flex-col tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
         <div className="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-px-3 tw-py-3">
-          <h3 className="tw-m-0 tw-text-base tw-font-medium">Consultations ({filteredConsultations.length})</h3>
+          <h3 className="tw-m-0 tw-text-base tw-font-medium">
+            Actions créées {formatEcheanceLabelPeriod(period)} ({filteredActionsCreatedAt.length})
+          </h3>
           {filterStatus.length > 0 && (
             <h4 className="tw-m-0 tw-text-base tw-font-medium">
               Filtrées par status:{' '}
@@ -109,17 +152,67 @@ export const ActionsOrConsultationsReport = ({ actions, consultations, period })
           )}
         </div>
         <div className="tw-grow tw-overflow-y-auto tw-border-t tw-border-main tw-border-opacity-20">
-          <ActionsSortableList data={filteredConsultations} />
+          <ActionsSortableList data={filteredActionsCreatedAt} showCreatedAt />
+        </div>
+      </section>
+
+      <section
+        aria-hidden="true"
+        className="printonly tw-mt-12 tw-flex tw-h-full tw-flex-col tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+        <div className="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-px-3 tw-py-3">
+          <h3 className="tw-m-0 tw-text-base tw-font-medium">
+            Consultations À FAIRE/FAITE/ANNULÉE {formatEcheanceLabelPeriod(period)} ({filteredConsultationsDueOrCompletedAt.length})
+          </h3>
+          {filterStatus.length > 0 && (
+            <h4 className="tw-m-0 tw-text-base tw-font-medium">
+              Filtrées par status:{' '}
+              {mappedIdsToLabels
+                .filter((s) => filterStatus.includes(s._id))
+                .map((status) => status.name)
+                .join(', ')}
+            </h4>
+          )}
+        </div>
+        <div className="tw-grow tw-overflow-y-auto tw-border-t tw-border-main tw-border-opacity-20">
+          <ActionsSortableList data={filteredConsultationsDueOrCompletedAt} showCreatedAt />
+        </div>
+      </section>
+      <section
+        aria-hidden="true"
+        className="printonly tw-mt-12 tw-flex tw-h-full tw-flex-col tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+        <div className="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-px-3 tw-py-3">
+          <h3 className="tw-m-0 tw-text-base tw-font-medium">
+            Consultations créées {formatEcheanceLabelPeriod(period)} ({filteredConsultationsCreatedAt.length})
+          </h3>
+          {filterStatus.length > 0 && (
+            <h4 className="tw-m-0 tw-text-base tw-font-medium">
+              Filtrées par status:{' '}
+              {mappedIdsToLabels
+                .filter((s) => filterStatus.includes(s._id))
+                .map((status) => status.name)
+                .join(', ')}
+            </h4>
+          )}
+        </div>
+        <div className="tw-grow tw-overflow-y-auto tw-border-t tw-border-main tw-border-opacity-20">
+          <ActionsSortableList data={filteredConsultationsCreatedAt} showCreatedAt />
         </div>
       </section>
       <ModalContainer open={!!fullScreen} className="" size="full" onClose={() => setFullScreen(false)}>
         <ModalHeader title={`${activeTab} (${filteredData.length})`} onClose={() => setFullScreen(false)}>
-          <div className="tw-mx-auto tw-mt-2 tw-w-full tw-max-w-lg">
-            <ActionsOrConsultationsFilters setFilterStatus={setFilterStatus} filterStatus={filterStatus} disabled={!data.length} />
+          <div className="tw-mx-auto tw-mt-2 tw-w-full tw-max-w-3xl">
+            <ActionsOrConsultationsFilters
+              switchCreatedAt={switchCreatedAt}
+              setSwitchCreatedAt={setSwitchCreatedAt}
+              setFilterStatus={setFilterStatus}
+              filterStatus={filterStatus}
+              disabled={!data.length}
+              period={period}
+            />
           </div>
         </ModalHeader>
         <ModalBody>
-          <ActionsSortableList data={filteredData} />
+          <ActionsSortableList data={filteredData} showCreatedAt />
         </ModalBody>
         <ModalFooter>
           <button type="button" name="cancel" className="button-cancel" onClick={() => setFullScreen(false)}>
@@ -141,17 +234,44 @@ export const ActionsOrConsultationsReport = ({ actions, consultations, period })
   );
 };
 
-const ActionsOrConsultationsFilters = ({ setFilterStatus, filterStatus, disabled }) => {
+const ActionsOrConsultationsFilters = ({ switchCreatedAt, setSwitchCreatedAt, setFilterStatus, filterStatus, disabled, period }) => {
+  const echeanceOptions = [
+    {
+      value: 'createdAt',
+      label: `Créées ${formatEcheanceLabelPeriod(period)}`,
+    },
+    {
+      value: 'dueOrCompletedAt',
+      label: `Échéance ${formatEcheanceLabelPeriod(period)} (À FAIRE/FAITE/ANNULÉE ${formatEcheanceLabelPeriod(period)})`,
+    },
+  ];
+
   return (
     <>
-      <div className="tw-flex tw-justify-between">
-        <div className="tw-flex tw-w-full tw-shrink-0 tw-grow tw-items-center tw-pl-1 tw-pr-2">
-          <label htmlFor="action-select-status-filter" className="tw-text-xs">
+      <div className="tw-flex tw-w-full tw-justify-between tw-gap-x-4">
+        <div className="tw-flex tw-shrink-0 tw-grow tw-basis-1/2 tw-items-center tw-pl-1 tw-pr-2">
+          <div className="tw-w-full">
+            <SelectCustom
+              inputId="action-switch-created-at"
+              options={echeanceOptions}
+              isMulti={false}
+              name="switchCreatedAt"
+              value={echeanceOptions.find((o) => o.value === switchCreatedAt)}
+              onChange={(e) => {
+                console.log(e, e.value);
+                setSwitchCreatedAt(e.value);
+              }}
+            />
+          </div>
+        </div>
+        <div className="tw-flex tw-shrink-0 tw-grow tw-basis-1/2 tw-items-center tw-pl-1 tw-pr-2">
+          {/* <label htmlFor="action-select-status-filter" className="tw-text-xs">
             Filtrer par statut
-          </label>
+          </label> */}
           <div className="tw-w-full">
             <SelectCustom
               inputId="action-select-status-filter"
+              placeholder="Filtrer par statut"
               options={mappedIdsToLabels}
               getOptionValue={(s) => s._id}
               getOptionLabel={(s) => s.name}

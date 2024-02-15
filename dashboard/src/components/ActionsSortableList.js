@@ -20,7 +20,7 @@ import useSearchParamState from '../services/useSearchParamState';
 import DescriptionIcon from './DescriptionIcon';
 import { AgendaMutedIcon } from '../assets/icons/AgendaMutedIcon';
 
-const ActionsSortableList = ({ data, limit }) => {
+const ActionsSortableList = ({ data, limit, showCreatedAt }) => {
   useTitle('Agenda');
   const history = useHistory();
   const user = useRecoilValue(userState);
@@ -154,7 +154,18 @@ const ActionsSortableList = ({ data, limit }) => {
               );
             },
           },
-        ]}
+          {
+            title: 'Créée le',
+            dataKey: 'createdAt',
+            onSortOrder: setSortOrder,
+            onSortBy: setSortBy,
+            sortBy,
+            sortOrder,
+            render: (action) => {
+              return <DateBloc date={action.createdAt} />;
+            },
+          },
+        ].filter((e) => showCreatedAt || e.dataKey !== 'createdAt')}
       />
       {limit > 0 && <Page page={page} limit={limit} total={total} onChange={({ page }) => setPage(page, true)} />}
     </>

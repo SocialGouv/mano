@@ -4,7 +4,7 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { useHistory, useLocation } from 'react-router-dom';
 import { actionsState, allowedActionFieldsInHistory, CANCEL, DONE, prepareActionForEncryption, TODO } from '../recoil/actions';
 import { currentTeamState, organisationState, teamsState, userState } from '../recoil/auth';
-import { dayjsInstance, now, outOfBoundariesDate } from '../services/date';
+import { dayjsInstance, formatDateWithNameOfDay, now, outOfBoundariesDate } from '../services/date';
 import API from '../services/api';
 import SelectPerson from './SelectPerson';
 import SelectStatus from './SelectStatus';
@@ -350,7 +350,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
               <UserName
                 className="tw-block tw-text-right tw-text-base tw-font-normal tw-italic"
                 id={action.user}
-                wrapper={(name) => ` (créée par ${name})`}
+                wrapper={(name) => ` (créée par ${name} le ${formatDateWithNameOfDay(action.createdAt)})`}
               />
             )}
           </>
