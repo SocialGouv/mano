@@ -1,3 +1,10 @@
+## [1.305.1](https://github.com/SocialGouv/mano/compare/v1.305.0...v1.305.1) (2024-02-16)
+
+
+### Bug Fixes
+
+* date de fermeture de l'ancien compte rendu ([0bb0e13](https://github.com/SocialGouv/mano/commit/0bb0e13f55f181b747fc8c6e9033dd4142802a4c))
+
 # [1.305.0](https://github.com/SocialGouv/mano/compare/v1.304.7...v1.305.0) (2024-02-14)
 
 
