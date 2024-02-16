@@ -528,7 +528,7 @@ const Teams = ({ person: { _id, assignedTeams } }) => (
   </React.Fragment>
 );
 
-const SelectedPersonsModal = ({ open, onClose, persons, title, onAfterLeave, sliceField }) => {
+export const SelectedPersonsModal = ({ open, onClose, persons, title, onAfterLeave, sliceField }) => {
   const history = useHistory();
   const teams = useRecoilValue(teamsState);
   const organisation = useRecoilValue(organisationState);
