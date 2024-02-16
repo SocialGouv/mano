@@ -5,7 +5,7 @@ import { selector, useRecoilState, useRecoilValue } from 'recoil';
 import AsyncSelect from 'react-select/async-creatable';
 import API from '../../services/api';
 import { formatBirthDate, formatCalendarDate } from '../../services/date';
-import { actionsState } from '../../recoil/actions';
+import { TODO, actionsState } from '../../recoil/actions';
 import { passagesState } from '../../recoil/passages';
 import { rencontresState } from '../../recoil/rencontres';
 import { useHistory } from 'react-router-dom';
@@ -23,7 +23,7 @@ function removeDiatricsAndAccents(str) {
     .replace(/[\u0300-\u036f]/g, '');
 }
 
-function personsToOptions(persons, actions, passages, rencontres) {
+function personsToOptions(persons, actions, passages, rencontres, urgentActions) {
   return persons.slice(0, 50).map((person) => ({
     value: person._id,
     label: person.name,
@@ -31,6 +31,7 @@ function personsToOptions(persons, actions, passages, rencontres) {
     lastAction: actions.find((action) => action.person === person._id),
     lastPassage: passages.find((passage) => passage.person === person._id),
     lastRencontre: rencontres.find((rencontre) => rencontre.person === person._id),
+    lastUrgentAction: urgentActions.find((action) => action.person === person._id),
   }));
 }
 
@@ -132,14 +133,37 @@ const SelectAndCreatePerson = ({ value, onChange, inputId, classNamePrefix }) =>
     );
   }, [rencontres, organisation]);
 
+  const lastUrgentActions = useMemo(() => {
+    return Object.values(
+      actions
+        .filter((action) => action.urgent && action.status === TODO)
+        .reduce((acc, action) => {
+          if (!acc[action.person] || action.dueAt > acc[action.person].dueAt) {
+            acc[action.person] = {
+              name: action.name,
+              dueAt: action.dueAt,
+              person: action.person,
+            };
+          }
+          return acc;
+        }, {})
+    );
+  }, [actions]);
+
   return (
     <AsyncSelect
       loadOptions={(inputValue) => {
-        const options = personsToOptions(filterEasySearch(inputValue, searchablePersons), lastActions, lastPassages, lastRencontres);
+        const options = personsToOptions(
+          filterEasySearch(inputValue, searchablePersons),
+          lastActions,
+          lastPassages,
+          lastRencontres,
+          lastUrgentActions
+        );
         optionsExist.current = options.length;
         return Promise.resolve(options);
       }}
-      defaultOptions={personsToOptions(searchablePersons, lastActions, lastPassages, lastRencontres)}
+      defaultOptions={personsToOptions(searchablePersons, lastActions, lastPassages, lastRencontres, lastUrgentActions)}
       name="persons"
       isMulti
       isDisabled={isDisabled}
@@ -249,11 +273,21 @@ const Person = ({ person }) => {
           <AdditionalInfo label="Motif" value={person.outOfActiveListReasons?.join(', ')} />
         </div>
       )}
-      <div className="tw-flex tw-gap-1 tw-text-xs">
+      <div className="tw-flex tw-gap-2 tw-text-xs">
+        <AdditionalInfoRed
+          label="Dernière action urgente"
+          value={
+            !person.lastUrgentAction
+              ? null
+              : ['restricted-access'].includes(user.role)
+              ? formatCalendarDate(person.lastUrgentAction.completedAt || person.lastUrgentAction.dueAt)
+              : `${person.lastUrgentAction?.name} - ${formatCalendarDate(person.lastUrgentAction.completedAt || person.lastUrgentAction.dueAt)}`
+          }
+        />
         <AdditionalInfo
           label="Dernière action"
           value={
-            !person.lastAction
+            !person.lastAction || person.lastUrgentAction?._id === person.lastAction._id
               ? null
               : ['restricted-access'].includes(user.role)
               ? formatCalendarDate(person.lastAction.completedAt || person.lastAction.dueAt)
@@ -272,6 +306,16 @@ const AdditionalInfo = ({ label, value }) => {
   return (
     <div>
       <p className="tw-m-0 tw-mr-2 tw-text-gray-400">{label}</p>
+      {value}
+    </div>
+  );
+};
+
+const AdditionalInfoRed = ({ label, value }) => {
+  if (!value) return null;
+  return (
+    <div className="px-1 tw-border-l-2 tw-border-red-600 tw-bg-red-100 tw-text-red-600">
+      <p className="tw-m-0 tw-mr-2 tw-text-red-400">⚠️ {label}</p>
       {value}
     </div>
   );
