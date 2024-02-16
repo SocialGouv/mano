@@ -122,6 +122,16 @@ const App = ({ resetRecoil }) => {
     };
   }, [authToken, refresh, initialLoadIsDone]);
 
+  if (process.env.REACT_APP_TEST_PLAYWRIGHT !== 'true' && window && !window.localStorage.getItem('by-pass-redirect')) {
+    return (
+      <div className="main-container">
+        <div className="tw-mb-8 tw-border-l-4 tw-border-orange-500 tw-bg-orange-100 tw-p-4 tw-text-orange-700" role="alert">
+          🚧 Mano n’est pas encore disponible sur ce site, vous devez patienter jusqu’au 5 mars en fin de journée.
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="main-container">
       <ToastContainer transition={process.env.REACT_APP_TEST_PLAYWRIGHT !== 'true' ? Bounce : ToastifyFastTransition} />
