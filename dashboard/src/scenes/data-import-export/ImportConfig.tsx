@@ -2,6 +2,7 @@ import { MutableRefObject, useRef, useState } from 'react';
 import { utils, read, writeFile, WorkBook } from 'xlsx';
 import { toast } from 'react-toastify';
 import { useRecoilState, useRecoilValue } from 'recoil';
+import { v4 as uuidv4 } from 'uuid';
 import ButtonCustom from '../../components/ButtonCustom';
 import { customFieldsPersonsSelector } from '../../recoil/persons';
 import { newCustomField, typeOptions } from '../../utils';
@@ -446,6 +447,7 @@ function processConfigWorkbook(workbook: WorkBook): WorkbookData {
 function mergerFieldWithPrevious(field: Partial<CustomField>, previousField?: CustomField): CustomField {
   return {
     ...(newCustomField() as CustomField),
+    name: `custom-${new Date().toISOString().split('.').join('-').split(':').join('-')}-${uuidv4()}`,
     ...field,
     ...(previousField ? { enabled: previousField.enabled } : {}),
     ...(previousField ? { required: previousField.required } : {}),
