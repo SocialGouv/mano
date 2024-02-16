@@ -242,7 +242,8 @@ const ActionsOrConsultationsFilters = ({ switchCreatedAt, setSwitchCreatedAt, se
     },
     {
       value: 'dueOrCompletedAt',
-      label: `Échéance ${formatEcheanceLabelPeriod(period)} (À FAIRE/FAITE/ANNULÉE ${formatEcheanceLabelPeriod(period)})`,
+      label: `Échéance ${formatEcheanceLabelPeriod(period)}`,
+      subtitle: `(À FAIRE/FAITE/ANNULÉE ${formatEcheanceLabelPeriod(period)})`,
     },
   ];
 
@@ -257,6 +258,20 @@ const ActionsOrConsultationsFilters = ({ switchCreatedAt, setSwitchCreatedAt, se
               isMulti={false}
               name="switchCreatedAt"
               value={echeanceOptions.find((o) => o.value === switchCreatedAt)}
+              formatOptionLabel={(option, params) => {
+                if (params.context === 'value') return option.label;
+                return (
+                  <>
+                    {option.label}
+                    {option.subtitle && (
+                      <>
+                        <br />
+                        <span className="tw-text-xs tw-opacity-60">{option.subtitle}</span>
+                      </>
+                    )}
+                  </>
+                );
+              }}
               onChange={(e) => {
                 console.log(e, e.value);
                 setSwitchCreatedAt(e.value);
