@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { CustomResponsivePie } from './charts';
 import { getPieData } from './utils';
 import { organisationState } from '../../recoil/auth';
@@ -6,9 +6,13 @@ import { useRecoilValue } from 'recoil';
 import { Block } from './Blocks';
 import CustomFieldsStats from './CustomFieldsStats';
 import Filters from '../../components/Filters';
+import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../components/tailwind/Modal';
+import ActionsSortableList from '../../components/ActionsSortableList';
 
 export default function ConsultationsStats({ consultations, personsWithConsultations, filterBase, filterPersons, setFilterPersons }) {
   const organisation = useRecoilValue(organisationState);
+  const [actionsModalOpened, setActionsModalOpened] = useState(false);
+  const [slicedData, setSlicedData] = useState([]);
 
   const filterTitle = useMemo(() => {
     if (!filterPersons.length) return `Filtrer par personnes suivies :`;
@@ -57,11 +61,19 @@ export default function ConsultationsStats({ consultations, personsWithConsultat
         <CustomResponsivePie
           title="Consultations par type"
           data={getPieData(consultations, 'type')}
+          onItemClick={(newSlice) => {
+            setActionsModalOpened(true);
+            setSlicedData(consultationsByType[newSlice]);
+          }}
           help={`Répartition par type des consultations réalisées dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des consultations.`}
         />
         <CustomResponsivePie
           title="Consultations par statut"
           data={getPieData(consultations, 'status')}
+          onItemClick={(newSlice) => {
+            setActionsModalOpened(true);
+            setSlicedData(consultations.filter((c) => c.status === newSlice));
+          }}
           help={`Répartition par statut des consultations réalisées dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des consultations.`}
         />
       </details>
@@ -85,12 +97,55 @@ export default function ConsultationsStats({ consultations, personsWithConsultat
             <CustomFieldsStats
               data={consultationsByType[c.name]}
               customFields={c.fields}
+              onSliceClick={(newSlice, field) => {
+                setActionsModalOpened(true);
+                if (newSlice === 'Non renseigné') {
+                  setSlicedData(consultationsByType[c.name].filter((c) => !c[field]));
+                } else {
+                  setSlicedData(consultationsByType[c.name].filter((c) => c[field] === newSlice));
+                }
+              }}
               help={(label) => `${label.capitalize()} des consultations réalisées dans la période définie.`}
               totalTitleForMultiChoice={<span className="tw-font-bold">Nombre de consultations concernées</span>}
             />
           </details>
         );
       })}
+      <SelectedActionsModal
+        open={actionsModalOpened}
+        onClose={() => {
+          setActionsModalOpened(false);
+        }}
+        onAfterLeave={() => {
+          setSlicedData([]);
+        }}
+        data={slicedData}
+        title={`Consultations (${slicedData.length})`}
+      />
     </>
   );
 }
+
+const SelectedActionsModal = ({ open, onClose, data, title, onAfterLeave }) => {
+  return (
+    <ModalContainer open={open} size="full" onClose={onClose} onAfterLeave={onAfterLeave}>
+      <ModalHeader title={title} />
+      <ModalBody>
+        <div className="tw-p-4">
+          <ActionsSortableList data={data} limit={20} />
+        </div>
+      </ModalBody>
+      <ModalFooter>
+        <button
+          type="button"
+          name="cancel"
+          className="button-cancel"
+          onClick={() => {
+            onClose(null);
+          }}>
+          Fermer
+        </button>
+      </ModalFooter>
+    </ModalContainer>
+  );
+};
