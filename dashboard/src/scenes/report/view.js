@@ -100,44 +100,53 @@ const itemsForReportsSelector = selectorFamily({
           if (!filterItemByTeam(action, 'teams')) continue;
           if (Array.isArray(action.teams)) {
             let isDueOrCompletedAt = false;
+            let isCreatedAt = false;
             for (const team of action.teams) {
               const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[team] ?? defaultIsoDates;
-              if (action.createdAt >= isoStartDate && action.createdAt < isoEndDate) {
-                actionsCreatedAt[action._id] = action;
-              }
-              if (action.completedAt >= isoStartDate && action.completedAt < isoEndDate) {
+              if (action.status !== TODO && action.completedAt >= isoStartDate && action.completedAt < isoEndDate) {
                 isDueOrCompletedAt = true;
                 continue;
               }
-              if (action.status !== TODO) continue;
-              if (action.dueAt >= isoStartDate && action.dueAt < isoEndDate) {
-                isDueOrCompletedAt = true;
+              if (action.createdAt >= isoStartDate && action.createdAt < isoEndDate) {
+                isCreatedAt = true;
               }
+              // if (action.status !== TODO) continue;
+              // if (action.dueAt >= isoStartDate && action.dueAt < isoEndDate) {
+              //   isDueOrCompletedAt = true;
+              //   continue;
+              // }
             }
-            if (!isDueOrCompletedAt) continue;
-            actionsDueOrCompletedAt[action._id] = action;
+            if (isDueOrCompletedAt) {
+              actionsDueOrCompletedAt[action._id] = action;
+            } else if (isCreatedAt) {
+              actionsCreatedAt[action._id] = action;
+            }
           }
         }
         for (const consultation of person.consultations || []) {
           if (!filterItemByTeam(consultation, 'teams')) continue;
           if (Array.isArray(consultation.teams)) {
             let isDueOrCompletedAt = false;
+            let isCreatedAt = false;
             for (const team of consultation.teams) {
               const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[team] ?? defaultIsoDates;
-              if (consultation.createdAt >= isoStartDate && consultation.createdAt < isoEndDate) {
-                consultationsCreatedAt[consultation._id] = consultation;
-              }
-              if (consultation.completedAt >= isoStartDate && consultation.completedAt < isoEndDate) {
+              if (consultation.status !== TODO && consultation.completedAt >= isoStartDate && consultation.completedAt < isoEndDate) {
                 isDueOrCompletedAt = true;
                 continue;
               }
-              if (consultation.status !== TODO) continue;
-              if (consultation.dueAt >= isoStartDate && consultation.dueAt < isoEndDate) {
-                isDueOrCompletedAt = true;
+              if (consultation.createdAt >= isoStartDate && consultation.createdAt < isoEndDate) {
+                isCreatedAt = true;
               }
+              // if (consultation.status !== TODO) continue;
+              // if (consultation.dueAt >= isoStartDate && consultation.dueAt < isoEndDate) {
+              //   isDueOrCompletedAt = true;
+              // }
             }
-            if (!isDueOrCompletedAt) continue;
-            consultationsDueOrCompletedAt[consultation._id] = consultation;
+            if (isDueOrCompletedAt) {
+              consultationsDueOrCompletedAt[consultation._id] = consultation;
+            } else if (isCreatedAt) {
+              consultationsCreatedAt[consultation._id] = consultation;
+            }
           }
         }
         for (const rencontre of person.rencontres || []) {

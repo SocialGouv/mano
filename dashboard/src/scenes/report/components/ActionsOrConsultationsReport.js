@@ -49,31 +49,29 @@ export const ActionsOrConsultationsReport = ({
   const [fullScreen, setFullScreen] = useState(false);
   const [filterStatus, setFilterStatus] = useLocalStorage('reports-actions-filter-status', []);
 
-  const switchCreatedAt = activeTab.includes('Créées') ? 'createdAt' : 'dueOrCompletedAt';
-
-  const actions = switchCreatedAt === 'createdAt' ? actionsCreatedAt : actionsDueOrCompletedAt;
-  const consultations = switchCreatedAt === 'createdAt' ? consultationsCreatedAt : consultationsDueOrCompletedAt;
-  const data = activeTab.includes('Actions') ? actions : consultations;
+  const data = useMemo(() => {
+    if (activeTab.includes('Action')) return actionsDueOrCompletedAt;
+    if (activeTab.includes('Consultations')) return consultationsDueOrCompletedAt;
+    return [...actionsCreatedAt, ...consultationsCreatedAt];
+  }, [activeTab, actionsCreatedAt, consultationsCreatedAt, consultationsDueOrCompletedAt, actionsDueOrCompletedAt]);
 
   const filteredActionsDueOrCompletedAt = actionsDueOrCompletedAt.filter((item) => !filterStatus.length || filterStatus.includes(item.status));
-  const filteredActionsCreatedAt = actionsCreatedAt.filter((item) => !filterStatus.length || filterStatus.includes(item.status));
   const filteredConsultationsDueOrCompletedAt = consultationsDueOrCompletedAt.filter(
     (item) => !filterStatus.length || filterStatus.includes(item.status)
   );
-  const filteredConsultationsCreatedAt = consultationsCreatedAt.filter((item) => !filterStatus.length || filterStatus.includes(item.status));
   const filteredData = useMemo(() => {
     if (activeTab.includes('Action')) return filteredActionsDueOrCompletedAt;
     if (activeTab.includes('Consultations')) return filteredConsultationsDueOrCompletedAt;
-    return [...filteredActionsCreatedAt, ...filteredConsultationsCreatedAt];
-  }, [activeTab, filteredActionsCreatedAt, filteredConsultationsCreatedAt, filteredConsultationsDueOrCompletedAt, filteredActionsDueOrCompletedAt]);
+    return [...actionsCreatedAt, ...consultationsCreatedAt];
+  }, [activeTab, actionsCreatedAt, consultationsCreatedAt, filteredConsultationsDueOrCompletedAt, filteredActionsDueOrCompletedAt]);
 
   const tabs = canSeeMedicalData
     ? [
         `Actions (${filteredActionsDueOrCompletedAt.length})`,
         `Consultations (${filteredConsultationsDueOrCompletedAt.length})`,
-        `Créées (${filteredConsultationsCreatedAt.length + filteredActionsCreatedAt.length})`,
+        `Créées (${consultationsCreatedAt.length + actionsCreatedAt.length})`,
       ]
-    : [`Actions (${filteredActionsDueOrCompletedAt.length})`, `Créées (${filteredConsultationsCreatedAt.length + filteredActionsCreatedAt.length})`];
+    : [`Actions (${filteredActionsDueOrCompletedAt.length})`, `Créées (${actionsCreatedAt.length})`];
 
   return (
     <>
@@ -103,7 +101,7 @@ export const ActionsOrConsultationsReport = ({
               aria-label="Ajouter une action"
               className={[
                 'tw-text-md tw-h-8 tw-w-8 tw-rounded-full tw-font-bold tw-text-white tw-transition hover:tw-scale-125',
-                activeTab.includes('Actions') ? 'tw-bg-main' : 'tw-bg-blue-900',
+                activeTab.includes('Consultations') ? 'tw-bg-blue-900' : 'tw-bg-main',
               ].join(' ')}
               onClick={() => {
                 const searchParams = new URLSearchParams(history.location.search);
@@ -118,7 +116,7 @@ export const ActionsOrConsultationsReport = ({
               title="Passer les actions/consultations en plein écran"
               className={[
                 'tw-h-6 tw-w-6 tw-rounded-full tw-transition hover:tw-scale-125 disabled:tw-cursor-not-allowed disabled:tw-opacity-30',
-                activeTab.includes('Actions') ? 'tw-text-main' : 'tw-text-blue-900',
+                activeTab.includes('Consultations') ? 'tw-text-blue-900' : 'tw-text-main',
               ].join(' ')}
               disabled={!data.length}
               onClick={() => setFullScreen(true)}>
@@ -126,13 +124,12 @@ export const ActionsOrConsultationsReport = ({
             </button>
           </div>
         </div>
-        <div className="w-full tw-max-w-3xl tw-bg-white tw-px-7 tw-pb-1">
+        <div className="w-full tw-max-w-lg tw-bg-white tw-px-7 tw-pb-1">
           <ActionsOrConsultationsFilters setFilterStatus={setFilterStatus} filterStatus={filterStatus} disabled={!data.length} period={period} />
         </div>
         <div className="tw-grow tw-overflow-y-auto tw-border-t tw-border-main tw-border-opacity-20">
           <ActionsSortableList data={filteredData} />
-        </div>{' '}
-        if (activeTab.includes('Action') return
+        </div>
       </section>
       <section
         aria-hidden="true"
@@ -160,75 +157,60 @@ export const ActionsOrConsultationsReport = ({
         className="printonly tw-mt-12 tw-flex tw-h-full tw-flex-col tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
         <div className="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-px-3 tw-py-3">
           <h3 className="tw-m-0 tw-text-base tw-font-medium">
-            Actions créées {formatEcheanceLabelPeriod(period)} ({filteredActionsCreatedAt.length})
+            Actions créées {formatEcheanceLabelPeriod(period)} ({actionsCreatedAt.length})
           </h3>
-          {filterStatus.length > 0 && (
-            <h4 className="tw-m-0 tw-text-base tw-font-medium">
-              Filtrées par status:{' '}
-              {mappedIdsToLabels
-                .filter((s) => filterStatus.includes(s._id))
-                .map((status) => status.name)
-                .join(', ')}
-            </h4>
-          )}
         </div>
         <div className="tw-grow tw-overflow-y-auto tw-border-t tw-border-main tw-border-opacity-20">
-          <ActionsSortableList data={filteredActionsCreatedAt} showCreatedAt />
+          <ActionsSortableList data={actionsCreatedAt} showCreatedAt />
         </div>
       </section>
 
-      <section
-        aria-hidden="true"
-        className="printonly tw-mt-12 tw-flex tw-h-full tw-flex-col tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
-        <div className="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-px-3 tw-py-3">
-          <h3 className="tw-m-0 tw-text-base tw-font-medium">
-            Consultations À FAIRE/FAITE/ANNULÉE {formatEcheanceLabelPeriod(period)} ({filteredConsultationsDueOrCompletedAt.length})
-          </h3>
-          {filterStatus.length > 0 && (
-            <h4 className="tw-m-0 tw-text-base tw-font-medium">
-              Filtrées par status:{' '}
-              {mappedIdsToLabels
-                .filter((s) => filterStatus.includes(s._id))
-                .map((status) => status.name)
-                .join(', ')}
-            </h4>
-          )}
-        </div>
-        <div className="tw-grow tw-overflow-y-auto tw-border-t tw-border-main tw-border-opacity-20">
-          <ActionsSortableList data={filteredConsultationsDueOrCompletedAt} showCreatedAt />
-        </div>
-      </section>
-      <section
-        aria-hidden="true"
-        className="printonly tw-mt-12 tw-flex tw-h-full tw-flex-col tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
-        <div className="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-px-3 tw-py-3">
-          <h3 className="tw-m-0 tw-text-base tw-font-medium">
-            Consultations créées {formatEcheanceLabelPeriod(period)} ({filteredConsultationsCreatedAt.length})
-          </h3>
-          {filterStatus.length > 0 && (
-            <h4 className="tw-m-0 tw-text-base tw-font-medium">
-              Filtrées par status:{' '}
-              {mappedIdsToLabels
-                .filter((s) => filterStatus.includes(s._id))
-                .map((status) => status.name)
-                .join(', ')}
-            </h4>
-          )}
-        </div>
-        <div className="tw-grow tw-overflow-y-auto tw-border-t tw-border-main tw-border-opacity-20">
-          <ActionsSortableList data={filteredConsultationsCreatedAt} showCreatedAt />
-        </div>
-      </section>
+      {canSeeMedicalData && (
+        <>
+          <section
+            aria-hidden="true"
+            className="printonly tw-mt-12 tw-flex tw-h-full tw-flex-col tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+            <div className="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-px-3 tw-py-3">
+              <h3 className="tw-m-0 tw-text-base tw-font-medium">
+                Consultations À FAIRE/FAITE/ANNULÉE {formatEcheanceLabelPeriod(period)} ({filteredConsultationsDueOrCompletedAt.length})
+              </h3>
+              {filterStatus.length > 0 && (
+                <h4 className="tw-m-0 tw-text-base tw-font-medium">
+                  Filtrées par status:{' '}
+                  {mappedIdsToLabels
+                    .filter((s) => filterStatus.includes(s._id))
+                    .map((status) => status.name)
+                    .join(', ')}
+                </h4>
+              )}
+            </div>
+            <div className="tw-grow tw-overflow-y-auto tw-border-t tw-border-main tw-border-opacity-20">
+              <ActionsSortableList data={filteredConsultationsDueOrCompletedAt} showCreatedAt />
+            </div>
+          </section>
+          <section
+            aria-hidden="true"
+            className="printonly tw-mt-12 tw-flex tw-h-full tw-flex-col tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+            <div className="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-px-3 tw-py-3">
+              <h3 className="tw-m-0 tw-text-base tw-font-medium">
+                Consultations créées {formatEcheanceLabelPeriod(period)} ({consultationsCreatedAt.length})
+              </h3>
+            </div>
+            <div className="tw-grow tw-overflow-y-auto tw-border-t tw-border-main tw-border-opacity-20">
+              <ActionsSortableList data={consultationsCreatedAt} showCreatedAt />
+            </div>
+          </section>
+        </>
+      )}
       <ModalContainer open={!!fullScreen} className="" size="full" onClose={() => setFullScreen(false)}>
         <ModalHeader title={`${activeTab} (${filteredData.length})`} onClose={() => setFullScreen(false)}>
-          <div className="twif (activeTab.includes('Action') return -max-w-3xl tw-mx-auto tw-mt-2 tw-w-full">
+          <div className="tw-mx-auto tw-mt-2 tw-w-full tw-max-w-lg">
             <ActionsOrConsultationsFilters setFilterStatus={setFilterStatus} filterStatus={filterStatus} disabled={!data.length} period={period} />
           </div>
         </ModalHeader>
         <ModalBody>
           <ActionsSortableList data={filteredData} showCreatedAt />
-        </ModalBody>{' '}
-        if (activeTab.includes('Action') return
+        </ModalBody>
         <ModalFooter>
           <button type="button" name="cancel" className="button-cancel" onClick={() => setFullScreen(false)}>
             Fermer
