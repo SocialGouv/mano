@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { mappedIdsToLabels } from '../../../recoil/actions';
 import { useHistory } from 'react-router-dom';
 import SelectCustom from '../../../components/SelectCustom';
@@ -32,10 +32,24 @@ export const ActionsOrConsultationsReport = ({
   consultationsCreatedAt,
   period,
 }) => {
+  const history = useHistory();
+  const user = useRecoilValue(userState);
+
   const [activeTab, setActiveTab] = useLocalStorage('reports-actions-consultation-toggle', 'Actions');
+  const canSeeMedicalData = ['admin', 'normal'].includes(user.role) && !!user.healthcareProfessional;
+
+  const activeTabIndex = useMemo(() => {
+    if (activeTab.includes('Actions')) return 0;
+    if (activeTab.includes('Consultations')) return 1;
+    if (activeTab.includes('Créées')) {
+      if (canSeeMedicalData) return 2;
+      return 1;
+    }
+  }, [activeTab, canSeeMedicalData]);
   const [fullScreen, setFullScreen] = useState(false);
-  const [switchCreatedAt, setSwitchCreatedAt] = useLocalStorage('reports-actions-switch-created-at', 'dueOrCompletedAt'); // 'createdAt' or 'dueOrCompletedAt'
   const [filterStatus, setFilterStatus] = useLocalStorage('reports-actions-filter-status', []);
+
+  const switchCreatedAt = activeTab.includes('Créées') ? 'createdAt' : 'dueOrCompletedAt';
 
   const actions = switchCreatedAt === 'createdAt' ? actionsCreatedAt : actionsDueOrCompletedAt;
   const consultations = switchCreatedAt === 'createdAt' ? consultationsCreatedAt : consultationsDueOrCompletedAt;
@@ -47,18 +61,19 @@ export const ActionsOrConsultationsReport = ({
     (item) => !filterStatus.length || filterStatus.includes(item.status)
   );
   const filteredConsultationsCreatedAt = consultationsCreatedAt.filter((item) => !filterStatus.length || filterStatus.includes(item.status));
-  const filteredActions = switchCreatedAt === 'createdAt' ? filteredActionsCreatedAt : filteredActionsDueOrCompletedAt;
-  const filteredConsultations = switchCreatedAt === 'createdAt' ? filteredConsultationsCreatedAt : filteredConsultationsDueOrCompletedAt;
-  const filteredData = activeTab.includes('Actions') ? filteredActions : filteredConsultations;
-
-  const history = useHistory();
-  const user = useRecoilValue(userState);
-
-  const canSeeMedicalData = ['admin', 'normal'].includes(user.role) && !!user.healthcareProfessional;
+  const filteredData = useMemo(() => {
+    if (activeTab.includes('Action')) return filteredActionsDueOrCompletedAt;
+    if (activeTab.includes('Consultations')) return filteredConsultationsDueOrCompletedAt;
+    return [...filteredActionsCreatedAt, ...filteredConsultationsCreatedAt];
+  }, [activeTab, filteredActionsCreatedAt, filteredConsultationsCreatedAt, filteredConsultationsDueOrCompletedAt, filteredActionsDueOrCompletedAt]);
 
   const tabs = canSeeMedicalData
-    ? [`Actions (${filteredActions.length})`, `Consultations (${filteredConsultations.length})`]
-    : [`Actions (${filteredActions.length})`];
+    ? [
+        `Actions (${filteredActionsDueOrCompletedAt.length})`,
+        `Consultations (${filteredConsultationsDueOrCompletedAt.length})`,
+        `Créées (${filteredConsultationsCreatedAt.length + filteredActionsCreatedAt.length})`,
+      ]
+    : [`Actions (${filteredActionsDueOrCompletedAt.length})`, `Créées (${filteredConsultationsCreatedAt.length + filteredActionsCreatedAt.length})`];
 
   return (
     <>
@@ -68,8 +83,20 @@ export const ActionsOrConsultationsReport = ({
             className="tw-m-0 tw-flex-wrap tw-justify-start tw-border-b-0 tw-py-0.5 tw-pl-0 [&_button]:tw-text-xl"
             tabs={tabs}
             renderTab={(caption) => <h3 className="tw-m-0 tw-text-base tw-font-medium">{caption}</h3>}
-            onClick={(_, index) => setActiveTab(index === 0 ? 'Actions' : 'Consultations')}
-            activeTabIndex={activeTab.includes('Actions') ? 0 : 1}
+            onClick={(_, index) => {
+              if (index === 0) setActiveTab('Actions');
+              if (index === 1) {
+                if (canSeeMedicalData) {
+                  setActiveTab('Consultations');
+                } else {
+                  setActiveTab('Créées');
+                }
+              }
+              if (index === 2) {
+                setActiveTab('Créées');
+              }
+            }}
+            activeTabIndex={activeTabIndex}
           />
           <div className="flex-col tw-flex tw-items-center tw-gap-2">
             <button
@@ -100,18 +127,12 @@ export const ActionsOrConsultationsReport = ({
           </div>
         </div>
         <div className="w-full tw-max-w-3xl tw-bg-white tw-px-7 tw-pb-1">
-          <ActionsOrConsultationsFilters
-            switchCreatedAt={switchCreatedAt}
-            setSwitchCreatedAt={setSwitchCreatedAt}
-            setFilterStatus={setFilterStatus}
-            filterStatus={filterStatus}
-            disabled={!data.length}
-            period={period}
-          />
+          <ActionsOrConsultationsFilters setFilterStatus={setFilterStatus} filterStatus={filterStatus} disabled={!data.length} period={period} />
         </div>
         <div className="tw-grow tw-overflow-y-auto tw-border-t tw-border-main tw-border-opacity-20">
           <ActionsSortableList data={filteredData} />
-        </div>
+        </div>{' '}
+        if (activeTab.includes('Action') return
       </section>
       <section
         aria-hidden="true"
@@ -200,20 +221,14 @@ export const ActionsOrConsultationsReport = ({
       </section>
       <ModalContainer open={!!fullScreen} className="" size="full" onClose={() => setFullScreen(false)}>
         <ModalHeader title={`${activeTab} (${filteredData.length})`} onClose={() => setFullScreen(false)}>
-          <div className="tw-mx-auto tw-mt-2 tw-w-full tw-max-w-3xl">
-            <ActionsOrConsultationsFilters
-              switchCreatedAt={switchCreatedAt}
-              setSwitchCreatedAt={setSwitchCreatedAt}
-              setFilterStatus={setFilterStatus}
-              filterStatus={filterStatus}
-              disabled={!data.length}
-              period={period}
-            />
+          <div className="twif (activeTab.includes('Action') return -max-w-3xl tw-mx-auto tw-mt-2 tw-w-full">
+            <ActionsOrConsultationsFilters setFilterStatus={setFilterStatus} filterStatus={filterStatus} disabled={!data.length} period={period} />
           </div>
         </ModalHeader>
         <ModalBody>
           <ActionsSortableList data={filteredData} showCreatedAt />
-        </ModalBody>
+        </ModalBody>{' '}
+        if (activeTab.includes('Action') return
         <ModalFooter>
           <button type="button" name="cancel" className="button-cancel" onClick={() => setFullScreen(false)}>
             Fermer
@@ -234,52 +249,11 @@ export const ActionsOrConsultationsReport = ({
   );
 };
 
-const ActionsOrConsultationsFilters = ({ switchCreatedAt, setSwitchCreatedAt, setFilterStatus, filterStatus, disabled, period }) => {
-  const echeanceOptions = [
-    {
-      value: 'createdAt',
-      label: `Créées ${formatEcheanceLabelPeriod(period)}`,
-    },
-    {
-      value: 'dueOrCompletedAt',
-      label: `Échéance ${formatEcheanceLabelPeriod(period)}`,
-      subtitle: `(À FAIRE/FAITE/ANNULÉE ${formatEcheanceLabelPeriod(period)})`,
-    },
-  ];
-
+const ActionsOrConsultationsFilters = ({ setFilterStatus, filterStatus, disabled }) => {
   return (
     <>
       <div className="tw-flex tw-w-full tw-justify-between tw-gap-x-4">
-        <div className="tw-flex tw-shrink-0 tw-grow tw-basis-1/2 tw-items-center tw-pl-1 tw-pr-2">
-          <div className="tw-w-full">
-            <SelectCustom
-              inputId="action-switch-created-at"
-              options={echeanceOptions}
-              isMulti={false}
-              name="switchCreatedAt"
-              value={echeanceOptions.find((o) => o.value === switchCreatedAt)}
-              formatOptionLabel={(option, params) => {
-                if (params.context === 'value') return option.label;
-                return (
-                  <>
-                    {option.label}
-                    {option.subtitle && (
-                      <>
-                        <br />
-                        <span className="tw-text-xs tw-opacity-60">{option.subtitle}</span>
-                      </>
-                    )}
-                  </>
-                );
-              }}
-              onChange={(e) => {
-                console.log(e, e.value);
-                setSwitchCreatedAt(e.value);
-              }}
-            />
-          </div>
-        </div>
-        <div className="tw-flex tw-shrink-0 tw-grow tw-basis-1/2 tw-items-center tw-pl-1 tw-pr-2">
+        <div className="tw-flex tw-shrink-0 tw-grow tw-basis-full tw-items-center tw-pl-1 tw-pr-2">
           {/* <label htmlFor="action-select-status-filter" className="tw-text-xs">
             Filtrer par statut
           </label> */}
