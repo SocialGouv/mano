@@ -44,7 +44,7 @@ export default function Notification() {
   const commentsFiltered = useMemo(
     () =>
       comments
-        .filter((c) => c.urgent)
+        .filter((c) => c.urgent && (Array.isArray(c.teams) ? c.teams.includes(currentTeam?._id) : c.team === currentTeam?._id))
         .map((comment) => {
           const commentPopulated = { ...comment };
           if (comment.person) {
@@ -63,7 +63,7 @@ export default function Notification() {
         })
         .filter((c) => c.actionPopulated || c.personPopulated)
         .sort((a, b) => dayjs(a.createdAt).diff(dayjs(b.createdAt))),
-    [comments, persons, actions]
+    [comments, persons, actions, currentTeam?._id]
   );
 
   if (!actionsFiltered.length && !commentsFiltered.length) return null;
