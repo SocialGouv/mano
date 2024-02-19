@@ -3,7 +3,7 @@ import { useState } from 'react';
 export default function FinDeManoFabrique() {
   const [show, setShow] = useState(true);
   return (
-    <div className="tw-mb-8 tw-border-l-4 tw-border-orange-500 tw-bg-orange-100 tw-p-4 tw-text-orange-700" role="alert">
+    <div className="noprint tw-mb-8 tw-border-l-4 tw-border-orange-500 tw-bg-orange-100 tw-p-4 tw-text-orange-700" role="alert">
       Dans le cadre de sa pérennisation, Mano ne sera pas accessible le 5 mars dès 9h. Pour en savoir plus, cliquez
       <button
         onClick={() => setShow(!show)}
