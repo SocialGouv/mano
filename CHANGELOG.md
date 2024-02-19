@@ -1,3 +1,10 @@
+## [1.305.3](https://github.com/SocialGouv/mano/compare/v1.305.2...v1.305.3) (2024-02-19)
+
+
+### Bug Fixes
+
+* suppression de l'ancien reporting ([#1870](https://github.com/SocialGouv/mano/issues/1870)) ([b5ec2b8](https://github.com/SocialGouv/mano/commit/b5ec2b8996e9407f5106d1958d600ee00908de7b))
+
 ## [1.305.2](https://github.com/SocialGouv/mano/compare/v1.305.1...v1.305.2) (2024-02-16)
 
 
