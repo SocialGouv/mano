@@ -77,7 +77,7 @@ const Drawer = () => {
               </NavLink>
             </li>
           )}
-          {['admin', 'normal', 'restricted-access'].includes(role) && (
+          {process.env.REACT_APP_TEST_PLAYWRIGHT === 'true' && ['admin', 'normal', 'restricted-access'].includes(role) && (
             <>
               <li>
                 <NavLink to="/report" activeClassName="active">
@@ -90,7 +90,7 @@ const Drawer = () => {
             <>
               <li>
                 <NavLink to="/report-new" activeClassName="active">
-                  Comptes rendus <span className="tw-ml-1 tw-rounded-full tw-bg-main tw-px-2 tw-py-1 tw-text-xs tw-text-white">BETA</span>
+                  Comptes rendus
                 </NavLink>
               </li>
             </>
