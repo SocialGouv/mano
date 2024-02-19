@@ -10,6 +10,7 @@ import { useLocalStorage } from '../../../services/useLocalStorage';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../../../recoil/auth';
 import { dayjsInstance } from '../../../services/date';
+import EyeIcon from '../../../assets/icons/EyeIcon';
 
 const formatEcheanceLabelPeriod = (period) => {
   if (!!period.startDate && !!period.endDate) {
@@ -26,52 +27,54 @@ const formatEcheanceLabelPeriod = (period) => {
 };
 
 export const ActionsOrConsultationsReport = ({
-  actionsDueOrCompletedAt,
+  actionsCompletedAt,
+  actionsCanceledAt,
   actionsCreatedAt,
-  consultationsDueOrCompletedAt,
+  consultationsCompletedAt,
+  consultationsCanceledAt,
   consultationsCreatedAt,
   period,
 }) => {
   const history = useHistory();
   const user = useRecoilValue(userState);
 
-  const [activeTab, setActiveTab] = useLocalStorage('reports-actions-consultation-toggle', 'Actions');
+  const [activeTab, setActiveTab] = useLocalStorage('reports-actions-consultations-todo-done-toggle', 'Faites');
   const canSeeMedicalData = ['admin', 'normal'].includes(user.role) && !!user.healthcareProfessional;
+  const [showActions, setShowActions] = useLocalStorage('reports-actions-consultations-show-actions', true);
+  const [showConsultations, setShowConsultations] = useLocalStorage('reports-actions-consultations-show-consults', canSeeMedicalData);
 
   const activeTabIndex = useMemo(() => {
-    if (activeTab.includes('Actions')) return 0;
-    if (activeTab.includes('Consultations')) return 1;
-    if (activeTab.includes('Créées')) {
-      if (canSeeMedicalData) return 2;
-      return 1;
-    }
+    if (activeTab.includes('Faites')) return 0;
+    if (activeTab.includes('Annulées')) return 1;
+    return 2; // activeTab.includes('Créées')
   }, [activeTab, canSeeMedicalData]);
+
   const [fullScreen, setFullScreen] = useState(false);
-  const [filterStatus, setFilterStatus] = useLocalStorage('reports-actions-filter-status', []);
+
+  const actions = useMemo(() => {
+    if (activeTab.includes('Faites')) return actionsCompletedAt;
+    if (activeTab.includes(`Annulées`)) return actionsCanceledAt;
+    return actionsCreatedAt;
+  }, [activeTab, actionsCompletedAt, actionsCanceledAt, actionsCreatedAt]);
+
+  const consultations = useMemo(() => {
+    if (activeTab.includes('Faites')) return consultationsCompletedAt;
+    if (activeTab.includes(`Annulées`)) return consultationsCanceledAt;
+    return consultationsCreatedAt;
+  }, [activeTab, consultationsCompletedAt, consultationsCanceledAt, consultationsCreatedAt]);
 
   const data = useMemo(() => {
-    if (activeTab.includes('Action')) return actionsDueOrCompletedAt;
-    if (activeTab.includes('Consultations')) return consultationsDueOrCompletedAt;
-    return [...actionsCreatedAt, ...consultationsCreatedAt];
-  }, [activeTab, actionsCreatedAt, consultationsCreatedAt, consultationsDueOrCompletedAt, actionsDueOrCompletedAt]);
+    if (showActions && showConsultations) return [...actions, ...consultations];
+    if (showActions) return actions;
+    if (showConsultations) return consultations;
+    return [];
+  }, [activeTab, showActions, showConsultations, actions, consultations]);
 
-  const filteredActionsDueOrCompletedAt = actionsDueOrCompletedAt.filter((item) => !filterStatus.length || filterStatus.includes(item.status));
-  const filteredConsultationsDueOrCompletedAt = consultationsDueOrCompletedAt.filter(
-    (item) => !filterStatus.length || filterStatus.includes(item.status)
-  );
-  const filteredData = useMemo(() => {
-    if (activeTab.includes('Action')) return filteredActionsDueOrCompletedAt;
-    if (activeTab.includes('Consultations')) return filteredConsultationsDueOrCompletedAt;
-    return [...actionsCreatedAt, ...consultationsCreatedAt];
-  }, [activeTab, actionsCreatedAt, consultationsCreatedAt, filteredConsultationsDueOrCompletedAt, filteredActionsDueOrCompletedAt]);
-
-  const tabs = canSeeMedicalData
-    ? [
-        `Actions (${filteredActionsDueOrCompletedAt.length})`,
-        `Consultations (${filteredConsultationsDueOrCompletedAt.length})`,
-        `Créées (${consultationsCreatedAt.length + actionsCreatedAt.length})`,
-      ]
-    : [`Actions (${filteredActionsDueOrCompletedAt.length})`, `Créées (${actionsCreatedAt.length})`];
+  const tabs = [
+    `Faites (${canSeeMedicalData ? actionsCompletedAt.length + consultationsCompletedAt.length : actionsCompletedAt.length})`,
+    `Annulées (${canSeeMedicalData ? actionsCanceledAt.length + consultationsCanceledAt.length : actionsCanceledAt.length})`,
+    `Créées (${canSeeMedicalData ? actionsCreatedAt.length + consultationsCreatedAt.length : actionsCreatedAt.length})`,
+  ];
 
   return (
     <>
@@ -82,17 +85,9 @@ export const ActionsOrConsultationsReport = ({
             tabs={tabs}
             renderTab={(caption) => <h3 className="tw-m-0 tw-text-base tw-font-medium">{caption}</h3>}
             onClick={(_, index) => {
-              if (index === 0) setActiveTab('Actions');
-              if (index === 1) {
-                if (canSeeMedicalData) {
-                  setActiveTab('Consultations');
-                } else {
-                  setActiveTab('Créées');
-                }
-              }
-              if (index === 2) {
-                setActiveTab('Créées');
-              }
+              if (index === 0) setActiveTab('Faites');
+              if (index === 1) setActiveTab('Annulées');
+              if (index === 2) setActiveTab('Créées');
             }}
             activeTabIndex={activeTabIndex}
           />
@@ -125,91 +120,37 @@ export const ActionsOrConsultationsReport = ({
           </div>
         </div>
         <div className="w-full tw-max-w-lg tw-bg-white tw-px-7 tw-pb-1">
-          <ActionsOrConsultationsFilters setFilterStatus={setFilterStatus} filterStatus={filterStatus} disabled={!data.length} period={period} />
+          <ActionsOrConsultationsFilters
+            showActions={showActions}
+            showConsultations={showConsultations}
+            setShowActions={setShowActions}
+            setShowConsultations={setShowConsultations}
+            numberOfActions={actions.length}
+            numberOfConsultations={consultations.length}
+          />
         </div>
         <div className="tw-grow tw-overflow-y-auto tw-border-t tw-border-main tw-border-opacity-20">
-          <ActionsSortableList data={filteredData} />
-        </div>
-      </section>
-      <section
-        aria-hidden="true"
-        className="printonly tw-flex tw-h-full tw-flex-col tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
-        <div className="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-px-3 tw-py-3">
-          <h3 className="tw-m-0 tw-text-base tw-font-medium">
-            Actions À FAIRE/FAITE/ANNULÉE {formatEcheanceLabelPeriod(period)} ({filteredActionsDueOrCompletedAt.length})
-          </h3>
-          {filterStatus.length > 0 && (
-            <h4 className="tw-m-0 tw-text-base tw-font-medium">
-              Filtrées par status:{' '}
-              {mappedIdsToLabels
-                .filter((s) => filterStatus.includes(s._id))
-                .map((status) => status.name)
-                .join(', ')}
-            </h4>
-          )}
-        </div>
-        <div className="tw-grow tw-overflow-y-auto tw-border-t tw-border-main tw-border-opacity-20">
-          <ActionsSortableList data={filteredActionsDueOrCompletedAt} showCreatedAt />
-        </div>
-      </section>
-      <section
-        aria-hidden="true"
-        className="printonly tw-mt-12 tw-flex tw-h-full tw-flex-col tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
-        <div className="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-px-3 tw-py-3">
-          <h3 className="tw-m-0 tw-text-base tw-font-medium">
-            Actions créées {formatEcheanceLabelPeriod(period)} ({actionsCreatedAt.length})
-          </h3>
-        </div>
-        <div className="tw-grow tw-overflow-y-auto tw-border-t tw-border-main tw-border-opacity-20">
-          <ActionsSortableList data={actionsCreatedAt} showCreatedAt />
+          <ActionsSortableList data={data} />
         </div>
       </section>
 
-      {canSeeMedicalData && (
-        <>
-          <section
-            aria-hidden="true"
-            className="printonly tw-mt-12 tw-flex tw-h-full tw-flex-col tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
-            <div className="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-px-3 tw-py-3">
-              <h3 className="tw-m-0 tw-text-base tw-font-medium">
-                Consultations À FAIRE/FAITE/ANNULÉE {formatEcheanceLabelPeriod(period)} ({filteredConsultationsDueOrCompletedAt.length})
-              </h3>
-              {filterStatus.length > 0 && (
-                <h4 className="tw-m-0 tw-text-base tw-font-medium">
-                  Filtrées par status:{' '}
-                  {mappedIdsToLabels
-                    .filter((s) => filterStatus.includes(s._id))
-                    .map((status) => status.name)
-                    .join(', ')}
-                </h4>
-              )}
-            </div>
-            <div className="tw-grow tw-overflow-y-auto tw-border-t tw-border-main tw-border-opacity-20">
-              <ActionsSortableList data={filteredConsultationsDueOrCompletedAt} showCreatedAt />
-            </div>
-          </section>
-          <section
-            aria-hidden="true"
-            className="printonly tw-mt-12 tw-flex tw-h-full tw-flex-col tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
-            <div className="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-px-3 tw-py-3">
-              <h3 className="tw-m-0 tw-text-base tw-font-medium">
-                Consultations créées {formatEcheanceLabelPeriod(period)} ({consultationsCreatedAt.length})
-              </h3>
-            </div>
-            <div className="tw-grow tw-overflow-y-auto tw-border-t tw-border-main tw-border-opacity-20">
-              <ActionsSortableList data={consultationsCreatedAt} showCreatedAt />
-            </div>
-          </section>
-        </>
-      )}
       <ModalContainer open={!!fullScreen} className="" size="full" onClose={() => setFullScreen(false)}>
-        <ModalHeader title={`${activeTab} (${filteredData.length})`} onClose={() => setFullScreen(false)}>
+        <ModalHeader
+          title={`${canSeeMedicalData ? 'Actions et Consultations' : 'Actions'} ${activeTab} (${data.length})`}
+          onClose={() => setFullScreen(false)}>
           <div className="tw-mx-auto tw-mt-2 tw-w-full tw-max-w-lg">
-            <ActionsOrConsultationsFilters setFilterStatus={setFilterStatus} filterStatus={filterStatus} disabled={!data.length} period={period} />
+            <ActionsOrConsultationsFilters
+              showActions={showActions}
+              showConsultations={showConsultations}
+              setShowActions={setShowActions}
+              setShowConsultations={setShowConsultations}
+              numberOfActions={actions.length}
+              numberOfConsultations={consultations.length}
+            />
           </div>
         </ModalHeader>
         <ModalBody>
-          <ActionsSortableList data={filteredData} showCreatedAt />
+          <ActionsSortableList data={data} showCreatedAt />
         </ModalBody>
         <ModalFooter>
           <button type="button" name="cancel" className="button-cancel" onClick={() => setFullScreen(false)}>
@@ -231,29 +172,36 @@ export const ActionsOrConsultationsReport = ({
   );
 };
 
-const ActionsOrConsultationsFilters = ({ setFilterStatus, filterStatus, disabled }) => {
+const ActionsOrConsultationsFilters = ({
+  setShowActions,
+  setShowConsultations,
+  showActions,
+  showConsultations,
+  numberOfActions,
+  numberOfConsultations,
+}) => {
   return (
     <>
       <div className="tw-flex tw-w-full tw-justify-between tw-gap-x-4">
-        <div className="tw-flex tw-shrink-0 tw-grow tw-basis-full tw-items-center tw-pl-1 tw-pr-2">
-          {/* <label htmlFor="action-select-status-filter" className="tw-text-xs">
-            Filtrer par statut
-          </label> */}
-          <div className="tw-w-full">
-            <SelectCustom
-              inputId="action-select-status-filter"
-              placeholder="Filtrer par statut"
-              options={mappedIdsToLabels}
-              getOptionValue={(s) => s._id}
-              getOptionLabel={(s) => s.name}
-              name="status"
-              onChange={(s) => setFilterStatus(s.map((s) => s._id))}
-              isClearable
-              isDisabled={disabled}
-              isMulti
-              value={mappedIdsToLabels.filter((s) => filterStatus.includes(s._id))}
-            />
-          </div>
+        <div className="tw-flex tw-shrink-0 tw-grow tw-basis-full tw-items-center tw-gap-x-4 tw-pl-1 tw-pr-2">
+          <button
+            type="button"
+            className={[
+              'tw-inline-flex tw-items-center tw-gap-x-2 tw-rounded-md tw-border tw-border-main/20 tw-py-1 tw-px-4',
+              showActions ? '' : 'tw-opacity-50',
+            ].join(' ')}
+            onClick={() => setShowActions((show) => !show)}>
+            <EyeIcon size={15} strikedThrough={!showActions} /> Actions ({numberOfActions})
+          </button>
+          <button
+            type="button"
+            className={[
+              'tw-inline-flex tw-items-center tw-gap-x-2 tw-rounded-md tw-border tw-border-main/20 tw-py-1 tw-px-4',
+              showConsultations ? '' : 'tw-opacity-50',
+            ].join(' ')}
+            onClick={() => setShowConsultations((show) => !show)}>
+            <EyeIcon size={15} strikedThrough={!showConsultations} /> Consultations ({numberOfConsultations})
+          </button>
         </div>
       </div>
     </>

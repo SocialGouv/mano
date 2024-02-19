@@ -5,7 +5,7 @@ import { HeaderStyled, Title as HeaderTitle } from '../../components/header';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../components/tailwind/Modal';
 
 import dayjs from 'dayjs';
-import { TODO } from '../../recoil/actions';
+import { CANCEL, TODO, DONE } from '../../recoil/actions';
 import ButtonCustom from '../../components/ButtonCustom';
 import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
 import { reportsState } from '../../recoil/reports';
@@ -67,9 +67,11 @@ const itemsForReportsSelector = selectorFamily({
 
       const personsCreated = {};
       const personsUpdated = {};
-      const actionsDueOrCompletedAt = {};
+      const actionsCompletedAt = {};
+      const actionsCanceledAt = {};
       const actionsCreatedAt = {};
-      const consultationsDueOrCompletedAt = {};
+      const consultationsCompletedAt = {};
+      const consultationsCanceledAt = {};
       const consultationsCreatedAt = {};
       const comments = {};
       const commentsMedical = {};
@@ -99,25 +101,33 @@ const itemsForReportsSelector = selectorFamily({
         for (const action of person.actions || []) {
           if (!filterItemByTeam(action, 'teams')) continue;
           if (Array.isArray(action.teams)) {
-            let isDueOrCompletedAt = false;
+            let isDoneAt = false;
+            let isCanceledAt = false;
             let isCreatedAt = false;
             for (const team of action.teams) {
               const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[team] ?? defaultIsoDates;
-              if (action.status !== TODO && action.completedAt >= isoStartDate && action.completedAt < isoEndDate) {
-                isDueOrCompletedAt = true;
+              if (action.completedAt >= isoStartDate && action.completedAt < isoEndDate) {
+                if (action.status === CANCEL) {
+                  isCanceledAt = true;
+                  continue;
+                }
+                if (action.status === DONE) {
+                  isDoneAt = true;
+                  continue;
+                }
                 continue;
               }
               if (action.createdAt >= isoStartDate && action.createdAt < isoEndDate) {
-                isCreatedAt = true;
+                if (action.status === TODO) {
+                  isCreatedAt = true;
+                  continue;
+                }
               }
-              // if (action.status !== TODO) continue;
-              // if (action.dueAt >= isoStartDate && action.dueAt < isoEndDate) {
-              //   isDueOrCompletedAt = true;
-              //   continue;
-              // }
             }
-            if (isDueOrCompletedAt) {
-              actionsDueOrCompletedAt[action._id] = action;
+            if (isDoneAt) {
+              actionsCompletedAt[action._id] = action;
+            } else if (isCanceledAt) {
+              actionsCanceledAt[action._id] = action;
             } else if (isCreatedAt) {
               actionsCreatedAt[action._id] = action;
             }
@@ -126,24 +136,33 @@ const itemsForReportsSelector = selectorFamily({
         for (const consultation of person.consultations || []) {
           if (!filterItemByTeam(consultation, 'teams')) continue;
           if (Array.isArray(consultation.teams)) {
-            let isDueOrCompletedAt = false;
+            let isDoneAt = false;
+            let isCanceledAt = false;
             let isCreatedAt = false;
             for (const team of consultation.teams) {
               const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[team] ?? defaultIsoDates;
-              if (consultation.status !== TODO && consultation.completedAt >= isoStartDate && consultation.completedAt < isoEndDate) {
-                isDueOrCompletedAt = true;
+              if (consultation.completedAt >= isoStartDate && consultation.completedAt < isoEndDate) {
+                if (consultation.status === CANCEL) {
+                  isCanceledAt = true;
+                  continue;
+                }
+                if (consultation.status === DONE) {
+                  isDoneAt = true;
+                  continue;
+                }
                 continue;
               }
               if (consultation.createdAt >= isoStartDate && consultation.createdAt < isoEndDate) {
-                isCreatedAt = true;
+                if (consultation.status === TODO) {
+                  isCreatedAt = true;
+                  continue;
+                }
               }
-              // if (consultation.status !== TODO) continue;
-              // if (consultation.dueAt >= isoStartDate && consultation.dueAt < isoEndDate) {
-              //   isDueOrCompletedAt = true;
-              // }
             }
-            if (isDueOrCompletedAt) {
-              consultationsDueOrCompletedAt[consultation._id] = consultation;
+            if (isDoneAt) {
+              consultationsCompletedAt[consultation._id] = consultation;
+            } else if (isCanceledAt) {
+              consultationsCanceledAt[consultation._id] = consultation;
             } else if (isCreatedAt) {
               consultationsCreatedAt[consultation._id] = consultation;
             }
@@ -206,9 +225,11 @@ const itemsForReportsSelector = selectorFamily({
       return {
         personsCreated: Object.values(personsCreated),
         personsUpdated: Object.values(personsUpdated),
-        actionsDueOrCompletedAt: Object.values(actionsDueOrCompletedAt),
+        actionsCompletedAt: Object.values(actionsCompletedAt),
+        actionsCanceledAt: Object.values(actionsCanceledAt),
         actionsCreatedAt: Object.values(actionsCreatedAt),
-        consultationsDueOrCompletedAt: Object.values(consultationsDueOrCompletedAt),
+        consultationsCompletedAt: Object.values(consultationsCompletedAt),
+        consultationsCanceledAt: Object.values(consultationsCanceledAt),
         consultationsCreatedAt: Object.values(consultationsCreatedAt),
         comments: Object.values(comments),
         commentsMedical: Object.values(commentsMedical),
@@ -265,9 +286,11 @@ const View = () => {
 
   const {
     personsCreated,
-    actionsDueOrCompletedAt,
+    actionsCompletedAt,
+    actionsCanceledAt,
     actionsCreatedAt,
-    consultationsDueOrCompletedAt,
+    consultationsCompletedAt,
+    consultationsCanceledAt,
     consultationsCreatedAt,
     comments,
     commentsMedical,
@@ -390,9 +413,11 @@ const View = () => {
               <div className="tw-mb-12 tw-min-h-1/2 tw-basis-6/12 tw-overflow-auto print:tw-min-h-0 print:tw-basis-full">
                 <div className="tw-mb-4 tw-h-[60vh] tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow print:tw-h-auto print:tw-border-none print:tw-shadow-none">
                   <ActionsOrConsultationsReport
-                    actionsDueOrCompletedAt={actionsDueOrCompletedAt}
+                    actionsCompletedAt={actionsCompletedAt}
+                    actionsCanceledAt={actionsCanceledAt}
                     actionsCreatedAt={actionsCreatedAt}
-                    consultationsDueOrCompletedAt={consultationsDueOrCompletedAt}
+                    consultationsCompletedAt={consultationsCompletedAt}
+                    consultationsCanceledAt={consultationsCanceledAt}
                     consultationsCreatedAt={consultationsCreatedAt}
                     period={period}
                     preset={preset}
