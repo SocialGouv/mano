@@ -67,8 +67,10 @@ const itemsForReportsSelector = selectorFamily({
 
       const personsCreated = {};
       const personsUpdated = {};
-      const actions = {};
-      const consultations = {};
+      const actionsDueOrCompletedAt = {};
+      const actionsCreatedAt = {};
+      const consultationsDueOrCompletedAt = {};
+      const consultationsCreatedAt = {};
       const comments = {};
       const commentsMedical = {};
       const passages = {};
@@ -97,39 +99,47 @@ const itemsForReportsSelector = selectorFamily({
         for (const action of person.actions || []) {
           if (!filterItemByTeam(action, 'teams')) continue;
           if (Array.isArray(action.teams)) {
-            let isIncluded = false;
+            let isDueOrCompletedAt = false;
+            let isCreatedAt = false;
             for (const team of action.teams) {
               const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[team] ?? defaultIsoDates;
-              if (action.completedAt >= isoStartDate && action.completedAt < isoEndDate) {
-                isIncluded = true;
+              if (action.createdAt >= isoStartDate && action.createdAt < isoEndDate) {
+                isCreatedAt = true;
+              }
+              if (action.status !== TODO && action.completedAt >= isoStartDate && action.completedAt < isoEndDate) {
+                isDueOrCompletedAt = true;
                 continue;
               }
-              if (action.status !== TODO) continue;
-              if (action.dueAt >= isoStartDate && action.dueAt < isoEndDate) {
-                isIncluded = true;
+              if (action.status === TODO && action.dueAt >= isoStartDate && action.dueAt < isoEndDate) {
+                isDueOrCompletedAt = true;
+                continue;
               }
             }
-            if (!isIncluded) continue;
-            actions[action._id] = action;
+            if (isDueOrCompletedAt) actionsDueOrCompletedAt[action._id] = action;
+            if (isCreatedAt) actionsCreatedAt[action._id] = action;
           }
         }
         for (const consultation of person.consultations || []) {
           if (!filterItemByTeam(consultation, 'teams')) continue;
           if (Array.isArray(consultation.teams)) {
-            let isIncluded = false;
+            let isDueOrCompletedAt = false;
+            let isCreatedAt = false;
             for (const team of consultation.teams) {
               const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[team] ?? defaultIsoDates;
-              if (consultation.completedAt >= isoStartDate && consultation.completedAt < isoEndDate) {
-                isIncluded = true;
+              if (consultation.createdAt >= isoStartDate && consultation.createdAt < isoEndDate) {
+                isCreatedAt = true;
+              }
+              if (consultation.status !== TODO && consultation.completedAt >= isoStartDate && consultation.completedAt < isoEndDate) {
+                isDueOrCompletedAt = true;
                 continue;
               }
-              if (consultation.status !== TODO) continue;
-              if (consultation.dueAt >= isoStartDate && consultation.dueAt < isoEndDate) {
-                isIncluded = true;
+              if (consultation.status === TODO && consultation.dueAt >= isoStartDate && consultation.dueAt < isoEndDate) {
+                isDueOrCompletedAt = true;
+                continue;
               }
             }
-            if (!isIncluded) continue;
-            consultations[consultation._id] = consultation;
+            if (isDueOrCompletedAt) consultationsDueOrCompletedAt[consultation._id] = consultation;
+            if (isCreatedAt) consultationsCreatedAt[consultation._id] = consultation;
           }
         }
         for (const rencontre of person.rencontres || []) {
@@ -189,8 +199,10 @@ const itemsForReportsSelector = selectorFamily({
       return {
         personsCreated: Object.values(personsCreated),
         personsUpdated: Object.values(personsUpdated),
-        actions: Object.values(actions),
-        consultations: Object.values(consultations),
+        actionsDueOrCompletedAt: Object.values(actionsDueOrCompletedAt),
+        actionsCreatedAt: Object.values(actionsCreatedAt),
+        consultationsDueOrCompletedAt: Object.values(consultationsDueOrCompletedAt),
+        consultationsCreatedAt: Object.values(consultationsCreatedAt),
         comments: Object.values(comments),
         commentsMedical: Object.values(commentsMedical),
         passages: Object.values(passages).sort((a, b) => (a.date >= b.date ? -1 : 1)),
@@ -244,7 +256,19 @@ const View = () => {
     return teamsIdsObject;
   }, [selectedTeams, period]);
 
-  const { personsCreated, actions, consultations, comments, commentsMedical, passages, rencontres, observations, reports } = useRecoilValue(
+  const {
+    personsCreated,
+    actionsDueOrCompletedAt,
+    actionsCreatedAt,
+    consultationsDueOrCompletedAt,
+    consultationsCreatedAt,
+    comments,
+    commentsMedical,
+    passages,
+    rencontres,
+    observations,
+    reports,
+  } = useRecoilValue(
     itemsForReportsSelector({
       period,
       viewAllOrganisationData,
@@ -358,7 +382,13 @@ const View = () => {
               ].join(' ')}>
               <div className="tw-mb-12 tw-min-h-1/2 tw-basis-6/12 tw-overflow-auto print:tw-min-h-0 print:tw-basis-full">
                 <div className="tw-mb-4 tw-h-[60vh] tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow print:tw-h-auto print:tw-border-none print:tw-shadow-none">
-                  <ActionsOrConsultationsReport actions={actions} consultations={consultations} period={period} />
+                  <ActionsOrConsultationsReport
+                    actionsDueOrCompletedAt={actionsDueOrCompletedAt}
+                    actionsCreatedAt={actionsCreatedAt}
+                    consultationsDueOrCompletedAt={consultationsDueOrCompletedAt}
+                    consultationsCreatedAt={consultationsCreatedAt}
+                    period={period}
+                  />
                 </div>
                 {canSeeComments && (
                   <div className="tw-mb-4 tw-h-[60vh] tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow print:tw-h-auto print:tw-border-none print:tw-shadow-none">

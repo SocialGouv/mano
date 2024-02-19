@@ -13,7 +13,7 @@ import {
   prepareConsultationForEncryption,
 } from '../recoil/consultations';
 import API from '../services/api';
-import { dayjsInstance } from '../services/date';
+import { dayjsInstance, formatDateWithNameOfDay } from '../services/date';
 import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
 import CustomFieldInput from './CustomFieldInput';
 import { modalConfirmState } from './ModalConfirm';
@@ -240,7 +240,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
               <UserName
                 className="tw-block tw-text-right tw-text-base tw-font-normal tw-italic"
                 id={consultation.user}
-                wrapper={(name) => ` (créée par ${name})`}
+                wrapper={(name) => ` (créée par ${name} le ${formatDateWithNameOfDay(consultation.createdAt)})`}
               />
             )}
           </>

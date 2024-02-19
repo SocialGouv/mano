@@ -4,7 +4,7 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { useHistory, useLocation } from 'react-router-dom';
 import { actionsState, allowedActionFieldsInHistory, CANCEL, DONE, prepareActionForEncryption, TODO } from '../recoil/actions';
 import { currentTeamState, organisationState, teamsState, userState } from '../recoil/auth';
-import { dayjsInstance, now, outOfBoundariesDate } from '../services/date';
+import { dayjsInstance, formatDateWithNameOfDay, now, outOfBoundariesDate } from '../services/date';
 import API from '../services/api';
 import SelectPerson from './SelectPerson';
 import SelectStatus from './SelectStatus';
@@ -274,15 +274,12 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
     const body = { ...data };
     body.teams = Array.isArray(data.teams) ? data.teams : [data.team];
     if (!data.teams?.length) return toast.error('Une action doit être associée à au moins une équipe.');
-    const statusChanged = data.status && action.status !== data.status;
-    if (statusChanged) {
-      if ([DONE, CANCEL].includes(data.status)) {
-        // When status changed to finished (done, cancel) completedAt we set it to now if not set.
-        body.completedAt = data.completedAt || now();
-      } else {
-        // When status just changed to "todo" we set completedAt to null (since it's not done yet).
-        body.completedAt = null;
-      }
+    if ([DONE, CANCEL].includes(data.status)) {
+      // When status changed to finished (done, cancel) completedAt we set it to now if not set.
+      body.completedAt = data.completedAt || now();
+    } else {
+      // When status just changed to "todo" we set completedAt to null (since it's not done yet).
+      body.completedAt = null;
     }
     if (data.completedAt && outOfBoundariesDate(data.completedAt)) return toast.error('La date de complétion est hors limites (entre 1900 et 2100)');
     if (data.dueAt && outOfBoundariesDate(data.dueAt)) return toast.error("La date d'échéance est hors limites (entre 1900 et 2100)");
@@ -350,7 +347,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
               <UserName
                 className="tw-block tw-text-right tw-text-base tw-font-normal tw-italic"
                 id={action.user}
-                wrapper={(name) => ` (créée par ${name})`}
+                wrapper={(name) => ` (créée par ${name} le ${formatDateWithNameOfDay(action.createdAt)})`}
               />
             )}
           </>
