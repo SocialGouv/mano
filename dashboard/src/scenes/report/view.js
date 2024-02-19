@@ -2,7 +2,6 @@ import { useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { addOneDay, dateForDatePicker, formatDateWithNameOfDay } from '../../services/date';
 import { HeaderStyled, Title as HeaderTitle } from '../../components/header';
-import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../components/tailwind/Modal';
 
 import dayjs from 'dayjs';
 import { TODO } from '../../recoil/actions';
@@ -211,7 +210,6 @@ const View = () => {
   const teams = useRecoilValue(teamsState);
   const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('reports-allOrg', teams.length === 1);
   const [selectedTeamIds, setSelectedTeamIds] = useLocalStorage('reports-teams', [currentTeam._id]);
-  const [showWarning, setShowWarning] = useLocalStorage('reports-beta-warnign', true);
 
   const [preset, setPreset, removePreset] = useLocalStorage('reports-date-preset', null);
   let [period, setPeriod] = useLocalStorage('reports-period', {
@@ -400,26 +398,6 @@ const View = () => {
           </div>
         </>
       )}
-      <ModalContainer open={showWarning} size="prose" onClose={() => setShowWarning(false)}>
-        <ModalHeader title="Comptes-rendus - Version Beta" onClose={() => setShowWarning(false)} />
-        <ModalBody className="tw-p-4">
-          <p>
-            Ce module est en cours de développement.
-            <br />
-            Il est possible que vous rencontriez des bugs.
-            <br />
-            N'hésitez pas à nous faire remonter les problèmes rencontrés.
-            <br />
-            <br />
-            Merci beaucoup !
-          </p>
-        </ModalBody>
-        <ModalFooter>
-          <button type="button" onClick={() => setShowWarning(false)} className="button-submit">
-            🧐 Bien compris
-          </button>
-        </ModalFooter>
-      </ModalContainer>
     </>
   );
 };
