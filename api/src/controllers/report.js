@@ -73,6 +73,18 @@ router.post(
       return next(error);
     }
 
+    // If there is already a deleted report for this date, restore it
+    // Fixes: https://sentry.fabrique.social.gouv.fr/organizations/incubateur/issues/96541
+    // FindOrCreate fails if there is a deleted report for the same date.
+    const [deletedReport] = await Report.findAll({
+      where: { organisation: req.user.organisation, team: req.body.team, date: req.body.date, deletedAt: { [Op.ne]: null } },
+      limit: 1,
+      paranoid: false,
+    });
+    if (deletedReport) {
+      await Report.restore({ where: { _id: deletedReport._id } });
+    }
+
     const [data, _created] = await Report.findOrCreate({
       where: { organisation: req.user.organisation, team: req.body.team, date: req.body.date },
       defaults: {
