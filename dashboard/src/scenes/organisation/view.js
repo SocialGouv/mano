@@ -534,7 +534,7 @@ const ImportFieldDetails = ({ field }) => {
       </span>
     ));
   }
-  if (['date', 'date-with-time'].includes(field.type)) {
+  if (['date', 'date-with-time', 'duration'].includes(field.type)) {
     return (
       <i style={{ color: '#666' }}>
         Une date sous la forme AAAA-MM-JJ (exemple: <code>2021-01-01</code>)

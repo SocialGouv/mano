@@ -291,8 +291,8 @@ export const EditCustomField = ({ open, onDelete, data, editingField, onClose, o
       if (['text', 'textarea', 'enum', 'yes-no'].includes(field.type)) {
         return !['text', 'textarea', 'enum'].includes(option.value);
       }
-      if (['date', 'date-with-time'].includes(field.type)) {
-        return !['date', 'date-with-time'].includes(option.value);
+      if (['date', 'date-with-time', 'duration'].includes(field.type)) {
+        return !['date', 'date-with-time', 'duration'].includes(option.value);
       }
       return true;
     },

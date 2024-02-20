@@ -65,6 +65,7 @@ export const sanitizeFieldValueFromExcel = (field, { v: rawValue, w: formattedTe
   if (field.type === 'number') return sanitizeNumber(rawValue);
   if (field.type === 'date') return sanitizeDate(formattedText);
   if (field.type === 'date-with-time') return sanitizeDate(formattedText);
+  if (field.type === 'duration') return sanitizeDate(formattedText);
   if (field.type === 'yes-no') return sanitizeYesNo(rawValue);
   if (field.type === 'enum') return sanitizeEnum(rawValue, field.options);
   if (field.type === 'multi-choice') return sanitizeMultiChoice(rawValue, field.options);

@@ -52,7 +52,7 @@ export const filterItem =
         if (filter.value === 'Non' && !itemValue) continue;
         return false;
       }
-      if (['date-with-time', 'date'].includes(filter.type)) {
+      if (['date-with-time', 'date', 'duration'].includes(filter.type)) {
         const { date, comparator } = filter.value;
         if (comparator === 'unfilled') {
           if (!itemValue) continue;
@@ -325,7 +325,7 @@ const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
     );
   }
 
-  if (['date-with-time', 'date'].includes(type)) {
+  if (['date-with-time', 'date', 'duration'].includes(type)) {
     return (
       <div className="-tw-mx-4 tw-flex tw-flex-wrap">
         <div className={['tw-px-4', value?.comparator !== 'unfilled' ? 'tw-basis-1/2' : 'tw-basis-full'].join(' ')}>

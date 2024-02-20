@@ -111,7 +111,7 @@ const SelectedObsModal = ({ open, onClose, observations, territories, title, onA
           'Observé le': dayjsInstance(observation.observedAt).format('YYYY-MM-DD HH:mm'),
           Équipe: observation.team ? teams.find((t) => t._id === observation.team)?.name : '',
           ...customFieldsObs.reduce((fields, field) => {
-            if (['date', 'date-with-time'].includes(field.type))
+            if (['date', 'date-with-time', 'duration'].includes(field.type))
               fields[field.label || field.name] = observation[field.name]
                 ? dayjsInstance(observation[field.name]).format(field.type === 'date' ? 'YYYY-MM-DD' : 'YYYY-MM-DD HH:mm')
                 : '';

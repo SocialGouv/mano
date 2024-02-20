@@ -38,7 +38,7 @@ const CustomFieldsStats = ({ customFields, data, additionalCols = [], dataTestId
             </div>
           );
         }
-        if (['date', 'date-with-time'].includes(field.type)) {
+        if (['date', 'date-with-time', 'duration'].includes(field.type)) {
           return (
             <div className="tw-basis-1/4 tw-px-4 tw-py-2" key={field.name}>
               <BlockDateWithTime data={data} field={field} help={help?.(field.label.capitalize())} />

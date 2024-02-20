@@ -15,7 +15,7 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = null,
         .replace("'", '') ?? field.name;
     if (['text', 'number'].includes(field.type)) return `${model}-custom-input-${slugifiedLabel}`;
     if (['textarea'].includes(field.type)) return `${model}-custom-textarea-${slugifiedLabel}`;
-    if (['date-with-time', 'date'].includes(field.type)) return `${model}-custom-datepicker-${slugifiedLabel}`;
+    if (['date-with-time', 'date', 'duration'].includes(field.type)) return `${model}-custom-datepicker-${slugifiedLabel}`;
     if (['boolean'].includes(field.type)) return `${model}-custom-checkbox-${slugifiedLabel}`;
     if (['yes-no'].includes(field.type)) return `${model}-custom-select-${slugifiedLabel}`;
     if (['enum'].includes(field.type)) return `${model}-custom-select-${slugifiedLabel}`;
@@ -73,7 +73,7 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = null,
               id={id}
             />
           )}
-          {!!['date-with-time', 'date'].includes(field.type) && (
+          {!!['date-with-time', 'date', 'duration'].includes(field.type) && (
             <div>
               <DatePicker
                 withTime={field.type === 'date-with-time'}

@@ -553,7 +553,7 @@ export const SelectedPersonsModal = ({ open, onClose, persons, title, onAfterLea
             .reduce((fields, field) => {
               if (field.name === 'assignedTeams') {
                 fields[field.label] = (person[field.name] || []).map((t) => teams.find((person) => person._id === t)?.name)?.join(', ');
-              } else if (['date', 'date-with-time'].includes(field.type))
+              } else if (['date', 'date-with-time', 'duration'].includes(field.type))
                 fields[field.label || field.name] = person[field.name] ? dayjsInstance(person[field.name]).format('YYYY-MM-DD') : '';
               else if (['boolean'].includes(field.type)) fields[field.label || field.name] = person[field.name] ? 'Oui' : 'Non';
               else if (['yes-no'].includes(field.type)) fields[field.label || field.name] = person[field.name];

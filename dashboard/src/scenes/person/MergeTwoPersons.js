@@ -28,6 +28,7 @@ import { consultationsState, prepareConsultationForEncryption } from '../../reco
 import { prepareTreatmentForEncryption, treatmentsState } from '../../recoil/treatments';
 import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../recoil/medicalFiles';
 import { useDataLoader } from '../../components/DataLoader';
+import { getDuration } from '../stats/utils';
 
 const getRawValue = (field, value) => {
   try {
@@ -36,6 +37,7 @@ const getRawValue = (field, value) => {
     if (field.type === 'number') return <span>{value}</span>;
     if (field.type === 'date') return <span>{dayjs(value).format('DD/MM/YYYY')}</span>;
     if (field.type === 'date-with-time') return <span>{dayjs(value).format('DD/MM/YYYY HH:mm')}</span>;
+    if (field.type === 'duration') return <span>{getDuration(dayjs(value).unix()).join(' ')}</span>;
     if (field.type === 'yes-no') return <span>{value}</span>;
     if (field.type === 'enum') return <span>{value}</span>;
     if (field.type === 'multi-choice') return <span>{(value || []).join(', ')}</span>;

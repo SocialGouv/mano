@@ -38,7 +38,7 @@ const computeCustomFieldDisplay = (field, value) => {
   if (!!['date-with-time'].includes(field.type) && !!value) {
     return new Date(value).getLocaleDateAndTime('fr');
   }
-  if (!!['date'].includes(field.type) && !!value) {
+  if (!!['date', 'duration'].includes(field.type) && !!value) {
     return new Date(value).getLocaleDate('fr');
   }
   if (['boolean'].includes(field.type)) return showBoolean(value);

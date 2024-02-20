@@ -40,7 +40,7 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
           if (field.name === 'assignedTeams') {
             fields[field.label] = (person[field.name] || []).map((t) => teams.find((person) => person._id === t)?.name)?.join(', ');
           } else if (field.name === 'user') {
-          } else if (['date', 'date-with-time'].includes(field.type))
+          } else if (['date', 'date-with-time', 'duration'].includes(field.type))
             fields[field.label || field.name] = person[field.name]
               ? dayjsInstance(person[field.name]).format(field.type === 'date' ? 'YYYY-MM-DD' : 'YYYY-MM-DD HH:mm')
               : '';
@@ -88,7 +88,7 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
       'Personne suivie - id': persons.find((p) => p._id === consultation.person)?._id,
       Type: consultation.type,
       ...consultationsFields.reduce((fields, field) => {
-        if (['date', 'date-with-time'].includes(field.type))
+        if (['date', 'date-with-time', 'duration'].includes(field.type))
           fields[field.label || field.name] = consultation[field.name]
             ? dayjsInstance(consultation[field.name]).format(field.type === 'date' ? 'YYYY-MM-DD' : 'YYYY-MM-DD HH:mm')
             : '';
@@ -141,7 +141,7 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
       'Observé le': dayjsInstance(observation.observedAt).format('YYYY-MM-DD HH:mm'),
       Équipe: observation.team ? teams.find((t) => t._id === observation.team)?.name : '',
       ...customFieldsObs.reduce((fields, field) => {
-        if (['date', 'date-with-time'].includes(field.type))
+        if (['date', 'date-with-time', 'duration'].includes(field.type))
           fields[field.label || field.name] = observation[field.name]
             ? dayjsInstance(observation[field.name]).format(field.type === 'date' ? 'YYYY-MM-DD' : 'YYYY-MM-DD HH:mm')
             : '';

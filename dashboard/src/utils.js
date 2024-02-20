@@ -15,6 +15,7 @@ export const typeOptions = [
   { value: 'number', label: 'Nombre' },
   { value: 'date', label: 'Date sans heure' },
   { value: 'date-with-time', label: 'Date avec heure' },
+  { value: 'duration', label: 'Durée (depuis une date)' },
   { value: 'yes-no', label: 'Oui/Non' },
   { value: 'enum', label: 'Choix dans une liste' },
   { value: 'multi-choice', label: 'Choix multiple dans une liste' },

@@ -28,7 +28,7 @@ const CustomFieldInput = forwardRef(({ label, field, value, handleChange, ...pro
           {...props}
         />
       )}
-      {!!['date-with-time', 'date'].includes(field.type) && (
+      {!!['date-with-time', 'date', 'duration'].includes(field.type) && (
         <DateAndTimeInput
           label={label}
           setDate={handleChange}

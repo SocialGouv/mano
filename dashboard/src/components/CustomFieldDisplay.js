@@ -1,5 +1,6 @@
 import React from 'react';
-import { formatDateTimeWithNameOfDay, formatDateWithNameOfDay } from '../services/date';
+import { dayjsInstance, formatDateTimeWithNameOfDay, formatDateWithNameOfDay } from '../services/date';
+import { getDuration } from '../scenes/stats/utils';
 
 const showBoolean = (value) => {
   if (value === null) return '';
@@ -24,6 +25,7 @@ const CustomFieldDisplay = ({ type, value }) => {
       )}
       {!!['date-with-time'].includes(type) && !!value && <span>{formatDateTimeWithNameOfDay(value)}</span>}
       {!!['date'].includes(type) && !!value && <span>{formatDateWithNameOfDay(value)}</span>}
+      {!!['duration'].includes(type) && !!value && <span>{getDuration(dayjsInstance(value).unix()).join(' ')}</span>}
       {!!['boolean'].includes(type) && <span>{showBoolean(value)}</span>}
       {!!['yes-no'].includes(type) && <span>{value}</span>}
       {!!['enum'].includes(type) && <span>{value}</span>}

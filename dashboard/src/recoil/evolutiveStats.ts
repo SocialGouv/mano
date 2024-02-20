@@ -18,6 +18,7 @@ export const evolutiveStatsIndicatorsBaseSelector = selector({
         case 'text':
         case 'textarea':
         case 'date':
+        case 'duration':
         case 'date-with-time':
           return false;
         case 'multi-choice':
