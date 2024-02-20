@@ -6003,14 +6003,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graceful-fs@npm:^4.1.11, graceful-fs@npm:^4.1.2, graceful-fs@npm:^4.1.3, graceful-fs@npm:^4.1.6, graceful-fs@npm:^4.2.0, graceful-fs@npm:^4.2.4, graceful-fs@npm:^4.2.9":
-  version: 4.2.10
-  resolution: "graceful-fs@npm:4.2.10"
-  checksum: 4223a833e38e1d0d2aea630c2433cfb94ddc07dfc11d511dbd6be1d16688c5be848acc31f9a5d0d0ddbfb56d2ee5a6ae0278aceeb0ca6a13f27e06b9956fb952
-  languageName: node
-  linkType: hard
-
-"graceful-fs@npm:^4.2.6":
+"graceful-fs@npm:^4.1.11, graceful-fs@npm:^4.1.2, graceful-fs@npm:^4.1.3, graceful-fs@npm:^4.1.6, graceful-fs@npm:^4.2.0, graceful-fs@npm:^4.2.4, graceful-fs@npm:^4.2.6, graceful-fs@npm:^4.2.9":
   version: 4.2.11
   resolution: "graceful-fs@npm:4.2.11"
   checksum: 386d011a553e02bc594ac2ca0bd6d9e4c22d7fa8cfbfc448a6d148c59ea881b092db9dbe3547ae4b88e55f1b01f7c4a2ecc53b310c042793e63aa44cf6c257f2
@@ -9671,8 +9664,8 @@ __metadata:
   linkType: hard
 
 "react-native-document-picker@npm:^8.1.3":
-  version: 8.1.3
-  resolution: "react-native-document-picker@npm:8.1.3"
+  version: 8.2.2
+  resolution: "react-native-document-picker@npm:8.2.2"
   dependencies:
     invariant: "npm:^2.2.4"
   peerDependencies:
@@ -9682,7 +9675,7 @@ __metadata:
   peerDependenciesMeta:
     react-native-windows:
       optional: true
-  checksum: a2590034365a14412b3341129e80731e346377c900a7408176390ceb78438502151015c554db99572b0e5a063bdd7db9c3d8218f136db909cf8f9c115ab03de4
+  checksum: 196ea75d2a2232d25ab27c3a0a1e54313bea46f7d770549ed3262362648b49aed552126dd42dd96582cc825f367fed6720bf8e30954e64d2246e9b18bdd7bb26
   languageName: node
   linkType: hard
 
