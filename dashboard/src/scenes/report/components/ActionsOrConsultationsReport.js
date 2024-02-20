@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { mappedIdsToLabels } from '../../../recoil/actions';
+import { CANCEL, DONE, TODO, mappedIdsToLabels } from '../../../recoil/actions';
 import { useHistory } from 'react-router-dom';
 import SelectCustom from '../../../components/SelectCustom';
 import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from '../../../components/tailwind/Modal';
@@ -11,12 +11,29 @@ import { useRecoilValue } from 'recoil';
 import { userState } from '../../../recoil/auth';
 import { dayjsInstance } from '../../../services/date';
 
-export const ActionsOrConsultationsReport = ({ actions, consultations, period }) => {
+export const ActionsOrConsultationsReport = ({ actions, consultations, actionsCreated, consultationsCreated, period }) => {
   const [activeTab, setActiveTab] = useLocalStorage('reports-actions-consultation-toggle', 'Actions');
   const [fullScreen, setFullScreen] = useState(false);
-  const [filterStatus, setFilterStatus] = useState([]);
+  const [filterStatus, setFilterStatus] = useState([TODO, DONE, CANCEL]);
+
+  const hasCreatedAtFilter = filterStatus.includes('CREATED');
   const filteredActions = actions.filter((item) => !filterStatus.length || filterStatus.includes(item.status));
+  if (hasCreatedAtFilter || !filterStatus.length) {
+    for (const action of actionsCreated) {
+      if (!filteredActions.find((a) => a._id === action._id)) {
+        filteredActions.push(action);
+      }
+    }
+  }
   const filteredConsultations = consultations.filter((item) => !filterStatus.length || filterStatus.includes(item.status));
+  if (hasCreatedAtFilter || !filterStatus.length) {
+    for (const consultation of consultationsCreated) {
+      if (!filteredConsultations.find((c) => c._id === consultation._id)) {
+        filteredConsultations.push(consultation);
+      }
+    }
+  }
+
   const data = activeTab.includes('Actions') ? actions : consultations;
   const filteredData = activeTab.includes('Actions') ? filteredActions : filteredConsultations;
   const history = useHistory();
@@ -67,7 +84,7 @@ export const ActionsOrConsultationsReport = ({ actions, consultations, period })
             </button>
           </div>
         </div>
-        <div className="w-full tw-max-w-lg tw-bg-white tw-px-7 tw-pb-1">
+        <div className="tw-w-full tw-px-7 tw-pb-2">
           <ActionsOrConsultationsFilters setFilterStatus={setFilterStatus} filterStatus={filterStatus} disabled={!data.length} />
         </div>
         <div className="tw-grow tw-overflow-y-auto tw-border-t tw-border-main tw-border-opacity-20">
@@ -142,17 +159,23 @@ export const ActionsOrConsultationsReport = ({ actions, consultations, period })
 };
 
 const ActionsOrConsultationsFilters = ({ setFilterStatus, filterStatus, disabled }) => {
+  const options = [
+    { _id: TODO, name: 'À faire' },
+    { _id: DONE, name: 'Faite' },
+    { _id: CANCEL, name: 'Annulée' },
+    { _id: 'CREATED', name: 'Créée' },
+  ];
   return (
     <>
       <div className="tw-flex tw-justify-between">
-        <div className="tw-flex tw-w-full tw-shrink-0 tw-grow tw-items-center tw-pl-1 tw-pr-2">
-          <label htmlFor="action-select-status-filter" className="tw-text-xs">
-            Filtrer par statut
+        <div className="tw-flex tw-w-full tw-shrink-0 tw-grow tw-content-center tw-items-center tw-pl-1 tw-pr-2">
+          <label htmlFor="action-select-status-filter" className="tw-mr-2 tw-mt-2 tw-text-sm">
+            Filtrer
           </label>
           <div className="tw-w-full">
             <SelectCustom
               inputId="action-select-status-filter"
-              options={mappedIdsToLabels}
+              options={options}
               getOptionValue={(s) => s._id}
               getOptionLabel={(s) => s.name}
               name="status"
@@ -160,7 +183,7 @@ const ActionsOrConsultationsFilters = ({ setFilterStatus, filterStatus, disabled
               isClearable
               isDisabled={disabled}
               isMulti
-              value={mappedIdsToLabels.filter((s) => filterStatus.includes(s._id))}
+              value={options.filter((s) => filterStatus.includes(s._id))}
             />
           </div>
         </div>
