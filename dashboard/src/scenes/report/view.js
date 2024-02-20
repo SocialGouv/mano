@@ -67,7 +67,9 @@ const itemsForReportsSelector = selectorFamily({
       const personsCreated = {};
       const personsUpdated = {};
       const actions = {};
+      const actionsCreated = {};
       const consultations = {};
+      const consultationsCreated = {};
       const comments = {};
       const commentsMedical = {};
       const passages = {};
@@ -99,6 +101,9 @@ const itemsForReportsSelector = selectorFamily({
             let isIncluded = false;
             for (const team of action.teams) {
               const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[team] ?? defaultIsoDates;
+              if (action.createdAt >= isoStartDate && action.createdAt < isoEndDate) {
+                actionsCreated[action._id] = action;
+              }
               if (action.completedAt >= isoStartDate && action.completedAt < isoEndDate) {
                 isIncluded = true;
                 continue;
@@ -118,6 +123,9 @@ const itemsForReportsSelector = selectorFamily({
             let isIncluded = false;
             for (const team of consultation.teams) {
               const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[team] ?? defaultIsoDates;
+              if (consultation.createdAt >= isoStartDate && consultation.createdAt < isoEndDate) {
+                consultationsCreated[consultation._id] = consultation;
+              }
               if (consultation.completedAt >= isoStartDate && consultation.completedAt < isoEndDate) {
                 isIncluded = true;
                 continue;
@@ -189,7 +197,9 @@ const itemsForReportsSelector = selectorFamily({
         personsCreated: Object.values(personsCreated),
         personsUpdated: Object.values(personsUpdated),
         actions: Object.values(actions),
+        actionsCreated: Object.values(actionsCreated),
         consultations: Object.values(consultations),
+        consultationsCreated: Object.values(consultationsCreated),
         comments: Object.values(comments),
         commentsMedical: Object.values(commentsMedical),
         passages: Object.values(passages).sort((a, b) => (a.date >= b.date ? -1 : 1)),
@@ -242,7 +252,19 @@ const View = () => {
     return teamsIdsObject;
   }, [selectedTeams, period]);
 
-  const { personsCreated, actions, consultations, comments, commentsMedical, passages, rencontres, observations, reports } = useRecoilValue(
+  const {
+    personsCreated,
+    actions,
+    consultations,
+    comments,
+    commentsMedical,
+    passages,
+    rencontres,
+    observations,
+    reports,
+    actionsCreated,
+    consultationsCreated,
+  } = useRecoilValue(
     itemsForReportsSelector({
       period,
       viewAllOrganisationData,
@@ -356,7 +378,13 @@ const View = () => {
               ].join(' ')}>
               <div className="tw-mb-12 tw-min-h-1/2 tw-basis-6/12 tw-overflow-auto print:tw-min-h-0 print:tw-basis-full">
                 <div className="tw-mb-4 tw-h-[60vh] tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow print:tw-h-auto print:tw-border-none print:tw-shadow-none">
-                  <ActionsOrConsultationsReport actions={actions} consultations={consultations} period={period} />
+                  <ActionsOrConsultationsReport
+                    actions={actions}
+                    consultations={consultations}
+                    actionsCreated={actionsCreated}
+                    consultationsCreated={consultationsCreated}
+                    period={period}
+                  />
                 </div>
                 {canSeeComments && (
                   <div className="tw-mb-4 tw-h-[60vh] tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow print:tw-h-auto print:tw-border-none print:tw-shadow-none">
