@@ -70,12 +70,12 @@ export const prepareActionForEncryption = (action, { checkRequiredFields = true 
       if (!looseUuidRegex.test(action.person)) {
         throw new Error('Action is missing person');
       }
+      if (!action.teams?.length) throw new Error('Action is missing teams');
       for (const team of action.teams) {
         if (!looseUuidRegex.test(team)) {
           throw new Error('Invalid team in Action');
         }
       }
-      if (!action.teams.length) throw new Error('Action is missing teams');
       if (!looseUuidRegex.test(action.user)) {
         throw new Error('Action is missing user');
       }

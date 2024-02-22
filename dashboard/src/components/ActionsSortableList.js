@@ -2,7 +2,6 @@ import React, { useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import Table from './table';
-import ActionStatus from './ActionStatus';
 import DateBloc from './DateBloc';
 import ActionOrConsultationName from './ActionOrConsultationName';
 import PersonName from './PersonName';
@@ -19,6 +18,7 @@ import Page from './pagination';
 import useSearchParamState from '../services/useSearchParamState';
 import DescriptionIcon from './DescriptionIcon';
 import { AgendaMutedIcon } from '../assets/icons/AgendaMutedIcon';
+import ActionStatusSelect from './ActionStatusSelect';
 
 const ActionsSortableList = ({ data, limit }) => {
   useTitle('Agenda');
@@ -138,7 +138,7 @@ const ActionsSortableList = ({ data, limit }) => {
             sortBy,
             sortOrder,
             dataKey: 'status',
-            render: (action) => <ActionStatus status={action.status} />,
+            render: (action) => <ActionStatusSelect action={action} />,
           },
           {
             title: 'Équipe(s) en charge',

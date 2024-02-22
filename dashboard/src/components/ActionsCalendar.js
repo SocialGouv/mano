@@ -3,7 +3,6 @@ import { useHistory, useLocation } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import { addOneDay, dayjsInstance, formatCalendarDate, formatDateTimeWithNameOfDay, formatTime, subtractOneDay } from '../services/date';
 import Table from './table';
-import ActionStatus from './ActionStatus';
 import ActionOrConsultationName from './ActionOrConsultationName';
 import PersonName from './PersonName';
 import ConsultationButton from './ConsultationButton';
@@ -15,6 +14,7 @@ import TagTeam from './TagTeam';
 import { useLocalStorage } from '../services/useLocalStorage';
 import TabsNav from './tailwind/TabsNav';
 import DescriptionIcon from './DescriptionIcon';
+import ActionStatusSelect from './ActionStatusSelect';
 
 const ActionsCalendar = ({ actions, isNightSession, columns = ['Heure', 'Nom', 'Personne suivie', 'Créée le', 'Statut', 'Équipe(s) en charge'] }) => {
   const history = useHistory();
@@ -180,7 +180,7 @@ const ActionsCalendar = ({ actions, isNightSession, columns = ['Heure', 'Nom', '
           sortBy,
           sortOrder,
           dataKey: 'status',
-          render: (action) => <ActionStatus status={action.status} />,
+          render: (action) => <ActionStatusSelect action={action} />,
         },
         {
           title: 'Équipe(s) en charge',

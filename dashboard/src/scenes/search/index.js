@@ -32,6 +32,7 @@ import DescriptionIcon from '../../components/DescriptionIcon';
 import { consultationsState } from '../../recoil/consultations';
 import { medicalFileState } from '../../recoil/medicalFiles';
 import { treatmentsState } from '../../recoil/treatments';
+import ActionStatusSelect from '../../components/ActionStatusSelect';
 
 const personsWithFormattedBirthDateSelector = selector({
   key: 'personsWithFormattedBirthDateSelector',
@@ -364,7 +365,7 @@ const Actions = ({ actions }) => {
           onSortBy: setSortBy,
           sortBy,
           sortOrder,
-          render: (action) => <ActionStatus status={action.status} />,
+          render: (action) => <ActionStatusSelect action={action} />,
         },
         {
           title: 'Équipe(s) en charge',
@@ -474,7 +475,7 @@ const Consultations = ({ consultations }) => {
           onSortBy: setSortBy,
           sortBy,
           sortOrder,
-          render: (consultation) => <ActionStatus status={consultation.status} />,
+          render: (consultation) => <ActionStatusSelect action={consultation} />,
         },
         {
           title: 'Équipe(s) en charge',

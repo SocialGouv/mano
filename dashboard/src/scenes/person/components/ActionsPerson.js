@@ -5,7 +5,6 @@ import { CANCEL, DONE, flattenedActionsCategoriesSelector, mappedIdsToLabels } f
 import { useHistory } from 'react-router-dom';
 import SelectCustom from '../../../components/SelectCustom';
 import ExclamationMarkButton from '../../../components/tailwind/ExclamationMarkButton';
-import ActionStatus from '../../../components/ActionStatus';
 import TagTeam from '../../../components/TagTeam';
 import ActionOrConsultationName from '../../../components/ActionOrConsultationName';
 import { formatDateWithNameOfDay, formatTime } from '../../../services/date';
@@ -16,6 +15,7 @@ import UserName from '../../../components/UserName';
 import { itemsGroupedByPersonSelector } from '../../../recoil/selectors';
 import DescriptionIcon from '../../../components/DescriptionIcon';
 import SelectTeamMultiple from '../../../components/SelectTeamMultiple';
+import ActionStatusSelect from '../../../components/ActionStatusSelect';
 
 const filteredPersonActionsSelector = selectorFamily({
   key: 'filteredPersonActionsSelector',
@@ -161,12 +161,7 @@ const ActionsFilters = ({ data, setFilterCategories, setFilterTeamIds, setFilter
             <label htmlFor="action-select-categories-filter" className="tw-text-xs">
               Filtrer par équipe
             </label>
-            <SelectTeamMultiple
-              onChange={(teamIds) => setFilterTeamIds(teamIds)}
-              value={filterTeamIds}
-              colored
-              inputId="action-team-select"
-            />
+            <SelectTeamMultiple onChange={(teamIds) => setFilterTeamIds(teamIds)} value={filterTeamIds} colored inputId="action-team-select" />
           </div>
           <div className="tw-shrink-0 tw-grow tw-basis-1/3 tw-pl-1 tw-pr-2">
             <label htmlFor="action-select-status-filter" className="tw-text-xs">
@@ -223,7 +218,7 @@ const ActionsTable = ({ filteredData }) => {
                       <span>{`${date}${time}`}</span>
                     </div>
                     <div>
-                      <ActionStatus status={action.status} />
+                      <ActionStatusSelect action={action} />
                     </div>
                   </div>
                   <div className="tw-mt-2 tw-flex">

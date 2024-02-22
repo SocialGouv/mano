@@ -12,6 +12,7 @@ import { organisationState, userState } from '../recoil/auth';
 import TagTeam from './TagTeam';
 import useSearchParamState from '../services/useSearchParamState';
 import { disableConsultationRow } from '../recoil/consultations';
+import ActionStatusSelect from './ActionStatusSelect';
 
 // TODO: remove inline style when UI is stabilized.
 
@@ -166,7 +167,7 @@ function ActionsOfDay({ actions }) {
             🧑 <PersonName item={action} />
           </div>
           {!!organisation.groupsEnabled && !!action.group && <div>👪 Action familiale</div>}
-          <ActionStatus status={action.status} />
+          <ActionStatusSelect action={action} />
         </div>
       ))}
     </>

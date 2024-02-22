@@ -16,6 +16,7 @@ import { disableConsultationRow } from '../../../recoil/consultations';
 import { FullScreenIcon } from '../../../assets/icons/FullScreenIcon';
 import UserName from '../../../components/UserName';
 import DescriptionIcon from '../../../components/DescriptionIcon';
+import ActionStatusSelect from '../../../components/ActionStatusSelect';
 
 export const Consultations = ({ person }) => {
   const [fullScreen, setFullScreen] = useState(false);
@@ -190,7 +191,7 @@ const ConsultationsTable = ({ filteredData, person }) => {
                         {`${date}${time}`}
                       </div>
                       <div>
-                        <ActionStatus status={consultation.status} />
+                        <ActionStatusSelect action={consultation} />
                       </div>
                     </div>
                     <div className="tw-mt-2 tw-flex">
