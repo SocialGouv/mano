@@ -4,7 +4,6 @@ import { useHistory } from 'react-router-dom';
 import { organisationState, userState } from '../../../recoil/auth';
 import { CANCEL, DONE, mappedIdsToLabels } from '../../../recoil/actions';
 import SelectCustom from '../../../components/SelectCustom';
-import ActionStatus from '../../../components/ActionStatus';
 import TagTeam from '../../../components/TagTeam';
 import ActionOrConsultationName from '../../../components/ActionOrConsultationName';
 import { formatDateWithNameOfDay, formatTime } from '../../../services/date';

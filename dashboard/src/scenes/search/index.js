@@ -2,7 +2,6 @@ import React, { useMemo, Fragment } from 'react';
 import { useHistory } from 'react-router-dom';
 import DateBloc from '../../components/DateBloc';
 import Header from '../../components/header';
-import ActionStatus from '../../components/ActionStatus';
 import Table from '../../components/table';
 import Observation from '../territory-observations/view';
 import dayjs from 'dayjs';

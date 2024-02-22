@@ -5,7 +5,6 @@ import { useRecoilValue } from 'recoil';
 import { CANCEL, DONE } from '../recoil/actions';
 import { dayjsInstance, formatTime } from '../services/date';
 import ActionOrConsultationName from './ActionOrConsultationName';
-import ActionStatus from './ActionStatus';
 import ExclamationMarkButton from './tailwind/ExclamationMarkButton';
 import PersonName from './PersonName';
 import { organisationState, userState } from '../recoil/auth';
