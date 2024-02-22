@@ -351,7 +351,6 @@ function CommentDisplay({ comment, onClose, onEditComment, canToggleUrgentCheck,
 
   const isEditable = useMemo(() => {
     if (comment.user === user?._id) return true;
-    if (['action', 'person'].includes(comment.type)) return true;
     return false;
   }, [comment, user]);
 
@@ -443,9 +442,8 @@ function CommentModal({
   const isEditable = useMemo(() => {
     if (isNewComment) return true;
     if (comment.user === user?._id) return true;
-    if (['action', 'person'].includes(comment.type)) return true;
     return false;
-  }, [comment, isNewComment, user]);
+  }, [comment.user, isNewComment, user]);
 
   return (
     <>
@@ -460,7 +458,6 @@ function CommentModal({
         <Formik
           initialValues={{ urgent: false, group: false, ...comment, comment: comment.comment || window.sessionStorage.getItem('currentComment') }}
           onSubmit={async (body, actions) => {
-            if (!body.user && !isNewComment) return toast.error("L'utilisateur est obligatoire");
             if (!body.date && !isNewComment) return toast.error('La date est obligatoire');
             if (!body.comment) return toast.error('Le commentaire est obligatoire');
             if (!isNewComment && (!body.date || outOfBoundariesDate(body.date)))
@@ -470,7 +467,7 @@ function CommentModal({
               comment: body.comment,
               urgent: body.urgent || false,
               group: body.group || false,
-              user: body.user || user._id,
+              user: user._id,
               date: body.date || new Date(),
               team: body.team || currentTeam._id,
               organisation: organisation._id,
@@ -501,7 +498,7 @@ function CommentModal({
                       <label htmlFor="user">Créé par</label>
                       <SelectUser
                         inputId="user"
-                        isDisabled={isNewComment || !isEditable}
+                        isDisabled={true}
                         value={values.user || user._id}
                         onChange={(userId) => handleChange({ target: { value: userId, name: 'user' } })}
                       />
@@ -587,7 +584,7 @@ function CommentModal({
                   <button
                     type="button"
                     className="button-destructive"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || !isEditable}
                     onClick={async () => {
                       if (!window.confirm('Voulez-vous vraiment supprimer ce commentaire ?')) return;
                       window.sessionStorage.removeItem('currentComment');
