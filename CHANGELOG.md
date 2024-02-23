@@ -1,3 +1,15 @@
+# [1.306.0](https://github.com/SocialGouv/mano/compare/v1.305.4...v1.306.0) (2024-02-23)
+
+
+### Bug Fixes
+
+* ajout d'un message de migration sur mobile ([#1871](https://github.com/SocialGouv/mano/issues/1871)) ([1ee0766](https://github.com/SocialGouv/mano/commit/1ee076675040eb9c9b0258d0ce23c0b59a634f8e))
+
+
+### Features
+
+* bandeau de fin de mano fabrique ([#1863](https://github.com/SocialGouv/mano/issues/1863)) ([5678872](https://github.com/SocialGouv/mano/commit/567887242ec9e21e69413e72010dfd2b2b9ed465))
+
 ## [1.305.4](https://github.com/SocialGouv/mano/compare/v1.305.3...v1.305.4) (2024-02-20)
 
 
