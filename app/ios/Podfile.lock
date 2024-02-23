@@ -399,7 +399,7 @@ PODS:
     - React-Core
   - react-native-pager-view (5.4.25):
     - React-Core
-  - react-native-pdf (6.6.2):
+  - react-native-pdf (6.7.4):
     - React-Core
   - react-native-safe-area-context (4.5.0):
     - RCT-Folly
@@ -884,7 +884,7 @@ SPEC CHECKSUMS:
   react-native-mmkv: e97c0c79403fb94577e5d902ab1ebd42b0715b43
   react-native-netinfo: 5ddbf20865bcffab6b43d0e4e1fd8b3896beb898
   react-native-pager-view: da490aa1f902c9a5aeecf0909cc975ad0e92e53e
-  react-native-pdf: 33c622cbdf776a649929e8b9d1ce2d313347c4fa
+  react-native-pdf: 79aa75e39a80c1d45ffe58aa500f3cf08f267a2e
   react-native-safe-area-context: 39c2d8be3328df5d437ac1700f4f3a4f75716acc
   react-native-sodium: 274874541aa6bd00040f28c2e1e5118cbf113c0e
   react-native-webview: 9f111dfbcfc826084d6c507f569e5e03342ee1c1

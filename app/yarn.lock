@@ -4573,10 +4573,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"crypto-js@npm:^3.2.0":
-  version: 3.3.0
-  resolution: "crypto-js@npm:3.3.0"
-  checksum: 10b5d91bdc85095df9be01f9d0d954b8a3aba6202f143efa6215b8b3d5dd984e0883e10aeff792ef4a51b77cd4442320242b496acf6dce5069d0e0fc2e1d75d2
+"crypto-js@npm:4.2.0":
+  version: 4.2.0
+  resolution: "crypto-js@npm:4.2.0"
+  checksum: 8fbdf9d56f47aea0794ab87b0eb9833baf80b01a7c5c1b0edc7faf25f662fb69ab18dc2199e2afcac54670ff0cd9607a9045a3f7a80336cccd18d77a55b9fdf0
   languageName: node
   linkType: hard
 
@@ -8044,7 +8044,7 @@ __metadata:
     react-native-image-picker: "npm:^4.10.3"
     react-native-mmkv: "npm:^2.11.0"
     react-native-pager-view: "npm:^5.4.25"
-    react-native-pdf: "npm:^6.6.0"
+    react-native-pdf: "npm:^6.7.4"
     react-native-permissions: "npm:^3.6.1"
     react-native-reanimated: "npm:^3.5.4"
     react-native-safe-area-context: "npm:^4.4.1"
@@ -9859,13 +9859,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-pdf@npm:^6.6.0":
-  version: 6.6.2
-  resolution: "react-native-pdf@npm:6.6.2"
+"react-native-pdf@npm:^6.7.4":
+  version: 6.7.4
+  resolution: "react-native-pdf@npm:6.7.4"
   dependencies:
-    crypto-js: "npm:^3.2.0"
+    crypto-js: "npm:4.2.0"
     deprecated-react-native-prop-types: "npm:^2.3.0"
-  checksum: 7b1552855d2e03ea4e2bac0dd1cea5361506dfd43127ca5fa67a4b8806dc5367d52936bcefd3334c3ecb3ed894cd4201bd1879155cefb56d31eda3b841777bae
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+    react-native-blob-util: ">=0.13.7"
+  checksum: a0471616696c7c0e48511d726bc0637300ad7f175e8e96398858f667c10b84050b3160796683294964deeb820b12e3b95d3db93fd0b73718e530822d86894782
   languageName: node
   linkType: hard
 
