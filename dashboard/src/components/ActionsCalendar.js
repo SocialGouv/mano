@@ -138,9 +138,10 @@ const ActionsCalendar = ({ actions, isNightSession, columns = ['Heure', 'Nom', '
           sortBy,
           sortOrder,
           small: true,
+          style: { width: '80px' },
           render: (action) => {
             if (!action.dueAt || !action.withTime) return null;
-            return formatTime(action.dueAt);
+            return <div className="tw-text-center">{formatTime(action.dueAt)}</div>;
           },
         },
         {
@@ -180,6 +181,7 @@ const ActionsCalendar = ({ actions, isNightSession, columns = ['Heure', 'Nom', '
           sortBy,
           sortOrder,
           dataKey: 'status',
+          style: { width: '90px' },
           render: (action) => <ActionStatusSelect action={action} />,
         },
         {

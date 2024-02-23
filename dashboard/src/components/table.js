@@ -90,8 +90,8 @@ const Table = ({
                   {column.help && <>{column.help}</>}
                   {!!onSortBy && (sortBy === sortableKey || sortBy === dataKey) && (
                     <button onClick={!!onSortBy ? onNameClick : null} type="button" aria-label="Changer l'ordre de tri">
-                      {sortOrder === 'ASC' && <span className="tw-mx-4" onClick={() => onSortOrder('DESC')}>{`\u00A0\u2193`}</span>}
-                      {sortOrder === 'DESC' && <span className="tw-mx-4" onClick={() => onSortOrder('ASC')}>{`\u00A0\u2191`}</span>}
+                      {sortOrder === 'ASC' && <span className="tw-mx-1" onClick={() => onSortOrder('DESC')}>{`\u00A0\u2193`}</span>}
+                      {sortOrder === 'DESC' && <span className="tw-mx-1" onClick={() => onSortOrder('ASC')}>{`\u00A0\u2191`}</span>}
                     </button>
                   )}
                 </td>
