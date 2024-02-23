@@ -112,9 +112,8 @@ export const CustomResponsiveBar = ({
   }, [chartData, isMultiChoice]);
 
   const total = useMemo(() => {
-    if (!isMultiChoice) return data.reduce((sum, item) => sum + getItemValue(item), 0);
-    return biggestValue;
-  }, [data, biggestValue, isMultiChoice]);
+    return data.reduce((sum, item) => sum + getItemValue(item), 0);
+  }, [data]);
 
   const onClick = ({ id }) => {
     if (!onItemClick) return;
@@ -148,11 +147,18 @@ export const CustomResponsiveBar = ({
               </tr>
             )}
             {Boolean(isMultiChoice) && Boolean(totalForMultiChoice) && (
-              <tr>
-                <td className="tw-border tw-border-zinc-400 tw-p-1">{totalTitleForMultiChoice}</td>
-                <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center tw-font-bold">{totalForMultiChoice}</td>
-                {/* <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center tw-font-bold ">100%</td> */}
-              </tr>
+              <>
+                <tr>
+                  <td className="tw-border tw-border-zinc-400 tw-p-1">{totalTitleForMultiChoice}</td>
+                  <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center tw-font-bold">{totalForMultiChoice}</td>
+                  <td className="tw-border tw-border-zinc-400 tw-p-1"></td>
+                </tr>
+                <tr>
+                  <td className="tw-border tw-border-zinc-400 tw-p-1 tw-font-bold">Total des valeurs</td>
+                  <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center tw-font-bold">{total}</td>
+                  <td className="tw-border tw-border-zinc-400 tw-p-1"></td>
+                </tr>
+              </>
             )}
           </tbody>
         </table>
