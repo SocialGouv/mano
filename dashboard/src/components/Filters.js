@@ -215,10 +215,10 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :', saveInURLParams
 
             return (
               <div className="tw-mx-auto tw-mb-2.5 tw-flex tw-items-center tw-gap-2" key={`${filter.field || 'empty'}${index}`}>
-                <div className="tw-grow tw-basis-2/12">
+                <div className="tw-min-w-[85px] tw-shrink-0">
                   <p className="tw-m-0 tw-w-full tw-pr-4 tw-text-right">{index === 0 ? 'Filtrer par' : 'ET'}</p>
                 </div>
-                <div className="tw-basis-4/12">
+                <div className="tw-w-96 tw-min-w-[384px]">
                   <SelectCustom
                     options={filterFields}
                     value={filter.field ? filter : null}
@@ -229,14 +229,14 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :', saveInURLParams
                     isMulti={false}
                   />
                 </div>
-                <div className="tw-basis-4/12">
+                <div className="tw-grow">
                   <ValueSelector field={filter.field} filterValues={filterValues} value={filter.value} base={base} onChangeValue={onChangeValue} />
                 </div>
-                <div className="tw-basis-2/12">
+                <div className="tw-shrink-0">
                   {!!filters.filter((_filter) => Boolean(_filter.field)).length && (
                     <button
                       type="button"
-                      className="tw-h-full tw-w-full tw-rounded tw-border tw-border-gray-300 tw-bg-white tw-text-red-500"
+                      className="tw-h-full tw-w-full tw-rounded tw-border tw-border-gray-300 tw-bg-white tw-py-2 tw-px-2.5 tw-text-sm tw-text-red-500 hover:tw-bg-red-100"
                       onClick={onRemoveFilter}>
                       Retirer
                     </button>
@@ -305,6 +305,7 @@ const numberOptions = [
 
 const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
   const [comparator, setComparator] = React.useState(null);
+  const [unfilledChecked, setUnfilledChecked] = React.useState(value === 'Non renseigné');
   if (!field) return <></>;
   const current = base.find((filter) => filter.field === field);
   if (!current) return <></>;
@@ -312,23 +313,41 @@ const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
 
   if (['text', 'textarea'].includes(type)) {
     return (
-      <input
-        name={name}
-        className="tailwindui !tw-mt-0"
-        type="text"
-        value={value || ''}
-        onChange={(e) => {
-          e.preventDefault();
-          onChangeValue(e.target.value);
-        }}
-      />
+      <div className="tw-flex">
+        <input
+          name={name}
+          className={`tailwindui !tw-mt-0 tw-grow ${unfilledChecked ? '!tw-text-gray-400' : ''}`}
+          disabled={unfilledChecked}
+          type="text"
+          value={value || ''}
+          onChange={(e) => {
+            e.preventDefault();
+            onChangeValue(e.target.value);
+          }}
+        />
+        <div className="tw-ml-2 tw-flex tw-shrink-0 tw-items-center tw-gap-1">
+          <input
+            type="checkbox"
+            id="unfilled"
+            className={`tw-h-4 tw-w-4`}
+            checked={unfilledChecked}
+            onChange={() => {
+              setUnfilledChecked(!unfilledChecked);
+              onChangeValue(unfilledChecked ? '' : 'Non renseigné');
+            }}
+          />
+          <label htmlFor="unfilled" className="tw-pt-2 tw-text-xs">
+            Non renseigné
+          </label>
+        </div>
+      </div>
     );
   }
 
   if (['date-with-time', 'date', 'duration'].includes(type)) {
     return (
       <div className="-tw-mx-4 tw-flex tw-flex-wrap">
-        <div className={['tw-px-4', value?.comparator !== 'unfilled' ? 'tw-basis-1/2' : 'tw-basis-full'].join(' ')}>
+        <div className={['tw-pl-4', value?.comparator !== 'unfilled' ? 'tw-basis-1/2 tw-pr-2' : 'tw-basis-full tw-pr-4'].join(' ')}>
           <SelectCustom
             options={dateOptions}
             value={dateOptions.find((opt) => opt.value === value?.comparator)}
@@ -341,7 +360,7 @@ const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
           />
         </div>
         {value?.comparator !== 'unfilled' && (
-          <div className="tw-basis-1/2 tw-px-4">
+          <div className="tw-basis-1/2 tw-pr-4">
             <DatePicker
               id={name}
               defaultValue={value?.date ? new Date(value?.date) : null}
@@ -358,7 +377,7 @@ const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
       <div className="-tw-mx-4 tw-flex tw-flex-wrap tw-items-center">
         <div
           className={[
-            'tw-px-4',
+            'tw-pl-4 tw-pr-2',
             value?.comparator === 'unfilled' ? 'tw-basis-full' : '',
             value?.comparator === 'between' ? 'tw-basis-5/12' : '',
             !['unfilled', 'between'].includes(value?.comparator) ? 'tw-basis-1/2' : '',
@@ -375,7 +394,7 @@ const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
           />
         </div>
         {value?.comparator !== 'unfilled' && (
-          <div className={['tw-px-4', value?.comparator === 'between' ? 'tw-basis-3/12' : 'tw-basis-1/2'].join(' ')}>
+          <div className={['tw-pr-4', value?.comparator === 'between' ? 'tw-basis-3/12' : 'tw-basis-1/2'].join(' ')}>
             <input
               name={name}
               className="tailwindui !tw-mt-0"
