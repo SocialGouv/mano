@@ -30,10 +30,16 @@ export function formatDateTimeWithNameOfDay(date) {
 export function formatBirthDate(date) {
   if (!date) return null;
   const birthDate = dayjs(date);
-  return `${birthDate.format('DD/MM/YYYY')} (${formatAge(date)} ans)`;
+  return `${birthDate.format('DD/MM/YYYY')} (${formatAge(date)})`;
 }
 
 export function formatAge(date) {
+  if (!date) return null;
+  const birthDate = dayjs(date);
+  return birthDate.fromNow(true);
+}
+
+export function ageFromBirthdateAsYear(date) {
   if (!date) return null;
   const birthDate = dayjs(date);
   return dayjsInstance(dayjsInstance()).diff(birthDate, 'year');

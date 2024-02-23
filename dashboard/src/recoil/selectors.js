@@ -3,7 +3,7 @@ import { personsState } from './persons';
 import { placesState } from './places';
 import { relsPersonPlaceState } from './relPersonPlace';
 import { reportsState } from './reports';
-import { dayjsInstance, formatAge, formatBirthDate } from '../services/date';
+import { ageFromBirthdateAsYear, dayjsInstance, formatBirthDate } from '../services/date';
 import { customFieldsObsSelector, territoryObservationsState } from './territoryObservations';
 import { selector, selectorFamily } from 'recoil';
 import { actionsState } from './actions';
@@ -105,7 +105,7 @@ export const itemsGroupedByPersonSelector = selector({
         followedSince: person.followedSince || person.createdAt,
         userPopulated: usersObject[person.user],
         formattedBirthDate: formatBirthDate(person.birthdate),
-        age: formatAge(person.birthdate),
+        age: ageFromBirthdateAsYear(person.birthdate),
         formattedPhoneNumber: person.phone?.replace(/\D/g, ''),
         interactions: [person.followedSince || person.createdAt],
         lastUpdateCheckForGDPR: person.followedSince || person.createdAt,
