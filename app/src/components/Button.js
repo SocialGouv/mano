@@ -29,10 +29,10 @@ const Button = ({
 }) => {
   const Root = loading !== undefined ? TouchableWithoutFeedback : TouchableOpacity;
   return (
-    <Root onPress={onPress} disabled={disabled} hitSlop={hitSlop} testID={testID}>
+    <Root onPress={onPress} disabled={loading || disabled} hitSlop={hitSlop} testID={testID}>
       <ButtonContainer
         outlined={outlined}
-        disabled={disabled}
+        disabled={loading || disabled}
         backgroundColor={backgroundColor}
         buttonSize={buttonSize}
         noBorder={noBorder}
