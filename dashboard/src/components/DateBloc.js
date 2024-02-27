@@ -1,5 +1,3 @@
-import React from 'react';
-import styled from 'styled-components';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import 'dayjs/locale/fr';
