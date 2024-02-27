@@ -63,14 +63,14 @@ const DragAndDropSettings = ({
     }
     if (groups.length !== data.length) {
       capture('Drag and drop group error', { extra: { groups, data, title } });
-      return toast.error('Désolé, une erreur est survenue lors du glisser/déposer', "L'équipe technique a été prévenue. Vous pouvez réessayer");
+      return toast.error("Désolé, une erreur est survenue lors du glisser/déposer. L'équipe technique a été prévenue. Vous pouvez réessayer");
     }
     if (
       groups.reduce((allItems, group) => [...allItems, ...group.items], []).length !==
       data.reduce((allItems, group) => [...allItems, ...group.items], []).length
     ) {
       capture('Drag and drop categories error', { extra: { groups, data, title } });
-      return toast.error('Désolé, une erreur est survenue lors du glisser/déposer', "L'équipe technique a été prévenue. Vous pouvez réessayer");
+      return toast.error("Désolé, une erreur est survenue lors du glisser/déposer. L'équipe technique a été prévenue. Vous pouvez réessayer");
     }
     setIsDisabled(true);
     await onDragAndDrop(groups);

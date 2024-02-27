@@ -98,7 +98,7 @@ const decryptDBItem = async (item, { path, encryptedVerificationKey = null } = {
     try {
       JSON.parse(content);
     } catch (errorDecryptParsing) {
-      toast.error(errorDecryptParsing, 'Désolé une erreur est survenue lors du déchiffrement');
+      toast.error('Désolé une erreur est survenue lors du déchiffrement ' + errorDecryptParsing);
       capture('ERROR PARSING CONTENT', { extra: { errorDecryptParsing, content } });
     }
 
@@ -118,8 +118,7 @@ const decryptDBItem = async (item, { path, encryptedVerificationKey = null } = {
     });
     if (!!encryptedVerificationKey) {
       toast.error(
-        "Désolé, un élément n'a pas pu être déchiffré",
-        "L'équipe technique a été prévenue, nous reviendrons vers vous dans les meilleurs délais."
+        "Désolé, un élément n'a pas pu être déchiffré. L'équipe technique a été prévenue, nous reviendrons vers vous dans les meilleurs délais."
       );
       return item;
     }
@@ -207,9 +206,8 @@ const execute = async ({ method, path = '', body = null, query = {}, headers = {
       organisation._id !== window.localStorage.getItem('mano-organisationId')
     ) {
       toast.error(
-        'Veuillez vous reconnecter',
-        'Il semble que des connexions à plusieurs organisations soient actives dans un même navigateur (par exemple dans un autre onglet). Cela peut poser des problèmes de cache.',
-        { timeOut: 8000 }
+        'Veuillez vous reconnecter. Il semble que des connexions à plusieurs organisations soient actives dans un même navigateur (par exemple dans un autre onglet). Cela peut poser des problèmes de cache.',
+        { autoClose: 8000 }
       );
       logout();
     }

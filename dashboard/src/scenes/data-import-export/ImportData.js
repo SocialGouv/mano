@@ -84,9 +84,8 @@ const ImportData = () => {
 
       if (!headerColumnsAndField.find((e) => e[1]?.name === 'name')) {
         toast.error(
-          `La colonne "${nameField.label}" est requise.`,
-          "Vérifiez votre fichier pour vous assurer que cette colonne existe et est correctement nommée. Vous pouvez vérifier avec le fichier d'exemple que les colonnes sont bien identiques.",
-          { timeOut: 5000 }
+          `La colonne "${nameField.label}" est requise. Vérifiez votre fichier pour vous assurer que cette colonne existe et est correctement nommée. Vous pouvez vérifier avec le fichier d'exemple que les colonnes sont bien identiques.`,
+          { autoClose: 5000 }
         );
         setReloadKey((k) => k + 1);
         return;
@@ -121,7 +120,7 @@ const ImportData = () => {
       setShowImpotSummary(true);
     } catch (e) {
       console.log(e);
-      toast.error("Désolé, nous n'avons pas pu lire votre fichier.", 'Mais vous pouvez réssayer !');
+      toast.error("Désolé, nous n'avons pas pu lire votre fichier. Mais vous pouvez réssayer !");
     }
     setReloadKey((k) => k + 1);
   };

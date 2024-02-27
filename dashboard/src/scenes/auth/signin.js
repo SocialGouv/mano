@@ -154,7 +154,7 @@ const SignIn = () => {
       setShowSelectTeam(true);
     } catch (signinError) {
       console.log('error signin', signinError);
-      toast.error('Mauvais identifiants', signinError.message);
+      toast.error('Mauvais identifiants');
     }
   };
   const handleChangeRequest = (e) => {
