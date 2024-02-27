@@ -53,7 +53,6 @@ const List = () => {
   useEffect(
     function fetchServicesCountByDay() {
       if (!(viewAllOrganisationData ? allTeamIds : selectedTeamIds)?.length) return;
-      console.log('INIT SERVICE FROM fetchServicesCountByDay');
       API.get({ path: `/service/team/${(viewAllOrganisationData ? allTeamIds : selectedTeamIds).join(',')}/month-stats/${startOfMonth}` }).then(
         (res) => {
           if (!res.ok) return toast.error("Erreur lors du chargement des statistiques des services de l'accueil");

@@ -25,7 +25,6 @@ const ServicesStats = ({ period, teamIds }) => {
         setServicesFromDatabase({});
         return;
       }
-      console.log('INIT SERVICE FROM SERVICES STATS');
       API.get({ path: `/service/team/${teamIds.join(',')}/stats`, query: startDate ? { from: startDate, to: endDate || startDate } : {} }).then(
         (res) => {
           if (!res.ok) return toast.error("Erreur lors du chargement des statistiques des services de l'accueil");

@@ -903,7 +903,6 @@ const Reception = ({ reports, selectedTeamsObject, dateString }) => {
         if (!dateString || !team || dateString === 'undefined') {
           return capture('Missing params for initServices in report', { extra: { dateString, team, report } });
         }
-        console.log('INIT SERVICE FROM REPORT VIEW');
         const res = await API.get({ path: `/service/team/${team}/date/${dateString}` });
         if (!res.ok) return toast.error(<ErrorOnGetServices />);
         const servicesFromLegacyReport = report?.services?.length ? JSON.parse(report?.services) : {};
