@@ -294,7 +294,7 @@ const Reception = () => {
               {!!passages.length && reportCreatedRef.current && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   <ButtonCustom
-                    onClick={() => history.push(`/report/${todaysReport?.date}?tab=passages`)}
+                    onClick={() => history.push(`/report/${todaysReport?.date || startOfToday().format('YYYY-MM-DD')}?tab=passages`)}
                     color="link"
                     title="Modifier les passages"
                     padding="0px"
