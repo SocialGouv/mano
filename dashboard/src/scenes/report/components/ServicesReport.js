@@ -92,7 +92,7 @@ export default function ServicesReport({ period, selectedTeamsObject }) {
             <div className="tw-flex tw-flex-col tw-items-center tw-justify-center tw-rounded-2xl tw-py-4">
               {teamIds.length > 1 ? (
                 <>
-                  <div className="tw-mb-6 tw-flex tw-items-center tw-justify-between tw-border-b-gray-300 tw-pb-2 tw-font-medium print:tw-justify-start">
+                  <div className="tw-mb-6 tw-flex tw-items-center tw-justify-between tw-border-b-gray-300 tw-px-2 tw-pb-2 tw-font-medium print:tw-justify-start">
                     <p className="tw-mb-0">
                       Services effectués par toutes les équipes sélectionnées
                       <>
@@ -111,7 +111,7 @@ export default function ServicesReport({ period, selectedTeamsObject }) {
                       count={value || 0}
                       date={dayjs(period.startDate).format('YYYY-MM-DD')}
                       disabled
-                      className="max-w-[400px] tw-w-full tw-text-neutral-600"
+                      className="max-w-[400px] tw-w-full tw-px-2 tw-text-neutral-600"
                     />
                   ))}
                 </>
@@ -174,7 +174,7 @@ function ServicesFullScreen({ open, onClose, period, isSingleDay, teamIds, servi
         <div className="py-2 tw-px-4 print:tw-mb-4">
           {teamIds.map((teamId) => {
             return (
-              <div key={teamId} className="tw-mb-4 tw-rounded-2xl tw-bg-gray-100 tw-py-4">
+              <div key={teamId} className="tw-mb-4 tw-rounded-2xl tw-bg-gray-100 tw-p-4">
                 <div
                   className={[
                     'tw-flex tw-items-center tw-justify-between tw-font-medium',

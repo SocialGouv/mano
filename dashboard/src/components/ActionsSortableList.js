@@ -101,6 +101,8 @@ const ActionsSortableList = ({ data, limit }) => {
             onSortBy: setSortBy,
             sortBy,
             sortOrder,
+            style: { width: '90px' },
+            small: true,
             render: (action) => {
               return (
                 <>
@@ -138,6 +140,7 @@ const ActionsSortableList = ({ data, limit }) => {
             sortBy,
             sortOrder,
             dataKey: 'status',
+            style: { width: '85px' },
             render: (action) => <ActionStatusSelect action={action} />,
           },
           {

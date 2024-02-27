@@ -11,10 +11,10 @@ const DateBloc = ({ date }) => {
   if (!date) return <div />;
   date = dayjs(date);
   return (
-    <Container>
-      <DayText>{date && date.format('dddd')}</DayText>
-      <DayNum>{date && date.format('D')}</DayNum>
-      <MonthText>
+    <div className="tw-m-0 tw-flex tw-flex-col tw-items-center tw-p-0">
+      <span className="tw-block tw-w-20 tw-text-center tw-text-xs tw-capitalize">{date && date.format('dddd')}</span>
+      <span className="tw-block tw-w-20 tw-text-center tw-text-2xl tw-font-bold tw-capitalize">{date && date.format('D')}</span>
+      <span className="tw-block tw-w-20 tw-text-center tw-text-xs tw-capitalize">
         {date && date.format('MMMM')}
         {date && date.format('YYYY') !== dayjs.utc().format('YYYY') && (
           <>
@@ -22,41 +22,8 @@ const DateBloc = ({ date }) => {
             {date.format('YYYY')}
           </>
         )}
-      </MonthText>
-    </Container>
+      </span>
+    </div>
   );
 };
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  /* width: 120px; */
-  margin: 0;
-  padding: 0;
-  > span {
-    width: 100px;
-    display: block;
-  }
-`;
-
-const MonthText = styled.span`
-  text-transform: capitalize;
-  text-align: center;
-  font-size: 14px;
-`;
-
-const DayNum = styled.span`
-  text-transform: capitalize;
-  text-align: center;
-  font-size: 22px;
-  font-weight: 900;
-`;
-
-const DayText = styled.span`
-  text-transform: capitalize;
-  text-align: center;
-  font-size: 14px;
-`;
-
 export default DateBloc;
