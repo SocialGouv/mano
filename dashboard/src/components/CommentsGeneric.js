@@ -246,6 +246,10 @@ function CommentsTable({ comments, onDisplayComment, onEditComment, onAddComment
                         history.push(`/person/${comment.person}?rencontreId=${comment.rencontre}`);
                         break;
                       case 'consultation':
+                        if (searchParams.get('newConsultation') === 'true') {
+                          onEditComment(comment);
+                          break;
+                        }
                         if (searchParams.get('consultationId') === comment.consultation._id) {
                           if (comment.user === user._id) onEditComment(comment);
                           break;
