@@ -258,6 +258,10 @@ function CommentsTable({ comments, onDisplayComment, onEditComment, onAddComment
                         history.push(`?${searchParams.toString()}`);
                         break;
                       case 'treatment':
+                        if (searchParams.get('newTreatment') === 'true') {
+                          onEditComment(comment);
+                          break;
+                        }
                         if (searchParams.get('treatmentId') === comment.treatment._id) {
                           if (comment.user === user._id) onEditComment(comment);
                           break;
