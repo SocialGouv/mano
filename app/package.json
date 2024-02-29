@@ -14,7 +14,7 @@
     "detox-build-and-test": "npm run detox-build && npm run detox-test",
     "android-clean-start": "npm run clean:android && react-native run-android",
     "postinstall": "pod install --project-directory=ios/ && npx jetify",
-    "clean:android": "cd android && ./gradlew clean && cd ../ && adb uninstall com.mano",
+    "clean:android": "cd android && ./gradlew clean && cd ../ && adb uninstall com.sesan.mano",
     "build:android": "cd android && ./gradlew clean && ./gradlew bundleRelease && cd ../",
     "build:android-apk": "cd android && ./gradlew clean && ./gradlew assembleRelease && cd ../",
     "build:android-apk-preproduction": "echo -p \"please update either .env.production with the preproduction values until we found a better solution 🥸\" && cd android && ./gradlew clean && ./gradlew assembleRelease && cd ../",

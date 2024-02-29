@@ -96,9 +96,9 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    namespace "com.mano"
+    namespace "com.sesan.mano"
     defaultConfig {
-        applicationId "com.mano"
+        applicationId "com.sesan.mano"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         multiDexEnabled true

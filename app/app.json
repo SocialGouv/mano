@@ -6,7 +6,7 @@
     "buildName": "2.38.0"
   },
   "bundle": {
-    "android": "com.mano",
-    "ios": "com.mano"
+    "android": "com.sesan.mano",
+    "ios": "com.sesan.mano"
   }
 }
