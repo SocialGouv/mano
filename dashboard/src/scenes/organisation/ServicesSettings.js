@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useDataLoader } from '../../components/DataLoader';
 import { organisationState } from '../../recoil/auth';
@@ -21,15 +21,22 @@ const ServicesSettings = () => {
   const { refresh } = useDataLoader();
 
   const onAddGroup = async (groupTitle) => {
-    const res = await API.put({
-      path: `/organisation/${organisation._id}`,
-      body: { groupedServices: [...groupedServices, { groupTitle, services: [] }] },
+    const oldOrganisation = organisation;
+    setOrganisation({ ...organisation, groupedServices: [...groupedServices, { groupTitle, services: [] }] }); // optimistic UI
+
+    const response = await API.put({
+      path: `/service/update-configuration`,
+      body: {
+        groupedServices: [...groupedServices, { groupTitle, services: [] }],
+      },
     });
-    if (res.ok) {
-      toast.success('Groupe ajouté', { autoclose: 2000 });
-      setOrganisation(res.data);
+    if (response.ok) {
+      refresh();
+      setOrganisation(response.data);
+      toast.success("Groupe créé. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
+    } else {
+      setOrganisation(oldOrganisation);
     }
-    refresh();
   };
 
   const onGroupTitleChange = async (oldGroupTitle, newGroupTitle) => {
@@ -45,7 +52,7 @@ const ServicesSettings = () => {
     setOrganisation({ ...organisation, groupedServices: newGroupedServices }); // optimistic UI
 
     const response = await API.put({
-      path: `/service`,
+      path: `/service/update-configuration`,
       body: {
         groupedServices: newGroupedServices,
       },
@@ -65,9 +72,9 @@ const ServicesSettings = () => {
     const oldOrganisation = organisation;
     setOrganisation({ ...organisation, groupedServices: newGroupedServices }); // optimistic UI
 
-    // TODO
+    // We don't delete the actual services to avoid user mistakes
     const response = await API.put({
-      path: `/service`,
+      path: `/service/update-configuration`,
       body: {
         groupedServices: newGroupedServices,
       },
@@ -84,16 +91,24 @@ const ServicesSettings = () => {
   const onDragAndDrop = useCallback(
     async (newGroups) => {
       newGroups = newGroups.map((group) => ({ groupTitle: group.groupTitle, services: group.items }));
-      const res = await API.put({
-        path: `/organisation/${organisation._id}`,
-        body: { groupedServices: newGroups },
+      const oldOrganisation = organisation;
+      setOrganisation({ ...organisation, groupedServices: newGroups }); // optimistic UI
+
+      const response = await API.put({
+        path: `/service/update-configuration`,
+        body: {
+          groupedServices: newGroups,
+        },
       });
-      if (res.ok) {
-        setOrganisation(res.data);
+      if (response.ok) {
         refresh();
+        setOrganisation(response.data);
+        toast.success('Le groupe a été déplacé.');
+      } else {
+        setOrganisation(oldOrganisation);
       }
     },
-    [organisation._id, refresh, setOrganisation]
+    [refresh, setOrganisation, organisation]
   );
 
   return (
@@ -125,7 +140,7 @@ const AddService = ({ groupTitle, services, onDragAndDrop }) => {
     if (!newService) return toast.error('Vous devez saisir un nom pour le service');
     if (flattenedServices.includes(newService)) {
       const existingGroupTitle = groupedServices.find(({ services }) => services.includes(newService)).groupTitle;
-      return toast.error(`Ce service existe déjà: ${existingGroupTitle} > ${newService}`);
+      return toast.error(`Ce service existe déjà : ${existingGroupTitle} > ${newService}`);
     }
     const newGroupedServices = groupedServices.map((group) => {
       if (group.groupTitle !== groupTitle) return group;
@@ -138,7 +153,7 @@ const AddService = ({ groupTitle, services, onDragAndDrop }) => {
     const oldOrganisation = organisation;
     setOrganisation({ ...organisation, groupedServices: newGroupedServices }); // optimistic UI
     const response = await API.put({
-      path: `/service`,
+      path: `/service/update-configuration`,
       body: {
         groupedServices: newGroupedServices,
       },
@@ -170,7 +185,6 @@ const AddService = ({ groupTitle, services, onDragAndDrop }) => {
 const Service = ({ item: service, groupTitle }) => {
   const [isSelected, setIsSelected] = useState(false);
   const [isEditingService, setIsEditingService] = useState(false);
-  const reports = useRecoilValue(reportsState);
   const [organisation, setOrganisation] = useRecoilState(organisationState);
 
   const groupedServices = useRecoilValue(servicesSelector);
@@ -187,35 +201,6 @@ const Service = ({ item: service, groupTitle }) => {
       const existingGroupTitle = groupedServices.find(({ services }) => services.includes(newService)).groupTitle;
       return toast.error(`Ce service existe déjà: ${existingGroupTitle} > ${newService}`);
     }
-    const reportsWithService = reports.filter((r) => Object.keys(JSON.parse(r.services || '{}')).includes(oldService.trim()));
-    const encryptedReports = await Promise.all(
-      reportsWithService
-        .filter((a) => a.services.includes(oldService))
-        .map((report) => {
-          const newServices = {};
-          const oldServices = JSON.parse(report.services || '{}');
-          for (const service of Object.keys(oldServices)) {
-            if (service === oldService) {
-              if (Object.keys(oldServices).includes(newService)) {
-                // merge
-                if (!newServices[newService]) newServices[newService] = 0;
-                newServices[newService] = newServices[newService] + oldServices[newService];
-              } else {
-                newServices[newService] = oldServices[oldService];
-              }
-            } else {
-              if (!newServices[service]) newServices[service] = 0;
-              newServices[service] = newServices[service] + oldServices[service];
-            }
-          }
-          return {
-            ...report,
-            services: JSON.stringify(newServices),
-          };
-        })
-        .map(prepareReportForEncryption)
-        .map(encryptItem)
-    );
     const newGroupedServices = groupedServices.map((group) => {
       if (group.groupTitle !== groupTitle) return group;
       return {
@@ -227,13 +212,21 @@ const Service = ({ item: service, groupTitle }) => {
     setOrganisation({ ...organisation, groupedServices: newGroupedServices }); // optimistic UI
 
     const response = await API.put({
-      path: `/service`,
+      path: `/service/update-configuration`,
       body: {
         groupedServices: newGroupedServices,
-        reports: encryptedReports,
       },
     });
     if (response.ok) {
+      const renamedServicesResponse = await API.put({
+        path: `/service/update-service-name`,
+        body: { oldService, newService },
+      });
+
+      if (!renamedServicesResponse.ok) {
+        toast.error('Erreur lors de la mise à jour du nom du service sur les anciens services');
+      }
+
       refresh();
       setOrganisation(response.data);
       setIsEditingService(false);
@@ -252,26 +245,15 @@ const Service = ({ item: service, groupTitle }) => {
         services: group.services.filter((cat) => cat !== service),
       };
     });
-    /* TODO
-    const encryptedActions = await Promise.all(
-      reports
-        .filter((a) => a.services.includes(service))
-        .map((action) => ({
-          ...action,
-          services: action.services.filter((cat) => cat !== service),
-        }))
-        .map(prepareReportForEncryption)
-        .map(encryptItem)
-    );
-    */
+
     const oldOrganisation = organisation;
     setOrganisation({ ...organisation, groupedServices: newGroupedServices }); // optimistic UI
 
+    // We don't delete the actual services to avoid user mistakes
     const response = await API.put({
-      path: `/service`,
+      path: `/service/update-configuration`,
       body: {
         groupedServices: newGroupedServices,
-        // actions: encryptedActions,
       },
     });
     if (response.ok) {

@@ -71,7 +71,7 @@ test("test", async ({ page }) => {
   await page.getByPlaceholder("Titre du groupe").click();
   await page.getByPlaceholder("Titre du groupe").fill("Le deux");
   await page.getByRole("dialog", { name: "Ajouter un groupe" }).getByRole("button", { name: "Ajouter" }).click();
-  await page.locator('div[role="alert"]:has-text("Groupe ajouté")').click();
+  await page.locator('div[role="alert"]:has-text("Groupe créé")').click();
   await page.locator("details[data-group='Le deux']").getByPlaceholder("Ajouter un service").click();
   await page.locator("details[data-group='Le deux']").getByPlaceholder("Ajouter un service").fill("essai 1");
   await page.locator("details[data-group='Le deux']").getByRole("button", { name: "Ajouter" }).click();
@@ -83,7 +83,7 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Ajouter un groupe" }).click();
   await page.getByPlaceholder("Titre du groupe").fill("Trois");
   await page.getByRole("dialog", { name: "Ajouter un groupe" }).getByRole("button", { name: "Ajouter" }).click();
-  await page.locator('div[role="alert"]:has-text("Groupe ajouté")').click();
+  await page.locator('div[role="alert"]:has-text("Groupe créé")').click();
   await page.locator("details[data-group='Trois']").getByPlaceholder("Ajouter un service").click();
   await page.locator("details[data-group='Trois']").getByPlaceholder("Ajouter un service").fill("dans le trois");
   await page.locator("details[data-group='Trois']").getByRole("button", { name: "Ajouter" }).click();

@@ -211,23 +211,41 @@ router.get(
   })
 );
 
+// Update service name (from old to new)
 router.put(
-  "/",
+  "/update-service-name",
+  passport.authenticate("user", { session: false }),
+  validateUser("admin"),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.object({
+        oldService: z.string(),
+        newService: z.string(),
+      }).parse(req.body);
+    } catch (e) {
+      const error = new Error(`Invalid request in service update-service-name: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+
+    const { oldService, newService } = req.body;
+    const organisation = req.user.organisation;
+
+    await Service.update({ service: newService }, { where: { service: oldService, organisation } });
+
+    return res.status(200).send({ ok: true });
+  })
+);
+
+// Update service configuration
+router.put(
+  "/update-configuration",
   passport.authenticate("user", { session: false }),
   validateEncryptionAndMigrations,
   validateUser("admin"),
   catchErrors(async (req, res, next) => {
     try {
       z.object({
-        reports: z.optional(
-          z.array(
-            z.object({
-              _id: z.string().regex(looseUuidRegex),
-              encrypted: z.string(),
-              encryptedEntityKey: z.string(),
-            })
-          )
-        ),
         groupedServices: z.array(
           z.object({
             groupTitle: z.string(),
@@ -245,16 +263,9 @@ router.put(
     if (!organisation) return res.status(404).send({ ok: false, error: "Not Found" });
 
     try {
-      await sequelize.transaction(async (tx) => {
-        const { reports = [], groupedServices = [] } = req.body;
-
-        for (let { encrypted, encryptedEntityKey, _id } of reports) {
-          await Report.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
-        }
-
-        organisation.set({ groupedServices });
-        await organisation.save({ transaction: tx });
-      });
+      const { groupedServices = [] } = req.body;
+      organisation.set({ groupedServices });
+      await organisation.save();
     } catch (e) {
       capture("error updating service", e);
       throw e;
