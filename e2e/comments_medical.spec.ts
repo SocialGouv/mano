@@ -31,7 +31,6 @@ test("test", async ({ page }) => {
   await page.getByRole("dialog", { name: "Ajouter une consultation" }).getByRole("button", { name: "＋ Ajouter un commentaire" }).click();
   await page.getByLabel("Commentaire", { exact: true }).fill("Avec un commentaire avant d'enregistrer");
   await page.getByRole("button", { name: "Enregistrer" }).click();
-  await page.getByText("Commentaire enregistré").click();
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await new Promise((r) => setTimeout(r, 300)); // time for dialog to close
   await page.getByText("Avec un commentaire avant d'enregistrer").click();
@@ -72,9 +71,8 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "＋ Ajouter un commentaire" }).click();
   await page.getByLabel("Commentaire", { exact: true }).fill("Commentaire de traitement avant création");
   await page.getByRole("button", { name: "Enregistrer" }).click();
-  await page.getByText("Commentaire enregistré").click();
   await page.getByRole("button", { name: "Sauvegarder" }).click();
-  await page.getByText("Traitement mis à jour !").click();
+  await page.getByText("Traitement créé !").click();
   await page.getByText("Commentaire de traitement avant création").click();
   await page.getByRole("button", { name: "Commentaires (1)" }).click();
   await page

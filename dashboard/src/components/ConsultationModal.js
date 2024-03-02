@@ -468,12 +468,14 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                   documents: [...data.documents, ...nextDocuments],
                 };
                 setData(newData);
+                if (isNewConsultation) return;
                 const ok = await handleSubmit({ newData });
                 if (ok && nextDocuments.length > 1) toast.success('Documents ajoutés');
               }}
               onDeleteDocument={async (document) => {
                 const newData = { ...data, documents: data.documents.filter((d) => d._id !== document._id) };
                 setData(newData);
+                if (isNewConsultation) return;
                 const ok = await handleSubmit({ newData });
                 if (ok) toast.success('Document supprimé');
                 return ok;
@@ -487,6 +489,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                   }),
                 };
                 setData(newData);
+                if (isNewConsultation) return;
                 const ok = await handleSubmit({ newData });
                 if (ok) toast.success('Document mis à jour');
               }}
@@ -503,6 +506,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
               onDeleteComment={async (comment) => {
                 const newData = { ...data, comments: data.comments.filter((c) => c._id !== comment._id) };
                 setData(newData);
+                if (isNewConsultation) return;
                 const ok = await handleSubmit({ newData });
                 if (ok) toast.success('Commentaire supprimé');
               }}
@@ -511,6 +515,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                   ? { ...data, comments: [{ ...comment, _id: uuidv4() }, ...data.comments] }
                   : { ...data, comments: data.comments.map((c) => (c._id === comment._id ? comment : c)) };
                 setData(newData);
+                if (isNewConsultation) return;
                 const ok = await handleSubmit({ newData });
                 if (ok) toast.success('Commentaire enregistré');
               }}

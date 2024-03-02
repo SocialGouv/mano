@@ -362,12 +362,14 @@ function TreatmentContent({ onClose, treatment, personId }) {
                   documents: [...data.documents, ...nextDocuments],
                 };
                 setData(newData);
+                if (isNewTreatment) return;
                 const ok = await handleSubmit({ newData });
                 if (ok && nextDocuments.length > 1) toast.success('Documents ajoutés');
               }}
               onDeleteDocument={async (document) => {
                 const newData = { ...data, documents: data.documents.filter((d) => d._id !== document._id) };
                 setData(newData);
+                if (isNewTreatment) return;
                 const ok = await handleSubmit({ newData });
                 if (ok) toast.success('Document supprimé');
                 return ok;
@@ -381,6 +383,7 @@ function TreatmentContent({ onClose, treatment, personId }) {
                   }),
                 };
                 setData(newData);
+                if (isNewTreatment) return;
                 const ok = await handleSubmit({ newData });
                 if (ok) toast.success('Document mis à jour');
               }}
@@ -397,6 +400,7 @@ function TreatmentContent({ onClose, treatment, personId }) {
               onDeleteComment={async (comment) => {
                 const newData = { ...data, comments: data.comments.filter((c) => c._id !== comment._id) };
                 setData(newData);
+                if (isNewTreatment) return;
                 const ok = await handleSubmit({ newData });
                 if (ok) toast.success('Commentaire supprimé');
               }}
@@ -405,6 +409,7 @@ function TreatmentContent({ onClose, treatment, personId }) {
                   ? { ...data, comments: [{ ...comment, _id: uuidv4() }, ...data.comments] }
                   : { ...data, comments: data.comments.map((c) => (c._id === comment._id ? comment : c)) };
                 setData(newData);
+                if (isNewTreatment) return;
                 const ok = await handleSubmit({ newData });
                 if (ok) toast.success('Commentaire enregistré');
               }}
