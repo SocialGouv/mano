@@ -214,7 +214,7 @@ function CommentsTable({ comments, onDisplayComment, onEditComment, onAddComment
       </div>
     );
   }
-
+  const searchParams = new URLSearchParams(location.search);
   return (
     <>
       {showAddCommentButton && (
@@ -228,11 +228,16 @@ function CommentsTable({ comments, onDisplayComment, onEditComment, onAddComment
         <tbody className="small">
           {(comments || []).map((comment, i) => {
             if (!comment.type) throw new Error('type is required');
+            const isNotEditable = (!!searchParams.get('consultationId') || !!searchParams.get('treatmentId')) && comment.user !== user._id;
             return (
-              <tr key={comment._id} className={[`tw-bg-${color} tw-w-full`, i % 2 ? 'tw-bg-opacity-0' : 'tw-bg-opacity-5'].join(' ')}>
+              <tr
+                key={comment._id}
+                title={isNotEditable ? "Ce commentaire peut seulement être modifié par l'utilisateur qui l'a créé" : ''}
+                className={[`tw-bg-${color} tw-w-full`, i % 2 ? 'tw-bg-opacity-0' : 'tw-bg-opacity-5', isNotEditable && '!tw-cursor-not-allowed']
+                  .filter(Boolean)
+                  .join(' ')}>
                 <td
                   onClick={() => {
-                    const searchParams = new URLSearchParams(location.search);
                     switch (comment.type) {
                       case 'action':
                       case 'person':
