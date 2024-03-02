@@ -1,9 +1,17 @@
 import { useHistory } from 'react-router-dom';
 import { Label } from 'reactstrap';
-import { useRecoilValue } from 'recoil';
-import { personsState } from '../recoil/persons';
+import { selector, useRecoilValue } from 'recoil';
+import { personsState, sortPersons } from '../recoil/persons';
 import ButtonCustom from './ButtonCustom';
 import SelectCustom from './SelectCustom';
+
+const sortedPersonsByNameSelector = selector({
+  key: 'sortedPersonsByNameSelector',
+  get: ({ get }) => {
+    const persons = get(personsState);
+    return [...persons].sort(sortPersons('name', 'ASC'));
+  },
+});
 
 const SelectPerson = ({
   value = '',
@@ -17,14 +25,14 @@ const SelectPerson = ({
   name = 'person',
   ...props
 }) => {
-  const persons = useRecoilValue(personsState);
+  const sortedPersonsByName = useRecoilValue(sortedPersonsByNameSelector);
   const history = useHistory();
 
   return (
     <>
       {!noLabel && <Label htmlFor={inputId}>{isMulti ? 'Personnes(s) suivie(s)' : 'Personne suivie'}</Label>}
       <SelectCustom
-        options={persons}
+        options={sortedPersonsByName}
         name={name}
         inputId={inputId}
         classNamePrefix={inputId}
@@ -32,9 +40,13 @@ const SelectPerson = ({
         isClearable={isClearable}
         isSearchable
         onChange={(person) => onChange?.({ currentTarget: { value: isMulti ? person.map((p) => p._id) : person?._id, name } })}
-        value={value != null && isMulti ? persons.filter((i) => value?.includes(i._id)) : persons.find((i) => i._id === value)}
+        value={
+          value != null && isMulti ? sortedPersonsByName.filter((i) => value?.includes(i._id)) : sortedPersonsByName.find((i) => i._id === value)
+        }
         defaultValue={
-          defaultValue != null && isMulti ? persons.filter((i) => defaultValue?.includes(i._id)) : persons.find((i) => i._id === defaultValue)
+          defaultValue != null && isMulti
+            ? sortedPersonsByName.filter((i) => defaultValue?.includes(i._id))
+            : sortedPersonsByName.find((i) => i._id === defaultValue)
         }
         getOptionValue={(i) => i._id}
         getOptionLabel={(i) => i?.name}
