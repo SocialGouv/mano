@@ -48,6 +48,11 @@ app.get("/sentry-check", async (req, res) => {
   res.send(`Sentry checked!`);
 });
 
+app.get("/is-mano-ready", async (req, res) => {
+  // Todo : passer à "yes" et enlever le code de blocage à la sortie
+  res.send({ ok: false, data: "no" });
+});
+
 app.get("/", async (req, res) => {
   res.send(`Hello World at ${now.toISOString()}`);
 });
