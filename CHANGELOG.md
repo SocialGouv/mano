@@ -1,3 +1,10 @@
+# [1.307.0](https://github.com/SocialGouv/mano/compare/v1.306.0...v1.307.0) (2024-03-04)
+
+
+### Features
+
+* fin de l'app mano fabrique ([#1881](https://github.com/SocialGouv/mano/issues/1881)) ([77154cc](https://github.com/SocialGouv/mano/commit/77154cc64ea17a228549e4a064210e5a1e878b31))
+
 # [1.306.0](https://github.com/SocialGouv/mano/compare/v1.305.4...v1.306.0) (2024-02-23)
 
 
