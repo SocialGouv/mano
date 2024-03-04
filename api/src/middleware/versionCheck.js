@@ -3,12 +3,11 @@ const { VERSION, MINIMUM_DASHBOARD_VERSION } = require("../config");
 module.exports = ({ headers: { version, platform } }, res, next) => {
   if (platform === "website") return next();
   if (platform === "dashboard") {
-    // Add header with API version to compare with client.
-    res.header("X-API-VERSION", VERSION);
-    res.header("X-MINIMUM-DASHBOARD-VERSION", MINIMUM_DASHBOARD_VERSION);
-    // See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Expose-Headers
-    res.header("Access-Control-Expose-Headers", "X-API-VERSION, X-MINIMUM-DASHBOARD-VERSION");
-    return next();
+    return res.status(403).send({
+      ok: false,
+      error:
+        "Cette version de Mano est en fin de vie 🪦. Veuillez désormais vous rediriger vers https://espace-mano.sesan.fr/ disponible à partir du mercredi 6 mars",
+    });
   }
 
   return res.status(403).send({
