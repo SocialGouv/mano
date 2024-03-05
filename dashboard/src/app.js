@@ -87,44 +87,6 @@ if (ENV === 'production') {
   });
 }
 
-function WaitForManoReady() {
-  const [isManoReady, setIsManoReady] = useState(false);
-  // Call the API once then every minute to check if Mano is ready
-
-  function checkManoReady() {
-    API.get({ path: '/is-mano-ready' })
-      .then((res) => {
-        console.log(res);
-        if (res.data !== 'no') {
-          setIsManoReady(true);
-        }
-      })
-      .catch((e) => {
-        console.error(e);
-      });
-  }
-  useEffect(() => {
-    checkManoReady();
-    const interval = setInterval(() => {
-      checkManoReady();
-    }, 60000);
-    return () => clearInterval(interval);
-  }, []);
-
-  if (isManoReady) {
-    window.localStorage.setItem('by-pass-redirect', 'true');
-    window.location.reload();
-  }
-
-  return (
-    <div className="main-container">
-      <div className="tw-mb-8 tw-border-l-4 tw-border-orange-500 tw-bg-orange-100 tw-p-4 tw-text-orange-700" role="alert">
-        🚧 Mano n’est pas encore disponible sur ce site, vous devez patienter jusqu’au mercredi 6 mars.
-      </div>
-    </div>
-  );
-}
-
 const App = ({ resetRecoil }) => {
   const authToken = useRecoilValue(authTokenState);
   const user = useRecoilValue(userState);
@@ -159,10 +121,6 @@ const App = ({ resetRecoil }) => {
       lifecycle.removeEventListener('statechange', onWindowFocus);
     };
   }, [authToken, refresh, initialLoadIsDone]);
-
-  if (process.env.REACT_APP_TEST_PLAYWRIGHT !== 'true' && window && !window.localStorage.getItem('by-pass-redirect')) {
-    return <WaitForManoReady />;
-  }
 
   return (
     <div className="main-container">
