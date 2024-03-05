@@ -1,3 +1,10 @@
+# [1.309.0](https://github.com/SocialGouv/mano/compare/v1.308.0...v1.309.0) (2024-03-05)
+
+
+### Features
+
+* bury mano social gouv ([#1887](https://github.com/SocialGouv/mano/issues/1887)) ([13dcd08](https://github.com/SocialGouv/mano/commit/13dcd08d34231a9a53341f40386eb7a6936e0906))
+
 # [1.308.0](https://github.com/SocialGouv/mano/compare/v1.307.0...v1.308.0) (2024-03-05)
 
 
