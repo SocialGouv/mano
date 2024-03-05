@@ -1,3 +1,10 @@
+# [1.308.0](https://github.com/SocialGouv/mano/compare/v1.307.0...v1.308.0) (2024-03-05)
+
+
+### Features
+
+* supprimer l'accès à mano ([#1885](https://github.com/SocialGouv/mano/issues/1885)) ([70494ce](https://github.com/SocialGouv/mano/commit/70494ce0064a4c947ef5e0e9506ad5a104cdada1))
+
 # [1.307.0](https://github.com/SocialGouv/mano/compare/v1.306.0...v1.307.0) (2024-03-04)
 
 
