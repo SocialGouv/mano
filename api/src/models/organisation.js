@@ -4,6 +4,7 @@ module.exports = (sequelize, DataTypes) => {
   const schema = {
     _id: { type: DataTypes.UUID, allowNull: false, defaultValue: DataTypes.UUIDV4, primaryKey: true },
     name: DataTypes.TEXT,
+    orgId: DataTypes.TEXT,
     categories: DataTypes.ARRAY(DataTypes.TEXT),
     actionsGroupedCategories: {
       type: DataTypes.JSONB, // example: [{"groupTitle": "médical", categories: ["seringue", "pansement"]}, { "groupTitle": "local", "categories": ["entretien", "lavage"]}]

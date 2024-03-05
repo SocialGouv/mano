@@ -8,7 +8,7 @@ import ButtonCustom from '../../components/ButtonCustom';
 
 import Loading from '../../components/loading';
 import API from '../../services/api';
-import { formatDateWithFullMonth } from '../../services/date';
+import { formatAge, formatDateWithFullMonth } from '../../services/date';
 import useTitle from '../../services/useTitle';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
 import { capture } from '../../services/sentry';
@@ -71,11 +71,11 @@ const List = () => {
           data={organisations}
           key={updateKey}
           columns={[
-            { title: 'Nom', dataKey: 'name', onSortOrder: setSortOrder, onSortBy: setSortBy, sortOrder, sortBy },
+            { title: 'Nom', dataKey: 'name', onSortOrder: setSortOrder, onSortBy: setSortBy, sortOrder, sortBy, render: (o) => <div>{o.name}<br /><small className="tw-text-gray-500">ID: {o.orgId}</small></div> },
             {
               title: 'Créée le',
               dataKey: 'createdAt',
-              render: (o) => formatDateWithFullMonth(o.createdAt || ''),
+              render: (o) => <div>{formatDateWithFullMonth(o.createdAt || '')}<br /><small className="tw-text-gray-500">il y a {o.createdAt ? formatAge(o.createdAt) : "un certain temps"}</small></div>,
               onSortOrder: setSortOrder,
               onSortBy: setSortBy,
               sortOrder,
@@ -138,7 +138,7 @@ const List = () => {
               sortOrder,
               onSortOrder: setSortOrder,
               onSortBy: setSortBy,
-              render: (o) => formatDateWithFullMonth(o.encryptionLastUpdateAt || ''),
+              render: (o) => <div>{o.encryptionLastUpdateAt ? formatDateWithFullMonth(o.encryptionLastUpdateAt) : "Pas encore chiffrée"}<br /><small className="tw-text-gray-500">{o.encryptionLastUpdateAt ? "il y a "+ formatAge(o.encryptionLastUpdateAt) : ""}</small></div>,
             },
             {
               title: 'Action',
@@ -196,11 +196,12 @@ const Create = ({ onChange, open, setOpen }) => {
         <ModalHeader toggle={() => setOpen(false)}>Créer une nouvelle organisation et un administrateur</ModalHeader>
         <ModalBody>
           <Formik
-            initialValues={{ orgName: '', name: '', email: '' }}
+            initialValues={{ orgName: '', name: '', email: '', orgId: ''}}
             validate={(values) => {
               const errors = {};
               if (!values.name) errors.name = 'Le nom est obligatoire';
               if (!values.orgName) errors.orgName = "Le nom de l'organisation est obligatoire";
+              if (!values.orgId) errors.orgId = "L'identifiant est obligatoire";
               if (!values.email) errors.email = "L'email est obligatoire";
               else if (!emailRegex.test(values.email)) errors.email = "L'email est invalide";
               return errors;
@@ -228,8 +229,16 @@ const Create = ({ onChange, open, setOpen }) => {
                       {touched.orgName && errors.orgName && <span className="tw-text-xs tw-text-red-500">{errors.orgName}</span>}
                     </FormGroup>
                   </Col>
+                  <Col md={6}>
+                    <FormGroup>
+                      <Label htmlFor="orgName">
+                        Identifiant interne <small>(non modifiable)</small>
+                      </Label>
+                      <Input name="orgId" id="orgId" value={values.orgId} onChange={handleChange} />
+                      {touched.orgId && errors.orgId && <span className="tw-text-xs tw-text-red-500">{errors.orgId}</span>}
+                    </FormGroup>
+                  </Col>
                 </Row>
-                <br />
                 <Row>
                   <Col md={6}>
                     <FormGroup>

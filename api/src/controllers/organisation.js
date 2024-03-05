@@ -111,6 +111,7 @@ router.post(
     try {
       z.object({
         orgName: z.string().min(1),
+        orgId: z.string().min(1),
         name: z.string().min(1),
         email: z.string().email(),
       }).parse(req.body);
@@ -119,13 +120,14 @@ router.post(
       error.status = 400;
       return next(error);
     }
-    const { orgName, name, email } = req.body;
+    const { orgName, name, email, orgId } = req.body;
     const user = await User.findOne({ where: { email } });
     if (!!user) return res.status(400).send({ ok: false, error: "Cet email existe déjà dans une autre organisation" });
 
     const organisation = await Organisation.create(
       {
         name: orgName,
+        orgId: orgId,
         // We have to add default custom fields on creation
         // (search for "custom-fields-persons-setup" or "custom-fields-persons-refacto-regroup" in code).
         customFieldsPersons: [
