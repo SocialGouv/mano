@@ -125,6 +125,14 @@ const App = ({ resetRecoil }) => {
 
   return (
     <div className="main-container">
+      <div className="tw-mb-8 tw-border-l-4 tw-border-orange-500 tw-bg-orange-100 tw-p-4 tw-text-orange-700" role="alert">
+        🚧 Mano est en cours de migration, vous devez patienter jusqu’au 6 mars, et vous rendre sur https://espace-mano.sesan.fr/
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="main-container">
       <ToastContainer transition={process.env.REACT_APP_TEST_PLAYWRIGHT !== 'true' ? Bounce : ToastifyFastTransition} />
       <VersionOutdatedAlert />
       {process.env.REACT_APP_TEST_PLAYWRIGHT === 'true' && <DuplicatedReportsTestChecker />}

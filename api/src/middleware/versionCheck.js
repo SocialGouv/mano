@@ -3,6 +3,13 @@ const { VERSION, MINIMUM_DASHBOARD_VERSION } = require("../config");
 module.exports = ({ headers: { version, platform } }, res, next) => {
   if (platform === "website") return next();
   if (platform === "dashboard") {
+    res.header("X-API-VERSION", "50.1.1");
+    res.header("X-MINIMUM-DASHBOARD-VERSION", "50.1.1");
+    res.header("Access-Control-Expose-Headers", "X-API-VERSION, X-MINIMUM-DASHBOARD-VERSION");
+    return res.status(403).send({
+      ok: false,
+      error: "Mano est en cours de migration vers Sesan. Vous pourrez vous connecter sur https://espace-mano.sesan.fr/ à partir du mercredi 6 mars",
+    });
     // Add header with API version to compare with client.
     res.header("X-API-VERSION", VERSION);
     res.header("X-MINIMUM-DASHBOARD-VERSION", MINIMUM_DASHBOARD_VERSION);
