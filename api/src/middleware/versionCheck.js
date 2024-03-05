@@ -31,22 +31,6 @@ module.exports = async ({ headers: { version, platform } }, res, next) => {
     return next();
   }
 
-  return res.status(403).send({
-    ok: false,
-    message: "Bienvenue sur Mano Sesan 🎆",
-    inAppMessage: [
-      `Bienvenue sur Mano Sesan 🎆`,
-      `L'application sera utilisable à partir du mardi 5 mars en fin de journée, sans changement d'interface ni de fonctionnalités, le temps pour nous de réaliser la bascule technique de Mano.
-
-Vous avec peut-être encore deux icônes "Mano" sur votre téléphone:
-- celle-ci, la nouvelle, estampillée "Sesan" pour la reconnaître facilement
-- et l'ancienne en fin de vie, que vous pouvez d'ores et déjà supprimer
-
-Merci de votre patience !`,
-      [{ text: "Un peu de musique pour patienter", link: "https://youtu.be/yG_xZLWzcjg" }],
-    ],
-  });
-
   // now platform is react native app
   if (!version) return res.status(403).send({ ok: false, message: "Veuillez mettre à jour votre application!" });
 
