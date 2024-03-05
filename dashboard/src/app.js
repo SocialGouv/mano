@@ -125,8 +125,22 @@ const App = ({ resetRecoil }) => {
 
   return (
     <div className="main-container">
-      <div className="tw-mb-8 tw-border-l-4 tw-border-orange-500 tw-bg-orange-100 tw-p-4 tw-text-orange-700" role="alert">
-        🚧 Mano est en cours de migration, vous devez patienter jusqu’au 6 mars, et vous rendre sur https://espace-mano.sesan.fr/
+      <div
+        className="tw-mb-8 tw-min-w-[600px] tw-border-l-4 tw-border-green-500 tw-bg-green-100 tw-p-4 tw-text-center tw-text-green-700"
+        role="alert">
+        La migration de Mano est terminée 🎉 <br />
+        vous pouvez vous rendre sur <br />
+        <br />
+        👉 <a href="https://espace-mano.sesan.fr/">https://espace-mano.sesan.fr/</a> 👈
+        <br />
+        <br />
+        <a
+          href="https://www.youtube.com/watch?v=VScSEXRwUqQ&pp=ygUQdGhpcyBpcyB0aGUgZW5kIA%3D%3D"
+          target="_blank"
+          rel="noreferrer"
+          className="tw-text-xs tw-text-green-700 tw-underline">
+          puis célébrer cette grande étape 🕺💃
+        </a>
       </div>
     </div>
   );
