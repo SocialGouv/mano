@@ -54,25 +54,22 @@ test("test", async ({ page }) => {
   /* ***** comptes rendus ***** */
 
   await page.getByRole("link", { name: "Comptes rendus" }).click();
-  await page.getByRole("button", { name: today }).click();
-
-  await expect(page.getByText("Passages (3)")).toBeVisible();
-  await expect(page.getByText("Rencontres (0)")).not.toBeVisible();
-
-  await page.getByText("Passages (3)").click();
-  await expect(page.getByText("Nombre de passages anonymes 1passage")).toBeVisible();
-  await expect(page.getByText("Nombre de passages non-anonymes 2passages")).toBeVisible();
-  await page.getByRole("button", { name: "Ajouter un passage ce jour" }).click();
+  await expect(page.getByText("3", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Passer les passages en plein écran" }).click();
+  await expect(page.getByRole("dialog", { name: "Passages (3)" }).getByText("Nombre de passages anonymes 1passage")).toBeVisible();
+  await expect(page.getByRole("dialog", { name: "Passages (3)" }).getByText("Nombre de passages non-anonymes 2passages")).toBeVisible();
+  await page.getByRole("button", { name: "Ajouter un passage" }).click();
   await page.locator(".person__input-container").click();
   await page.locator("#react-select-persons-option-0").click();
   await page.getByRole("dialog").getByLabel("Commentaire").fill("ajout passage");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Passages enregistrés !").click();
 
-  await page.getByRole("cell", { name: "ajout passage" }).click();
+  await page.getByRole("cell", { name: "ajout passage", exact: true }).click();
   await page.getByRole("dialog").getByLabel("Commentaire").fill("ajout passage modification");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Passage mis à jour").click();
+  await page.getByText("Fermer").click();
 
   /* ***** statistiques ***** */
 
@@ -132,18 +129,16 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Rencontre mise à jour").click();
   /* ***** comptes rendus ***** */
+
   await page.getByRole("link", { name: "Comptes rendus" }).click();
-  await page.getByRole("button", { name: today }).click();
-  await page.getByText("Rencontres (1)").click();
-
-  await expect(page.getByText("Passages (0)")).not.toBeVisible();
-
-  await page.getByRole("button", { name: "Ajouter une rencontre ce jour" }).click();
+  await expect(page.getByTitle("Rencontres", { exact: true }).getByText("1")).toBeVisible();
+  await page.getByRole("button", { name: "Passer les rencontres en plein écran" }).click();
+  await page.getByRole("button", { name: "Ajouter une rencontre" }).click();
   await page.getByRole("dialog").getByLabel("Commentaire").fill("test ajoute nouvelle rencontre");
   await page.locator(".person__input-container").click();
   await page.locator("#react-select-persons-option-0").click();
   await page.getByRole("button", { name: "Enregistrer" }).click();
-  await page.getByRole("cell", { name: "test ajoute nouvelle rencontre" }).click();
+  await page.getByRole("cell", { name: "test ajoute nouvelle rencontre", exact: true }).click();
   page.once("dialog", (dialog) => {
     console.log(`Dialog message: ${dialog.message()}`);
     dialog.dismiss().catch(() => {});
@@ -151,6 +146,7 @@ test("test", async ({ page }) => {
 
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Rencontre mise à jour").click();
+  await page.getByText("Fermer").click();
 
   /* ***** statistiques ***** */
 
@@ -202,14 +198,6 @@ test("test", async ({ page }) => {
   await expect(page.getByRole("link", { name: "Passages (0)" })).not.toBeVisible();
   await expect(page.getByRole("link", { name: "Rencontres (0)" })).not.toBeVisible();
 
-  /* ***** comptes rendus ***** */
-
-  await page.getByRole("link", { name: "Comptes rendus" }).click();
-  await page.getByRole("button", { name: today }).click();
-
-  await expect(page.getByRole("button", { name: "Rencontres", exact: true })).not.toBeVisible();
-  await expect(page.getByRole("button", { name: "Passages" })).not.toBeVisible();
-
   /* ***** statistiques ***** */
 
   await page.getByRole("link", { name: "Statistiques" }).click();
@@ -255,9 +243,8 @@ test("test", async ({ page }) => {
 
   /* ***** comptes rendus ***** */
   await page.getByRole("link", { name: "Comptes rendus" }).click();
-  await page.getByRole("button", { name: today }).click();
-  await page.getByText("Passages (1)").click();
-  await page.getByText("Rencontres (1)").click();
+  await expect(page.getByTitle("Rencontres", { exact: true }).getByText("1")).toBeVisible();
+  await expect(page.getByTitle("Passages", { exact: true }).getByText("1")).toBeVisible();
 
   /* ***** statistiques ***** */
 

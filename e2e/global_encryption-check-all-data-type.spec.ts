@@ -119,19 +119,6 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Structure créée !").click();
   await page.getByRole("link", { name: "Comptes rendus" }).click();
-  await page.getByRole("button", { name: dayjs().format("YYYY-MM-DD") }).click();
-  await page.locator(".report-select-collaboration__input-container").click();
-  await page.locator("#react-select-collaborations-option-0").click();
-  await page.getByRole("button", { name: "Mettre à jour" }).click();
-  await page.getByText("Mis à jour !").click();
-
-  await page.getByRole("button", { name: "Ajouter une description" }).click();
-  await page.getByRole("textbox", { name: "Description Description" }).fill("La description");
-  await page.getByRole("button", { name: "Enregistrer" }).click();
-  await page.getByRole("navigation", { name: "Navigation dans les catégories du compte-rendu" }).getByText("Accueil").click();
-  await page.locator('[id="Café-add"]').click();
-  await page.locator("#Douche-add").click();
-  await page.locator("#Douche-add").click();
   await page.getByRole("link", { name: "Organisation" }).click();
   await page.getByRole("link", { name: "Agenda" }).click();
   await page.getByRole("link", { name: "Personnes suivies" }).click();
@@ -181,16 +168,6 @@ test("test", async ({ page }) => {
   await expect(page.getByText("Avec un commentaire")).toBeVisible();
   await page.getByRole("button", { name: "Fermer" }).first().click();
   await page.getByRole("link", { name: "Comptes rendus" }).click();
-  await page.getByRole("button", { name: dayjs().format("YYYY-MM-DD") }).click();
-  await page.getByText("La description").click();
-  await page.getByText("Ma première collab").click();
-  await page.getByText("Actions créées (1)").click();
-  await page.getByText("Commentaires (2)").click();
-  await page.getByText("Passages (1)").click();
-  await page.getByText("Rencontres (1)").click();
-  await page.getByText("Observations (1)").click();
-  await page.getByText("Personnes créées (2)").click();
-  await page.getByText("Consultations créées (1)").click();
   await page.getByRole("link", { name: "Organisation" }).click();
   await page.getByRole("button", { name: "Chiffrement" }).click();
   await page.getByRole("button", { name: "Changer la clé de chiffrement" }).click();

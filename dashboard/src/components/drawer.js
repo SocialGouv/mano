@@ -77,16 +77,7 @@ const Drawer = () => {
               </NavLink>
             </li>
           )}
-          {process.env.REACT_APP_TEST_PLAYWRIGHT === 'true' && ['admin', 'normal', 'restricted-access'].includes(role) && (
-            <>
-              <li>
-                <NavLink to="/report" activeClassName="active">
-                  Comptes rendus
-                </NavLink>
-              </li>
-            </>
-          )}
-          {process.env.REACT_APP_TEST_PLAYWRIGHT !== 'true' && ['admin', 'normal', 'restricted-access'].includes(role) && (
+          {['admin', 'normal', 'restricted-access'].includes(role) && (
             <>
               <li>
                 <NavLink to="/report-new" activeClassName="active">

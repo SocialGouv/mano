@@ -113,6 +113,5 @@ test("Create action with comments", async ({ page }) => {
   await page.getByRole("button", { name: "Fermer" }).first().click();
 
   await page.getByRole("link", { name: "Comptes rendus" }).click();
-  await page.getByRole("button", { name: dayjs().format("YYYY-MM-DD") }).click();
-  await page.getByText("Commentaires (3)").click();
+  await page.getByRole("button", { name: "Commentaires (3)" }).click();
 });

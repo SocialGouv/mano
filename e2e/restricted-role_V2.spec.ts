@@ -10,13 +10,7 @@ test.beforeAll(async () => {
 test("test", async ({ page }) => {
   await loginWith(page, "admin8@example.org");
 
-  // On ne peut pas utiliser la date à laquelle on a fait le test car le test est exécuté à une date différente.
-  // Donc pour les rapports 2023-03-18 est potentiellement une date qui n'est plus accessible.
   const today = dayjs().format("YYYY-MM-DD");
-  // Pour avoir un autre jour c'est un peu plus compliqué car il ne faut pas que ça bug le dernier jour du mois si on met le lendemain
-  // Si demain est le mois suivant, on prend la date du début du mois actuel
-  const anotherDay =
-    dayjs().add(1, "day").month() === dayjs().month() ? dayjs().add(1, "day").format("YYYY-MM-DD") : dayjs().startOf("month").format("YYYY-MM-DD");
 
   // Admin : creation personne/action/passage/rencontre/commentaire
 
@@ -106,16 +100,19 @@ test("test", async ({ page }) => {
   await page.getByText("Création réussie !").click();
   await page.getByRole("link", { name: "Organisation" }).click();
   await page.getByRole("link", { name: "Comptes rendus" }).click();
-  await page.getByRole("button", { name: anotherDay }).click();
-  await page.getByText("Observations (0)").click();
+  await page.getByRole("button", { name: "Aujourd'hui" }).click();
+  await page.getByRole("button", { name: "Hier" }).click();
+  await expect(page.getByTitle("Observations", { exact: true }).getByText("0")).toBeVisible();
   await page.getByRole("link", { name: "Territoires" }).click();
   await page.getByText("nouveauterritoire").click();
+
   await page.getByRole("button", { name: "Nouvelle observation" }).click();
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
   await page.getByRole("link", { name: "Comptes rendus" }).click();
-  await page.getByRole("button", { name: today }).click();
-  await page.getByText("Observations (3)").click();
+  await page.getByRole("button", { name: "Hier" }).click();
+  await page.getByRole("button", { name: "Aujourd'hui" }).click();
+  await expect(page.getByTitle("Observations", { exact: true }).getByText("3")).toBeVisible();
 
   await page.getByRole("link", { name: "Accueil" }).click();
 
@@ -197,7 +194,8 @@ test("test", async ({ page }) => {
 
   await page.getByRole("link", { name: "Territoires" }).click();
   await page.getByRole("link", { name: "Comptes rendus" }).click();
-  await page.getByRole("button", { name: anotherDay }).click();
+  await page.getByRole("button", { name: "Aujourd'hui" }).click();
+  await page.getByRole("button", { name: "Hier" }).click();
 
   // test sur les territoires
   await page.getByRole("link", { name: "Territoires" }).click();
@@ -223,16 +221,9 @@ test("test", async ({ page }) => {
 
   // test sur les comptes rendus
   await page.getByRole("link", { name: "Comptes rendus" }).click();
-  await page.getByRole("button", { name: today }).click();
-  await page.getByText("Observations (4)").click();
-  await page.getByRole("button", { name: "Ajouter une observation" }).click();
-  await page.getByRole("dialog").getByLabel("Commentaire", { exact: true }).fill("test");
-  await page.getByLabel("Nombre de personnes non connues femmes rencontrées").click();
-  await page.getByLabel("Nombre de personnes non connues femmes rencontrées").fill("3");
-  await page.locator(".observation-select-territory__input-container").click();
-  await page.locator("#react-select-place-option-0").click();
-  await page.getByRole("button", { name: "Sauvegarder" }).click();
-  await page.getByText("Création réussie !").click();
+  await page.getByRole("button", { name: "Hier" }).click();
+  await page.getByRole("button", { name: "Aujourd'hui" }).click();
+  await expect(page.getByTitle("Observations", { exact: true }).getByText("4")).toBeVisible();
 
   await page.getByRole("link", { name: "Accueil" }).click();
 

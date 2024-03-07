@@ -188,9 +188,9 @@ test("Familles", async ({ page }) => {
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: action1Name }) }).getByText("👪")).toBeVisible();
 
     await page.getByRole("link", { name: "Comptes rendus" }).click();
-    await page.getByRole("button", { name: dayjs().format("YYYY-MM-DD") }).click();
-    await page.getByText("Actions créées (1)").click();
-    await expect(page.locator("tr", { has: page.getByRole("cell", { name: action1Name }) }).getByText("👪")).toBeVisible();
+
+    await expect(page.getByRole("cell", { name: action1Name }).getByText(action1Name)).toBeVisible();
+    await expect(page.getByRole("cell", { name: "Action familiale" }).getByText("👪")).toBeVisible();
 
     await page.getByRole("link", { name: "Personnes suivies" }).click();
     await page.getByRole("cell", { name: person1Name }).click();
@@ -222,8 +222,8 @@ test("Familles", async ({ page }) => {
     await expect(page.locator("tr", { has: page.getByText(comment1Name) }).getByText("👪")).toBeVisible();
 
     await page.getByRole("link", { name: "Comptes rendus" }).click();
-    await page.getByRole("button", { name: dayjs().format("YYYY-MM-DD") }).click();
-    await page.getByText("Commentaires (1)").click();
+
+    await page.getByRole("button", { name: "Commentaires (1)" }).click();
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: comment1Name }) }).getByText("👪")).toBeVisible();
 
     await page.getByRole("link", { name: "Personnes suivies" }).click();

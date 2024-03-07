@@ -19,12 +19,7 @@ test("Territories - enable - disable", async ({ page }) => {
     await page.getByRole("link", { name: "Territoires" }).click();
 
     await page.getByRole("link", { name: "Comptes rendus" }).click();
-    await page.getByRole("button", { name: dayjs().format("YYYY-MM-DD") }).click();
-
-    await expect(page.getByText("Observations (0)")).toBeVisible();
-    await page.getByText("Observations (0)").click();
-
-    await page.waitForTimeout(1000);
+    await expect(page.getByTitle("Observations", { exact: true }).getByText("0")).toBeVisible();
 
     await page.getByRole("link", { name: "Statistiques" }).click();
     await expect(page.getByRole("button", { name: "Observations" })).toBeVisible();
@@ -46,15 +41,11 @@ test("Territories - enable - disable", async ({ page }) => {
 
     await expect(page.getByRole("link", { name: "Territoires" })).not.toBeVisible();
 
-    await page.waitForTimeout(1000);
-
     await page.getByRole("link", { name: "Statistiques" }).click();
     await expect(page.getByRole("button", { name: "Observations", exact: true })).not.toBeVisible();
 
     await page.getByRole("link", { name: "Comptes rendus" }).click();
-    await page.getByRole("button", { name: dayjs().format("YYYY-MM-DD") }).click();
-
-    await expect(page.getByText("Observations (0)")).not.toBeVisible();
+    await expect(page.getByTitle("Observations", { exact: true }).getByText("0")).not.toBeVisible();
   });
 
   await test.step("Enable territories", async () => {
@@ -73,17 +64,12 @@ test("Territories - enable - disable", async ({ page }) => {
     await expect(page.getByRole("link", { name: "Territoires" })).toBeVisible();
     await page.getByRole("link", { name: "Territoires" }).click();
 
-    await page.waitForTimeout(1000);
-
     await page.getByRole("link", { name: "Statistiques" }).click();
     await expect(page.getByRole("button", { name: "Observations", exact: true }).first()).toBeVisible();
     await page.getByRole("button", { name: "Observations", exact: true }).first().click();
     await expect(page.getByText("Nombre d'observations de territoire ?")).toBeVisible();
 
     await page.getByRole("link", { name: "Comptes rendus" }).click();
-    await page.getByRole("button", { name: dayjs().format("YYYY-MM-DD") }).click();
-
-    await expect(page.getByText("Observations (0)")).toBeVisible();
-    await page.getByText("Observations (0)").click();
+    await expect(page.getByTitle("Observations", { exact: true }).getByText("0")).toBeVisible();
   });
 });

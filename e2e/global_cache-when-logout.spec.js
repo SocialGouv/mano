@@ -3,7 +3,7 @@ import { nanoid } from "nanoid";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import "dayjs/locale/fr";
-import { changeReactSelectValue, clickOnEmptyReactSelect, loginWith } from "./utils";
+import { loginWith } from "./utils";
 import { populate } from "./scripts/populate-db";
 
 dayjs.extend(utc);
@@ -48,17 +48,10 @@ test("Person creation", async ({ page }) => {
 
   await test.step("Persons created should appear in report", async () => {
     await page.getByRole("link", { name: "Comptes rendus" }).click();
-
-    await expect(page.locator(`data-test-id=report-dot-${dayjs().format("YYYY-MM-DD")}`)).toBeVisible();
-    await page.getByRole("button", { name: dayjs().format("YYYY-MM-DD") }).click();
-
-    await page.getByText("Personnes créées (2)").click();
-    await expect(page.locator(`data-test-id=${person1Name}`)).toBeVisible();
-    await expect(page.locator(`data-test-id=${person1Name}`).getByRole("cell", { name: "User Admin Test - 5" })).toBeVisible();
-    await expect(page.locator(`data-test-id=${person1Name}`).getByRole("cell", { name: "Team Test - 5" })).toBeVisible();
-    await expect(page.locator(`data-test-id=${person2Name}`)).toBeVisible();
-    await expect(page.locator(`data-test-id=${person2Name}`).getByRole("cell", { name: "User Admin Test - 5" })).toBeVisible();
-    await expect(page.locator(`data-test-id=${person2Name}`).getByRole("cell", { name: "Team Test - 5" })).toBeVisible();
+    await page.getByRole("button", { name: "Passer les personnes créées en plein écran" }).click();
+    await expect(page.getByRole("cell", { name: person1Name })).toBeVisible();
+    await expect(page.getByRole("cell", { name: person2Name })).toBeVisible();
+    await page.getByText("Fermer").click();
   });
 
   await page.getByRole("button", { name: "User Admin Test - 5" }).click();

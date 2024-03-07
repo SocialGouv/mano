@@ -111,30 +111,12 @@ test("Create action with comments", async ({ page }) => {
   await page.getByRole("button", { name: "Fermer" }).first().click();
 
   await page.getByRole("link", { name: "Comptes rendus" }).click();
-  await page.getByRole("button", { name: dayjs().format("YYYY-MM-DD") }).click();
-  await page.getByText("Commentaires (4)").click();
-
-  /*
-
-
-
-
-
-
-
-
-
-  start here
-
-
-
-
-  */
+  await page.getByRole("button", { name: "Commentaires (4)" }).click();
 
   await page.getByRole("button", { name: "Actions et commentaires urgents et vigilance" }).click();
 
   await page.locator('[data-test-id="action avec commentaire"]').getByRole("cell", { name: "action avec commentaire" }).click();
-  await expect(page).toHaveURL(/http:\/\/localhost:8090\/report\/.*\?reportsTeam=%5B%22.*%22%5D&actionId=.*/);
+  await expect(page).toHaveURL(/http:\/\/localhost:8090\/report-new.*/);
   await page.getByRole("button", { name: "Commentaires (1)" }).click();
   await expect(page.getByRole("heading", { name: "Action: action avec commentaire (créée par User Admin Test - 7)" })).toBeVisible();
   await page.getByRole("button", { name: "Fermer" }).first().click();
