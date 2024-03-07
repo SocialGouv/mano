@@ -61,6 +61,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { currentTeamState, organisationState, teamsState, userState } from './recoil/auth';
 import { appCurrentCacheKey, clearCache } from './services/dataManagement';
 import useResetAllCachedDataRecoilStates from './recoil/reset';
+import CGUsAcceptance from './scenes/Login/CGUsAcceptance';
 
 const ActionsStack = createStackNavigator();
 const ActionsNavigator = () => {
@@ -270,6 +271,7 @@ const LoginNavigator = () => (
     <LoginStack.Screen name="Login" component={Login} />
     <LoginStack.Screen name="TeamSelection" component={TeamSelection} />
     <LoginStack.Screen name="CharteAcceptance" component={CharteAcceptance} />
+    <LoginStack.Screen name="CGUsAcceptance" component={CGUsAcceptance} />
     <LoginStack.Screen name="ForceChangePassword" component={ForceChangePassword} />
     <LoginStack.Screen name="ForgetPassword" component={ForgetPassword} />
   </LoginStack.Navigator>

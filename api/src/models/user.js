@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
     organisation: { type: DataTypes.UUID, references: { model: "Organisation", key: "_id", deferrable: Deferrable.INITIALLY_IMMEDIATE } },
     lastLoginAt: DataTypes.DATE,
     termsAccepted: DataTypes.DATE,
+    cgusAccepted: DataTypes.DATE,
     lastChangePasswordAt: DataTypes.DATE,
     forgotPasswordResetToken: DataTypes.TEXT,
     forgotPasswordResetExpires: DataTypes.DATE,

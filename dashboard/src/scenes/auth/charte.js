@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
 import { useRecoilState } from 'recoil';
 import ButtonCustom from '../../components/ButtonCustom';
 import { userState } from '../../recoil/auth';
 import API from '../../services/api';
-import { theme } from '../../config';
 import OpenNewWindowIcon from '../../components/OpenNewWindowIcon';
 
 const Charte = () => {
@@ -20,10 +18,14 @@ const Charte = () => {
   };
 
   return (
-    <Wrapper id="charte">
-      <Title>Charte d'Utilisation de Mano</Title>
-      <Subtitle>Veuillez lire et accepter la Charte d'Utilisation de Mano avant de continuer</Subtitle>
-      <Content>
+    <div
+      className="tw-flex tw-w-full tw-flex-col tw-items-center tw-overflow-y-auto tw-overflow-x-hidden tw-rounded-lg tw-bg-white tw-py-20 tw-text-black"
+      id="cgus">
+      <h1 className="tw-mt-20 tw-mb-4 tw-text-center tw-text-3xl tw-font-semibold tw-text-main">Charte d'Utilisation de Mano</h1>
+      <small className="tw-block tw-text-center tw-font-medium tw-italic">
+        Veuillez lire et accepter la Charte d'Utilisation de Mano avant de continuer
+      </small>
+      <main className="[&_b]:tw-font-weight-normal tw-w-full tw-max-w-prose tw-px-5 [&_ol_>_li]:tw-mb-8 [&_ol_>_li]:tw-mt-20 [&_ol_>_li]:tw-font-bold [&_ul>li]:tw-mb-4 [&_span]:tw-mb-8 [&_span]:tw-block [&_b]:tw-mt-20 [&_b]:tw-block">
         <ol>
           <li>Présentation du dispositif et propriété des données</li>
           <p>
@@ -138,84 +140,20 @@ const Charte = () => {
           Tout manquement à ces engagements pourra conduire MANO à retirer l'utilisation de l'outil à un·e professionnel·le, une équipe ou une
           organisation.
         </b>
-      </Content>
-      <Submit loading={loading} type="submit" color="primary" title="Accepter et continuer" onClick={onSigninValidated} />
-      <DownloadLink tag="a" href="/charte.pdf" target="_blank" rel="noreferrer">
+      </main>
+      <ButtonCustom
+        className="tw-m-auto tw-mt-20 tw-w-56 tw-rounded-3xl tw-text-base"
+        loading={loading}
+        type="submit"
+        color="primary"
+        title="Accepter et continuer"
+        onClick={onSigninValidated}
+      />
+      <a className="tw-mt-3 tw-mb-20 tw-block tw-text-xs" href="/charte.pdf" target="_blank" rel="noreferrer">
         Télécharger le .pdf <OpenNewWindowIcon />
-      </DownloadLink>
-    </Wrapper>
+      </a>
+    </div>
   );
 };
-
-const Wrapper = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  border-radius: 0.5em;
-  background-color: #fff;
-  font-family: Nista, Helvetica;
-  color: #252b2f;
-  padding: 5em auto;
-  overflow-x: hidden;
-  overflow-y: auto;
-`;
-
-const Title = styled.div`
-  margin-top: 5rem;
-  font-family: Helvetica;
-  text-align: center;
-  font-size: 32px;
-  font-weight: 600;
-  margin-bottom: 15px;
-  color: ${theme.main};
-`;
-
-const Subtitle = styled.small`
-  display: block;
-  font-family: Helvetica;
-  text-align: center;
-  font-weight: 500;
-  font-style: italic;
-`;
-
-const Content = styled.main`
-  max-width: 65ch;
-  width: calc(100% - 40px);
-  ol > li {
-    font-weight: bold;
-    margin-bottom: 2rem;
-    margin-top: 5rem;
-  }
-  ul > li {
-    margin-bottom: 1rem;
-  }
-  span {
-    display: block;
-    margin-bottom: 2rem;
-  }
-  b {
-    display: block;
-    font-weight: normal;
-    margin-top: 5rem;
-  }
-`;
-
-const Submit = styled(ButtonCustom)`
-  font-family: Helvetica;
-  width: 220px;
-  border-radius: 30px;
-  margin: auto;
-  font-size: 16px;
-  min-height: 42px;
-  margin-top: 5rem;
-`;
-
-const DownloadLink = styled.a`
-  display: block;
-  margin-top: 0.75rem;
-  margin-bottom: 5rem;
-  font-size: 0.75rem;
-`;
 
 export default Charte;

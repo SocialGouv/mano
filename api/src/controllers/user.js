@@ -477,6 +477,7 @@ router.post(
         healthcareProfessional: userWithoutPassword.healthcareProfessional,
         lastChangePasswordAt: userWithoutPassword.lastChangePasswordAt,
         termsAccepted: userWithoutPassword.termsAccepted,
+        cgusAccepted: userWithoutPassword.cgusAccepted,
         gaveFeedbackEarly2023: userWithoutPassword.gaveFeedbackEarly2023,
       },
     });
@@ -515,6 +516,7 @@ router.get(
         healthcareProfessional: user.healthcareProfessional,
         lastChangePasswordAt: user.lastChangePasswordAt,
         termsAccepted: user.termsAccepted,
+        cgusAccepted: user.cgusAccepted,
         gaveFeedbackEarly2023: user.gaveFeedbackEarly2023,
         team: team.map((t) => t._id),
       },
@@ -558,6 +560,7 @@ router.get(
         healthcareProfessional: user.healthcareProfessional,
         lastChangePasswordAt: user.lastChangePasswordAt,
         termsAccepted: user.termsAccepted,
+        cgusAccepted: user.cgusAccepted,
         gaveFeedbackEarly2023: user.gaveFeedbackEarly2023,
         lastLoginAt: user.lastLoginAt,
         teams: teams.map(serializeTeam),
@@ -581,6 +584,7 @@ router.put(
         gaveFeedbackEarly2023: z.optional(z.boolean()),
         team: z.optional(z.array(z.string().regex(looseUuidRegex))),
         ...(req.body.termsAccepted ? { termsAccepted: z.preprocess((input) => new Date(input), z.date()) } : {}),
+        ...(req.body.cgusAccepted ? { cgusAccepted: z.preprocess((input) => new Date(input), z.date()) } : {}),
       });
     } catch (e) {
       const error = new Error(`Invalid request in put user by id: ${e}`);
@@ -589,7 +593,7 @@ router.put(
     }
 
     const _id = req.user._id;
-    const { name, email, password, team, termsAccepted, gaveFeedbackEarly2023, phone } = req.body;
+    const { name, email, password, team, termsAccepted, cgusAccepted, gaveFeedbackEarly2023, phone } = req.body;
 
     const user = await User.findOne({ where: { _id } });
     if (!user) return res.status(404).send({ ok: false, error: "Utilisateur non trouvé" });
@@ -598,6 +602,7 @@ router.put(
     if (phone) user.set({ phone: sanitizeAll(phone) });
     if (email) user.set({ email: sanitizeAll(email.trim().toLowerCase()) });
     if (termsAccepted) user.set({ termsAccepted: termsAccepted });
+    if (cgusAccepted) user.set({ cgusAccepted: cgusAccepted });
     if (password) {
       if (!validatePassword(password)) return res.status(400).send({ ok: false, error: passwordCheckError, code: PASSWORD_NOT_VALIDATED });
       user.set({ password: password });
@@ -629,6 +634,7 @@ router.put(
         healthcareProfessional: user.healthcareProfessional,
         lastChangePasswordAt: user.lastChangePasswordAt,
         termsAccepted: user.termsAccepted,
+        cgusAccepted: user.cgusAccepted,
         gaveFeedbackEarly2023: user.gaveFeedbackEarly2023,
       },
     });
@@ -700,6 +706,7 @@ router.put(
         healthcareProfessional: user.healthcareProfessional,
         lastChangePasswordAt: user.lastChangePasswordAt,
         termsAccepted: user.termsAccepted,
+        cgusAccepted: user.cgusAccepted,
         gaveFeedbackEarly2023: user.gaveFeedbackEarly2023,
       },
     });

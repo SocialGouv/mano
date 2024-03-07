@@ -219,6 +219,7 @@ CREATE TABLE IF NOT EXISTS mano."User" (
     "forgotPasswordResetExpires" date,
     "forgotPasswordResetToken" text,
     "termsAccepted" timestamp with time zone,
+    "cgusAccepted" timestamp with time zone,
     "healthcareProfessional" boolean DEFAULT false,
     "debugApp" jsonb,
     "debugDashboard" jsonb,

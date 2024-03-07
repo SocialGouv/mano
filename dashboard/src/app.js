@@ -42,6 +42,7 @@ import DuplicatedReportsTestChecker from './components/DuplicatedReportsTestChec
 import ConsultationModal from './components/ConsultationModal';
 import TreatmentModal from './scenes/person/components/TreatmentModal';
 import BottomBar from './components/BottomBar';
+import CGUs from './scenes/auth/cgus';
 
 RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = process.env.REACT_APP_DISABLE_RECOIL_DUPLICATE_ATOM_KEY_CHECKING ? false : true;
 
@@ -165,6 +166,12 @@ const RestrictedRoute = ({ component: Component, _isLoggedIn, ...rest }) => {
     return (
       <main className="main">
         <SentryRoute {...rest} path="/auth" component={Charte} />
+      </main>
+    );
+  if (!!user && !user?.cgusAccepted)
+    return (
+      <main className="main">
+        <SentryRoute {...rest} path="/auth" component={CGUs} />
       </main>
     );
 

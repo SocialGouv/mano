@@ -193,7 +193,9 @@ const Login = ({ navigation }) => {
       if (!__DEV__ && !response.user.lastChangePasswordAt) {
         navigation.navigate('ForceChangePassword');
       } else {
-        if (!response.user?.termsAccepted) {
+        if (!response.user?.cgusAccepted) {
+          navigation.navigate('CGUsAcceptance');
+        } else if (!response.user?.termsAccepted) {
           navigation.navigate('CharteAcceptance');
         } else if (response.user?.teams?.length === 1) {
           setCurrentTeam(response.user.teams[0]);

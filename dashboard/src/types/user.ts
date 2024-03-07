@@ -8,6 +8,7 @@ export type UserInstance = {
   organisation: UUIDV4;
   lastLoginAt: Date | null;
   termsAccepted: Date | null;
+  cgusAccepted: Date | null;
   healthcareProfessional: boolean | null;
   role: 'normal' | 'admin'; // Add other roles if available.
   team?: UUIDV4[];

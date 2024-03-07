@@ -82,6 +82,7 @@ function serializeUserWithTeamsAndOrganisation(user, teams, organisation) {
     healthcareProfessional: user.healthcareProfessional,
     lastChangePasswordAt: user.lastChangePasswordAt,
     termsAccepted: user.termsAccepted,
+    cgusAccepted: user.cgusAccepted,
     gaveFeedbackEarly2023: user.gaveFeedbackEarly2023,
     teams: teams.map(serializeTeam),
     organisation: serializeOrganisation(organisation),

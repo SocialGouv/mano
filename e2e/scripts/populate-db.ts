@@ -79,6 +79,7 @@ async function createUsersAndOrgas() {
         "forgotPasswordResetExpires",
         "forgotPasswordResetToken",
         "termsAccepted",
+        "cgusAccepted",
         "healthcareProfessional"
       ) VALUES (
         $1,
@@ -93,6 +94,7 @@ async function createUsersAndOrgas() {
         $5::date,
         null,
         null,
+        $4,
         $4,
         true
       );`,
@@ -114,6 +116,7 @@ async function createUsersAndOrgas() {
         "forgotPasswordResetExpires",
         "forgotPasswordResetToken",
         "termsAccepted",
+        "cgusAccepted",
         "healthcareProfessional"
       ) VALUES (
         $1,
@@ -128,6 +131,7 @@ async function createUsersAndOrgas() {
         $5::date,
         null,
         null,
+        $4,
         $4,
         true
       );`,
@@ -149,6 +153,7 @@ async function createUsersAndOrgas() {
         "forgotPasswordResetExpires",
         "forgotPasswordResetToken",
         "termsAccepted",
+        "cgusAccepted",
         "healthcareProfessional"
       ) VALUES (
         $1,
@@ -163,6 +168,7 @@ async function createUsersAndOrgas() {
         $5::date,
         null,
         null,
+        $4,
         $4,
         false
       );`,
@@ -184,6 +190,7 @@ async function createUsersAndOrgas() {
         "forgotPasswordResetExpires",
         "forgotPasswordResetToken",
         "termsAccepted",
+        "cgusAccepted",
         "healthcareProfessional"
       ) VALUES (
         $1,
@@ -198,6 +205,7 @@ async function createUsersAndOrgas() {
         $5::date,
         null,
         null,
+        $4,
         $4,
         false
       );`,
