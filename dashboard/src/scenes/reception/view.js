@@ -293,12 +293,6 @@ const Reception = () => {
               <ButtonCustom onClick={onAddAnonymousPassage} color="primary" icon={plusIcon} title="Passage anonyme" id="add-anonymous-passage" />
               {!!passages.length && reportCreatedRef.current && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <ButtonCustom
-                    onClick={() => history.push(`/report/${todaysReport?.date || startOfToday().format('YYYY-MM-DD')}?tab=passages`)}
-                    color="link"
-                    title="Modifier les passages"
-                    padding="0px"
-                  />
                   <ButtonCustom onClick={() => setTodaysPassagesOpen(true)} color="link" title="Voir les passages d'aujourd'hui" padding="0px" />
                 </div>
               )}

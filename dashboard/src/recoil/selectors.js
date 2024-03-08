@@ -38,16 +38,6 @@ export const currentTeamReportsSelector = selector({
   },
 });
 
-export const selectedTeamsReportsSelector = selectorFamily({
-  key: 'selectedTeamsReportsSelector',
-  get:
-    ({ teamIds }) =>
-    ({ get }) => {
-      const reports = get(reportsState);
-      return reports.filter((a) => teamIds.includes(a.team));
-    },
-});
-
 const actionsWithCommentsSelector = selector({
   key: 'actionsWithCommentsSelector',
   get: ({ get }) => {
