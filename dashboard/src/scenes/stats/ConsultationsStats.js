@@ -24,11 +24,12 @@ export default function ConsultationsStats({ consultations, personsWithConsultat
   const consultationsByType = useMemo(() => {
     const _consultationsByType = {};
     for (const consultationSetting of organisation.consultations) {
-      _consultationsByType[consultationSetting.name] = [];
+      _consultationsByType[consultationSetting.name] = { persons: {}, data: [] };
     }
     for (const consultation of consultations) {
-      if (!_consultationsByType[consultation.type]) _consultationsByType[consultation.type] = [];
-      _consultationsByType[consultation.type].push(consultation);
+      if (!_consultationsByType[consultation.type]) _consultationsByType[consultation.type] = { persons: {}, data: [] };
+      _consultationsByType[consultation.type].data.push(consultation);
+      _consultationsByType[consultation.type].persons[consultation.person.id] = consultation.person;
     }
     return _consultationsByType;
   }, [consultations, organisation.consultations]);
@@ -57,13 +58,18 @@ export default function ConsultationsStats({ consultations, personsWithConsultat
             title="Nombre de consultations"
             help={`Nombre de consultations réalisées dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des consultations.`}
           />
+          <Block
+            data={personsWithConsultations}
+            title="Nombre de personnes suivies"
+            help={`Nombre de personnes suivies ayant eu une consultation dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des consultations.`}
+          />
         </div>
         <CustomResponsivePie
           title="Consultations par type"
           data={getPieData(consultations, 'type')}
           onItemClick={(newSlice) => {
             setActionsModalOpened(true);
-            setSlicedData(consultationsByType[newSlice]);
+            setSlicedData(consultationsByType[newSlice].data);
           }}
           help={`Répartition par type des consultations réalisées dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des consultations.`}
         />
@@ -91,18 +97,30 @@ export default function ConsultationsStats({ consultations, personsWithConsultat
             key={c.name}>
             <summary className="tw-my-8 tw-mx-0">
               <h4 className="tw-inline tw-text-xl tw-text-black75">
-                Statistiques des consultations de type « {c.name} » ({consultationsByType[c.name]?.length ?? 0})
+                Statistiques des consultations de type « {c.name} » ({consultationsByType[c.name]?.data?.length ?? 0})
               </h4>
             </summary>
+            <div className="tw-mb-5 tw-flex tw-justify-center">
+              <Block
+                data={consultationsByType[c.name].data.length}
+                title="Nombre de consultations"
+                help={`Nombre de consultations réalisées dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des consultations.`}
+              />
+              <Block
+                data={Object.keys(consultationsByType[c.name].persons).length}
+                title="Nombre de personnes suivies"
+                help={`Nombre de personnes suivies ayant eu une consultation dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des consultations.`}
+              />
+            </div>
             <CustomFieldsStats
-              data={consultationsByType[c.name]}
+              data={consultationsByType[c.name].data}
               customFields={c.fields}
               onSliceClick={(newSlice, field) => {
                 setActionsModalOpened(true);
                 if (newSlice === 'Non renseigné') {
-                  setSlicedData(consultationsByType[c.name].filter((c) => !c[field]));
+                  setSlicedData(consultationsByType[c.name].data.filter((c) => !c[field]));
                 } else {
-                  setSlicedData(consultationsByType[c.name].filter((c) => c[field] === newSlice));
+                  setSlicedData(consultationsByType[c.name].data.filter((c) => c[field] === newSlice));
                 }
               }}
               help={(label) => `${label.capitalize()} des consultations réalisées dans la période définie.`}
