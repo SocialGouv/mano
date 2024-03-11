@@ -57,6 +57,7 @@ const ObservationsSettings = () => {
     <DragAndDropSettings
       title={<h3 className="tw-mb-0 tw-text-xl tw-font-extrabold">Observations de territoire</h3>}
       data={dataFormatted}
+      sectionId="customFieldsObs"
       dataItemKey={(cat) => cat.name}
       ItemComponent={ObservationCustomField}
       NewItemComponent={AddField}

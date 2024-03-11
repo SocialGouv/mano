@@ -39,6 +39,7 @@ const StructuresCategoriesSettings = () => {
     <DragAndDropSettings
       title="Catégories de structures"
       data={dataFormatted}
+      sectionId="structuresGroupedCategories"
       dataItemKey={(cat) => cat}
       ItemComponent={Category}
       NewItemComponent={AddCategory}

@@ -102,6 +102,7 @@ const ServicesSettings = () => {
       data={dataFormatted}
       addButtonCaption="Ajouter un groupe"
       onAddGroup={onAddGroup}
+      sectionId="services"
       onGroupTitleChange={onGroupTitleChange}
       dataItemKey={(cat) => cat}
       ItemComponent={Service}
