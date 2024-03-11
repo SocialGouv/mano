@@ -29,7 +29,7 @@ export default function ConsultationsStats({ consultations, personsWithConsultat
     for (const consultation of consultations) {
       if (!_consultationsByType[consultation.type]) _consultationsByType[consultation.type] = { persons: {}, data: [] };
       _consultationsByType[consultation.type].data.push(consultation);
-      _consultationsByType[consultation.type].persons[consultation.person.id] = consultation.person;
+      _consultationsByType[consultation.type].persons[consultation.person] = true;
     }
     return _consultationsByType;
   }, [consultations, organisation.consultations]);
