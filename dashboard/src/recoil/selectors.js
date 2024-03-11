@@ -5,7 +5,7 @@ import { relsPersonPlaceState } from './relPersonPlace';
 import { reportsState } from './reports';
 import { ageFromBirthdateAsYear, dayjsInstance, formatBirthDate } from '../services/date';
 import { customFieldsObsSelector, territoryObservationsState } from './territoryObservations';
-import { selector, selectorFamily } from 'recoil';
+import { selector } from 'recoil';
 import { actionsState } from './actions';
 import { consultationsState } from './consultations';
 import { commentsState } from './comments';
