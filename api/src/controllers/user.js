@@ -351,7 +351,7 @@ router.post(
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
-  validateUser("admin"),
+  validateUser(["superadmin", "admin"]),
   catchErrors(async (req, res, next) => {
     try {
       z.object({
@@ -361,6 +361,7 @@ router.post(
         healthcareProfessional: z.boolean(),
         team: z.array(z.string().regex(looseUuidRegex)),
         role: z.enum(["admin", "normal", "restricted-access"]),
+        ...(req.user.role === "superadmin" ? { organisation: z.string().regex(looseUuidRegex) } : {}),
       }).parse(req.body);
     } catch (e) {
       const error = new Error(`Invalid request in user creation: ${e}`);
@@ -368,6 +369,7 @@ router.post(
       return next(error);
     }
 
+    const organisationId = req.user.role === "superadmin" ? req.body.organisation : req.user.organisation;
     const { name, email, role, team, healthcareProfessional, phone } = req.body;
     const token = crypto.randomBytes(20).toString("hex");
     const newUser = {
@@ -377,13 +379,13 @@ router.post(
       healthcareProfessional: role === "restricted-access" ? false : healthcareProfessional,
       email: sanitizeAll(email.trim().toLowerCase()),
       password: crypto.randomBytes(60).toString("hex"), // A useless password.
-      organisation: req.user.organisation,
+      organisation: organisationId,
       forgotPasswordResetToken: token,
       forgotPasswordResetExpires: new Date(Date.now() + 60 * 60 * 24 * 30 * 1000), // 30 days
     };
 
     UserLog.create({
-      organisation: req.user.organisation,
+      organisation: organisationId,
       user: req.user.id,
       platform: req.headers.platform === "android" ? "app" : req.headers.platform === "dashboard" ? "dashboard" : "unknown",
       action: `create-user-${sanitizeAll(email.trim().toLowerCase())}`,
@@ -395,7 +397,7 @@ router.post(
     const data = await User.create(newUser, { returning: true });
 
     const user = await User.findOne({ where: { _id: data._id } });
-    const teams = await Team.findAll({ where: { organisation: req.user.organisation, _id: { [Op.in]: team } } });
+    const teams = await Team.findAll({ where: { organisation: organisationId, _id: { [Op.in]: team } } });
     const tx = await User.sequelize.transaction();
     await RelUserTeam.bulkCreate(
       teams.map((t) => ({ user: data._id, team: t._id })),
@@ -404,7 +406,7 @@ router.post(
     await tx.commit();
     await user.save({ transaction: tx });
 
-    const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
+    const organisation = await Organisation.findOne({ where: { _id: organisationId } });
     await mailservice.sendEmail(data.email, "Bienvenue dans Mano", null, mailBienvenueHtml(data.name, data.email, organisation.name, token));
 
     return res.status(200).send({

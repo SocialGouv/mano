@@ -15,6 +15,8 @@ import { capture } from '../../services/sentry';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../../recoil/auth';
 import { emailRegex } from '../../utils';
+import SelectRole from '../../components/SelectRole';
+import SelectCustom from '../../components/SelectCustom';
 
 const List = () => {
   const [organisations, setOrganisations] = useState(null);
@@ -24,6 +26,8 @@ const List = () => {
   const [sortOrder, setSortOrder] = useState('DESC');
   const [refresh, setRefresh] = useState(false);
   const [openCreateModal, setOpenCreateModal] = useState(false);
+  const [openCreateUserModal, setOpenCreateUserModal] = useState(false);
+  const [selectedOrganisation, setSelectedOrganisation] = useState(null);
 
   useTitle('Organisations');
 
@@ -51,6 +55,7 @@ const List = () => {
   return (
     <>
       <Create onChange={() => setRefresh(true)} open={openCreateModal} setOpen={setOpenCreateModal} />
+      <CreateUser onChange={() => setRefresh(true)} open={openCreateUserModal} setOpen={setOpenCreateUserModal} organisation={selectedOrganisation} />
       {!refresh && !total ? (
         <div className="tw-flex tw-h-full tw-w-full tw-flex-col tw-items-center tw-justify-center tw-gap-2">
           <ButtonCustom onClick={() => setRefresh(true)} color="primary" title="Voir les organisations existantes" />
@@ -71,11 +76,31 @@ const List = () => {
           data={organisations}
           key={updateKey}
           columns={[
-            { title: 'Nom', dataKey: 'name', onSortOrder: setSortOrder, onSortBy: setSortBy, sortOrder, sortBy, render: (o) => <div>{o.name}<br /><small className="tw-text-gray-500">ID: {o.orgId}</small></div> },
+            {
+              title: 'Nom',
+              dataKey: 'name',
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortOrder,
+              sortBy,
+              render: (o) => (
+                <div>
+                  {o.name}
+                  <br />
+                  <small className="tw-text-gray-500">ID: {o.orgId}</small>
+                </div>
+              ),
+            },
             {
               title: 'Créée le',
               dataKey: 'createdAt',
-              render: (o) => <div>{formatDateWithFullMonth(o.createdAt || '')}<br /><small className="tw-text-gray-500">il y a {o.createdAt ? formatAge(o.createdAt) : "un certain temps"}</small></div>,
+              render: (o) => (
+                <div>
+                  {formatDateWithFullMonth(o.createdAt || '')}
+                  <br />
+                  <small className="tw-text-gray-500">il y a {o.createdAt ? formatAge(o.createdAt) : 'un certain temps'}</small>
+                </div>
+              ),
               onSortOrder: setSortOrder,
               onSortBy: setSortBy,
               sortOrder,
@@ -138,36 +163,56 @@ const List = () => {
               sortOrder,
               onSortOrder: setSortOrder,
               onSortBy: setSortBy,
-              render: (o) => <div>{o.encryptionLastUpdateAt ? formatDateWithFullMonth(o.encryptionLastUpdateAt) : "Pas encore chiffrée"}<br /><small className="tw-text-gray-500">{o.encryptionLastUpdateAt ? "il y a "+ formatAge(o.encryptionLastUpdateAt) : ""}</small></div>,
+              render: (o) => (
+                <div>
+                  {o.encryptionLastUpdateAt ? formatDateWithFullMonth(o.encryptionLastUpdateAt) : 'Pas encore chiffrée'}
+                  <br />
+                  <small className="tw-text-gray-500">{o.encryptionLastUpdateAt ? 'il y a ' + formatAge(o.encryptionLastUpdateAt) : ''}</small>
+                </div>
+              ),
             },
             {
               title: 'Action',
               dataKey: 'delete',
               render: (organisation) => {
                 return (
-                  <DeleteButtonAndConfirmModal
-                    title={`Voulez-vous vraiment supprimer l'organisation ${organisation.name}`}
-                    textToConfirm={organisation.name}
-                    onConfirm={async () => {
-                      try {
-                        const res = await API.delete({ path: `/organisation/${organisation._id}` });
-                        if (res.ok) {
-                          toast.success('Organisation supprimée');
-                          setRefresh(true);
-                        }
-                      } catch (organisationDeleteError) {
-                        capture(organisationDeleteError, { extra: { organisation }, user });
-                        toast.error(organisationDeleteError.message);
-                      }
-                    }}>
-                    <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
-                      Cette opération est irréversible
-                      <br />
-                      et entrainera la suppression définitive de toutes les données liées à l'organisation&nbsp;:
-                      <br />
-                      équipes, utilisateurs, personnes suivies, actions, territoires, commentaires et observations, comptes-rendus...
-                    </span>
-                  </DeleteButtonAndConfirmModal>
+                  <div className="tw-grid tw-gap-2">
+                    <div>
+                      <button
+                        onClick={() => {
+                          setSelectedOrganisation(organisation);
+                          setOpenCreateUserModal(true);
+                        }}
+                        className="button-classic">
+                        Ajouter un utilisateur
+                      </button>
+                    </div>
+                    <div>
+                      <DeleteButtonAndConfirmModal
+                        title={`Voulez-vous vraiment supprimer l'organisation ${organisation.name}`}
+                        textToConfirm={organisation.name}
+                        onConfirm={async () => {
+                          try {
+                            const res = await API.delete({ path: `/organisation/${organisation._id}` });
+                            if (res.ok) {
+                              toast.success('Organisation supprimée');
+                              setRefresh(true);
+                            }
+                          } catch (organisationDeleteError) {
+                            capture(organisationDeleteError, { extra: { organisation }, user });
+                            toast.error(organisationDeleteError.message);
+                          }
+                        }}>
+                        <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
+                          Cette opération est irréversible
+                          <br />
+                          et entrainera la suppression définitive de toutes les données liées à l'organisation&nbsp;:
+                          <br />
+                          équipes, utilisateurs, personnes suivies, actions, territoires, commentaires et observations, comptes-rendus...
+                        </span>
+                      </DeleteButtonAndConfirmModal>
+                    </div>
+                  </div>
                 );
               },
             },
@@ -196,7 +241,7 @@ const Create = ({ onChange, open, setOpen }) => {
         <ModalHeader toggle={() => setOpen(false)}>Créer une nouvelle organisation et un administrateur</ModalHeader>
         <ModalBody>
           <Formik
-            initialValues={{ orgName: '', name: '', email: '', orgId: ''}}
+            initialValues={{ orgName: '', name: '', email: '', orgId: '' }}
             validate={(values) => {
               const errors = {};
               if (!values.name) errors.name = 'Le nom est obligatoire';
@@ -254,6 +299,126 @@ const Create = ({ onChange, open, setOpen }) => {
                       {touched.email && errors.email && <span className="tw-text-xs tw-text-red-500">{errors.email}</span>}
                     </FormGroup>
                   </Col>
+                </Row>
+                <ButtonCustom loading={isSubmitting} onClick={handleSubmit} title="Créer" />
+              </React.Fragment>
+            )}
+          </Formik>
+        </ModalBody>
+      </Modal>
+    </>
+  );
+};
+
+const CreateUser = ({ onChange, open, setOpen, organisation }) => {
+  const [team, setTeam] = useState([]);
+  useEffect(() => {
+    if (!organisation?._id) return;
+    (async () => {
+      const { data } = await API.get({ path: `organisation/${organisation._id}/teams` });
+      setTeam(data);
+    })();
+  }, [organisation?._id]);
+
+  if (!organisation) return;
+
+  return (
+    <>
+      <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
+        <ModalHeader toggle={() => setOpen(false)}>Créer un utilisateur pour {organisation.orgId}</ModalHeader>
+        <ModalBody>
+          <Formik
+            initialValues={{ name: '', email: '', phone: '', team, healthcareProfessional: false }}
+            onSubmit={async (body, actions) => {
+              try {
+                if (!body.email) return toast.error("L'email est obligatoire");
+                if (!emailRegex.test(body.email)) return toast.error("L'email est invalide");
+                if (!body.role) return toast.error('Le rôle est obligatoire');
+
+                body.organisation = organisation._id;
+                const { ok } = await API.post({ path: '/user', body });
+                if (!ok) {
+                  return false;
+                }
+                toast.success('Création réussie !');
+                onChange();
+                setOpen(false);
+              } catch (orgCreationError) {
+                console.log('error in creating organisation', orgCreationError);
+                actions.setSubmitting(false);
+                toast.error(orgCreationError.message);
+              }
+            }}>
+            {({ values, handleChange, handleSubmit, isSubmitting, touched, errors }) => (
+              <React.Fragment>
+                <Row>
+                  <Col md={6}>
+                    <FormGroup>
+                      <Label htmlFor="name">Nom</Label>
+                      <Input name="name" id="name" value={values.name} onChange={handleChange} />
+                    </FormGroup>
+                  </Col>
+
+                  <Col md={6}>
+                    <FormGroup>
+                      <Label htmlFor="email">Email</Label>
+                      <Input name="email" id="email" value={values.email} onChange={handleChange} />
+                    </FormGroup>
+                  </Col>
+                  <Col md={6}>
+                    <FormGroup>
+                      <Label htmlFor="phone">Téléphone</Label>
+                      <Input name="phone" id="phone" value={values.phone} onChange={handleChange} />
+                    </FormGroup>
+                  </Col>
+                  <Col md={6}>
+                    <FormGroup>
+                      <Label htmlFor="team">Équipes</Label>
+                      <div>
+                        <SelectCustom
+                          name="name"
+                          options={team}
+                          onChange={(teams) => handleChange({ target: { value: teams?.map((t) => t._id) || [], name: 'team' } })}
+                          value={values.team.map((_teamId) => team.find((_team) => _team._id === _teamId))}
+                          getOptionValue={(team) => team._id}
+                          getOptionLabel={(team) => team.name}
+                          isMulti
+                          isDisabled={team.length === 0}
+                          inputId="team"
+                        />
+                      </div>
+                    </FormGroup>
+                  </Col>
+                  <Col md={6}>
+                    <FormGroup>
+                      <Label htmlFor="role">Role</Label>
+                      <SelectRole handleChange={handleChange} value={values.role} />
+                    </FormGroup>
+                  </Col>
+                  <div className="tw-flex tw-basis-full tw-flex-col tw-px-4 tw-py-2">
+                    <label htmlFor="healthcareProfessional" style={{ marginBottom: 0 }}>
+                      <input
+                        type="checkbox"
+                        style={{ marginRight: '0.5rem' }}
+                        name="healthcareProfessional"
+                        id="healthcareProfessional"
+                        checked={values.healthcareProfessional}
+                        onChange={() => {
+                          handleChange({
+                            target: {
+                              name: 'healthcareProfessional',
+                              checked: Boolean(!values.healthcareProfessional),
+                              value: Boolean(!values.healthcareProfessional),
+                            },
+                          });
+                        }}
+                      />
+                      Professionnel·le de santé
+                    </label>
+                    <div>
+                      <small className="text-muted">Un professionnel·le de santé a accès au dossier médical complet des personnes.</small>
+                    </div>
+                  </div>
                 </Row>
                 <ButtonCustom loading={isSubmitting} onClick={handleSubmit} title="Créer" />
               </React.Fragment>

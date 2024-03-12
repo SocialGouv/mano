@@ -23,6 +23,7 @@ const {
   User,
   TerritoryObservation,
   UserLog,
+  Team,
 } = require("../db/sequelize");
 const mailservice = require("../utils/mailservice");
 const validateUser = require("../middleware/validateUser");
@@ -379,6 +380,25 @@ router.delete(
     const result = await Organisation.destroy({ where: { _id: req.params._id } });
     if (result === 0) return res.status(404).send({ ok: false, error: "Not Found" });
     return res.status(200).send({ ok: true });
+  })
+);
+
+router.get(
+  "/:id/teams",
+  passport.authenticate("user", { session: false }),
+  validateUser(["superadmin"]),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.object({
+        id: z.string().regex(looseUuidRegex),
+      }).parse(req.params);
+    } catch (e) {
+      const error = new Error(`Invalid request in teams get`);
+      error.status = 400;
+      return next(error);
+    }
+    const data = await Team.findAll({ where: { organisation: req.params.id }, include: ["Organisation"] });
+    return res.status(200).send({ ok: true, data });
   })
 );
 
