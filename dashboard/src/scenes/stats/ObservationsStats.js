@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useRecoilValue } from 'recoil';
-import { utils, writeFile } from 'xlsx';
+import { utils, writeFile } from '@e965/xlsx';
 import SelectCustom from '../../components/SelectCustom';
 import CustomFieldsStats from './CustomFieldsStats';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../components/tailwind/Modal';

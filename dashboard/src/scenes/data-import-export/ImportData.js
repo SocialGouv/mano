@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState } from 'react';
-import { read } from 'xlsx';
+import { read } from '@e965/xlsx';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { toast } from 'react-toastify';
 import { Modal, ModalBody, ModalHeader, Alert } from 'reactstrap';

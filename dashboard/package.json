@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@babel/runtime": "^7.14.5",
+    "@e965/xlsx": "^0.20.1",
     "@headlessui/react": "^1.7.4",
     "@nivo/bar": "^0.80.0",
     "@nivo/core": "^0.80.0",
@@ -51,8 +52,7 @@
     "urijs": "^1.19.11",
     "uuid": "^9.0.0",
     "validator": "^13.7.0",
-    "web-vitals": "^3.0.0",
-    "xlsx": "^0.18.5"
+    "web-vitals": "^3.0.0"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.3",

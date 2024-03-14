@@ -2,7 +2,7 @@ import { Fragment, useState } from 'react';
 import { Menu, Transition } from '@headlessui/react';
 import { useRecoilValue } from 'recoil';
 import { personFieldsIncludingCustomFieldsSelector, personsState } from '../../recoil/persons';
-import { utils, writeFile } from 'xlsx';
+import { utils, writeFile } from '@e965/xlsx';
 import { dayjsInstance } from '../../services/date';
 import { teamsState, userState } from '../../recoil/auth';
 import API from '../../services/api';

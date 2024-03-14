@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useRecoilValue } from 'recoil';
-import { utils, writeFile } from 'xlsx';
+import { utils, writeFile } from '@e965/xlsx';
 import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from '../../../components/tailwind/Modal';
 import { FullScreenIcon } from '../../../assets/icons/FullScreenIcon';
 import Table from '../../../components/table';

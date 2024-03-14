@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { utils, writeFile } from 'xlsx';
+import { utils, writeFile } from '@e965/xlsx';
 
 import ButtonCustom from '../../components/ButtonCustom';
 import { flattenedCustomFieldsPersonsSelector, personsState } from '../../recoil/persons';

@@ -1,5 +1,5 @@
 import { MutableRefObject, useRef, useState } from 'react';
-import { utils, read, writeFile, WorkBook } from 'xlsx';
+import { utils, read, writeFile, WorkBook } from '@e965/xlsx';
 import { toast } from 'react-toastify';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { v4 as uuidv4 } from 'uuid';

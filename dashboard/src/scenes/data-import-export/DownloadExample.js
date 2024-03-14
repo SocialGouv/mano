@@ -1,5 +1,5 @@
 import { useRecoilValue } from 'recoil';
-import { utils, writeFile } from 'xlsx';
+import { utils, writeFile } from '@e965/xlsx';
 import ButtonCustom from '../../components/ButtonCustom';
 import { currentTeamState } from '../../recoil/auth';
 import { personFieldsIncludingCustomFieldsSelector } from '../../recoil/persons';
