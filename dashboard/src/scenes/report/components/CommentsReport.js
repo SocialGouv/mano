@@ -149,6 +149,12 @@ const CommentsTable = ({ data, activeTab }) => {
             searchParams.set('treatmentId', comment.treatment._id);
             history.push(`?${searchParams.toString()}`);
             break;
+          case 'passage':
+            history.push(`/person/${comment.person}?passageId=${comment.passage}`);
+            break;
+          case 'rencontre':
+            history.push(`/person/${comment.person}?rencontreId=${comment.rencontre}`);
+            break;
           case 'medical-file':
             history.push(`/person/${comment.person}?tab=Dossier+Médical`);
             break;
