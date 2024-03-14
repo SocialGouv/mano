@@ -199,10 +199,12 @@ const CommentsTable = ({ data, activeTab }) => {
                       pour{' '}
                     </>
                   )}
-                  {comment.type === 'treatment' && <>Traitement pour: </>}
-                  {comment.type === 'person' && <>Personne suivie: </>}
-                  {comment.type === 'consultation' && <>Consultation pour: </>}
-                  {comment.type === 'medical-file' && <>Personne suivie: </>}
+                  {comment.type === 'treatment' && <>Traitement pour </>}
+                  {comment.type === 'passage' && <>Passage pour </>}
+                  {comment.type === 'rencontre' && <>Rencontre pour </>}
+                  {comment.type === 'person' && <>Personne suivie </>}
+                  {comment.type === 'consultation' && <>Consultation pour </>}
+                  {comment.type === 'medical-file' && <>Personne suivie </>}
                   <b>
                     <PersonName item={comment} />
                   </b>
