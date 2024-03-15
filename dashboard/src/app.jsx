@@ -1,66 +1,66 @@
-import React, { useEffect, useState } from 'react';
-import { RecoilEnv, RecoilRoot, useRecoilValue } from 'recoil';
-import RecoilNexus from 'recoil-nexus';
-import { Router, Switch, Redirect } from 'react-router-dom';
-import { createBrowserHistory } from 'history';
-import * as Sentry from '@sentry/react';
-import { BrowserTracing } from '@sentry/tracing';
-import { fr } from 'date-fns/esm/locale';
-import { registerLocale } from 'react-datepicker';
-// import 'react-datepicker/dist/react-datepicker.css';
-import lifecycle from 'page-lifecycle';
-import Account from './scenes/account';
-import Auth from './scenes/auth';
-import Organisation from './scenes/organisation';
-import Action from './scenes/action';
-import Territory from './scenes/territory';
-import Structure from './scenes/structure';
-import Place from './scenes/place';
-import Team from './scenes/team';
-import Stats from './scenes/stats';
-import SearchView from './scenes/search';
-import User from './scenes/user';
-import Report from './scenes/report';
-import Person from './scenes/person';
-import Drawer from './components/drawer';
-import Reception from './scenes/reception';
-import ActionModal from './components/ActionModal';
-import Charte from './scenes/auth/charte';
-import { userState } from './recoil/auth';
-import API, { recoilResetKeyState, authTokenState } from './services/api';
-import ScrollToTop from './components/ScrollToTop';
-import TopBar from './components/TopBar';
-import VersionOutdatedAlert from './components/VersionOutdatedAlert';
-import ModalConfirm from './components/ModalConfirm';
-import DataLoader, { initialLoadIsDoneState, useDataLoader } from './components/DataLoader';
-import { Bounce, cssTransition, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import SentryRoute from './components/Sentryroute';
-import { ENV, VERSION } from './config';
-import DuplicatedReportsTestChecker from './components/DuplicatedReportsTestChecker';
-import ConsultationModal from './components/ConsultationModal';
-import TreatmentModal from './scenes/person/components/TreatmentModal';
-import BottomBar from './components/BottomBar';
-import CGUs from './scenes/auth/cgus';
+import React, { useEffect, useState } from "react";
+import { RecoilEnv, RecoilRoot, useRecoilValue } from "recoil";
+import RecoilNexus from "recoil-nexus";
+import { Router, Switch, Redirect } from "react-router-dom";
+import { createBrowserHistory } from "history";
+import * as Sentry from "@sentry/react";
+import { BrowserTracing } from "@sentry/tracing";
+import { fr } from "date-fns/esm/locale";
+import { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import lifecycle from "page-lifecycle";
+import Account from "./scenes/account";
+import Auth from "./scenes/auth";
+import Organisation from "./scenes/organisation";
+import Action from "./scenes/action";
+import Territory from "./scenes/territory";
+import Structure from "./scenes/structure";
+import Place from "./scenes/place";
+import Team from "./scenes/team";
+import Stats from "./scenes/stats";
+import SearchView from "./scenes/search";
+import User from "./scenes/user";
+import Report from "./scenes/report";
+import Person from "./scenes/person";
+import Drawer from "./components/drawer";
+import Reception from "./scenes/reception";
+import ActionModal from "./components/ActionModal";
+import Charte from "./scenes/auth/charte";
+import { userState } from "./recoil/auth";
+import API, { recoilResetKeyState, authTokenState } from "./services/api";
+import ScrollToTop from "./components/ScrollToTop";
+import TopBar from "./components/TopBar";
+import VersionOutdatedAlert from "./components/VersionOutdatedAlert";
+import ModalConfirm from "./components/ModalConfirm";
+import DataLoader, { initialLoadIsDoneState, useDataLoader } from "./components/DataLoader";
+import { Bounce, cssTransition, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import SentryRoute from "./components/Sentryroute";
+import { ENV, VERSION } from "./config";
+import DuplicatedReportsTestChecker from "./components/DuplicatedReportsTestChecker";
+import ConsultationModal from "./components/ConsultationModal";
+import TreatmentModal from "./scenes/person/components/TreatmentModal";
+import BottomBar from "./components/BottomBar";
+import CGUs from "./scenes/auth/cgus";
 
 RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = import.meta.env.VITE_DISABLE_RECOIL_DUPLICATE_ATOM_KEY_CHECKING ? false : true;
 
 const ToastifyFastTransition = cssTransition({
-  enter: 'Toastify--animate Toastify__hack-force-fast Toastify__bounce-enter',
-  exit: 'Toastify--animate Toastify__hack-force-fast Toastify__bounce-exit',
+  enter: "Toastify--animate Toastify__hack-force-fast Toastify__bounce-enter",
+  exit: "Toastify--animate Toastify__hack-force-fast Toastify__bounce-exit",
   appendPosition: true,
   collapseDuration: 0,
   collapse: true,
 });
 
-registerLocale('fr', fr);
+registerLocale("fr", fr);
 
 const history = createBrowserHistory();
 
-if (ENV === 'production') {
+if (ENV === "production") {
   Sentry.init({
-    dsn: 'https://2e784fe581bff74181600b4460c01955@o4506615228596224.ingest.sentry.io/4506672157229056',
-    environment: 'dashboard',
+    dsn: "https://2e784fe581bff74181600b4460c01955@o4506615228596224.ingest.sentry.io/4506672157229056",
+    environment: "dashboard",
     release: VERSION,
     integrations: [
       new BrowserTracing({
@@ -73,16 +73,16 @@ if (ENV === 'production') {
     // We recommend adjusting this value in production
     tracesSampleRate: 0.05,
     ignoreErrors: [
-      'Network request failed',
-      'Failed to fetch',
-      'NetworkError',
+      "Network request failed",
+      "Failed to fetch",
+      "NetworkError",
       // ???
-      'withrealtime/messaging',
+      "withrealtime/messaging",
       // This error seems to happen only in firefox and to be ignorable.
       // The "fetch" failed because user has navigated.
       // Since other browsers don't have this problem, we don't care about it,
       // it may be a false positive.
-      'AbortError: The operation was aborted',
+      "AbortError: The operation was aborted",
     ],
   });
 }
@@ -103,30 +103,30 @@ const App = ({ resetRecoil }) => {
 
   useEffect(() => {
     const onWindowFocus = (e) => {
-      if (authToken && e.newState === 'active') {
-        API.get({ path: '/check-auth' }) // will force logout if session is expired
+      if (authToken && e.newState === "active") {
+        API.get({ path: "/check-auth" }) // will force logout if session is expired
           .then(() => {
             if (initialLoadIsDone) {
               // if the app is already loaded
               // will refresh data if session is still valid
               refresh();
             } else {
-              console.log('initial load not done');
+              console.log("initial load not done");
             }
           });
       }
     };
-    lifecycle.addEventListener('statechange', onWindowFocus);
+    lifecycle.addEventListener("statechange", onWindowFocus);
     return () => {
-      lifecycle.removeEventListener('statechange', onWindowFocus);
+      lifecycle.removeEventListener("statechange", onWindowFocus);
     };
   }, [authToken, refresh, initialLoadIsDone]);
 
   return (
     <div className="main-container">
-      <ToastContainer transition={import.meta.env.VITE_TEST_PLAYWRIGHT !== 'true' ? Bounce : ToastifyFastTransition} />
+      <ToastContainer transition={import.meta.env.VITE_TEST_PLAYWRIGHT !== "true" ? Bounce : ToastifyFastTransition} />
       <VersionOutdatedAlert />
-      {import.meta.env.VITE_TEST_PLAYWRIGHT === 'true' && <DuplicatedReportsTestChecker />}
+      {import.meta.env.VITE_TEST_PLAYWRIGHT === "true" && <DuplicatedReportsTestChecker />}
       <Router history={history}>
         <ScrollToTop />
         <Switch>
@@ -146,7 +146,7 @@ const App = ({ resetRecoil }) => {
           <RestrictedRoute path="/search" component={SearchView} />
           <RestrictedRoute path="/report" component={Report} />
           <RestrictedRoute path="/report-new" component={Report} />
-          <RestrictedRoute path="*" component={() => <Redirect to={'stats'} />} />
+          <RestrictedRoute path="*" component={() => <Redirect to={"stats"} />} />
         </Switch>
         <ActionModal />
         <ConsultationModal />
@@ -180,7 +180,7 @@ const RestrictedRoute = ({ component: Component, _isLoggedIn, ...rest }) => {
     <>
       {!!user && <TopBar />}
       <div className="main">
-        {!!user && !['superadmin'].includes(user.role) && <Drawer />}
+        {!!user && !["superadmin"].includes(user.role) && <Drawer />}
         {/*
          height: auto;
     margin-left: 0 !important;
@@ -188,8 +188,8 @@ const RestrictedRoute = ({ component: Component, _isLoggedIn, ...rest }) => {
     padding: 0 !important;
     overflow: initial;
         */}
-        <main className="tw-relative tw-flex tw-grow tw-basis-full tw-flex-col tw-overflow-auto tw-overflow-x-hidden tw-overflow-y-scroll tw-px-2 print:!tw-ml-0 print:tw-h-auto print:tw-max-w-full print:tw-overflow-visible print:tw-p-0 sm:tw-px-12 sm:tw-pt-4 sm:tw-pb-12">
-          <SentryRoute {...rest} render={(props) => (user ? <Component {...props} /> : <Redirect to={{ pathname: '/auth' }} />)} />
+        <main className="print:!tw-ml-0 tw-relative tw-flex tw-grow tw-basis-full tw-flex-col tw-overflow-auto tw-overflow-x-hidden tw-overflow-y-scroll tw-px-2 sm:tw-px-12 sm:tw-pb-12 sm:tw-pt-4 print:tw-h-auto print:tw-max-w-full print:tw-overflow-visible print:tw-p-0">
+          <SentryRoute {...rest} render={(props) => (user ? <Component {...props} /> : <Redirect to={{ pathname: "/auth" }} />)} />
         </main>
       </div>
       <BottomBar />
