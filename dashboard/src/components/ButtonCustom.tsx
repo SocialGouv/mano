@@ -1,29 +1,29 @@
-import { MouseEventHandler } from 'react';
-import styled from 'styled-components';
-import { theme } from '../config';
-import { Spinner } from 'reactstrap';
+import { MouseEventHandler } from "react";
+import styled from "styled-components";
+import { theme } from "../config";
+import { Spinner } from "reactstrap";
 
 const ButtonCustom = ({
-  color = 'primary',
+  color = "primary",
   onClick = () => {},
   style,
-  className = '',
+  className = "",
   loading,
-  title = 'ButtonCustom',
-  type = 'submit',
+  title = "ButtonCustom",
+  type = "submit",
   width,
   disabled,
   icon,
-  padding = '',
+  padding = "",
   ...rest
 }: {
-  color?: 'primary' | 'secondary' | 'link' | 'cancel' | 'danger' | 'warning';
+  color?: "primary" | "secondary" | "link" | "cancel" | "danger" | "warning";
   onClick?: MouseEventHandler<HTMLButtonElement>;
   style?: any;
   className?: string;
   loading?: boolean;
   title?: string;
-  type?: 'button' | 'submit' | 'reset';
+  type?: "button" | "submit" | "reset";
   width?: number;
   disabled?: boolean;
   icon?: string;
@@ -31,7 +31,7 @@ const ButtonCustom = ({
 }) => {
   return (
     <ButtonWrapper
-      className={[className, 'noprint'].join(' ')}
+      className={[className, "noprint"].join(" ")}
       onClick={onClick}
       color={color}
       style={style}
@@ -39,8 +39,8 @@ const ButtonCustom = ({
       disabled={loading || disabled}
       type={type}
       {...rest}>
-      <SpinnerContainer visibility={!loading ? 'hidden' : 'visible'}>
-        <Spinner color={'white'} size={'sm'} style={{ borderWidth: '0.1em' }} />
+      <SpinnerContainer visibility={!loading ? "hidden" : "visible"}>
+        <Spinner color={"white"} size={"sm"} style={{ borderWidth: "0.1em" }} />
       </SpinnerContainer>
       <Content padding={padding}>
         {!!icon && <Icon color={color} icon={icon} />}
@@ -60,13 +60,13 @@ const STYLES = {
 };
 
 const ButtonWrapper = styled.button<{
-  color: 'primary' | 'secondary' | 'link' | 'cancel' | 'danger' | 'warning';
+  color: "primary" | "secondary" | "link" | "cancel" | "danger" | "warning";
   width?: number;
 }>`
   border-radius: 8px;
   font-size: 14px;
-  ${(p) => p.color === 'link' && 'font-weight: 600;'}
-  width: ${(p) => (p.width ? `${p.width}px` : 'auto')};
+  ${(p) => p.color === "link" && "font-weight: 600;"}
+  width: ${(p) => (p.width ? `${p.width}px` : "auto")};
   max-width: 450px;
   display: grid;
   align-items: center;
@@ -74,7 +74,7 @@ const ButtonWrapper = styled.button<{
   box-shadow: none;
   border: none;
   position: relative;
-  ${(props) => props.disabled && 'pointer-events: none;'}
+  ${(props) => props.disabled && "pointer-events: none;"}
   ${(p) => STYLES[p.color] || `background: ${theme.main}; color: ${theme.white};`};
 
   &:disabled {
@@ -83,7 +83,7 @@ const ButtonWrapper = styled.button<{
 
   &:hover {
     cursor: pointer;
-    ${(p) => p.color === 'link' && 'text-decoration: underline;'}
+    ${(p) => p.color === "link" && "text-decoration: underline;"}
   }
 `;
 
@@ -91,7 +91,7 @@ const Icon = styled.div<{
   icon: string;
 }>`
   color: currentColor;
-  background-image: url(${(props) => props.icon});
+  background-image: url("${(props) => props.icon}");
   background-size: 20px;
   display: inline-block;
   width: 20px;
@@ -102,7 +102,7 @@ const Icon = styled.div<{
 const Title = styled.p<{
   transparent: boolean;
 }>`
-  ${(props) => props.transparent && 'color: transparent'};
+  ${(props) => props.transparent && "color: transparent"};
   margin-bottom: 0;
 `;
 
@@ -116,7 +116,7 @@ const Content = styled.div<{
   ${(props) => `padding: ${props.padding}`}
 `;
 const SpinnerContainer = styled.div<{
-  visibility: 'visible' | 'hidden';
+  visibility: "visible" | "hidden";
 }>`
   visibility: ${(props) => props.visibility};
   position: absolute;
