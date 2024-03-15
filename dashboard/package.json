@@ -15,6 +15,7 @@
     "@sentry/browser": "^6.17.5",
     "@sentry/react": "^7.69.0",
     "@sentry/tracing": "^7.14.0",
+    "@sentry/vite-plugin": "^2.15.0",
     "@types/jest": "^29.5.2",
     "@types/node": "^20.3.3",
     "@types/react": "^18.2.14",
