@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("./assets/Lato/font-face.css");
-
 @font-face {
   font-family: "password";
   src: url("./assets/password.woff");
@@ -174,7 +172,7 @@ table.table-selego {
 }
 
 body {
-  font-family: Lato, serif;
+  font-family: serif;
   color: #1d2021;
 }
 
