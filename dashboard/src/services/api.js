@@ -259,11 +259,11 @@ const execute = async ({ method, path = '', body = null, query = {}, headers = {
       const res = await response.json();
       if (!response.ok) {
         if (res?.error?.message) {
-          toast?.error(res?.error?.message, { autoClose: process.env.REACT_APP_TEST_PLAYWRIGHT !== 'true' });
+          toast?.error(res?.error?.message, { autoClose: import.meta.env.VITE_TEST_PLAYWRIGHT !== 'true' });
         } else if (res?.error) {
-          toast?.error(res?.error, { autoClose: process.env.REACT_APP_TEST_PLAYWRIGHT !== 'true' });
+          toast?.error(res?.error, { autoClose: import.meta.env.VITE_TEST_PLAYWRIGHT !== 'true' });
         } else if (res?.code) {
-          toast?.error(res?.code, { autoClose: process.env.REACT_APP_TEST_PLAYWRIGHT !== 'true' });
+          toast?.error(res?.code, { autoClose: import.meta.env.VITE_TEST_PLAYWRIGHT !== 'true' });
         } else {
           capture('api error unhandled', { extra: { res, path, query } });
         }
@@ -296,11 +296,11 @@ const execute = async ({ method, path = '', body = null, query = {}, headers = {
       },
     });
     if (typeof errorExecuteApi === 'string') {
-      toast.error(errorExecuteApi, { autoClose: process.env.REACT_APP_TEST_PLAYWRIGHT !== 'true' });
+      toast.error(errorExecuteApi, { autoClose: import.meta.env.VITE_TEST_PLAYWRIGHT !== 'true' });
     } else if (errorExecuteApi?.message) {
-      toast.error(errorExecuteApi.message, { autoClose: process.env.REACT_APP_TEST_PLAYWRIGHT !== 'true' });
+      toast.error(errorExecuteApi.message, { autoClose: import.meta.env.VITE_TEST_PLAYWRIGHT !== 'true' });
     } else {
-      toast.error('Désolé, une erreur est survenue', { autoClose: process.env.REACT_APP_TEST_PLAYWRIGHT !== 'true' });
+      toast.error('Désolé, une erreur est survenue', { autoClose: import.meta.env.VITE_TEST_PLAYWRIGHT !== 'true' });
     }
 
     throw errorExecuteApi;

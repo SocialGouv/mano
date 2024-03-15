@@ -119,7 +119,7 @@ const Item = styled.div`
     text-align: center;
   }
   button {
-    display: ${process.env.REACT_APP_TEST === 'true' ? 'block' : 'none'};
+    display: ${import.meta.env.TEST === 'true' ? 'block' : 'none'};
     border: none;
     position: absolute;
     top: 5px;

@@ -16,16 +16,16 @@ services:
     build:
       context: ./dashboard
       args:
-        REACT_APP_SCHEME: ${REACT_APP_SCHEME}
-        REACT_APP_HOST: ${REACT_APP_HOST}
-        REACT_APP_USE_HTTP: ${REACT_APP_USE_HTTP}
+        VITE_SCHEME: ${VITE_SCHEME}
+        VITE_HOST: ${VITE_HOST}
+        VITE_USE_HTTP: ${VITE_USE_HTTP}
     environment:
       - NODE_ENV=production
       - VIRTUAL_HOST=espace-mano.localhost,espace-mano.test.fabrique.social.gouv.fr,espace-mano.sesan.fr,preprod-espace-mano.sesan.fr
       - PORT=8083
-      - REACT_APP_SCHEME=${REACT_APP_SCHEME}
-      - REACT_APP_HOST=${REACT_APP_HOST}
-      - REACT_APP_USE_HTTP=${REACT_APP_USE_HTTP}
+      - VITE_SCHEME=${VITE_SCHEME}
+      - VITE_HOST=${VITE_HOST}
+      - VITE_USE_HTTP=${VITE_USE_HTTP}
       - no_proxy=ad.sesan.fr,.gcsidf.local,localhost,127.0.0.1
       - https_proxy=http://sesclaprx-vip.grita.fr:3128
       - http_proxy=http://sesclaprx-vip.grita.fr:3128

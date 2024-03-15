@@ -7,8 +7,7 @@ import * as Sentry from '@sentry/react';
 import { BrowserTracing } from '@sentry/tracing';
 import { fr } from 'date-fns/esm/locale';
 import { registerLocale } from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import 'react-spring-bottom-sheet/dist/style.css';
+// import 'react-datepicker/dist/react-datepicker.css';
 import lifecycle from 'page-lifecycle';
 import Account from './scenes/account';
 import Auth from './scenes/auth';
@@ -44,7 +43,7 @@ import TreatmentModal from './scenes/person/components/TreatmentModal';
 import BottomBar from './components/BottomBar';
 import CGUs from './scenes/auth/cgus';
 
-RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = process.env.REACT_APP_DISABLE_RECOIL_DUPLICATE_ATOM_KEY_CHECKING ? false : true;
+RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = import.meta.env.VITE_DISABLE_RECOIL_DUPLICATE_ATOM_KEY_CHECKING ? false : true;
 
 const ToastifyFastTransition = cssTransition({
   enter: 'Toastify--animate Toastify__hack-force-fast Toastify__bounce-enter',
@@ -125,9 +124,9 @@ const App = ({ resetRecoil }) => {
 
   return (
     <div className="main-container">
-      <ToastContainer transition={process.env.REACT_APP_TEST_PLAYWRIGHT !== 'true' ? Bounce : ToastifyFastTransition} />
+      <ToastContainer transition={import.meta.env.VITE_TEST_PLAYWRIGHT !== 'true' ? Bounce : ToastifyFastTransition} />
       <VersionOutdatedAlert />
-      {process.env.REACT_APP_TEST_PLAYWRIGHT === 'true' && <DuplicatedReportsTestChecker />}
+      {import.meta.env.VITE_TEST_PLAYWRIGHT === 'true' && <DuplicatedReportsTestChecker />}
       <Router history={history}>
         <ScrollToTop />
         <Switch>

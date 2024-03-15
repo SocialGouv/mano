@@ -20,8 +20,8 @@ const theme = {
 };
 
 const getHost = () => {
-  if (process.env.NODE_ENV !== 'production' || process.env.REACT_APP_TEST === 'true') {
-    return process.env.REACT_APP_HOST;
+  if (process.env.NODE_ENV !== 'production' || import.meta.env.VITE_TEST === 'true') {
+    return import.meta.env.VITE_HOST;
   }
   if (window.location.host.includes('.ovh.')) {
     return window.location.host.replace('dashboard-', '');
@@ -45,12 +45,11 @@ const getHost = () => {
 
 const HOST = getHost();
 const SCHEME =
-  process.env.NODE_ENV === 'development' || process.env.REACT_APP_TEST === 'true' || process.env.REACT_APP_USE_HTTP === 'true'
-    ? process.env.REACT_APP_SCHEME
+  process.env.NODE_ENV === 'development' || import.meta.env.VITE_TEST === 'true' || import.meta.env.VITE_USE_HTTP === 'true'
+    ? import.meta.env.VITE_SCHEME
     : 'https';
 const ENV = process.env.NODE_ENV || 'production';
 const VERSION = packageInfo.version;
 const DEFAULT_ORGANISATION_KEY =
-  process.env.NODE_ENV === 'development' && process.env.REACT_APP_TEST !== 'true' ? process.env.REACT_APP_DEFAULT_ORGANISATION_KEY : '';
-
+  process.env.NODE_ENV === 'development' && import.meta.env.VITE_TEST !== 'true' ? import.meta.env.VITE_DEFAULT_ORGANISATION_KEY : '';
 export { theme, HOST, SCHEME, ENV, VERSION, DEFAULT_ORGANISATION_KEY };

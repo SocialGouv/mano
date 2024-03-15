@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 
-module.exports = {
+export default {
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
   safelist: [
     'tw-min-w-0',
@@ -37,7 +37,7 @@ module.exports = {
         },
       },
       gridTemplateColumns: {
-        "new-report-squares": 'repeat(auto-fit, minmax(40%, 1fr))'
+        'new-report-squares': 'repeat(auto-fit, minmax(40%, 1fr))',
       },
       colors: {
         main: '#226854', // higher contrast

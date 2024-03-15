@@ -18,7 +18,7 @@ export default function IncrementorSmall({ service, team, date, count: initialVa
         if (res.ok) onUpdated(res.data.count);
       });
     },
-    process.env.REACT_APP_TEST === 'true' ? 0 : 1000,
+    import.meta.env.TEST === 'true' ? 0 : 1000,
     [value]
   );
   return (

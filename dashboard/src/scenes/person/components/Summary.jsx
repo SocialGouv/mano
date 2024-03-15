@@ -19,7 +19,7 @@ export default function Summary({ person }) {
 
   return (
     <>
-      {!process.env.REACT_APP_TEST_PLAYWRIGHT && <SummaryPrint person={person} />}
+      {!import.meta.env.VITE_TEST_PLAYWRIGHT && <SummaryPrint person={person} />}
       <div className="noprint tw-grid tw-grid-cols-12 tw-gap-4 tw-pt-4">
         <div className="tw-col-span-3">
           <InfosMain person={person} />

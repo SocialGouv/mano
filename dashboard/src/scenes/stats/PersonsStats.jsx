@@ -88,7 +88,7 @@ export default function PersonStats({
       ) : (
         <>
           <details
-            open={process.env.REACT_APP_TEST_PLAYWRIGHT === 'true' || window.localStorage.getItem('person-stats-general-open') === 'true'}
+            open={import.meta.env.VITE_TEST_PLAYWRIGHT === 'true' || window.localStorage.getItem('person-stats-general-open') === 'true'}
             onToggle={(e) => {
               if (e.target.open) {
                 window.localStorage.setItem('person-stats-general-open', 'true');
@@ -186,7 +186,7 @@ export default function PersonStats({
                 key={section.name}
                 className="print:tw-break-before-page"
                 open={
-                  process.env.REACT_APP_TEST_PLAYWRIGHT === 'true' ||
+                  import.meta.env.VITE_TEST_PLAYWRIGHT === 'true' ||
                   window.localStorage.getItem(`person-stats-${section.name.replace(' ', '-').toLocaleLowerCase()}-open`) === 'true'
                 }
                 onToggle={(e) => {

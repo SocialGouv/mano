@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 import { selectorFamily, useRecoilValue } from 'recoil';
 import { useHistory } from 'react-router-dom';
-import { BottomSheet } from 'react-spring-bottom-sheet';
 import { SmallHeader } from '../../components/header';
 import Search from '../../components/search';
 import ActionsCalendar from '../../components/ActionsCalendar';
@@ -176,51 +175,40 @@ const List = () => {
           </span>
         }
       />
-      {isDesktop ? (
-        <div className="tw-mb-5 tw-flex tw-flex-row tw-justify-center">
-          <div className="noprint tw-flex tw-w-full tw-justify-end tw-gap-3">
+
+      <div className="tw-mb-5 tw-flex tw-flex-row tw-justify-center">
+        <div className="noprint tw-flex tw-w-full tw-justify-end tw-gap-3">
+          <ButtonCustom
+            icon={agendaIcon}
+            disabled={!currentTeam}
+            onClick={() => {
+              const searchParams = new URLSearchParams(history.location.search);
+              searchParams.set('dueAt', dayjsInstance().toISOString());
+              searchParams.set('newAction', true);
+              history.push(`?${searchParams.toString()}`);
+            }}
+            color="primary"
+            title="Créer une nouvelle action"
+            padding={'12px 24px'}
+          />
+          {Boolean(user.healthcareProfessional) && (
             <ButtonCustom
               icon={agendaIcon}
               disabled={!currentTeam}
               onClick={() => {
                 const searchParams = new URLSearchParams(history.location.search);
                 searchParams.set('dueAt', dayjsInstance().toISOString());
-                searchParams.set('newAction', true);
+                searchParams.set('newConsultation', true);
                 history.push(`?${searchParams.toString()}`);
               }}
               color="primary"
-              title="Créer une nouvelle action"
+              title="Créer une nouvelle consultation"
               padding={'12px 24px'}
             />
-            {Boolean(user.healthcareProfessional) && (
-              <ButtonCustom
-                icon={agendaIcon}
-                disabled={!currentTeam}
-                onClick={() => {
-                  const searchParams = new URLSearchParams(history.location.search);
-                  searchParams.set('dueAt', dayjsInstance().toISOString());
-                  searchParams.set('newConsultation', true);
-                  history.push(`?${searchParams.toString()}`);
-                }}
-                color="primary"
-                title="Créer une nouvelle consultation"
-                padding={'12px 24px'}
-              />
-            )}
-          </div>
+          )}
         </div>
-      ) : (
-        <>
-          <button
-            type="button"
-            onClick={setMobileBottomSheetOpened}
-            className="tw-fixed tw-top-3/4 tw-right-4 tw-z-20 tw-inline-flex tw-h-12 tw-w-12 tw-items-center tw-justify-center tw-rounded-full tw-bg-red-500 tw-text-6xl tw-text-white">
-            <span className="tw-absolute tw-m-auto tw-block tw-h-1 tw-w-6/12 tw-bg-white" />
-            <span className="tw-absolute tw-m-auto tw-block tw-h-1 tw-w-6/12 tw-rotate-90 tw-bg-white" />
-          </button>
-          <BottomSheet open={mobileBottomSheetOpened}>My awesome content here</BottomSheet>
-        </>
-      )}
+      </div>
+
       {isDesktop && (
         <div className="tw-mb-10 tw-flex tw-flex-wrap tw-border-b tw-border-gray-200">
           <div className="tw-mb-5 tw-flex tw-w-full tw-items-center tw-px-2">
