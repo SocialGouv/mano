@@ -1,4 +1,4 @@
-import { dayjsInstance } from "../../../services/date";
+import { dayjsInstance, formatAge } from "../../../services/date";
 import React, { useState } from "react";
 import EditModal from "./EditModal";
 import TagTeam from "../../../components/TagTeam";
@@ -24,7 +24,7 @@ export function InfosMain({ person, isMedicalFile }) {
             {person.birthdate && (
               <div>
                 <div>
-                  <b>Âge :</b> {dayjsInstance(dayjsInstance()).diff(person.birthdate, "year")} ans
+                  <b>Âge :</b> {formatAge(person.birthdate)}
                 </div>
                 <i>{dayjsInstance(person.birthdate).format("DD/MM/YYYY")}</i>
               </div>
