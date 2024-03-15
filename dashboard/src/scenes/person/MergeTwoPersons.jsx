@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Col, Button, Row, Modal, ModalBody, ModalHeader } from "reactstrap";
 import styled from "styled-components";
 import { Formik } from "formik";
@@ -37,7 +37,7 @@ const getRawValue = (field, value) => {
     if (field.type === "number") return <span>{value}</span>;
     if (field.type === "date") return <span>{dayjs(value).format("DD/MM/YYYY")}</span>;
     if (field.type === "date-with-time") return <span>{dayjs(value).format("DD/MM/YYYY HH:mm")}</span>;
-    if (field.type === "duration") return <span>{getDuration(dayjs(value).unix()).join(" ")}</span>;
+    if (field.type === "duration") return <span>{formatAge(value)}</span>;
     if (field.type === "yes-no") return <span>{value}</span>;
     if (field.type === "enum") return <span>{value}</span>;
     if (field.type === "multi-choice") return <span>{(value || []).join(", ")}</span>;
