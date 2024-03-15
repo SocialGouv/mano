@@ -1,32 +1,32 @@
-import React, { useMemo, useState } from 'react';
-import { Col, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
-import { useHistory } from 'react-router-dom';
-import { Formik } from 'formik';
-import { toast } from 'react-toastify';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import React, { useMemo, useState } from "react";
+import { Col, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, Row } from "reactstrap";
+import { useHistory } from "react-router-dom";
+import { Formik } from "formik";
+import { toast } from "react-toastify";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 
-import { SmallHeader } from '../../components/header';
-import ButtonCustom from '../../components/ButtonCustom';
-import Table from '../../components/table';
-import NightSessionModale from '../../components/NightSessionModale';
-import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
-import API from '../../services/api';
-import OnboardingEndModal from '../../components/OnboardingEndModal';
-import { formatDateWithFullMonth } from '../../services/date';
-import useTitle from '../../services/useTitle';
-import { useLocalStorage } from '../../services/useLocalStorage';
+import { SmallHeader } from "../../components/header";
+import ButtonCustom from "../../components/ButtonCustom";
+import Table from "../../components/table";
+import NightSessionModale from "../../components/NightSessionModale";
+import { currentTeamState, organisationState, teamsState, userState } from "../../recoil/auth";
+import API from "../../services/api";
+import OnboardingEndModal from "../../components/OnboardingEndModal";
+import { formatDateWithFullMonth } from "../../services/date";
+import useTitle from "../../services/useTitle";
+import { useLocalStorage } from "../../services/useLocalStorage";
 
-const defaultSort = (a, b, sortOrder) => (sortOrder === 'ASC' ? (a.name || '').localeCompare(b.name) : (b.name || '').localeCompare(a.name));
+const defaultSort = (a, b, sortOrder) => (sortOrder === "ASC" ? (a.name || "").localeCompare(b.name) : (b.name || "").localeCompare(a.name));
 
 const sortTeams = (sortBy, sortOrder) => (a, b) => {
-  if (sortBy === 'createdAt') {
-    if (a.createdAt > b.createdAt) return sortOrder === 'ASC' ? 1 : -1;
-    if (a.createdAt < b.createdAt) return sortOrder === 'ASC' ? -1 : 1;
+  if (sortBy === "createdAt") {
+    if (a.createdAt > b.createdAt) return sortOrder === "ASC" ? 1 : -1;
+    if (a.createdAt < b.createdAt) return sortOrder === "ASC" ? -1 : 1;
     return defaultSort(a, b, sortOrder);
   }
-  if (sortBy === 'nightSession') {
-    if (a.nightSession && !b.nightSession) return sortOrder === 'ASC' ? 1 : -1;
-    if (!a.nightSession && b.nightSession) return sortOrder === 'ASC' ? -1 : 1;
+  if (sortBy === "nightSession") {
+    if (a.nightSession && !b.nightSession) return sortOrder === "ASC" ? 1 : -1;
+    if (!a.nightSession && b.nightSession) return sortOrder === "ASC" ? -1 : 1;
     return defaultSort(a, b, sortOrder);
   }
   // default sort: name
@@ -36,9 +36,9 @@ const sortTeams = (sortBy, sortOrder) => (a, b) => {
 const List = () => {
   const teams = useRecoilValue(teamsState);
   const history = useHistory();
-  useTitle('Équipes');
-  const [sortBy, setSortBy] = useLocalStorage('users-sortBy', 'name');
-  const [sortOrder, setSortOrder] = useLocalStorage('users-sortOrder', 'ASC');
+  useTitle("Équipes");
+  const [sortBy, setSortBy] = useLocalStorage("users-sortBy", "name");
+  const [sortOrder, setSortOrder] = useLocalStorage("users-sortOrder", "ASC");
 
   const data = useMemo(() => [...teams].sort(sortTeams(sortBy, sortOrder)), [teams, sortBy, sortOrder]);
 
@@ -49,19 +49,19 @@ const List = () => {
       <Table
         data={data}
         onRowClick={(i) => history.push(`/team/${i._id}`)}
-        rowKey={'_id'}
+        rowKey={"_id"}
         columns={[
           {
-            title: 'Nom',
-            dataKey: 'name',
+            title: "Nom",
+            dataKey: "name",
             onSortOrder: setSortOrder,
             onSortBy: setSortBy,
             sortOrder,
             sortBy,
           },
           {
-            title: 'Créée le',
-            dataKey: 'createdAt',
+            title: "Créée le",
+            dataKey: "createdAt",
             onSortOrder: setSortOrder,
             onSortBy: setSortBy,
             sortOrder,
@@ -69,14 +69,14 @@ const List = () => {
             render: (i) => formatDateWithFullMonth(i.createdAt),
           },
           {
-            title: 'Équipe de nuit',
+            title: "Équipe de nuit",
             help: <NightSessionModale />,
-            dataKey: 'nightSession',
+            dataKey: "nightSession",
             onSortOrder: setSortOrder,
             onSortBy: setSortBy,
             sortOrder,
             sortBy,
-            render: (i) => (i.nightSession ? '🌒' : '☀️'),
+            render: (i) => (i.nightSession ? "🌒" : "☀️"),
           },
         ]}
       />
@@ -102,7 +102,7 @@ const Create = () => {
       <ButtonCustom color="primary" onClick={() => setOpen(true)} title="Créer une nouvelle équipe" padding="12px 24px" />
       <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
         <ModalHeader close={onboardingForTeams ? <></> : null} toggle={() => setOpen(false)}>
-          {onboardingForTeams ? 'Dernière étape !' : 'Créer une nouvelle équipe'}
+          {onboardingForTeams ? "Dernière étape !" : "Créer une nouvelle équipe"}
         </ModalHeader>
         <ModalBody>
           {Boolean(onboardingForTeams) && (
@@ -112,16 +112,16 @@ const Create = () => {
             </span>
           )}
           <Formik
-            initialValues={{ name: '' }}
+            initialValues={{ name: "" }}
             onSubmit={async (values, actions) => {
               if (!values.name) {
-                toast.error('Vous devez choisir un nom');
+                toast.error("Vous devez choisir un nom");
                 actions.setSubmitting(false);
                 return;
               }
               const newTeamRes = await API.post({
-                path: '/team',
-                body: { name: values.name, organisation: organisation._id, nightSession: values.nightSession === 'true' },
+                path: "/team",
+                body: { name: values.name, organisation: organisation._id, nightSession: values.nightSession === "true" },
               });
               if (!newTeamRes.ok) return actions.setSubmitting(false);
               const userPutRes = await API.put({
@@ -131,20 +131,21 @@ const Create = () => {
                 },
               });
               if (!userPutRes.ok) return actions.setSubmitting(false);
-              const meResponse = await API.get({ path: '/user/me' });
+              const meResponse = await API.get({ path: "/user/me" });
               setUser(meResponse.user);
               setCurrentTeam(meResponse.user.teams[0]);
               if (onboardingForTeams) {
                 toast.success(`Création réussie ! Vous êtes dans l'équipe ${newTeamRes.data.name}`);
                 setOnboardingEndModalOpen(true);
               } else {
-                toast.success('Création réussie !');
+                toast.success("Création réussie !");
               }
               actions.setSubmitting(false);
-              const { data: teams } = await API.get({ path: '/team' });
+              const { data: teams } = await API.get({ path: "/team" });
               setTeams(teams);
               setOpen(false);
-            }}>
+            }}
+          >
             {({ values, handleChange, handleSubmit, isSubmitting }) => {
               return (
                 <React.Fragment>
@@ -158,7 +159,7 @@ const Create = () => {
                     <Col md={6}>
                       <FormGroup>
                         <Label htmlFor="">L'équipe travaille-t-elle de nuit ?</Label>
-                        <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
+                        <div style={{ display: "flex", flexDirection: "column", marginLeft: 20, width: "80%" }}>
                           <FormGroup style={{ marginBottom: 0 }}>
                             <input
                               style={{ marginRight: 10 }}
@@ -166,7 +167,7 @@ const Create = () => {
                               id="nightSessionYes"
                               name="nightSession"
                               value="true"
-                              checked={values.nightSession === 'true'}
+                              checked={values.nightSession === "true"}
                               onChange={handleChange}
                             />
                             <label htmlFor="nightSessionYes">Oui</label>
@@ -178,7 +179,7 @@ const Create = () => {
                               id="nightSessionNo"
                               name="nightSession"
                               value="false"
-                              checked={values.nightSession === 'false'}
+                              checked={values.nightSession === "false"}
                               onChange={handleChange}
                             />
                             <label htmlFor="nightSessionNo">Non</label>

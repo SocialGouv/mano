@@ -1,21 +1,21 @@
 const excludeFields = new Set([
-  '_id',
-  'encryptedEntityKey',
-  'entityKey',
-  'createdBy',
-  'documents',
-  'user', // because it is an id
-  'organisation', // because it is an id
-  'action', // because it is an id
-  'person', // because it is an id
-  'team', // because it is an id
-  'item', // because it is an id
+  "_id",
+  "encryptedEntityKey",
+  "entityKey",
+  "createdBy",
+  "documents",
+  "user", // because it is an id
+  "organisation", // because it is an id
+  "action", // because it is an id
+  "person", // because it is an id
+  "team", // because it is an id
+  "item", // because it is an id
 ]);
-const isObject = (variable) => typeof variable === 'object' && variable !== null && !Array.isArray(variable);
+const isObject = (variable) => typeof variable === "object" && variable !== null && !Array.isArray(variable);
 
 const prepareItemForSearch = (item, userSpecificExcludeFields) => {
-  if (typeof item === 'string') return item;
-  if (!item) return '';
+  if (typeof item === "string") return item;
+  if (!item) return "";
   const itemClean = {};
   for (let key of Object.keys(item)) {
     if (excludeFields.has(key)) continue;
@@ -34,9 +34,9 @@ const prepareItemForSearch = (item, userSpecificExcludeFields) => {
 export const filterBySearch = (search, items = [], userSpecificExcludeFields = []) => {
   const searchLowercased = search.toLocaleLowerCase();
   // replace all accents with normal letters
-  const searchNormalized = searchLowercased.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  const searchTerms = searchLowercased.split(' ');
-  const searchNormalizedTerms = searchNormalized.split(' ');
+  const searchNormalized = searchLowercased.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const searchTerms = searchLowercased.split(" ");
+  const searchNormalizedTerms = searchNormalized.split(" ");
 
   const itemsNameStartWithWord = [];
   const itemsNameStartWithWordWithNoAccent = [];
@@ -46,12 +46,12 @@ export const filterBySearch = (search, items = [], userSpecificExcludeFields = [
   const anyOtherPrropertyContainsOneOfTheWordsWithNoAccent = [];
 
   for (const item of items) {
-    const lowerCaseName = item?.name?.toLocaleLowerCase() || '';
+    const lowerCaseName = item?.name?.toLocaleLowerCase() || "";
     if (lowerCaseName.startsWith(searchLowercased)) {
       itemsNameStartWithWord.push(item);
       continue;
     }
-    const normalizedName = lowerCaseName.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const normalizedName = lowerCaseName.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     if (normalizedName.startsWith(searchNormalized)) {
       itemsNameStartWithWordWithNoAccent.push(item);
       continue;
@@ -70,7 +70,7 @@ export const filterBySearch = (search, items = [], userSpecificExcludeFields = [
       anyOtherPrropertyContainsOneOfTheWords.push(item);
       continue;
     }
-    const stringifiedItemWithNoAccent = stringifiedItem.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const stringifiedItemWithNoAccent = stringifiedItem.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     if (searchNormalizedTerms.filter((word) => stringifiedItemWithNoAccent.includes(word)).length === searchNormalizedTerms.length) {
       anyOtherPrropertyContainsOneOfTheWordsWithNoAccent.push(item);
       continue;

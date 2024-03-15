@@ -1,17 +1,18 @@
-import { dayjsInstance } from '../../../services/date';
-import React, { useState } from 'react';
-import EditModal from './EditModal';
-import TagTeam from '../../../components/TagTeam';
-import ExclamationMarkButton from '../../../components/tailwind/ExclamationMarkButton';
+import { dayjsInstance } from "../../../services/date";
+import React, { useState } from "react";
+import EditModal from "./EditModal";
+import TagTeam from "../../../components/TagTeam";
+import ExclamationMarkButton from "../../../components/tailwind/ExclamationMarkButton";
 
 export function InfosMain({ person, isMedicalFile }) {
   const [editModal, setEditModal] = useState(false);
   return (
     <div>
-      {Boolean(editModal) && <EditModal isMedicalFile={isMedicalFile} person={person} selectedPanel={'main'} onClose={() => setEditModal(false)} />}
+      {Boolean(editModal) && <EditModal isMedicalFile={isMedicalFile} person={person} selectedPanel={"main"} onClose={() => setEditModal(false)} />}
       <div
-        className={['tw-flex tw-min-h-[350px] tw-items-center !tw-rounded-lg', isMedicalFile ? '!tw-bg-blue-900' : '!tw-bg-main'].join(' ')}
-        data-test-id={person._id}>
+        className={["tw-flex tw-min-h-[350px] tw-items-center !tw-rounded-lg", isMedicalFile ? "!tw-bg-blue-900" : "!tw-bg-main"].join(" ")}
+        data-test-id={person._id}
+      >
         <div className="tw-flex-1 tw-p-5 tw-text-center tw-text-white">
           <div className="tw-border-b tw-border-white tw-pb-2 [overflow-wrap:anywhere]">
             {person.alertness && <ExclamationMarkButton className="tw-mr-2" />}
@@ -23,9 +24,9 @@ export function InfosMain({ person, isMedicalFile }) {
             {person.birthdate && (
               <div>
                 <div>
-                  <b>Âge :</b> {dayjsInstance(dayjsInstance()).diff(person.birthdate, 'year')} ans
+                  <b>Âge :</b> {dayjsInstance(dayjsInstance()).diff(person.birthdate, "year")} ans
                 </div>
-                <i>{dayjsInstance(person.birthdate).format('DD/MM/YYYY')}</i>
+                <i>{dayjsInstance(person.birthdate).format("DD/MM/YYYY")}</i>
               </div>
             )}
             <div>
@@ -34,12 +35,12 @@ export function InfosMain({ person, isMedicalFile }) {
             </div>
             <div>
               <b>Suivi·e depuis le : </b>
-              {dayjsInstance(person.followedSince || person.createdAt).format('DD/MM/YYYY')}
+              {dayjsInstance(person.followedSince || person.createdAt).format("DD/MM/YYYY")}
             </div>
             {person.wanderingAt ? (
               <div>
                 <b>En rue depuis le : </b>
-                {dayjsInstance(person.wanderingAt).format('DD/MM/YYYY')}
+                {dayjsInstance(person.wanderingAt).format("DD/MM/YYYY")}
               </div>
             ) : null}
             <div>
@@ -60,10 +61,11 @@ export function InfosMain({ person, isMedicalFile }) {
               Imprimer
             </button>
             <button
-              className={['tw-block tw-rounded tw-bg-white tw-px-2 tw-py-1 tw-text-sm', isMedicalFile ? '!tw-text-blue-900' : '!tw-text-main'].join(
-                ' '
+              className={["tw-block tw-rounded tw-bg-white tw-px-2 tw-py-1 tw-text-sm", isMedicalFile ? "!tw-text-blue-900" : "!tw-text-main"].join(
+                " "
               )}
-              onClick={() => setEditModal(true)}>
+              onClick={() => setEditModal(true)}
+            >
               Modifier
             </button>
           </div>

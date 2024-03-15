@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { toast } from 'react-toastify';
+import React, { useState } from "react";
+import { toast } from "react-toastify";
 
-import ButtonCustom from './ButtonCustom';
-import PasswordInput from './PasswordInput';
+import ButtonCustom from "./ButtonCustom";
+import PasswordInput from "./PasswordInput";
 
 /* eslint-disable no-extend-native */
 String.prototype.capitalize = function () {
@@ -15,7 +15,7 @@ String.prototype.capitalize = function () {
 };
 
 const checks = {
-  IS_EMPTY: (password) => password === '',
+  IS_EMPTY: (password) => password === "",
   IS_TOO_SHORT_OR_TOO_LONG: (password) => password.length < 6 || password.length > 32,
   NO_NUMBER: (password) => !/\d/.test(password),
   NO_LETTER: (password) => !/[a-zA-Z]/g.test(password),
@@ -33,30 +33,30 @@ const checkErrorPassword = (password) => {
 };
 
 const codesToErrors = {
-  IS_EMPTY: 'Le mot de passe ne peut pas être vide',
-  IS_TOO_SHORT_OR_TOO_LONG: 'Le mot de passe doit avoir entre 6 et 32 caractères',
-  NO_NUMBER: 'Le mot de passe doit avoir au moins un chiffre',
-  NO_LETTER: 'Le mot de passe doit avoir au moins une lettre',
-  NO_UPPERCASE: 'Le mot de passe doit avoir au moins une lettre majuscule',
-  NO_LOWERCASE: 'Le mot de passe doit avoir au moins une lettre minuscule',
-  NO_SPECIAL: 'Le mot de passe doit avoir au moins un caractère spécial',
+  IS_EMPTY: "Le mot de passe ne peut pas être vide",
+  IS_TOO_SHORT_OR_TOO_LONG: "Le mot de passe doit avoir entre 6 et 32 caractères",
+  NO_NUMBER: "Le mot de passe doit avoir au moins un chiffre",
+  NO_LETTER: "Le mot de passe doit avoir au moins une lettre",
+  NO_UPPERCASE: "Le mot de passe doit avoir au moins une lettre majuscule",
+  NO_LOWERCASE: "Le mot de passe doit avoir au moins une lettre minuscule",
+  NO_SPECIAL: "Le mot de passe doit avoir au moins un caractère spécial",
 };
 
 const codesToHints = {
-  IS_TOO_SHORT_OR_TOO_LONG: 'entre 6 et 32 caractères',
-  NO_NUMBER: 'au moins un chiffre',
-  NO_LETTER: 'au moins une lettre',
-  NO_UPPERCASE: 'au moins une majuscule',
-  NO_LOWERCASE: 'au moins une minuscule',
-  NO_SPECIAL: 'au moins un caractère spécial',
+  IS_TOO_SHORT_OR_TOO_LONG: "entre 6 et 32 caractères",
+  NO_NUMBER: "au moins un chiffre",
+  NO_LETTER: "au moins une lettre",
+  NO_UPPERCASE: "au moins une majuscule",
+  NO_LOWERCASE: "au moins une minuscule",
+  NO_SPECIAL: "au moins un caractère spécial",
 };
 
 const ChangePassword = ({ onSubmit, onFinished, withCurrentPassword, centerButton }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [changePasswordForm, setChangePasswordForm] = useState({
-    password: '',
-    newPassword: '',
-    verifyPassword: '',
+    password: "",
+    newPassword: "",
+    verifyPassword: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -71,7 +71,7 @@ const ChangePassword = ({ onSubmit, onFinished, withCurrentPassword, centerButto
         return toast.error(codesToErrors[checkErrorPassword(changePasswordForm.newPassword)]);
       }
       if (changePasswordForm.newPassword.trim() !== changePasswordForm.verifyPassword.trim()) {
-        return toast.error('Les mots de passe ne sont pas identiques !');
+        return toast.error("Les mots de passe ne sont pas identiques !");
       }
       onFinished({
         body: {
@@ -83,11 +83,11 @@ const ChangePassword = ({ onSubmit, onFinished, withCurrentPassword, centerButto
       const res = await onSubmit(changePasswordForm);
       setIsSubmitting(false);
       if (res.ok) {
-        toast.success('Mot de passe mis à jour!');
+        toast.success("Mot de passe mis à jour!");
         onFinished(true);
       }
     } catch (errorUpdatePassword) {
-      console.log('error in updating password', errorUpdatePassword);
+      console.log("error in updating password", errorUpdatePassword);
       toast.error(errorUpdatePassword);
     }
   };
@@ -126,10 +126,11 @@ const ChangePassword = ({ onSubmit, onFinished, withCurrentPassword, centerButto
             if (index !== array.length - 1) caption = `${caption}, `;
             return (
               <span
-                className={['tw-self-center tw-text-center tw-text-xs', !checks[check](changePasswordForm.newPassword) ? 'tw-opacity-30' : ''].join(
-                  ' '
+                className={["tw-self-center tw-text-center tw-text-xs", !checks[check](changePasswordForm.newPassword) ? "tw-opacity-30" : ""].join(
+                  " "
                 )}
-                key={caption}>
+                key={caption}
+              >
                 {caption}
               </span>
             );
@@ -152,7 +153,7 @@ const ChangePassword = ({ onSubmit, onFinished, withCurrentPassword, centerButto
           type="submit"
           disabled={isSubmitting}
           onClick={handleSubmit}
-          className={['tw-mt-10', centerButton ? 'tw-mx-auto' : 'tw-ml-auto'].join(' ')}
+          className={["tw-mt-10", centerButton ? "tw-mx-auto" : "tw-ml-auto"].join(" ")}
         />
       </div>
     </form>

@@ -1,7 +1,7 @@
-import React from 'react';
-import { useDataLoader } from './DataLoader';
-import API from '../services/api';
-import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from './tailwind/Modal';
+import React from "react";
+import { useDataLoader } from "./DataLoader";
+import API from "../services/api";
+import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "./tailwind/Modal";
 
 export default function UnBugButton() {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
@@ -13,7 +13,8 @@ export default function UnBugButton() {
         className="button-link !tw-ml-0"
         onClick={() => {
           setIsModalOpen(true);
-        }}>
+        }}
+      >
         Un bug ?
       </button>
       {isModalOpen && (
@@ -26,16 +27,17 @@ export default function UnBugButton() {
             </p>
             <ul className="tw-list-disc tw-space-y-2">
               <li>
-                Cliquez{' '}
+                Cliquez{" "}
                 <button
-                  className={'tw-text-blue-500 tw-underline'}
+                  className={"tw-text-blue-500 tw-underline"}
                   onClick={() => {
                     resetCache().then(() => {
                       return API.logout();
                     });
-                  }}>
+                  }}
+                >
                   sur ce lien
-                </button>{' '}
+                </button>{" "}
                 pour réinitialiser le cache et vérifiez si le problème persiste
               </li>
               <li>

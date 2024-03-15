@@ -1,12 +1,12 @@
-import React, { useMemo } from 'react';
-import { useRecoilValue } from 'recoil';
-import { customFieldsPersonsSelector } from '../../../recoil/persons';
-import { currentTeamAuthentifiedState, teamsState, userState, usersState } from '../../../recoil/auth';
-import { dayjsInstance, formatDateTimeWithNameOfDay, formatDateWithNameOfDay, formatTime } from '../../../services/date';
-import CustomFieldDisplay from '../../../components/CustomFieldDisplay';
-import { CANCEL, DONE, getName } from '../../../recoil/actions';
-import { PersonPopulated } from '../../../types/person';
-import UserName from '../../../components/UserName';
+import React, { useMemo } from "react";
+import { useRecoilValue } from "recoil";
+import { customFieldsPersonsSelector } from "../../../recoil/persons";
+import { currentTeamAuthentifiedState, teamsState, userState, usersState } from "../../../recoil/auth";
+import { dayjsInstance, formatDateTimeWithNameOfDay, formatDateWithNameOfDay, formatTime } from "../../../services/date";
+import CustomFieldDisplay from "../../../components/CustomFieldDisplay";
+import { CANCEL, DONE, getName } from "../../../recoil/actions";
+import { PersonPopulated } from "../../../types/person";
+import UserName from "../../../components/UserName";
 
 export function SummaryPrint({ person }: { person: PersonPopulated }) {
   const user = useRecoilValue(userState);
@@ -16,17 +16,17 @@ export function SummaryPrint({ person }: { person: PersonPopulated }) {
   const customFieldsPersons = useRecoilValue(customFieldsPersonsSelector);
   const actions = person.actions || [];
   const personPassages = useMemo(
-    () => [...(person?.passages || [])].sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), 'day') ? 1 : -1)),
+    () => [...(person?.passages || [])].sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), "day") ? 1 : -1)),
     [person]
   );
   const personRencontres = useMemo(
-    () => [...(person?.rencontres || [])].sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), 'day') ? 1 : -1)),
+    () => [...(person?.rencontres || [])].sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), "day") ? 1 : -1)),
     [person]
   );
   const comments = useMemo(
     () =>
       [...(person?.comments || [])].sort((r1, r2) =>
-        dayjsInstance(r1.date || r1.createdAt).isBefore(dayjsInstance(r2.date || r2.createdAt), 'day') ? 1 : -1
+        dayjsInstance(r1.date || r1.createdAt).isBefore(dayjsInstance(r2.date || r2.createdAt), "day") ? 1 : -1
       ),
     [person]
   );
@@ -35,7 +35,7 @@ export function SummaryPrint({ person }: { person: PersonPopulated }) {
     <div className="printonly">
       <h1>Dossier social de {person?.name}</h1>
       <small>extrait le {formatDateTimeWithNameOfDay()}</small>
-      <div className="tw-mx-0 tw-mt-8 tw-mb-5 tw-flex tw-items-center">
+      <div className="tw-mx-0 tw-mb-5 tw-mt-8 tw-flex tw-items-center">
         <h2 className="tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Informations générales</h2>
       </div>
       <div>
@@ -63,7 +63,7 @@ export function SummaryPrint({ person }: { person: PersonPopulated }) {
         const enabledFields = fields.filter((f) => f.enabled || f.enabledTeams?.includes(team._id));
         return (
           <React.Fragment key={name}>
-            <div className="tw-mx-0 tw-mt-16 tw-mb-5 tw-flex tw-items-center">
+            <div className="tw-mx-0 tw-mb-5 tw-mt-16 tw-flex tw-items-center">
               <h2 className="tw-flex tw-justify-between tw-text-xl tw-font-extrabold">{name}</h2>
             </div>
             <div>
@@ -79,14 +79,14 @@ export function SummaryPrint({ person }: { person: PersonPopulated }) {
         );
       })}
       <hr className="tw-my-8" />
-      <div className="tw-mx-0 tw-mt-16 tw-mb-5 tw-flex tw-items-center">
+      <div className="tw-mx-0 tw-mb-5 tw-mt-16 tw-flex tw-items-center">
         <h2 className="tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Actions</h2>
       </div>
       <div>
         {Boolean(actions.length > 0) &&
           actions.map((action) => {
             const date = formatDateWithNameOfDay([DONE, CANCEL].includes(action.status) ? action.completedAt : action.dueAt);
-            const time = action.withTime && action.dueAt ? ` ${formatTime(action.dueAt)}` : '';
+            const time = action.withTime && action.dueAt ? ` ${formatTime(action.dueAt)}` : "";
             return (
               <div key={action._id}>
                 <div>
@@ -95,7 +95,7 @@ export function SummaryPrint({ person }: { person: PersonPopulated }) {
                 <div>{`${date}${time}`}</div>
                 {Boolean(action.categories) && (
                   <div>
-                    Catégories :{' '}
+                    Catégories :{" "}
                     {action.categories?.map((category: string) => (
                       <span key={category}>{category}</span>
                     ))}
@@ -111,7 +111,7 @@ export function SummaryPrint({ person }: { person: PersonPopulated }) {
                 </div>
                 {Boolean(action.group) && <div>Action familiale</div>}
                 <div>
-                  Équipe(s) :{' '}
+                  Équipe(s) :{" "}
                   {Array.isArray(action?.teams) ? (
                     action.teams.map((e: string) => {
                       const team = teams.find((u) => u._id === e);
@@ -131,9 +131,9 @@ export function SummaryPrint({ person }: { person: PersonPopulated }) {
           })}
       </div>
 
-      {!['restricted-access'].includes(user!.role) && (
+      {!["restricted-access"].includes(user!.role) && (
         <>
-          <div className="tw-mx-0 tw-mt-16 tw-mb-5 tw-flex tw-items-center">
+          <div className="tw-mx-0 tw-mb-5 tw-mt-16 tw-flex tw-items-center">
             <h2 className="tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Commentaires</h2>
           </div>
           <div>
@@ -144,7 +144,7 @@ export function SummaryPrint({ person }: { person: PersonPopulated }) {
                   <div>Date : {formatDateTimeWithNameOfDay(comment.date || comment.createdAt)}</div>
                   {Boolean(comment.group) && <div>Commentaire familial</div>}
                   <div>
-                    {(comment.comment || '').split('\n').map((e: string, i: number) => (
+                    {(comment.comment || "").split("\n").map((e: string, i: number) => (
                       <p key={e + i} className="tw-mb-0">
                         {e}
                       </p>
@@ -155,7 +155,7 @@ export function SummaryPrint({ person }: { person: PersonPopulated }) {
               ))}
           </div>
 
-          <div className="tw-mx-0 tw-mt-16 tw-mb-5 tw-flex tw-items-center">
+          <div className="tw-mx-0 tw-mb-5 tw-mt-16 tw-flex tw-items-center">
             <h2 className="tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Passages</h2>
           </div>
           <div>
@@ -166,8 +166,8 @@ export function SummaryPrint({ person }: { person: PersonPopulated }) {
                     <b>{formatDateTimeWithNameOfDay(passage.date || passage.createdAt)}</b>
                   </div>
                   <div>
-                    {(passage.comment || '')
-                      .split('\n')
+                    {(passage.comment || "")
+                      .split("\n")
                       .filter((e: string) => e)
                       .map((e: string, i: number) => (
                         <p key={e + i} className="tw-mb-0">
@@ -181,7 +181,7 @@ export function SummaryPrint({ person }: { person: PersonPopulated }) {
                 </div>
               ))}
           </div>
-          <div className="tw-mx-0 tw-mt-16 tw-mb-5 tw-flex tw-items-center">
+          <div className="tw-mx-0 tw-mb-5 tw-mt-16 tw-flex tw-items-center">
             <h2 className="tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Rencontres</h2>
           </div>
           <div>
@@ -192,8 +192,8 @@ export function SummaryPrint({ person }: { person: PersonPopulated }) {
                     <b>{formatDateTimeWithNameOfDay(rencontre.date || rencontre.createdAt)}</b>
                   </div>
                   <div>
-                    {(rencontre.comment || '')
-                      .split('\n')
+                    {(rencontre.comment || "")
+                      .split("\n")
                       .filter((e: string) => e)
                       .map((e: string, i: number) => (
                         <p key={e + i} className="tw-mb-0">

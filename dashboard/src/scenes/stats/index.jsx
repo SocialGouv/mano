@@ -1,54 +1,54 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { selectorFamily, useRecoilValue } from 'recoil';
-import { useLocalStorage } from '../../services/useLocalStorage';
+import React, { useEffect, useMemo, useState } from "react";
+import { selectorFamily, useRecoilValue } from "recoil";
+import { useLocalStorage } from "../../services/useLocalStorage";
 import {
   fieldsPersonsCustomizableOptionsSelector,
   filterPersonsBaseSelector,
   personFieldsSelector,
   flattenedCustomFieldsPersonsSelector,
-} from '../../recoil/persons';
-import { customFieldsObsSelector, territoryObservationsState } from '../../recoil/territoryObservations';
-import { currentTeamState, organisationState, teamsState } from '../../recoil/auth';
-import { actionsCategoriesSelector, DONE, flattenedActionsCategoriesSelector } from '../../recoil/actions';
-import { reportsState } from '../../recoil/reports';
-import { territoriesState } from '../../recoil/territory';
-import { customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
-import { personsForStatsSelector, populatedPassagesSelector } from '../../recoil/selectors';
-import useTitle from '../../services/useTitle';
-import DateRangePickerWithPresets, { formatPeriod, statsPresets } from '../../components/DateRangePickerWithPresets';
-import { useDataLoader } from '../../components/DataLoader';
-import { HeaderStyled, Title as HeaderTitle } from '../../components/header';
-import Loading from '../../components/loading';
-import SelectTeamMultiple from '../../components/SelectTeamMultiple';
-import ExportFormattedData from '../data-import-export/ExportFormattedData';
-import GeneralStats from './GeneralStats';
-import ServicesStats from './ServicesStats';
-import ActionsStats from './ActionsStats';
-import PersonStats from './PersonsStats';
-import PassagesStats from './PassagesStats';
-import RencontresStats from './RencontresStats';
-import ObservationsStats from './ObservationsStats';
-import ReportsStats from './ReportsStats';
-import ConsultationsStats from './ConsultationsStats';
-import MedicalFilesStats from './MedicalFilesStats';
-import ButtonCustom from '../../components/ButtonCustom';
-import dayjs from 'dayjs';
-import { filterItem } from '../../components/Filters';
-import TabsNav from '../../components/tailwind/TabsNav';
+} from "../../recoil/persons";
+import { customFieldsObsSelector, territoryObservationsState } from "../../recoil/territoryObservations";
+import { currentTeamState, organisationState, teamsState } from "../../recoil/auth";
+import { actionsCategoriesSelector, DONE, flattenedActionsCategoriesSelector } from "../../recoil/actions";
+import { reportsState } from "../../recoil/reports";
+import { territoriesState } from "../../recoil/territory";
+import { customFieldsMedicalFileSelector } from "../../recoil/medicalFiles";
+import { personsForStatsSelector, populatedPassagesSelector } from "../../recoil/selectors";
+import useTitle from "../../services/useTitle";
+import DateRangePickerWithPresets, { formatPeriod, statsPresets } from "../../components/DateRangePickerWithPresets";
+import { useDataLoader } from "../../components/DataLoader";
+import { HeaderStyled, Title as HeaderTitle } from "../../components/header";
+import Loading from "../../components/loading";
+import SelectTeamMultiple from "../../components/SelectTeamMultiple";
+import ExportFormattedData from "../data-import-export/ExportFormattedData";
+import GeneralStats from "./GeneralStats";
+import ServicesStats from "./ServicesStats";
+import ActionsStats from "./ActionsStats";
+import PersonStats from "./PersonsStats";
+import PassagesStats from "./PassagesStats";
+import RencontresStats from "./RencontresStats";
+import ObservationsStats from "./ObservationsStats";
+import ReportsStats from "./ReportsStats";
+import ConsultationsStats from "./ConsultationsStats";
+import MedicalFilesStats from "./MedicalFilesStats";
+import ButtonCustom from "../../components/ButtonCustom";
+import dayjs from "dayjs";
+import { filterItem } from "../../components/Filters";
+import TabsNav from "../../components/tailwind/TabsNav";
 
 const tabs = [
-  'Général',
-  'Services',
-  'Actions',
-  'Personnes créées',
-  'Personnes suivies',
-  'Passages',
-  'Rencontres',
-  'Observations',
-  'Comptes-rendus',
-  'Consultations',
-  'Dossiers médicaux des personnes créées',
-  'Dossiers médicaux des personnes suivies',
+  "Général",
+  "Services",
+  "Actions",
+  "Personnes créées",
+  "Personnes suivies",
+  "Passages",
+  "Rencontres",
+  "Observations",
+  "Comptes-rendus",
+  "Consultations",
+  "Dossiers médicaux des personnes créées",
+  "Dossiers médicaux des personnes suivies",
 ];
 
 /*
@@ -85,7 +85,7 @@ const StatsLoader = () => {
 };
 
 const itemsForStatsSelector = selectorFamily({
-  key: 'itemsForStatsSelector',
+  key: "itemsForStatsSelector",
   get:
     ({ period, filterPersons, selectedTeamsObjectWithOwnPeriod, viewAllOrganisationData }) =>
     ({ get }) => {
@@ -99,8 +99,8 @@ const itemsForStatsSelector = selectorFamily({
         }
         return !!selectedTeamsObjectWithOwnPeriod[item[key]];
       };
-      const filtersExceptOutOfActiveList = activeFilters.filter((f) => f.field !== 'outOfActiveList');
-      const outOfActiveListFilter = activeFilters.find((f) => f.field === 'outOfActiveList')?.value;
+      const filtersExceptOutOfActiveList = activeFilters.filter((f) => f.field !== "outOfActiveList");
+      const outOfActiveListFilter = activeFilters.find((f) => f.field === "outOfActiveList")?.value;
 
       const allPersons = get(personsForStatsSelector);
 
@@ -118,18 +118,18 @@ const itemsForStatsSelector = selectorFamily({
       const personsInRencontresBeforePeriod = {};
       const noPeriodSelected = !period.startDate || !period.endDate;
       const defaultIsoDates = {
-        isoStartDate: period.startDate ? dayjs(period.startDate).startOf('day').toISOString() : null,
-        isoEndDate: period.endDate ? dayjs(period.endDate).startOf('day').add(1, 'day').toISOString() : null,
+        isoStartDate: period.startDate ? dayjs(period.startDate).startOf("day").toISOString() : null,
+        isoEndDate: period.endDate ? dayjs(period.endDate).startOf("day").add(1, "day").toISOString() : null,
       };
       for (let person of allPersons) {
         // get the persons concerned by filters
         if (!filterItem(filtersExceptOutOfActiveList)(person)) continue;
-        if (outOfActiveListFilter === 'Oui' && !person.outOfActiveList) continue;
-        if (outOfActiveListFilter === 'Non' && !!person.outOfActiveList) continue;
+        if (outOfActiveListFilter === "Oui" && !person.outOfActiveList) continue;
+        if (outOfActiveListFilter === "Non" && !!person.outOfActiveList) continue;
         // get persons for stats for period
         const createdDate = person.followedSince || person.createdAt;
 
-        if (filterItemByTeam(person, 'assignedTeams')) {
+        if (filterItemByTeam(person, "assignedTeams")) {
           if (noPeriodSelected) {
             personsUpdated[person._id] = person;
             personsCreated[person._id] = person;
@@ -149,7 +149,7 @@ const itemsForStatsSelector = selectorFamily({
         }
         // get actions for stats for period
         for (const action of person.actions || []) {
-          if (!filterItemByTeam(action, 'teams')) continue;
+          if (!filterItemByTeam(action, "teams")) continue;
           if (noPeriodSelected) {
             actionsFilteredByPersons[action._id] = action;
             personsWithActions[person._id] = person;
@@ -174,7 +174,7 @@ const itemsForStatsSelector = selectorFamily({
           personsWithActions[person._id] = person;
         }
         for (const consultation of person.consultations || []) {
-          if (!filterItemByTeam(consultation, 'teams')) continue;
+          if (!filterItemByTeam(consultation, "teams")) continue;
           if (noPeriodSelected) {
             consultationsFilteredByPersons.push(consultation);
             personsWithConsultations[person._id] = person;
@@ -200,7 +200,7 @@ const itemsForStatsSelector = selectorFamily({
         }
         if (!!person.passages?.length) {
           for (const passage of person.passages) {
-            if (!filterItemByTeam(passage, 'team')) continue;
+            if (!filterItemByTeam(passage, "team")) continue;
             if (noPeriodSelected) {
               passagesFilteredByPersons.push(passage);
               personsWithPassages[person._id] = person;
@@ -219,7 +219,7 @@ const itemsForStatsSelector = selectorFamily({
         }
         if (!!person.rencontres?.length) {
           for (const rencontre of person.rencontres) {
-            if (!filterItemByTeam(rencontre, 'team')) continue;
+            if (!filterItemByTeam(rencontre, "team")) continue;
             if (noPeriodSelected) {
               rencontresFilteredByPersons.push(rencontre);
               personsWithRencontres[person._id] = person;
@@ -254,9 +254,9 @@ const itemsForStatsSelector = selectorFamily({
 });
 
 const filterMakingThingsClearAboutOutOfActiveListStatus = {
-  field: 'outOfActiveList',
+  field: "outOfActiveList",
   value: "Oui et non (c'est-à-dire tout le monde)",
-  type: 'multi-choice',
+  type: "multi-choice",
 };
 
 const initFilters = [filterMakingThingsClearAboutOutOfActiveListStatus];
@@ -278,19 +278,19 @@ const Stats = () => {
   const allCategories = useRecoilValue(flattenedActionsCategoriesSelector);
   const groupsCategories = useRecoilValue(actionsCategoriesSelector);
 
-  const [selectedTerritories, setSelectedTerritories] = useLocalStorage('stats-territories', []);
-  const [activeTab, setActiveTab] = useLocalStorage('stats-tabCaption', 'Général');
-  const [filterPersons, setFilterPersons] = useLocalStorage('stats-filterPersons-defaultEverybody', initFilters);
-  const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('stats-viewAllOrganisationData', teams.length === 1);
-  const [period, setPeriod] = useLocalStorage('period', { startDate: null, endDate: null });
-  const [preset, setPreset, removePreset] = useLocalStorage('stats-date-preset', null);
-  const [manuallySelectedTeams, setSelectedTeams] = useLocalStorage('stats-teams', [currentTeam]);
-  const [actionsStatuses, setActionsStatuses] = useLocalStorage('stats-actionsStatuses', DONE);
-  const [actionsCategoriesGroups, setActionsCategoriesGroups] = useLocalStorage('stats-catGroups', []);
-  const [actionsCategories, setActionsCategories] = useLocalStorage('stats-categories', []);
+  const [selectedTerritories, setSelectedTerritories] = useLocalStorage("stats-territories", []);
+  const [activeTab, setActiveTab] = useLocalStorage("stats-tabCaption", "Général");
+  const [filterPersons, setFilterPersons] = useLocalStorage("stats-filterPersons-defaultEverybody", initFilters);
+  const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage("stats-viewAllOrganisationData", teams.length === 1);
+  const [period, setPeriod] = useLocalStorage("period", { startDate: null, endDate: null });
+  const [preset, setPreset, removePreset] = useLocalStorage("stats-date-preset", null);
+  const [manuallySelectedTeams, setSelectedTeams] = useLocalStorage("stats-teams", [currentTeam]);
+  const [actionsStatuses, setActionsStatuses] = useLocalStorage("stats-actionsStatuses", DONE);
+  const [actionsCategoriesGroups, setActionsCategoriesGroups] = useLocalStorage("stats-catGroups", []);
+  const [actionsCategories, setActionsCategories] = useLocalStorage("stats-categories", []);
 
-  const [evolutivesStatsActivated, setEvolutivesStatsActivated] = useLocalStorage('stats-evolutivesStatsActivated', false);
-  const [evolutiveStatsIndicators, setEvolutiveStatsIndicators] = useLocalStorage('stats-evolutivesStatsIndicatorsArray', []);
+  const [evolutivesStatsActivated, setEvolutivesStatsActivated] = useLocalStorage("stats-evolutivesStatsActivated", false);
+  const [evolutiveStatsIndicators, setEvolutiveStatsIndicators] = useLocalStorage("stats-evolutivesStatsIndicatorsArray", []);
 
   useTitle(`${activeTab} - Statistiques`);
 
@@ -314,8 +314,8 @@ const Stats = () => {
     const teamsIdsObject = {};
     for (const team of selectedTeams) {
       const offsetHours = team.nightSession ? 12 : 0;
-      const isoStartDate = period.startDate ? dayjs(period.startDate).startOf('day').add(offsetHours, 'hour').toISOString() : null;
-      const isoEndDate = period.endDate ? dayjs(period.endDate).startOf('day').add(1, 'day').add(offsetHours, 'hour').toISOString() : null;
+      const isoStartDate = period.startDate ? dayjs(period.startDate).startOf("day").add(offsetHours, "hour").toISOString() : null;
+      const isoEndDate = period.endDate ? dayjs(period.endDate).startOf("day").add(1, "day").add(offsetHours, "hour").toISOString() : null;
       teamsIdsObject[team._id] = {
         isoStartDate,
         isoEndDate,
@@ -326,8 +326,8 @@ const Stats = () => {
 
   const defaultIsoDates = useMemo(
     () => ({
-      isoStartDate: period.startDate ? dayjs(period.startDate).startOf('day').toISOString() : null,
-      isoEndDate: period.endDate ? dayjs(period.endDate).startOf('day').add(1, 'day').toISOString() : null,
+      isoStartDate: period.startDate ? dayjs(period.startDate).startOf("day").toISOString() : null,
+      isoEndDate: period.endDate ? dayjs(period.endDate).startOf("day").add(1, "day").toISOString() : null,
     }),
     [period]
   );
@@ -375,7 +375,7 @@ const Stats = () => {
     })
   );
   const filterableActionsCategories = useMemo(() => {
-    if (!actionsCategoriesGroups.length) return ['-- Aucune --', ...allCategories];
+    if (!actionsCategoriesGroups.length) return ["-- Aucune --", ...allCategories];
     return groupsCategories
       .filter((group) => actionsCategoriesGroups.includes(group.groupTitle))
       .reduce((filteredCats, group) => [...filteredCats, ...group.categories], []);
@@ -398,7 +398,7 @@ const Stats = () => {
           actionsDetailed.push({
             ...action,
             category,
-            categoryGroup: categoriesGroupObject[category] ?? 'Catégories supprimées',
+            categoryGroup: categoriesGroupObject[category] ?? "Catégories supprimées",
           });
         }
       } else {
@@ -409,7 +409,7 @@ const Stats = () => {
       .filter((a) => !actionsCategoriesGroups.length || actionsCategoriesGroups.includes(a.categoryGroup))
       .filter((a) => {
         if (!actionsCategories.length) return true;
-        if (actionsCategories.length === 1 && actionsCategories[0] === '-- Aucune --') return !a.categories?.length;
+        if (actionsCategories.length === 1 && actionsCategories[0] === "-- Aucune --") return !a.categories?.length;
         return actionsCategories.includes(a.category);
       });
     return _actionsWithDetailedGroupAndCategories;
@@ -477,12 +477,12 @@ const Stats = () => {
       .filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id))
       .map((a) => ({ field: a.name, ...a })),
     ...filterPersonsBase.map((f) =>
-      f.field !== 'outOfActiveList'
+      f.field !== "outOfActiveList"
         ? f
         : {
             ...f,
-            options: ['Oui', 'Non', "Oui et non (c'est-à-dire tout le monde)"],
-            type: 'multi-choice',
+            options: ["Oui", "Non", "Oui et non (c'est-à-dire tout le monde)"],
+            type: "multi-choice",
           }
     ),
     ...fieldsPersonsCustomizableOptions.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
@@ -490,16 +490,16 @@ const Stats = () => {
   ];
 
   const availableTabs = tabs.filter((tabCaption) => {
-    if (['Observations'].includes(tabCaption)) {
+    if (["Observations"].includes(tabCaption)) {
       return !!organisation.territoriesEnabled;
     }
-    if (['Services'].includes(tabCaption)) {
+    if (["Services"].includes(tabCaption)) {
       return !!organisation.receptionEnabled;
     }
-    if (['Rencontres'].includes(tabCaption)) {
+    if (["Rencontres"].includes(tabCaption)) {
       return !!organisation.rencontresEnabled;
     }
-    if (['Passages'].includes(tabCaption)) {
+    if (["Passages"].includes(tabCaption)) {
       return !!organisation.passagesEnabled;
     }
     return true;
@@ -508,20 +508,20 @@ const Stats = () => {
   return (
     <>
       <HeaderStyled className=" !tw-py-4 tw-px-0">
-        <div className="printonly tw-py-4 tw-px-8 tw-text-2xl tw-font-bold" aria-hidden>
-          Statistiques{' '}
+        <div className="printonly tw-px-8 tw-py-4 tw-text-2xl tw-font-bold" aria-hidden>
+          Statistiques{" "}
           {viewAllOrganisationData ? (
             <>globales</>
           ) : (
             <>
-              {selectedTeams.length > 1 ? 'des équipes' : "de l'équipe"} {selectedTeams.map((t) => t.name).join(', ')}
+              {selectedTeams.length > 1 ? "des équipes" : "de l'équipe"} {selectedTeams.map((t) => t.name).join(", ")}
             </>
-          )}{' '}
+          )}{" "}
           - {formatPeriod({ period, preset })}
         </div>
         <div className="noprint tw-flex tw-grow">
           <HeaderTitle className="tw-w-64 tw-font-normal">
-            <span>Statistiques {viewAllOrganisationData ? <>globales</> : <>{selectedTeams.length > 1 ? 'des équipes' : "de l'équipe"}</>}</span>
+            <span>Statistiques {viewAllOrganisationData ? <>globales</> : <>{selectedTeams.length > 1 ? "des équipes" : "de l'équipe"}</>}</span>
           </HeaderTitle>
           <div className="tw-ml-4">
             <SelectTeamMultiple
@@ -560,15 +560,16 @@ const Stats = () => {
           />
         </div>
         <div className="tw-min-w-[15rem] tw-basis-1/3 tw-p-0">
-          {activeTab.includes('Personnes') &&
-            ['fdaed30a-5add-46d7-b08a-60d7a5a60aa2', '00000000-5f5a-89e2-2e60-88fa20cc50bf'].includes(organisation._id) && (
+          {activeTab.includes("Personnes") &&
+            ["fdaed30a-5add-46d7-b08a-60d7a5a60aa2", "00000000-5f5a-89e2-2e60-88fa20cc50bf"].includes(organisation._id) && (
               <button
                 type="button"
-                className={!evolutivesStatsActivated ? 'button-classic' : 'button-submit'}
+                className={!evolutivesStatsActivated ? "button-classic" : "button-submit"}
                 onClick={() => {
                   setEvolutivesStatsActivated(!evolutivesStatsActivated);
-                }}>
-                Affichage évolutif {evolutivesStatsActivated ? 'activé' : 'désactivé'}
+                }}
+              >
+                Affichage évolutif {evolutivesStatsActivated ? "activé" : "désactivé"}
               </button>
             )}
         </div>
@@ -592,7 +593,7 @@ const Stats = () => {
         activeTabIndex={availableTabs.findIndex((tab) => tab === activeTab)}
       />
       <div className="tw-pb-[75vh] print:tw-flex print:tw-flex-col print:tw-px-8 print:tw-py-4">
-        {activeTab === 'Général' && (
+        {activeTab === "Général" && (
           <GeneralStats
             personsCreated={personsCreated}
             personsUpdated={personsUpdated}
@@ -606,8 +607,8 @@ const Stats = () => {
             setFilterPersons={setFilterPersons}
           />
         )}
-        {!!organisation.receptionEnabled && activeTab === 'Services' && <ServicesStats period={period} teamIds={selectedTeams.map((e) => e?._id)} />}
-        {activeTab === 'Actions' && (
+        {!!organisation.receptionEnabled && activeTab === "Services" && <ServicesStats period={period} teamIds={selectedTeams.map((e) => e?._id)} />}
+        {activeTab === "Actions" && (
           <ActionsStats
             // data
             actionsWithDetailedGroupAndCategories={actionsWithDetailedGroupAndCategories}
@@ -629,7 +630,7 @@ const Stats = () => {
             setFilterPersons={setFilterPersons}
           />
         )}
-        {activeTab === 'Personnes créées' && (
+        {activeTab === "Personnes créées" && (
           <PersonStats
             title="personnes créées"
             firstBlockHelp={`Nombre de personnes dont la date 'Suivi(e) depuis le / Créé(e) le' se situe dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
@@ -645,7 +646,7 @@ const Stats = () => {
             setEvolutiveStatsIndicators={setEvolutiveStatsIndicators}
           />
         )}
-        {activeTab === 'Personnes suivies' && (
+        {activeTab === "Personnes suivies" && (
           <PersonStats
             title="personnes suivies"
             firstBlockHelp={`Nombre de personnes pour lesquelles il s'est passé quelque chose durant la période sélectionnée:\n\ncréation, modification, commentaire, action, rencontre, passage, lieu fréquenté, consultation, traitement.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
@@ -662,7 +663,7 @@ const Stats = () => {
             setEvolutiveStatsIndicators={setEvolutiveStatsIndicators}
           />
         )}
-        {!!organisation.passagesEnabled && activeTab === 'Passages' && (
+        {!!organisation.passagesEnabled && activeTab === "Passages" && (
           <PassagesStats
             passages={passages}
             personFields={personFields}
@@ -674,7 +675,7 @@ const Stats = () => {
             setFilterPersons={setFilterPersons}
           />
         )}
-        {!!organisation.rencontresEnabled && activeTab === 'Rencontres' && (
+        {!!organisation.rencontresEnabled && activeTab === "Rencontres" && (
           <RencontresStats
             rencontres={rencontresFilteredByPersons}
             personFields={personFields}
@@ -686,7 +687,7 @@ const Stats = () => {
             setFilterPersons={setFilterPersons}
           />
         )}
-        {activeTab === 'Observations' && (
+        {activeTab === "Observations" && (
           <ObservationsStats
             territories={territories}
             setSelectedTerritories={setSelectedTerritories}
@@ -701,8 +702,8 @@ const Stats = () => {
             }}
           />
         )}
-        {activeTab === 'Comptes-rendus' && <ReportsStats reports={reports} />}
-        {activeTab === 'Consultations' && (
+        {activeTab === "Comptes-rendus" && <ReportsStats reports={reports} />}
+        {activeTab === "Consultations" && (
           <ConsultationsStats
             consultations={consultationsFilteredByPersons} // filter by persons
             // filter by persons
@@ -712,7 +713,7 @@ const Stats = () => {
             setFilterPersons={setFilterPersons}
           />
         )}
-        {activeTab === 'Dossiers médicaux des personnes créées' && (
+        {activeTab === "Dossiers médicaux des personnes créées" && (
           <MedicalFilesStats
             filterBase={filterPersonsWithAllFields(true)}
             title="personnes créées"
@@ -723,7 +724,7 @@ const Stats = () => {
             personFields={personFields}
           />
         )}
-        {activeTab === 'Dossiers médicaux des personnes suivies' && (
+        {activeTab === "Dossiers médicaux des personnes suivies" && (
           <MedicalFilesStats
             title="personnes suivies"
             personsForStats={personsUpdated}

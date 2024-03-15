@@ -1,16 +1,16 @@
-import { useRecoilValue } from 'recoil';
-import { userState, organisationState } from '../../../recoil/auth';
-import { Actions } from './ActionsPerson';
-import { InfosMain } from './InfosMain';
-import PersonDocuments from './PersonDocuments';
-import PersonCustomFields from './PersonCustomFields';
-import Comments from './Comments';
-import DeletePersonButton from './DeletePersonButton';
-import PassagesRencontres from './PassagesRencontres';
-import OutOfActiveList from '../OutOfActiveList';
-import MergeTwoPersons from '../MergeTwoPersons';
-import { customFieldsPersonsSelector } from '../../../recoil/persons';
-import { SummaryPrint } from './SummaryPrint';
+import { useRecoilValue } from "recoil";
+import { userState, organisationState } from "../../../recoil/auth";
+import { Actions } from "./ActionsPerson";
+import { InfosMain } from "./InfosMain";
+import PersonDocuments from "./PersonDocuments";
+import PersonCustomFields from "./PersonCustomFields";
+import Comments from "./Comments";
+import DeletePersonButton from "./DeletePersonButton";
+import PassagesRencontres from "./PassagesRencontres";
+import OutOfActiveList from "../OutOfActiveList";
+import MergeTwoPersons from "../MergeTwoPersons";
+import { customFieldsPersonsSelector } from "../../../recoil/persons";
+import { SummaryPrint } from "./SummaryPrint";
 
 export default function Summary({ person }) {
   const user = useRecoilValue(userState);
@@ -29,10 +29,10 @@ export default function Summary({ person }) {
         </div>
 
         <div className="tw-col-span-4 tw-h-0 tw-min-h-full tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
-          {['restricted-access'].includes(user.role) ? <PassagesRencontres person={person} /> : <Comments person={person} />}
+          {["restricted-access"].includes(user.role) ? <PassagesRencontres person={person} /> : <Comments person={person} />}
         </div>
       </div>
-      {!['restricted-access'].includes(user.role) && (
+      {!["restricted-access"].includes(user.role) && (
         <>
           <div className="noprint tw-grid tw-grid-cols-12 tw-gap-4 tw-pt-4">
             <div className="tw-col-span-8 tw-flex tw-flex-col tw-gap-4">

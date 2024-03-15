@@ -1,12 +1,12 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { components } from 'react-select';
-import SortableJS from 'sortablejs';
-import SelectCustom from './SelectCustom';
-import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from './tailwind/Modal';
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { components } from "react-select";
+import SortableJS from "sortablejs";
+import SelectCustom from "./SelectCustom";
+import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "./tailwind/Modal";
 
 const SelectDraggableAndEditable = ({ onChange, classNamePrefix, value, onEditChoice, editChoiceWarning, options, ...props }) => {
-  const [editingChoice, setEditingChoice] = useState('');
-  const [newChoice, setNewChoice] = useState('');
+  const [editingChoice, setEditingChoice] = useState("");
+  const [newChoice, setNewChoice] = useState("");
 
   const onDragAndDrop = useCallback(async () => {
     const grid = gridRef.current;
@@ -28,7 +28,7 @@ const SelectDraggableAndEditable = ({ onChange, classNamePrefix, value, onEditCh
   const sortableRef = useRef(null);
   useEffect(() => {
     gridRef.current = document.querySelector(`.${classNamePrefix}__value-container--is-multi`);
-    gridRef.current.lastChild.classList.add('not-draggable'); // this is the input {classNamePrefix}__input-container
+    gridRef.current.lastChild.classList.add("not-draggable"); // this is the input {classNamePrefix}__input-container
     sortableRef.current = SortableJS.create(gridRef.current, {
       animation: 150,
       group: classNamePrefix,
@@ -72,7 +72,8 @@ const SelectDraggableAndEditable = ({ onChange, classNamePrefix, value, onEditCh
                       e.preventDefault();
                       setEditingChoice(props.children);
                     }}
-                    type="button">
+                    type="button"
+                  >
                     &#9998;
                   </button>
                 )}
@@ -114,9 +115,10 @@ const SelectDraggableAndEditable = ({ onChange, classNamePrefix, value, onEditCh
             name="cancel"
             className="button-cancel"
             onClick={() => {
-              setEditingChoice('');
-              setNewChoice('');
-            }}>
+              setEditingChoice("");
+              setNewChoice("");
+            }}
+          >
             Annuler
           </button>
           <button
@@ -127,18 +129,19 @@ const SelectDraggableAndEditable = ({ onChange, classNamePrefix, value, onEditCh
             onClick={(e) => {
               e.preventDefault();
               if (newChoice === editingChoice) {
-                setEditingChoice('');
-                setNewChoice('');
+                setEditingChoice("");
+                setNewChoice("");
                 return;
               }
               if (options.map((option) => option.label).includes(newChoice)) {
-                alert('Ce choix existe déjà');
+                alert("Ce choix existe déjà");
                 return;
               }
               onEditChoice({ newChoice, oldChoice: editingChoice, options });
-              setEditingChoice('');
-              setNewChoice('');
-            }}>
+              setEditingChoice("");
+              setNewChoice("");
+            }}
+          >
             Enregistrer
           </button>
         </ModalFooter>

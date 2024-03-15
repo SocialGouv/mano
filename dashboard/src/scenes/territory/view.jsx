@@ -1,22 +1,22 @@
-import React from 'react';
-import { Row, Col, FormGroup, Input, Label } from 'reactstrap';
-import { useParams, useHistory } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { Formik } from 'formik';
+import React from "react";
+import { Row, Col, FormGroup, Input, Label } from "reactstrap";
+import { useParams, useHistory } from "react-router-dom";
+import { toast } from "react-toastify";
+import { Formik } from "formik";
 
-import { SmallHeaderWithBackButton } from '../../components/header';
-import Loading from '../../components/loading';
-import ButtonCustom from '../../components/ButtonCustom';
+import { SmallHeaderWithBackButton } from "../../components/header";
+import Loading from "../../components/loading";
+import ButtonCustom from "../../components/ButtonCustom";
 
-import Observations from '../territory-observations/list';
-import SelectCustom from '../../components/SelectCustom';
-import { territoryTypes, territoriesState, prepareTerritoryForEncryption } from '../../recoil/territory';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import API from '../../services/api';
-import { territoryObservationsState } from '../../recoil/territoryObservations';
-import useTitle from '../../services/useTitle';
-import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
-import { userState } from '../../recoil/auth';
+import Observations from "../territory-observations/list";
+import SelectCustom from "../../components/SelectCustom";
+import { territoryTypes, territoriesState, prepareTerritoryForEncryption } from "../../recoil/territory";
+import { useRecoilState, useRecoilValue } from "recoil";
+import API from "../../services/api";
+import { territoryObservationsState } from "../../recoil/territoryObservations";
+import useTitle from "../../services/useTitle";
+import DeleteButtonAndConfirmModal from "../../components/DeleteButtonAndConfirmModal";
+import { userState } from "../../recoil/auth";
 
 const View = () => {
   const { id } = useParams();
@@ -48,9 +48,10 @@ const View = () => {
                 return a;
               })
             );
-            toast.success('Mis à jour !');
+            toast.success("Mis à jour !");
           }
-        }}>
+        }}
+      >
         {({ values, handleChange, handleSubmit, isSubmitting }) => {
           return (
             <React.Fragment>
@@ -58,7 +59,7 @@ const View = () => {
                 <Col md={6}>
                   <FormGroup>
                     <Label htmlFor="name">Nom</Label>
-                    <Input name="name" id="name" value={values.name} onChange={handleChange} readOnly={user.role === 'restricted-access'} />
+                    <Input name="name" id="name" value={values.name} onChange={handleChange} readOnly={user.role === "restricted-access"} />
                   </FormGroup>
                 </Col>
 
@@ -68,7 +69,7 @@ const View = () => {
                     <SelectCustom
                       options={territoryTypes.map((_option) => ({ value: _option, label: _option }))}
                       name="types"
-                      onChange={(values) => handleChange({ currentTarget: { value: values.map((v) => v.value), name: 'types' } })}
+                      onChange={(values) => handleChange({ currentTarget: { value: values.map((v) => v.value), name: "types" } })}
                       isClearable={false}
                       isMulti
                       value={values.types?.map((_option) => ({ value: _option, label: _option })) || []}
@@ -76,7 +77,7 @@ const View = () => {
                       getOptionLabel={(i) => i.label}
                       inputId="territory-select-types"
                       classNamePrefix="territory-select-types"
-                      isDisabled={user.role === 'restricted-access'}
+                      isDisabled={user.role === "restricted-access"}
                     />
                   </FormGroup>
                 </Col>
@@ -89,13 +90,13 @@ const View = () => {
                       id="perimeter"
                       value={values.perimeter}
                       onChange={handleChange}
-                      readOnly={user.role === 'restricted-access'}
+                      readOnly={user.role === "restricted-access"}
                     />
                   </FormGroup>
                 </Col>
               </Row>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
-                {!['restricted-access'].includes(user.role) && (
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "1rem" }}>
+                {!["restricted-access"].includes(user.role) && (
                   <>
                     <DeleteButtonAndConfirmModal
                       title={`Voulez-vous vraiment supprimer le territoire ${territory.name}`}
@@ -110,17 +111,18 @@ const View = () => {
                               setTerritoryObservations((territoryObservations) => territoryObservations.filter((p) => p._id !== obs._id));
                             }
                           }
-                          toast.success('Suppression réussie');
+                          toast.success("Suppression réussie");
                           history.goBack();
                         }
-                      }}>
-                      <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
+                      }}
+                    >
+                      <span style={{ marginBottom: 30, display: "block", width: "100%", textAlign: "center" }}>
                         Cette opération est irréversible
                         <br />
                         et entrainera la suppression définitive de toutes les observations liées au territoire.
                       </span>
                     </DeleteButtonAndConfirmModal>
-                    <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} />
+                    <ButtonCustom title={"Mettre à jour"} loading={isSubmitting} onClick={handleSubmit} />
                   </>
                 )}
               </div>

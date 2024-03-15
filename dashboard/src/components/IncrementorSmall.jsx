@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { useDebounce } from 'react-use';
-import API from '../services/api';
-import { capture } from '../services/sentry';
+import React, { useEffect, useState } from "react";
+import { useDebounce } from "react-use";
+import API from "../services/api";
+import { capture } from "../services/sentry";
 
-export default function IncrementorSmall({ service, team, date, count: initialValue, onUpdated, dataTestId, disabled = false, className = '' }) {
+export default function IncrementorSmall({ service, team, date, count: initialValue, onUpdated, dataTestId, disabled = false, className = "" }) {
   const [value, setValue] = useState(initialValue);
 
   useEffect(() => setValue(initialValue), [initialValue]);
@@ -11,18 +11,18 @@ export default function IncrementorSmall({ service, team, date, count: initialVa
   useDebounce(
     function updateServiceInDatabase() {
       if (value === initialValue || disabled) return;
-      if (!date || !team || date === 'undefined') {
-        return capture('Missing params for initServices in IncrementorSmall', { extra: { date, team, service, initialValue } });
+      if (!date || !team || date === "undefined") {
+        return capture("Missing params for initServices in IncrementorSmall", { extra: { date, team, service, initialValue } });
       }
       API.post({ path: `/service/team/${team}/date/${date}`, body: { count: value, service } }).then((res) => {
         if (res.ok) onUpdated(res.data.count);
       });
     },
-    import.meta.env.TEST === 'true' ? 0 : 1000,
+    import.meta.env.TEST === "true" ? 0 : 1000,
     [value]
   );
   return (
-    <div className={['tw-mb-2.5 tw-flex tw-gap-0.5 print:tw-max-w-sm', className].join(' ')}>
+    <div className={["tw-mb-2.5 tw-flex tw-gap-0.5 print:tw-max-w-sm", className].join(" ")}>
       <p id={`${service}-title`} className="tw-m-0 tw-flex-grow tw-text-black75">
         {service}
       </p>
@@ -32,7 +32,8 @@ export default function IncrementorSmall({ service, team, date, count: initialVa
         disabled={disabled || value === 0}
         onClick={() => setValue(value - 1)}
         id={`${service}-remove`}
-        type="button">
+        type="button"
+      >
         -
       </button>
       <input
@@ -52,7 +53,8 @@ export default function IncrementorSmall({ service, team, date, count: initialVa
         onClick={() => setValue(value + 1)}
         id={`${service}-add`}
         disabled={disabled}
-        type="button">
+        type="button"
+      >
         +
       </button>
     </div>

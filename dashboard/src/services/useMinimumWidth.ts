@@ -1,5 +1,5 @@
-import { useMediaQuery } from '@react-hookz/web/esm/useMediaQuery';
-import { useMemo } from 'react';
+import { useMediaQuery } from "@react-hookz/web/esm/useMediaQuery";
+import { useMemo } from "react";
 
 // Breakpoint prefix	Minimum width	CSS
 // sm	640px	@media (min-width: 640px) { ... }
@@ -8,20 +8,20 @@ import { useMemo } from 'react';
 // xl	1280px	@media (min-width: 1280px) { ... }
 // 2xl	1536px	@media (min-width: 1536px) { ... }
 
-type MinScreen = 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+type MinScreen = "sm" | "md" | "lg" | "xl" | "2xl";
 
 export default function useMinimumWidth(minScreen: MinScreen) {
   const media = useMemo(() => {
     switch (minScreen) {
-      case 'sm':
+      case "sm":
         return 640;
-      case 'md':
+      case "md":
         return 768;
-      case 'lg':
+      case "lg":
         return 1024;
-      case 'xl':
+      case "xl":
         return 1280;
-      case '2xl':
+      case "2xl":
         return 1536;
       default:
         return 0;

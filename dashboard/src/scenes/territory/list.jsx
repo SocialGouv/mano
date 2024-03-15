@@ -1,40 +1,40 @@
-import React, { useMemo, useState } from 'react';
-import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader, Input, Label } from 'reactstrap';
-import { useHistory } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { Formik } from 'formik';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { useLocalStorage } from '../../services/useLocalStorage';
-import { SmallHeader } from '../../components/header';
-import Page from '../../components/pagination';
-import Loading from '../../components/loading';
-import Table from '../../components/table';
-import ButtonCustom from '../../components/ButtonCustom';
-import Search from '../../components/search';
-import { territoryTypes, territoriesState, prepareTerritoryForEncryption, sortTerritories } from '../../recoil/territory';
-import SelectCustom from '../../components/SelectCustom';
-import { onlyFilledObservationsTerritories } from '../../recoil/selectors';
-import { currentTeamState, organisationState, userState } from '../../recoil/auth';
-import { formatDateWithFullMonth } from '../../services/date';
-import API from '../../services/api';
-import { filterBySearch } from '../search/utils';
-import useTitle from '../../services/useTitle';
-import useSearchParamState from '../../services/useSearchParamState';
-import { useDataLoader } from '../../components/DataLoader';
+import React, { useMemo, useState } from "react";
+import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader, Input, Label } from "reactstrap";
+import { useHistory } from "react-router-dom";
+import { toast } from "react-toastify";
+import { Formik } from "formik";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useLocalStorage } from "../../services/useLocalStorage";
+import { SmallHeader } from "../../components/header";
+import Page from "../../components/pagination";
+import Loading from "../../components/loading";
+import Table from "../../components/table";
+import ButtonCustom from "../../components/ButtonCustom";
+import Search from "../../components/search";
+import { territoryTypes, territoriesState, prepareTerritoryForEncryption, sortTerritories } from "../../recoil/territory";
+import SelectCustom from "../../components/SelectCustom";
+import { onlyFilledObservationsTerritories } from "../../recoil/selectors";
+import { currentTeamState, organisationState, userState } from "../../recoil/auth";
+import { formatDateWithFullMonth } from "../../services/date";
+import API from "../../services/api";
+import { filterBySearch } from "../search/utils";
+import useTitle from "../../services/useTitle";
+import useSearchParamState from "../../services/useSearchParamState";
+import { useDataLoader } from "../../components/DataLoader";
 
 const List = () => {
   const organisation = useRecoilValue(organisationState);
   const history = useHistory();
-  useTitle('Territoires');
+  useTitle("Territoires");
   useDataLoader({ refreshOnMount: true });
 
-  const [page, setPage] = useSearchParamState('page', 0);
-  const [search, setSearch] = useSearchParamState('search', '');
+  const [page, setPage] = useSearchParamState("page", 0);
+  const [search, setSearch] = useSearchParamState("search", "");
 
   const territories = useRecoilValue(territoriesState);
   const territoryObservations = useRecoilValue(onlyFilledObservationsTerritories);
-  const [sortBy, setSortBy] = useLocalStorage('territory-sortBy', 'name');
-  const [sortOrder, setSortOrder] = useLocalStorage('territory-sortOrder', 'ASC');
+  const [sortBy, setSortBy] = useLocalStorage("territory-sortBy", "name");
+  const [sortOrder, setSortOrder] = useLocalStorage("territory-sortOrder", "ASC");
 
   const filteredTerritories = useMemo(() => {
     if (!search.length) return [...territories].sort(sortTerritories(sortBy, sortOrder));
@@ -68,22 +68,22 @@ const List = () => {
           <CreateTerritory organisation={organisation} />
         </Col>
       </Row>
-      <Row style={{ marginBottom: 40, borderBottom: '1px solid #ddd' }}>
-        <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
+      <Row style={{ marginBottom: 40, borderBottom: "1px solid #ddd" }}>
+        <Col md={12} style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
           <label htmlFor="search" style={{ marginRight: 20, width: 250, flexShrink: 0 }}>
-            Recherche :{' '}
+            Recherche :{" "}
           </label>
           <Search placeholder="Par mot clé, présent dans le nom, une observation, ..." value={search} onChange={setSearch} />
         </Col>
       </Row>
       <Table
         data={data}
-        rowKey={'_id'}
+        rowKey={"_id"}
         onRowClick={(territory) => history.push(`/territory/${territory._id}`)}
         columns={[
           {
-            title: 'Nom',
-            dataKey: 'name',
+            title: "Nom",
+            dataKey: "name",
             onSortOrder: setSortOrder,
             onSortBy: setSortBy,
             sortOrder,
@@ -97,30 +97,30 @@ const List = () => {
             },
           },
           {
-            title: 'Types',
-            dataKey: 'types',
+            title: "Types",
+            dataKey: "types",
             onSortOrder: setSortOrder,
             onSortBy: setSortBy,
             sortOrder,
             sortBy,
-            render: ({ types }) => (types ? types.join(', ') : ''),
+            render: ({ types }) => (types ? types.join(", ") : ""),
           },
           {
-            title: 'Périmètre',
-            dataKey: 'perimeter',
+            title: "Périmètre",
+            dataKey: "perimeter",
             onSortOrder: setSortOrder,
             onSortBy: setSortBy,
             sortOrder,
             sortBy,
           },
           {
-            title: 'Créé le',
-            dataKey: 'createdAt',
+            title: "Créé le",
+            dataKey: "createdAt",
             onSortOrder: setSortOrder,
             onSortBy: setSortBy,
             sortOrder,
             sortBy,
-            render: (territory) => formatDateWithFullMonth(territory.createdAt || ''),
+            render: (territory) => formatDateWithFullMonth(territory.createdAt || ""),
           },
         ]}
       />
@@ -139,7 +139,7 @@ const CreateTerritory = () => {
 
   return (
     <div className="tw-flex tw-w-full tw-justify-end">
-      {!['restricted-access'].includes(user.role) && (
+      {!["restricted-access"].includes(user.role) && (
         <ButtonCustom
           disabled={!currentTeam?._id}
           onClick={() => setOpen(true)}
@@ -152,20 +152,21 @@ const CreateTerritory = () => {
         <ModalHeader toggle={() => setOpen(false)}>Créer un nouveau territoire</ModalHeader>
         <ModalBody>
           <Formik
-            initialValues={{ name: '', types: [], perimeter: '' }}
+            initialValues={{ name: "", types: [], perimeter: "" }}
             onSubmit={async (body, actions) => {
-              if (!body.name) return toast.error('Le nom est obligatoire');
-              const res = await API.post({ path: '/territory', body: prepareTerritoryForEncryption({ ...body, user: user._id }) });
+              if (!body.name) return toast.error("Le nom est obligatoire");
+              const res = await API.post({ path: "/territory", body: prepareTerritoryForEncryption({ ...body, user: user._id }) });
               if (res.ok) {
                 setTerritories((territories) => [res.decryptedData, ...territories]);
               }
               actions.setSubmitting(false);
               if (res.ok) {
-                toast.success('Création réussie !');
+                toast.success("Création réussie !");
                 setOpen(false);
                 history.push(`/territory/${res.data._id}`);
               }
-            }}>
+            }}
+          >
             {({ values, handleChange, handleSubmit, isSubmitting }) => (
               <React.Fragment>
                 <Row>
@@ -181,7 +182,7 @@ const CreateTerritory = () => {
                       <SelectCustom
                         options={territoryTypes.map((_option) => ({ value: _option, label: _option }))}
                         name="types"
-                        onChange={(values) => handleChange({ currentTarget: { value: values.map((v) => v.value), name: 'types' } })}
+                        onChange={(values) => handleChange({ currentTarget: { value: values.map((v) => v.value), name: "types" } })}
                         isClearable={false}
                         isMulti
                         value={values.types?.map((_option) => ({ value: _option, label: _option })) || []}

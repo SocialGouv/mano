@@ -1,8 +1,8 @@
-import { UUIDV4 } from './uuid';
+import { UUIDV4 } from "./uuid";
 
 export type CustomFieldName = string; // `custom-${new Date().toISOString().split('.').join('-').split(':').join('-')}`
 
-export type FieldType = 'text' | 'textarea' | 'number' | 'date' | 'duration' | 'date-with-time' | 'yes-no' | 'enum' | 'multi-choice' | 'boolean';
+export type FieldType = "text" | "textarea" | "number" | "date" | "duration" | "date-with-time" | "yes-no" | "enum" | "multi-choice" | "boolean";
 
 export interface CustomField {
   name: CustomFieldName; // `custom-${new Date().toISOString().split('.').join('-').split(':').join('-')}`

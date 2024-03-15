@@ -1,12 +1,12 @@
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { DONE, TODO, CANCEL, prepareActionForEncryption, actionsState } from '../recoil/actions';
-import API from '../services/api';
-import { now } from '../services/date';
-import { toast } from 'react-toastify';
-import { organisationState, userState } from '../recoil/auth';
-import { consultationsState, defaultConsultationFields, prepareConsultationForEncryption } from '../recoil/consultations';
-import { ConsultationInstance } from '../types/consultation';
-import { ActionInstance } from '../types/action';
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { DONE, TODO, CANCEL, prepareActionForEncryption, actionsState } from "../recoil/actions";
+import API from "../services/api";
+import { now } from "../services/date";
+import { toast } from "react-toastify";
+import { organisationState, userState } from "../recoil/auth";
+import { consultationsState, defaultConsultationFields, prepareConsultationForEncryption } from "../recoil/consultations";
+import { ConsultationInstance } from "../types/consultation";
+import { ActionInstance } from "../types/action";
 
 function isConsultation(action: ActionInstance | ConsultationInstance): action is ConsultationInstance {
   return action.isConsultation !== undefined && action.isConsultation;
@@ -23,7 +23,7 @@ export default function ActionStatusSelect({ action }: { action: ActionInstance 
   return (
     <select
       className={`tw-cursor-pointer tw-appearance-none tw-rounded tw-border-none tw-px-2 tw-transition hover:tw-scale-105 ${
-        action.status === DONE ? 'tw-bg-green-700' : action.status === TODO ? 'tw-bg-red-700' : 'tw-bg-cyan-700'
+        action.status === DONE ? "tw-bg-green-700" : action.status === TODO ? "tw-bg-red-700" : "tw-bg-cyan-700"
       } tw-text-center tw-text-[11px] tw-font-bold tw-text-white tw-outline-none`}
       value={action.status}
       onClick={(e) => {
@@ -59,7 +59,7 @@ export default function ActionStatusSelect({ action }: { action: ActionInstance 
             }),
           });
           if (!consultationResponse.ok) {
-            toast.error('Erreur lors de la mise à jour de la consultation');
+            toast.error("Erreur lors de la mise à jour de la consultation");
             return;
           }
           const newConsultation = { ...consultationResponse.decryptedData, ...defaultConsultationFields };
@@ -71,7 +71,7 @@ export default function ActionStatusSelect({ action }: { action: ActionInstance 
               })
               .sort((a, b) => new Date(b.dueAt).getTime() - new Date(a.dueAt).getTime())
           );
-          toast.success('Le statut de la consultation a été mis à jour');
+          toast.success("Le statut de la consultation a été mis à jour");
           return;
         } else {
           const actionResponse = await API.put({
@@ -97,7 +97,8 @@ export default function ActionStatusSelect({ action }: { action: ActionInstance 
           );
           toast.success("Le statut de l'action a été mis à jour");
         }
-      }}>
+      }}
+    >
       <option value={TODO}>À faire</option>
       <option value={DONE}>Fait</option>
       <option value={CANCEL}>Annulé</option>

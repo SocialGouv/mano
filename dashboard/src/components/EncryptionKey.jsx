@@ -1,18 +1,18 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader, Input, Label } from 'reactstrap';
-import styled from 'styled-components';
-import { Formik } from 'formik';
-import { toast } from 'react-toastify';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { useHistory } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from "react";
+import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader, Input, Label } from "reactstrap";
+import styled from "styled-components";
+import { Formik } from "formik";
+import { toast } from "react-toastify";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { useHistory } from "react-router-dom";
 
-import ButtonCustom from './ButtonCustom';
-import { theme } from '../config';
-import { organisationState, teamsState, userState } from '../recoil/auth';
-import { encryptVerificationKey } from '../services/encryption';
-import { capture } from '../services/sentry';
-import API, { setOrgEncryptionKey, getHashedOrgEncryptionKey, decryptAndEncryptItem } from '../services/api';
-import { useDataLoader } from './DataLoader';
+import ButtonCustom from "./ButtonCustom";
+import { theme } from "../config";
+import { organisationState, teamsState, userState } from "../recoil/auth";
+import { encryptVerificationKey } from "../services/encryption";
+import { capture } from "../services/sentry";
+import API, { setOrgEncryptionKey, getHashedOrgEncryptionKey, decryptAndEncryptItem } from "../services/api";
+import { useDataLoader } from "./DataLoader";
 
 const EncryptionKey = ({ isMain }) => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
@@ -27,8 +27,8 @@ const EncryptionKey = ({ isMain }) => {
   const history = useHistory();
 
   const [open, setOpen] = useState(onboardingForEncryption);
-  const [encryptionKey, setEncryptionKey] = useState('');
-  const [encryptingStatus, setEncryptingStatus] = useState('');
+  const [encryptionKey, setEncryptionKey] = useState("");
+  const [encryptingStatus, setEncryptingStatus] = useState("");
   const [encryptingProgress, setEncryptingProgress] = useState(0);
   const [encryptionDone, setEncryptionDone] = useState(false);
   const { isLoading, refresh } = useDataLoader();
@@ -40,23 +40,23 @@ const EncryptionKey = ({ isMain }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, encryptionKey]);
 
-  if (!['admin'].includes(user.role)) return null;
+  if (!["admin"].includes(user.role)) return null;
 
   const onEncrypt = async (values) => {
     try {
       // just for the button to show loading state, sorry Raph I couldn't find anything better
       await new Promise((resolve) => setTimeout(resolve, 100));
-      if (!values.encryptionKey) return toast.error('La clé est obligatoire');
-      if (!values.encryptionKeyConfirm) return toast.error('La validation de la clé est obligatoire');
-      if (values.encryptionKey !== values.encryptionKeyConfirm) return toast.error('Les clés ne sont pas identiques');
+      if (!values.encryptionKey) return toast.error("La clé est obligatoire");
+      if (!values.encryptionKeyConfirm) return toast.error("La validation de la clé est obligatoire");
+      if (values.encryptionKey !== values.encryptionKeyConfirm) return toast.error("Les clés ne sont pas identiques");
       previousKey.current = getHashedOrgEncryptionKey();
       setEncryptionKey(values.encryptionKey.trim());
       const hashedOrgEncryptionKey = await setOrgEncryptionKey(values.encryptionKey.trim());
-      setEncryptingStatus('Chiffrement des données...');
+      setEncryptingStatus("Chiffrement des données...");
       const encryptedVerificationKey = await encryptVerificationKey(hashedOrgEncryptionKey);
 
       async function recrypt(path, callback = null) {
-        setEncryptingStatus(`Chiffrement des données : (${path.replace('/', '')}s)`);
+        setEncryptingStatus(`Chiffrement des données : (${path.replace("/", "")}s)`);
         const cryptedItems = await API.get({
           skipDecrypt: true,
           path,
@@ -83,28 +83,28 @@ const EncryptionKey = ({ isMain }) => {
         return encryptedItems;
       }
 
-      const encryptedPersons = await recrypt('/person', async (decryptedData, item) =>
+      const encryptedPersons = await recrypt("/person", async (decryptedData, item) =>
         recryptPersonRelatedDocuments(decryptedData, item._id, previousKey.current, hashedOrgEncryptionKey)
       );
-      const encryptedConsultations = await recrypt('/consultation', async (decryptedData) =>
+      const encryptedConsultations = await recrypt("/consultation", async (decryptedData) =>
         recryptPersonRelatedDocuments(decryptedData, decryptedData.person, previousKey.current, hashedOrgEncryptionKey)
       );
-      const encryptedTreatments = await recrypt('/treatment', async (decryptedData) =>
+      const encryptedTreatments = await recrypt("/treatment", async (decryptedData) =>
         recryptPersonRelatedDocuments(decryptedData, decryptedData.person, previousKey.current, hashedOrgEncryptionKey)
       );
-      const encryptedMedicalFiles = await recrypt('/medical-file', async (decryptedData) =>
+      const encryptedMedicalFiles = await recrypt("/medical-file", async (decryptedData) =>
         recryptPersonRelatedDocuments(decryptedData, decryptedData.person, previousKey.current, hashedOrgEncryptionKey)
       );
-      const encryptedGroups = await recrypt('/group');
-      const encryptedActions = await recrypt('/action');
-      const encryptedComments = await recrypt('/comment');
-      const encryptedPassages = await recrypt('/passage');
-      const encryptedRencontres = await recrypt('/rencontre');
-      const encryptedTerritories = await recrypt('/territory');
-      const encryptedTerritoryObservations = await recrypt('/territory-observation');
-      const encryptedPlaces = await recrypt('/place');
-      const encryptedRelsPersonPlace = await recrypt('/relPersonPlace');
-      const encryptedReports = await recrypt('/report');
+      const encryptedGroups = await recrypt("/group");
+      const encryptedActions = await recrypt("/action");
+      const encryptedComments = await recrypt("/comment");
+      const encryptedPassages = await recrypt("/passage");
+      const encryptedRencontres = await recrypt("/rencontre");
+      const encryptedTerritories = await recrypt("/territory");
+      const encryptedTerritoryObservations = await recrypt("/territory-observation");
+      const encryptedPlaces = await recrypt("/place");
+      const encryptedRelsPersonPlace = await recrypt("/relPersonPlace");
+      const encryptedReports = await recrypt("/report");
 
       const totalToEncrypt =
         encryptedPersons.length +
@@ -125,7 +125,7 @@ const EncryptionKey = ({ isMain }) => {
       totalDurationOnServer.current = totalToEncrypt * 0.005; // average 5 ms in server
 
       setEncryptingStatus(
-        'Sauvegarde des données nouvellement chiffrées en base de donnée. Ne fermez pas votre fenêtre, cela peut prendre quelques minutes...'
+        "Sauvegarde des données nouvellement chiffrées en base de donnée. Ne fermez pas votre fenêtre, cela peut prendre quelques minutes..."
       );
       const updateStatusBarInterval = 2; // in seconds
       const elpasedBarInterval = setInterval(() => {
@@ -133,7 +133,7 @@ const EncryptionKey = ({ isMain }) => {
       }, updateStatusBarInterval * 1000);
       setOrganisation({ ...organisation, encryptionEnabled: true });
       const res = await API.post({
-        path: '/encrypt',
+        path: "/encrypt",
         body: {
           persons: encryptedPersons,
           groups: encryptedGroups,
@@ -162,20 +162,20 @@ const EncryptionKey = ({ isMain }) => {
       if (res.ok) {
         // TODO: clean unused person documents
         setEncryptingProgress(totalDurationOnServer.current);
-        setEncryptingStatus('Données chiffrées !');
+        setEncryptingStatus("Données chiffrées !");
         setOrganisation(res.data);
         setEncryptionDone(true);
         if (onboardingForTeams) {
-          history.push('/team');
+          history.push("/team");
         } else {
-          toast.success('Données chiffrées ! Veuillez noter la clé puis vous reconnecter');
+          toast.success("Données chiffrées ! Veuillez noter la clé puis vous reconnecter");
         }
       }
     } catch (orgEncryptionError) {
-      capture('erreur in organisation encryption', orgEncryptionError);
+      capture("erreur in organisation encryption", orgEncryptionError);
       toast.error(orgEncryptionError.message, { autoClose: false, closeOnClick: false, draggable: false });
       setEncryptingProgress(0);
-      setEncryptionKey('');
+      setEncryptionKey("");
       setEncryptionDone(false);
       await setOrgEncryptionKey(previousKey.current, { needDerivation: false });
       setEncryptingStatus("Erreur lors du chiffrement, veuillez contacter l'administrateur");
@@ -184,37 +184,38 @@ const EncryptionKey = ({ isMain }) => {
 
   const renderEncrypting = () => (
     <ModalBody>
-      <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
+      <span style={{ marginBottom: 30, display: "block", width: "100%", textAlign: "center" }}>
         Ne fermez pas cette page pendant le chiffrement des données...
       </span>
-      <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
+      <span style={{ marginBottom: 30, display: "block", width: "100%", textAlign: "center" }}>
         N'oubliez pas votre nouvelle clé, sinon toutes vos données seront perdues
       </span>
-      <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center', color: theme.redDark }}>
+      <span style={{ marginBottom: 30, display: "block", width: "100%", textAlign: "center", color: theme.redDark }}>
         <b>{encryptionKey}</b>
       </span>
-      <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
+      <span style={{ marginBottom: 30, display: "block", width: "100%", textAlign: "center" }}>
         Si vous perdez cette clé, vos données seront perdues définitivement. Notez-la bien quelque part !
       </span>
-      <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'column', width: '60%', margin: '0 auto' }}>
+      <div style={{ display: "flex", alignItems: "center", flexDirection: "column", width: "60%", margin: "0 auto" }}>
         <span>{encryptingStatus}</span>
         <div
           style={{
             marginTop: 10,
             marginBottom: 30,
-            display: 'block',
-            width: '100%',
-            textAlign: 'center',
+            display: "block",
+            width: "100%",
+            textAlign: "center",
             height: 10,
             borderRadius: 10,
-            border: '1px solid black',
-            overflow: 'hidden',
-          }}>
+            border: "1px solid black",
+            overflow: "hidden",
+          }}
+        >
           <div
             style={{
               backgroundColor: theme.main,
               width: `${(encryptingProgress / totalDurationOnServer.current) * 100}%`,
-              height: '100%',
+              height: "100%",
             }}
           />
         </div>
@@ -227,7 +228,7 @@ const EncryptionKey = ({ isMain }) => {
             onClick={async () => {
               return API.logout();
             }}
-            title={'Se déconnecter'}
+            title={"Se déconnecter"}
           />
         </div>
       )}
@@ -236,7 +237,7 @@ const EncryptionKey = ({ isMain }) => {
 
   const renderForm = () => (
     <ModalBody>
-      <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
+      <span style={{ marginBottom: 30, display: "block", width: "100%", textAlign: "center" }}>
         {organisation.encryptionEnabled ? (
           "Cette opération entrainera la modification définitive de toutes les données chiffrées liées à l'organisation : personnes suivies, actions, territoires, commentaires et observations, rapports... "
         ) : (
@@ -250,14 +251,14 @@ const EncryptionKey = ({ isMain }) => {
           </>
         )}
       </span>
-      <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
+      <span style={{ marginBottom: 30, display: "block", width: "100%", textAlign: "center" }}>
         Si vous perdez cette clé, vos données seront perdues définitivement. <br />
         Notez-la bien quelque part !
       </span>
-      <Formik initialValues={{ encryptionKey: '', encryptionKeyConfirm: '' }} onSubmit={onEncrypt}>
+      <Formik initialValues={{ encryptionKey: "", encryptionKeyConfirm: "" }} onSubmit={onEncrypt}>
         {({ values, handleChange, handleSubmit, isSubmitting }) => (
           <React.Fragment>
-            <Row style={{ justifyContent: 'center' }}>
+            <Row style={{ justifyContent: "center" }}>
               <Col md={3} />
               <Col md={6}>
                 <FormGroup>
@@ -276,7 +277,7 @@ const EncryptionKey = ({ isMain }) => {
               <Col md={3} />
             </Row>
             <br />
-            <Row style={{ justifyContent: 'center' }}>
+            <Row style={{ justifyContent: "center" }}>
               <ButtonCustom
                 color="secondary"
                 id="encrypt"
@@ -287,7 +288,7 @@ const EncryptionKey = ({ isMain }) => {
                   if (isSubmitting) return;
                   handleSubmit();
                 }}
-                title={organisation.encryptionEnabled ? 'Changer la clé de chiffrement' : 'Activer le chiffrement'}
+                title={organisation.encryptionEnabled ? "Changer la clé de chiffrement" : "Activer le chiffrement"}
               />
             </Row>
           </React.Fragment>
@@ -307,7 +308,7 @@ const EncryptionKey = ({ isMain }) => {
   return (
     <>
       <ButtonCustom
-        title={organisation.encryptionEnabled ? 'Changer la clé de chiffrement' : 'Activer le chiffrement'}
+        title={organisation.encryptionEnabled ? "Changer la clé de chiffrement" : "Activer le chiffrement"}
         type="button"
         color="secondary"
         style={{ marginRight: 20 }}
@@ -318,16 +319,17 @@ const EncryptionKey = ({ isMain }) => {
         isOpen={open}
         toggle={() => setOpen(false)}
         onClosed={() => {
-          setEncryptionKey('');
+          setEncryptionKey("");
           setEncryptingProgress(0);
-          setEncryptingStatus('');
+          setEncryptingStatus("");
         }}
         size="lg"
         data-test-id="encryption-modal"
-        centered>
+        centered
+      >
         <ModalHeader close={onboardingForEncryption ? <></> : null} toggle={() => setOpen(false)} color="danger">
-          <span style={{ color: theme.black, textAlign: 'center', display: 'block' }}>
-            {organisation.encryptionEnabled ? 'Changer la clé de chiffrement' : 'Activer le chiffrement'}
+          <span style={{ color: theme.black, textAlign: "center", display: "block" }}>
+            {organisation.encryptionEnabled ? "Changer la clé de chiffrement" : "Activer le chiffrement"}
           </span>
         </ModalHeader>
         {!encryptionKey ? renderForm() : renderEncrypting()}

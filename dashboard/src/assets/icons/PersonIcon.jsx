@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import React from 'react';
+import React from "react";
 
 const PersonIcon = ({ size = 20 }) => (
   <svg width={size} height={size} viewBox="0 0 222 200">

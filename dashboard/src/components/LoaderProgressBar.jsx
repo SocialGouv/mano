@@ -1,6 +1,6 @@
-import React from 'react';
-import styled from 'styled-components';
-import { theme } from '../config';
+import React from "react";
+import styled from "styled-components";
+import { theme } from "../config";
 
 export default function ProgressBar({ loadingText, progress, total }) {
   const status = progress !== null && total !== null ? progress / total : 0.01;

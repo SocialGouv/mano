@@ -1,18 +1,18 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import ButtonCustom from '../../components/ButtonCustom';
-import UserName from '../../components/UserName';
-import { userState } from '../../recoil/auth';
-import { dayjsInstance } from '../../services/date';
-import API from '../../services/api';
-import { useDataLoader } from '../../components/DataLoader';
-import { ModalContainer, ModalHeader, ModalBody, ModalFooter } from '../../components/tailwind/Modal';
-import SelectCustom from '../../components/SelectCustom';
-import { placesState, preparePlaceForEncryption } from '../../recoil/places';
-import SelectUser from '../../components/SelectUser';
-import { toast } from 'react-toastify';
-import { prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from '../../recoil/relPersonPlace';
-import QuestionMarkButton from '../../components/QuestionMarkButton';
+import React, { useEffect, useMemo, useState } from "react";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import ButtonCustom from "../../components/ButtonCustom";
+import UserName from "../../components/UserName";
+import { userState } from "../../recoil/auth";
+import { dayjsInstance } from "../../services/date";
+import API from "../../services/api";
+import { useDataLoader } from "../../components/DataLoader";
+import { ModalContainer, ModalHeader, ModalBody, ModalFooter } from "../../components/tailwind/Modal";
+import SelectCustom from "../../components/SelectCustom";
+import { placesState, preparePlaceForEncryption } from "../../recoil/places";
+import SelectUser from "../../components/SelectUser";
+import { toast } from "react-toastify";
+import { prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from "../../recoil/relPersonPlace";
+import QuestionMarkButton from "../../components/QuestionMarkButton";
 
 const PersonPlaces = ({ person }) => {
   const user = useRecoilValue(userState);
@@ -26,7 +26,7 @@ const PersonPlaces = ({ person }) => {
   const { refresh } = useDataLoader();
 
   const onDeleteRelPersonPlace = async (relPersonPlace) => {
-    if (!window.confirm('Voulez-vous vraiment supprimer ce lieu fréquenté ?')) return;
+    if (!window.confirm("Voulez-vous vraiment supprimer ce lieu fréquenté ?")) return;
     setDeleting(true);
     const response = await API.delete({ path: `/relPersonPlace/${relPersonPlace?._id}` });
     setDeleting(false);
@@ -49,7 +49,7 @@ const PersonPlaces = ({ person }) => {
     <>
       <div className="tw-my-10 tw-flex tw-items-center tw-gap-2">
         <h3 className="tw-mb-0 tw-flex tw-items-center tw-gap-5 tw-text-xl tw-font-extrabold">
-          Lieux fréquentés {person.relsPersonPlace?.length ? `(${person.relsPersonPlace?.length})` : ''}{' '}
+          Lieux fréquentés {person.relsPersonPlace?.length ? `(${person.relsPersonPlace?.length})` : ""}{" "}
           <QuestionMarkButton onClick={() => setHelpModal(true)} />
         </h3>
         <ButtonCustom
@@ -91,14 +91,15 @@ const PersonPlaces = ({ person }) => {
                       title={`Modifier le nom du lieu ${place?.name}`}
                       className="noprint tw-invisible tw-z-10 tw-ml-4 tw-cursor-pointer tw-p-0 tw-text-sm tw-text-main hover:tw-underline group-hover:tw-visible"
                       onClick={() => setPlaceToEdit(place)}
-                      type="button">
+                      type="button"
+                    >
                       Modifier le nom du lieu
                     </button>
                   </td>
                   <td width="15%">
                     <UserName id={user} />
                   </td>
-                  <td width="15%">{dayjsInstance(createdAt).format('DD/MM/YYYY HH:mm')}</td>
+                  <td width="15%">{dayjsInstance(createdAt).format("DD/MM/YYYY HH:mm")}</td>
                   <td width="15%">
                     <div className="tw-flex tw-flex-col tw-items-center tw-gap-2">
                       <button
@@ -106,7 +107,8 @@ const PersonPlaces = ({ person }) => {
                         title={`Modifier le lieu fréquenté ${place?.name}`}
                         type="button"
                         className="button-classic"
-                        onClick={() => setRelPersonPlaceModal(relPersonPlace)}>
+                        onClick={() => setRelPersonPlaceModal(relPersonPlace)}
+                      >
                         Modifier
                       </button>
                       <button
@@ -114,7 +116,8 @@ const PersonPlaces = ({ person }) => {
                         disabled={deleting}
                         type="button"
                         className="button-destructive"
-                        onClick={() => onDeleteRelPersonPlace(relPersonPlace)}>
+                        onClick={() => onDeleteRelPersonPlace(relPersonPlace)}
+                      >
                         Supprimer
                       </button>
                     </div>
@@ -154,13 +157,13 @@ const RelPersonPlaceModal = ({ open, setOpen, person, relPersonPlaceModal, setPl
   }, [me._id, relPersonPlaceModal]);
 
   const onCreatePlace = async (name) => {
-    if (!name?.length) return toast.error('Le nom du lieu est obligatoire');
+    if (!name?.length) return toast.error("Le nom du lieu est obligatoire");
     if (places.find((p) => p.name?.toLocaleLowerCase() === name?.toLocaleLowerCase())) {
-      toast.error('Ce lieu existe déjà');
+      toast.error("Ce lieu existe déjà");
       return;
     }
     setUpdating(true);
-    const response = await API.post({ path: '/place', body: preparePlaceForEncryption({ name, user: me._id }) });
+    const response = await API.post({ path: "/place", body: preparePlaceForEncryption({ name, user: me._id }) });
     setUpdating(false);
     if (response.error) {
       toast.error(response.error);
@@ -168,7 +171,7 @@ const RelPersonPlaceModal = ({ open, setOpen, person, relPersonPlaceModal, setPl
     }
     setPlaces((places) =>
       [response.decryptedData, ...places].sort((p1, p2) =>
-        p1?.name?.toLocaleLowerCase().localeCompare(p2.name?.toLocaleLowerCase(), 'fr', { ignorPunctuation: true, sensitivity: 'base' })
+        p1?.name?.toLocaleLowerCase().localeCompare(p2.name?.toLocaleLowerCase(), "fr", { ignorPunctuation: true, sensitivity: "base" })
       )
     );
     setPlaceId(response.decryptedData._id);
@@ -182,14 +185,14 @@ const RelPersonPlaceModal = ({ open, setOpen, person, relPersonPlaceModal, setPl
   const onSaveRelPersonPlace = async (e) => {
     e.preventDefault();
     if (person.relsPersonPlace?.find((rpp) => rpp.place === placeId)) {
-      toast.error('Ce lieu est déjà enregistré pour cette personne');
+      toast.error("Ce lieu est déjà enregistré pour cette personne");
       return;
     }
     setUpdating(true);
     const isNew = !relPersonPlaceModal?._id;
     const response = isNew
       ? await API.post({
-          path: '/relPersonPlace',
+          path: "/relPersonPlace",
           body: prepareRelPersonPlaceForEncryption({ place: placeId, person: person._id, user: userId }),
         })
       : await API.put({
@@ -202,7 +205,7 @@ const RelPersonPlaceModal = ({ open, setOpen, person, relPersonPlaceModal, setPl
       toast.error(response.error);
       return;
     }
-    toast.success(`Le lieu a été ${isNew ? 'ajouté' : 'modifié'}`);
+    toast.success(`Le lieu a été ${isNew ? "ajouté" : "modifié"}`);
     if (isNew) {
       setRelsPersonPlace((relsPersonPlace) => [response.decryptedData, ...relsPersonPlace]);
     } else {
@@ -219,7 +222,8 @@ const RelPersonPlaceModal = ({ open, setOpen, person, relPersonPlaceModal, setPl
         <form
           id="new-rel-person-place"
           className="tw-flex tw-min-h-[50vh] tw-w-full tw-flex-col tw-gap-4 tw-px-8 tw-py-4"
-          onSubmit={onSaveRelPersonPlace}>
+          onSubmit={onSaveRelPersonPlace}
+        >
           <div>
             <label htmlFor="place" className="tailwindui">
               Lieu
@@ -237,7 +241,7 @@ const RelPersonPlaceModal = ({ open, setOpen, person, relPersonPlaceModal, setPl
               getOptionValue={(i) => i._id}
               getOptionLabel={(i) => i.name}
               formatOptionLabel={(place, options) => {
-                if (options.context === 'menu') {
+                if (options.context === "menu") {
                   if (place.__isNew__) return <span>Créer "{place.value}"</span>;
                   return place?.name;
                 }
@@ -253,7 +257,8 @@ const RelPersonPlaceModal = ({ open, setOpen, person, relPersonPlaceModal, setPl
                       // onTouchEnd required to work on tablet
                       // see https://github.com/JedWatson/react-select/issues/3117#issuecomment-1286232693 for similar issue
                       onTouchEnd={onEditPlace}
-                      type="button">
+                      type="button"
+                    >
                       Modifier le nom du lieu
                     </button>
                   </div>
@@ -299,9 +304,9 @@ const EditRelPersonPlaceModal = ({ open, setOpen, placeToEdit }) => {
 
   const onEditPlace = async (e) => {
     e.preventDefault();
-    if (!name?.length) return toast.error('Le nom du lieu est obligatoire');
+    if (!name?.length) return toast.error("Le nom du lieu est obligatoire");
     if (places.filter((p) => p._id !== placeToEdit._id).find((p) => p.name?.toLocaleLowerCase() === name?.toLocaleLowerCase())) {
-      toast.error('Ce lieu existe déjà');
+      toast.error("Ce lieu existe déjà");
       return;
     }
     setUpdating(true);
@@ -340,7 +345,7 @@ const EditRelPersonPlaceModal = ({ open, setOpen, placeToEdit }) => {
       await API.delete({ path: `/relPersonPlace/${relPersonPlace._id}` });
     }
     setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel.place !== placeToEdit._id));
-    toast.success('Lieu supprimé !');
+    toast.success("Lieu supprimé !");
     refresh();
     setOpen(null);
   };
@@ -382,11 +387,11 @@ const EditRelPersonPlaceModal = ({ open, setOpen, placeToEdit }) => {
 
 const HelpModal = ({ open, setOpen, sameMultiplePlaces }) => {
   useEffect(() => {
-    if (!window.localStorage.getItem('lieux-fréquentés-help-modal-seen')) {
+    if (!window.localStorage.getItem("lieux-fréquentés-help-modal-seen")) {
       setOpen(true);
     }
     if (!open) {
-      window.localStorage.setItem('lieux-fréquentés-help-modal-seen', true);
+      window.localStorage.setItem("lieux-fréquentés-help-modal-seen", true);
     }
   }, [open, setOpen]);
   return (
@@ -419,7 +424,8 @@ const HelpModal = ({ open, setOpen, sameMultiplePlaces }) => {
           className="button-cancel"
           onClick={() => {
             setOpen(null);
-          }}>
+          }}
+        >
           Fermer
         </button>
       </ModalFooter>

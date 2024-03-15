@@ -1,5 +1,5 @@
-import { Col, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
-import SelectAsInput from '../../../components/SelectAsInput';
+import { Col, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, Row } from "reactstrap";
+import SelectAsInput from "../../../components/SelectAsInput";
 import {
   allowedPersonFieldsInHistorySelector,
   customFieldsPersonsSelector,
@@ -7,20 +7,20 @@ import {
   personFieldsSelector,
   personsState,
   usePreparePersonForEncryption,
-} from '../../../recoil/persons';
-import { outOfBoundariesDate } from '../../../services/date';
-import SelectTeamMultiple from '../../../components/SelectTeamMultiple';
-import { currentTeamState, userState } from '../../../recoil/auth';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import CustomFieldInput from '../../../components/CustomFieldInput';
-import { useMemo, useState } from 'react';
-import ButtonCustom from '../../../components/ButtonCustom';
-import { Formik } from 'formik';
-import { toast } from 'react-toastify';
-import API from '../../../services/api';
-import { cleanHistory } from './PersonHistory';
-import DatePicker from '../../../components/DatePicker';
-import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../../recoil/medicalFiles';
+} from "../../../recoil/persons";
+import { outOfBoundariesDate } from "../../../services/date";
+import SelectTeamMultiple from "../../../components/SelectTeamMultiple";
+import { currentTeamState, userState } from "../../../recoil/auth";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import CustomFieldInput from "../../../components/CustomFieldInput";
+import { useMemo, useState } from "react";
+import ButtonCustom from "../../../components/ButtonCustom";
+import { Formik } from "formik";
+import { toast } from "react-toastify";
+import API from "../../../services/api";
+import { cleanHistory } from "./PersonHistory";
+import DatePicker from "../../../components/DatePicker";
+import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from "../../../recoil/medicalFiles";
 
 export default function EditModal({ person, selectedPanel, onClose, isMedicalFile = false }) {
   const [openPanels, setOpenPanels] = useState([selectedPanel]);
@@ -36,9 +36,9 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
 
   const customFieldsMedicalFileWithLegacyFields = useMemo(() => {
     const c = [...customFieldsMedicalFile];
-    const structureMedical = flattenedCustomFieldsPersons.find((e) => e.name === 'structureMedical');
+    const structureMedical = flattenedCustomFieldsPersons.find((e) => e.name === "structureMedical");
     if (structureMedical) c.unshift(structureMedical);
-    const healthInsurances = flattenedCustomFieldsPersons.find((e) => e.name === 'healthInsurances');
+    const healthInsurances = flattenedCustomFieldsPersons.find((e) => e.name === "healthInsurances");
     if (healthInsurances) c.unshift(healthInsurances);
     return c;
   }, [customFieldsMedicalFile, flattenedCustomFieldsPersons]);
@@ -54,16 +54,16 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
           enableReinitialize
           initialValues={person}
           onSubmit={async (body) => {
-            if (!body.name?.trim()?.length) return toast.error('Une personne doit avoir un nom');
+            if (!body.name?.trim()?.length) return toast.error("Une personne doit avoir un nom");
             const existingPerson = persons.find((p) => p.name === body.name && p._id !== person._id);
-            if (existingPerson) return toast.error('Une personne existe déjà à ce nom');
+            if (existingPerson) return toast.error("Une personne existe déjà à ce nom");
             if (!body.followedSince) body.followedSince = person.createdAt;
-            if (!body.assignedTeams?.length) return toast.error('Une personne doit être suivie par au moins une équipe');
-            if (outOfBoundariesDate(body.followedSince)) return toast.error('La date de suivi est hors limites (entre 1900 et 2100)');
+            if (!body.assignedTeams?.length) return toast.error("Une personne doit être suivie par au moins une équipe");
+            if (outOfBoundariesDate(body.followedSince)) return toast.error("La date de suivi est hors limites (entre 1900 et 2100)");
             if (body.birthdate && outOfBoundariesDate(body.birthdate))
-              return toast.error('La date de naissance est hors limites (entre 1900 et 2100)');
+              return toast.error("La date de naissance est hors limites (entre 1900 et 2100)");
             if (body.wanderingAt && outOfBoundariesDate(body.wanderingAt))
-              return toast.error('La date temps passé en rue est hors limites (entre 1900 et 2100)');
+              return toast.error("La date temps passé en rue est hors limites (entre 1900 et 2100)");
 
             body.entityKey = person.entityKey;
 
@@ -90,12 +90,13 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                 })
               );
 
-              toast.success('Mis à jour !');
+              toast.success("Mis à jour !");
               onClose();
             } else {
               toast.error("Erreur de l'enregistrement, les données n'ont pas été enregistrées");
             }
-          }}>
+          }}
+        >
           {({ values, handleChange, handleSubmit, isSubmitting, setFieldValue }) => {
             return (
               <>
@@ -104,36 +105,37 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                     <div
                       className="tw-mb-4 tw-flex tw-cursor-pointer tw-border-b tw-pb-2 tw-text-lg tw-font-semibold"
                       onClick={() => {
-                        if (openPanels.includes('main')) {
-                          setOpenPanels(openPanels.filter((p) => p !== 'main'));
+                        if (openPanels.includes("main")) {
+                          setOpenPanels(openPanels.filter((p) => p !== "main"));
                         } else {
-                          setOpenPanels([...openPanels, 'main']);
+                          setOpenPanels([...openPanels, "main"]);
                         }
-                      }}>
+                      }}
+                    >
                       <div className="tw-flex-1">Informations principales</div>
-                      <div>{!openPanels.includes('main') ? '+' : '-'}</div>
+                      <div>{!openPanels.includes("main") ? "+" : "-"}</div>
                     </div>
-                    {openPanels.includes('main') && (
+                    {openPanels.includes("main") && (
                       <>
                         <Row>
                           <Col md={4}>
                             <FormGroup>
                               <Label htmlFor="name">Nom prénom ou Pseudonyme</Label>
-                              <Input name="name" id="name" value={values.name || ''} onChange={handleChange} />
+                              <Input name="name" id="name" value={values.name || ""} onChange={handleChange} />
                             </FormGroup>
                           </Col>
                           <Col md={4}>
                             <FormGroup>
                               <Label htmlFor="otherNames">Autres pseudos</Label>
-                              <Input name="otherNames" id="otherNames" value={values.otherNames || ''} onChange={handleChange} />
+                              <Input name="otherNames" id="otherNames" value={values.otherNames || ""} onChange={handleChange} />
                             </FormGroup>
                           </Col>
                           <Col md={4}>
                             <Label htmlFor="person-select-gender">Genre</Label>
                             <SelectAsInput
-                              options={personFields.find((f) => f.name === 'gender').options}
+                              options={personFields.find((f) => f.name === "gender").options}
                               name="gender"
-                              value={values.gender || ''}
+                              value={values.gender || ""}
                               onChange={handleChange}
                               inputId="person-select-gender"
                               classNamePrefix="person-select-gender"
@@ -174,7 +176,7 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                               <Label htmlFor="person-select-assigned-team">Équipe(s) en charge</Label>
                               <div>
                                 <SelectTeamMultiple
-                                  onChange={(teamIds) => handleChange({ target: { value: teamIds, name: 'assignedTeams' } })}
+                                  onChange={(teamIds) => handleChange({ target: { value: teamIds, name: "assignedTeams" } })}
                                   value={values.assignedTeams}
                                   colored
                                   inputId="person-select-assigned-team"
@@ -186,16 +188,16 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                           <Col md={4}>
                             <FormGroup>
                               <Label htmlFor="phone">Téléphone</Label>
-                              <Input name="phone" id="phone" value={values.phone || ''} onChange={handleChange} />
+                              <Input name="phone" id="phone" value={values.phone || ""} onChange={handleChange} />
                             </FormGroup>
                           </Col>
                           <Col md={4}>
                             <FormGroup>
                               <Label htmlFor="email">Email</Label>
-                              <Input type="email" name="email" id="email" value={values.email || ''} onChange={handleChange} />
+                              <Input type="email" name="email" id="email" value={values.email || ""} onChange={handleChange} />
                             </FormGroup>
                           </Col>
-                          {!['restricted-access'].includes(user.role) && (
+                          {!["restricted-access"].includes(user.role) && (
                             <Col md={12}>
                               <FormGroup>
                                 <Label htmlFor="description">Description</Label>
@@ -205,7 +207,7 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                                   rows={5}
                                   name="description"
                                   id="description"
-                                  value={values.description || ''}
+                                  value={values.description || ""}
                                   onChange={handleChange}
                                 />
                               </FormGroup>
@@ -213,7 +215,7 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                           )}
                           <Col md={12}>
                             <FormGroup>
-                              <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20 }}>
+                              <div style={{ display: "flex", flexDirection: "column", marginLeft: 20 }}>
                                 <label htmlFor="person-alertness-checkbox">
                                   Personne très vulnérable, ou ayant besoin d'une attention particulière
                                 </label>
@@ -222,7 +224,7 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                                   type="checkbox"
                                   name="alertness"
                                   checked={values.alertness}
-                                  onChange={() => handleChange({ target: { value: !values.alertness, name: 'alertness' } })}
+                                  onChange={() => handleChange({ target: { value: !values.alertness, name: "alertness" } })}
                                 />
                               </div>
                             </FormGroup>
@@ -244,7 +246,7 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                     )}
                   </div>
                   {!isMedicalFile &&
-                    !['restricted-access'].includes(user.role) &&
+                    !["restricted-access"].includes(user.role) &&
                     customFieldsPersons.map(({ name, fields }, index) => {
                       if (!fields.filter((f) => f.enabled || f.enabledTeams?.includes(team._id)).length) return null;
                       return (
@@ -257,9 +259,10 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                               } else {
                                 setOpenPanels([...openPanels, name]);
                               }
-                            }}>
+                            }}
+                          >
                             <div className="tw-flex-1">{name}</div>
-                            <div>{!openPanels.includes(name) ? '+' : '-'}</div>
+                            <div>{!openPanels.includes(name) ? "+" : "-"}</div>
                           </div>
 
                           <div className="[overflow-wrap:anywhere]">
@@ -335,8 +338,8 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
               }
 
               // We have to save legacy fields in person
-              const structureMedical = flattenedCustomFieldsPersons.find((e) => e.name === 'structureMedical');
-              const healthInsurances = flattenedCustomFieldsPersons.find((e) => e.name === 'healthInsurances');
+              const structureMedical = flattenedCustomFieldsPersons.find((e) => e.name === "structureMedical");
+              const healthInsurances = flattenedCustomFieldsPersons.find((e) => e.name === "healthInsurances");
               if (structureMedical || healthInsurances) {
                 const bodySocial = {
                   ...person,
@@ -376,29 +379,31 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
               if (!success) {
                 toast.error("Les données médicales n'ont pas été enregistrées");
               } else {
-                toast.success('Mis à jour !');
+                toast.success("Mis à jour !");
                 onClose();
               }
-            }}>
+            }}
+          >
             {({ values, handleChange, handleSubmit, isSubmitting, setFieldValue }) => {
               return (
                 <>
-                  <div key={'Dossier Médical'}>
+                  <div key={"Dossier Médical"}>
                     <div
                       className="tw-mb-4 tw-flex tw-cursor-pointer tw-border-b tw-pb-2 tw-text-lg tw-font-semibold"
                       onClick={() => {
-                        if (openPanels.includes('Dossier Médical')) {
-                          setOpenPanels(openPanels.filter((p) => p !== 'Dossier Médical'));
+                        if (openPanels.includes("Dossier Médical")) {
+                          setOpenPanels(openPanels.filter((p) => p !== "Dossier Médical"));
                         } else {
-                          setOpenPanels([...openPanels, 'Dossier Médical']);
+                          setOpenPanels([...openPanels, "Dossier Médical"]);
                         }
-                      }}>
+                      }}
+                    >
                       <div className="tw-flex-1">Dossier Médical</div>
-                      <div>{!openPanels.includes('Dossier Médical') ? '+' : '-'}</div>
+                      <div>{!openPanels.includes("Dossier Médical") ? "+" : "-"}</div>
                     </div>
 
                     <div className="[overflow-wrap:anywhere]">
-                      {openPanels.includes('Dossier Médical') && (
+                      {openPanels.includes("Dossier Médical") && (
                         <>
                           <Row>
                             {customFieldsMedicalFileWithLegacyFields

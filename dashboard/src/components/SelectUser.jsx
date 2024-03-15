@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { useRecoilValue } from 'recoil';
-import { usersState } from '../recoil/auth';
-import SelectCustom from './SelectCustom';
+import React, { useState } from "react";
+import { useRecoilValue } from "recoil";
+import { usersState } from "../recoil/auth";
+import SelectCustom from "./SelectCustom";
 
 const SelectUser = ({ value, onChange, ...props }) => {
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const allUsers = useRecoilValue(usersState);
 
   const users = search?.length ? allUsers.filter((p) => p.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())) : allUsers;
@@ -21,9 +21,9 @@ const SelectUser = ({ value, onChange, ...props }) => {
         onChange(v?._id);
       }}
       value={users.filter((i) => i._id === value)[0]}
-      placeholder={' -- Choisir un utilisateur -- '}
+      placeholder={" -- Choisir un utilisateur -- "}
       getOptionValue={(i) => i._id}
-      getOptionLabel={(i) => i?.name || ''}
+      getOptionLabel={(i) => i?.name || ""}
       {...props}
     />
   );

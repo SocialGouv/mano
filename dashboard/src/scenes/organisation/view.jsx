@@ -1,51 +1,51 @@
-import { useEffect, useRef, useState } from 'react';
-import { FormGroup, Input, Label, Row, Col } from 'reactstrap';
-import { Formik } from 'formik';
-import { toast } from 'react-toastify';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useEffect, useRef, useState } from "react";
+import { FormGroup, Input, Label, Row, Col } from "reactstrap";
+import { Formik } from "formik";
+import { toast } from "react-toastify";
+import { useRecoilState, useRecoilValue } from "recoil";
 
-import ButtonCustom from '../../components/ButtonCustom';
-import EncryptionKey from '../../components/EncryptionKey';
+import ButtonCustom from "../../components/ButtonCustom";
+import EncryptionKey from "../../components/EncryptionKey";
 import {
   fieldsPersonsCustomizableOptionsSelector,
   personFieldsIncludingCustomFieldsSelector,
   personsState,
   usePreparePersonForEncryption,
-} from '../../recoil/persons';
-import TableCustomFields from '../../components/TableCustomFields';
-import { organisationState, userState } from '../../recoil/auth';
-import API, { encryptItem } from '../../services/api';
-import ExportData from '../data-import-export/ExportData';
-import ImportData from '../data-import-export/ImportData';
-import ImportConfig from '../data-import-export/ImportConfig';
-import DownloadExample from '../data-import-export/DownloadExample';
-import useTitle from '../../services/useTitle';
-import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
-import { capture } from '../../services/sentry';
+} from "../../recoil/persons";
+import TableCustomFields from "../../components/TableCustomFields";
+import { organisationState, userState } from "../../recoil/auth";
+import API, { encryptItem } from "../../services/api";
+import ExportData from "../data-import-export/ExportData";
+import ImportData from "../data-import-export/ImportData";
+import ImportConfig from "../data-import-export/ImportConfig";
+import DownloadExample from "../data-import-export/DownloadExample";
+import useTitle from "../../services/useTitle";
+import DeleteButtonAndConfirmModal from "../../components/DeleteButtonAndConfirmModal";
+import { capture } from "../../services/sentry";
 
-import { useDataLoader } from '../../components/DataLoader';
-import ActionCategoriesSettings from './ActionCategoriesSettings';
-import ServicesSettings from './ServicesSettings';
-import ObservationsSettings from './ObservationsSettings';
-import ConsultationsSettings from './ConsultationsSettings';
-import MedicalFileSettings from './MedicalFileSettings';
-import PersonCustomFieldsSettings from './PersonCustomFieldsSettings';
-import StructuresCategoriesSettings from './StructuresCategoriesSettings';
+import { useDataLoader } from "../../components/DataLoader";
+import ActionCategoriesSettings from "./ActionCategoriesSettings";
+import ServicesSettings from "./ServicesSettings";
+import ObservationsSettings from "./ObservationsSettings";
+import ConsultationsSettings from "./ConsultationsSettings";
+import MedicalFileSettings from "./MedicalFileSettings";
+import PersonCustomFieldsSettings from "./PersonCustomFieldsSettings";
+import StructuresCategoriesSettings from "./StructuresCategoriesSettings";
 
 const getSettingTitle = (tabId) => {
-  if (tabId === 'infos') return 'Infos';
-  if (tabId === 'encryption') return 'Chiffrement';
-  if (tabId === 'reception') return 'Accueil';
-  if (tabId === 'persons') return 'Personnes';
-  if (tabId === 'consultations') return 'Consultations 🧑‍⚕️ ';
-  if (tabId === 'medicalFile') return 'Dossier Médical 🧑‍⚕️';
-  if (tabId === 'actions') return 'Actions';
-  if (tabId === 'structures') return 'Structures';
-  if (tabId === 'territories') return 'Territoires';
-  if (tabId === 'export') return 'Export';
-  if (tabId === 'import') return 'Import';
-  if (tabId === 'rencontres-passages') return 'Passages/rencontres';
-  return '';
+  if (tabId === "infos") return "Infos";
+  if (tabId === "encryption") return "Chiffrement";
+  if (tabId === "reception") return "Accueil";
+  if (tabId === "persons") return "Personnes";
+  if (tabId === "consultations") return "Consultations 🧑‍⚕️ ";
+  if (tabId === "medicalFile") return "Dossier Médical 🧑‍⚕️";
+  if (tabId === "actions") return "Actions";
+  if (tabId === "structures") return "Structures";
+  if (tabId === "territories") return "Territoires";
+  if (tabId === "export") return "Export";
+  if (tabId === "import") return "Import";
+  if (tabId === "rencontres-passages") return "Passages/rencontres";
+  return "";
 };
 
 function TabTitle({ children }) {
@@ -63,7 +63,7 @@ const View = () => {
   const [refreshErrorKey, setRefreshErrorKey] = useState(0);
   const { refresh } = useDataLoader();
 
-  const [tab, setTab] = useState(!organisation.encryptionEnabled ? 'encryption' : 'infos');
+  const [tab, setTab] = useState(!organisation.encryptionEnabled ? "encryption" : "infos");
   const scrollContainer = useRef(null);
   useTitle(`Organisation - ${getSettingTitle(tab)}`);
 
@@ -79,7 +79,7 @@ const View = () => {
       const updatedPersons = replaceOldChoiceByNewChoice(persons, oldChoice, newChoice, field);
 
       const response = await API.post({
-        path: '/custom-field',
+        path: "/custom-field",
         body: {
           customFields: {
             [customFieldsRow]: fields,
@@ -88,7 +88,7 @@ const View = () => {
         },
       });
       if (response.ok) {
-        toast.success('Choix mis à jour !');
+        toast.success("Choix mis à jour !");
         setOrganisation(response.data);
       } else {
         setRefreshErrorKey((k) => k + 1); // to reset the table to its original values
@@ -103,85 +103,99 @@ const View = () => {
       </h2>
       <div className="tw-flex tw-flex-1 tw-overflow-hidden">
         <nav
-          className="tw-flex tw-h-full tw-w-52 tw-shrink-0 tw-flex-col tw-items-start tw-bg-main  tw-bg-opacity-10 tw-pt-5 tw-pl-2.5"
-          title="Navigation dans la configuration de l'organisation">
+          className="tw-flex tw-h-full tw-w-52 tw-shrink-0 tw-flex-col tw-items-start tw-bg-main  tw-bg-opacity-10 tw-pl-2.5 tw-pt-5"
+          title="Navigation dans la configuration de l'organisation"
+        >
           <button
-            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'infos' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
-            onClick={() => setTab('infos')}>
+            className={["tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold", tab === "infos" ? "tw-text-main" : "tw-text-zinc-600"].join(" ")}
+            onClick={() => setTab("infos")}
+          >
             Infos
           </button>
           <button
-            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'encryption' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
-            onClick={() => setTab('encryption')}>
+            className={["tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold", tab === "encryption" ? "tw-text-main" : "tw-text-zinc-600"].join(" ")}
+            onClick={() => setTab("encryption")}
+          >
             Chiffrement
           </button>
           <hr />
           <button
-            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'reception' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
-            onClick={() => setTab('reception')}>
+            className={["tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold", tab === "reception" ? "tw-text-main" : "tw-text-zinc-600"].join(" ")}
+            onClick={() => setTab("reception")}
+          >
             Accueil de jour
           </button>
           <button
-            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'persons' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
-            onClick={() => setTab('persons')}
-            disabled={!organisation.encryptionEnabled}>
+            className={["tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold", tab === "persons" ? "tw-text-main" : "tw-text-zinc-600"].join(" ")}
+            onClick={() => setTab("persons")}
+            disabled={!organisation.encryptionEnabled}
+          >
             Personnes suivies
           </button>
           <button
-            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'medicalFile' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
-            onClick={() => setTab('medicalFile')}>
+            className={["tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold", tab === "medicalFile" ? "tw-text-main" : "tw-text-zinc-600"].join(" ")}
+            onClick={() => setTab("medicalFile")}
+          >
             Dossier Médical 🧑‍⚕️
           </button>
           <button
-            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'consultations' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
-            onClick={() => setTab('consultations')}>
+            className={["tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold", tab === "consultations" ? "tw-text-main" : "tw-text-zinc-600"].join(" ")}
+            onClick={() => setTab("consultations")}
+          >
             Consultations 🧑‍⚕️
           </button>
 
           <button
-            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'actions' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
-            onClick={() => setTab('actions')}>
+            className={["tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold", tab === "actions" ? "tw-text-main" : "tw-text-zinc-600"].join(" ")}
+            onClick={() => setTab("actions")}
+          >
             Actions
           </button>
           <button
-            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'structures' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
-            onClick={() => setTab('structures')}>
+            className={["tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold", tab === "structures" ? "tw-text-main" : "tw-text-zinc-600"].join(" ")}
+            onClick={() => setTab("structures")}
+          >
             Structures
           </button>
           <button
-            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'territories' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
-            onClick={() => setTab('territories')}
-            disabled={!organisation.encryptionEnabled}>
+            className={["tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold", tab === "territories" ? "tw-text-main" : "tw-text-zinc-600"].join(" ")}
+            onClick={() => setTab("territories")}
+            disabled={!organisation.encryptionEnabled}
+          >
             Territoires
           </button>
           <button
-            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'rencontres-passages' ? 'tw-text-main' : 'tw-text-zinc-600'].join(
-              ' '
+            className={["tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold", tab === "rencontres-passages" ? "tw-text-main" : "tw-text-zinc-600"].join(
+              " "
             )}
-            onClick={() => setTab('rencontres-passages')}
-            disabled={!organisation.encryptionEnabled}>
+            onClick={() => setTab("rencontres-passages")}
+            disabled={!organisation.encryptionEnabled}
+          >
             Passages/rencontres
           </button>
           <hr />
           <button
-            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'import' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
-            onClick={() => setTab('import')}>
+            className={["tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold", tab === "import" ? "tw-text-main" : "tw-text-zinc-600"].join(" ")}
+            onClick={() => setTab("import")}
+          >
             Import de personnes suivies
           </button>
           <button
-            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'import-configuration' ? 'tw-text-main' : 'tw-text-zinc-600'].join(
-              ' '
+            className={["tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold", tab === "import-configuration" ? "tw-text-main" : "tw-text-zinc-600"].join(
+              " "
             )}
-            onClick={() => setTab('import-configuration')}>
+            onClick={() => setTab("import-configuration")}
+          >
             Import de configuration
           </button>
           <button
-            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'export' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
-            onClick={() => setTab('export')}>
+            className={["tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold", tab === "export" ? "tw-text-main" : "tw-text-zinc-600"].join(" ")}
+            onClick={() => setTab("export")}
+          >
             Export des données
           </button>
         </nav>
-        <div ref={scrollContainer} className="tw-basis-full tw-overflow-auto tw-py-4 tw-px-6">
+        <div ref={scrollContainer} className="tw-basis-full tw-overflow-auto tw-px-6 tw-py-4">
           <Formik
             initialValues={{
               ...organisation,
@@ -195,18 +209,19 @@ const View = () => {
               try {
                 const response = await API.put({ path: `/organisation/${organisation._id}`, body });
                 if (response.ok) {
-                  toast.success('Mise à jour !');
+                  toast.success("Mise à jour !");
                   setOrganisation(response.data);
                 }
               } catch (orgUpdateError) {
-                console.log('error in updating organisation', orgUpdateError);
+                console.log("error in updating organisation", orgUpdateError);
                 toast.error(orgUpdateError.message);
               }
-            }}>
+            }}
+          >
             {({ values, handleChange, handleSubmit, isSubmitting }) => {
               switch (tab) {
                 default:
-                case 'infos':
+                case "infos":
                   return (
                     <>
                       <TabTitle>Informations générales</TabTitle>
@@ -226,14 +241,15 @@ const View = () => {
                             try {
                               const res = await API.delete({ path: `/organisation/${organisation._id}` });
                               if (res.ok) {
-                                toast.success('Organisation supprimée');
+                                toast.success("Organisation supprimée");
                                 API.logout();
                               }
                             } catch (organisationDeleteError) {
                               capture(organisationDeleteError, { extra: { organisation }, user });
                               toast.error(organisationDeleteError.message);
                             }
-                          }}>
+                          }}
+                        >
                           <span className="tw-mb-7 tw-block tw-w-full tw-text-center">
                             Cette opération est irréversible
                             <br />
@@ -246,7 +262,7 @@ const View = () => {
                       </div>
                     </>
                   );
-                case 'encryption':
+                case "encryption":
                   return (
                     <>
                       <TabTitle>Chiffrement</TabTitle>
@@ -255,15 +271,15 @@ const View = () => {
                       </div>
                     </>
                   );
-                case 'consultations':
+                case "consultations":
                   return <ConsultationsSettings />;
-                case 'medicalFile':
+                case "medicalFile":
                   return <MedicalFileSettings />;
-                case 'actions':
+                case "actions":
                   return <ActionCategoriesSettings />;
-                case 'structures':
+                case "structures":
                   return <StructuresCategoriesSettings />;
-                case 'reception':
+                case "reception":
                   return (
                     <>
                       <TabTitle>Accueil de jour</TabTitle>
@@ -287,7 +303,7 @@ const View = () => {
                         </FormGroup>
                         <div className="tw-mb-10 tw-flex tw-justify-end tw-gap-4">
                           <ButtonCustom
-                            title={'Mettre à jour'}
+                            title={"Mettre à jour"}
                             disabled={values.receptionEnabled === organisation.receptionEnabled}
                             loading={isSubmitting}
                             onClick={handleSubmit}
@@ -298,7 +314,7 @@ const View = () => {
                       </div>
                     </>
                   );
-                case 'territories':
+                case "territories":
                   return (
                     <>
                       <TabTitle>Territoires</TabTitle>
@@ -321,7 +337,7 @@ const View = () => {
                       </FormGroup>
                       <div className="tw-mb-10 tw-flex tw-justify-end tw-gap-4">
                         <ButtonCustom
-                          title={'Mettre à jour'}
+                          title={"Mettre à jour"}
                           disabled={values.territoriesEnabled === organisation.territoriesEnabled}
                           loading={isSubmitting}
                           onClick={handleSubmit}
@@ -331,7 +347,7 @@ const View = () => {
                       <ObservationsSettings />
                     </>
                   );
-                case 'rencontres-passages':
+                case "rencontres-passages":
                   return (
                     <>
                       <TabTitle>Passages / rencontres</TabTitle>
@@ -369,7 +385,7 @@ const View = () => {
                       </FormGroup>
                       <div className="tw-mb-10 tw-flex tw-justify-end tw-gap-4">
                         <ButtonCustom
-                          title={'Mettre à jour'}
+                          title={"Mettre à jour"}
                           disabled={
                             values.rencontresEnabled === organisation.rencontresEnabled && values.passagesEnabled === organisation.passagesEnabled
                           }
@@ -380,7 +396,7 @@ const View = () => {
                       <hr />
                     </>
                   );
-                case 'persons':
+                case "persons":
                   return (
                     <>
                       <TabTitle>Personnes suivies</TabTitle>
@@ -405,7 +421,7 @@ const View = () => {
                           </FormGroup>
                           <div className="tw-mb-10 tw-flex tw-justify-end tw-gap-4">
                             <ButtonCustom
-                              title={'Mettre à jour'}
+                              title={"Mettre à jour"}
                               disabled={values.groupsEnabled === organisation.groupsEnabled}
                               loading={isSubmitting}
                               onClick={handleSubmit}
@@ -415,11 +431,11 @@ const View = () => {
                           <h4 className="tw-my-8">Champs permanents - options modulables</h4>
                           <TableCustomFields
                             customFields="fieldsPersonsCustomizableOptions"
-                            key={refreshErrorKey + 'fieldsPersonsCustomizableOptions'}
+                            key={refreshErrorKey + "fieldsPersonsCustomizableOptions"}
                             data={persons}
                             fields={fieldsPersonsCustomizableOptions}
                             onlyOptionsEditable
-                            onEditChoice={onEditPersonsCustomInputChoice('fieldsPersonsCustomizableOptions')}
+                            onEditChoice={onEditPersonsCustomInputChoice("fieldsPersonsCustomizableOptions")}
                           />
                           <hr />
                           <PersonCustomFieldsSettings />
@@ -441,7 +457,7 @@ const View = () => {
                       )}
                     </>
                   );
-                case 'export':
+                case "export":
                   return (
                     <>
                       <TabTitle>Exporter des données</TabTitle>
@@ -455,7 +471,7 @@ const View = () => {
                       </div>
                     </>
                   );
-                case 'import-configuration':
+                case "import-configuration":
                   return (
                     <>
                       <TabTitle>Importer une configuration</TabTitle>
@@ -464,7 +480,7 @@ const View = () => {
                       </div>
                     </>
                   );
-                case 'import':
+                case "import":
                   return (
                     <>
                       <TabTitle>Importer des personnes suivies</TabTitle>
@@ -482,7 +498,7 @@ const View = () => {
                             <li>
                               les colonnes qui seront importées peuvent être parmi la liste suivante - toute colonne qui ne s'appelle pas ainsi ne
                               sera pas prise en compte - certaines colonnes ont des valeurs imposées :
-                              <table className="table-sm table" style={{ fontSize: '14px', marginTop: '2rem' }}>
+                              <table className="table-sm table" style={{ fontSize: "14px", marginTop: "2rem" }}>
                                 <thead>
                                   <tr>
                                     <th>Colonne</th>
@@ -529,28 +545,28 @@ const ImportFieldDetails = ({ field }) => {
       <span key={option}>
         <code>
           {option}
-          {index !== field.options.length - 1 && ', '}
+          {index !== field.options.length - 1 && ", "}
         </code>
       </span>
     ));
   }
-  if (['date', 'date-with-time', 'duration'].includes(field.type)) {
+  if (["date", "date-with-time", "duration"].includes(field.type)) {
     return (
-      <i style={{ color: '#666' }}>
+      <i style={{ color: "#666" }}>
         Une date sous la forme AAAA-MM-JJ (exemple: <code>2021-01-01</code>)
       </i>
     );
   }
-  if (['boolean', 'yes-no'].includes(field.type)) {
+  if (["boolean", "yes-no"].includes(field.type)) {
     return <code>Oui, Non</code>;
   }
-  return <i style={{ color: '#666' }}>Un texte</i>;
+  return <i style={{ color: "#666" }}>Un texte</i>;
 };
 
 const replaceOldChoiceByNewChoice = (data, oldChoice, newChoice, field) => {
   return data
     .map((item) => {
-      if (typeof item[field.name] === 'string') {
+      if (typeof item[field.name] === "string") {
         if (item[field.name] !== oldChoice) return null;
         return {
           ...item,

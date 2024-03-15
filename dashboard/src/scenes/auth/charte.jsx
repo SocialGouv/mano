@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { useRecoilState } from 'recoil';
-import ButtonCustom from '../../components/ButtonCustom';
-import { userState } from '../../recoil/auth';
-import API from '../../services/api';
-import OpenNewWindowIcon from '../../components/OpenNewWindowIcon';
+import React, { useState } from "react";
+import { useRecoilState } from "recoil";
+import ButtonCustom from "../../components/ButtonCustom";
+import { userState } from "../../recoil/auth";
+import API from "../../services/api";
+import OpenNewWindowIcon from "../../components/OpenNewWindowIcon";
 
 const Charte = () => {
   const [loading, setLoading] = useState(false);
@@ -12,7 +12,7 @@ const Charte = () => {
   const onSigninValidated = async () => {
     setLoading(true);
     const termsAccepted = Date.now();
-    const response = await API.put({ path: '/user', body: { termsAccepted } });
+    const response = await API.put({ path: "/user", body: { termsAccepted } });
     if (!response.ok) return;
     setUser({ ...user, termsAccepted });
   };
@@ -20,12 +20,13 @@ const Charte = () => {
   return (
     <div
       className="tw-flex tw-w-full tw-flex-col tw-items-center tw-overflow-y-auto tw-overflow-x-hidden tw-rounded-lg tw-bg-white tw-py-20 tw-text-black"
-      id="cgus">
-      <h1 className="tw-mt-20 tw-mb-4 tw-text-center tw-text-3xl tw-font-semibold tw-text-main">Charte d'Utilisation de Mano</h1>
+      id="cgus"
+    >
+      <h1 className="tw-mb-4 tw-mt-20 tw-text-center tw-text-3xl tw-font-semibold tw-text-main">Charte d'Utilisation de Mano</h1>
       <small className="tw-block tw-text-center tw-font-medium tw-italic">
         Veuillez lire et accepter la Charte d'Utilisation de Mano avant de continuer
       </small>
-      <main className="[&_b]:tw-font-weight-normal tw-w-full tw-max-w-prose tw-px-5 [&_ol_>_li]:tw-mb-8 [&_ol_>_li]:tw-mt-20 [&_ol_>_li]:tw-font-bold [&_ul>li]:tw-mb-4 [&_span]:tw-mb-8 [&_span]:tw-block [&_b]:tw-mt-20 [&_b]:tw-block">
+      <main className="[&_b]:tw-font-weight-normal tw-w-full tw-max-w-prose tw-px-5 [&_b]:tw-mt-20 [&_b]:tw-block [&_ol_>_li]:tw-mb-8 [&_ol_>_li]:tw-mt-20 [&_ol_>_li]:tw-font-bold [&_span]:tw-mb-8 [&_span]:tw-block [&_ul>li]:tw-mb-4">
         <ol>
           <li>Présentation du dispositif et propriété des données</li>
           <p>
@@ -149,7 +150,7 @@ const Charte = () => {
         title="Accepter et continuer"
         onClick={onSigninValidated}
       />
-      <a className="tw-mt-3 tw-mb-20 tw-block tw-text-xs" href="/charte.pdf" target="_blank" rel="noreferrer">
+      <a className="tw-mb-20 tw-mt-3 tw-block tw-text-xs" href="/charte.pdf" target="_blank" rel="noreferrer">
         Télécharger le .pdf <OpenNewWindowIcon />
       </a>
     </div>

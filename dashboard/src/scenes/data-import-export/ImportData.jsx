@@ -1,15 +1,15 @@
-import React, { useMemo, useRef, useState } from 'react';
-import { read } from '@e965/xlsx';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { toast } from 'react-toastify';
-import { Modal, ModalBody, ModalHeader, Alert } from 'reactstrap';
-import ButtonCustom from '../../components/ButtonCustom';
-import { personFieldsIncludingCustomFieldsSelector, personsState, usePreparePersonForEncryption } from '../../recoil/persons';
-import { teamsState, userState } from '../../recoil/auth';
-import { isNullOrUndefined } from '../../utils';
-import API, { encryptItem } from '../../services/api';
-import { formatDateWithFullMonth, now } from '../../services/date';
-import { sanitizeFieldValueFromExcel } from './importSanitizer';
+import React, { useMemo, useRef, useState } from "react";
+import { read } from "@e965/xlsx";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { toast } from "react-toastify";
+import { Modal, ModalBody, ModalHeader, Alert } from "reactstrap";
+import ButtonCustom from "../../components/ButtonCustom";
+import { personFieldsIncludingCustomFieldsSelector, personsState, usePreparePersonForEncryption } from "../../recoil/persons";
+import { teamsState, userState } from "../../recoil/auth";
+import { isNullOrUndefined } from "../../utils";
+import API, { encryptItem } from "../../services/api";
+import { formatDateWithFullMonth, now } from "../../services/date";
+import { sanitizeFieldValueFromExcel } from "./importSanitizer";
 
 const ImportData = () => {
   const user = useRecoilValue(userState);
@@ -32,7 +32,7 @@ const ImportData = () => {
         .filter((field) => field.importable)
         .map((field) => ({
           ...field,
-          options: field.name === 'assignedTeams' ? teams.map((team) => team.name) : field.options,
+          options: field.name === "assignedTeams" ? teams.map((team) => team.name) : field.options,
         })),
     [personFieldsIncludingCustomFields, teams]
   );
@@ -46,9 +46,9 @@ const ImportData = () => {
       const data = await file.arrayBuffer();
       // See: https://stackoverflow.com/a/57802737/978690
       // I only took one part of the code, because we use "w" only.
-      const workbook = read(data, { dateNF: 'yyyy-mm-dd' });
+      const workbook = read(data, { dateNF: "yyyy-mm-dd" });
       const { SheetNames, Sheets } = workbook;
-      const personsSheetName = SheetNames.find((name) => name.toLocaleLowerCase().includes('person'));
+      const personsSheetName = SheetNames.find((name) => name.toLocaleLowerCase().includes("person"));
       const personsSheet = Sheets[personsSheetName];
       /*
       something like that:
@@ -64,7 +64,7 @@ const ImportData = () => {
 
       */
       const sheetCells = Object.keys(personsSheet);
-      const headerCells = sheetCells.filter((cell) => cell.replace(/\D+/g, '') === '1'); // ['A1', 'B1'...]
+      const headerCells = sheetCells.filter((cell) => cell.replace(/\D+/g, "") === "1"); // ['A1', 'B1'...]
 
       const fieldsToIgnore = headerCells
         .filter((headerKey) => !importableLabels.includes(personsSheet[headerKey].v))
@@ -73,16 +73,16 @@ const ImportData = () => {
 
       const headersCellsToImport = headerCells.filter((headerKey) => importableLabels.includes(personsSheet[headerKey].v?.trim()));
       const headerColumnsAndField = headersCellsToImport.map((cell) => {
-        const column = cell.replace('1', ''); // ['A', 'B'...]
+        const column = cell.replace("1", ""); // ['A', 'B'...]
         const field = importableFields.find((f) => f.label === personsSheet[cell].v?.trim()); // { name: type: label: importable: options: }
         return [column, field];
       });
       setImportedFields(headersCellsToImport.map((headerKey) => personsSheet[headerKey].v?.trim()));
-      const lastRow = parseInt(personsSheet['!ref'].split(':')[1].replace(/\D+/g, ''), 10);
+      const lastRow = parseInt(personsSheet["!ref"].split(":")[1].replace(/\D+/g, ""), 10);
 
-      const nameField = importableFields.find((f) => f.name === 'name');
+      const nameField = importableFields.find((f) => f.name === "name");
 
-      if (!headerColumnsAndField.find((e) => e[1]?.name === 'name')) {
+      if (!headerColumnsAndField.find((e) => e[1]?.name === "name")) {
         toast.error(
           `La colonne "${nameField.label}" est requise. Vérifiez votre fichier pour vous assurer que cette colonne existe et est correctement nommée. Vous pouvez vérifier avec le fichier d'exemple que les colonnes sont bien identiques.`,
           { autoClose: 5000 }
@@ -99,13 +99,13 @@ const ImportData = () => {
           const value = sanitizeFieldValueFromExcel(field, personsSheet[`${column}${i}`]);
           if (!isNullOrUndefined(value)) {
             person[field.name] = value;
-            if (field.name === 'assignedTeams' && value.length > 0) {
+            if (field.name === "assignedTeams" && value.length > 0) {
               person[field.name] = value.map((teamName) => teams.find((team) => team.name === teamName)?._id).filter((a) => a);
             }
           }
         }
         if (Object.keys(person).length) {
-          person.description = `Données importées le ${formatDateWithFullMonth(now())}\n${person.description || ''}`;
+          person.description = `Données importées le ${formatDateWithFullMonth(now())}\n${person.description || ""}`;
           if (!person.name) {
             toast.error(`La colonne "${nameField.label}" ne doit pas être vide, vérifiez la ligne ${i} du fichier.`);
             setReloadKey((k) => k + 1);
@@ -127,14 +127,14 @@ const ImportData = () => {
 
   const onImportData = async () => {
     if (window.confirm(`Voulez-vous vraiment importer ${dataToImport.length} personnes dans Mano ? Cette opération est irréversible.`)) {
-      const response = await API.post({ path: '/person/import', body: dataToImport });
-      if (response.ok) toast.success('Importation réussie !');
-      setAllPersons((oldPersons) => [...oldPersons, ...response.decryptedData].sort((p1, p2) => (p1.name || '').localeCompare(p2.name || '')));
+      const response = await API.post({ path: "/person/import", body: dataToImport });
+      if (response.ok) toast.success("Importation réussie !");
+      setAllPersons((oldPersons) => [...oldPersons, ...response.decryptedData].sort((p1, p2) => (p1.name || "").localeCompare(p2.name || "")));
       setShowImpotSummary(false);
     }
   };
 
-  if (!['admin'].includes(user.role)) return null;
+  if (!["admin"].includes(user.role)) return null;
 
   return (
     <>
@@ -145,7 +145,7 @@ const ImportData = () => {
         type="file"
         id="fileDialog"
         accept="csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        style={{ display: 'none' }}
+        style={{ display: "none" }}
         onChange={onParseData}
       />
       <Modal isOpen={showImportSummary} toggle={() => setShowImpotSummary(false)} size="lg" backdrop="static">
@@ -185,7 +185,7 @@ const ImportData = () => {
             <ul>
               {importedFields.map((label) => (
                 <li key={label}>
-                  <code style={{ color: 'black' }}>{label}</code>
+                  <code style={{ color: "black" }}>{label}</code>
                 </li>
               ))}
             </ul>

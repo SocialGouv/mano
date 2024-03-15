@@ -1,19 +1,19 @@
-import { useEffect, useRef, useState } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useEffect, useRef, useState } from "react";
+import { useHistory, useLocation } from "react-router-dom";
 
 const setDataAsSearchParam = (data) => {
-  if (typeof data === 'string') return data;
-  if (typeof data === 'number') return data;
-  if (typeof data === 'boolean') return data;
+  if (typeof data === "string") return data;
+  if (typeof data === "number") return data;
+  if (typeof data === "boolean") return data;
   return JSON.stringify(data);
 };
 
 const getDataAsSearchParam = (data, defaultValue) => {
   if (!data) return null;
   // handle objects
-  if (typeof defaultValue === 'string') return data;
-  if (typeof defaultValue === 'number') return Number(data);
-  if (typeof defaultValue === 'boolean') return Boolean(data);
+  if (typeof defaultValue === "string") return data;
+  if (typeof defaultValue === "number") return Number(data);
+  if (typeof defaultValue === "boolean") return Boolean(data);
   try {
     return JSON.parse(data);
   } catch (e) {

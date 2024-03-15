@@ -1,17 +1,17 @@
-import { organisationState } from './auth';
-import { atom, selector } from 'recoil';
-import { getCacheItemDefaultValue, setCacheItem } from '../services/dataManagement';
-import { looseUuidRegex } from '../utils';
-import { toast } from 'react-toastify';
-import { capture } from '../services/sentry';
+import { organisationState } from "./auth";
+import { atom, selector } from "recoil";
+import { getCacheItemDefaultValue, setCacheItem } from "../services/dataManagement";
+import { looseUuidRegex } from "../utils";
+import { toast } from "react-toastify";
+import { capture } from "../services/sentry";
 
-const collectionName = 'territory-observation';
+const collectionName = "territory-observation";
 export const territoryObservationsState = atom({
   key: collectionName,
   default: selector({
-    key: 'territory-observation/default',
+    key: "territory-observation/default",
     get: async () => {
-      const cache = await getCacheItemDefaultValue('territory-observation', []);
+      const cache = await getCacheItemDefaultValue("territory-observation", []);
       return cache;
     },
   }),
@@ -19,7 +19,7 @@ export const territoryObservationsState = atom({
 });
 
 export const customFieldsObsSelector = selector({
-  key: 'customFieldsObsSelector',
+  key: "customFieldsObsSelector",
   get: ({ get }) => {
     const organisation = get(organisationState);
     if (Array.isArray(organisation.customFieldsObs)) return organisation.customFieldsObs;
@@ -29,65 +29,65 @@ export const customFieldsObsSelector = selector({
 
 export const defaultCustomFields = [
   {
-    name: 'personsMale',
-    label: 'Nombre de personnes non connues hommes rencontrées',
-    type: 'number',
+    name: "personsMale",
+    label: "Nombre de personnes non connues hommes rencontrées",
+    type: "number",
     enabled: true,
     required: true,
     showInStats: true,
   },
   {
-    name: 'personsFemale',
-    label: 'Nombre de personnes non connues femmes rencontrées',
-    type: 'number',
+    name: "personsFemale",
+    label: "Nombre de personnes non connues femmes rencontrées",
+    type: "number",
     enabled: true,
     required: true,
     showInStats: true,
   },
   {
-    name: 'police',
-    label: 'Présence policière',
-    type: 'yes-no',
+    name: "police",
+    label: "Présence policière",
+    type: "yes-no",
     enabled: true,
     required: true,
     showInStats: true,
   },
   {
-    name: 'material',
-    label: 'Nombre de matériel ramassé',
-    type: 'number',
+    name: "material",
+    label: "Nombre de matériel ramassé",
+    type: "number",
     enabled: true,
     required: true,
     showInStats: true,
   },
   {
-    name: 'atmosphere',
-    label: 'Ambiance',
-    options: ['Violences', 'Tensions', 'RAS'],
-    type: 'enum',
+    name: "atmosphere",
+    label: "Ambiance",
+    options: ["Violences", "Tensions", "RAS"],
+    type: "enum",
     enabled: true,
     required: true,
     showInStats: true,
   },
   {
-    name: 'mediation',
-    label: 'Nombre de médiations avec les riverains / les structures',
-    type: 'number',
+    name: "mediation",
+    label: "Nombre de médiations avec les riverains / les structures",
+    type: "number",
     enabled: true,
     required: true,
     showInStats: true,
   },
   {
-    name: 'comment',
-    label: 'Commentaire',
-    type: 'textarea',
+    name: "comment",
+    label: "Commentaire",
+    type: "textarea",
     enabled: true,
     required: true,
     showInStats: true,
   },
 ];
 
-const compulsoryEncryptedFields = ['territory', 'user', 'team', 'observedAt'];
+const compulsoryEncryptedFields = ["territory", "user", "team", "observedAt"];
 
 export const prepareObsForEncryption =
   (customFields) =>
@@ -95,16 +95,16 @@ export const prepareObsForEncryption =
     if (!!checkRequiredFields) {
       try {
         if (!looseUuidRegex.test(obs.territory)) {
-          throw new Error('Observation is missing territory');
+          throw new Error("Observation is missing territory");
         }
         if (!looseUuidRegex.test(obs.user)) {
-          throw new Error('Observation is missing user');
+          throw new Error("Observation is missing user");
         }
         if (!looseUuidRegex.test(obs.team)) {
-          throw new Error('Observation is missing team');
+          throw new Error("Observation is missing team");
         }
         if (!obs.observedAt) {
-          throw new Error('Observation is missing observedAt');
+          throw new Error("Observation is missing observedAt");
         }
       } catch (error) {
         toast.error(

@@ -1,4 +1,4 @@
-import { UUIDV4 } from './uuid';
+import { UUIDV4 } from "./uuid";
 
 export type Relation = {
   persons: UUIDV4[];
@@ -8,7 +8,7 @@ export type Relation = {
   user: UUIDV4;
 };
 
-export type EncryptedGroupKeys = 'persons' | 'relations';
+export type EncryptedGroupKeys = "persons" | "relations";
 
 export interface EncryptedGroupFields {
   persons: UUIDV4[];

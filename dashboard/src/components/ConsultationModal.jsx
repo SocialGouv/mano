@@ -1,50 +1,50 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
-import DatePicker from './DatePicker';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { v4 as uuidv4 } from 'uuid';
-import { toast } from 'react-toastify';
-import { useLocation, useHistory } from 'react-router-dom';
-import { CANCEL, DONE, TODO } from '../recoil/actions';
-import { currentTeamState, organisationState, teamsState, userState } from '../recoil/auth';
+import { useState, useMemo, useEffect, useRef } from "react";
+import DatePicker from "./DatePicker";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { v4 as uuidv4 } from "uuid";
+import { toast } from "react-toastify";
+import { useLocation, useHistory } from "react-router-dom";
+import { CANCEL, DONE, TODO } from "../recoil/actions";
+import { currentTeamState, organisationState, teamsState, userState } from "../recoil/auth";
 import {
   consultationsFieldsIncludingCustomFieldsSelector,
   consultationsState,
   defaultConsultationFields,
   prepareConsultationForEncryption,
-} from '../recoil/consultations';
-import API from '../services/api';
-import { dayjsInstance } from '../services/date';
-import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
-import CustomFieldInput from './CustomFieldInput';
-import { modalConfirmState } from './ModalConfirm';
-import SelectAsInput from './SelectAsInput';
-import SelectStatus from './SelectStatus';
-import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from './tailwind/Modal';
-import SelectPerson from './SelectPerson';
-import { CommentsModule } from './CommentsGeneric';
-import SelectTeamMultiple from './SelectTeamMultiple';
-import UserName from './UserName';
-import PersonName from './PersonName';
-import TagTeam from './TagTeam';
-import CustomFieldDisplay from './CustomFieldDisplay';
-import { itemsGroupedByConsultationSelector } from '../recoil/selectors';
-import { DocumentsModule } from './DocumentsGeneric';
-import TabsNav from './tailwind/TabsNav';
-import { useDataLoader } from './DataLoader';
+} from "../recoil/consultations";
+import API from "../services/api";
+import { dayjsInstance } from "../services/date";
+import useCreateReportAtDateIfNotExist from "../services/useCreateReportAtDateIfNotExist";
+import CustomFieldInput from "./CustomFieldInput";
+import { modalConfirmState } from "./ModalConfirm";
+import SelectAsInput from "./SelectAsInput";
+import SelectStatus from "./SelectStatus";
+import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from "./tailwind/Modal";
+import SelectPerson from "./SelectPerson";
+import { CommentsModule } from "./CommentsGeneric";
+import SelectTeamMultiple from "./SelectTeamMultiple";
+import UserName from "./UserName";
+import PersonName from "./PersonName";
+import TagTeam from "./TagTeam";
+import CustomFieldDisplay from "./CustomFieldDisplay";
+import { itemsGroupedByConsultationSelector } from "../recoil/selectors";
+import { DocumentsModule } from "./DocumentsGeneric";
+import TabsNav from "./tailwind/TabsNav";
+import { useDataLoader } from "./DataLoader";
 
 export default function ConsultationModal() {
   const consultationsObjects = useRecoilValue(itemsGroupedByConsultationSelector);
   const history = useHistory();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const currentConsultationId = searchParams.get('consultationId');
-  const newConsultation = searchParams.get('newConsultation');
+  const currentConsultationId = searchParams.get("consultationId");
+  const newConsultation = searchParams.get("newConsultation");
   const currentConsultation = useMemo(() => {
     if (!currentConsultationId) return null;
     return consultationsObjects[currentConsultationId];
   }, [currentConsultationId, consultationsObjects]);
-  const personId = searchParams.get('personId');
-  const date = searchParams.get('dueAt') || searchParams.get('completedAt');
+  const personId = searchParams.get("personId");
+  const date = searchParams.get("dueAt") || searchParams.get("completedAt");
 
   const [open, setOpen] = useState(false);
   const consultationIdRef = useRef(currentConsultationId);
@@ -86,8 +86,8 @@ const newConsultationInitialState = (organisationId, personId, userId, date, tea
   _id: null,
   dueAt: date ? new Date(date) : new Date(),
   completedAt: new Date(),
-  name: '',
-  type: '',
+  name: "",
+  type: "",
   status: TODO,
   teams: teams.length === 1 ? [teams[0]._id] : [],
   user: userId,
@@ -136,24 +136,24 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
     setData(initialState);
   }, [initialState]);
 
-  const [activeTab, setActiveTab] = useState('Informations');
+  const [activeTab, setActiveTab] = useState("Informations");
 
   async function handleSubmit({ newData = {}, closeOnSubmit = false } = {}) {
     const body = { ...data, ...newData };
     if (!body.type) {
-      toast.error('Veuillez choisir un type de consultation');
+      toast.error("Veuillez choisir un type de consultation");
       return false;
     }
     if (!body.dueAt) {
-      toast.error('Vous devez préciser une date prévue');
+      toast.error("Vous devez préciser une date prévue");
       return false;
     }
     if (!body.person) {
-      toast.error('Veuillez sélectionner une personne suivie');
+      toast.error("Veuillez sélectionner une personne suivie");
       return false;
     }
     if (!body.teams.length) {
-      toast.error('Veuillez sélectionner au moins une équipe');
+      toast.error("Veuillez sélectionner au moins une équipe");
       return false;
     }
     if ([DONE, CANCEL].includes(body.status)) {
@@ -177,7 +177,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
 
     const consultationResponse = isNewConsultation
       ? await API.post({
-          path: '/consultation',
+          path: "/consultation",
           body: prepareConsultationForEncryption(organisation.consultations)(body),
         })
       : await API.put({
@@ -202,7 +202,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
     const { createdAt, completedAt } = consultationResponse.decryptedData;
     await createReportAtDateIfNotExist(createdAt);
     if (!!completedAt) {
-      if (dayjsInstance(completedAt).format('YYYY-MM-DD') !== dayjsInstance(createdAt).format('YYYY-MM-DD')) {
+      if (dayjsInstance(completedAt).format("YYYY-MM-DD") !== dayjsInstance(createdAt).format("YYYY-MM-DD")) {
         await createReportAtDateIfNotExist(completedAt);
       }
     }
@@ -233,9 +233,9 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
       <ModalHeader
         title={
           <>
-            {isNewConsultation && 'Ajouter une consultation'}
-            {!isNewConsultation && !isEditing && 'Consultation'}
-            {!isNewConsultation && isEditing && 'Modifier la consultation'}
+            {isNewConsultation && "Ajouter une consultation"}
+            {!isNewConsultation && !isEditing && "Consultation"}
+            {!isNewConsultation && isEditing && "Modifier la consultation"}
             {!isNewConsultation && consultation?.user && (
               <UserName
                 className="tw-block tw-text-right tw-text-base tw-font-normal tw-italic"
@@ -250,16 +250,16 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
           setModalConfirmState({
             open: true,
             options: {
-              title: 'Quitter la consultation sans enregistrer ?',
-              subTitle: 'Toutes les modifications seront perdues.',
+              title: "Quitter la consultation sans enregistrer ?",
+              subTitle: "Toutes les modifications seront perdues.",
               buttons: [
                 {
-                  text: 'Annuler',
-                  className: 'button-cancel',
+                  text: "Annuler",
+                  className: "button-cancel",
                 },
                 {
-                  text: 'Oui',
-                  className: 'button-destructive',
+                  text: "Oui",
+                  className: "button-destructive",
                   onClick: () => onClose(),
                 },
               ],
@@ -272,29 +272,30 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
           <TabsNav
             className="tw-px-3 tw-py-2"
             tabs={[
-              'Informations',
-              `Documents ${data?.documents?.length ? `(${data.documents.length})` : ''}`,
-              `Commentaires ${data?.comments?.length ? `(${data.comments.length})` : ''}`,
-              'Historique',
+              "Informations",
+              `Documents ${data?.documents?.length ? `(${data.documents.length})` : ""}`,
+              `Commentaires ${data?.comments?.length ? `(${data.comments.length})` : ""}`,
+              "Historique",
             ]}
             onClick={(tab) => {
-              if (tab.includes('Informations')) setActiveTab('Informations');
-              if (tab.includes('Documents')) setActiveTab('Documents');
-              if (tab.includes('Commentaires')) setActiveTab('Commentaires');
-              if (tab.includes('Historique')) setActiveTab('Historique');
+              if (tab.includes("Informations")) setActiveTab("Informations");
+              if (tab.includes("Documents")) setActiveTab("Documents");
+              if (tab.includes("Commentaires")) setActiveTab("Commentaires");
+              if (tab.includes("Historique")) setActiveTab("Historique");
               refresh();
             }}
-            activeTabIndex={['Informations', 'Documents', 'Commentaires', 'Historique'].findIndex((tab) => tab === activeTab)}
+            activeTabIndex={["Informations", "Documents", "Commentaires", "Historique"].findIndex((tab) => tab === activeTab)}
           />
           <form
             id="add-consultation-form"
-            className={['tw-flex tw-h-[90vh] tw-w-full tw-flex-wrap tw-p-4', activeTab !== 'Informations' && 'tw-hidden'].filter(Boolean).join(' ')}
+            className={["tw-flex tw-h-[90vh] tw-w-full tw-flex-wrap tw-p-4", activeTab !== "Informations" && "tw-hidden"].filter(Boolean).join(" ")}
             onSubmit={(e) => {
               e.preventDefault();
               handleSubmit({ closeOnSubmit: true });
-            }}>
+            }}
+          >
             <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
-              <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-blue-900'} htmlFor="create-consultation-team">
+              <label className={isEditing ? "" : "tw-text-sm tw-font-semibold tw-text-blue-900"} htmlFor="create-consultation-team">
                 Personne suivie
               </label>
               {isEditing ? (
@@ -304,7 +305,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
               )}
             </div>
             <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
-              <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-blue-900'} htmlFor="create-consultation-team">
+              <label className={isEditing ? "" : "tw-text-sm tw-font-semibold tw-text-blue-900"} htmlFor="create-consultation-team">
                 Équipe(s) en charge
               </label>
               {isEditing ? (
@@ -325,7 +326,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
             </div>
 
             <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
-              <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-blue-900'} htmlFor="create-consultation-name">
+              <label className={isEditing ? "" : "tw-text-sm tw-font-semibold tw-text-blue-900"} htmlFor="create-consultation-name">
                 Nom (facultatif)
               </label>
               {isEditing ? (
@@ -336,7 +337,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
             </div>
 
             <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
-              <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-blue-900'} htmlFor="type">
+              <label className={isEditing ? "" : "tw-text-sm tw-font-semibold tw-text-blue-900"} htmlFor="type">
                 Type
               </label>
               {isEditing ? (
@@ -370,7 +371,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                 }
                 return (
                   <CustomFieldInput
-                    colWidth={field.type === 'textarea' ? 12 : 6}
+                    colWidth={field.type === "textarea" ? 12 : 6}
                     model="person"
                     values={data}
                     handleChange={handleChange}
@@ -387,7 +388,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                     <input
                       type="checkbox"
                       id="create-consultation-onlyme"
-                      style={{ marginRight: '0.5rem' }}
+                      style={{ marginRight: "0.5rem" }}
                       name="onlyVisibleByCreator"
                       checked={data.onlyVisibleBy?.includes(user._id)}
                       onChange={() => {
@@ -401,13 +402,13 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
             )}
             <hr className="tw-basis-full" />
             <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
-              <label className={canEdit ? '' : 'tw-text-sm tw-font-semibold tw-text-blue-900'} htmlFor="new-consultation-select-status">
+              <label className={canEdit ? "" : "tw-text-sm tw-font-semibold tw-text-blue-900"} htmlFor="new-consultation-select-status">
                 Statut
               </label>
               {canEdit ? (
                 <SelectStatus
                   name="status"
-                  value={data.status || ''}
+                  value={data.status || ""}
                   onChange={handleChange}
                   inputId="new-consultation-select-status"
                   classNamePrefix="new-consultation-select-status"
@@ -417,7 +418,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
               )}
             </div>
             <div className="tw-basis-1/2 tw-px-4 tw-py-2">
-              <label className={canEdit ? '' : 'tw-text-sm tw-font-semibold tw-text-blue-900'} htmlFor="create-consultation-dueat">
+              <label className={canEdit ? "" : "tw-text-sm tw-font-semibold tw-text-blue-900"} htmlFor="create-consultation-dueat">
                 Date prévue
               </label>
               <div>
@@ -429,9 +430,9 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
               </div>
             </div>
 
-            <div className={['tw-basis-1/2 tw-px-4 tw-py-2', [DONE, CANCEL].includes(data.status) ? 'tw-visible' : 'tw-invisible'].join(' ')} />
-            <div className={['tw-basis-1/2 tw-px-4 tw-py-2', [DONE, CANCEL].includes(data.status) ? 'tw-visible' : 'tw-invisible'].join(' ')}>
-              <label className={canEdit ? '' : 'tw-text-sm tw-font-semibold tw-text-blue-900'} htmlFor="create-consultation-completedAt">
+            <div className={["tw-basis-1/2 tw-px-4 tw-py-2", [DONE, CANCEL].includes(data.status) ? "tw-visible" : "tw-invisible"].join(" ")} />
+            <div className={["tw-basis-1/2 tw-px-4 tw-py-2", [DONE, CANCEL].includes(data.status) ? "tw-visible" : "tw-invisible"].join(" ")}>
+              <label className={canEdit ? "" : "tw-text-sm tw-font-semibold tw-text-blue-900"} htmlFor="create-consultation-completedAt">
                 Date réalisée
               </label>
               <div>
@@ -450,17 +451,18 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
             </div>
           </form>
           <div
-            className={['tw-flex tw-h-[50vh] tw-w-full tw-flex-col tw-gap-4 tw-overflow-y-auto', activeTab !== 'Documents' && 'tw-hidden']
+            className={["tw-flex tw-h-[50vh] tw-w-full tw-flex-col tw-gap-4 tw-overflow-y-auto", activeTab !== "Documents" && "tw-hidden"]
               .filter(Boolean)
-              .join(' ')}>
+              .join(" ")}
+          >
             <DocumentsModule
               personId={data.person}
               color="blue-900"
               showAssociatedItem={false}
               documents={data.documents.map((doc) => ({
                 ...doc,
-                type: doc.type ?? 'document', // or 'folder'
-                linkedItem: { _id: consultation?._id, type: 'consultation' },
+                type: doc.type ?? "document", // or 'folder'
+                linkedItem: { _id: consultation?._id, type: "consultation" },
               }))}
               onAddDocuments={async (nextDocuments) => {
                 const newData = {
@@ -470,14 +472,14 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                 setData(newData);
                 if (isNewConsultation) return;
                 const ok = await handleSubmit({ newData });
-                if (ok && nextDocuments.length > 1) toast.success('Documents ajoutés');
+                if (ok && nextDocuments.length > 1) toast.success("Documents ajoutés");
               }}
               onDeleteDocument={async (document) => {
                 const newData = { ...data, documents: data.documents.filter((d) => d._id !== document._id) };
                 setData(newData);
                 if (isNewConsultation) return;
                 const ok = await handleSubmit({ newData });
-                if (ok) toast.success('Document supprimé');
+                if (ok) toast.success("Document supprimé");
                 return ok;
               }}
               onSubmitDocument={async (document) => {
@@ -491,16 +493,17 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                 setData(newData);
                 if (isNewConsultation) return;
                 const ok = await handleSubmit({ newData });
-                if (ok) toast.success('Document mis à jour');
+                if (ok) toast.success("Document mis à jour");
               }}
             />
           </div>
           <div
-            className={['tw-flex tw-h-[50vh] tw-w-full tw-flex-col tw-gap-4 tw-overflow-y-auto', activeTab !== 'Commentaires' && 'tw-hidden']
+            className={["tw-flex tw-h-[50vh] tw-w-full tw-flex-col tw-gap-4 tw-overflow-y-auto", activeTab !== "Commentaires" && "tw-hidden"]
               .filter(Boolean)
-              .join(' ')}>
+              .join(" ")}
+          >
             <CommentsModule
-              comments={data.comments.map((c) => ({ ...c, type: 'consultation', consultation }))}
+              comments={data.comments.map((c) => ({ ...c, type: "consultation", consultation }))}
               color="blue-900"
               typeForNewComment="consultation"
               onDeleteComment={async (comment) => {
@@ -508,7 +511,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                 setData(newData);
                 if (isNewConsultation) return;
                 const ok = await handleSubmit({ newData });
-                if (ok) toast.success('Commentaire supprimé');
+                if (ok) toast.success("Commentaire supprimé");
               }}
               onSubmitComment={async (comment, isNewComment) => {
                 const newData = isNewComment
@@ -517,14 +520,15 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                 setData(newData);
                 if (isNewConsultation) return;
                 const ok = await handleSubmit({ newData });
-                if (ok) toast.success('Commentaire enregistré');
+                if (ok) toast.success("Commentaire enregistré");
               }}
             />
           </div>
           <div
-            className={['tw-flex tw-h-[50vh] tw-w-full tw-flex-col tw-gap-4 tw-overflow-y-auto', activeTab !== 'Historique' && 'tw-hidden']
+            className={["tw-flex tw-h-[50vh] tw-w-full tw-flex-col tw-gap-4 tw-overflow-y-auto", activeTab !== "Historique" && "tw-hidden"]
               .filter(Boolean)
-              .join(' ')}>
+              .join(" ")}
+          >
             <ConsultationHistory consultation={consultation} />
           </div>
         </div>
@@ -542,13 +546,14 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
             className="button-destructive"
             onClick={async (e) => {
               e.stopPropagation();
-              if (!window.confirm('Voulez-vous supprimer cette consultation ?')) return;
+              if (!window.confirm("Voulez-vous supprimer cette consultation ?")) return;
               const response = await API.delete({ path: `/consultation/${consultation._id}` });
               if (!response.ok) return;
               setAllConsultations((all) => all.filter((t) => t._id !== consultation._id));
-              toast.success('Consultation supprimée !');
+              toast.success("Consultation supprimée !");
               onClose();
-            }}>
+            }}
+          >
             Supprimer
           </button>
         )}
@@ -558,7 +563,8 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
             type="submit"
             className="button-submit !tw-bg-blue-900"
             form="add-consultation-form"
-            disabled={!canEdit}>
+            disabled={!canEdit}
+          >
             Sauvegarder
           </button>
         )}
@@ -570,8 +576,9 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
               e.preventDefault();
               setIsEditing(true);
             }}
-            className={['button-submit !tw-bg-blue-900', activeTab === 'Informations' ? 'tw-visible' : 'tw-invisible'].join(' ')}
-            disabled={!canEdit}>
+            className={["button-submit !tw-bg-blue-900", activeTab === "Informations" ? "tw-visible" : "tw-invisible"].join(" ")}
+            disabled={!canEdit}
+          >
             Modifier
           </button>
         )}
@@ -599,7 +606,7 @@ function ConsultationHistory({ consultation }) {
           {history.map((h) => {
             return (
               <tr key={h.date} className="tw-cursor-default">
-                <td>{dayjsInstance(h.date).format('DD/MM/YYYY HH:mm')}</td>
+                <td>{dayjsInstance(h.date).format("DD/MM/YYYY HH:mm")}</td>
                 <td>
                   <UserName id={h.user} />
                 </td>
@@ -607,34 +614,34 @@ function ConsultationHistory({ consultation }) {
                   {Object.entries(h.data).map(([key, value]) => {
                     const consultationField = consultationsFieldsIncludingCustomFields.find((f) => f.name === key);
 
-                    if (key === 'teams') {
+                    if (key === "teams") {
                       return (
                         <p className="tw-flex tw-flex-col" key={key}>
                           <span>{consultationField?.label} : </span>
-                          <code>"{(value.oldValue || []).map((teamId) => teams.find((t) => t._id === teamId)?.name).join(', ')}"</code>
+                          <code>"{(value.oldValue || []).map((teamId) => teams.find((t) => t._id === teamId)?.name).join(", ")}"</code>
                           <span>↓</span>
-                          <code>"{(value.newValue || []).map((teamId) => teams.find((t) => t._id === teamId)?.name).join(', ')}"</code>
+                          <code>"{(value.newValue || []).map((teamId) => teams.find((t) => t._id === teamId)?.name).join(", ")}"</code>
                         </p>
                       );
                     }
 
-                    if (key === 'onlyVisibleBy') {
+                    if (key === "onlyVisibleBy") {
                       return (
                         <p key={key}>
                           {consultationField?.label} : <br />
-                          <code>{value.oldValue.length ? 'Oui' : 'Non'}</code> ➔ <code>{value.newValue.length ? 'Oui' : 'Non'}</code>
+                          <code>{value.oldValue.length ? "Oui" : "Non"}</code> ➔ <code>{value.newValue.length ? "Oui" : "Non"}</code>
                         </p>
                       );
                     }
 
-                    if (key === 'person') {
+                    if (key === "person") {
                       return (
                         <p key={key}>
                           {consultationField?.label} : <br />
                           <code>
                             <PersonName item={{ person: value.oldValue }} />
-                          </code>{' '}
-                          ➔{' '}
+                          </code>{" "}
+                          ➔{" "}
                           <code>
                             <PersonName item={{ person: value.newValue }} />
                           </code>
@@ -645,9 +652,10 @@ function ConsultationHistory({ consultation }) {
                     return (
                       <p
                         key={key}
-                        data-test-id={`${consultationField?.label}: ${JSON.stringify(value.oldValue || '')} ➔ ${JSON.stringify(value.newValue)}`}>
+                        data-test-id={`${consultationField?.label}: ${JSON.stringify(value.oldValue || "")} ➔ ${JSON.stringify(value.newValue)}`}
+                      >
                         {consultationField?.label} : <br />
-                        <code>{JSON.stringify(value.oldValue || '')}</code> ➔ <code>{JSON.stringify(value.newValue)}</code>
+                        <code>{JSON.stringify(value.oldValue || "")}</code> ➔ <code>{JSON.stringify(value.newValue)}</code>
                       </p>
                     );
                   })}
@@ -657,7 +665,7 @@ function ConsultationHistory({ consultation }) {
           })}
           {consultation?.createdAt && (
             <tr key={consultation.createdAt} className="tw-cursor-default">
-              <td>{dayjsInstance(consultation.createdAt).format('DD/MM/YYYY HH:mm')}</td>
+              <td>{dayjsInstance(consultation.createdAt).format("DD/MM/YYYY HH:mm")}</td>
               <td>
                 <UserName id={consultation.user} />
               </td>

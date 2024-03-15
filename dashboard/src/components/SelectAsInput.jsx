@@ -1,5 +1,5 @@
-import React from 'react';
-import SelectCustom from './SelectCustom';
+import React from "react";
+import SelectCustom from "./SelectCustom";
 
 const SelectAsInput = ({ options, name, onChange, value, ...props }) => {
   return (

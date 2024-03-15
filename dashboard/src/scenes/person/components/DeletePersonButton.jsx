@@ -1,20 +1,20 @@
-import React from 'react';
-import { useHistory } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { useRecoilValue } from 'recoil';
-import { actionsState, prepareActionForEncryption } from '../../../recoil/actions';
-import API, { encryptItem } from '../../../services/api';
-import { commentsState, prepareCommentForEncryption } from '../../../recoil/comments';
-import { passagesState } from '../../../recoil/passages';
-import { rencontresState } from '../../../recoil/rencontres';
-import DeleteButtonAndConfirmModal from '../../../components/DeleteButtonAndConfirmModal';
-import { relsPersonPlaceState } from '../../../recoil/relPersonPlace';
-import { medicalFileState } from '../../../recoil/medicalFiles';
-import { consultationsState } from '../../../recoil/consultations';
-import { treatmentsState } from '../../../recoil/treatments';
-import { userState } from '../../../recoil/auth';
-import { useDataLoader } from '../../../components/DataLoader';
-import { prepareGroupForEncryption } from '../../../recoil/groups';
+import React from "react";
+import { useHistory } from "react-router-dom";
+import { toast } from "react-toastify";
+import { useRecoilValue } from "recoil";
+import { actionsState, prepareActionForEncryption } from "../../../recoil/actions";
+import API, { encryptItem } from "../../../services/api";
+import { commentsState, prepareCommentForEncryption } from "../../../recoil/comments";
+import { passagesState } from "../../../recoil/passages";
+import { rencontresState } from "../../../recoil/rencontres";
+import DeleteButtonAndConfirmModal from "../../../components/DeleteButtonAndConfirmModal";
+import { relsPersonPlaceState } from "../../../recoil/relPersonPlace";
+import { medicalFileState } from "../../../recoil/medicalFiles";
+import { consultationsState } from "../../../recoil/consultations";
+import { treatmentsState } from "../../../recoil/treatments";
+import { userState } from "../../../recoil/auth";
+import { useDataLoader } from "../../../components/DataLoader";
+import { prepareGroupForEncryption } from "../../../recoil/groups";
 
 const DeletePersonButton = ({ person }) => {
   const actions = useRecoilValue(actionsState);
@@ -32,8 +32,8 @@ const DeletePersonButton = ({ person }) => {
   return (
     <DeleteButtonAndConfirmModal
       title={`Voulez-vous vraiment supprimer la personne ${person.name}`}
-      textToConfirm={person.name || 'Nom de la personne non renseigné'}
-      roles={['normal', 'admin', 'superadmin']}
+      textToConfirm={person.name || "Nom de la personne non renseigné"}
+      roles={["normal", "admin", "superadmin"]}
       roleErrorMessage="Désolé, seules les personnes autorisées peuvent supprimer des personnes"
       onConfirm={async () => {
         if (
@@ -44,7 +44,7 @@ const DeletePersonButton = ({ person }) => {
         ) {
           if (
             !window.confirm(
-              'Des données médicales sont associées à cette personne. Si vous la supprimez, ces données seront également effacées. Vous n’avez pas accès à ces données médicales car vous n’êtes pas un·e professionnel·le de santé. Voulez-vous supprimer cette personne et toutes ses données ?'
+              "Des données médicales sont associées à cette personne. Si vous la supprimez, ces données seront également effacées. Vous n’avez pas accès à ces données médicales car vous n’êtes pas un·e professionnel·le de santé. Voulez-vous supprimer cette personne et toutes ses données ?"
             )
           )
             return;
@@ -113,12 +113,13 @@ const DeletePersonButton = ({ person }) => {
 
         const personRes = await API.delete({ path: `/person/${person._id}`, body });
         if (personRes?.ok) {
-          toast.success('Suppression réussie');
+          toast.success("Suppression réussie");
           refresh();
           history.goBack();
         }
-      }}>
-      <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
+      }}
+    >
+      <span style={{ marginBottom: 30, display: "block", width: "100%", textAlign: "center" }}>
         Cette opération est irréversible
         <br />
         et entrainera la suppression définitive de toutes les données liées à la personne&nbsp;:

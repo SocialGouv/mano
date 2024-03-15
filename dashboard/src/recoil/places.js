@@ -1,32 +1,32 @@
-import { getCacheItemDefaultValue, setCacheItem } from '../services/dataManagement';
-import { atom, selector } from 'recoil';
-import { looseUuidRegex } from '../utils';
-import { toast } from 'react-toastify';
-import { capture } from '../services/sentry';
+import { getCacheItemDefaultValue, setCacheItem } from "../services/dataManagement";
+import { atom, selector } from "recoil";
+import { looseUuidRegex } from "../utils";
+import { toast } from "react-toastify";
+import { capture } from "../services/sentry";
 
-const collectionName = 'place';
+const collectionName = "place";
 export const placesState = atom({
   key: collectionName,
   default: selector({
-    key: 'place/default',
+    key: "place/default",
     get: async () => {
-      const cache = await getCacheItemDefaultValue('place', []);
+      const cache = await getCacheItemDefaultValue("place", []);
       return cache;
     },
   }),
   effects: [({ onSet }) => onSet(async (newValue) => setCacheItem(collectionName, newValue))],
 });
 
-const encryptedFields = ['user', 'name'];
+const encryptedFields = ["user", "name"];
 
 export const preparePlaceForEncryption = (place, { checkRequiredFields = true } = {}) => {
   if (!!checkRequiredFields) {
     try {
       if (!place.name) {
-        throw new Error('Place is missing name');
+        throw new Error("Place is missing name");
       }
       if (!looseUuidRegex.test(place.user)) {
-        throw new Error('Place is missing user');
+        throw new Error("Place is missing user");
       }
     } catch (error) {
       toast.error(

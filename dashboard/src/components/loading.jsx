@@ -1,11 +1,11 @@
-import React from 'react';
-import { Spinner } from 'reactstrap';
-import styled from 'styled-components';
+import React from "react";
+import { Spinner } from "reactstrap";
+import styled from "styled-components";
 
 const Loading = () => {
   return (
     <LoadingWrapper>
-      <Spinner style={{ width: 100, height: 100 }} color={'primary'} />
+      <Spinner style={{ width: 100, height: 100 }} color={"primary"} />
     </LoadingWrapper>
   );
 };

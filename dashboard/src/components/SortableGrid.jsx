@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useCallback, useState } from 'react';
-import styled from 'styled-components';
-import Sortable from 'sortablejs';
-import { theme } from '../config';
-import { Col, FormGroup, Input, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
-import { Formik } from 'formik';
-import ButtonCustom from './ButtonCustom';
+import React, { useEffect, useRef, useCallback, useState } from "react";
+import styled from "styled-components";
+import Sortable from "sortablejs";
+import { theme } from "../config";
+import { Col, FormGroup, Input, Modal, ModalBody, ModalHeader, Row } from "reactstrap";
+import { Formik } from "formik";
+import ButtonCustom from "./ButtonCustom";
 
 const SortableGrid = ({ list, onUpdateList, onRemoveItem, onEditItem, editItemTitle }) => {
   const gridRef = useRef(null);
@@ -56,12 +56,13 @@ const EditContent = ({ open, setOpen, onSubmit, content, title }) => {
       <ModalHeader toggle={() => setOpen(false)}>{title}</ModalHeader>
       <ModalBody>
         <Formik
-          initialValues={{ content, newContent: '' }}
+          initialValues={{ content, newContent: "" }}
           onSubmit={async (body, actions) => {
             await onSubmit(body);
             actions.setSubmitting(false);
             setOpen(null);
-          }}>
+          }}
+        >
           {({ values, handleChange, handleSubmit, isSubmitting }) => (
             <React.Fragment>
               <Row>
@@ -119,7 +120,7 @@ const Item = styled.div`
     text-align: center;
   }
   button {
-    display: ${import.meta.env.TEST === 'true' ? 'block' : 'none'};
+    display: ${import.meta.env.TEST === "true" ? "block" : "none"};
     border: none;
     position: absolute;
     top: 5px;

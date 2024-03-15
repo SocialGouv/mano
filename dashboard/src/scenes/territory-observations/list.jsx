@@ -1,14 +1,14 @@
-import React, { useMemo, useState } from 'react';
-import styled from 'styled-components';
-import { Col, Row } from 'reactstrap';
-import { toast } from 'react-toastify';
+import React, { useMemo, useState } from "react";
+import styled from "styled-components";
+import { Col, Row } from "reactstrap";
+import { toast } from "react-toastify";
 
-import ButtonCustom from '../../components/ButtonCustom';
-import Observation from './view';
-import CreateObservation from '../../components/CreateObservation';
-import { territoryObservationsState } from '../../recoil/territoryObservations';
-import { useRecoilState } from 'recoil';
-import API from '../../services/api';
+import ButtonCustom from "../../components/ButtonCustom";
+import Observation from "./view";
+import CreateObservation from "../../components/CreateObservation";
+import { territoryObservationsState } from "../../recoil/territoryObservations";
+import { useRecoilState } from "recoil";
+import API from "../../services/api";
 
 const List = ({ territory = {} }) => {
   const [territoryObservations, setTerritoryObservations] = useRecoilState(territoryObservationsState);
@@ -26,25 +26,25 @@ const List = ({ territory = {} }) => {
   if (!observations) return null;
 
   const deleteData = async (id) => {
-    const confirm = window.confirm('Êtes-vous sûr ?');
+    const confirm = window.confirm("Êtes-vous sûr ?");
     if (confirm) {
       const res = await API.delete({ path: `/territory-observation/${id}` });
       if (res.ok) {
         setTerritoryObservations((territoryObservations) => territoryObservations.filter((p) => p._id !== id));
       }
       if (!res.ok) return;
-      toast.success('Suppression réussie');
+      toast.success("Suppression réussie");
     }
   };
 
   return (
     <>
-      <Row style={{ marginTop: '30px', marginBottom: '5px' }}>
+      <Row style={{ marginTop: "30px", marginBottom: "5px" }}>
         <Col md={9}>
           <Title>Observations</Title>
         </Col>
       </Row>
-      <Row style={{ marginBottom: '30px', justifyContent: 'flex-end' }}>
+      <Row style={{ marginBottom: "30px", justifyContent: "flex-end" }}>
         <Col md={3}>
           <ButtonCustom
             onClick={() => {

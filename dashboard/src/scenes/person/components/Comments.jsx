@@ -1,11 +1,11 @@
-import { useMemo } from 'react';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { toast } from 'react-toastify';
-import { CommentsModule } from '../../../components/CommentsGeneric';
-import { commentsState, prepareCommentForEncryption } from '../../../recoil/comments';
-import API from '../../../services/api';
-import { organisationState } from '../../../recoil/auth';
-import { groupsState } from '../../../recoil/groups';
+import { useMemo } from "react";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { toast } from "react-toastify";
+import { CommentsModule } from "../../../components/CommentsGeneric";
+import { commentsState, prepareCommentForEncryption } from "../../../recoil/comments";
+import API from "../../../services/api";
+import { organisationState } from "../../../recoil/auth";
+import { groupsState } from "../../../recoil/groups";
 
 export default function Comments({ person }) {
   const organisation = useRecoilValue(organisationState);
@@ -30,19 +30,19 @@ export default function Comments({ person }) {
         canToggleUrgentCheck
         showPanel
         onDeleteComment={async (comment) => {
-          window.sessionStorage.removeItem('currentComment');
+          window.sessionStorage.removeItem("currentComment");
           await API.delete({ path: `/comment/${comment._id}` });
           setComments((comments) => comments.filter((c) => c._id !== comment._id));
-          toast.success('Commentaire supprimé !');
+          toast.success("Commentaire supprimé !");
         }}
         onSubmitComment={async (comment, isNewComment) => {
           if (isNewComment) {
             const response = await API.post({
-              path: '/comment',
+              path: "/comment",
               body: prepareCommentForEncryption(comment),
             });
             if (response.ok) {
-              toast.success('Commentaire enregistré');
+              toast.success("Commentaire enregistré");
               setComments((comments) => [response.decryptedData, ...comments]);
             } else {
               toast.error(response.error);
@@ -53,7 +53,7 @@ export default function Comments({ person }) {
               body: prepareCommentForEncryption(comment),
             });
             if (response.ok) {
-              toast.success('Commentaire enregistré');
+              toast.success("Commentaire enregistré");
               setComments((comments) => comments.map((c) => (c._id === comment._id ? response.decryptedData : c)));
             } else {
               toast.error(response.error);

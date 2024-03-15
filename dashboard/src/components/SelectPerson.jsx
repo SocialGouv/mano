@@ -1,28 +1,28 @@
-import { useHistory } from 'react-router-dom';
-import { Label } from 'reactstrap';
-import { selector, useRecoilValue } from 'recoil';
-import { personsState, sortPersons } from '../recoil/persons';
-import ButtonCustom from './ButtonCustom';
-import SelectCustom from './SelectCustom';
+import { useHistory } from "react-router-dom";
+import { Label } from "reactstrap";
+import { selector, useRecoilValue } from "recoil";
+import { personsState, sortPersons } from "../recoil/persons";
+import ButtonCustom from "./ButtonCustom";
+import SelectCustom from "./SelectCustom";
 
 const sortedPersonsByNameSelector = selector({
-  key: 'sortedPersonsByNameSelector',
+  key: "sortedPersonsByNameSelector",
   get: ({ get }) => {
     const persons = get(personsState);
-    return [...persons].sort(sortPersons('name', 'ASC'));
+    return [...persons].sort(sortPersons("name", "ASC"));
   },
 });
 
 const SelectPerson = ({
-  value = '',
+  value = "",
   defaultValue = null,
   onChange,
   isMulti = false,
   noLabel = false,
   isClearable = false,
   disableAccessToPerson = false,
-  inputId = 'person',
-  name = 'person',
+  inputId = "person",
+  name = "person",
   ...props
 }) => {
   const sortedPersonsByName = useRecoilValue(sortedPersonsByNameSelector);
@@ -30,7 +30,7 @@ const SelectPerson = ({
 
   return (
     <>
-      {!noLabel && <Label htmlFor={inputId}>{isMulti ? 'Personnes(s) suivie(s)' : 'Personne suivie'}</Label>}
+      {!noLabel && <Label htmlFor={inputId}>{isMulti ? "Personnes(s) suivie(s)" : "Personne suivie"}</Label>}
       <SelectCustom
         options={sortedPersonsByName}
         name={name}
@@ -52,10 +52,10 @@ const SelectPerson = ({
         getOptionLabel={(i) => i?.name}
         formatOptionLabel={(i, options) => {
           return (
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ display: "flex", alignItems: "center" }}>
               {i?.name}
-              {Boolean(i?.otherNames) && <span style={{ marginLeft: '0.5rem', fontSize: '0.8rem', opacity: 0.5 }}>{i?.otherNames}</span>}
-              {!disableAccessToPerson && options.context !== 'menu' && (
+              {Boolean(i?.otherNames) && <span style={{ marginLeft: "0.5rem", fontSize: "0.8rem", opacity: 0.5 }}>{i?.otherNames}</span>}
+              {!disableAccessToPerson && options.context !== "menu" && (
                 <ButtonCustom
                   onClick={(e) => {
                     e.preventDefault();
@@ -65,7 +65,7 @@ const SelectPerson = ({
                   color="link"
                   title="Accéder au dossier"
                   padding="0"
-                  style={{ marginLeft: '0.5rem' }}
+                  style={{ marginLeft: "0.5rem" }}
                 />
               )}
             </div>

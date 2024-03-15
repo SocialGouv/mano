@@ -1,31 +1,31 @@
-import { selector, selectorFamily } from 'recoil';
-import { capture } from '../services/sentry';
-import type { PersonInstance } from '../types/person';
-import type { CustomOrPredefinedField } from '../types/field';
-import type { IndicatorsSelection } from '../types/evolutivesStats';
-import type { EvolutiveStatsPersonFields, EvolutiveStatOption, EvolutiveStatDateYYYYMMDD } from '../types/evolutivesStats';
-import { dayjsInstance } from '../services/date';
-import { personFieldsIncludingCustomFieldsSelector } from './persons';
+import { selector, selectorFamily } from "recoil";
+import { capture } from "../services/sentry";
+import type { PersonInstance } from "../types/person";
+import type { CustomOrPredefinedField } from "../types/field";
+import type { IndicatorsSelection } from "../types/evolutivesStats";
+import type { EvolutiveStatsPersonFields, EvolutiveStatOption, EvolutiveStatDateYYYYMMDD } from "../types/evolutivesStats";
+import { dayjsInstance } from "../services/date";
+import { personFieldsIncludingCustomFieldsSelector } from "./persons";
 
 export const evolutiveStatsIndicatorsBaseSelector = selector({
-  key: 'evolutiveStatsIndicatorsBaseSelector',
+  key: "evolutiveStatsIndicatorsBaseSelector",
   get: ({ get }) => {
     const allFields = get(personFieldsIncludingCustomFieldsSelector);
     const indicatorsBase = allFields.filter((f) => {
-      if (f.name === 'history') return false;
-      if (f.name === 'documents') return false;
+      if (f.name === "history") return false;
+      if (f.name === "documents") return false;
       switch (f.type) {
-        case 'text':
-        case 'textarea':
-        case 'date':
-        case 'duration':
-        case 'date-with-time':
+        case "text":
+        case "textarea":
+        case "date":
+        case "duration":
+        case "date-with-time":
           return false;
-        case 'multi-choice':
-        case 'number':
-        case 'yes-no':
-        case 'enum':
-        case 'boolean':
+        case "multi-choice":
+        case "number":
+        case "yes-no":
+        case "enum":
+        case "boolean":
         default:
           return f.filterable;
       }
@@ -35,56 +35,56 @@ export const evolutiveStatsIndicatorsBaseSelector = selector({
   },
 });
 
-export const startHistoryFeatureDate = '2022-09-23';
+export const startHistoryFeatureDate = "2022-09-23";
 
-type FieldsMap = Record<CustomOrPredefinedField['name'], CustomOrPredefinedField>;
+type FieldsMap = Record<CustomOrPredefinedField["name"], CustomOrPredefinedField>;
 
 function getValuesOptionsByField(field: CustomOrPredefinedField, fieldsMap: FieldsMap): Array<EvolutiveStatOption> {
   if (!field) return [];
   const current = fieldsMap[field.name];
   if (!current) return [];
-  if (['yes-no'].includes(current.type)) return ['Oui', 'Non', 'Non renseigné'];
-  if (['boolean'].includes(current.type)) return ['Oui', 'Non'];
-  if (current?.name === 'outOfActiveList') return current.options ?? ['Oui', 'Non'];
+  if (["yes-no"].includes(current.type)) return ["Oui", "Non", "Non renseigné"];
+  if (["boolean"].includes(current.type)) return ["Oui", "Non"];
+  if (current?.name === "outOfActiveList") return current.options ?? ["Oui", "Non"];
   if (current?.options?.length) {
-    return [...current?.options, 'Non renseigné'].filter((option) => {
-      if (option.includes('Choisissez un genre')) return false;
+    return [...current?.options, "Non renseigné"].filter((option) => {
+      if (option.includes("Choisissez un genre")) return false;
       return true;
     });
   }
-  return ['Non renseigné'];
+  return ["Non renseigné"];
 }
 
-function getValueByField(fieldName: CustomOrPredefinedField['name'], fieldsMap: FieldsMap, value: any): string | Array<string> {
-  if (!fieldName) return '';
+function getValueByField(fieldName: CustomOrPredefinedField["name"], fieldsMap: FieldsMap, value: any): string | Array<string> {
+  if (!fieldName) return "";
   const current = fieldsMap[fieldName];
-  if (!current) return '';
-  if (['yes-no'].includes(current.type)) {
-    if (value === 'Oui') return 'Oui';
-    return 'Non';
+  if (!current) return "";
+  if (["yes-no"].includes(current.type)) {
+    if (value === "Oui") return "Oui";
+    return "Non";
   }
-  if (['boolean'].includes(current.type)) {
-    if (value === true || value === 'Oui') return 'Oui';
-    return 'Non';
+  if (["boolean"].includes(current.type)) {
+    if (value === true || value === "Oui") return "Oui";
+    return "Non";
   }
-  if (current?.name === 'outOfActiveList') {
-    if (value === true) return 'Oui';
-    return 'Non';
+  if (current?.name === "outOfActiveList") {
+    if (value === true) return "Oui";
+    return "Non";
   }
-  if (current.type === 'multi-choice') {
+  if (current.type === "multi-choice") {
     if (Array.isArray(value)) {
-      if (value.length === 0) return ['Non renseigné'];
+      if (value.length === 0) return ["Non renseigné"];
       return value;
     }
-    if (value == null || value === '') {
-      return ['Non renseigné'];
+    if (value == null || value === "") {
+      return ["Non renseigné"];
     }
     return [value];
   }
-  if (value == null || value === '') {
-    return 'Non renseigné'; // we cover the case of undefined, null, empty string
+  if (value == null || value === "") {
+    return "Non renseigné"; // we cover the case of undefined, null, empty string
   }
-  if (value.includes('Choisissez un genre')) return 'Non renseigné';
+  if (value.includes("Choisissez un genre")) return "Non renseigné";
   return value;
 }
 
@@ -98,20 +98,20 @@ function getPersonSnapshotAtDate({
   snapshotDate: string; // YYYYMMDD
 }): PersonInstance | null {
   let snapshot = structuredClone(person);
-  const followedSince = dayjsInstance(snapshot.followedSince || snapshot.createdAt).format('YYYYMMDD');
+  const followedSince = dayjsInstance(snapshot.followedSince || snapshot.createdAt).format("YYYYMMDD");
   if (followedSince > snapshotDate) return null;
   const history = snapshot.history;
   if (!history?.length) return snapshot;
   const reversedHistory = [...history].reverse();
   for (const historyItem of reversedHistory) {
-    let historyDate = dayjsInstance(historyItem.date).format('YYYYMMDD');
+    let historyDate = dayjsInstance(historyItem.date).format("YYYYMMDD");
     if (historyDate < snapshotDate) return snapshot;
     for (const historyChangeField of Object.keys(historyItem.data)) {
       const oldValue = getValueByField(historyChangeField, fieldsMap, historyItem.data[historyChangeField].oldValue);
       const historyNewValue = getValueByField(historyChangeField, fieldsMap, historyItem.data[historyChangeField].newValue);
       const currentPersonValue = getValueByField(historyChangeField, fieldsMap, snapshot[historyChangeField]);
       if (JSON.stringify(historyNewValue) !== JSON.stringify(currentPersonValue)) {
-        capture(new Error('Incoherent snapshot history'), {
+        capture(new Error("Incoherent snapshot history"), {
           extra: {
             snapshot,
             historyItem,
@@ -122,7 +122,7 @@ function getPersonSnapshotAtDate({
           },
         });
       }
-      if (oldValue === '') continue;
+      if (oldValue === "") continue;
       snapshot = {
         ...snapshot,
         [historyChangeField]: oldValue,
@@ -133,7 +133,7 @@ function getPersonSnapshotAtDate({
 }
 
 export const evolutiveStatsPersonSelector = selectorFamily({
-  key: 'evolutiveStatsPersonSelector',
+  key: "evolutiveStatsPersonSelector",
   get:
     ({
       startDate,
@@ -167,12 +167,12 @@ export const evolutiveStatsPersonSelector = selectorFamily({
 
       // we take the years since the history began, let's say early 2023
       const dates: Record<EvolutiveStatDateYYYYMMDD, number> = {};
-      const minimumDateForEvolutiveStats = dayjsInstance(startDate ?? startHistoryFeatureDate).format('YYYYMMDD');
+      const minimumDateForEvolutiveStats = dayjsInstance(startDate ?? startHistoryFeatureDate).format("YYYYMMDD");
       let date = minimumDateForEvolutiveStats;
-      const today = dayjsInstance().format('YYYYMMDD');
+      const today = dayjsInstance().format("YYYYMMDD");
       while (date <= today) {
         dates[date] = 0;
-        date = dayjsInstance(date).add(1, 'day').format('YYYYMMDD');
+        date = dayjsInstance(date).add(1, "day").format("YYYYMMDD");
       }
 
       for (const field of indicatorsBase) {
@@ -187,7 +187,7 @@ export const evolutiveStatsPersonSelector = selectorFamily({
 
       const indicator = evolutiveStatsIndicators[0];
       const indicatorFieldName = indicator?.fieldName;
-      if (typeof indicatorFieldName === 'string' && indicator?.fromValue) {
+      if (typeof indicatorFieldName === "string" && indicator?.fromValue) {
         persons = persons.filter((p) => {
           const snapshot = getPersonSnapshotAtDate({ person: p, snapshotDate: minimumDateForEvolutiveStats, fieldsMap });
           if (!snapshot) return false;
@@ -197,13 +197,13 @@ export const evolutiveStatsPersonSelector = selectorFamily({
       }
 
       for (const person of persons) {
-        const followedSince = dayjsInstance(person.followedSince || person.createdAt).format('YYYYMMDD');
+        const followedSince = dayjsInstance(person.followedSince || person.createdAt).format("YYYYMMDD");
         const minimumDate = followedSince < minimumDateForEvolutiveStats ? minimumDateForEvolutiveStats : followedSince;
         let currentDate = today;
         let currentPerson = structuredClone(person);
         for (const field of indicatorsBase) {
           const rawValue = getValueByField(field.name, fieldsMap, currentPerson[field.name]);
-          if (rawValue === '') continue;
+          if (rawValue === "") continue;
           const valueToLoop = Array.isArray(rawValue) ? rawValue : [rawValue];
           for (const value of valueToLoop) {
             try {
@@ -223,12 +223,12 @@ export const evolutiveStatsPersonSelector = selectorFamily({
         if (!!history?.length) {
           const reversedHistory = [...history].reverse();
           for (const historyItem of reversedHistory) {
-            let historyDate = dayjsInstance(historyItem.date).format('YYYYMMDD');
+            let historyDate = dayjsInstance(historyItem.date).format("YYYYMMDD");
             while (currentDate > historyDate && currentDate > minimumDate) {
-              currentDate = dayjsInstance(currentDate).subtract(1, 'day').format('YYYYMMDD');
+              currentDate = dayjsInstance(currentDate).subtract(1, "day").format("YYYYMMDD");
               for (const field of indicatorsBase) {
                 const rawValue = getValueByField(field.name, fieldsMap, currentPerson[field.name]);
-                if (rawValue === '') continue;
+                if (rawValue === "") continue;
                 const valueToLoop = Array.isArray(rawValue) ? rawValue : [rawValue];
                 for (const value of valueToLoop) {
                   try {
@@ -250,7 +250,7 @@ export const evolutiveStatsPersonSelector = selectorFamily({
               const historyNewValue = getValueByField(historyChangeField, fieldsMap, historyItem.data[historyChangeField].newValue);
               const currentPersonValue = getValueByField(historyChangeField, fieldsMap, currentPerson[historyChangeField]);
               if (JSON.stringify(historyNewValue) !== JSON.stringify(currentPersonValue)) {
-                capture(new Error('Incoherent history'), {
+                capture(new Error("Incoherent history"), {
                   extra: {
                     person,
                     currentPerson,
@@ -262,7 +262,7 @@ export const evolutiveStatsPersonSelector = selectorFamily({
                   },
                 });
               }
-              if (oldValue === '') continue;
+              if (oldValue === "") continue;
               currentPerson = {
                 ...currentPerson,
                 [historyChangeField]: oldValue,
@@ -271,10 +271,10 @@ export const evolutiveStatsPersonSelector = selectorFamily({
           }
         }
         while (currentDate >= minimumDate) {
-          currentDate = dayjsInstance(currentDate).subtract(1, 'day').format('YYYYMMDD');
+          currentDate = dayjsInstance(currentDate).subtract(1, "day").format("YYYYMMDD");
           for (const field of indicatorsBase) {
             const rawValue = getValueByField(field.name, fieldsMap, currentPerson[field.name]);
-            if (rawValue === '') continue;
+            if (rawValue === "") continue;
             const valueToLoop = Array.isArray(rawValue) ? rawValue : [rawValue];
             for (const value of valueToLoop) {
               try {

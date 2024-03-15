@@ -1,5 +1,5 @@
-import { useRecoilValue } from 'recoil';
-import { reportsState } from '../recoil/reports';
+import { useRecoilValue } from "recoil";
+import { reportsState } from "../recoil/reports";
 
 const DuplicatedReportsTestChecker = () => {
   const reports = useRecoilValue(reportsState);

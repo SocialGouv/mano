@@ -1,24 +1,24 @@
-import React, { useState } from 'react';
-import { useRecoilValue, selectorFamily } from 'recoil';
-import { organisationState, userState } from '../../../recoil/auth';
-import { CANCEL, DONE, flattenedActionsCategoriesSelector, mappedIdsToLabels } from '../../../recoil/actions';
-import { useHistory } from 'react-router-dom';
-import SelectCustom from '../../../components/SelectCustom';
-import ExclamationMarkButton from '../../../components/tailwind/ExclamationMarkButton';
-import TagTeam from '../../../components/TagTeam';
-import ActionOrConsultationName from '../../../components/ActionOrConsultationName';
-import { formatDateWithNameOfDay, formatTime } from '../../../services/date';
-import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from '../../../components/tailwind/Modal';
-import { AgendaMutedIcon } from '../../../assets/icons/AgendaMutedIcon';
-import { FullScreenIcon } from '../../../assets/icons/FullScreenIcon';
-import UserName from '../../../components/UserName';
-import { itemsGroupedByPersonSelector } from '../../../recoil/selectors';
-import DescriptionIcon from '../../../components/DescriptionIcon';
-import SelectTeamMultiple from '../../../components/SelectTeamMultiple';
-import ActionStatusSelect from '../../../components/ActionStatusSelect';
+import React, { useState } from "react";
+import { useRecoilValue, selectorFamily } from "recoil";
+import { organisationState, userState } from "../../../recoil/auth";
+import { CANCEL, DONE, flattenedActionsCategoriesSelector, mappedIdsToLabels } from "../../../recoil/actions";
+import { useHistory } from "react-router-dom";
+import SelectCustom from "../../../components/SelectCustom";
+import ExclamationMarkButton from "../../../components/tailwind/ExclamationMarkButton";
+import TagTeam from "../../../components/TagTeam";
+import ActionOrConsultationName from "../../../components/ActionOrConsultationName";
+import { formatDateWithNameOfDay, formatTime } from "../../../services/date";
+import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from "../../../components/tailwind/Modal";
+import { AgendaMutedIcon } from "../../../assets/icons/AgendaMutedIcon";
+import { FullScreenIcon } from "../../../assets/icons/FullScreenIcon";
+import UserName from "../../../components/UserName";
+import { itemsGroupedByPersonSelector } from "../../../recoil/selectors";
+import DescriptionIcon from "../../../components/DescriptionIcon";
+import SelectTeamMultiple from "../../../components/SelectTeamMultiple";
+import ActionStatusSelect from "../../../components/ActionStatusSelect";
 
 const filteredPersonActionsSelector = selectorFamily({
-  key: 'filteredPersonActionsSelector',
+  key: "filteredPersonActionsSelector",
   get:
     ({ personId, filterCategories, filterStatus, filterTeamIds }) =>
     ({ get }) => {
@@ -27,7 +27,7 @@ const filteredPersonActionsSelector = selectorFamily({
 
       if (filterCategories.length) {
         actionsToSet = actionsToSet.filter((a) =>
-          filterCategories.some((c) => (c === '-- Aucune --' ? a.categories?.length === 0 : a.categories?.includes(c)))
+          filterCategories.some((c) => (c === "-- Aucune --" ? a.categories?.length === 0 : a.categories?.includes(c)))
         );
       }
       if (filterStatus.length) {
@@ -45,7 +45,7 @@ const filteredPersonActionsSelector = selectorFamily({
       }
       return [...actionsToSet]
         .sort((p1, p2) => ((p1.completedAt || p1.dueAt) > (p2.completedAt || p2.dueAt) ? -1 : 1))
-        .map((a) => (a.urgent ? { ...a, style: { backgroundColor: '#fecaca99' } } : a));
+        .map((a) => (a.urgent ? { ...a, style: { backgroundColor: "#fecaca99" } } : a));
     },
 });
 
@@ -61,24 +61,26 @@ export const Actions = ({ person }) => {
   return (
     <section title="Actions de la personne suivie" className="tw-relative tw-overflow-x-hidden">
       <div className="tw-sticky tw-top-0 tw-z-10 tw-flex tw-bg-white tw-p-3 tw-shadow-sm">
-        <h4 className="tw-flex-1 tw-text-xl">Actions {filteredData.length ? `(${filteredData.length})` : ''}</h4>
+        <h4 className="tw-flex-1 tw-text-xl">Actions {filteredData.length ? `(${filteredData.length})` : ""}</h4>
         <div className="flex-col tw-flex tw-items-center tw-gap-2">
           <button
             aria-label="Ajouter une action"
             className="tw-text-md tw-h-8 tw-w-8 tw-rounded-full tw-bg-main tw-font-bold tw-text-white tw-transition hover:tw-scale-125"
             onClick={() => {
               const searchParams = new URLSearchParams(history.location.search);
-              searchParams.set('newAction', true);
-              searchParams.set('personId', person._id);
+              searchParams.set("newAction", true);
+              searchParams.set("personId", person._id);
               history.push(`?${searchParams.toString()}`);
-            }}>
+            }}
+          >
             ＋
           </button>
           {Boolean(filteredData.length) && (
             <button
               title="Passer les actions en plein écran"
               className="tw-h-6 tw-w-6 tw-rounded-full tw-text-main tw-transition hover:tw-scale-125"
-              onClick={() => setFullScreen(true)}>
+              onClick={() => setFullScreen(true)}
+            >
               <FullScreenIcon />
             </button>
           )}
@@ -119,9 +121,10 @@ export const Actions = ({ person }) => {
             className="button-submit"
             onClick={() => {
               const searchParams = new URLSearchParams(history.location.search);
-              searchParams.set('newAction', true);
+              searchParams.set("newAction", true);
               history.push(`?${searchParams.toString()}`);
-            }}>
+            }}
+          >
             ＋ Ajouter une action
           </button>
         </ModalFooter>
@@ -134,7 +137,7 @@ export const Actions = ({ person }) => {
 const ActionsFilters = ({ data, setFilterCategories, setFilterTeamIds, setFilterStatus, filterStatus, filterTeamIds, filterCategories }) => {
   const categories = useRecoilValue(flattenedActionsCategoriesSelector);
 
-  const catsSelect = ['-- Aucune --', ...(categories || [])];
+  const catsSelect = ["-- Aucune --", ...(categories || [])];
   return (
     <>
       {data.length ? (
@@ -200,17 +203,18 @@ const ActionsTable = ({ filteredData }) => {
       <tbody className="small">
         {filteredData.map((action, i) => {
           const date = formatDateWithNameOfDay([DONE, CANCEL].includes(action.status) ? action.completedAt : action.dueAt);
-          const time = action.withTime && action.dueAt ? ` ${formatTime(action.dueAt)}` : '';
+          const time = action.withTime && action.dueAt ? ` ${formatTime(action.dueAt)}` : "";
           return (
             <tr key={action._id}>
               <td>
                 <div
-                  className={['restricted-access'].includes(user.role) ? 'tw-cursor-not-allowed tw-py-2' : 'tw-cursor-pointer tw-py-2'}
+                  className={["restricted-access"].includes(user.role) ? "tw-cursor-not-allowed tw-py-2" : "tw-cursor-pointer tw-py-2"}
                   onClick={() => {
                     const searchParams = new URLSearchParams(history.location.search);
-                    searchParams.set('actionId', action._id);
+                    searchParams.set("actionId", action._id);
                     history.push(`?${searchParams.toString()}`);
-                  }}>
+                  }}
+                >
                   <div className="tw-flex">
                     <div className="tw-flex tw-flex-1 tw-items-center tw-gap-x-2">
                       {action.urgent ? <ExclamationMarkButton /> : null}
@@ -236,7 +240,7 @@ const ActionsTable = ({ filteredData }) => {
                       </div>
                     </div>
                   </div>
-                  <div className="tw-mt-2 -tw-mb-2 tw-flex tw-basis-full tw-gap-1 tw-text-xs tw-opacity-50 [overflow-wrap:anywhere]">
+                  <div className="-tw-mb-2 tw-mt-2 tw-flex tw-basis-full tw-gap-1 tw-text-xs tw-opacity-50 [overflow-wrap:anywhere]">
                     <span>Créée par</span>
                     <UserName id={action.user} />
                   </div>

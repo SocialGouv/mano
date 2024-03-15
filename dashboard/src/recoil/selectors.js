@@ -1,24 +1,24 @@
-import { currentTeamState, userState, usersState } from './auth';
-import { personsState } from './persons';
-import { placesState } from './places';
-import { relsPersonPlaceState } from './relPersonPlace';
-import { reportsState } from './reports';
-import { ageFromBirthdateAsYear, dayjsInstance, formatBirthDate } from '../services/date';
-import { customFieldsObsSelector, territoryObservationsState } from './territoryObservations';
-import { selector } from 'recoil';
-import { actionsState } from './actions';
-import { consultationsState } from './consultations';
-import { commentsState } from './comments';
-import { passagesState } from './passages';
-import { medicalFileState } from './medicalFiles';
-import { treatmentsState } from './treatments';
-import { rencontresState } from './rencontres';
-import { groupsState } from './groups';
+import { currentTeamState, userState, usersState } from "./auth";
+import { personsState } from "./persons";
+import { placesState } from "./places";
+import { relsPersonPlaceState } from "./relPersonPlace";
+import { reportsState } from "./reports";
+import { ageFromBirthdateAsYear, dayjsInstance, formatBirthDate } from "../services/date";
+import { customFieldsObsSelector, territoryObservationsState } from "./territoryObservations";
+import { selector } from "recoil";
+import { actionsState } from "./actions";
+import { consultationsState } from "./consultations";
+import { commentsState } from "./comments";
+import { passagesState } from "./passages";
+import { medicalFileState } from "./medicalFiles";
+import { treatmentsState } from "./treatments";
+import { rencontresState } from "./rencontres";
+import { groupsState } from "./groups";
 
-const tomorrow = dayjsInstance().add(1, 'day').format('YYYY-MM-DD');
+const tomorrow = dayjsInstance().add(1, "day").format("YYYY-MM-DD");
 
 const usersObjectSelector = selector({
-  key: 'usersObjectSelector',
+  key: "usersObjectSelector",
   get: ({ get }) => {
     const users = get(usersState);
     const usersObject = {};
@@ -30,7 +30,7 @@ const usersObjectSelector = selector({
 });
 
 export const currentTeamReportsSelector = selector({
-  key: 'currentTeamReportsSelector',
+  key: "currentTeamReportsSelector",
   get: ({ get }) => {
     const reports = get(reportsState);
     const currentTeam = get(currentTeamState);
@@ -39,7 +39,7 @@ export const currentTeamReportsSelector = selector({
 });
 
 const actionsWithCommentsSelector = selector({
-  key: 'actionsWithCommentsSelector',
+  key: "actionsWithCommentsSelector",
   get: ({ get }) => {
     const actions = get(actionsState);
     const comments = get(commentsState);
@@ -56,7 +56,7 @@ const actionsWithCommentsSelector = selector({
 });
 
 const placesObjectSelector = selector({
-  key: 'placesObjectSelector',
+  key: "placesObjectSelector",
   get: ({ get }) => {
     const places = get(placesState);
     const placesObject = {};
@@ -69,7 +69,7 @@ const placesObjectSelector = selector({
 });
 
 export const personsObjectSelector = selector({
-  key: 'personsObjectSelector',
+  key: "personsObjectSelector",
   get: ({ get }) => {
     const persons = get(personsState);
     const personsObject = {};
@@ -81,7 +81,7 @@ export const personsObjectSelector = selector({
 });
 
 export const itemsGroupedByPersonSelector = selector({
-  key: 'itemsGroupedByPersonSelector',
+  key: "itemsGroupedByPersonSelector",
   get: ({ get }) => {
     const persons = get(personsState);
     const originalPersonsObject = {};
@@ -96,7 +96,7 @@ export const itemsGroupedByPersonSelector = selector({
         userPopulated: usersObject[person.user],
         formattedBirthDate: formatBirthDate(person.birthdate),
         age: ageFromBirthdateAsYear(person.birthdate),
-        formattedPhoneNumber: person.phone?.replace(/\D/g, ''),
+        formattedPhoneNumber: person.phone?.replace(/\D/g, ""),
         interactions: [person.followedSince || person.createdAt],
         lastUpdateCheckForGDPR: person.followedSince || person.createdAt,
         // BUG FIX: we used to set an `outOfActiveListDate` even if `outOfActiveList` was false.
@@ -133,10 +133,10 @@ export const itemsGroupedByPersonSelector = selector({
       for (const document of person.documents) {
         const documentForModule = {
           ...document,
-          type: document.type ?? 'document', // or 'folder'
+          type: document.type ?? "document", // or 'folder'
           linkedItem: {
             _id: person._id,
-            type: 'person',
+            type: "person",
           },
         };
         documentsForModule.push(documentForModule);
@@ -183,12 +183,12 @@ export const itemsGroupedByPersonSelector = selector({
         if (!person) continue;
         if (!personsObject[person]) continue;
         personsObject[person].comments = personsObject[person].comments || [];
-        personsObject[person].comments.push({ ...comment, type: 'action', date: comment.date || comment.createdAt });
+        personsObject[person].comments.push({ ...comment, type: "action", date: comment.date || comment.createdAt });
         continue;
       }
       if (!personsObject[comment.person]) continue;
       personsObject[comment.person].comments = personsObject[comment.person].comments || [];
-      personsObject[comment.person].comments.push({ ...comment, type: 'person', date: comment.date || comment.createdAt });
+      personsObject[comment.person].comments.push({ ...comment, type: "person", date: comment.date || comment.createdAt });
       personsObject[comment.person].interactions.push(comment.date || comment.createdAt);
       if (!!comment.group) {
         const group = personsObject[comment.person].group;
@@ -197,7 +197,7 @@ export const itemsGroupedByPersonSelector = selector({
           if (!personsObject[person]) continue;
           if (person === comment.person) continue;
           personsObject[person].comments = personsObject[person].comments || [];
-          personsObject[person].comments.push({ ...comment, type: 'person', date: comment.date || comment.createdAt });
+          personsObject[person].comments.push({ ...comment, type: "person", date: comment.date || comment.createdAt });
         }
       }
     }
@@ -228,7 +228,7 @@ export const itemsGroupedByPersonSelector = selector({
           ...comment,
           consultation,
           person: consultation.person,
-          type: 'consultation',
+          type: "consultation",
         });
       }
     }
@@ -244,7 +244,7 @@ export const itemsGroupedByPersonSelector = selector({
           ...comment,
           treatment,
           person: treatment.person,
-          type: 'treatment',
+          type: "treatment",
         });
       }
     }
@@ -282,7 +282,7 @@ export const itemsGroupedByPersonSelector = selector({
         personsObject[medicalFile.person].commentsMedical.push({
           ...comment,
           person: medicalFile.person,
-          type: 'medical-file',
+          type: "medical-file",
         });
       }
     }
@@ -291,15 +291,15 @@ export const itemsGroupedByPersonSelector = selector({
       personsObject[passage.person].passages = personsObject[passage.person].passages || [];
       personsObject[passage.person].passages.push({
         ...passage,
-        type: 'Non-anonyme',
-        gender: personsObject[passage.person]?.gender || 'Non renseigné',
+        type: "Non-anonyme",
+        gender: personsObject[passage.person]?.gender || "Non renseigné",
       });
       personsObject[passage.person].interactions.push(passage.date || passage.createdAt);
       if (passage.comment) {
         personsObject[passage.person].comments = personsObject[passage.person].comments || [];
         personsObject[passage.person].comments.push({
           comment: passage.comment,
-          type: 'passage',
+          type: "passage",
           team: passage.team,
           person: passage.person,
           passage: passage._id,
@@ -318,7 +318,7 @@ export const itemsGroupedByPersonSelector = selector({
         personsObject[rencontre.person].comments = personsObject[rencontre.person].comments || [];
         personsObject[rencontre.person].comments.push({
           comment: rencontre.comment,
-          type: 'rencontre',
+          type: "rencontre",
           rencontre: rencontre._id,
           person: rencontre.person,
           team: rencontre.team,
@@ -352,7 +352,7 @@ export const itemsGroupedByPersonSelector = selector({
 });
 
 export const arrayOfitemsGroupedByPersonSelector = selector({
-  key: 'arrayOfitemsGroupedByPersonSelector',
+  key: "arrayOfitemsGroupedByPersonSelector",
   get: ({ get }) => {
     const itemsGroupedByPerson = get(itemsGroupedByPersonSelector);
     return Object.values(itemsGroupedByPerson);
@@ -360,7 +360,7 @@ export const arrayOfitemsGroupedByPersonSelector = selector({
 });
 
 export const personsWithMedicalFileMergedSelector = selector({
-  key: 'personsWithMedicalFileMergedSelector',
+  key: "personsWithMedicalFileMergedSelector",
   get: ({ get }) => {
     const user = get(userState);
     const persons = get(arrayOfitemsGroupedByPersonSelector);
@@ -373,7 +373,7 @@ export const personsWithMedicalFileMergedSelector = selector({
 });
 
 export const personsForStatsSelector = selector({
-  key: 'personsForStatsSelector',
+  key: "personsForStatsSelector",
   get: ({ get }) => {
     const persons = get(arrayOfitemsGroupedByPersonSelector);
     return persons.map((p) => ({
@@ -384,7 +384,7 @@ export const personsForStatsSelector = selector({
 });
 
 const personsWithPlacesSelector = selector({
-  key: 'personsWithPlacesSelector',
+  key: "personsWithPlacesSelector",
   get: ({ get }) => {
     const persons = get(personsState);
     const personsObject = {};
@@ -406,7 +406,7 @@ const personsWithPlacesSelector = selector({
 });
 
 export const itemsGroupedByActionSelector = selector({
-  key: 'itemsGroupedByActionSelector',
+  key: "itemsGroupedByActionSelector",
   get: ({ get }) => {
     const actionsWithCommentsObject = get(actionsWithCommentsSelector);
     const personsWithPlacesObject = get(personsWithPlacesSelector);
@@ -426,7 +426,7 @@ export const itemsGroupedByActionSelector = selector({
 });
 
 export const arrayOfitemsGroupedByActionSelector = selector({
-  key: 'arrayOfitemsGroupedByActionSelector',
+  key: "arrayOfitemsGroupedByActionSelector",
   get: ({ get }) => {
     const itemsGroupedByAction = get(itemsGroupedByActionSelector);
     const itemsGroupedByActionArray = Object.values(itemsGroupedByAction);
@@ -435,7 +435,7 @@ export const arrayOfitemsGroupedByActionSelector = selector({
 });
 
 export const itemsGroupedByConsultationSelector = selector({
-  key: 'itemsGroupedByConsultationSelector',
+  key: "itemsGroupedByConsultationSelector",
   get: ({ get }) => {
     const consultations = get(consultationsState);
     const personsWithPlacesObject = get(personsWithPlacesSelector);
@@ -454,7 +454,7 @@ export const itemsGroupedByConsultationSelector = selector({
 });
 
 export const arrayOfitemsGroupedByConsultationSelector = selector({
-  key: 'arrayOfitemsGroupedByConsultationSelector',
+  key: "arrayOfitemsGroupedByConsultationSelector",
   get: ({ get }) => {
     const itemsGroupedByConsultation = get(itemsGroupedByConsultationSelector);
     const itemsGroupedByConsultationArray = Object.values(itemsGroupedByConsultation);
@@ -463,7 +463,7 @@ export const arrayOfitemsGroupedByConsultationSelector = selector({
 });
 
 export const itemsGroupedByTreatmentSelector = selector({
-  key: 'itemsGroupedByTreatmentSelector',
+  key: "itemsGroupedByTreatmentSelector",
   get: ({ get }) => {
     const treatments = get(treatmentsState);
     const personsWithPlacesObject = get(personsWithPlacesSelector);
@@ -482,7 +482,7 @@ export const itemsGroupedByTreatmentSelector = selector({
 });
 
 export const onlyFilledObservationsTerritories = selector({
-  key: 'onlyFilledObservationsTerritories',
+  key: "onlyFilledObservationsTerritories",
   get: ({ get }) => {
     const customFieldsObs = get(customFieldsObsSelector);
     const territoryObservations = get(territoryObservationsState);
@@ -508,7 +508,7 @@ export const onlyFilledObservationsTerritories = selector({
 });
 
 export const populatedPassagesSelector = selector({
-  key: 'populatedPassagesSelector',
+  key: "populatedPassagesSelector",
   get: ({ get }) => {
     const passages = get(passagesState);
     const allPersonsAsObject = get(itemsGroupedByPersonSelector);
@@ -517,8 +517,8 @@ export const populatedPassagesSelector = selector({
         if (!!passage.person && !allPersonsAsObject[passage.person]) return null;
         return {
           ...passage,
-          type: !!passage.person ? 'Non-anonyme' : 'Anonyme',
-          gender: !passage.person ? null : allPersonsAsObject[passage.person].gender || 'Non renseigné',
+          type: !!passage.person ? "Non-anonyme" : "Anonyme",
+          gender: !passage.person ? null : allPersonsAsObject[passage.person].gender || "Non renseigné",
         };
       })
       .filter(Boolean);

@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useRef } from 'react';
-import Sortable from 'sortablejs';
-import useMinimumWidth from '../services/useMinimumWidth';
+import React, { useCallback, useEffect, useRef } from "react";
+import Sortable from "sortablejs";
+import useMinimumWidth from "../services/useMinimumWidth";
 
 const Table = ({
   columns = [],
@@ -10,7 +10,7 @@ const Table = ({
   dataTestId = null,
   onRowClick,
   rowDisabled = () => false,
-  nullDisplay = '',
+  nullDisplay = "",
   className,
   title,
   noData,
@@ -35,11 +35,11 @@ const Table = ({
     }
   }, [onListChange, isSortable, data.length]);
 
-  const isDesktop = useMinimumWidth('sm');
+  const isDesktop = useMinimumWidth("sm");
 
   if (!data.length && noData) {
     return (
-      <table className={[className, 'table-selego'].join(' ')}>
+      <table className={[className, "table-selego"].join(" ")}>
         <thead>
           {!!title && (
             <tr>
@@ -60,7 +60,7 @@ const Table = ({
 
   if (isDesktop || !renderCellSmallDevices) {
     return (
-      <table className={[className, 'table-selego'].join(' ')}>
+      <table className={[className, "table-selego"].join(" ")}>
         <thead className="tw-hidden sm:tw-table-header-group">
           {!!title && (
             <tr>
@@ -74,24 +74,25 @@ const Table = ({
               const { onSortBy, onSortOrder, sortBy, sortOrder, sortableKey, dataKey } = column;
               const onNameClick = () => {
                 if (sortBy === sortableKey || sortBy === dataKey) {
-                  onSortOrder(sortOrder === 'ASC' ? 'DESC' : 'ASC');
+                  onSortOrder(sortOrder === "ASC" ? "DESC" : "ASC");
                   return;
                 }
                 onSortBy(sortableKey || dataKey);
               };
               return (
                 <td
-                  className={[column.className || '', !!onSortBy ? 'tw-cursor-pointer' : 'tw-cursor-default'].join(' ')}
+                  className={[column.className || "", !!onSortBy ? "tw-cursor-pointer" : "tw-cursor-default"].join(" ")}
                   style={column.style || {}}
-                  key={String(dataKey) + String(column.title)}>
+                  key={String(dataKey) + String(column.title)}
+                >
                   <button aria-label="Changer l'ordre de tri" type="button" onClick={!!onSortBy ? onNameClick : null}>
                     {column.title}
                   </button>
                   {column.help && <>{column.help}</>}
                   {!!onSortBy && (sortBy === sortableKey || sortBy === dataKey) && (
                     <button onClick={!!onSortBy ? onNameClick : null} type="button" aria-label="Changer l'ordre de tri">
-                      {sortOrder === 'ASC' && <span className="tw-mx-1" onClick={() => onSortOrder('DESC')}>{`\u00A0\u2193`}</span>}
-                      {sortOrder === 'DESC' && <span className="tw-mx-1" onClick={() => onSortOrder('ASC')}>{`\u00A0\u2191`}</span>}
+                      {sortOrder === "ASC" && <span className="tw-mx-1" onClick={() => onSortOrder("DESC")}>{`\u00A0\u2193`}</span>}
+                      {sortOrder === "DESC" && <span className="tw-mx-1" onClick={() => onSortOrder("ASC")}>{`\u00A0\u2191`}</span>}
                     </button>
                   )}
                 </td>
@@ -107,7 +108,7 @@ const Table = ({
                 <tr
                   onClick={() => (!rowDisabled(item) && onRowClick ? onRowClick(item) : null)}
                   onKeyUp={(event) => {
-                    if (event.key === 'Enter')
+                    if (event.key === "Enter")
                       if (!rowDisabled(item) && onRowClick) {
                         onRowClick(item);
                       }
@@ -118,19 +119,21 @@ const Table = ({
                   tabIndex={0}
                   className={[
                     rowDisabled(item)
-                      ? 'tw-cursor-not-allowed'
+                      ? "tw-cursor-not-allowed"
                       : isSortable
-                      ? 'tw-cursor-move'
+                      ? "tw-cursor-move"
                       : Boolean(onRowClick)
-                      ? 'tw-cursor-pointer'
-                      : 'tw-cursor-auto',
-                  ].join(' ')}
-                  style={item.style || {}}>
+                      ? "tw-cursor-pointer"
+                      : "tw-cursor-auto",
+                  ].join(" ")}
+                  style={item.style || {}}
+                >
                   {columns.map((column) => {
                     return (
                       <td
-                        className={([column.className || ''].join(' '), !!column.small ? 'small' : 'not-small')}
-                        key={item[rowKey] + column.dataKey}>
+                        className={([column.className || ""].join(" "), !!column.small ? "small" : "not-small")}
+                        key={item[rowKey] + column.dataKey}
+                      >
                         {column.render ? column.render(item) : item[column.dataKey] || nullDisplay}
                       </td>
                     );

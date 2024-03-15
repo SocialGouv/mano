@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
-import { toast } from 'react-toastify';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import dayjs from 'dayjs';
-import { v4 as uuidv4 } from 'uuid';
-import ButtonCustom from '../../components/ButtonCustom';
-import UserName from '../../components/UserName';
-import { userState } from '../../recoil/auth';
-import { dayjsInstance } from '../../services/date';
-import API from '../../services/api';
-import { groupSelector, groupsState, prepareGroupForEncryption } from '../../recoil/groups';
-import SelectPerson from '../../components/SelectPerson';
-import { useDataLoader } from '../../components/DataLoader';
-import PersonName from '../../components/PersonName';
-import { ModalContainer, ModalHeader, ModalBody, ModalFooter } from '../../components/tailwind/Modal';
-import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
+import React, { useState } from "react";
+import { toast } from "react-toastify";
+import { useRecoilState, useRecoilValue } from "recoil";
+import dayjs from "dayjs";
+import { v4 as uuidv4 } from "uuid";
+import ButtonCustom from "../../components/ButtonCustom";
+import UserName from "../../components/UserName";
+import { userState } from "../../recoil/auth";
+import { dayjsInstance } from "../../services/date";
+import API from "../../services/api";
+import { groupSelector, groupsState, prepareGroupForEncryption } from "../../recoil/groups";
+import SelectPerson from "../../components/SelectPerson";
+import { useDataLoader } from "../../components/DataLoader";
+import PersonName from "../../components/PersonName";
+import { ModalContainer, ModalHeader, ModalBody, ModalFooter } from "../../components/tailwind/Modal";
+import { itemsGroupedByPersonSelector } from "../../recoil/selectors";
 
 const PersonFamily = ({ person }) => {
   const [groups, setGroups] = useRecoilState(groupsState);
@@ -31,7 +31,7 @@ const PersonFamily = ({ person }) => {
       return toast.error("Le lien avec cette personne est vite vu : c'est elle !");
     }
     if (personGroup.persons.find((_personId) => _personId === personId)) {
-      return toast.error('Il y a déjà un lien entre ces deux personnes');
+      return toast.error("Il y a déjà un lien entre ces deux personnes");
     }
     const personDoesntBelongToAGroupYet = !personGroup?.persons?.length;
     const personAlreadyBelongToAGroup = !personDoesntBelongToAGroupYet;
@@ -53,7 +53,7 @@ const PersonFamily = ({ person }) => {
       },
     ];
     for (const otherNewRelation of Object.keys(otherNewRelations) || []) {
-      const otherPersonId = otherNewRelation.replace('description-', '');
+      const otherPersonId = otherNewRelation.replace("description-", "");
       const description = otherNewRelations[otherNewRelation];
       if (person._id === otherPersonId) {
         continue;
@@ -75,14 +75,14 @@ const PersonFamily = ({ person }) => {
     };
     const isNew = !groupToEdit?._id;
     const response = isNew
-      ? await API.post({ path: '/group', body: prepareGroupForEncryption(nextGroup) })
+      ? await API.post({ path: "/group", body: prepareGroupForEncryption(nextGroup) })
       : await API.put({ path: `/group/${groupToEdit._id}`, body: prepareGroupForEncryption(nextGroup) });
     if (response.ok) {
       setGroups((groups) =>
         isNew ? [...groups, response.decryptedData] : groups.map((group) => (group._id === groupToEdit._id ? response.decryptedData : group))
       );
       setNewRelationModalOpen(false);
-      toast.success('Le lien familial a été ajouté');
+      toast.success("Le lien familial a été ajouté");
     }
   };
 
@@ -99,7 +99,7 @@ const PersonFamily = ({ person }) => {
     if (response.ok) {
       setGroups((groups) => groups.map((group) => (group._id === personGroup._id ? response.decryptedData : group)));
       setRelationToEdit(null);
-      toast.success('Le lien familial a été modifié');
+      toast.success("Le lien familial a été modifié");
     }
   };
 
@@ -121,7 +121,7 @@ const PersonFamily = ({ person }) => {
       if (deleteResponse.ok) {
         setGroups((groups) => groups.filter((group) => group._id !== personGroup._id));
         setRelationToEdit(null);
-        toast.success('Le lien familial a été supprimé');
+        toast.success("Le lien familial a été supprimé");
         return;
       }
     }
@@ -133,7 +133,7 @@ const PersonFamily = ({ person }) => {
     if (response.ok) {
       setGroups((groups) => groups.map((group) => (group._id === personGroup._id ? response.decryptedData : group)));
       setRelationToEdit(null);
-      toast.success('Le lien familial a été supprimé');
+      toast.success("Le lien familial a été supprimé");
     }
   };
 
@@ -176,14 +176,14 @@ const PersonFamily = ({ person }) => {
                 <tr key={JSON.stringify(persons)}>
                   <td>
                     <PersonName item={{ person: persons[0] }} />
-                    {' et '}
+                    {" et "}
                     <PersonName item={{ person: persons[1] }} />
                   </td>
                   <td>{description}</td>
                   <td width="15%">
                     <UserName id={user} />
                   </td>
-                  <td width="15%">{dayjsInstance(createdAt).format('DD/MM/YYYY HH:mm')}</td>
+                  <td width="15%">{dayjsInstance(createdAt).format("DD/MM/YYYY HH:mm")}</td>
                   <td width="15%">
                     <div className="tw-flex tw-flex-col tw-items-center tw-gap-2">
                       <button type="button" className="button-classic" onClick={() => setRelationToEdit(_relation)}>
@@ -314,7 +314,8 @@ const EditRelation = ({ open, setOpen, onEditRelation, onDeleteRelation, relatio
           key={JSON.stringify(relationToEdit)}
           id="edit-family-relation"
           className="tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8 tw-py-4"
-          onSubmit={onEditRelation}>
+          onSubmit={onEditRelation}
+        >
           <input type="hidden" name="_id" defaultValue={relationToEdit?._id} />
           <input type="hidden" name="personId1" defaultValue={relationToEdit?.persons[0]} />
           <input type="hidden" name="personId2" defaultValue={relationToEdit?.persons[1]} />

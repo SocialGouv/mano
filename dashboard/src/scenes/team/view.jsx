@@ -1,26 +1,26 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { FormGroup, Input, Label, Row, Col } from 'reactstrap';
+import React, { useEffect, useMemo, useState } from "react";
+import { FormGroup, Input, Label, Row, Col } from "reactstrap";
 
-import { useParams, useHistory } from 'react-router-dom';
-import { Formik } from 'formik';
-import { toast } from 'react-toastify';
+import { useParams, useHistory } from "react-router-dom";
+import { Formik } from "formik";
+import { toast } from "react-toastify";
 
-import { SmallHeaderWithBackButton } from '../../components/header';
-import Loading from '../../components/loading';
-import ButtonCustom from '../../components/ButtonCustom';
-import NightSessionModale from '../../components/NightSessionModale';
-import { currentTeamState, teamsState } from '../../recoil/auth';
-import API from '../../services/api';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import useTitle from '../../services/useTitle';
-import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
-import { actionsState } from '../../recoil/actions';
-import { consultationsState } from '../../recoil/consultations';
-import { commentsState } from '../../recoil/comments';
-import { territoryObservationsState } from '../../recoil/territoryObservations';
-import { personsState } from '../../recoil/persons';
-import { passagesState } from '../../recoil/passages';
-import { rencontresState } from '../../recoil/rencontres';
+import { SmallHeaderWithBackButton } from "../../components/header";
+import Loading from "../../components/loading";
+import ButtonCustom from "../../components/ButtonCustom";
+import NightSessionModale from "../../components/NightSessionModale";
+import { currentTeamState, teamsState } from "../../recoil/auth";
+import API from "../../services/api";
+import { useRecoilState, useRecoilValue } from "recoil";
+import useTitle from "../../services/useTitle";
+import DeleteButtonAndConfirmModal from "../../components/DeleteButtonAndConfirmModal";
+import { actionsState } from "../../recoil/actions";
+import { consultationsState } from "../../recoil/consultations";
+import { commentsState } from "../../recoil/comments";
+import { territoryObservationsState } from "../../recoil/territoryObservations";
+import { personsState } from "../../recoil/persons";
+import { passagesState } from "../../recoil/passages";
+import { rencontresState } from "../../recoil/rencontres";
 
 const View = () => {
   const [team, setTeam] = useState(null);
@@ -50,7 +50,7 @@ const View = () => {
     if (personsInTeam.length) items.push(`${personsInTeam.length} personnes`);
     if (passagesInTeam.length) items.push(`${passagesInTeam.length} passages`);
     if (rencontresInTeam.length) items.push(`${rencontresInTeam.length} rencontres`);
-    return items.length ? `Vous ne pouvez pas supprimer cette équipe, vous avez ${items.join(', ')} qui y sont liées.` : null;
+    return items.length ? `Vous ne pouvez pas supprimer cette équipe, vous avez ${items.join(", ")} qui y sont liées.` : null;
   }, [actions, consultations, comments, observations, persons, passages, rencontres, id]);
 
   useTitle(`Équipes ${team?.name}`);
@@ -80,7 +80,7 @@ const View = () => {
           try {
             const response = await API.put({ path: `/team/${team._id}`, body });
             if (response.ok) {
-              toast.success('Mise à jour !');
+              toast.success("Mise à jour !");
               setTeams(
                 teams.map((t) => {
                   if (t._id !== id) return t;
@@ -90,10 +90,11 @@ const View = () => {
               if (currentTeam._id === id) setCurrentTeam(response.data);
             }
           } catch (errorUpdatingTeam) {
-            console.log('error in updating team', errorUpdatingTeam);
+            console.log("error in updating team", errorUpdatingTeam);
             toast.error(errorUpdatingTeam.message);
           }
-        }}>
+        }}
+      >
         {({ values, handleChange, handleSubmit, isSubmitting }) => (
           <React.Fragment>
             <Row>
@@ -107,7 +108,7 @@ const View = () => {
               <Col md={12}>
                 <FormGroup>
                   <Label />
-                  <div style={{ display: 'flex', marginLeft: 20, width: '80%' }}>
+                  <div style={{ display: "flex", marginLeft: 20, width: "80%" }}>
                     <label htmlFor="nightSession">Équipe de nuit</label>
                     <Input type="checkbox" name="nightSession" id="nightSession" checked={values.nightSession} onChange={handleChange} />
                     <NightSessionModale />
@@ -121,7 +122,8 @@ const View = () => {
                   className="button-destructive"
                   onClick={() => {
                     toast.error(cantDeleteMessage);
-                  }}>
+                  }}
+                >
                   Supprimer
                 </button>
               ) : (
@@ -134,16 +136,17 @@ const View = () => {
                     const res = await API.delete({ path: `/team/${id}` });
                     if (!res.ok) return;
                     setTeams(teams.filter((t) => t._id !== id));
-                    toast.success('Suppression réussie');
+                    toast.success("Suppression réussie");
                     history.goBack();
-                  }}>
-                  <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
+                  }}
+                >
+                  <span style={{ marginBottom: 30, display: "block", width: "100%", textAlign: "center" }}>
                     Cette opération est irréversible
                     <br />
                   </span>
                 </DeleteButtonAndConfirmModal>
               )}
-              <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} />
+              <ButtonCustom title={"Mettre à jour"} loading={isSubmitting} onClick={handleSubmit} />
             </div>
           </React.Fragment>
         )}

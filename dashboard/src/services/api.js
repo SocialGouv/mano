@@ -1,14 +1,14 @@
-import { atom } from 'recoil';
-import { getRecoil, setRecoil } from 'recoil-nexus';
-import URI from 'urijs';
-import { toast } from 'react-toastify';
-import fetchRetry from 'fetch-retry';
-import packageInfo from '../../package.json';
-import { HOST, SCHEME } from '../config';
-import { organisationState } from '../recoil/auth';
-import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey, encryptFile, decryptFile } from './encryption';
-import { AppSentry, capture } from './sentry';
-import { deploymentCommitState, deploymentDateState } from '../recoil/version';
+import { atom } from "recoil";
+import { getRecoil, setRecoil } from "recoil-nexus";
+import URI from "urijs";
+import { toast } from "react-toastify";
+import fetchRetry from "fetch-retry";
+import packageInfo from "../../package.json";
+import { HOST, SCHEME } from "../config";
+import { organisationState } from "../recoil/auth";
+import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey, encryptFile, decryptFile } from "./encryption";
+import { AppSentry, capture } from "./sentry";
+import { deploymentCommitState, deploymentDateState } from "../recoil/version";
 const fetch = fetchRetry(window.fetch);
 
 const getUrl = (path, query = {}) => {
@@ -20,7 +20,7 @@ let hashedOrgEncryptionKey = null;
 let enableEncrypt = false;
 
 /* auth */
-export const authTokenState = atom({ key: 'authTokenState', default: null });
+export const authTokenState = atom({ key: "authTokenState", default: null });
 
 /* methods */
 export const setOrgEncryptionKey = async (orgEncryptionKey, { encryptedVerificationKey = null, needDerivation = true } = {}) => {
@@ -29,7 +29,7 @@ export const setOrgEncryptionKey = async (orgEncryptionKey, { encryptedVerificat
     const encryptionKeyIsValid = await checkEncryptedVerificationKey(encryptedVerificationKey, newHashedOrgEncryptionKey);
     if (!encryptionKeyIsValid) {
       toast.error(
-        'La clé de chiffrement ne semble pas être correcte, veuillez réessayer ou demander à un membre de votre organisation de vous aider (les équipes ne mano ne la connaissent pas)'
+        "La clé de chiffrement ne semble pas être correcte, veuillez réessayer ou demander à un membre de votre organisation de vous aider (les équipes ne mano ne la connaissent pas)"
       );
       return false;
     }
@@ -58,7 +58,7 @@ export const encryptItem = async (item) => {
       decryptDBItem({ encryptedContent, encryptedEntityKey }, hashedOrgEncryptionKey);
     } catch (e) {
       // TODO: remove when debug is done
-      capture('error decrypting item after encrypting', { extra: { e, item: item._id } });
+      capture("error decrypting item after encrypting", { extra: { e, item: item._id } });
     }
 
     item.encrypted = encryptedContent;
@@ -98,8 +98,8 @@ const decryptDBItem = async (item, { path, encryptedVerificationKey = null } = {
     try {
       JSON.parse(content);
     } catch (errorDecryptParsing) {
-      toast.error('Désolé une erreur est survenue lors du déchiffrement ' + errorDecryptParsing);
-      capture('ERROR PARSING CONTENT', { extra: { errorDecryptParsing, content } });
+      toast.error("Désolé une erreur est survenue lors du déchiffrement " + errorDecryptParsing);
+      capture("ERROR PARSING CONTENT", { extra: { errorDecryptParsing, content } });
     }
 
     const decryptedItem = {
@@ -111,7 +111,7 @@ const decryptDBItem = async (item, { path, encryptedVerificationKey = null } = {
   } catch (errorDecrypt) {
     capture(`ERROR DECRYPTING ITEM : ${errorDecrypt}`, {
       extra: {
-        message: 'ERROR DECRYPTING ITEM',
+        message: "ERROR DECRYPTING ITEM",
         item,
         path,
       },
@@ -126,7 +126,7 @@ const decryptDBItem = async (item, { path, encryptedVerificationKey = null } = {
   return item;
 };
 
-export const recoilResetKeyState = atom({ key: 'recoilResetKeyState', default: 0 });
+export const recoilResetKeyState = atom({ key: "recoilResetKeyState", default: 0 });
 
 const reset = () => {
   hashedOrgEncryptionKey = null;
@@ -134,11 +134,11 @@ const reset = () => {
   setRecoil(authTokenState, null);
   setRecoil(recoilResetKeyState, Date.now());
   AppSentry.setUser({});
-  AppSentry.setTag('organisationId', '');
+  AppSentry.setTag("organisationId", "");
 };
 
 const logout = async (reloadAfterLogout = true) => {
-  await post({ path: '/user/logout' });
+  await post({ path: "/user/logout" });
   reset();
   if (reloadAfterLogout) window.location.reload();
 };
@@ -149,14 +149,14 @@ const upload = async ({ file, path }, forceKey) => {
   const tokenCached = getRecoil(authTokenState);
   const { encryptedEntityKey, encryptedFile } = await encryptFile(file, forceKey || hashedOrgEncryptionKey);
   const formData = new FormData();
-  formData.append('file', encryptedFile);
+  formData.append("file", encryptedFile);
 
   const options = {
-    method: 'POST',
-    mode: 'cors',
-    credentials: 'include',
+    method: "POST",
+    mode: "cors",
+    credentials: "include",
     body: formData,
-    headers: { Authorization: `JWT ${tokenCached}`, Accept: 'application/json', platform: 'dashboard', version: packageInfo.version },
+    headers: { Authorization: `JWT ${tokenCached}`, Accept: "application/json", platform: "dashboard", version: packageInfo.version },
   };
   const url = getUrl(path);
   const response = await fetch(url, options);
@@ -168,10 +168,10 @@ const upload = async ({ file, path }, forceKey) => {
 const download = async ({ path, encryptedEntityKey }, forceKey) => {
   const tokenCached = getRecoil(authTokenState);
   const options = {
-    method: 'GET',
-    mode: 'cors',
-    credentials: 'include',
-    headers: { Authorization: `JWT ${tokenCached}`, 'Content-Type': 'application/json', platform: 'dashboard', version: packageInfo.version },
+    method: "GET",
+    mode: "cors",
+    credentials: "include",
+    headers: { Authorization: `JWT ${tokenCached}`, "Content-Type": "application/json", platform: "dashboard", version: packageInfo.version },
   };
   const url = getUrl(path);
   const response = await fetch(url, options);
@@ -183,30 +183,30 @@ const download = async ({ path, encryptedEntityKey }, forceKey) => {
 const deleteFile = async ({ path }) => {
   const tokenCached = getRecoil(authTokenState);
   const options = {
-    method: 'DELETE',
-    mode: 'cors',
-    credentials: 'include',
-    headers: { Authorization: `JWT ${tokenCached}`, 'Content-Type': 'application/json', platform: 'dashboard', version: packageInfo.version },
+    method: "DELETE",
+    mode: "cors",
+    credentials: "include",
+    headers: { Authorization: `JWT ${tokenCached}`, "Content-Type": "application/json", platform: "dashboard", version: packageInfo.version },
   };
   const url = getUrl(path);
   const response = await fetch(url, options);
   return response.json();
 };
 
-const execute = async ({ method, path = '', body = null, query = {}, headers = {}, forceMigrationLastUpdate = null, skipDecrypt = false } = {}) => {
+const execute = async ({ method, path = "", body = null, query = {}, headers = {}, forceMigrationLastUpdate = null, skipDecrypt = false } = {}) => {
   const organisation = getRecoil(organisationState) || {};
   const tokenCached = getRecoil(authTokenState);
   const { encryptionLastUpdateAt, encryptionEnabled, encryptedVerificationKey, migrationLastUpdateAt } = organisation;
   try {
     // Force logout when one user has been logged in multiple tabs to different organisations.
     if (
-      path !== '/user/logout' &&
+      path !== "/user/logout" &&
       organisation._id &&
-      window.localStorage.getItem('mano-organisationId') &&
-      organisation._id !== window.localStorage.getItem('mano-organisationId')
+      window.localStorage.getItem("mano-organisationId") &&
+      organisation._id !== window.localStorage.getItem("mano-organisationId")
     ) {
       toast.error(
-        'Veuillez vous reconnecter. Il semble que des connexions à plusieurs organisations soient actives dans un même navigateur (par exemple dans un autre onglet). Cela peut poser des problèmes de cache.',
+        "Veuillez vous reconnecter. Il semble que des connexions à plusieurs organisations soient actives dans un même navigateur (par exemple dans un autre onglet). Cela peut poser des problèmes de cache.",
         { autoClose: 8000 }
       );
       logout();
@@ -214,16 +214,16 @@ const execute = async ({ method, path = '', body = null, query = {}, headers = {
     if (tokenCached) headers.Authorization = `JWT ${tokenCached}`;
     const options = {
       method,
-      mode: 'cors',
-      credentials: 'include',
-      headers: { ...headers, 'Content-Type': 'application/json', Accept: 'application/json', platform: 'dashboard', version: packageInfo.version },
+      mode: "cors",
+      credentials: "include",
+      headers: { ...headers, "Content-Type": "application/json", Accept: "application/json", platform: "dashboard", version: packageInfo.version },
     };
 
     if (body) {
       options.body = JSON.stringify(await encryptItem(body));
     }
 
-    if (['PUT', 'POST', 'DELETE'].includes(method) && enableEncrypt) {
+    if (["PUT", "POST", "DELETE"].includes(method) && enableEncrypt) {
       query = {
         encryptionLastUpdateAt,
         encryptionEnabled,
@@ -237,21 +237,21 @@ const execute = async ({ method, path = '', body = null, query = {}, headers = {
 
     const url = getUrl(path, query);
     const response = await fetch(url, options);
-    if (response.headers.has('x-api-deployment-commit')) {
-      setRecoil(deploymentCommitState, response.headers.get('x-api-deployment-commit'));
-      if (!window.localStorage.getItem('deploymentCommit')) {
-        window.localStorage.setItem('deploymentCommit', response.headers.get('x-api-deployment-commit'));
+    if (response.headers.has("x-api-deployment-commit")) {
+      setRecoil(deploymentCommitState, response.headers.get("x-api-deployment-commit"));
+      if (!window.localStorage.getItem("deploymentCommit")) {
+        window.localStorage.setItem("deploymentCommit", response.headers.get("x-api-deployment-commit"));
       }
     }
-    if (response.headers.has('x-api-deployment-date')) {
-      setRecoil(deploymentDateState, response.headers.get('x-api-deployment-date'));
-      if (!window.localStorage.getItem('deploymentDate')) {
-        window.localStorage.setItem('deploymentDate', response.headers.get('x-api-deployment-date'));
+    if (response.headers.has("x-api-deployment-date")) {
+      setRecoil(deploymentDateState, response.headers.get("x-api-deployment-date"));
+      if (!window.localStorage.getItem("deploymentDate")) {
+        window.localStorage.setItem("deploymentDate", response.headers.get("x-api-deployment-date"));
       }
     }
 
     if (!response.ok && response.status === 401) {
-      if (!['/user/logout', '/user/signin-token'].includes(path)) logout();
+      if (!["/user/logout", "/user/signin-token"].includes(path)) logout();
       return response;
     }
 
@@ -259,13 +259,13 @@ const execute = async ({ method, path = '', body = null, query = {}, headers = {
       const res = await response.json();
       if (!response.ok) {
         if (res?.error?.message) {
-          toast?.error(res?.error?.message, { autoClose: import.meta.env.VITE_TEST_PLAYWRIGHT !== 'true' });
+          toast?.error(res?.error?.message, { autoClose: import.meta.env.VITE_TEST_PLAYWRIGHT !== "true" });
         } else if (res?.error) {
-          toast?.error(res?.error, { autoClose: import.meta.env.VITE_TEST_PLAYWRIGHT !== 'true' });
+          toast?.error(res?.error, { autoClose: import.meta.env.VITE_TEST_PLAYWRIGHT !== "true" });
         } else if (res?.code) {
-          toast?.error(res?.code, { autoClose: import.meta.env.VITE_TEST_PLAYWRIGHT !== 'true' });
+          toast?.error(res?.code, { autoClose: import.meta.env.VITE_TEST_PLAYWRIGHT !== "true" });
         } else {
-          capture('api error unhandled', { extra: { res, path, query } });
+          capture("api error unhandled", { extra: { res, path, query } });
         }
       }
       if (skipDecrypt) {
@@ -281,7 +281,7 @@ const execute = async ({ method, path = '', body = null, query = {}, headers = {
         return res;
       }
     } catch (errorFromJson) {
-      capture(errorFromJson, { extra: { message: 'error parsing response', response, path, query } });
+      capture(errorFromJson, { extra: { message: "error parsing response", response, path, query } });
       return { ok: false, error: "Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !" };
     }
   } catch (errorExecuteApi) {
@@ -295,22 +295,22 @@ const execute = async ({ method, path = '', body = null, query = {}, headers = {
         headers,
       },
     });
-    if (typeof errorExecuteApi === 'string') {
-      toast.error(errorExecuteApi, { autoClose: import.meta.env.VITE_TEST_PLAYWRIGHT !== 'true' });
+    if (typeof errorExecuteApi === "string") {
+      toast.error(errorExecuteApi, { autoClose: import.meta.env.VITE_TEST_PLAYWRIGHT !== "true" });
     } else if (errorExecuteApi?.message) {
-      toast.error(errorExecuteApi.message, { autoClose: import.meta.env.VITE_TEST_PLAYWRIGHT !== 'true' });
+      toast.error(errorExecuteApi.message, { autoClose: import.meta.env.VITE_TEST_PLAYWRIGHT !== "true" });
     } else {
-      toast.error('Désolé, une erreur est survenue', { autoClose: import.meta.env.VITE_TEST_PLAYWRIGHT !== 'true' });
+      toast.error("Désolé, une erreur est survenue", { autoClose: import.meta.env.VITE_TEST_PLAYWRIGHT !== "true" });
     }
 
     throw errorExecuteApi;
   }
 };
 
-const get = (args) => execute({ method: 'GET', ...args });
-const post = (args) => execute({ method: 'POST', ...args });
-const put = (args) => execute({ method: 'PUT', ...args });
-const executeDelete = (args) => execute({ method: 'DELETE', ...args });
+const get = (args) => execute({ method: "GET", ...args });
+const post = (args) => execute({ method: "POST", ...args });
+const put = (args) => execute({ method: "PUT", ...args });
+const executeDelete = (args) => execute({ method: "DELETE", ...args });
 
 const API = {
   get,

@@ -1,13 +1,13 @@
-import React, { useMemo, useState } from 'react';
-import { CustomResponsivePie } from './charts';
-import { getPieData } from './utils';
-import { organisationState } from '../../recoil/auth';
-import { useRecoilValue } from 'recoil';
-import { Block } from './Blocks';
-import CustomFieldsStats from './CustomFieldsStats';
-import Filters from '../../components/Filters';
-import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../components/tailwind/Modal';
-import ActionsSortableList from '../../components/ActionsSortableList';
+import React, { useMemo, useState } from "react";
+import { CustomResponsivePie } from "./charts";
+import { getPieData } from "./utils";
+import { organisationState } from "../../recoil/auth";
+import { useRecoilValue } from "recoil";
+import { Block } from "./Blocks";
+import CustomFieldsStats from "./CustomFieldsStats";
+import Filters from "../../components/Filters";
+import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "../../components/tailwind/Modal";
+import ActionsSortableList from "../../components/ActionsSortableList";
 
 export default function ConsultationsStats({ consultations, personsWithConsultations, filterBase, filterPersons, setFilterPersons }) {
   const organisation = useRecoilValue(organisationState);
@@ -41,15 +41,16 @@ export default function ConsultationsStats({ consultations, personsWithConsultat
         <Filters title={filterTitle} base={filterBase} filters={filterPersons} onChange={setFilterPersons} />
       </div>
       <details
-        open={window.localStorage.getItem('consultations-stats-general-open') === 'true'}
+        open={window.localStorage.getItem("consultations-stats-general-open") === "true"}
         onToggle={(e) => {
           if (e.target.open) {
-            window.localStorage.setItem('consultations-stats-general-open', 'true');
+            window.localStorage.setItem("consultations-stats-general-open", "true");
           } else {
-            window.localStorage.removeItem('consultations-stats-general-open');
+            window.localStorage.removeItem("consultations-stats-general-open");
           }
-        }}>
-        <summary className="tw-my-8 tw-mx-0">
+        }}
+      >
+        <summary className="tw-mx-0 tw-my-8">
           <h4 className="tw-inline tw-text-xl tw-text-black75">Global</h4>
         </summary>
         <div className="tw-mb-5 tw-flex tw-justify-center">
@@ -66,7 +67,7 @@ export default function ConsultationsStats({ consultations, personsWithConsultat
         </div>
         <CustomResponsivePie
           title="Consultations par type"
-          data={getPieData(consultations, 'type')}
+          data={getPieData(consultations, "type")}
           onItemClick={(newSlice) => {
             setActionsModalOpened(true);
             setSlicedData(consultationsByType[newSlice].data);
@@ -75,7 +76,7 @@ export default function ConsultationsStats({ consultations, personsWithConsultat
         />
         <CustomResponsivePie
           title="Consultations par statut"
-          data={getPieData(consultations, 'status')}
+          data={getPieData(consultations, "status")}
           onItemClick={(newSlice) => {
             setActionsModalOpened(true);
             setSlicedData(consultations.filter((c) => c.status === newSlice));
@@ -86,16 +87,17 @@ export default function ConsultationsStats({ consultations, personsWithConsultat
       {organisation.consultations.map((c) => {
         return (
           <details
-            open={window.localStorage.getItem(`person-stats-${c.name.replace(' ', '-').toLocaleLowerCase()}-open`) === 'true'}
+            open={window.localStorage.getItem(`person-stats-${c.name.replace(" ", "-").toLocaleLowerCase()}-open`) === "true"}
             onToggle={(e) => {
               if (e.target.open) {
-                window.localStorage.setItem(`person-stats-${c.name.replace(' ', '-').toLocaleLowerCase()}-open`, 'true');
+                window.localStorage.setItem(`person-stats-${c.name.replace(" ", "-").toLocaleLowerCase()}-open`, "true");
               } else {
-                window.localStorage.removeItem(`person-stats-${c.name.replace(' ', '-').toLocaleLowerCase()}-open`);
+                window.localStorage.removeItem(`person-stats-${c.name.replace(" ", "-").toLocaleLowerCase()}-open`);
               }
             }}
-            key={c.name}>
-            <summary className="tw-my-8 tw-mx-0">
+            key={c.name}
+          >
+            <summary className="tw-mx-0 tw-my-8">
               <h4 className="tw-inline tw-text-xl tw-text-black75">
                 Statistiques des consultations de type « {c.name} » ({consultationsByType[c.name]?.data?.length ?? 0})
               </h4>
@@ -117,7 +119,7 @@ export default function ConsultationsStats({ consultations, personsWithConsultat
               customFields={c.fields}
               onSliceClick={(newSlice, field) => {
                 setActionsModalOpened(true);
-                if (newSlice === 'Non renseigné') {
+                if (newSlice === "Non renseigné") {
                   setSlicedData(consultationsByType[c.name].data.filter((c) => !c[field]));
                 } else {
                   setSlicedData(consultationsByType[c.name].data.filter((c) => c[field] === newSlice));
@@ -160,7 +162,8 @@ const SelectedActionsModal = ({ open, onClose, data, title, onAfterLeave }) => {
           className="button-cancel"
           onClick={() => {
             onClose(null);
-          }}>
+          }}
+        >
           Fermer
         </button>
       </ModalFooter>

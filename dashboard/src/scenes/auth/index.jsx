@@ -1,10 +1,10 @@
-import React from 'react';
-import { Switch } from 'react-router-dom';
+import React from "react";
+import { Switch } from "react-router-dom";
 
-import Reset from './reset';
-import Forgot from './forgot';
-import SignIn from './signin';
-import SentryRoute from '../../components/Sentryroute';
+import Reset from "./reset";
+import Forgot from "./forgot";
+import SignIn from "./signin";
+import SentryRoute from "../../components/Sentryroute";
 
 const Router = () => {
   return (

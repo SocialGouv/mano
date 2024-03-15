@@ -1,28 +1,28 @@
-import { useMemo } from 'react';
-import { Col, FormGroup } from 'reactstrap';
-import SelectAsInput from './SelectAsInput';
-import SelectCustom from './SelectCustom';
-import { capture } from '../services/sentry';
-import DatePicker from './DatePicker';
+import { useMemo } from "react";
+import { Col, FormGroup } from "reactstrap";
+import SelectAsInput from "./SelectAsInput";
+import SelectCustom from "./SelectCustom";
+import { capture } from "../services/sentry";
+import DatePicker from "./DatePicker";
 
 const CustomFieldInput = ({ field, values, handleChange, model, colWidth = null, disabled, hideLabel = false }) => {
   const id = useMemo(() => {
     const slugifiedLabel =
       field.label
         .toLowerCase()
-        .replace(/ /g, '-')
-        .replace(/[\\(\\)]/g, '')
-        .replace("'", '') ?? field.name;
-    if (['text', 'number'].includes(field.type)) return `${model}-custom-input-${slugifiedLabel}`;
-    if (['textarea'].includes(field.type)) return `${model}-custom-textarea-${slugifiedLabel}`;
-    if (['date-with-time', 'date', 'duration'].includes(field.type)) return `${model}-custom-datepicker-${slugifiedLabel}`;
-    if (['boolean'].includes(field.type)) return `${model}-custom-checkbox-${slugifiedLabel}`;
-    if (['yes-no'].includes(field.type)) return `${model}-custom-select-${slugifiedLabel}`;
-    if (['enum'].includes(field.type)) return `${model}-custom-select-${slugifiedLabel}`;
-    if (['multi-choice'].includes(field.type)) return `${model}-custom-select-${slugifiedLabel}`;
+        .replace(/ /g, "-")
+        .replace(/[\\(\\)]/g, "")
+        .replace("'", "") ?? field.name;
+    if (["text", "number"].includes(field.type)) return `${model}-custom-input-${slugifiedLabel}`;
+    if (["textarea"].includes(field.type)) return `${model}-custom-textarea-${slugifiedLabel}`;
+    if (["date-with-time", "date", "duration"].includes(field.type)) return `${model}-custom-datepicker-${slugifiedLabel}`;
+    if (["boolean"].includes(field.type)) return `${model}-custom-checkbox-${slugifiedLabel}`;
+    if (["yes-no"].includes(field.type)) return `${model}-custom-select-${slugifiedLabel}`;
+    if (["enum"].includes(field.type)) return `${model}-custom-select-${slugifiedLabel}`;
+    if (["multi-choice"].includes(field.type)) return `${model}-custom-select-${slugifiedLabel}`;
   }, [field, model]);
 
-  if (!colWidth) colWidth = field.type === 'textarea' ? 12 : 4;
+  if (!colWidth) colWidth = field.type === "textarea" ? 12 : 4;
 
   try {
     return (
@@ -33,22 +33,22 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = null,
               {field.label}
             </label>
           )}
-          {!!['text', 'number'].includes(field.type) && (
+          {!!["text", "number"].includes(field.type) && (
             <input
               disabled={disabled}
               name={field.name}
               className="tailwindui"
               required={field.required}
-              value={values[field.name] || ''}
+              value={values[field.name] || ""}
               onChange={(e) => {
-                if (field.type === 'text') return handleChange(e);
-                if (field.type === 'number') {
+                if (field.type === "text") return handleChange(e);
+                if (field.type === "number") {
                   e.persist();
                   // test the current value to have positive numbers or decimal only
                   if (!e.target.value?.length) return handleChange(e);
                   const regex = /^[0-9]*\.?[0-9]*$/;
                   if (!regex.test(e.target.value)) return;
-                  if (!e.target.value?.endsWith('.')) e.target.value = Number(e.target.value);
+                  if (!e.target.value?.endsWith(".")) e.target.value = Number(e.target.value);
                   handleChange(e);
                 }
               }}
@@ -58,10 +58,10 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = null,
               // the only con is that there is nomore arrows to increase/decrease the value
               // https://stackoverflow.com/a/54463605/5225096
               type="text"
-              inputMode={field.type === 'number' ? 'numeric' : undefined}
+              inputMode={field.type === "number" ? "numeric" : undefined}
             />
           )}
-          {!!['textarea'].includes(field.type) && (
+          {!!["textarea"].includes(field.type) && (
             <textarea
               disabled={disabled}
               className="tailwindui"
@@ -73,10 +73,10 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = null,
               id={id}
             />
           )}
-          {!!['date-with-time', 'date', 'duration'].includes(field.type) && (
+          {!!["date-with-time", "date", "duration"].includes(field.type) && (
             <div>
               <DatePicker
-                withTime={field.type === 'date-with-time'}
+                withTime={field.type === "date-with-time"}
                 id={id}
                 defaultValue={values[field.name] ? values[field.name] : field.required ? new Date() : null}
                 onChange={(e) => {
@@ -86,7 +86,7 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = null,
               />
             </div>
           )}
-          {!!['boolean'].includes(field.type) && (
+          {!!["boolean"].includes(field.type) && (
             /*
               display: flex;
   flex-direction: column;
@@ -109,23 +109,23 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = null,
               </label>
             </div>
           )}
-          {!!['yes-no'].includes(field.type) && (
+          {!!["yes-no"].includes(field.type) && (
             <SelectAsInput
-              options={['Oui', 'Non']}
+              options={["Oui", "Non"]}
               name={field.name}
-              value={values[field.name] || ''}
+              value={values[field.name] || ""}
               onChange={handleChange}
               inputId={id}
               classNamePrefix={id}
               isDisabled={disabled}
             />
           )}
-          {!!['enum'].includes(field.type) && (
+          {!!["enum"].includes(field.type) && (
             <SelectAsInput
               creatable={Boolean(field.allowCreateOption)}
               options={field.options}
               name={field.name}
-              value={values[field.name] || ''}
+              value={values[field.name] || ""}
               onChange={handleChange}
               inputId={id}
               classNamePrefix={id}
@@ -133,7 +133,7 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = null,
               formatCreateLabel={(inputValue) => `Autre : "${inputValue}"`}
             />
           )}
-          {!!['multi-choice'].includes(field.type) && (
+          {!!["multi-choice"].includes(field.type) && (
             <SelectCustom
               creatable={Boolean(field.allowCreateOption)}
               options={(field.options || []).map((o) => ({ value: o, label: o }))}
@@ -145,8 +145,8 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = null,
               isMulti
               inputId={id}
               classNamePrefix={id}
-              value={(typeof values[field.name] === 'string' ? [values[field.name]] : values[field.name])?.map((o) => ({ value: o, label: o }))}
-              placeholder={'Choisir...'}
+              value={(typeof values[field.name] === "string" ? [values[field.name]] : values[field.name])?.map((o) => ({ value: o, label: o }))}
+              placeholder={"Choisir..."}
               getOptionValue={(i) => i.value}
               getOptionLabel={(i) => i.label}
               isDisabled={disabled}
@@ -164,7 +164,7 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = null,
       <FormGroup>
         {!hideLabel && (
           <label className="tw-text-sm tw-font-semibold tw-text-gray-600" data-test-id={field.label} htmlFor={id}>
-            {field.type !== 'boolean' ? field.label : ''}
+            {field.type !== "boolean" ? field.label : ""}
           </label>
         )}
         {JSON.stringify(values[field.name])}

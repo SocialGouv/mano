@@ -1,12 +1,12 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { useDataLoader } from '../../components/DataLoader';
-import { actionsCategoriesSelector, flattenedActionsCategoriesSelector, actionsState, prepareActionForEncryption } from '../../recoil/actions';
-import { organisationState, userState } from '../../recoil/auth';
-import API, { encryptItem } from '../../services/api';
-import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from '../../components/tailwind/Modal';
-import { toast } from 'react-toastify';
-import DragAndDropSettings from './DragAndDropSettings';
+import React, { useState, useCallback, useMemo } from "react";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { useDataLoader } from "../../components/DataLoader";
+import { actionsCategoriesSelector, flattenedActionsCategoriesSelector, actionsState, prepareActionForEncryption } from "../../recoil/actions";
+import { organisationState, userState } from "../../recoil/auth";
+import API, { encryptItem } from "../../services/api";
+import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from "../../components/tailwind/Modal";
+import { toast } from "react-toastify";
+import DragAndDropSettings from "./DragAndDropSettings";
 
 const ActionCategoriesSettings = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
@@ -26,7 +26,7 @@ const ActionCategoriesSettings = () => {
       body: { actionsGroupedCategories: [...actionsGroupedCategories, { groupTitle, categories: [] }] },
     });
     if (res.ok) {
-      toast.success('Groupe ajouté', { autoclose: 2000 });
+      toast.success("Groupe ajouté", { autoclose: 2000 });
       setOrganisation(res.data);
     }
     refresh();
@@ -120,7 +120,7 @@ const AddCategory = ({ groupTitle }) => {
   const onAddCategory = async (e) => {
     e.preventDefault();
     const { newCategory } = Object.fromEntries(new FormData(e.target));
-    if (!newCategory) return toast.error('Vous devez saisir un nom pour la catégorie');
+    if (!newCategory) return toast.error("Vous devez saisir un nom pour la catégorie");
     if (flattenedCategories.includes(newCategory)) {
       const existingGroupTitle = actionsGroupedCategories.find(({ categories }) => categories.includes(newCategory)).groupTitle;
       return toast.error(`Cette catégorie existe déjà: ${existingGroupTitle} > ${newCategory}`);
@@ -180,7 +180,7 @@ const Category = ({ item: category, groupTitle }) => {
     e.preventDefault();
     const { newCategory } = Object.fromEntries(new FormData(e.target));
     const oldCategory = category;
-    if (!newCategory) return toast.error('Vous devez saisir un nom pour la catégorie');
+    if (!newCategory) return toast.error("Vous devez saisir un nom pour la catégorie");
     if (newCategory.trim() === oldCategory.trim()) return toast.error("Le nom de la catégorie n'a pas changé");
     if (flattenedCategories.includes(newCategory)) {
       const existingGroupTitle = actionsGroupedCategories.find(({ categories }) => categories.includes(newCategory)).groupTitle;
@@ -224,7 +224,7 @@ const Category = ({ item: category, groupTitle }) => {
   };
 
   const onDeleteCategory = async () => {
-    if (!window.confirm('Voulez-vous vraiment supprimer cette catégorie ? Cette opération est irréversible')) return;
+    if (!window.confirm("Voulez-vous vraiment supprimer cette catégorie ? Cette opération est irréversible")) return;
     const newActionsGroupedCategories = actionsGroupedCategories.map((group) => {
       if (group.groupTitle !== groupTitle) return group;
       return {
@@ -259,9 +259,10 @@ const Category = ({ item: category, groupTitle }) => {
         onMouseDown={() => setIsSelected(true)}
         onMouseUp={() => setIsSelected(false)}
         className={[
-          'tw-group tw-flex tw-cursor-move tw-items-center tw-border-2 tw-border-transparent tw-pl-1',
-          isSelected ? 'tw-rounded tw-border-main' : '',
-        ].join(' ')}>
+          "tw-group tw-flex tw-cursor-move tw-items-center tw-border-2 tw-border-transparent tw-pl-1",
+          isSelected ? "tw-rounded tw-border-main" : "",
+        ].join(" ")}
+      >
         <p className="tw-m-0" id={category}>
           {category}
         </p>
@@ -269,7 +270,8 @@ const Category = ({ item: category, groupTitle }) => {
           type="button"
           aria-label={`Modifier la catégorie ${category}`}
           className="tw-ml-auto tw-hidden group-hover:tw-inline-flex"
-          onClick={() => setIsEditingCategory(true)}>
+          onClick={() => setIsEditingCategory(true)}
+        >
           ✏️
         </button>
       </div>

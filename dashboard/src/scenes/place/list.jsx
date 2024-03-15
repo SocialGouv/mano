@@ -1,25 +1,25 @@
-import React, { Fragment, useState } from 'react';
-import { Col, FormGroup, Input, Modal, ModalBody, ModalHeader, Row, Label } from 'reactstrap';
-import { useHistory } from 'react-router-dom';
-import { Formik } from 'formik';
-import { toast } from 'react-toastify';
-import { SmallHeader } from '../../components/header';
-import ButtonCustom from '../../components/ButtonCustom';
-import Loading from '../../components/loading';
-import Table from '../../components/table';
-import Search from '../../components/search';
-import Page from '../../components/pagination';
-import { filterBySearch } from '../search/utils';
-import { currentTeamState, organisationState, userState } from '../../recoil/auth';
-import { personsState } from '../../recoil/persons';
-import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
-import { placesState, preparePlaceForEncryption } from '../../recoil/places';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { formatDateWithFullMonth } from '../../services/date';
-import API from '../../services/api';
-import useTitle from '../../services/useTitle';
-import useSearchParamState from '../../services/useSearchParamState';
-import { useDataLoader } from '../../components/DataLoader';
+import React, { Fragment, useState } from "react";
+import { Col, FormGroup, Input, Modal, ModalBody, ModalHeader, Row, Label } from "reactstrap";
+import { useHistory } from "react-router-dom";
+import { Formik } from "formik";
+import { toast } from "react-toastify";
+import { SmallHeader } from "../../components/header";
+import ButtonCustom from "../../components/ButtonCustom";
+import Loading from "../../components/loading";
+import Table from "../../components/table";
+import Search from "../../components/search";
+import Page from "../../components/pagination";
+import { filterBySearch } from "../search/utils";
+import { currentTeamState, organisationState, userState } from "../../recoil/auth";
+import { personsState } from "../../recoil/persons";
+import { relsPersonPlaceState } from "../../recoil/relPersonPlace";
+import { placesState, preparePlaceForEncryption } from "../../recoil/places";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { formatDateWithFullMonth } from "../../services/date";
+import API from "../../services/api";
+import useTitle from "../../services/useTitle";
+import useSearchParamState from "../../services/useSearchParamState";
+import { useDataLoader } from "../../components/DataLoader";
 
 const filterPlaces = (places, { page, limit, search }) => {
   if (search?.length) places = filterBySearch(search, places);
@@ -29,7 +29,7 @@ const filterPlaces = (places, { page, limit, search }) => {
 };
 
 const List = () => {
-  useTitle('Lieux fréquentés');
+  useTitle("Lieux fréquentés");
   useDataLoader({ refreshOnMount: true });
 
   const history = useHistory();
@@ -39,8 +39,8 @@ const List = () => {
   const organisation = useRecoilValue(organisationState);
   const persons = useRecoilValue(personsState);
 
-  const [page, setPage] = useSearchParamState('page', 0);
-  const [search, setSearch] = useSearchParamState('search', '');
+  const [page, setPage] = useSearchParamState("page", 0);
+  const [search, setSearch] = useSearchParamState("search", "");
 
   const limit = 20;
 
@@ -62,23 +62,23 @@ const List = () => {
           <Create />
         </Col>
       </Row>
-      <Row style={{ marginBottom: 40, borderBottom: '1px solid #ddd' }}>
-        <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
+      <Row style={{ marginBottom: 40, borderBottom: "1px solid #ddd" }}>
+        <Col md={12} style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
           <label htmlFor="search" style={{ marginRight: 20, width: 250, flexShrink: 0 }}>
-            Recherche :{' '}
+            Recherche :{" "}
           </label>
           <Search placeholder="Par nom du lieu" value={search} onChange={setSearch} />
         </Col>
       </Row>
       <Table
         data={data}
-        rowKey={'_id'}
+        rowKey={"_id"}
         onRowClick={(place) => history.push(`/place/${place._id}`)}
         columns={[
-          { title: 'Nom', dataKey: 'name' },
+          { title: "Nom", dataKey: "name" },
           {
-            title: 'Personnes suivies',
-            dataKey: 'persons',
+            title: "Personnes suivies",
+            dataKey: "persons",
             render: (place) => (
               <p style={{ marginBottom: 0 }}>
                 {relsPersonPlace
@@ -94,7 +94,7 @@ const List = () => {
               </p>
             ),
           },
-          { title: 'Créée le', dataKey: 'createdAt', render: (place) => formatDateWithFullMonth(place.createdAt) },
+          { title: "Créée le", dataKey: "createdAt", render: (place) => formatDateWithFullMonth(place.createdAt) },
         ]}
       />
       <Page page={page} limit={limit} total={total} onChange={({ page }) => setPage(page, true)} />
@@ -121,19 +121,20 @@ const Create = () => {
         <ModalHeader toggle={() => setOpen(false)}>Créer un nouveau lieu frequenté</ModalHeader>
         <ModalBody>
           <Formik
-            initialValues={{ name: '', organisation: '' }}
+            initialValues={{ name: "", organisation: "" }}
             onSubmit={async (body, actions) => {
               body.user = user._id;
-              const response = await API.post({ path: '/place', body: preparePlaceForEncryption(body) });
+              const response = await API.post({ path: "/place", body: preparePlaceForEncryption(body) });
               if (response.ok) {
                 setPlaces((places) => [response.decryptedData, ...places].sort((p1, p2) => p1.name.localeCompare(p2.name)));
-                toast.success('Création réussie !');
+                toast.success("Création réussie !");
               } else {
                 toast.error(response.error);
               }
               actions.setSubmitting(false);
               setOpen(false);
-            }}>
+            }}
+          >
             {({ values, handleChange, handleSubmit, isSubmitting }) => (
               <React.Fragment>
                 <Row>

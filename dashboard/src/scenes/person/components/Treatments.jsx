@@ -1,13 +1,13 @@
-import React, { useMemo, useState } from 'react';
-import { useRecoilValue } from 'recoil';
-import { useHistory } from 'react-router-dom';
-import { userState } from '../../../recoil/auth';
-import { formatDateWithFullMonth } from '../../../services/date';
-import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from '../../../components/tailwind/Modal';
-import { treatmentsState } from '../../../recoil/treatments';
-import { AgendaMutedIcon } from '../../../assets/icons/AgendaMutedIcon';
-import { FullScreenIcon } from '../../../assets/icons/FullScreenIcon';
-import UserName from '../../../components/UserName';
+import React, { useMemo, useState } from "react";
+import { useRecoilValue } from "recoil";
+import { useHistory } from "react-router-dom";
+import { userState } from "../../../recoil/auth";
+import { formatDateWithFullMonth } from "../../../services/date";
+import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from "../../../components/tailwind/Modal";
+import { treatmentsState } from "../../../recoil/treatments";
+import { AgendaMutedIcon } from "../../../assets/icons/AgendaMutedIcon";
+import { FullScreenIcon } from "../../../assets/icons/FullScreenIcon";
+import UserName from "../../../components/UserName";
 
 export const Treatments = ({ person }) => {
   const [fullScreen, setFullScreen] = useState(false);
@@ -23,24 +23,26 @@ export const Treatments = ({ person }) => {
     <>
       <div className="tw-relative">
         <div className="tw-sticky tw-top-0 tw-z-10 tw-flex tw-bg-white tw-p-3 tw-shadow-sm">
-          <h4 className="tw-flex-1 tw-text-xl">Traitements {filteredData.length ? `(${filteredData.length})` : ''}</h4>
+          <h4 className="tw-flex-1 tw-text-xl">Traitements {filteredData.length ? `(${filteredData.length})` : ""}</h4>
           <div className="flex-col tw-flex tw-items-center tw-gap-2">
             <button
               aria-label="Ajouter un traitement"
               className="tw-text-md tw-h-8 tw-w-8 tw-rounded-full tw-bg-blue-900 tw-font-bold tw-text-white tw-transition hover:tw-scale-125"
               onClick={() => {
                 const searchParams = new URLSearchParams(history.location.search);
-                searchParams.set('newTreatment', true);
-                searchParams.set('personId', person._id);
+                searchParams.set("newTreatment", true);
+                searchParams.set("personId", person._id);
                 history.push(`?${searchParams.toString()}`);
-              }}>
+              }}
+            >
               ＋
             </button>
             {Boolean(filteredData.length) && (
               <button
                 title="Passer les traitements en plein écran"
                 className="tw-h-6 tw-w-6 tw-rounded-full tw-text-blue-900 tw-transition hover:tw-scale-125"
-                onClick={() => setFullScreen(true)}>
+                onClick={() => setFullScreen(true)}
+              >
                 <FullScreenIcon />
               </button>
             )}
@@ -60,10 +62,11 @@ export const Treatments = ({ person }) => {
               className="button-submit !tw-bg-blue-900"
               onClick={() => {
                 const searchParams = new URLSearchParams(history.location.search);
-                searchParams.set('newTreatment', true);
-                searchParams.set('personId', person._id);
+                searchParams.set("newTreatment", true);
+                searchParams.set("personId", person._id);
                 history.push(`?${searchParams.toString()}`);
-              }}>
+              }}
+            >
               ＋ Ajouter un traitement
             </button>
           </ModalFooter>
@@ -106,25 +109,27 @@ const TreatmentsTable = ({ filteredData, person }) => {
           return (
             <tr
               key={treatment._id}
-              className={['tw-w-full tw-border-t tw-border-zinc-200 tw-bg-blue-900', Boolean(i % 2) ? 'tw-bg-opacity-0' : 'tw-bg-opacity-5'].join(
-                ' '
-              )}>
+              className={["tw-w-full tw-border-t tw-border-zinc-200 tw-bg-blue-900", Boolean(i % 2) ? "tw-bg-opacity-0" : "tw-bg-opacity-5"].join(
+                " "
+              )}
+            >
               <td>
                 <div
                   className={
-                    ['restricted-access'].includes(user.role)
-                      ? 'tw-mx-auto tw-max-w-prose tw-cursor-not-allowed tw-py-2'
-                      : ' tw-mx-auto tw-max-w-prose tw-cursor-pointer tw-py-2'
+                    ["restricted-access"].includes(user.role)
+                      ? "tw-mx-auto tw-max-w-prose tw-cursor-not-allowed tw-py-2"
+                      : " tw-mx-auto tw-max-w-prose tw-cursor-pointer tw-py-2"
                   }
                   onClick={() => {
                     const searchParams = new URLSearchParams(history.location.search);
-                    searchParams.set('treatmentId', treatment._id);
+                    searchParams.set("treatmentId", treatment._id);
                     history.push(`?${searchParams.toString()}`);
-                  }}>
+                  }}
+                >
                   <TreatmentDate treatment={treatment} />
                   <div className="tw-mt-2 tw-font-semibold">{displayTreatment(treatment)}</div>
                   <div className="tw-flex tw-w-full tw-justify-between">
-                    <p className="tw-mt-2 tw-mb-0 tw-flex tw-basis-full tw-gap-1 tw-text-xs tw-opacity-50 [overflow-wrap:anywhere]">
+                    <p className="tw-mb-0 tw-mt-2 tw-flex tw-basis-full tw-gap-1 tw-text-xs tw-opacity-50 [overflow-wrap:anywhere]">
                       <span>Créé par</span>
                       <UserName id={treatment.user} />
                     </p>

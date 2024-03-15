@@ -1,5 +1,5 @@
 const isNullOrUndefined = (value) => {
-  if (typeof value === 'undefined') return true;
+  if (typeof value === "undefined") return true;
   if (value === null) return true;
   return false;
 };
@@ -10,22 +10,22 @@ export const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
 // custom fields
 export const typeOptions = [
-  { value: 'text', label: 'Texte' },
-  { value: 'textarea', label: 'Zone de texte multi-lignes' },
-  { value: 'number', label: 'Nombre' },
-  { value: 'date', label: 'Date sans heure' },
-  { value: 'date-with-time', label: 'Date avec heure' },
-  { value: 'duration', label: 'Durée (depuis une date)' },
-  { value: 'yes-no', label: 'Oui/Non' },
-  { value: 'enum', label: 'Choix dans une liste' },
-  { value: 'multi-choice', label: 'Choix multiple dans une liste' },
-  { value: 'boolean', label: 'Case à cocher' },
+  { value: "text", label: "Texte" },
+  { value: "textarea", label: "Zone de texte multi-lignes" },
+  { value: "number", label: "Nombre" },
+  { value: "date", label: "Date sans heure" },
+  { value: "date-with-time", label: "Date avec heure" },
+  { value: "duration", label: "Durée (depuis une date)" },
+  { value: "yes-no", label: "Oui/Non" },
+  { value: "enum", label: "Choix dans une liste" },
+  { value: "multi-choice", label: "Choix multiple dans une liste" },
+  { value: "boolean", label: "Case à cocher" },
 ];
 
 export const newCustomField = () => ({
-  name: `custom-${new Date().toISOString().split('.').join('-').split(':').join('-')}`,
-  label: '',
-  type: 'text',
+  name: `custom-${new Date().toISOString().split(".").join("-").split(":").join("-")}`,
+  label: "",
+  type: "text",
   enabled: true,
   required: false,
   showInStats: true,
@@ -38,7 +38,7 @@ function download(file, fileName) {
     window.navigator.msSaveOrOpenBlob(file, fileName);
   } else {
     //Other browsers
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     document.body.appendChild(a);
     a.href = URL.createObjectURL(file);
     a.download = fileName;
@@ -51,7 +51,7 @@ async function viewBlobInNewWindow(url) {
   const response = await fetch(url);
 
   if (!response.ok) {
-    throw new Error('Network response was not ok');
+    throw new Error("Network response was not ok");
   }
 
   const blob = await response.blob();

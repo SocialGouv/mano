@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
-import logo from '../assets/logo-green.png';
-import SelectTeam from './SelectTeam';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from "reactstrap";
+import logo from "../assets/logo-green.png";
+import SelectTeam from "./SelectTeam";
 
-import { currentTeamState, organisationState, teamsState, userState } from '../recoil/auth';
-import API from '../services/api';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import Notification from './Notification';
-import { useDataLoader } from './DataLoader';
-import OpenNewWindowIcon from './OpenNewWindowIcon';
-import ColorHeaderBand from './ColorHeaderBand';
-import UnBugButton from './UnBugButton';
+import { currentTeamState, organisationState, teamsState, userState } from "../recoil/auth";
+import API from "../services/api";
+import { useRecoilState, useRecoilValue } from "recoil";
+import Notification from "./Notification";
+import { useDataLoader } from "./DataLoader";
+import OpenNewWindowIcon from "./OpenNewWindowIcon";
+import ColorHeaderBand from "./ColorHeaderBand";
+import UnBugButton from "./UnBugButton";
 
 const TopBar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -25,18 +25,19 @@ const TopBar = () => {
   return (
     <div className="tw-hidden tw-w-full sm:tw-block">
       <aside
-        className="noprint tw-flex tw-w-full tw-shrink-0 tw-items-center tw-justify-between tw-bg-white tw-py-3 tw-px-5 print:tw-relative print:tw-hidden"
-        title="Choix de l'équipe et menu déroulant pour le Profil">
+        className="noprint tw-flex tw-w-full tw-shrink-0 tw-items-center tw-justify-between tw-bg-white tw-px-5 tw-py-3 print:tw-relative print:tw-hidden"
+        title="Choix de l'équipe et menu déroulant pour le Profil"
+      >
         <div className="tw-flex tw-flex-1 tw-items-center tw-justify-start">
           <div className="tw-mr-4 tw-w-max tw-text-left tw-text-sm tw-font-semibold tw-tracking-tighter">
-            {['superadmin'].includes(user.role) ? 'Support' : organisation?.name}
+            {["superadmin"].includes(user.role) ? "Support" : organisation?.name}
           </div>
-          {!['superadmin'].includes(user.role) && (
+          {!["superadmin"].includes(user.role) && (
             <SelectTeam
-              style={{ maxWidth: '250px', fontSize: '13px' }}
+              style={{ maxWidth: "250px", fontSize: "13px" }}
               onChange={setCurrentTeam}
               teamId={currentTeam?._id}
-              teams={user.role === 'admin' ? teams : user.teams}
+              teams={user.role === "admin" ? teams : user.teams}
               inputId="team-selector-topBar"
             />
           )}
@@ -57,7 +58,7 @@ const TopBar = () => {
           <Notification />
           <UnBugButton />
           <ButtonDropdown direction="down" isOpen={dropdownOpen} toggle={() => setDropdownOpen(!dropdownOpen)}>
-            <DropdownToggle className="tw-ml-2.5 !tw-inline-flex tw-flex-1 tw-items-center tw-justify-between tw-gap-x-2.5 !tw-rounded-full tw-border-main tw-bg-main tw-py-1 !tw-px-4 tw-text-xs">
+            <DropdownToggle className="tw-ml-2.5 !tw-inline-flex tw-flex-1 tw-items-center tw-justify-between tw-gap-x-2.5 !tw-rounded-full tw-border-main tw-bg-main !tw-px-4 tw-py-1 tw-text-xs">
               <span>{user?.name}</span>
               <div className="tw-inline-flex tw-h-3 tw-w-3 tw-flex-1 tw-flex-col tw-justify-between">
                 <div className="tw-block tw-h-px tw-w-full tw-bg-white" />
@@ -78,7 +79,8 @@ const TopBar = () => {
                 tag="a"
                 target="_blank"
                 rel="noreferrer"
-                href="https://framaforms.org/nouveau-questionnaire-de-satisfaction-de-mano-1627635427">
+                href="https://framaforms.org/nouveau-questionnaire-de-satisfaction-de-mano-1627635427"
+              >
                 Donner mon avis sur Mano <OpenNewWindowIcon />
               </DropdownItem>
               <DropdownItem tag="a" href="/charte.pdf" target="_blank" rel="noreferrer">
@@ -100,7 +102,8 @@ const TopBar = () => {
               <DropdownItem
                 onClick={() => {
                   API.logout();
-                }}>
+                }}
+              >
                 Se déconnecter
               </DropdownItem>
               <DropdownItem
@@ -108,7 +111,8 @@ const TopBar = () => {
                   resetCache().then(() => {
                     return API.logout();
                   });
-                }}>
+                }}
+              >
                 Se déconnecter et vider le cache
               </DropdownItem>
             </DropdownMenu>

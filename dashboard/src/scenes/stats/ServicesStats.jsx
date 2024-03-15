@@ -1,23 +1,23 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { CustomResponsivePie } from './charts';
-import { useRecoilValue } from 'recoil';
-import API from '../../services/api';
-import { toast } from 'react-toastify';
-import { dayjsInstance } from '../../services/date';
-import { useLocalStorage } from '../../services/useLocalStorage';
-import SelectCustom from '../../components/SelectCustom';
-import { servicesSelector } from '../../recoil/reports';
+import React, { useEffect, useMemo, useState } from "react";
+import { CustomResponsivePie } from "./charts";
+import { useRecoilValue } from "recoil";
+import API from "../../services/api";
+import { toast } from "react-toastify";
+import { dayjsInstance } from "../../services/date";
+import { useLocalStorage } from "../../services/useLocalStorage";
+import SelectCustom from "../../components/SelectCustom";
+import { servicesSelector } from "../../recoil/reports";
 
 const ServicesStats = ({ period, teamIds }) => {
   const groupedServices = useRecoilValue(servicesSelector);
   const allServices = useMemo(() => {
     return groupedServices.reduce((services, group) => [...services, ...group.services], []);
   }, [groupedServices]);
-  const [servicesGroupFilter, setServicesGroupFilter] = useLocalStorage('stats-servicesGroupFilter', []);
-  const [servicesFilter, setServicesFilter] = useLocalStorage('stats-servicesFilter', []);
+  const [servicesGroupFilter, setServicesGroupFilter] = useLocalStorage("stats-servicesGroupFilter", []);
+  const [servicesFilter, setServicesFilter] = useLocalStorage("stats-servicesFilter", []);
   const [servicesFromDatabase, setServicesFromDatabase] = useState(null);
-  const startDate = useMemo(() => (period.startDate ? dayjsInstance(period.startDate).format('YYYY-MM-DD') : null), [period.startDate]);
-  const endDate = useMemo(() => (period.endDate ? dayjsInstance(period.endDate).format('YYYY-MM-DD') : null), [period.endDate]);
+  const startDate = useMemo(() => (period.startDate ? dayjsInstance(period.startDate).format("YYYY-MM-DD") : null), [period.startDate]);
+  const endDate = useMemo(() => (period.endDate ? dayjsInstance(period.endDate).format("YYYY-MM-DD") : null), [period.endDate]);
 
   useEffect(
     function fetchServicesStats() {
@@ -25,7 +25,7 @@ const ServicesStats = ({ period, teamIds }) => {
         setServicesFromDatabase({});
         return;
       }
-      API.get({ path: `/service/team/${teamIds.join(',')}/stats`, query: startDate ? { from: startDate, to: endDate || startDate } : {} }).then(
+      API.get({ path: `/service/team/${teamIds.join(",")}/stats`, query: startDate ? { from: startDate, to: endDate || startDate } : {} }).then(
         (res) => {
           if (!res.ok) return toast.error("Erreur lors du chargement des statistiques des services de l'accueil");
           const servicesObj = {};

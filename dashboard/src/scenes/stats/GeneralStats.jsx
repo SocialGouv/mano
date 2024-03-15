@@ -1,6 +1,6 @@
-import React from 'react';
-import { Block } from './Blocks';
-import Filters from '../../components/Filters';
+import React from "react";
+import { Block } from "./Blocks";
+import Filters from "../../components/Filters";
 
 const GeneralStats = ({
   personsCreated,

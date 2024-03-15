@@ -1,38 +1,38 @@
-import { getCacheItemDefaultValue, setCacheItem } from '../services/dataManagement';
-import { atom, selector } from 'recoil';
-import { looseUuidRegex } from '../utils';
-import { toast } from 'react-toastify';
-import { capture } from '../services/sentry';
+import { getCacheItemDefaultValue, setCacheItem } from "../services/dataManagement";
+import { atom, selector } from "recoil";
+import { looseUuidRegex } from "../utils";
+import { toast } from "react-toastify";
+import { capture } from "../services/sentry";
 
-const collectionName = 'rencontre';
+const collectionName = "rencontre";
 export const rencontresState = atom({
   key: collectionName,
   default: selector({
-    key: 'rencontre/default',
+    key: "rencontre/default",
     get: async () => {
-      const cache = await getCacheItemDefaultValue('rencontre', []);
+      const cache = await getCacheItemDefaultValue("rencontre", []);
       return cache;
     },
   }),
   effects: [({ onSet }) => onSet(async (newValue) => setCacheItem(collectionName, newValue))],
 });
 
-const encryptedFields = ['person', 'team', 'user', 'date', 'comment'];
+const encryptedFields = ["person", "team", "user", "date", "comment"];
 
 export const prepareRencontreForEncryption = (rencontre, { checkRequiredFields = true } = {}) => {
   if (!!checkRequiredFields) {
     try {
       if (!looseUuidRegex.test(rencontre.person)) {
-        throw new Error('Rencontre is missing person');
+        throw new Error("Rencontre is missing person");
       }
       if (!looseUuidRegex.test(rencontre.team)) {
-        throw new Error('Rencontre is missing team');
+        throw new Error("Rencontre is missing team");
       }
       if (!looseUuidRegex.test(rencontre.user)) {
-        throw new Error('Rencontre is missing user');
+        throw new Error("Rencontre is missing user");
       }
       if (!rencontre.date) {
-        throw new Error('Rencontre is missing date');
+        throw new Error("Rencontre is missing date");
       }
     } catch (error) {
       toast.error(

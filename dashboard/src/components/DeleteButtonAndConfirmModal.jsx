@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { toast } from 'react-toastify';
+import React, { useState } from "react";
+import { toast } from "react-toastify";
 
-import { useRecoilValue } from 'recoil';
-import { userState } from '../recoil/auth';
-import { ModalBody, ModalContainer, ModalHeader, ModalFooter } from './tailwind/Modal';
+import { useRecoilValue } from "recoil";
+import { userState } from "../recoil/auth";
+import { ModalBody, ModalContainer, ModalHeader, ModalFooter } from "./tailwind/Modal";
 
 const DeleteButtonAndConfirmModal = ({
   title,
@@ -11,7 +11,7 @@ const DeleteButtonAndConfirmModal = ({
   textToConfirm,
   onConfirm,
   buttonWidth = null,
-  roles = ['admin', 'superadmin'],
+  roles = ["admin", "superadmin"],
   roleErrorMessage = "Désolé, seul un admin peut supprimer ce type d'élément",
   disabled = false,
   disabledTitle = "Vous n'avez pas le droit de supprimer cet élément",
@@ -23,14 +23,15 @@ const DeleteButtonAndConfirmModal = ({
       <button
         type="button"
         title={disabled ? disabledTitle : title}
-        className={['button-destructive', disabled ? 'tw-cursor-not-allowed' : ''].join(' ')}
+        className={["button-destructive", disabled ? "tw-cursor-not-allowed" : ""].join(" ")}
         onClick={() => {
           if (!roles.includes(user.role)) return toast.error(roleErrorMessage);
           setOpen(true);
         }}
         disabled={disabled}
         aria-disabled={disabled}
-        style={buttonWidth ? { width: buttonWidth } : {}}>
+        style={buttonWidth ? { width: buttonWidth } : {}}
+      >
         Supprimer
       </button>
       <ModalContainer open={open} toggle={() => setOpen(false)} size="3xl">
@@ -55,17 +56,18 @@ const DeleteButtonAndConfirmModal = ({
             onSubmit={async (e) => {
               e.preventDefault();
               const _textToConfirm = Object.fromEntries(new FormData(e.target))?.textToConfirm;
-              if (!_textToConfirm) return toast.error('Veuillez rentrer le texte demandé');
+              if (!_textToConfirm) return toast.error("Veuillez rentrer le texte demandé");
               if (_textToConfirm.trim().toLocaleLowerCase() !== textToConfirm.trim().toLocaleLowerCase()) {
-                return toast.error('Le texte renseigné est incorrect');
+                return toast.error("Le texte renseigné est incorrect");
               }
               if (_textToConfirm.trim() !== textToConfirm.trim()) {
-                return toast.error('Veuillez respecter les minuscules/majuscules');
+                return toast.error("Veuillez respecter les minuscules/majuscules");
               }
               await onConfirm();
               setOpen(false);
             }}
-            className="tw-flex tw-w-full tw-items-center tw-justify-center tw-px-12">
+            className="tw-flex tw-w-full tw-items-center tw-justify-center tw-px-12"
+          >
             <input className="tailwindui tw-basis-1/2" name="textToConfirm" placeholder={textToConfirm} type="text" />
           </form>
         </ModalBody>

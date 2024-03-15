@@ -1,8 +1,8 @@
-import React, { useMemo } from 'react';
-import { CustomResponsivePie } from './charts';
-import { getPieData } from './utils';
-import Filters from '../../components/Filters';
-import { Block } from './Blocks';
+import React, { useMemo } from "react";
+import { CustomResponsivePie } from "./charts";
+import { getPieData } from "./utils";
+import Filters from "../../components/Filters";
+import { Block } from "./Blocks";
 
 const RencontresStats = ({
   rencontres,
@@ -37,15 +37,15 @@ const RencontresStats = ({
         help={`Répartition par genre des rencontres non-anonymes (c'est-à-dire attachées à une personne) enregistrées dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des rencontres.`}
         data={getPieData(
           rencontres.filter((p) => !!p.gender),
-          'gender',
-          { options: [...personFields.find((f) => f.name === 'gender').options, 'Non précisé'] }
+          "gender",
+          { options: [...personFields.find((f) => f.name === "gender").options, "Non précisé"] }
         )}
       />
       <CustomResponsivePie
         title="Nombre de personnes différentes rencontrées"
         help={`Répartition par genre des rencontres non-anonymes (c'est-à-dire attachées à une personne) et uniques enregistrées dans la période définie.\n\nEn d'autres termes, si une personne est rencontrée plusieurs fois, elle n'est comptabilisée ici qu'une seule fois.\n\nSi aucune période n'est définie, on considère l'ensemble des rencontres.`}
-        data={getPieData(personsWithRencontres, 'gender', {
-          options: [...personFields.find((f) => f.name === 'gender').options, 'Non précisé'],
+        data={getPieData(personsWithRencontres, "gender", {
+          options: [...personFields.find((f) => f.name === "gender").options, "Non précisé"],
         })}
       />
       <CustomResponsivePie
@@ -53,8 +53,8 @@ const RencontresStats = ({
         help={`Répartition par genre des rencontres concernant des personnes créées pendant la période définie, enregistrées dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des rencontres.`}
         data={getPieData(
           personsWithRencontres.filter((person) => !personsInRencontresBeforePeriod[person._id]),
-          'gender',
-          { options: [...personFields.find((f) => f.name === 'gender').options, 'Non précisé'] }
+          "gender",
+          { options: [...personFields.find((f) => f.name === "gender").options, "Non précisé"] }
         )}
       />
     </>

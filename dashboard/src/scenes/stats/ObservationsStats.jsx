@@ -1,18 +1,18 @@
-import { useState } from 'react';
-import { useRecoilValue } from 'recoil';
-import { utils, writeFile } from '@e965/xlsx';
-import SelectCustom from '../../components/SelectCustom';
-import CustomFieldsStats from './CustomFieldsStats';
-import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../components/tailwind/Modal';
-import { teamsState, usersState } from '../../recoil/auth';
-import TagTeam from '../../components/TagTeam';
-import Table from '../../components/table';
-import { dayjsInstance } from '../../services/date';
-import { customFieldsObsSelector } from '../../recoil/territoryObservations';
-import CreateObservation from '../../components/CreateObservation';
-import { filterData } from '../../components/Filters';
-import DateBloc from '../../components/DateBloc';
-import Observation from '../../scenes/territory-observations/view';
+import { useState } from "react";
+import { useRecoilValue } from "recoil";
+import { utils, writeFile } from "@e965/xlsx";
+import SelectCustom from "../../components/SelectCustom";
+import CustomFieldsStats from "./CustomFieldsStats";
+import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "../../components/tailwind/Modal";
+import { teamsState, usersState } from "../../recoil/auth";
+import TagTeam from "../../components/TagTeam";
+import Table from "../../components/table";
+import { dayjsInstance } from "../../services/date";
+import { customFieldsObsSelector } from "../../recoil/territoryObservations";
+import CreateObservation from "../../components/CreateObservation";
+import { filterData } from "../../components/Filters";
+import DateBloc from "../../components/DateBloc";
+import Observation from "../../scenes/territory-observations/view";
 
 const ObservationsStats = ({ territories, setSelectedTerritories, observations, customFieldsObs, allFilters }) => {
   const [obsModalOpened, setObsModalOpened] = useState(false);
@@ -25,11 +25,11 @@ const ObservationsStats = ({ territories, setSelectedTerritories, observations, 
     setSliceField(newSlicefield);
     setSliceValue(newSlice);
     const slicedData =
-      newSlicefield.type === 'boolean'
-        ? observationsConcerned.filter((p) => (newSlice === 'Non' ? !p[newSlicefield.field] : !!p[newSlicefield.field]))
+      newSlicefield.type === "boolean"
+        ? observationsConcerned.filter((p) => (newSlice === "Non" ? !p[newSlicefield.field] : !!p[newSlicefield.field]))
         : filterData(
             observationsConcerned,
-            [{ ...newSlicefield, value: newSlice, type: newSlicefield.field === 'outOfActiveList' ? 'boolean' : newSlicefield.field }],
+            [{ ...newSlicefield, value: newSlice, type: newSlicefield.field === "outOfActiveList" ? "boolean" : newSlicefield.field }],
             true
           );
     setSlicedData(slicedData);
@@ -86,7 +86,7 @@ const ObservationsStats = ({ territories, setSelectedTerritories, observations, 
           setSliceValue(null);
           setSlicedData([]);
         }}
-        title={`${sliceField?.label ?? 'Observations de territoire'}${sliceValue ? ` : ${sliceValue}` : ''} (${slicedData.length})`}
+        title={`${sliceField?.label ?? "Observations de territoire"}${sliceValue ? ` : ${sliceValue}` : ""} (${slicedData.length})`}
         territories={territories}
         allFilters={allFilters}
       />
@@ -107,43 +107,43 @@ const SelectedObsModal = ({ open, onClose, observations, territories, title, onA
       observations.map((observation) => {
         return {
           id: observation._id,
-          'Territoire - Nom': territories.find((t) => t._id === observation.territory)?.name,
-          'Observé le': dayjsInstance(observation.observedAt).format('YYYY-MM-DD HH:mm'),
-          Équipe: observation.team ? teams.find((t) => t._id === observation.team)?.name : '',
+          "Territoire - Nom": territories.find((t) => t._id === observation.territory)?.name,
+          "Observé le": dayjsInstance(observation.observedAt).format("YYYY-MM-DD HH:mm"),
+          Équipe: observation.team ? teams.find((t) => t._id === observation.team)?.name : "",
           ...customFieldsObs.reduce((fields, field) => {
-            if (['date', 'date-with-time', 'duration'].includes(field.type))
+            if (["date", "date-with-time", "duration"].includes(field.type))
               fields[field.label || field.name] = observation[field.name]
-                ? dayjsInstance(observation[field.name]).format(field.type === 'date' ? 'YYYY-MM-DD' : 'YYYY-MM-DD HH:mm')
-                : '';
-            else if (['boolean'].includes(field.type)) fields[field.label || field.name] = observation[field.name] ? 'Oui' : 'Non';
-            else if (['yes-no'].includes(field.type)) fields[field.label || field.name] = observation[field.name];
-            else if (Array.isArray(observation[field.name])) fields[field.label || field.name] = observation[field.name].join(', ');
+                ? dayjsInstance(observation[field.name]).format(field.type === "date" ? "YYYY-MM-DD" : "YYYY-MM-DD HH:mm")
+                : "";
+            else if (["boolean"].includes(field.type)) fields[field.label || field.name] = observation[field.name] ? "Oui" : "Non";
+            else if (["yes-no"].includes(field.type)) fields[field.label || field.name] = observation[field.name];
+            else if (Array.isArray(observation[field.name])) fields[field.label || field.name] = observation[field.name].join(", ");
             else fields[field.label || field.name] = observation[field.name];
             return fields;
           }, {}),
-          'Créée par': users.find((u) => u._id === observation.user)?.name,
-          'Créée le': dayjsInstance(observation.createdAt).format('YYYY-MM-DD HH:mm'),
-          'Mise à jour le': dayjsInstance(observation.updatedAt).format('YYYY-MM-DD HH:mm'),
+          "Créée par": users.find((u) => u._id === observation.user)?.name,
+          "Créée le": dayjsInstance(observation.createdAt).format("YYYY-MM-DD HH:mm"),
+          "Mise à jour le": dayjsInstance(observation.updatedAt).format("YYYY-MM-DD HH:mm"),
         };
       })
     );
-    utils.book_append_sheet(wb, formattedData, 'Observations de territoires');
+    utils.book_append_sheet(wb, formattedData, "Observations de territoires");
 
-    utils.book_append_sheet(wb, utils.json_to_sheet(observations), 'Observations (données brutes)');
-    utils.book_append_sheet(wb, utils.json_to_sheet(territories), 'Territoires (données brutes)');
-    utils.book_append_sheet(wb, utils.json_to_sheet(allFilters.selectedTerritories), 'Filtres (territoires)');
-    utils.book_append_sheet(wb, utils.json_to_sheet(allFilters.selectedTeams), 'Filtres (équipes)');
+    utils.book_append_sheet(wb, utils.json_to_sheet(observations), "Observations (données brutes)");
+    utils.book_append_sheet(wb, utils.json_to_sheet(territories), "Territoires (données brutes)");
+    utils.book_append_sheet(wb, utils.json_to_sheet(allFilters.selectedTerritories), "Filtres (territoires)");
+    utils.book_append_sheet(wb, utils.json_to_sheet(allFilters.selectedTeams), "Filtres (équipes)");
     const otherFilters = [
       {
-        'Période - début': allFilters.period.startDate,
-        'Période - fin': allFilters.period.endDate,
+        "Période - début": allFilters.period.startDate,
+        "Période - fin": allFilters.period.endDate,
       },
     ];
-    utils.book_append_sheet(wb, utils.json_to_sheet(otherFilters), 'Filtres (autres)');
+    utils.book_append_sheet(wb, utils.json_to_sheet(otherFilters), "Filtres (autres)");
     writeFile(
       wb,
-      `Statistiques (${dayjsInstance(allFilters.period.startDate).format('YYYY-MM-DD')} - ${dayjsInstance(allFilters.period.endDate).format(
-        'YYYY-MM-DD'
+      `Statistiques (${dayjsInstance(allFilters.period.startDate).format("YYYY-MM-DD")} - ${dayjsInstance(allFilters.period.endDate).format(
+        "YYYY-MM-DD"
       )}) - ${title}.xlsx`
     );
   };
@@ -154,7 +154,7 @@ const SelectedObsModal = ({ open, onClose, observations, territories, title, onA
         <ModalHeader
           title={
             <div className="tw-flex tw-w-full tw-items-center tw-justify-between">
-              {title}{' '}
+              {title}{" "}
               <button onClick={exportXlsx} className="button-submit tw-ml-auto tw-mr-20">
                 Télécharger un export
               </button>
@@ -170,29 +170,29 @@ const SelectedObsModal = ({ open, onClose, observations, territories, title, onA
                 setObservationToEdit(obs);
                 setOpenObservationModaleKey((k) => k + 1);
               }}
-              rowKey={'_id'}
+              rowKey={"_id"}
               columns={[
                 {
-                  title: 'Date',
-                  dataKey: 'observedAt',
+                  title: "Date",
+                  dataKey: "observedAt",
                   render: (obs) => {
                     // anonymous comment migrated from `report.observations`
                     // have no time
                     // have no user assigned either
-                    const time = dayjsInstance(obs.observedAt).format('D MMM HH:mm');
+                    const time = dayjsInstance(obs.observedAt).format("D MMM HH:mm");
                     return (
                       <>
                         <DateBloc date={obs.observedAt} />
-                        <span className="tw-mb-2 tw-block tw-w-full tw-text-center tw-opacity-50">{time === '00:00' && !obs.user ? null : time}</span>
+                        <span className="tw-mb-2 tw-block tw-w-full tw-text-center tw-opacity-50">{time === "00:00" && !obs.user ? null : time}</span>
                       </>
                     );
                   },
                 },
-                { title: 'Territoire', dataKey: 'territory', render: (obs) => territories.find((t) => t._id === obs.territory)?.name },
-                { title: 'Observation', dataKey: 'entityKey', render: (obs) => <Observation noTeams noBorder obs={obs} />, left: true },
+                { title: "Territoire", dataKey: "territory", render: (obs) => territories.find((t) => t._id === obs.territory)?.name },
+                { title: "Observation", dataKey: "entityKey", render: (obs) => <Observation noTeams noBorder obs={obs} />, left: true },
                 {
-                  title: 'Équipe en charge',
-                  dataKey: 'team',
+                  title: "Équipe en charge",
+                  dataKey: "team",
                   render: (obs) => <TagTeam teamId={obs?.team} />,
                 },
               ]}
@@ -206,7 +206,8 @@ const SelectedObsModal = ({ open, onClose, observations, territories, title, onA
             className="button-cancel"
             onClick={() => {
               onClose(null);
-            }}>
+            }}
+          >
             Fermer
           </button>
         </ModalFooter>

@@ -1,11 +1,11 @@
-import React, { useMemo, useState } from 'react';
-import { CustomResponsiveBar } from './charts';
-import { mappedIdsToLabels } from '../../recoil/actions';
-import SelectCustom from '../../components/SelectCustom';
-import { getMultichoiceBarData } from './utils';
-import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../components/tailwind/Modal';
-import ActionsSortableList from '../../components/ActionsSortableList';
-import Filters from '../../components/Filters';
+import React, { useMemo, useState } from "react";
+import { CustomResponsiveBar } from "./charts";
+import { mappedIdsToLabels } from "../../recoil/actions";
+import SelectCustom from "../../components/SelectCustom";
+import { getMultichoiceBarData } from "./utils";
+import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "../../components/tailwind/Modal";
+import ActionsSortableList from "../../components/ActionsSortableList";
+import Filters from "../../components/Filters";
 
 const ActionsStats = ({
   // data
@@ -35,7 +35,7 @@ const ActionsStats = ({
     if (groupSlice) {
       const withGroupSlice = {};
       for (const action of actionsWithDetailedGroupAndCategories) {
-        if (groupSlice === 'Non renseigné' && !action.categoryGroup) {
+        if (groupSlice === "Non renseigné" && !action.categoryGroup) {
           withGroupSlice[action._id] = action;
         }
         if (action.categoryGroup === groupSlice) {
@@ -47,7 +47,7 @@ const ActionsStats = ({
     if (categorySlice) {
       const withCatSlice = {};
       for (const action of actionsWithDetailedGroupAndCategories) {
-        if (categorySlice === 'Non renseigné' && !action.categories?.length) {
+        if (categorySlice === "Non renseigné" && !action.categories?.length) {
           withCatSlice[action._id] = action;
         }
         if (action.categories.includes(categorySlice)) {
@@ -136,7 +136,7 @@ const ActionsStats = ({
         isMultiChoice
         axisTitleY="Actions"
         axisTitleX="Groupe"
-        data={getMultichoiceBarData(actionsWithDetailedGroupAndCategories, 'categoryGroup', {
+        data={getMultichoiceBarData(actionsWithDetailedGroupAndCategories, "categoryGroup", {
           options: groupsCategories.map((group) => group.groupTitle),
           debug: true,
         })}
@@ -155,7 +155,7 @@ const ActionsStats = ({
         isMultiChoice
         axisTitleY="Actions"
         axisTitleX="Catégorie"
-        data={getMultichoiceBarData(actionsWithDetailedGroupAndCategories, 'category')}
+        data={getMultichoiceBarData(actionsWithDetailedGroupAndCategories, "category")}
         // here we decide that the total is NOT the total of actions
         // but the total of actions splitted by category
         totalForMultiChoice={actionsWithDetailedGroupAndCategories.length}
@@ -171,7 +171,7 @@ const ActionsStats = ({
           setCategorySlice(null);
         }}
         data={filteredActionsBySlice}
-        title={`Actions ${groupSlice !== null ? `du groupe ${groupSlice}` : ''}${categorySlice !== null ? `de la catégorie ${categorySlice}` : ''} (${
+        title={`Actions ${groupSlice !== null ? `du groupe ${groupSlice}` : ""}${categorySlice !== null ? `de la catégorie ${categorySlice}` : ""} (${
           filteredActionsBySlice.length
         })`}
       />
@@ -195,7 +195,8 @@ const SelectedActionsModal = ({ open, onClose, data, title, onAfterLeave }) => {
           className="button-cancel"
           onClick={() => {
             onClose(null);
-          }}>
+          }}
+        >
           Fermer
         </button>
       </ModalFooter>

@@ -1,4 +1,4 @@
-import { CustomField, PredefinedField, CustomFieldsGroup } from './field';
+import { CustomField, PredefinedField, CustomFieldsGroup } from "./field";
 
 interface GroupedCategories {
   groupTitle: string;

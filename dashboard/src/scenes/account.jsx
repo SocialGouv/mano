@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { FormGroup, Input, Label, Row, Col, Modal, ModalHeader, ModalBody } from 'reactstrap';
-import { Formik } from 'formik';
-import { toast } from 'react-toastify';
-import { useRecoilState } from 'recoil';
+import React, { useState } from "react";
+import { FormGroup, Input, Label, Row, Col, Modal, ModalHeader, ModalBody } from "reactstrap";
+import { Formik } from "formik";
+import { toast } from "react-toastify";
+import { useRecoilState } from "recoil";
 
-import Header from '../components/header';
-import Loading from '../components/loading';
-import ButtonCustom from '../components/ButtonCustom';
-import ChangePassword from '../components/ChangePassword';
-import { userState } from '../recoil/auth';
-import API from '../services/api';
+import Header from "../components/header";
+import Loading from "../components/loading";
+import ButtonCustom from "../components/ButtonCustom";
+import ChangePassword from "../components/ChangePassword";
+import { userState } from "../recoil/auth";
+import API from "../services/api";
 
 const Account = () => {
   const [user, setUser] = useRecoilState(userState);
@@ -23,17 +23,18 @@ const Account = () => {
         initialValues={user}
         onSubmit={async (body) => {
           try {
-            const response = await API.put({ path: '/user', body });
+            const response = await API.put({ path: "/user", body });
             if (response.ok) {
-              toast.success('Mis à jour !');
-              const { user } = await API.get({ path: '/user/me' });
+              toast.success("Mis à jour !");
+              const { user } = await API.get({ path: "/user/me" });
               setUser(user);
             }
           } catch (userUpdateError) {
-            console.log('error in user update', userUpdateError);
+            console.log("error in user update", userUpdateError);
             toast.error(userUpdateError.message);
           }
-        }}>
+        }}
+      >
         {({ values, handleChange, handleSubmit, isSubmitting }) => (
           <React.Fragment>
             <Row>
@@ -53,7 +54,7 @@ const Account = () => {
               {/* <Col md={6} /> */}
             </Row>
             <hr />
-            <Row style={{ display: 'flex', justifyContent: 'center' }}>
+            <Row style={{ display: "flex", justifyContent: "center" }}>
               <LinkToChangePassword />
               <ButtonCustom width="250" title="Mettre à jour" loading={isSubmitting} onClick={handleSubmit} />
             </Row>

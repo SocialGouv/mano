@@ -1,5 +1,5 @@
 // types/user.ts
-import { UUIDV4 } from './uuid';
+import { UUIDV4 } from "./uuid";
 
 export type UserInstance = {
   _id: UUIDV4;
@@ -10,7 +10,7 @@ export type UserInstance = {
   termsAccepted: Date | null;
   cgusAccepted: Date | null;
   healthcareProfessional: boolean | null;
-  role: 'normal' | 'admin'; // Add other roles if available.
+  role: "normal" | "admin"; // Add other roles if available.
   team?: UUIDV4[];
   teams?: UUIDV4[];
 };

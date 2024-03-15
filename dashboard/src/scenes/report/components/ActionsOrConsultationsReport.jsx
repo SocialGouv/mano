@@ -1,22 +1,22 @@
-import { useState } from 'react';
-import { CANCEL, DONE, TODO, mappedIdsToLabels } from '../../../recoil/actions';
-import { useHistory } from 'react-router-dom';
-import SelectCustom from '../../../components/SelectCustom';
-import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from '../../../components/tailwind/Modal';
-import { FullScreenIcon } from '../../../assets/icons/FullScreenIcon';
-import ActionsSortableList from '../../../components/ActionsSortableList';
-import TabsNav from '../../../components/tailwind/TabsNav';
-import { useLocalStorage } from '../../../services/useLocalStorage';
-import { useRecoilValue } from 'recoil';
-import { userState } from '../../../recoil/auth';
-import { dayjsInstance } from '../../../services/date';
+import { useState } from "react";
+import { CANCEL, DONE, TODO, mappedIdsToLabels } from "../../../recoil/actions";
+import { useHistory } from "react-router-dom";
+import SelectCustom from "../../../components/SelectCustom";
+import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from "../../../components/tailwind/Modal";
+import { FullScreenIcon } from "../../../assets/icons/FullScreenIcon";
+import ActionsSortableList from "../../../components/ActionsSortableList";
+import TabsNav from "../../../components/tailwind/TabsNav";
+import { useLocalStorage } from "../../../services/useLocalStorage";
+import { useRecoilValue } from "recoil";
+import { userState } from "../../../recoil/auth";
+import { dayjsInstance } from "../../../services/date";
 
 export const ActionsOrConsultationsReport = ({ actions, consultations, actionsCreated, consultationsCreated, period }) => {
-  const [activeTab, setActiveTab] = useLocalStorage('reports-actions-consultation-toggle', 'Actions');
+  const [activeTab, setActiveTab] = useLocalStorage("reports-actions-consultation-toggle", "Actions");
   const [fullScreen, setFullScreen] = useState(false);
   const [filterStatus, setFilterStatus] = useState([TODO, DONE, CANCEL]);
 
-  const hasCreatedAtFilter = filterStatus.includes('CREATED');
+  const hasCreatedAtFilter = filterStatus.includes("CREATED");
   const filteredActions = actions.filter((item) => !filterStatus.length || filterStatus.includes(item.status));
   if (hasCreatedAtFilter || !filterStatus.length) {
     for (const action of actionsCreated) {
@@ -34,12 +34,12 @@ export const ActionsOrConsultationsReport = ({ actions, consultations, actionsCr
     }
   }
 
-  const data = activeTab.includes('Actions') ? actions : consultations;
-  const filteredData = activeTab.includes('Actions') ? filteredActions : filteredConsultations;
+  const data = activeTab.includes("Actions") ? actions : consultations;
+  const filteredData = activeTab.includes("Actions") ? filteredActions : filteredConsultations;
   const history = useHistory();
   const user = useRecoilValue(userState);
 
-  const canSeeMedicalData = ['admin', 'normal'].includes(user.role) && !!user.healthcareProfessional;
+  const canSeeMedicalData = ["admin", "normal"].includes(user.role) && !!user.healthcareProfessional;
 
   const tabs = canSeeMedicalData
     ? [`Actions (${filteredActions.length})`, `Consultations (${filteredConsultations.length})`]
@@ -53,33 +53,35 @@ export const ActionsOrConsultationsReport = ({ actions, consultations, actionsCr
             className="tw-m-0 tw-flex-wrap tw-justify-start tw-border-b-0 tw-py-0.5 tw-pl-0 [&_button]:tw-text-xl"
             tabs={tabs}
             renderTab={(caption) => <h3 className="tw-m-0 tw-text-base tw-font-medium">{caption}</h3>}
-            onClick={(_, index) => setActiveTab(index === 0 ? 'Actions' : 'Consultations')}
-            activeTabIndex={activeTab.includes('Actions') ? 0 : 1}
+            onClick={(_, index) => setActiveTab(index === 0 ? "Actions" : "Consultations")}
+            activeTabIndex={activeTab.includes("Actions") ? 0 : 1}
           />
           <div className="flex-col tw-flex tw-items-center tw-gap-2">
             <button
               aria-label="Ajouter une action"
               className={[
-                'tw-text-md tw-h-8 tw-w-8 tw-rounded-full tw-font-bold tw-text-white tw-transition hover:tw-scale-125',
-                activeTab.includes('Actions') ? 'tw-bg-main' : 'tw-bg-blue-900',
-              ].join(' ')}
+                "tw-text-md tw-h-8 tw-w-8 tw-rounded-full tw-font-bold tw-text-white tw-transition hover:tw-scale-125",
+                activeTab.includes("Actions") ? "tw-bg-main" : "tw-bg-blue-900",
+              ].join(" ")}
               onClick={() => {
                 const searchParams = new URLSearchParams(history.location.search);
-                searchParams.set(activeTab.includes('Actions') ? 'newAction' : 'newConsultation', true);
-                searchParams.set('dueAt', period.startDate);
-                searchParams.set('completedAt', dayjsInstance(period.startDate).set('hour', 12));
+                searchParams.set(activeTab.includes("Actions") ? "newAction" : "newConsultation", true);
+                searchParams.set("dueAt", period.startDate);
+                searchParams.set("completedAt", dayjsInstance(period.startDate).set("hour", 12));
                 history.push(`?${searchParams.toString()}`);
-              }}>
+              }}
+            >
               ＋
             </button>
             <button
               title="Passer les actions/consultations en plein écran"
               className={[
-                'tw-h-6 tw-w-6 tw-rounded-full tw-transition hover:tw-scale-125 disabled:tw-cursor-not-allowed disabled:tw-opacity-30',
-                activeTab.includes('Actions') ? 'tw-text-main' : 'tw-text-blue-900',
-              ].join(' ')}
+                "tw-h-6 tw-w-6 tw-rounded-full tw-transition hover:tw-scale-125 disabled:tw-cursor-not-allowed disabled:tw-opacity-30",
+                activeTab.includes("Actions") ? "tw-text-main" : "tw-text-blue-900",
+              ].join(" ")}
               disabled={!data.length}
-              onClick={() => setFullScreen(true)}>
+              onClick={() => setFullScreen(true)}
+            >
               <FullScreenIcon />
             </button>
           </div>
@@ -93,16 +95,17 @@ export const ActionsOrConsultationsReport = ({ actions, consultations, actionsCr
       </section>
       <section
         aria-hidden="true"
-        className="printonly tw-flex tw-h-full tw-flex-col tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+        className="printonly tw-flex tw-h-full tw-flex-col tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow"
+      >
         <div className="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-px-3 tw-py-3">
           <h3 className="tw-m-0 tw-text-base tw-font-medium">Actions ({filteredActions.length})</h3>
           {filterStatus.length > 0 && (
             <h4 className="tw-m-0 tw-text-base tw-font-medium">
-              Filtrées par status:{' '}
+              Filtrées par status:{" "}
               {mappedIdsToLabels
                 .filter((s) => filterStatus.includes(s._id))
                 .map((status) => status.name)
-                .join(', ')}
+                .join(", ")}
             </h4>
           )}
         </div>
@@ -112,16 +115,17 @@ export const ActionsOrConsultationsReport = ({ actions, consultations, actionsCr
       </section>
       <section
         aria-hidden="true"
-        className="printonly tw-mt-12 tw-flex tw-h-full tw-flex-col tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+        className="printonly tw-mt-12 tw-flex tw-h-full tw-flex-col tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow"
+      >
         <div className="tw-flex tw-flex-col tw-items-stretch tw-bg-white tw-px-3 tw-py-3">
           <h3 className="tw-m-0 tw-text-base tw-font-medium">Consultations ({filteredConsultations.length})</h3>
           {filterStatus.length > 0 && (
             <h4 className="tw-m-0 tw-text-base tw-font-medium">
-              Filtrées par status:{' '}
+              Filtrées par status:{" "}
               {mappedIdsToLabels
                 .filter((s) => filterStatus.includes(s._id))
                 .map((status) => status.name)
-                .join(', ')}
+                .join(", ")}
             </h4>
           )}
         </div>
@@ -147,9 +151,10 @@ export const ActionsOrConsultationsReport = ({ actions, consultations, actionsCr
             className="button-submit"
             onClick={() => {
               const searchParams = new URLSearchParams(history.location.search);
-              searchParams.set(activeTab.includes('Actions') ? 'newAction' : 'newConsultation', true);
+              searchParams.set(activeTab.includes("Actions") ? "newAction" : "newConsultation", true);
               history.push(`?${searchParams.toString()}`);
-            }}>
+            }}
+          >
             ＋ Ajouter une action
           </button>
         </ModalFooter>
@@ -160,10 +165,10 @@ export const ActionsOrConsultationsReport = ({ actions, consultations, actionsCr
 
 const ActionsOrConsultationsFilters = ({ setFilterStatus, filterStatus, disabled }) => {
   const options = [
-    { _id: TODO, name: 'À faire' },
-    { _id: DONE, name: 'Faite' },
-    { _id: CANCEL, name: 'Annulée' },
-    { _id: 'CREATED', name: 'Créée' },
+    { _id: TODO, name: "À faire" },
+    { _id: DONE, name: "Faite" },
+    { _id: CANCEL, name: "Annulée" },
+    { _id: "CREATED", name: "Créée" },
   ];
   return (
     <>

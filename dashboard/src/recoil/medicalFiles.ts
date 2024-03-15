@@ -1,19 +1,19 @@
-import { atom, selector } from 'recoil';
-import { organisationAuthentifiedState } from './auth';
-import { capture } from '../services/sentry';
-import { toast } from 'react-toastify';
-import { looseUuidRegex } from '../utils';
-import type { MedicalFileInstance, NewMedicalFileInstance } from '../types/medicalFile';
-import type { CustomField } from '../types/field';
+import { atom, selector } from "recoil";
+import { organisationAuthentifiedState } from "./auth";
+import { capture } from "../services/sentry";
+import { toast } from "react-toastify";
+import { looseUuidRegex } from "../utils";
+import type { MedicalFileInstance, NewMedicalFileInstance } from "../types/medicalFile";
+import type { CustomField } from "../types/field";
 
-const collectionName = 'medical-file';
+const collectionName = "medical-file";
 export const medicalFileState = atom<MedicalFileInstance[]>({
   key: collectionName,
   default: [],
 });
 
 export const customFieldsMedicalFileSelector = selector<CustomField[]>({
-  key: 'customFieldsMedicalFileSelector',
+  key: "customFieldsMedicalFileSelector",
   get: ({ get }) => {
     const organisation = get(organisationAuthentifiedState);
     if (Array.isArray(organisation.customFieldsMedicalFile)) return organisation.customFieldsMedicalFile;
@@ -21,7 +21,7 @@ export const customFieldsMedicalFileSelector = selector<CustomField[]>({
   },
 });
 
-const encryptedFields = ['person', 'documents', 'comments', 'history'];
+const encryptedFields = ["person", "documents", "comments", "history"];
 
 export const prepareMedicalFileForEncryption =
   (customFieldsMedicalFile: CustomField[]) =>
@@ -29,7 +29,7 @@ export const prepareMedicalFileForEncryption =
     if (!!checkRequiredFields) {
       try {
         if (!looseUuidRegex.test(medicalFile.person)) {
-          throw new Error('MedicalFile is missing person');
+          throw new Error("MedicalFile is missing person");
         }
       } catch (error) {
         toast.error(
@@ -58,9 +58,9 @@ export const prepareMedicalFileForEncryption =
 
 const defaultMedicalFileCustomFields: CustomField[] = [
   {
-    name: 'numeroSecuriteSociale',
-    label: 'Numéro de sécurité sociale',
-    type: 'text',
+    name: "numeroSecuriteSociale",
+    label: "Numéro de sécurité sociale",
+    type: "text",
     enabled: true,
     required: false,
     showInStats: false,

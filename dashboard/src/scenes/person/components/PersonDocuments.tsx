@@ -1,17 +1,17 @@
-import { useMemo } from 'react';
-import { toast } from 'react-toastify';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import type { RecoilValueReadOnly } from 'recoil';
-import { organisationAuthentifiedState } from '../../../recoil/auth';
-import { personsState, usePreparePersonForEncryption } from '../../../recoil/persons';
-import API from '../../../services/api';
-import { capture } from '../../../services/sentry';
-import { DocumentsModule } from '../../../components/DocumentsGeneric';
-import { groupsState } from '../../../recoil/groups';
-import type { PersonPopulated, PersonInstance } from '../../../types/person';
-import type { Document } from '../../../types/document';
-import type { UUIDV4 } from '../../../types/uuid';
-import { personsObjectSelector } from '../../../recoil/selectors';
+import { useMemo } from "react";
+import { toast } from "react-toastify";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import type { RecoilValueReadOnly } from "recoil";
+import { organisationAuthentifiedState } from "../../../recoil/auth";
+import { personsState, usePreparePersonForEncryption } from "../../../recoil/persons";
+import API from "../../../services/api";
+import { capture } from "../../../services/sentry";
+import { DocumentsModule } from "../../../components/DocumentsGeneric";
+import { groupsState } from "../../../recoil/groups";
+import type { PersonPopulated, PersonInstance } from "../../../types/person";
+import type { Document } from "../../../types/document";
+import type { UUIDV4 } from "../../../types/uuid";
+import { personsObjectSelector } from "../../../recoil/selectors";
 
 interface PersonDocumentsProps {
   person: PersonPopulated;
@@ -81,7 +81,7 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
             documents: (_person.documents || [])
               .filter((f) => f._id !== folder._id)
               .map((item) => {
-                if (item.parentId === folder._id) return { ...item, parentId: '' };
+                if (item.parentId === folder._id) return { ...item, parentId: "" };
                 return item;
               }),
           }),
@@ -94,10 +94,10 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
               return p;
             })
           );
-          toast.success('Dossier supprimé');
+          toast.success("Dossier supprimé");
           return true;
         } else {
-          toast.error('Erreur lors de la suppression du document, vous pouvez contactez le support');
+          toast.error("Erreur lors de la suppression du document, vous pouvez contactez le support");
           return false;
         }
       }}
@@ -121,10 +121,10 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
               return p;
             })
           );
-          toast.success('Document supprimé');
+          toast.success("Document supprimé");
           return true;
         } else {
-          toast.error('Erreur lors de la suppression du document, vous pouvez contactez le support');
+          toast.error("Erreur lors de la suppression du document, vous pouvez contactez le support");
           return false;
         }
       }}
@@ -150,10 +150,10 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
               return p;
             })
           );
-          toast.success(documentOrFolder.type === 'document' ? 'Document mis à jour' : 'Dossier mis à jour');
+          toast.success(documentOrFolder.type === "document" ? "Document mis à jour" : "Dossier mis à jour");
         } else {
-          toast.error('Erreur lors de la mise à jour du document, vous pouvez contactez le support');
-          capture('Error while updating treatment document', { personResponseError: personResponse.error });
+          toast.error("Erreur lors de la mise à jour du document, vous pouvez contactez le support");
+          capture("Error while updating treatment document", { personResponseError: personResponse.error });
         }
       }}
       onAddDocuments={async (newDocuments) => {
@@ -165,8 +165,8 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
           }),
         });
         if (personResponse.ok) {
-          if (newDocuments.filter((d) => d.type === 'document').length > 1) toast.success('Documents enregistrés !');
-          if (newDocuments.filter((d) => d.type === 'folder').length > 0) toast.success('Dossier créé !');
+          if (newDocuments.filter((d) => d.type === "document").length > 1) toast.success("Documents enregistrés !");
+          if (newDocuments.filter((d) => d.type === "folder").length > 0) toast.success("Dossier créé !");
           const newPerson = personResponse.decryptedData;
           setPersons((persons) =>
             persons.map((p) => {

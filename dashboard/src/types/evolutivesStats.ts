@@ -1,14 +1,14 @@
-import type { CustomOrPredefinedField } from '../types/field';
-import type { UUIDV4 } from './uuid';
+import type { CustomOrPredefinedField } from "../types/field";
+import type { UUIDV4 } from "./uuid";
 
 export type EvolutiveStatOption = string;
 export type EvolutiveStatDateYYYYMMDD = string;
 export type EvolutiveStatsPersonFields = Record<
-  CustomOrPredefinedField['name'],
+  CustomOrPredefinedField["name"],
   Record<EvolutiveStatOption, Record<EvolutiveStatDateYYYYMMDD, number>>
 >;
 export type EvolutiveStatsOldestStatusPersonFields = Record<
-  CustomOrPredefinedField['name'],
+  CustomOrPredefinedField["name"],
   Record<EvolutiveStatOption, Record<EvolutiveStatDateYYYYMMDD, Array<UUIDV4>>>
 >;
 

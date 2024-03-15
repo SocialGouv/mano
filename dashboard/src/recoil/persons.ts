@@ -1,18 +1,18 @@
-import { getCacheItemDefaultValue, setCacheItem } from '../services/dataManagement';
-import { atom, selector, useRecoilValue } from 'recoil';
-import { organisationState } from './auth';
-import { toast } from 'react-toastify';
-import { capture } from '../services/sentry';
-import type { PersonInstance } from '../types/person';
-import type { PredefinedField, CustomField, CustomOrPredefinedField } from '../types/field';
+import { getCacheItemDefaultValue, setCacheItem } from "../services/dataManagement";
+import { atom, selector, useRecoilValue } from "recoil";
+import { organisationState } from "./auth";
+import { toast } from "react-toastify";
+import { capture } from "../services/sentry";
+import type { PersonInstance } from "../types/person";
+import type { PredefinedField, CustomField, CustomOrPredefinedField } from "../types/field";
 
-const collectionName = 'person';
+const collectionName = "person";
 export const personsState = atom<PersonInstance[]>({
   key: collectionName,
   default: selector({
-    key: 'person/default',
+    key: "person/default",
     get: async () => {
-      const cache = await getCacheItemDefaultValue('person', []);
+      const cache = await getCacheItemDefaultValue("person", []);
       return cache;
     },
   }),
@@ -28,7 +28,7 @@ All fields for person are
 
 */
 export const personFieldsSelector = selector({
-  key: 'personFieldsSelector',
+  key: "personFieldsSelector",
   get: ({ get }) => {
     const organisation = get(organisationState);
     return organisation?.personFields || [];
@@ -36,7 +36,7 @@ export const personFieldsSelector = selector({
 });
 
 export const fieldsPersonsCustomizableOptionsSelector = selector<CustomField[]>({
-  key: 'fieldsPersonsCustomizableOptionsSelector',
+  key: "fieldsPersonsCustomizableOptionsSelector",
   get: ({ get }) => {
     const organisation = get(organisationState);
     return (organisation?.fieldsPersonsCustomizableOptions || []) as CustomField[];
@@ -44,7 +44,7 @@ export const fieldsPersonsCustomizableOptionsSelector = selector<CustomField[]>(
 });
 
 export const customFieldsPersonsSelector = selector({
-  key: 'customFieldsPersonsSelector',
+  key: "customFieldsPersonsSelector",
   get: ({ get }) => {
     const organisation = get(organisationState);
     return organisation?.customFieldsPersons || [];
@@ -52,7 +52,7 @@ export const customFieldsPersonsSelector = selector({
 });
 
 export const flattenedCustomFieldsPersonsSelector = selector({
-  key: 'flattenedCustomFieldsPersonsSelector',
+  key: "flattenedCustomFieldsPersonsSelector",
   get: ({ get }) => {
     const customFieldsPersonsSections = get(customFieldsPersonsSelector);
     const customFieldsPersons = [];
@@ -68,7 +68,7 @@ export const flattenedCustomFieldsPersonsSelector = selector({
 /* Other utils selector */
 
 export const personFieldsIncludingCustomFieldsSelector = selector({
-  key: 'personFieldsIncludingCustomFieldsSelector',
+  key: "personFieldsIncludingCustomFieldsSelector",
   get: ({ get }) => {
     const personFields = get(personFieldsSelector) as PredefinedField[];
     const fieldsPersonsCustomizableOptions = get(fieldsPersonsCustomizableOptionsSelector) as CustomField[];
@@ -92,15 +92,15 @@ export const personFieldsIncludingCustomFieldsSelector = selector({
 });
 
 export const allowedPersonFieldsInHistorySelector = selector({
-  key: 'allowedPersonFieldsInHistorySelector',
+  key: "allowedPersonFieldsInHistorySelector",
   get: ({ get }) => {
     const allFields = get(personFieldsIncludingCustomFieldsSelector);
-    return allFields.map((f) => f.name).filter((f) => f !== 'history');
+    return allFields.map((f) => f.name).filter((f) => f !== "history");
   },
 });
 
 export const filterPersonsBaseSelector = selector({
-  key: 'filterPersonsBaseSelector',
+  key: "filterPersonsBaseSelector",
   get: ({ get }) => {
     const personFields = get(personFieldsSelector) as PredefinedField[];
     const filterPersonsBase = [];
@@ -111,19 +111,19 @@ export const filterPersonsBaseSelector = selector({
         field: field.name,
         ...field,
       });
-      if (field.name === 'birthdate') {
+      if (field.name === "birthdate") {
         filterPersonsBase.push({
-          field: 'age',
-          label: 'Age',
-          type: 'number',
+          field: "age",
+          label: "Age",
+          type: "number",
           filterable: true,
         });
       }
     }
     filterPersonsBase.push({
-      field: 'hasAtLeastOneConsultation',
-      label: 'A eu une consultation',
-      type: 'boolean',
+      field: "hasAtLeastOneConsultation",
+      label: "A eu une consultation",
+      type: "boolean",
     });
     return filterPersonsBase;
   },
@@ -143,7 +143,7 @@ export const usePreparePersonForEncryption = () => {
     if (!!checkRequiredFields) {
       try {
         if (!person.name) {
-          throw new Error('Person is missing name');
+          throw new Error("Person is missing name");
         }
       } catch (error) {
         toast.error(
@@ -178,58 +178,58 @@ export const usePreparePersonForEncryption = () => {
   return preparePersonForEncryption;
 };
 
-type SortOrder = 'ASC' | 'DESC';
+type SortOrder = "ASC" | "DESC";
 
-type SortBy = 'name' | 'createdAt' | 'formattedBirthDate' | 'alertness' | 'group' | 'user' | 'followedSince' | 'lastUpdateCheckForGDPR';
+type SortBy = "name" | "createdAt" | "formattedBirthDate" | "alertness" | "group" | "user" | "followedSince" | "lastUpdateCheckForGDPR";
 
 const defaultSort = (a: PersonInstance, b: PersonInstance, sortOrder: SortOrder) =>
-  sortOrder === 'ASC' ? (a.name || '').localeCompare(b.name) : (b.name || '').localeCompare(a.name);
+  sortOrder === "ASC" ? (a.name || "").localeCompare(b.name) : (b.name || "").localeCompare(a.name);
 
 export const sortPersons = (sortBy: SortBy, sortOrder: SortOrder) => (a: PersonInstance, b: PersonInstance) => {
-  if (sortBy === 'createdAt') {
-    return sortOrder === 'ASC'
+  if (sortBy === "createdAt") {
+    return sortOrder === "ASC"
       ? new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       : new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
   }
-  if (sortBy === 'formattedBirthDate') {
+  if (sortBy === "formattedBirthDate") {
     if (!a.birthdate && !b.birthdate) return defaultSort(a, b, sortOrder);
-    if (!a.birthdate) return sortOrder === 'ASC' ? 1 : -1;
-    if (!b.birthdate) return sortOrder === 'DESC' ? 1 : -1;
-    return sortOrder === 'ASC'
+    if (!a.birthdate) return sortOrder === "ASC" ? 1 : -1;
+    if (!b.birthdate) return sortOrder === "DESC" ? 1 : -1;
+    return sortOrder === "ASC"
       ? new Date(b.birthdate).getTime() - new Date(a.birthdate).getTime()
       : new Date(a.birthdate).getTime() - new Date(b.birthdate).getTime();
   }
-  if (sortBy === 'alertness') {
+  if (sortBy === "alertness") {
     if (a.alertness === b.alertness) return defaultSort(a, b, sortOrder);
-    if (!a.alertness) return sortOrder === 'ASC' ? 1 : -1;
-    if (!b.alertness) return sortOrder === 'DESC' ? 1 : -1;
+    if (!a.alertness) return sortOrder === "ASC" ? 1 : -1;
+    if (!b.alertness) return sortOrder === "DESC" ? 1 : -1;
     return 0;
   }
-  if (sortBy === 'group') {
+  if (sortBy === "group") {
     if (!!a.group === !!b.group) return defaultSort(a, b, sortOrder);
-    if (!a.group) return sortOrder === 'ASC' ? 1 : -1;
-    if (!b.group) return sortOrder === 'DESC' ? 1 : -1;
+    if (!a.group) return sortOrder === "ASC" ? 1 : -1;
+    if (!b.group) return sortOrder === "DESC" ? 1 : -1;
     return 0;
   }
-  if (sortBy === 'user') {
+  if (sortBy === "user") {
     if (!a.userPopulated && !b.userPopulated) return defaultSort(a, b, sortOrder);
-    if (!a.userPopulated) return sortOrder === 'ASC' ? 1 : -1;
-    if (!b.userPopulated) return sortOrder === 'ASC' ? -1 : 1;
-    return sortOrder === 'ASC' ? a.userPopulated.name.localeCompare(b.userPopulated.name) : b.userPopulated.name.localeCompare(a.userPopulated.name);
+    if (!a.userPopulated) return sortOrder === "ASC" ? 1 : -1;
+    if (!b.userPopulated) return sortOrder === "ASC" ? -1 : 1;
+    return sortOrder === "ASC" ? a.userPopulated.name.localeCompare(b.userPopulated.name) : b.userPopulated.name.localeCompare(a.userPopulated.name);
   }
-  if (sortBy === 'followedSince') {
+  if (sortBy === "followedSince") {
     if (!a.followedSince && !b.followedSince) return defaultSort(a, b, sortOrder);
-    if (!a.followedSince) return sortOrder === 'ASC' ? 1 : -1;
-    if (!b.followedSince) return sortOrder === 'DESC' ? 1 : -1;
-    return sortOrder === 'ASC'
+    if (!a.followedSince) return sortOrder === "ASC" ? 1 : -1;
+    if (!b.followedSince) return sortOrder === "DESC" ? 1 : -1;
+    return sortOrder === "ASC"
       ? new Date(b.followedSince).getTime() - new Date(a.followedSince).getTime()
       : new Date(a.followedSince).getTime() - new Date(b.followedSince).getTime();
   }
-  if (sortBy === 'lastUpdateCheckForGDPR') {
+  if (sortBy === "lastUpdateCheckForGDPR") {
     if (!a.lastUpdateCheckForGDPR && !b.lastUpdateCheckForGDPR) return defaultSort(a, b, sortOrder);
-    if (!a.lastUpdateCheckForGDPR) return sortOrder === 'ASC' ? 1 : -1;
-    if (!b.lastUpdateCheckForGDPR) return sortOrder === 'DESC' ? 1 : -1;
-    return sortOrder === 'ASC'
+    if (!a.lastUpdateCheckForGDPR) return sortOrder === "ASC" ? 1 : -1;
+    if (!b.lastUpdateCheckForGDPR) return sortOrder === "DESC" ? 1 : -1;
+    return sortOrder === "ASC"
       ? new Date(b.lastUpdateCheckForGDPR).getTime() - new Date(a.lastUpdateCheckForGDPR).getTime()
       : new Date(a.lastUpdateCheckForGDPR).getTime() - new Date(b.lastUpdateCheckForGDPR).getTime();
   }

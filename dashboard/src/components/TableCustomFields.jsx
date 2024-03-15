@@ -1,17 +1,17 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { toast } from 'react-toastify';
-import { useRecoilState } from 'recoil';
-import { organisationState } from '../recoil/auth';
-import API from '../services/api';
-import ButtonCustom from './ButtonCustom';
-import SelectCustom from './SelectCustom';
-import Table from './table';
-import DeleteButtonAndConfirmModal from './DeleteButtonAndConfirmModal';
-import TableCustomFieldteamSelector from './TableCustomFieldTeamSelector';
-import SelectDraggableAndEditable from './SelectDraggableAndEditable';
-import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from './tailwind/Modal';
-import { newCustomField, typeOptions } from '../utils';
-import SelectTeamMultiple from './SelectTeamMultiple';
+import React, { useCallback, useMemo, useRef, useState } from "react";
+import { toast } from "react-toastify";
+import { useRecoilState } from "recoil";
+import { organisationState } from "../recoil/auth";
+import API from "../services/api";
+import ButtonCustom from "./ButtonCustom";
+import SelectCustom from "./SelectCustom";
+import Table from "./table";
+import DeleteButtonAndConfirmModal from "./DeleteButtonAndConfirmModal";
+import TableCustomFieldteamSelector from "./TableCustomFieldTeamSelector";
+import SelectDraggableAndEditable from "./SelectDraggableAndEditable";
+import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "./tailwind/Modal";
+import { newCustomField, typeOptions } from "../utils";
+import SelectTeamMultiple from "./SelectTeamMultiple";
 
 const getValueFromType = (type) => typeOptions.find((opt) => opt.value === type);
 
@@ -59,7 +59,7 @@ const TableCustomFields = ({
   };
 
   const onDelete = (fieldToDelete) => {
-    const confirm = window.confirm('Voulez-vous vraiment supprimer ce champ ? Cette opération est irréversible.');
+    const confirm = window.confirm("Voulez-vous vraiment supprimer ce champ ? Cette opération est irréversible.");
     if (confirm) {
       const dataToSave = mutableData.filter((f) => f).filter((f) => f.name !== fieldToDelete.name);
       setMutableData(dataToSave);
@@ -77,13 +77,13 @@ const TableCustomFields = ({
         body: { [customFields]: mergeData ? mergeData(newData) : newData },
       });
       if (response.ok) {
-        toast.success('Mise à jour !');
+        toast.success("Mise à jour !");
         setMutableData(extractData ? extractData(response.data[customFields]) : response.data[customFields]);
         setOrganisation(response.data);
         setTableKey((k) => k + 1);
       }
     } catch (orgUpdateError) {
-      console.log('error in updating organisation', orgUpdateError);
+      console.log("error in updating organisation", orgUpdateError);
       toast.error(orgUpdateError.message);
     }
     setIsSubmitting(false);
@@ -98,13 +98,13 @@ const TableCustomFields = ({
         body: { [customFields]: mergeData ? mergeData(dataForApi) : dataForApi },
       });
       if (response.ok) {
-        toast.success('Mise à jour !');
+        toast.success("Mise à jour !");
         setMutableData(extractData ? extractData(response.data[customFields]) : response.data[customFields]);
         setOrganisation(response.data);
         setTableKey((k) => k + 1);
       }
     } catch (orgUpdateError) {
-      console.log('error in updating organisation', orgUpdateError);
+      console.log("error in updating organisation", orgUpdateError);
       toast.error(orgUpdateError.message);
     }
     setIsSubmitting(false);
@@ -123,14 +123,15 @@ const TableCustomFields = ({
         noData="Pas de champ personnalisé"
         columns={[
           {
-            dataKey: '_id',
+            dataKey: "_id",
             render: (field) => (
               <button
                 type="button"
                 aria-label="Modifier le champ"
                 title="Modifier le champ"
                 className="tw-w-8 tw-border-none tw-bg-transparent"
-                onClick={() => setEditingField(field)}>
+                onClick={() => setEditingField(field)}
+              >
                 &#9998;
               </button>
             ),
@@ -138,8 +139,8 @@ const TableCustomFields = ({
             show: true,
           },
           {
-            title: 'Nom',
-            dataKey: 'label',
+            title: "Nom",
+            dataKey: "label",
             render: (f) => (
               <div className="tw-m-auto tw-w-36">
                 <span>{f.label}</span>
@@ -148,8 +149,8 @@ const TableCustomFields = ({
             show: true,
           },
           {
-            title: 'Type',
-            dataKey: 'type',
+            title: "Type",
+            dataKey: "type",
             render: (f) => (
               <div className="tw-m-auto tw-w-36">
                 <span>{getValueFromType(f.type)?.label}</span>
@@ -158,18 +159,18 @@ const TableCustomFields = ({
             show: true,
           },
           {
-            title: 'Options',
-            dataKey: 'options',
+            title: "Options",
+            dataKey: "options",
             render: (f) => (
-              <div className="tw-m-auto tw-w-36">{!['enum', 'multi-choice'].includes(f.type) ? null : (f?.options || []).join(', ')}</div>
+              <div className="tw-m-auto tw-w-36">{!["enum", "multi-choice"].includes(f.type) ? null : (f?.options || []).join(", ")}</div>
             ),
             show: true,
           },
           {
             title: "Activé pour l'équipe",
             show: true,
-            style: { width: '180px' },
-            dataKey: 'enabled',
+            style: { width: "180px" },
+            dataKey: "enabled",
             render: (f) => <TableCustomFieldteamSelector field={f} onUpdate={(data) => onUpdate(f, data)} />,
           },
           {
@@ -180,13 +181,13 @@ const TableCustomFields = ({
                 statistiques
               </>
             ),
-            dataKey: 'showInStats',
+            dataKey: "showInStats",
             render: (f) => <input type="checkbox" checked={f.showInStats} onChange={onShowStatsChange(f)} />,
             show: !onlyOptionsEditable,
           },
           {
-            title: '',
-            dataKey: 'name',
+            title: "",
+            dataKey: "name",
             small: true,
             show: !onlyOptionsEditable,
             render: (f) => (
@@ -194,8 +195,9 @@ const TableCustomFields = ({
                 buttonWidth={75}
                 title={`Voulez-vous vraiment supprimer le champ ${f.label}`}
                 textToConfirm={f.label}
-                onConfirm={async () => onDelete(f)}>
-                <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
+                onConfirm={async () => onDelete(f)}
+              >
+                <span style={{ marginBottom: 30, display: "block", width: "100%", textAlign: "center" }}>
                   Cette opération est irréversible
                   <br />
                   et entrainera la suppression définitive de toutes les données enregistrées sous ce champ.
@@ -262,11 +264,11 @@ export const EditCustomField = ({ open, onDelete, data, editingField, onClose, o
     const formData = new FormData(e.target);
     const editedField = {
       ...field,
-      name: formData.get('name'),
-      label: formData.get('label'),
-      type: formData.get('type'),
-      showInStats: formData.get('showInStats') === 'on',
-      options: formData.getAll('options'),
+      name: formData.get("name"),
+      label: formData.get("label"),
+      type: formData.get("type"),
+      showInStats: formData.get("showInStats") === "on",
+      options: formData.getAll("options"),
     };
     onSaveField(editedField);
   };
@@ -276,7 +278,7 @@ export const EditCustomField = ({ open, onDelete, data, editingField, onClose, o
     // the idea to disable the type is to avoid bugs with existing data if the type is changed.
     // for example, if the type is changed from multi-choice (array) to text (string), or from boolean to text
     // BUT some data is compatible, let's allow it
-    if (['boolean', 'multi-choice'].includes(field.type)) return true;
+    if (["boolean", "multi-choice"].includes(field.type)) return true;
     return false;
   }, [isNewField, fieldIsUsed, field.type]);
 
@@ -285,14 +287,14 @@ export const EditCustomField = ({ open, onDelete, data, editingField, onClose, o
       if (typeIsDisabled) return true;
       if (isNewField || !fieldIsUsed) return false;
 
-      if (['number'].includes(field.type)) {
-        return !['text', 'number', 'textarea', 'enum'].includes(option.value);
+      if (["number"].includes(field.type)) {
+        return !["text", "number", "textarea", "enum"].includes(option.value);
       }
-      if (['text', 'textarea', 'enum', 'yes-no'].includes(field.type)) {
-        return !['text', 'textarea', 'enum'].includes(option.value);
+      if (["text", "textarea", "enum", "yes-no"].includes(field.type)) {
+        return !["text", "textarea", "enum"].includes(option.value);
       }
-      if (['date', 'date-with-time', 'duration'].includes(field.type)) {
-        return !['date', 'date-with-time', 'duration'].includes(option.value);
+      if (["date", "date-with-time", "duration"].includes(field.type)) {
+        return !["date", "date-with-time", "duration"].includes(option.value);
       }
       return true;
     },
@@ -301,7 +303,7 @@ export const EditCustomField = ({ open, onDelete, data, editingField, onClose, o
 
   return (
     <ModalContainer open={open} onClose={() => onClose(null)} size="3xl">
-      <ModalHeader title={!isNewField ? 'Modifier le champ' : 'Créer un nouveau champ'} />
+      <ModalHeader title={!isNewField ? "Modifier le champ" : "Créer un nouveau champ"} />
       <ModalBody ref={bodyRef}>
         <form id="custom-field-form" className="tw-flex tw-min-h-[75vh] tw-w-full tw-flex-wrap tw-px-4" onSubmit={onSubmit}>
           <div className="tw-basis-full tw-p-4">
@@ -315,7 +317,7 @@ export const EditCustomField = ({ open, onDelete, data, editingField, onClose, o
               id="label"
               name="label"
               required
-              onInvalid={(F) => F.target.setCustomValidity('Le nom est obligatoire')}
+              onInvalid={(F) => F.target.setCustomValidity("Le nom est obligatoire")}
               value={field.label}
               disabled={onlyOptionsEditable}
               onChange={(e) => setField({ ...field, label: e.target.value })}
@@ -331,7 +333,7 @@ export const EditCustomField = ({ open, onDelete, data, editingField, onClose, o
               classNamePrefix="type"
               name="type"
               onMenuScrollToBottom={() => {
-                bodyRef.current.scrollTo({ top: bodyRef.current.scrollHeight, behavior: 'smooth' });
+                bodyRef.current.scrollTo({ top: bodyRef.current.scrollHeight, behavior: "smooth" });
               }}
               isDisabled={typeIsDisabled || onlyOptionsEditable}
               isOptionDisabled={optionIsDisabled}
@@ -342,7 +344,7 @@ export const EditCustomField = ({ open, onDelete, data, editingField, onClose, o
             {(fieldIsUsed || onlyOptionsEditable) && <input type="hidden" name="type" value={field.type} />}
           </div>
           <div className="tw-basis-1/2 tw-p-4">
-            {!!['enum', 'multi-choice'].includes(field.type) && (
+            {!!["enum", "multi-choice"].includes(field.type) && (
               <>
                 <label htmlFor="options" className="tailwindui">
                   Choix
@@ -442,15 +444,17 @@ export const EditCustomField = ({ open, onDelete, data, editingField, onClose, o
           onClick={() => {
             setField(editingField || newCustomField());
             onClose();
-          }}>
+          }}
+        >
           Annuler
         </button>
         {!isNewField && !onlyOptionsEditable && (
           <DeleteButtonAndConfirmModal
             title={`Voulez-vous vraiment supprimer le champ ${editingField?.label}`}
             textToConfirm={editingField?.label}
-            onConfirm={async () => onDelete(editingField)}>
-            <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
+            onConfirm={async () => onDelete(editingField)}
+          >
+            <span style={{ marginBottom: 30, display: "block", width: "100%", textAlign: "center" }}>
               Cette opération est irréversible
               <br />
               et entrainera la suppression définitive de toutes les données enregistrées sous ce champ.

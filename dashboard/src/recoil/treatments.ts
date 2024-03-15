@@ -1,47 +1,47 @@
-import { atom } from 'recoil';
-import { looseUuidRegex } from '../utils';
-import { toast } from 'react-toastify';
-import { capture } from '../services/sentry';
-import type { TreatmentInstance } from '../types/treatment';
+import { atom } from "recoil";
+import { looseUuidRegex } from "../utils";
+import { toast } from "react-toastify";
+import { capture } from "../services/sentry";
+import type { TreatmentInstance } from "../types/treatment";
 
-const collectionName = 'treatment';
+const collectionName = "treatment";
 export const treatmentsState = atom<TreatmentInstance[]>({
   key: collectionName,
   default: [],
 });
 
 const encryptedFields: Array<keyof TreatmentInstance> = [
-  'person',
-  'user',
-  'startDate',
-  'endDate',
-  'name',
-  'dosage',
-  'frequency',
-  'indication',
-  'documents',
-  'comments',
-  'history',
+  "person",
+  "user",
+  "startDate",
+  "endDate",
+  "name",
+  "dosage",
+  "frequency",
+  "indication",
+  "documents",
+  "comments",
+  "history",
 ];
 
 export const allowedTreatmentFieldsInHistory = [
-  { name: 'person', label: 'Personne suivie' },
-  { name: 'name', label: 'Nom du traitement' },
-  { name: 'startDate', label: 'Date de début' },
-  { name: 'endDate', label: 'Date de fin' },
-  { name: 'dosage', label: 'Dosage' },
-  { name: 'frequency', label: 'Fréquence' },
-  { name: 'indication', label: 'Indication' },
+  { name: "person", label: "Personne suivie" },
+  { name: "name", label: "Nom du traitement" },
+  { name: "startDate", label: "Date de début" },
+  { name: "endDate", label: "Date de fin" },
+  { name: "dosage", label: "Dosage" },
+  { name: "frequency", label: "Fréquence" },
+  { name: "indication", label: "Indication" },
 ];
 
 export const prepareTreatmentForEncryption = (treatment: TreatmentInstance, { checkRequiredFields = true } = {}) => {
   if (!!checkRequiredFields) {
     try {
       if (!looseUuidRegex.test(treatment.person)) {
-        throw new Error('Treatment is missing person');
+        throw new Error("Treatment is missing person");
       }
       if (!looseUuidRegex.test(treatment.user)) {
-        throw new Error('Treatment is missing user');
+        throw new Error("Treatment is missing user");
       }
     } catch (error) {
       toast.error(

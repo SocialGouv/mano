@@ -1,13 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
-import dayjs from 'dayjs';
-import duration from 'dayjs/plugin/duration';
-import utc from 'dayjs/plugin/utc';
-import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from './tailwind/Modal';
-import PasswordInput from './PasswordInput';
-import validator from 'validator';
-import { useRecoilValue } from 'recoil';
-import { organisationState, sessionInitialDateTimestamp } from '../recoil/auth';
-import API, { setOrgEncryptionKey } from '../services/api';
+import React, { useEffect, useRef, useState } from "react";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+import utc from "dayjs/plugin/utc";
+import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "./tailwind/Modal";
+import PasswordInput from "./PasswordInput";
+import validator from "validator";
+import { useRecoilValue } from "recoil";
+import { organisationState, sessionInitialDateTimestamp } from "../recoil/auth";
+import API, { setOrgEncryptionKey } from "../services/api";
 
 dayjs.extend(utc);
 dayjs.extend(duration);
@@ -51,16 +51,17 @@ const SessionCountDownLimiter = () => {
 
   return (
     <>
-      <div className={['tw-mt-4', remainingSession < warnBeforeEndOfSession ? 'tw-font-bold tw-text-red-500' : ''].join(' ')}>
+      <div className={["tw-mt-4", remainingSession < warnBeforeEndOfSession ? "tw-font-bold tw-text-red-500" : ""].join(" ")}>
         <div>Temps de session restant</div>
         <div>{timeString}</div>
       </div>
       <button
         onClick={() => setReloadModalOpen(true)}
         className={[
-          'button-link !tw-m-0 !tw-justify-start !tw-p-0',
-          remainingSession < warnBeforeEndOfSession ? '!tw-font-bold !tw-text-red-500' : '',
-        ].join(' ')}>
+          "button-link !tw-m-0 !tw-justify-start !tw-p-0",
+          remainingSession < warnBeforeEndOfSession ? "!tw-font-bold !tw-text-red-500" : "",
+        ].join(" ")}
+      >
         Verrouiller/Recharger
       </button>
       {remainingTimeBeforeDeconnection <= 60 && (
@@ -83,7 +84,7 @@ const SessionCountDownLimiter = () => {
 };
 
 const ReloadModal = ({ open, onSuccess }) => {
-  const [encryptionKey, setEncryptionKey] = useState('');
+  const [encryptionKey, setEncryptionKey] = useState("");
   const organisation = useRecoilValue(organisationState);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -93,9 +94,10 @@ const ReloadModal = ({ open, onSuccess }) => {
       size="3xl"
       blurryBackground
       onAfterLeave={() => {
-        setEncryptionKey('');
+        setEncryptionKey("");
         setShowPassword(false);
-      }}>
+      }}
+    >
       <ModalHeader title="Veuillez saisir votre clé de chiffrement d'organisation" />
       <ModalBody>
         <form
@@ -104,16 +106,17 @@ const ReloadModal = ({ open, onSuccess }) => {
           onSubmit={async (e) => {
             e.preventDefault();
             const encryptionIsValid = await setOrgEncryptionKey(encryptionKey.trim(), organisation);
-            if (!encryptionIsValid) return setEncryptionKey('');
+            if (!encryptionIsValid) return setEncryptionKey("");
             onSuccess(false);
-          }}>
+          }}
+        >
           <label htmlFor="orgEncryptionKey">Clé de chiffrement d'organisation</label>
           <PasswordInput
             className={[
-              'focus:tw-shadow-outline tw-mb-1 tw-block tw-w-full tw-rounded tw-border tw-border-teal-500 tw-bg-transparent tw-p-2 tw-leading-5 tw-text-gray-900 tw-outline-none tw-transition-all tw-duration-200 focus:tw-border-main50 focus:tw-outline-none',
-              !showPassword ? 'tw-font-[password] tw-text-xs tw-tracking-widest' : '',
-            ].join(' ')}
-            validate={(v) => validator.isEmpty(v) && 'Ce champ est obligatoire'}
+              "focus:tw-shadow-outline tw-mb-1 tw-block tw-w-full tw-rounded tw-border tw-border-teal-500 tw-bg-transparent tw-p-2 tw-leading-5 tw-text-gray-900 tw-outline-none tw-transition-all tw-duration-200 focus:tw-border-main50 focus:tw-outline-none",
+              !showPassword ? "tw-font-[password] tw-text-xs tw-tracking-widest" : "",
+            ].join(" ")}
+            validate={(v) => validator.isEmpty(v) && "Ce champ est obligatoire"}
             name="orgEncryptionKey"
             type="search" // for the delete button
             autoComplete="off"

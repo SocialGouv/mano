@@ -1,12 +1,12 @@
-import { useState, useCallback, useMemo } from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { useDataLoader } from '../../components/DataLoader';
-import { organisationState } from '../../recoil/auth';
-import API from '../../services/api';
-import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from '../../components/tailwind/Modal';
-import { toast } from 'react-toastify';
-import { servicesSelector, flattenedServicesSelector } from '../../recoil/reports';
-import DragAndDropSettings from './DragAndDropSettings';
+import { useState, useCallback, useMemo } from "react";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { useDataLoader } from "../../components/DataLoader";
+import { organisationState } from "../../recoil/auth";
+import API from "../../services/api";
+import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from "../../components/tailwind/Modal";
+import { toast } from "react-toastify";
+import { servicesSelector, flattenedServicesSelector } from "../../recoil/reports";
+import DragAndDropSettings from "./DragAndDropSettings";
 
 const ServicesSettings = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
@@ -103,7 +103,7 @@ const ServicesSettings = () => {
       if (response.ok) {
         refresh();
         setOrganisation(response.data);
-        toast.success('Le groupe a été déplacé.');
+        toast.success("Le groupe a été déplacé.");
       } else {
         setOrganisation(oldOrganisation);
       }
@@ -137,7 +137,7 @@ const AddService = ({ groupTitle, services, onDragAndDrop }) => {
   const onAddService = async (e) => {
     e.preventDefault();
     const { newService } = Object.fromEntries(new FormData(e.target));
-    if (!newService) return toast.error('Vous devez saisir un nom pour le service');
+    if (!newService) return toast.error("Vous devez saisir un nom pour le service");
     if (flattenedServices.includes(newService)) {
       const existingGroupTitle = groupedServices.find(({ services }) => services.includes(newService)).groupTitle;
       return toast.error(`Ce service existe déjà : ${existingGroupTitle} > ${newService}`);
@@ -195,7 +195,7 @@ const Service = ({ item: service, groupTitle }) => {
     e.preventDefault();
     const { newService } = Object.fromEntries(new FormData(e.target));
     const oldService = service;
-    if (!newService) return toast.error('Vous devez saisir un nom pour le service');
+    if (!newService) return toast.error("Vous devez saisir un nom pour le service");
     if (newService.trim() === oldService.trim()) return toast.error("Le nom de le service n'a pas changé");
     if (flattenedServices.includes(newService)) {
       const existingGroupTitle = groupedServices.find(({ services }) => services.includes(newService)).groupTitle;
@@ -224,7 +224,7 @@ const Service = ({ item: service, groupTitle }) => {
       });
 
       if (!renamedServicesResponse.ok) {
-        toast.error('Erreur lors de la mise à jour du nom du service sur les anciens services');
+        toast.error("Erreur lors de la mise à jour du nom du service sur les anciens services");
       }
 
       refresh();
@@ -237,7 +237,7 @@ const Service = ({ item: service, groupTitle }) => {
   };
 
   const onDeleteService = async () => {
-    if (!window.confirm('Voulez-vous vraiment supprimer ce service ? Cette opération est irréversible')) return;
+    if (!window.confirm("Voulez-vous vraiment supprimer ce service ? Cette opération est irréversible")) return;
     const newGroupedServices = groupedServices.map((group) => {
       if (group.groupTitle !== groupTitle) return group;
       return {
@@ -274,9 +274,10 @@ const Service = ({ item: service, groupTitle }) => {
         onMouseDown={() => setIsSelected(true)}
         onMouseUp={() => setIsSelected(false)}
         className={[
-          'tw-group tw-flex tw-cursor-move tw-items-center tw-border-2 tw-border-transparent tw-pl-1',
-          isSelected ? 'tw-rounded tw-border-main' : '',
-        ].join(' ')}>
+          "tw-group tw-flex tw-cursor-move tw-items-center tw-border-2 tw-border-transparent tw-pl-1",
+          isSelected ? "tw-rounded tw-border-main" : "",
+        ].join(" ")}
+      >
         <p className="tw-m-0" id={service}>
           {service}
         </p>
@@ -284,7 +285,8 @@ const Service = ({ item: service, groupTitle }) => {
           type="button"
           aria-label={`Modifier le service ${service}`}
           className="tw-ml-auto tw-hidden group-hover:tw-inline-flex"
-          onClick={() => setIsEditingService(true)}>
+          onClick={() => setIsEditingService(true)}
+        >
           ✏️
         </button>
       </div>

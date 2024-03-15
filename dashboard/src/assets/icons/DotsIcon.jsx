@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 const DotsIcon = ({ size = 20 }) => (
   <svg height={size} width={size} viewBox="0 0 200 30">

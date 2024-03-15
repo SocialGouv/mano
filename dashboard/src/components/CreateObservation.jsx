@@ -1,21 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader, Label } from 'reactstrap';
-import styled from 'styled-components';
-import { Formik } from 'formik';
-import { toast } from 'react-toastify';
+import React, { useState, useEffect } from "react";
+import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader, Label } from "reactstrap";
+import styled from "styled-components";
+import { Formik } from "formik";
+import { toast } from "react-toastify";
 
-import { customFieldsObsSelector, prepareObsForEncryption, territoryObservationsState } from '../recoil/territoryObservations';
-import SelectTeam from './SelectTeam';
-import ButtonCustom from './ButtonCustom';
-import SelectCustom from './SelectCustom';
-import CustomFieldInput from './CustomFieldInput';
-import { currentTeamState, teamsState, userState } from '../recoil/auth';
-import { territoriesState } from '../recoil/territory';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { dayjsInstance, outOfBoundariesDate } from '../services/date';
-import API from '../services/api';
-import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
-import DatePicker from './DatePicker';
+import { customFieldsObsSelector, prepareObsForEncryption, territoryObservationsState } from "../recoil/territoryObservations";
+import SelectTeam from "./SelectTeam";
+import ButtonCustom from "./ButtonCustom";
+import SelectCustom from "./SelectCustom";
+import CustomFieldInput from "./CustomFieldInput";
+import { currentTeamState, teamsState, userState } from "../recoil/auth";
+import { territoriesState } from "../recoil/territory";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { dayjsInstance, outOfBoundariesDate } from "../services/date";
+import API from "../services/api";
+import useCreateReportAtDateIfNotExist from "../services/useCreateReportAtDateIfNotExist";
+import DatePicker from "./DatePicker";
 
 const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
   const [open, setOpen] = useState(false);
@@ -34,7 +34,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const addTerritoryObs = async (obs) => {
-    const res = await API.post({ path: '/territory-observation', body: prepareObsForEncryption(customFieldsObs)(obs) });
+    const res = await API.post({ path: "/territory-observation", body: prepareObsForEncryption(customFieldsObs)(obs) });
     if (res.ok) {
       setTerritoryObs((territoryObservations) =>
         [res.decryptedData, ...territoryObservations].sort((a, b) => new Date(b.observedAt || b.createdAt) - new Date(a.observedAt || a.createdAt))
@@ -63,14 +63,14 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
   return (
     <CreateStyle>
       <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
-        <ModalHeader toggle={() => setOpen(false)}>{observation._id ? "Modifier l'observation" : 'Créer une nouvelle observation'}</ModalHeader>
+        <ModalHeader toggle={() => setOpen(false)}>{observation._id ? "Modifier l'observation" : "Créer une nouvelle observation"}</ModalHeader>
         <ModalBody>
           <Formik
             key={open}
             initialValues={observation}
             onSubmit={async (values, actions) => {
               if (!values.team) return toast.error("L'équipe est obligatoire");
-              if (!values.territory) return toast.error('Le territoire est obligatoire');
+              if (!values.territory) return toast.error("Le territoire est obligatoire");
               if (values.observedAt && outOfBoundariesDate(values.observedAt))
                 return toast.error("La date d'observation est hors limites (entre 1900 et 2100)");
               const body = {
@@ -86,10 +86,11 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
               const res = observation._id ? await updateTerritoryObs(body) : await addTerritoryObs(body);
               actions.setSubmitting(false);
               if (res.ok) {
-                toast.success(observation._id ? 'Observation mise à jour' : 'Création réussie !');
+                toast.success(observation._id ? "Observation mise à jour" : "Création réussie !");
                 setOpen(false);
               }
-            }}>
+            }}
+          >
             {({ values, handleChange, handleSubmit, isSubmitting }) => (
               <React.Fragment>
                 <Row>
@@ -118,9 +119,9 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
                       <Label htmlFor="observation-select-team">Sous l'équipe</Label>
                       <SelectTeam
                         name="team"
-                        teams={user.role === 'admin' ? teams : user.teams}
+                        teams={user.role === "admin" ? teams : user.teams}
                         teamId={values.team}
-                        onChange={(team) => handleChange({ target: { value: team._id, name: 'team' } })}
+                        onChange={(team) => handleChange({ target: { value: team._id, name: "team" } })}
                         colored
                         inputId="observation-select-team"
                         classNamePrefix="observation-select-team"
@@ -133,7 +134,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
                       <SelectCustom
                         options={territories}
                         name="place"
-                        onChange={(territory) => handleChange({ currentTarget: { value: territory._id, name: 'territory' } })}
+                        onChange={(territory) => handleChange({ currentTarget: { value: territory._id, name: "territory" } })}
                         isClearable={false}
                         value={territories.find((i) => i._id === values.territory)}
                         getOptionValue={(i) => i._id}

@@ -1,5 +1,5 @@
-import { useRecoilState } from 'recoil';
-import { teamsState } from '../recoil/auth';
+import { useRecoilState } from "recoil";
+import { teamsState } from "../recoil/auth";
 
 export default function TableCustomFieldTeamSelector({ field, onUpdate }) {
   const [teams] = useRecoilState(teamsState);
@@ -14,7 +14,7 @@ export default function TableCustomFieldTeamSelector({ field, onUpdate }) {
               const checked = event.target.checked;
               onUpdate({ enabled: checked, enabledTeams: checked ? [] : teams.map((team) => team._id) });
             }}
-          />{' '}
+          />{" "}
           Toute l'organisation
         </label>
       </div>
@@ -39,7 +39,7 @@ export default function TableCustomFieldTeamSelector({ field, onUpdate }) {
                       });
                     }
                   }}
-                />{' '}
+                />{" "}
                 {e.name}
               </label>
             </div>

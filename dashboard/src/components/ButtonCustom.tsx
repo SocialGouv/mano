@@ -38,7 +38,8 @@ const ButtonCustom = ({
       width={width}
       disabled={loading || disabled}
       type={type}
-      {...rest}>
+      {...rest}
+    >
       <SpinnerContainer visibility={!loading ? "hidden" : "visible"}>
         <Spinner color={"white"} size={"sm"} style={{ borderWidth: "0.1em" }} />
       </SpinnerContainer>

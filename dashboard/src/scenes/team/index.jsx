@@ -1,9 +1,9 @@
-import React from 'react';
-import { Switch } from 'react-router-dom';
-import SentryRoute from '../../components/Sentryroute';
+import React from "react";
+import { Switch } from "react-router-dom";
+import SentryRoute from "../../components/Sentryroute";
 
-import List from './list';
-import View from './view';
+import List from "./list";
+import View from "./view";
 
 const Router = () => {
   return (

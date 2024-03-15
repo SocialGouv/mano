@@ -1,5 +1,5 @@
-import { Fragment, forwardRef, useRef } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
+import { Fragment, forwardRef, useRef } from "react";
+import { Dialog, Transition } from "@headlessui/react";
 
 // inspired by https://tailwindui.com/components/application-ui/overlays/modals#component-47a5888a08838ad98779d50878d359b3
 
@@ -23,7 +23,7 @@ interface ModalContainerProps {
   onAfterEnter?: () => void;
   onAfterLeave?: () => void;
   onBeforeLeave?: () => void;
-  size?: 'lg' | 'xl' | '3xl' | 'full' | 'prose';
+  size?: "lg" | "xl" | "3xl" | "full" | "prose";
   blurryBackground?: boolean; // if true, the background will be blurred
 }
 
@@ -32,11 +32,11 @@ const ModalContainer = ({
   open,
   onClose = null,
   // setOpen,
-  className = '',
+  className = "",
   onAfterEnter = () => null,
   onAfterLeave = () => null,
   onBeforeLeave = () => null,
-  size = 'lg', // lg, xl, 3xl, full, prose
+  size = "lg", // lg, xl, 3xl, full, prose
   blurryBackground = false,
 }: ModalContainerProps) => {
   const backgroundRef = useRef<HTMLDivElement | null>(null);
@@ -46,7 +46,7 @@ const ModalContainer = ({
       <Transition.Root show={open} as={Fragment}>
         <Dialog
           as="div"
-          className={['tw-relative tw-z-[100]', className].join(' ')}
+          className={["tw-relative tw-z-[100]", className].join(" ")}
           // onClose={setOpen} // uncomment this if you want backdrop click to close modal
           onClose={nullFunction} // uncomment this if you want backdrop click to NOT close modal
         >
@@ -57,8 +57,9 @@ const ModalContainer = ({
             enterTo="tw-opacity-100"
             leave="tw-ease-in tw-duration-200"
             leaveFrom="tw-opacity-100"
-            leaveTo="tw-opacity-0">
-            <div className={['tw-fixed tw-inset-0 tw-bg-black/70 tw-transition-opacity ', blurryBackground ? 'tw-backdrop-blur-xl' : ''].join(' ')} />
+            leaveTo="tw-opacity-0"
+          >
+            <div className={["tw-fixed tw-inset-0 tw-bg-black/70 tw-transition-opacity ", blurryBackground ? "tw-backdrop-blur-xl" : ""].join(" ")} />
           </Transition.Child>
 
           <div className="tw-fixed tw-inset-0 tw-z-[101] tw-overflow-y-auto" ref={backgroundRef}>
@@ -76,23 +77,26 @@ const ModalContainer = ({
                   onAfterEnter();
                 }}
                 beforeLeave={onBeforeLeave}
-                afterLeave={onAfterLeave}>
+                afterLeave={onAfterLeave}
+              >
                 <Dialog.Panel
                   className={[
-                    'tw-relative tw-flex tw-max-h-[90vh] tw-transform tw-flex-col tw-overflow-hidden tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all sm:tw-my-8 sm:tw-w-full',
-                    size === 'lg' ? 'sm:tw-max-w-lg' : '',
-                    size === 'xl' ? 'sm:tw-max-w-xl' : '',
-                    size === '3xl' ? 'sm:tw-max-w-3xl' : '',
-                    size === 'full' ? 'sm:tw-max-w-[90vw]' : '',
-                    size === 'prose' ? 'sm:tw-max-w-prose' : '',
-                  ].join(' ')}>
+                    "tw-relative tw-flex tw-max-h-[90vh] tw-transform tw-flex-col tw-overflow-hidden tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all sm:tw-my-8 sm:tw-w-full",
+                    size === "lg" ? "sm:tw-max-w-lg" : "",
+                    size === "xl" ? "sm:tw-max-w-xl" : "",
+                    size === "3xl" ? "sm:tw-max-w-3xl" : "",
+                    size === "full" ? "sm:tw-max-w-[90vw]" : "",
+                    size === "prose" ? "sm:tw-max-w-prose" : "",
+                  ].join(" ")}
+                >
                   {children}
                   {!!onClose && (
                     <button
                       type="button"
                       aria-label="Fermer"
-                      className="tw-absolute tw-top-4 tw-right-0 tw-text-gray-900 sm:tw-px-6"
-                      onClick={onClose}>
+                      className="tw-absolute tw-right-0 tw-top-4 tw-text-gray-900 sm:tw-px-6"
+                      onClick={onClose}
+                    >
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="tw-h-6 tw-w-6">
                         <path
                           fillRule="evenodd"
@@ -132,7 +136,7 @@ const ModalHeader = ({ children, title, onClose }: ModalHeaderProps) => {
           )}
           {children}
           {!!onClose && (
-            <button type="button" aria-label="Fermer" className="tw-absolute tw-top-4 tw-right-0 tw-text-gray-900 sm:tw-px-6" onClick={onClose}>
+            <button type="button" aria-label="Fermer" className="tw-absolute tw-right-0 tw-top-4 tw-text-gray-900 sm:tw-px-6" onClick={onClose}>
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="tw-h-6 tw-w-6">
                 <path
                   fillRule="evenodd"
@@ -154,11 +158,11 @@ interface ModalBodyProps {
   overflowY?: boolean;
 }
 
-const ModalBody = forwardRef<HTMLDivElement, ModalBodyProps>(({ children, className = '', overflowY = true }, ref) => {
+const ModalBody = forwardRef<HTMLDivElement, ModalBodyProps>(({ children, className = "", overflowY = true }, ref) => {
   return (
-    <div ref={ref} className={['tw-z-[102] tw-order-2 tw-shrink', overflowY ? 'tw-overflow-y-auto' : ''].join(' ')}>
+    <div ref={ref} className={["tw-z-[102] tw-order-2 tw-shrink", overflowY ? "tw-overflow-y-auto" : ""].join(" ")}>
       <div className="sm:tw-flex sm:tw-items-start">
-        <div className={['tw-w-full tw-text-center sm:tw-mt-0 sm:tw-text-left', className].join(' ')}>{children}</div>
+        <div className={["tw-w-full tw-text-center sm:tw-mt-0 sm:tw-text-left", className].join(" ")}>{children}</div>
       </div>
     </div>
   );

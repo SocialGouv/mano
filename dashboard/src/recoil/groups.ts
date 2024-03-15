@@ -1,15 +1,15 @@
-import { getCacheItemDefaultValue, setCacheItem } from '../services/dataManagement';
-import { atom, selector, selectorFamily } from 'recoil';
-import type { GroupInstance } from '../types/group';
-import type { UUIDV4 } from '../types/uuid';
+import { getCacheItemDefaultValue, setCacheItem } from "../services/dataManagement";
+import { atom, selector, selectorFamily } from "recoil";
+import type { GroupInstance } from "../types/group";
+import type { UUIDV4 } from "../types/uuid";
 
-const collectionName = 'group';
+const collectionName = "group";
 export const groupsState = atom<GroupInstance[]>({
   key: collectionName,
   default: selector({
-    key: 'group/default',
+    key: "group/default",
     get: async () => {
-      const cache = await getCacheItemDefaultValue('group', []);
+      const cache = await getCacheItemDefaultValue("group", []);
       return cache;
     },
   }),
@@ -17,7 +17,7 @@ export const groupsState = atom<GroupInstance[]>({
 });
 
 export const groupSelector = selectorFamily({
-  key: 'groupSelector',
+  key: "groupSelector",
   get:
     ({ personId }: { personId: UUIDV4 }) =>
     ({ get }) => {
@@ -26,7 +26,7 @@ export const groupSelector = selectorFamily({
     },
 });
 
-const encryptedFields: Array<keyof GroupInstance> = ['persons', 'relations'];
+const encryptedFields: Array<keyof GroupInstance> = ["persons", "relations"];
 
 export const prepareGroupForEncryption = (group: GroupInstance) => {
   const decrypted: any = {};

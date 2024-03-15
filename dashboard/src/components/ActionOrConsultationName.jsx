@@ -1,9 +1,9 @@
-import React from 'react';
-import { userState } from '../recoil/auth';
-import { useRecoilValue } from 'recoil';
-import { disableConsultationRow } from '../recoil/consultations';
-import { getName } from '../recoil/actions';
-import UserName from './UserName';
+import React from "react";
+import { userState } from "../recoil/auth";
+import { useRecoilValue } from "recoil";
+import { disableConsultationRow } from "../recoil/consultations";
+import { getName } from "../recoil/actions";
+import UserName from "./UserName";
 
 export default function ActionOrConsultationName({ item, hideType = false }) {
   const me = useRecoilValue(userState);
@@ -12,7 +12,7 @@ export default function ActionOrConsultationName({ item, hideType = false }) {
     return (
       <div className="tw-italic tw-opacity-30">
         Seulement visible par
-        {hideType ? ' ' : <br />}
+        {hideType ? " " : <br />}
         <UserName id={item.user} />
       </div>
     );
@@ -23,10 +23,11 @@ export default function ActionOrConsultationName({ item, hideType = false }) {
       <div>
         {item.categories?.map((category) => (
           <span
-            className="tw-whitespace-no-wrap tw-my-px tw-mx-0.5 tw-inline-block tw-rounded tw-bg-main75 tw-py-0.5 tw-px-1 tw-text-center tw-align-baseline tw-text-[10.5px] tw-font-bold tw-leading-none tw-text-white"
+            className="tw-whitespace-no-wrap tw-mx-0.5 tw-my-px tw-inline-block tw-rounded tw-bg-main75 tw-px-1 tw-py-0.5 tw-text-center tw-align-baseline tw-text-[10.5px] tw-font-bold tw-leading-none tw-text-white"
             color="info"
             key={category}
-            data-test-id={item.name + category}>
+            data-test-id={item.name + category}
+          >
             {category}
           </span>
         ))}

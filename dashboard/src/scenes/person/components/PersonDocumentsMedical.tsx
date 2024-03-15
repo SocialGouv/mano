@@ -1,16 +1,16 @@
-import { useMemo } from 'react';
-import { toast } from 'react-toastify';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { organisationAuthentifiedState, userAuthentifiedState } from '../../../recoil/auth';
-import { consultationsState, prepareConsultationForEncryption } from '../../../recoil/consultations';
-import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../../recoil/medicalFiles';
-import { prepareTreatmentForEncryption, treatmentsState } from '../../../recoil/treatments';
-import API, { encryptItem } from '../../../services/api';
-import { capture } from '../../../services/sentry';
-import { DocumentsModule } from '../../../components/DocumentsGeneric';
-import type { PersonPopulated } from '../../../types/person';
-import type { DocumentWithLinkedItem, FolderWithLinkedItem, Document, Folder } from '../../../types/document';
-import { useDataLoader } from '../../../components/DataLoader';
+import { useMemo } from "react";
+import { toast } from "react-toastify";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { organisationAuthentifiedState, userAuthentifiedState } from "../../../recoil/auth";
+import { consultationsState, prepareConsultationForEncryption } from "../../../recoil/consultations";
+import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from "../../../recoil/medicalFiles";
+import { prepareTreatmentForEncryption, treatmentsState } from "../../../recoil/treatments";
+import API, { encryptItem } from "../../../services/api";
+import { capture } from "../../../services/sentry";
+import { DocumentsModule } from "../../../components/DocumentsGeneric";
+import type { PersonPopulated } from "../../../types/person";
+import type { DocumentWithLinkedItem, FolderWithLinkedItem, Document, Folder } from "../../../types/document";
+import { useDataLoader } from "../../../components/DataLoader";
 
 interface PersonDocumentsProps {
   person: PersonPopulated;
@@ -37,30 +37,30 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
     // define ordannace typed
     const treatmentsDocs: Array<DocumentWithLinkedItem | FolderWithLinkedItem> = [
       {
-        _id: 'treatment',
-        name: 'Traitements',
+        _id: "treatment",
+        name: "Traitements",
         position: 1,
-        parentId: 'root',
-        type: 'folder',
+        parentId: "root",
+        type: "folder",
         linkedItem: {
           _id: medicalFile._id,
-          type: 'medical-file',
+          type: "medical-file",
         },
         movable: false,
         createdAt: new Date(),
-        createdBy: 'we do not care',
+        createdBy: "we do not care",
       },
     ];
     for (const treatment of treatments) {
       for (const document of treatment.documents || []) {
         const docWithLinkedItem = {
           ...document,
-          type: document.type ?? 'document', // it will always be a document in treatments - folders are only saved in medicalFile
+          type: document.type ?? "document", // it will always be a document in treatments - folders are only saved in medicalFile
           linkedItem: {
             _id: treatment._id,
-            type: 'treatment',
+            type: "treatment",
           },
-          parentId: document.parentId ?? 'treatment',
+          parentId: document.parentId ?? "treatment",
         } as DocumentWithLinkedItem;
         treatmentsDocs.push(docWithLinkedItem);
       }
@@ -68,18 +68,18 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
 
     const consultationsDocs: Array<DocumentWithLinkedItem | FolderWithLinkedItem> = [
       {
-        _id: 'consultation',
-        name: 'Consultations',
+        _id: "consultation",
+        name: "Consultations",
         position: 0,
-        parentId: 'root',
-        type: 'folder',
+        parentId: "root",
+        type: "folder",
         linkedItem: {
           _id: medicalFile._id,
-          type: 'medical-file',
+          type: "medical-file",
         },
         movable: false,
         createdAt: new Date(),
-        createdBy: 'we do not care',
+        createdBy: "we do not care",
       },
     ];
     for (const consultation of consultations) {
@@ -89,12 +89,12 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
       for (const document of consultation.documents || []) {
         const docWithLinkedItem = {
           ...document,
-          type: document.type ?? 'document', // it will always be a document in treatments - folders are only saved in medicalFile
+          type: document.type ?? "document", // it will always be a document in treatments - folders are only saved in medicalFile
           linkedItem: {
             _id: consultation._id,
-            type: 'consultation',
+            type: "consultation",
           },
-          parentId: document.parentId ?? 'consultation',
+          parentId: document.parentId ?? "consultation",
         } as DocumentWithLinkedItem;
         consultationsDocs.push(docWithLinkedItem);
       }
@@ -105,12 +105,12 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
     for (const document of medicalFile?.documents || []) {
       const docWithLinkedItem = {
         ...document,
-        type: document.type ?? 'document', // or 'folder'
+        type: document.type ?? "document", // or 'folder'
         linkedItem: {
           _id: medicalFile._id,
-          type: 'medical-file',
+          type: "medical-file",
         },
-        parentId: document.parentId ?? 'root',
+        parentId: document.parentId ?? "root",
       } as DocumentWithLinkedItem;
       otherDocs.push(docWithLinkedItem);
     }
@@ -127,11 +127,11 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
       title={`Documents médicaux de ${person.name} (${allMedicalDocuments.length})`}
       personId={person._id}
       onDeleteDocument={async (documentOrFolder) => {
-        if (documentOrFolder.type === 'document') {
+        if (documentOrFolder.type === "document") {
           const document = documentOrFolder as DocumentWithLinkedItem;
           await API.delete({ path: document.downloadPath ?? `/person/${person._id}/document/${document.file.filename}` });
         }
-        if (documentOrFolder.linkedItem.type === 'treatment') {
+        if (documentOrFolder.linkedItem.type === "treatment") {
           const treatment = treatments.find((t) => t._id === documentOrFolder.linkedItem._id);
           if (!treatment) return false;
           const treatmentResponse = await API.put({
@@ -149,14 +149,14 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
                 return t;
               })
             );
-            toast.success('Document supprimé');
+            toast.success("Document supprimé");
             return true;
           } else {
-            toast.error('Erreur lors de la suppression du document, vous pouvez contactez le support');
-            capture('Error while deleting treatment document', { treatmentResponse });
+            toast.error("Erreur lors de la suppression du document, vous pouvez contactez le support");
+            capture("Error while deleting treatment document", { treatmentResponse });
           }
         }
-        if (documentOrFolder.linkedItem.type === 'consultation') {
+        if (documentOrFolder.linkedItem.type === "consultation") {
           const consultation = consultations.find((c) => c._id === documentOrFolder.linkedItem._id);
           if (!consultation) return false;
           const consultationResponse = await API.put({
@@ -174,14 +174,14 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
                 return c;
               })
             );
-            toast.success('Document supprimé');
+            toast.success("Document supprimé");
             return true;
           } else {
-            toast.error('Erreur lors de la suppression du document, vous pouvez contactez le support');
-            capture('Error while deleting consultation document', { consultationResponse });
+            toast.error("Erreur lors de la suppression du document, vous pouvez contactez le support");
+            capture("Error while deleting consultation document", { consultationResponse });
           }
         }
-        if (documentOrFolder.linkedItem.type === 'medical-file') {
+        if (documentOrFolder.linkedItem.type === "medical-file") {
           if (!medicalFile?._id) return false;
           const medicalFileResponse = await API.put({
             path: `/medical-file/${medicalFile._id}`,
@@ -198,17 +198,17 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
                 return m;
               })
             );
-            toast.success('Document supprimé');
+            toast.success("Document supprimé");
             return true;
           } else {
-            toast.error('Erreur lors de la suppression du document, vous pouvez contactez le support');
-            capture('Error while deleting medical file document', { medicalFileResponse });
+            toast.error("Erreur lors de la suppression du document, vous pouvez contactez le support");
+            capture("Error while deleting medical file document", { medicalFileResponse });
           }
         }
         return false;
       }}
       onSubmitDocument={async (documentOrFolder) => {
-        if (documentOrFolder.linkedItem.type === 'treatment') {
+        if (documentOrFolder.linkedItem.type === "treatment") {
           const treatment = treatments.find((t) => t._id === documentOrFolder.linkedItem._id);
           if (!treatment) return;
           const treatmentResponse = await API.put({
@@ -234,13 +234,13 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
                 return t;
               })
             );
-            toast.success('Document mis à jour');
+            toast.success("Document mis à jour");
           } else {
-            toast.error('Erreur lors de la mise à jour du document, vous pouvez contactez le support');
-            capture('Error while updating treatment document', { treatmentResponse });
+            toast.error("Erreur lors de la mise à jour du document, vous pouvez contactez le support");
+            capture("Error while updating treatment document", { treatmentResponse });
           }
         }
-        if (documentOrFolder.linkedItem.type === 'consultation') {
+        if (documentOrFolder.linkedItem.type === "consultation") {
           const consultation = consultations.find((c) => c._id === documentOrFolder.linkedItem._id);
           if (!consultation) return;
           const consultationResponse = await API.put({
@@ -266,13 +266,13 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
                 return c;
               })
             );
-            toast.success('Document mis à jour');
+            toast.success("Document mis à jour");
           } else {
-            toast.error('Erreur lors de la mise à jour du document, vous pouvez contactez le support');
-            capture('Error while updating consultation document', { consultationResponse });
+            toast.error("Erreur lors de la mise à jour du document, vous pouvez contactez le support");
+            capture("Error while updating consultation document", { consultationResponse });
           }
         }
-        if (documentOrFolder.linkedItem.type === 'medical-file') {
+        if (documentOrFolder.linkedItem.type === "medical-file") {
           if (!medicalFile?._id) return;
           const medicalFileResponse = await API.put({
             path: `/medical-file/${medicalFile._id}`,
@@ -297,10 +297,10 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
                 return m;
               })
             );
-            toast.success('Document mis à jour');
+            toast.success("Document mis à jour");
           } else {
-            toast.error('Erreur lors de la mise à jour du document, vous pouvez contactez le support');
-            capture('Error while updating medical file document', { medicalFileResponse });
+            toast.error("Erreur lors de la mise à jour du document, vous pouvez contactez le support");
+            capture("Error while updating medical file document", { medicalFileResponse });
           }
         }
       }}
@@ -310,11 +310,11 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
           const groupedById: any = {
             treatment: {},
             consultation: {},
-            'medical-file': {},
+            "medical-file": {},
           };
           for (const document of nextDocuments) {
-            if (document._id === 'treatment') continue; // it's the non movable Treatments folder
-            if (document._id === 'consultation') continue; // it's the non movable Consultations folder
+            if (document._id === "treatment") continue; // it's the non movable Treatments folder
+            if (document._id === "consultation") continue; // it's the non movable Consultations folder
             if (!groupedById[document.linkedItem.type][document.linkedItem._id]) groupedById[document.linkedItem.type][document.linkedItem._id] = [];
             groupedById[document.linkedItem.type][document.linkedItem._id].push(document);
           }
@@ -322,7 +322,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
             Object.keys(groupedById.treatment)
               .map((treatmentId) => {
                 const treatment = treatments.find((t) => t._id === treatmentId);
-                if (!treatment) throw new Error('Treatment not found');
+                if (!treatment) throw new Error("Treatment not found");
                 return prepareTreatmentForEncryption({
                   ...treatment,
                   documents: groupedById.treatment[treatmentId],
@@ -335,7 +335,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
             Object.keys(groupedById.consultation)
               .map((consultationId) => {
                 const consultation = consultations.find((c) => c._id === consultationId);
-                if (!consultation) throw new Error('Consultation not found');
+                if (!consultation) throw new Error("Consultation not found");
                 const nextConsultation = prepareConsultationForEncryption(organisation.consultations)({
                   ...consultation,
                   documents: groupedById.consultation[consultationId],
@@ -344,15 +344,15 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
               })
               .map(encryptItem)
           );
-          if (!medicalFile?._id) throw new Error('Medical file not found');
+          if (!medicalFile?._id) throw new Error("Medical file not found");
           const encryptedMedicalFile = await encryptItem(
             prepareMedicalFileForEncryption(customFieldsMedicalFile)({
               ...medicalFile,
-              documents: groupedById['medical-file'][medicalFile._id],
+              documents: groupedById["medical-file"][medicalFile._id],
             })
           );
           const medicalDocumentsResponse = await API.put({
-            path: '/medical-file/documents-reorder',
+            path: "/medical-file/documents-reorder",
             body: {
               treatments: treatmentsToUpdate,
               consultations: consultationsToUpdate,
@@ -360,17 +360,17 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
             },
           });
           if (medicalDocumentsResponse.ok) {
-            toast.success('Documents mis à jour');
+            toast.success("Documents mis à jour");
             refresh();
             return true;
           } else {
-            toast.error('Erreur lors de la mise à jour des documents, vous pouvez contactez le support');
-            capture('Error while updating medical file documents reorder', { medicalDocumentsResponse });
+            toast.error("Erreur lors de la mise à jour des documents, vous pouvez contactez le support");
+            capture("Error while updating medical file documents reorder", { medicalDocumentsResponse });
           }
           return false;
         } catch (e) {
-          toast.error('Erreur lors de la mise à jour des documents, vous pouvez contactez le support');
-          capture(e, { message: 'Error while updating documents order' });
+          toast.error("Erreur lors de la mise à jour des documents, vous pouvez contactez le support");
+          capture(e, { message: "Error while updating documents order" });
         }
         return false;
       }}
@@ -384,8 +384,8 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
           }),
         });
         if (medicalFileResponse.ok) {
-          if (nextDocuments.filter((d) => d.type === 'document').length > 1) toast.success('Documents enregistrés !');
-          if (nextDocuments.filter((d) => d.type === 'folder').length > 0) toast.success('Dossier créé !');
+          if (nextDocuments.filter((d) => d.type === "document").length > 1) toast.success("Documents enregistrés !");
+          if (nextDocuments.filter((d) => d.type === "folder").length > 0) toast.success("Dossier créé !");
           setAllMedicalFiles((allMedicalFiles) =>
             allMedicalFiles.map((m) => {
               if (m._id === medicalFile._id) return medicalFileResponse.decryptedData;

@@ -1,11 +1,11 @@
-import { useRecoilValue } from 'recoil';
-import { currentTeamState } from '../../recoil/auth';
-import { CustomResponsiveBar, CustomResponsivePie } from './charts';
-import { BlockDateWithTime, BlockTotal } from './Blocks';
-import Card from '../../components/Card';
-import { getMultichoiceBarData, getPieData } from './utils';
+import { useRecoilValue } from "recoil";
+import { currentTeamState } from "../../recoil/auth";
+import { CustomResponsiveBar, CustomResponsivePie } from "./charts";
+import { BlockDateWithTime, BlockTotal } from "./Blocks";
+import Card from "../../components/Card";
+import { getMultichoiceBarData, getPieData } from "./utils";
 
-const CustomFieldsStats = ({ customFields, data, additionalCols = [], dataTestId = '', help, onSliceClick, totalTitleForMultiChoice }) => {
+const CustomFieldsStats = ({ customFields, data, additionalCols = [], dataTestId = "", help, onSliceClick, totalTitleForMultiChoice }) => {
   const team = useRecoilValue(currentTeamState);
 
   const customFieldsInStats = customFields
@@ -31,21 +31,21 @@ const CustomFieldsStats = ({ customFields, data, additionalCols = [], dataTestId
         ))}
       </div>
       {customFieldsInStats.map((field) => {
-        if (['number'].includes(field.type)) {
+        if (["number"].includes(field.type)) {
           return (
             <div className="tw-basis-1/4 tw-px-4 tw-py-2" key={field.name}>
               <BlockTotal title={field.label} data={data} field={field.name} help={help?.(field.label.capitalize())} />
             </div>
           );
         }
-        if (['date', 'date-with-time', 'duration'].includes(field.type)) {
+        if (["date", "date-with-time", "duration"].includes(field.type)) {
           return (
             <div className="tw-basis-1/4 tw-px-4 tw-py-2" key={field.name}>
               <BlockDateWithTime data={data} field={field} help={help?.(field.label.capitalize())} />
             </div>
           );
         }
-        if (['boolean', 'yes-no', 'enum'].includes(field.type)) {
+        if (["boolean", "yes-no", "enum"].includes(field.type)) {
           return (
             <CustomResponsivePie
               title={field.label}
@@ -54,12 +54,12 @@ const CustomFieldsStats = ({ customFields, data, additionalCols = [], dataTestId
               key={field.name}
               data={getPieData(data, field.name, {
                 options: field.options,
-                isBoolean: field.type === 'boolean',
+                isBoolean: field.type === "boolean",
               })}
             />
           );
         }
-        if (['multi-choice'].includes(field.type)) {
+        if (["multi-choice"].includes(field.type)) {
           return (
             <CustomResponsiveBar
               title={field.label}

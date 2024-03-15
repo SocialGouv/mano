@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { servicesSelector } from '../recoil/reports';
-import { useRecoilValue } from 'recoil';
-import API from '../services/api';
-import { toast } from 'react-toastify';
-import IncrementorSmall from './IncrementorSmall';
-import { organisationState } from '../recoil/auth';
-import { capture } from '../services/sentry';
+import React, { useState, useEffect } from "react";
+import { servicesSelector } from "../recoil/reports";
+import { useRecoilValue } from "recoil";
+import API from "../services/api";
+import { toast } from "react-toastify";
+import IncrementorSmall from "./IncrementorSmall";
+import { organisationState } from "../recoil/auth";
+import { capture } from "../services/sentry";
 
-const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = '', services, onUpdateServices: setServices }) => {
+const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = "", services, onUpdateServices: setServices }) => {
   const organisation = useRecoilValue(organisationState);
   const groupedServices = useRecoilValue(servicesSelector);
   const [selected, setSelected] = useState(groupedServices[0]?.groupTitle || null);
@@ -15,8 +15,8 @@ const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = '', ser
   useEffect(
     // Init services for a team. We need to fetch services from legacy report and database and merge them.
     function initServices() {
-      if (!dateString || !team?._id || dateString === 'undefined') {
-        return capture('Missing params for initServices in reception', { extra: { dateString, team, report } });
+      if (!dateString || !team?._id || dateString === "undefined") {
+        return capture("Missing params for initServices in reception", { extra: { dateString, team, report } });
       }
       API.get({ path: `/service/team/${team._id}/date/${dateString}` }).then((res) => {
         if (!res.ok) return toast.error(<ErrorOnGetServices />);
@@ -48,10 +48,11 @@ const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = '', ser
             key={group + index}
             className={
               selected === group.groupTitle
-                ? 'tw-mb-[-1px] tw-rounded-t tw-border tw-border-slate-300 tw-border-b-[#f8f8f8] tw-px-4 tw-py-2'
-                : 'tw-px-4 tw-py-2  tw-text-main tw-outline-slate-300 hover:tw-outline'
+                ? "tw-mb-[-1px] tw-rounded-t tw-border tw-border-slate-300 tw-border-b-[#f8f8f8] tw-px-4 tw-py-2"
+                : "tw-px-4 tw-py-2  tw-text-main tw-outline-slate-300 hover:tw-outline"
             }
-            onClick={() => setSelected(group.groupTitle)}>
+            onClick={() => setSelected(group.groupTitle)}
+          >
             {group.groupTitle}
           </button>
         ))}
@@ -62,7 +63,7 @@ const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = '', ser
         {selectedServices.map((service) => (
           <IncrementorSmall
             dataTestId={`${dataTestIdPrefix}${service}-${services[service] || 0}`}
-            key={team._id + ' ' + service}
+            key={team._id + " " + service}
             service={service}
             team={team._id}
             date={dateString}

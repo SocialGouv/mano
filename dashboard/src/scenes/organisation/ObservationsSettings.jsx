@@ -1,13 +1,13 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { useDataLoader } from '../../components/DataLoader';
-import { organisationState } from '../../recoil/auth';
-import API, { encryptItem } from '../../services/api';
-import { toast } from 'react-toastify';
-import DragAndDropSettings from './DragAndDropSettings';
-import { customFieldsObsSelector, prepareObsForEncryption, territoryObservationsState } from '../../recoil/territoryObservations';
-import CustomFieldSetting from '../../components/CustomFieldSetting';
-import { EditCustomField } from '../../components/TableCustomFields';
+import React, { useState, useCallback, useMemo } from "react";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { useDataLoader } from "../../components/DataLoader";
+import { organisationState } from "../../recoil/auth";
+import API, { encryptItem } from "../../services/api";
+import { toast } from "react-toastify";
+import DragAndDropSettings from "./DragAndDropSettings";
+import { customFieldsObsSelector, prepareObsForEncryption, territoryObservationsState } from "../../recoil/territoryObservations";
+import CustomFieldSetting from "../../components/CustomFieldSetting";
+import { EditCustomField } from "../../components/TableCustomFields";
 
 const sanitizeFields = (field) => {
   const sanitizedField = {};
@@ -23,7 +23,7 @@ const ObservationsSettings = () => {
   const dataFormatted = useMemo(() => {
     return [
       {
-        groupTitle: 'Observations de territoire',
+        groupTitle: "Observations de territoire",
         items: customFieldsObs,
       },
     ];
@@ -41,12 +41,12 @@ const ObservationsSettings = () => {
           body: { customFieldsObs: reorderedCustomFields },
         });
         if (response.ok) {
-          toast.success('Mise à jour !');
+          toast.success("Mise à jour !");
           setOrganisation(response.data);
           refresh();
         }
       } catch (orgUpdateError) {
-        console.log('error in updating organisation', orgUpdateError);
+        console.log("error in updating organisation", orgUpdateError);
         toast.error(orgUpdateError.message);
       }
     },
@@ -79,12 +79,12 @@ const AddField = () => {
         body: { customFieldsObs: [...customFieldsObs, newField] },
       });
       if (response.ok) {
-        toast.success('Mise à jour !');
+        toast.success("Mise à jour !");
         setOrganisation(response.data);
         refresh();
       }
     } catch (orgUpdateError) {
-      console.log('error in updating organisation', orgUpdateError);
+      console.log("error in updating organisation", orgUpdateError);
       toast.error(orgUpdateError.message);
     }
     setIsAddingField(false);
@@ -97,7 +97,8 @@ const AddField = () => {
         className="tw-mt-2 tw-block tw-break-normal tw-rounded tw-bg-transparent hover:tw-underline"
         onClick={() => {
           setIsAddingField(true);
-        }}>
+        }}
+      >
         Ajouter un champ
       </button>
       <EditCustomField
@@ -115,7 +116,7 @@ const AddField = () => {
 const replaceOldChoiceByNewChoice = (data, oldChoice, newChoice, field) => {
   return data
     .map((item) => {
-      if (typeof item[field.name] === 'string') {
+      if (typeof item[field.name] === "string") {
         if (item[field.name] !== oldChoice) return null;
         return {
           ...item,
@@ -149,12 +150,12 @@ const ObservationCustomField = ({ item: customField }) => {
         body: { customFieldsObs: customFieldsObs.map((field) => (field.name !== editedField.name ? field : editedField)) },
       });
       if (response.ok) {
-        toast.success('Mise à jour !');
+        toast.success("Mise à jour !");
         setOrganisation(response.data);
         refresh();
       }
     } catch (orgUpdateError) {
-      console.log('error in updating organisation', orgUpdateError);
+      console.log("error in updating organisation", orgUpdateError);
       toast.error(orgUpdateError.message);
     }
     setIsEditingField(false);
@@ -173,7 +174,7 @@ const ObservationCustomField = ({ item: customField }) => {
     const updatedObservations = replaceOldChoiceByNewChoice(observations, oldChoice, newChoice, field);
 
     const response = await API.post({
-      path: '/custom-field',
+      path: "/custom-field",
       body: {
         customFields: {
           customFieldsObs: updatedFields,
@@ -182,7 +183,7 @@ const ObservationCustomField = ({ item: customField }) => {
       },
     });
     if (response.ok) {
-      toast.success('Choix mis à jour !');
+      toast.success("Choix mis à jour !");
       setOrganisation(response.data);
     }
     refresh();
@@ -195,12 +196,12 @@ const ObservationCustomField = ({ item: customField }) => {
         body: { customFieldsObs: customFieldsObs.filter((field) => field.name !== customField.name) },
       });
       if (response.ok) {
-        toast.success('Mise à jour !');
+        toast.success("Mise à jour !");
         setOrganisation(response.data);
         refresh();
       }
     } catch (orgUpdateError) {
-      console.log('error in updating organisation', orgUpdateError);
+      console.log("error in updating organisation", orgUpdateError);
       toast.error(orgUpdateError.message);
     }
     setIsEditingField(false);
@@ -213,15 +214,17 @@ const ObservationCustomField = ({ item: customField }) => {
         onMouseDown={() => setIsSelected(true)}
         onMouseUp={() => setIsSelected(false)}
         className={[
-          'tw-group tw-flex tw-cursor-move tw-items-center tw-border-2 tw-border-transparent tw-pl-1',
-          isSelected ? 'tw-rounded tw-border-main' : '',
-        ].join(' ')}>
+          "tw-group tw-flex tw-cursor-move tw-items-center tw-border-2 tw-border-transparent tw-pl-1",
+          isSelected ? "tw-rounded tw-border-main" : "",
+        ].join(" ")}
+      >
         <CustomFieldSetting customField={customField} />
         <button
           type="button"
           aria-label={`Modifier le champ ${customField.label}`}
           className="tw-invisible tw-ml-auto tw-inline-flex tw-pl-2 group-hover:tw-visible"
-          onClick={() => setIsEditingField(true)}>
+          onClick={() => setIsEditingField(true)}
+        >
           ✏️
         </button>
       </div>

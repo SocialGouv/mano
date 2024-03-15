@@ -1,13 +1,13 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { useDataLoader } from '../../components/DataLoader';
-import { organisationState } from '../../recoil/auth';
-import API, { encryptItem } from '../../services/api';
-import { toast } from 'react-toastify';
-import DragAndDropSettings from './DragAndDropSettings';
-import { consultationsState, prepareConsultationForEncryption } from '../../recoil/consultations';
-import { EditCustomField } from '../../components/TableCustomFields';
-import CustomFieldSetting from '../../components/CustomFieldSetting';
+import React, { useState, useCallback, useMemo } from "react";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { useDataLoader } from "../../components/DataLoader";
+import { organisationState } from "../../recoil/auth";
+import API, { encryptItem } from "../../services/api";
+import { toast } from "react-toastify";
+import DragAndDropSettings from "./DragAndDropSettings";
+import { consultationsState, prepareConsultationForEncryption } from "../../recoil/consultations";
+import { EditCustomField } from "../../components/TableCustomFields";
+import CustomFieldSetting from "../../components/CustomFieldSetting";
 
 const sanitizeFields = (field) => {
   const sanitizedField = {};
@@ -36,7 +36,7 @@ const ConsultationsSettings = () => {
       body: { consultations: [...consultationFields, { name, fields: [] }] },
     });
     if (res.ok) {
-      toast.success('Type de consultation ajouté', { autoclose: 2000 });
+      toast.success("Type de consultation ajouté", { autoclose: 2000 });
       setOrganisation(res.data);
     }
     refresh();
@@ -44,7 +44,7 @@ const ConsultationsSettings = () => {
 
   const onConsultationTypeChange = async (oldName, newName) => {
     if (!newName) {
-      toast.error('Vous devez saisir un nom pour le type de consultation');
+      toast.error("Vous devez saisir un nom pour le type de consultation");
       return;
     }
     const newConsultationFields = consultationFields.map((type) => {
@@ -65,7 +65,7 @@ const ConsultationsSettings = () => {
         .map(encryptItem)
     );
     const response = await API.post({
-      path: '/custom-field',
+      path: "/custom-field",
       body: {
         customFields: {
           consultations: newConsultationFields,
@@ -94,7 +94,7 @@ const ConsultationsSettings = () => {
       body: { consultations: newConsultationFields },
     });
     if (response.ok) {
-      toast.success('Type de consultation supprimé', { autoclose: 2000 });
+      toast.success("Type de consultation supprimé", { autoclose: 2000 });
       setOrganisation(response.data);
       refresh();
     } else {
@@ -157,12 +157,12 @@ const AddField = ({ groupTitle: typeName }) => {
         body: { consultations: newConsultationFields },
       });
       if (response.ok) {
-        toast.success('Mise à jour !');
+        toast.success("Mise à jour !");
         setOrganisation(response.data);
         refresh();
       }
     } catch (orgUpdateError) {
-      console.log('error in updating organisation', orgUpdateError);
+      console.log("error in updating organisation", orgUpdateError);
       toast.error(orgUpdateError.message);
     }
     setIsAddingField(false);
@@ -175,7 +175,8 @@ const AddField = ({ groupTitle: typeName }) => {
         className="tw-mt-2 tw-block tw-break-normal tw-rounded tw-bg-transparent hover:tw-underline"
         onClick={() => {
           setIsAddingField(true);
-        }}>
+        }}
+      >
         Ajouter un champ
       </button>
       <EditCustomField
@@ -193,7 +194,7 @@ const AddField = ({ groupTitle: typeName }) => {
 const replaceOldChoiceByNewChoice = (data, oldChoice, newChoice, field) => {
   return data
     .map((item) => {
-      if (typeof item[field.name] === 'string') {
+      if (typeof item[field.name] === "string") {
         if (item[field.name] !== oldChoice) return null;
         return {
           ...item,
@@ -234,12 +235,12 @@ const ConsultationCustomField = ({ item: customField, groupTitle: typeName }) =>
         body: { consultations: newConsultationFields },
       });
       if (response.ok) {
-        toast.success('Mise à jour !');
+        toast.success("Mise à jour !");
         setOrganisation(response.data);
         refresh();
       }
     } catch (orgUpdateError) {
-      console.log('error in updating organisation', orgUpdateError);
+      console.log("error in updating organisation", orgUpdateError);
       toast.error(orgUpdateError.message);
     }
     setIsEditingField(false);
@@ -264,7 +265,7 @@ const ConsultationCustomField = ({ item: customField, groupTitle: typeName }) =>
     const updatedConsultations = replaceOldChoiceByNewChoice(allConsultations, oldChoice, newChoice, field);
 
     const response = await API.post({
-      path: '/custom-field',
+      path: "/custom-field",
       body: {
         customFields: {
           consultations: newConsultationFields,
@@ -273,7 +274,7 @@ const ConsultationCustomField = ({ item: customField, groupTitle: typeName }) =>
       },
     });
     if (response.ok) {
-      toast.success('Choix mis à jour !');
+      toast.success("Choix mis à jour !");
       setOrganisation(response.data);
     }
     refresh();
@@ -293,12 +294,12 @@ const ConsultationCustomField = ({ item: customField, groupTitle: typeName }) =>
         body: { consultations: newConsultationFields },
       });
       if (response.ok) {
-        toast.success('Mise à jour !');
+        toast.success("Mise à jour !");
         setOrganisation(response.data);
         refresh();
       }
     } catch (orgUpdateError) {
-      console.log('error in updating organisation', orgUpdateError);
+      console.log("error in updating organisation", orgUpdateError);
       toast.error(orgUpdateError.message);
     }
     setIsEditingField(false);
@@ -311,15 +312,17 @@ const ConsultationCustomField = ({ item: customField, groupTitle: typeName }) =>
         onMouseDown={() => setIsSelected(true)}
         onMouseUp={() => setIsSelected(false)}
         className={[
-          'tw-group tw-flex tw-cursor-move tw-items-center tw-border-2 tw-border-transparent tw-pl-1',
-          isSelected ? 'tw-rounded tw-border-main' : '',
-        ].join(' ')}>
+          "tw-group tw-flex tw-cursor-move tw-items-center tw-border-2 tw-border-transparent tw-pl-1",
+          isSelected ? "tw-rounded tw-border-main" : "",
+        ].join(" ")}
+      >
         <CustomFieldSetting customField={customField} />
         <button
           type="button"
           aria-label={`Modifier le champ ${customField.label}`}
           className="tw-invisible tw-ml-auto tw-inline-flex tw-pl-2 group-hover:tw-visible"
-          onClick={() => setIsEditingField(true)}>
+          onClick={() => setIsEditingField(true)}
+        >
           ✏️
         </button>
       </div>

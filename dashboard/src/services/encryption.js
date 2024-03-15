@@ -1,5 +1,5 @@
-import libsodium from 'libsodium-wrappers';
-import { Buffer } from 'buffer';
+import libsodium from "libsodium-wrappers";
+import { Buffer } from "buffer";
 
 // TODO: consolidate the base 64 in both dashboard / app: it looks inconsistent right now
 
@@ -26,7 +26,7 @@ const derivedMasterKey = async (password) => {
 
   const password_base64 = window.btoa(password);
 
-  let salt = Buffer.from('808182838485868788898a8b8c8d8e8f', 'hex');
+  let salt = Buffer.from("808182838485868788898a8b8c8d8e8f", "hex");
   const crypted = sodium.crypto_pwhash(32, password_base64, salt, 2, 65536 << 10, 2);
 
   // Uint8Array
@@ -45,7 +45,7 @@ const _decrypt_after_extracting_nonce = async (nonce_and_ciphertext_b64, key_uin
   const nonce_and_cypher_uint8array = sodium.from_base64(nonce_and_ciphertext_b64, sodium.base64_variants.ORIGINAL);
 
   if (nonce_and_cypher_uint8array.length < sodium.crypto_secretbox_NONCEBYTES + sodium.crypto_secretbox_MACBYTES) {
-    throw new Error('Short message');
+    throw new Error("Short message");
   }
 
   const nonce_uint8array = nonce_and_cypher_uint8array.slice(0, sodium.crypto_secretbox_NONCEBYTES);
@@ -58,7 +58,7 @@ const _decrypt_after_extracting_nonce_uint8array = async (nonce_and_cypher_uint8
   const sodium = libsodium;
 
   if (nonce_and_cypher_uint8array.length < sodium.crypto_secretbox_NONCEBYTES + sodium.crypto_secretbox_MACBYTES) {
-    throw new Error('Short message');
+    throw new Error("Short message");
   }
 
   const nonce_uint8array = nonce_and_cypher_uint8array.slice(0, sodium.crypto_secretbox_NONCEBYTES);
@@ -112,12 +112,12 @@ const encodeContent = (content) => {
   try {
     const purifiedContent = content
       // https://stackoverflow.com/a/31652607/5225096
-      .replace(/[\u007F-\uFFFF]/g, (chr) => '\\u' + ('0000' + chr.charCodeAt(0).toString(16)).substr(-4))
-      .replace(/\//g, '\\/');
+      .replace(/[\u007F-\uFFFF]/g, (chr) => "\\u" + ("0000" + chr.charCodeAt(0).toString(16)).substr(-4))
+      .replace(/\//g, "\\/");
     const base64PurifiedContent = window.btoa(purifiedContent);
     return base64PurifiedContent;
   } catch (errorPurifying) {
-    console.log('error purifying content', errorPurifying);
+    console.log("error purifying content", errorPurifying);
     throw errorPurifying;
   }
 };
@@ -156,7 +156,7 @@ const decryptFile = async (file, encryptedEntityKey, masterKey) => {
   return decryptedFile;
 };
 
-const verificationPassphrase = 'Surprise !';
+const verificationPassphrase = "Surprise !";
 const encryptVerificationKey = async (masterKey) => {
   const encryptedVerificationKey = await _encrypt_and_prepend_nonce(encodeContent(verificationPassphrase), masterKey);
 
@@ -170,7 +170,7 @@ const checkEncryptedVerificationKey = async (encryptedVerificationKey, masterKey
 
     return decryptedVerificationKey === verificationPassphrase;
   } catch (e) {
-    console.log('error checkEncryptedVerificationKey', e);
+    console.log("error checkEncryptedVerificationKey", e);
   }
   return false;
 };

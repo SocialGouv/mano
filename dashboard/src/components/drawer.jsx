@@ -1,13 +1,13 @@
-import { NavLink } from 'react-router-dom';
-import { atom, useRecoilState, useRecoilValue } from 'recoil';
-import { organisationState, teamsState, userState } from '../recoil/auth';
-import OpenNewWindowIcon from './OpenNewWindowIcon';
-import SessionCountDownLimiter from './SessionCountDownLimiter';
-import useMinimumWidth from '../services/useMinimumWidth';
-import { deploymentShortCommitSHAState } from '../recoil/version';
+import { NavLink } from "react-router-dom";
+import { atom, useRecoilState, useRecoilValue } from "recoil";
+import { organisationState, teamsState, userState } from "../recoil/auth";
+import OpenNewWindowIcon from "./OpenNewWindowIcon";
+import SessionCountDownLimiter from "./SessionCountDownLimiter";
+import useMinimumWidth from "../services/useMinimumWidth";
+import { deploymentShortCommitSHAState } from "../recoil/version";
 
 export const showDrawerState = atom({
-  key: 'showDrawerState',
+  key: "showDrawerState",
   default: false,
 });
 
@@ -24,22 +24,24 @@ const Drawer = () => {
   const isOnboarding = onboardingForEncryption || onboardingForTeams;
   const [showDrawer, setShowDrawer] = useRecoilState(showDrawerState);
 
-  const isDesktop = useMinimumWidth('sm');
+  const isDesktop = useMinimumWidth("sm");
 
   return (
     <nav
       title="Navigation principale"
       className={[
-        'noprint tw-absolute tw-flex tw-h-screen tw-w-screen tw-overflow-hidden tw-bg-gray-900/80 tw-opacity-100 tw-transition-all sm:!tw-pointer-events-auto sm:!tw-visible sm:tw-relative sm:!tw-z-30 sm:tw-h-auto sm:tw-w-auto sm:tw-translate-x-0 sm:tw-bg-transparent',
-        showDrawer ? 'tw-visible tw-z-30 tw-translate-x-0 tw-transition-all' : 'tw-pointer-events-none tw-invisible tw-z-[-1] -tw-translate-x-full',
-      ].join(' ')}>
+        "noprint tw-absolute tw-flex tw-h-screen tw-w-screen tw-overflow-hidden tw-bg-gray-900/80 tw-opacity-100 tw-transition-all sm:!tw-pointer-events-auto sm:!tw-visible sm:tw-relative sm:!tw-z-30 sm:tw-h-auto sm:tw-w-auto sm:tw-translate-x-0 sm:tw-bg-transparent",
+        showDrawer ? "tw-visible tw-z-30 tw-translate-x-0 tw-transition-all" : "tw-pointer-events-none tw-invisible tw-z-[-1] -tw-translate-x-full",
+      ].join(" ")}
+    >
       <div
         className={[
-          'noprint tw-max-h-full tw-w-64 tw-min-w-min tw-shrink-0 tw-basis-52 tw-flex-col tw-justify-between tw-overflow-y-auto tw-border-r tw-border-black tw-border-opacity-10 tw-bg-white tw-p-4 tw-drop-shadow-xl sm:!tw-flex sm:tw-drop-shadow-none',
-          isOnboarding ? '[&_li:not(#show-on-onboarding)]:tw-pointer-events-none [&_li:not(#show-on-onboarding)]:tw-opacity-20' : '',
-        ].join(' ')}>
-        <div className="tw-pl-0 [&_li]:tw-list-none [&_a]:tw-my-0.5 [&_a]:tw-block [&_a]:tw-rounded-lg [&_a]:tw-py-0.5 [&_a]:tw-text-sm [&_a]:tw-font-semibold [&_a]:tw-text-black75 [&_a:hover]:tw-text-main [&_a.active]:tw-text-main [&_a.active]:tw-underline">
-          {['admin', 'normal'].includes(role) && isDesktop && (
+          "noprint tw-max-h-full tw-w-64 tw-min-w-min tw-shrink-0 tw-basis-52 tw-flex-col tw-justify-between tw-overflow-y-auto tw-border-r tw-border-black tw-border-opacity-10 tw-bg-white tw-p-4 tw-drop-shadow-xl sm:!tw-flex sm:tw-drop-shadow-none",
+          isOnboarding ? "[&_li:not(#show-on-onboarding)]:tw-pointer-events-none [&_li:not(#show-on-onboarding)]:tw-opacity-20" : "",
+        ].join(" ")}
+      >
+        <div className="tw-pl-0 [&_a.active]:tw-text-main [&_a.active]:tw-underline [&_a:hover]:tw-text-main [&_a]:tw-my-0.5 [&_a]:tw-block [&_a]:tw-rounded-lg [&_a]:tw-py-0.5 [&_a]:tw-text-sm [&_a]:tw-font-semibold [&_a]:tw-text-black75 [&_li]:tw-list-none">
+          {["admin", "normal"].includes(role) && isDesktop && (
             <>
               <li>
                 <NavLink to="/search" activeClassName="active">
@@ -49,35 +51,35 @@ const Drawer = () => {
               <hr />
             </>
           )}
-          {['admin', 'normal', 'restricted-access'].includes(role) && !!organisation.receptionEnabled && !!isDesktop && (
+          {["admin", "normal", "restricted-access"].includes(role) && !!organisation.receptionEnabled && !!isDesktop && (
             <li>
               <NavLink to="/reception" activeClassName="active">
                 Accueil
               </NavLink>
             </li>
           )}
-          {['admin', 'normal', 'restricted-access'].includes(role) && (
+          {["admin", "normal", "restricted-access"].includes(role) && (
             <li>
               <NavLink to="/action" activeClassName="active">
                 Agenda
               </NavLink>
             </li>
           )}
-          {['admin', 'normal', 'restricted-access'].includes(role) && (
+          {["admin", "normal", "restricted-access"].includes(role) && (
             <li>
               <NavLink to="/person" activeClassName="active">
                 Personnes suivies
               </NavLink>
             </li>
           )}
-          {['admin', 'normal', 'restricted-access'].includes(role) && !!organisation.territoriesEnabled && (
+          {["admin", "normal", "restricted-access"].includes(role) && !!organisation.territoriesEnabled && (
             <li>
               <NavLink to="/territory" activeClassName="active">
                 Territoires
               </NavLink>
             </li>
           )}
-          {['admin', 'normal', 'restricted-access'].includes(role) && (
+          {["admin", "normal", "restricted-access"].includes(role) && (
             <>
               <li>
                 <NavLink to="/report-new" activeClassName="active">
@@ -86,7 +88,7 @@ const Drawer = () => {
               </li>
             </>
           )}
-          {['admin', 'normal', 'restricted-access'].includes(role) && (
+          {["admin", "normal", "restricted-access"].includes(role) && (
             <>
               <hr />
               {/* <li>
@@ -107,7 +109,7 @@ const Drawer = () => {
               <hr />
             </>
           )}
-          {['admin', 'normal'].includes(role) && isDesktop && (
+          {["admin", "normal"].includes(role) && isDesktop && (
             <>
               <li>
                 <NavLink to="/stats" activeClassName="active">
@@ -116,7 +118,7 @@ const Drawer = () => {
               </li>
             </>
           )}
-          {['admin'].includes(role) && isDesktop && (
+          {["admin"].includes(role) && isDesktop && (
             <>
               <hr />
               <li id="show-on-onboarding">
@@ -137,7 +139,7 @@ const Drawer = () => {
             </>
           )}
         </div>
-        <div className="tw-mt-auto tw-mb-4 tw-flex tw-flex-col tw-justify-between tw-text-[0.65rem] tw-text-main">
+        <div className="tw-mb-4 tw-mt-auto tw-flex tw-flex-col tw-justify-between tw-text-[0.65rem] tw-text-main">
           <p className="m-0">Version&nbsp;: {deploymentCommit}</p>
           <p className="m-0">Accessibilité&nbsp;: partielle</p>
           <SessionCountDownLimiter />
@@ -145,8 +147,9 @@ const Drawer = () => {
         <button
           type="button"
           aria-label="Cacher la navigation latérale"
-          className="tw-absolute tw-top-2 tw-right-2 tw-text-gray-900 sm:tw-hidden sm:tw-px-6"
-          onClick={() => setShowDrawer(!showDrawer)}>
+          className="tw-absolute tw-right-2 tw-top-2 tw-text-gray-900 sm:tw-hidden sm:tw-px-6"
+          onClick={() => setShowDrawer(!showDrawer)}
+        >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="tw-h-6 tw-w-6">
             <path
               fillRule="evenodd"

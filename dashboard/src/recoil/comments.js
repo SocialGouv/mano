@@ -1,35 +1,35 @@
-import { getCacheItemDefaultValue, setCacheItem } from '../services/dataManagement';
-import { atom, selector } from 'recoil';
-import { looseUuidRegex } from '../utils';
-import { toast } from 'react-toastify';
-import { capture } from '../services/sentry';
+import { getCacheItemDefaultValue, setCacheItem } from "../services/dataManagement";
+import { atom, selector } from "recoil";
+import { looseUuidRegex } from "../utils";
+import { toast } from "react-toastify";
+import { capture } from "../services/sentry";
 
-const collectionName = 'comment';
+const collectionName = "comment";
 export const commentsState = atom({
   key: collectionName,
   default: selector({
-    key: 'comment/default',
+    key: "comment/default",
     get: async () => {
-      const cache = await getCacheItemDefaultValue('comment', []);
+      const cache = await getCacheItemDefaultValue("comment", []);
       return cache;
     },
   }),
   effects: [({ onSet }) => onSet(async (newValue) => setCacheItem(collectionName, newValue))],
 });
 
-const encryptedFields = ['comment', 'person', 'action', 'group', 'team', 'user', 'date', 'urgent'];
+const encryptedFields = ["comment", "person", "action", "group", "team", "user", "date", "urgent"];
 
 export const prepareCommentForEncryption = (comment, { checkRequiredFields = true } = {}) => {
   if (!!checkRequiredFields) {
     try {
       if (!looseUuidRegex.test(comment.person) && !looseUuidRegex.test(comment.action)) {
-        throw new Error('Comment is missing person or action');
+        throw new Error("Comment is missing person or action");
       }
       if (!looseUuidRegex.test(comment.team)) {
-        throw new Error('Comment is missing team');
+        throw new Error("Comment is missing team");
       }
       if (!looseUuidRegex.test(comment.user)) {
-        throw new Error('Comment is missing user');
+        throw new Error("Comment is missing user");
       }
     } catch (error) {
       toast.error(
@@ -57,5 +57,5 @@ export const prepareCommentForEncryption = (comment, { checkRequiredFields = tru
 
 export const sortComments = (sortBy, sortOrder) => (a, b) => {
   // sortBy is always `date` for now
-  return sortOrder === 'ASC' ? new Date(b.date).getTime() - new Date(a.date).getTime() : new Date(a.date).getTime() - new Date(b.date).getTime();
+  return sortOrder === "ASC" ? new Date(b.date).getTime() - new Date(a.date).getTime() : new Date(a.date).getTime() - new Date(b.date).getTime();
 };

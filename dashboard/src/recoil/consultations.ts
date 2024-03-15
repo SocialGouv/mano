@@ -1,22 +1,22 @@
-import { atom, selector } from 'recoil';
-import { looseUuidRegex } from '../utils';
-import { toast } from 'react-toastify';
-import { capture } from '../services/sentry';
-import type { ConsultationInstance } from '../types/consultation';
-import type { CustomFieldsGroup } from '../types/field';
-import type { UserInstance } from '../types/user';
-import { organisationState } from './auth';
+import { atom, selector } from "recoil";
+import { looseUuidRegex } from "../utils";
+import { toast } from "react-toastify";
+import { capture } from "../services/sentry";
+import type { ConsultationInstance } from "../types/consultation";
+import type { CustomFieldsGroup } from "../types/field";
+import type { UserInstance } from "../types/user";
+import { organisationState } from "./auth";
 
-const collectionName = 'consultation';
+const collectionName = "consultation";
 export const consultationsState = atom<ConsultationInstance[]>({
   key: collectionName,
   default: [],
 });
 
-const encryptedFields: Array<keyof ConsultationInstance> = ['name', 'type', 'person', 'user', 'teams', 'documents', 'comments', 'history'];
+const encryptedFields: Array<keyof ConsultationInstance> = ["name", "type", "person", "user", "teams", "documents", "comments", "history"];
 
 export const consultationFieldsSelector = selector({
-  key: 'consultationFieldsSelector',
+  key: "consultationFieldsSelector",
   get: ({ get }) => {
     const organisation = get(organisationState);
     return organisation?.consultations || [];
@@ -24,7 +24,7 @@ export const consultationFieldsSelector = selector({
 });
 
 export const flattenedCustomFieldsConsultationsSelector = selector({
-  key: 'flattenedCustomFieldsConsultationsSelector',
+  key: "flattenedCustomFieldsConsultationsSelector",
   get: ({ get }) => {
     const customFieldsConsultationsSections = get(consultationFieldsSelector);
     const customFieldsConsultations = [];
@@ -40,18 +40,18 @@ export const flattenedCustomFieldsConsultationsSelector = selector({
 /* Other utils selector */
 
 export const consultationsFieldsIncludingCustomFieldsSelector = selector({
-  key: 'consultationsFieldsIncludingCustomFieldsSelector',
+  key: "consultationsFieldsIncludingCustomFieldsSelector",
   get: ({ get }) => {
     const flattenedCustomFieldsConsultations = get(flattenedCustomFieldsConsultationsSelector);
     return [
-      { name: 'name', label: 'Nom' },
-      { name: 'type', label: 'Type' },
-      { name: 'onlyVisibleBy', label: 'Seulement visible par moi' },
-      { name: 'person', label: 'Personne suivie' },
-      { name: 'teams', label: ':Equipe(s) en charge' },
-      { name: 'completedAt', label: 'Faite le' },
-      { name: 'dueAt', label: 'À faire le' },
-      { name: 'status', label: 'Statut' },
+      { name: "name", label: "Nom" },
+      { name: "type", label: "Type" },
+      { name: "onlyVisibleBy", label: "Seulement visible par moi" },
+      { name: "person", label: "Personne suivie" },
+      { name: "teams", label: ":Equipe(s) en charge" },
+      { name: "completedAt", label: "Faite le" },
+      { name: "dueAt", label: "À faire le" },
+      { name: "status", label: "Statut" },
       ...flattenedCustomFieldsConsultations.map((f) => {
         return {
           name: f.name,
@@ -68,10 +68,10 @@ export const prepareConsultationForEncryption =
     if (!!checkRequiredFields) {
       try {
         if (!looseUuidRegex.test(consultation.person)) {
-          throw new Error('Consultation is missing person');
+          throw new Error("Consultation is missing person");
         }
         if (!looseUuidRegex.test(consultation.user)) {
-          throw new Error('Consultation is missing user');
+          throw new Error("Consultation is missing user");
         }
         // we don't force the team (yet) because it's blocking with automatic updates of consultation
         // like merge people + change custom fields

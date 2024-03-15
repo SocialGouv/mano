@@ -1,7 +1,7 @@
-import React from 'react';
-import { useRecoilValue } from 'recoil';
-import { teamsState } from '../recoil/auth';
-import SelectCustom from './SelectCustom';
+import React from "react";
+import { useRecoilValue } from "recoil";
+import { teamsState } from "../recoil/auth";
+import SelectCustom from "./SelectCustom";
 
 const SelectTeamMultiple = ({ onChange, value: teamIds = [], inputId, classNamePrefix, isDisabled = false }) => {
   const teams = useRecoilValue(teamsState);

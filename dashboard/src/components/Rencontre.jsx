@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, Col, Row, ModalHeader, ModalBody, FormGroup, Label } from 'reactstrap';
-import { toast } from 'react-toastify';
-import { Formik } from 'formik';
-import ButtonCustom from './ButtonCustom';
-import SelectUser from './SelectUser';
-import { currentTeamState, teamsState, userState } from '../recoil/auth';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import API from '../services/api';
-import { rencontresState, prepareRencontreForEncryption } from '../recoil/rencontres';
-import SelectTeam from './SelectTeam';
-import SelectPerson from './SelectPerson';
-import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
-import DatePicker from './DatePicker';
-import { outOfBoundariesDate } from '../services/date';
-import AutoResizeTextarea from './AutoresizeTextArea';
+import React, { useEffect, useState } from "react";
+import { Modal, Col, Row, ModalHeader, ModalBody, FormGroup, Label } from "reactstrap";
+import { toast } from "react-toastify";
+import { Formik } from "formik";
+import ButtonCustom from "./ButtonCustom";
+import SelectUser from "./SelectUser";
+import { currentTeamState, teamsState, userState } from "../recoil/auth";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import API from "../services/api";
+import { rencontresState, prepareRencontreForEncryption } from "../recoil/rencontres";
+import SelectTeam from "./SelectTeam";
+import SelectPerson from "./SelectPerson";
+import useCreateReportAtDateIfNotExist from "../services/useCreateReportAtDateIfNotExist";
+import DatePicker from "./DatePicker";
+import { outOfBoundariesDate } from "../services/date";
+import AutoResizeTextarea from "./AutoresizeTextArea";
 
 const Rencontre = ({ rencontre, personId, onFinished }) => {
   const user = useRecoilValue(userState);
@@ -35,11 +35,11 @@ const Rencontre = ({ rencontre, personId, onFinished }) => {
   };
 
   const onDeleteRencontre = async () => {
-    const confirm = window.confirm('Êtes-vous sûr ?');
+    const confirm = window.confirm("Êtes-vous sûr ?");
     if (confirm) {
       const rencontreRes = await API.delete({ path: `/rencontre/${rencontre._id}` });
       if (rencontreRes.ok) {
-        toast.success('Suppression réussie');
+        toast.success("Suppression réussie");
         setOpen(false);
         setRencontres((rencontres) => rencontres.filter((p) => p._id !== rencontre._id));
       }
@@ -53,17 +53,17 @@ const Rencontre = ({ rencontre, personId, onFinished }) => {
   return (
     <>
       <Modal zIndex={5000} isOpen={!!open && !!rencontre} toggle={onCancelRequest} size="lg" backdrop="static">
-        <ModalHeader toggle={onCancelRequest}>{isNew ? 'Enregistrer une rencontre' : 'Éditer la rencontre'}</ModalHeader>
+        <ModalHeader toggle={onCancelRequest}>{isNew ? "Enregistrer une rencontre" : "Éditer la rencontre"}</ModalHeader>
         <ModalBody>
           <Formik
             initialValues={{ date: new Date(), ...rencontre, anonymousNumberOfRencontres: 1, persons: rencontre?.person ? [rencontre.person] : [] }}
             onSubmit={async (body, actions) => {
               if (!body.user) return toast.error("L'utilisateur est obligatoire");
-              if (!body.date) return toast.error('La date est obligatoire');
-              if (outOfBoundariesDate(body.date)) return toast.error('La date est hors limites (entre 1900 et 2100)');
+              if (!body.date) return toast.error("La date est obligatoire");
+              if (outOfBoundariesDate(body.date)) return toast.error("La date est hors limites (entre 1900 et 2100)");
               if (!body.team) return toast.error("L'équipe est obligatoire");
               if (!body.anonymous && (showMultiSelect ? !body.persons?.length : !body.person?.length))
-                return toast.error('Veuillez spécifier une personne');
+                return toast.error("Veuillez spécifier une personne");
 
               if (isNew) {
                 const newRencontre = {
@@ -77,7 +77,7 @@ const Rencontre = ({ rencontre, personId, onFinished }) => {
                 if (showMultiSelect) {
                   for (const person of body.persons) {
                     const response = await API.post({
-                      path: '/rencontre',
+                      path: "/rencontre",
                       body: prepareRencontreForEncryption({ ...newRencontre, person }),
                     });
                     if (response.ok) {
@@ -86,7 +86,7 @@ const Rencontre = ({ rencontre, personId, onFinished }) => {
                   }
                 } else {
                   const response = await API.post({
-                    path: '/rencontre',
+                    path: "/rencontre",
                     body: prepareRencontreForEncryption({ ...newRencontre, person: body.person }),
                   });
                   if (response.ok) {
@@ -96,7 +96,7 @@ const Rencontre = ({ rencontre, personId, onFinished }) => {
 
                 setOpen(false);
                 onFinished();
-                toast.success(body.person.length > 1 ? 'Rencontre enregistrée' : 'Rencontres enregistrées');
+                toast.success(body.person.length > 1 ? "Rencontre enregistrée" : "Rencontres enregistrées");
                 actions.setSubmitting(false);
                 await createReportAtDateIfNotExist(newRencontre.date);
                 return;
@@ -115,9 +115,10 @@ const Rencontre = ({ rencontre, personId, onFinished }) => {
               await createReportAtDateIfNotExist(rencontre.date);
               setOpen(false);
               onFinished();
-              toast.success('Rencontre mise à jour');
+              toast.success("Rencontre mise à jour");
               actions.setSubmitting(false);
-            }}>
+            }}
+          >
             {({ values, handleChange, handleSubmit, isSubmitting }) => {
               return (
                 <React.Fragment>
@@ -160,7 +161,7 @@ const Rencontre = ({ rencontre, personId, onFinished }) => {
                         <SelectUser
                           inputId="update-rencontre-user-select"
                           value={values.user || user._id}
-                          onChange={(userId) => handleChange({ target: { value: userId, name: 'user' } })}
+                          onChange={(userId) => handleChange({ target: { value: userId, name: "user" } })}
                         />
                       </FormGroup>
                     </Col>
@@ -168,16 +169,16 @@ const Rencontre = ({ rencontre, personId, onFinished }) => {
                       <FormGroup>
                         <Label htmlFor="update-rencontre-team-select">Sous l'équipe</Label>
                         <SelectTeam
-                          teams={user.role === 'admin' ? teams : user.teams}
+                          teams={user.role === "admin" ? teams : user.teams}
                           teamId={values.team}
-                          onChange={(team) => handleChange({ target: { value: team._id, name: 'team' } })}
+                          onChange={(team) => handleChange({ target: { value: team._id, name: "team" } })}
                           inputId="update-rencontre-team-select"
                         />
                       </FormGroup>
                     </Col>
                   </Row>
                   <br />
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+                  <div style={{ display: "flex", justifyContent: "flex-end", gap: "1rem" }}>
                     {!isNew && <ButtonCustom title="Supprimer" type="button" color="danger" onClick={onDeleteRencontre} />}
                     <ButtonCustom title="Enregistrer" loading={isSubmitting} onClick={() => !isSubmitting && handleSubmit()} />
                   </div>

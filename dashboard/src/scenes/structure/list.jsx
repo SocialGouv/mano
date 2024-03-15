@@ -1,25 +1,25 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { SmallHeader } from '../../components/header';
-import Loading from '../../components/loading';
-import Table from '../../components/table';
-import { toast } from 'react-toastify';
-import ButtonCustom from '../../components/ButtonCustom';
-import Search from '../../components/search';
-import API from '../../services/api';
-import { formatDateWithFullMonth } from '../../services/date';
-import useTitle from '../../services/useTitle';
-import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../components/tailwind/Modal';
-import SelectCustom from '../../components/SelectCustom';
-import { useRecoilValue } from 'recoil';
-import { userState } from '../../recoil/auth';
-import { flattenedStructuresCategoriesSelector } from '../../recoil/structures';
-import { filterBySearch } from '../search/utils';
+import React, { useEffect, useMemo, useState } from "react";
+import { SmallHeader } from "../../components/header";
+import Loading from "../../components/loading";
+import Table from "../../components/table";
+import { toast } from "react-toastify";
+import ButtonCustom from "../../components/ButtonCustom";
+import Search from "../../components/search";
+import API from "../../services/api";
+import { formatDateWithFullMonth } from "../../services/date";
+import useTitle from "../../services/useTitle";
+import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "../../components/tailwind/Modal";
+import SelectCustom from "../../components/SelectCustom";
+import { useRecoilValue } from "recoil";
+import { userState } from "../../recoil/auth";
+import { flattenedStructuresCategoriesSelector } from "../../recoil/structures";
+import { filterBySearch } from "../search/utils";
 
 const List = () => {
   const [structures, setStructures] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [currentStructure, setCurrentStructure] = useState(null);
   const [currentStructureOpen, setCurrentStructureOpen] = useState(false);
 
@@ -27,10 +27,10 @@ const List = () => {
     return filterBySearch(search, structures);
   }, [search, structures]);
 
-  useTitle('Structures');
+  useTitle("Structures");
 
   const getStructures = async () => {
-    const response = await API.get({ path: '/structure' });
+    const response = await API.get({ path: "/structure" });
     if (response.ok) {
       setStructures(response.data);
     }
@@ -74,15 +74,15 @@ const List = () => {
       </div>
       <Table
         data={filteredStructures}
-        rowKey={'_id'}
+        rowKey={"_id"}
         onRowClick={(s) => {
           setCurrentStructure(s);
           setCurrentStructureOpen(true);
         }}
         columns={[
           {
-            title: 'Nom',
-            dataKey: 'name',
+            title: "Nom",
+            dataKey: "name",
             render: (structure) => {
               return (
                 <div className="[overflow-wrap:anywhere]">
@@ -91,28 +91,29 @@ const List = () => {
               );
             },
           },
-          { title: 'Téléphone', dataKey: 'phone' },
+          { title: "Téléphone", dataKey: "phone" },
           {
-            title: 'Adresse',
-            dataKey: 'adresse',
+            title: "Adresse",
+            dataKey: "adresse",
             render: (structure) => {
               return <div className="[overflow-wrap:anywhere]">{structure.adresse}</div>;
             },
           },
-          { title: 'Code postal', dataKey: 'postcode' },
-          { title: 'Ville', dataKey: 'city' },
+          { title: "Code postal", dataKey: "postcode" },
+          { title: "Ville", dataKey: "city" },
           {
-            title: 'Catégories',
-            dataKey: 'categories',
+            title: "Catégories",
+            dataKey: "categories",
             render: (structure) => {
               return (
                 <>
                   {structure.categories?.map((category) => (
                     <span
-                      className="tw-whitespace-no-wrap tw-my-0 tw-mx-0.5 tw-inline-block tw-rounded tw-bg-main75 tw-py-0.5 tw-px-1 tw-text-center tw-align-baseline tw-text-[10.5px] tw-font-bold tw-leading-none tw-text-white"
+                      className="tw-whitespace-no-wrap tw-mx-0.5 tw-my-0 tw-inline-block tw-rounded tw-bg-main75 tw-px-1 tw-py-0.5 tw-text-center tw-align-baseline tw-text-[10.5px] tw-font-bold tw-leading-none tw-text-white"
                       color="info"
                       key={category}
-                      data-test-id={structure.name + category}>
+                      data-test-id={structure.name + category}
+                    >
                       {category}
                     </span>
                   ))}
@@ -120,7 +121,7 @@ const List = () => {
               );
             },
           },
-          { title: 'Créée le', dataKey: 'createdAt', render: (i) => formatDateWithFullMonth(i.createdAt) },
+          { title: "Créée le", dataKey: "createdAt", render: (i) => formatDateWithFullMonth(i.createdAt) },
         ]}
       />
     </>
@@ -145,14 +146,14 @@ const Structure = ({ structure: initStructure, onSuccess, open, onClose, onOpen 
     e.preventDefault();
     setDisabled(true);
     try {
-      if (!structure.name) throw new Error('Le nom de la structure est obligatoire');
+      if (!structure.name) throw new Error("Le nom de la structure est obligatoire");
       const isNew = !initStructure?._id;
       const res = !isNew
         ? await API.put({ path: `/structure/${initStructure._id}`, body: structure })
-        : await API.post({ path: '/structure', body: structure });
+        : await API.post({ path: "/structure", body: structure });
       setDisabled(false);
       if (!res.ok) return;
-      toast.success(!isNew ? 'Structure mise à jour !' : 'Structure créée !');
+      toast.success(!isNew ? "Structure mise à jour !" : "Structure créée !");
       onSuccess();
       onResetAndClose();
     } catch (errorCreatingStructure) {
@@ -162,10 +163,10 @@ const Structure = ({ structure: initStructure, onSuccess, open, onClose, onOpen 
   };
 
   const onDeleteStructure = async () => {
-    if (window.confirm('Voulez-vous vraiment supprimer cette structure ? Cette action est irréversible.')) {
+    if (window.confirm("Voulez-vous vraiment supprimer cette structure ? Cette action est irréversible.")) {
       const res = await API.delete({ path: `/structure/${structure._id}` });
       if (!res.ok) return;
-      toast.success('Structure supprimée !');
+      toast.success("Structure supprimée !");
       onSuccess();
       onResetAndClose();
     }
@@ -178,43 +179,43 @@ const Structure = ({ structure: initStructure, onSuccess, open, onClose, onOpen 
         <ModalHeader title="Créer une structure" />
         <ModalBody className="tw-pb-4">
           <form id="create-structure-form" className="tw-flex tw-w-full tw-flex-row tw-flex-wrap" onSubmit={onSubmit}>
-            <div className="tw-flex tw-basis-1/2 tw-flex-col tw-py-2 tw-px-4">
+            <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
               <label className="tailwindui" htmlFor="name">
                 Nom
               </label>
-              <input type="text" className="tailwindui" name="name" id="name" value={structure?.name || ''} onChange={onChange} />
+              <input type="text" className="tailwindui" name="name" id="name" value={structure?.name || ""} onChange={onChange} />
             </div>
-            <div className="tw-flex tw-basis-1/2 tw-flex-col tw-py-2 tw-px-4">
+            <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
               <label className="tailwindui" htmlFor="phone">
                 Téléphone
               </label>
-              <input type="text" className="tailwindui" name="phone" id="phone" value={structure?.phone || ''} onChange={onChange} />
+              <input type="text" className="tailwindui" name="phone" id="phone" value={structure?.phone || ""} onChange={onChange} />
             </div>
-            <div className="tw-flex tw-basis-full tw-flex-col tw-py-2 tw-px-4">
+            <div className="tw-flex tw-basis-full tw-flex-col tw-px-4 tw-py-2">
               <label className="tailwindui" htmlFor="adresse">
                 Adresse (numéro et rue)
               </label>
-              <textarea type="text" className="tailwindui" name="adresse" id="adresse" value={structure?.adresse || ''} onChange={onChange} />
+              <textarea type="text" className="tailwindui" name="adresse" id="adresse" value={structure?.adresse || ""} onChange={onChange} />
             </div>
-            <div className="tw-flex tw-basis-1/2 tw-flex-col tw-py-2 tw-px-4">
+            <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
               <label className="tailwindui" htmlFor="postcode">
                 Code postal
               </label>
-              <input type="text" className="tailwindui" name="postcode" id="postcode" value={structure?.postcode || ''} onChange={onChange} />
+              <input type="text" className="tailwindui" name="postcode" id="postcode" value={structure?.postcode || ""} onChange={onChange} />
             </div>
-            <div className="tw-flex tw-basis-1/2 tw-flex-col tw-py-2 tw-px-4">
+            <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
               <label className="tailwindui" htmlFor="city">
                 Ville
               </label>
-              <input type="text" className="tailwindui" name="city" id="city" value={structure?.city || ''} onChange={onChange} />
+              <input type="text" className="tailwindui" name="city" id="city" value={structure?.city || ""} onChange={onChange} />
             </div>
-            <div className="tw-flex tw-basis-1/2 tw-flex-col tw-py-2 tw-px-4">
+            <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
               <label className="tailwindui" htmlFor="description">
                 Description
               </label>
-              <textarea className="tailwindui" name="description" id="description" value={structure?.description || ''} onChange={onChange} />
+              <textarea className="tailwindui" name="description" id="description" value={structure?.description || ""} onChange={onChange} />
             </div>
-            <div className="tw-flex tw-basis-1/2 tw-flex-col tw-py-2 tw-px-4">
+            <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
               <label className="tailwindui" htmlFor="description">
                 Catégorie(s)
               </label>
@@ -226,7 +227,7 @@ const Structure = ({ structure: initStructure, onSuccess, open, onClose, onOpen 
                 options={categories.map((opt) => ({ value: opt, label: opt }))}
                 value={(structure?.categories || []).map((opt) => ({ value: opt, label: opt }))}
                 onChange={(v) => {
-                  onChange({ target: { name: 'categories', value: v.map((v) => v.value) } });
+                  onChange({ target: { name: "categories", value: v.map((v) => v.value) } });
                 }}
               />
             </div>
@@ -236,7 +237,7 @@ const Structure = ({ structure: initStructure, onSuccess, open, onClose, onOpen 
           <button type="button" name="cancel" className="button-cancel" onClick={onClose}>
             Annuler
           </button>
-          {user.role === 'admin' && Boolean(initStructure?._id) && (
+          {user.role === "admin" && Boolean(initStructure?._id) && (
             <button type="button" className="button-destructive" onClick={onDeleteStructure}>
               Supprimer
             </button>
@@ -245,7 +246,8 @@ const Structure = ({ structure: initStructure, onSuccess, open, onClose, onOpen 
             type="submit"
             disabled={disabled || JSON.stringify(structureRef.current) === JSON.stringify(structure)}
             className="button-submit"
-            form="create-structure-form">
+            form="create-structure-form"
+          >
             Enregistrer
           </button>
         </ModalFooter>

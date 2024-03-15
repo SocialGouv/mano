@@ -1,8 +1,8 @@
-import React from 'react';
-import { mappedIdsToLabels } from '../recoil/actions';
-import SelectCustom from './SelectCustom';
+import React from "react";
+import { mappedIdsToLabels } from "../recoil/actions";
+import SelectCustom from "./SelectCustom";
 
-const SelectStatus = ({ onChange, value, name = 'status', inputId = '', classNamePrefix = '' }) => {
+const SelectStatus = ({ onChange, value, name = "status", inputId = "", classNamePrefix = "" }) => {
   return (
     <SelectCustom
       options={mappedIdsToLabels}

@@ -1,21 +1,21 @@
-import React from 'react';
-import { dayjsInstance, formatDateTimeWithNameOfDay, formatDateWithNameOfDay } from '../services/date';
-import { getDuration } from '../scenes/stats/utils';
+import React from "react";
+import { dayjsInstance, formatDateTimeWithNameOfDay, formatDateWithNameOfDay } from "../services/date";
+import { getDuration } from "../scenes/stats/utils";
 
 const showBoolean = (value) => {
-  if (value === null) return '';
-  if (value === undefined) return '';
-  if (!value) return '';
-  return 'Oui';
+  if (value === null) return "";
+  if (value === undefined) return "";
+  if (!value) return "";
+  return "Oui";
 };
 
 const CustomFieldDisplay = ({ type, value }) => {
   return (
     <>
-      {!!['text', 'number'].includes(type) && <span>{value}</span>}
-      {!!['textarea'].includes(type) && (
+      {!!["text", "number"].includes(type) && <span>{value}</span>}
+      {!!["textarea"].includes(type) && (
         <p className="tw-mb-0">
-          {value?.split?.('\n')?.map((sentence, index) => (
+          {value?.split?.("\n")?.map((sentence, index) => (
             <React.Fragment key={sentence + index}>
               {sentence}
               <br />
@@ -23,23 +23,23 @@ const CustomFieldDisplay = ({ type, value }) => {
           ))}
         </p>
       )}
-      {!!['date-with-time'].includes(type) && !!value && <span>{formatDateTimeWithNameOfDay(value)}</span>}
-      {!!['date'].includes(type) && !!value && <span>{formatDateWithNameOfDay(value)}</span>}
-      {!!['duration'].includes(type) && !!value && <span>{getDuration(dayjsInstance(value).unix()).join(' ')}</span>}
-      {!!['boolean'].includes(type) && <span>{showBoolean(value)}</span>}
-      {!!['yes-no'].includes(type) && <span>{value}</span>}
-      {!!['enum'].includes(type) && <span>{value}</span>}
-      {!!['multi-choice'].includes(type) &&
+      {!!["date-with-time"].includes(type) && !!value && <span>{formatDateTimeWithNameOfDay(value)}</span>}
+      {!!["date"].includes(type) && !!value && <span>{formatDateWithNameOfDay(value)}</span>}
+      {!!["duration"].includes(type) && !!value && <span>{getDuration(dayjsInstance(value).unix()).join(" ")}</span>}
+      {!!["boolean"].includes(type) && <span>{showBoolean(value)}</span>}
+      {!!["yes-no"].includes(type) && <span>{value}</span>}
+      {!!["enum"].includes(type) && <span>{value}</span>}
+      {!!["multi-choice"].includes(type) &&
         (Array.isArray(value) ? (
           <ul className="tw-list-disc tw-pl-4">
             {value.map((v) => (
               <li key={v}>
-                <span className="tw-overflow-ellipsis tw-break-words">{v || '-'}</span>
+                <span className="tw-overflow-ellipsis tw-break-words">{v || "-"}</span>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="tw-overflow-ellipsis tw-break-words">{String(value || '-')}</p>
+          <p className="tw-overflow-ellipsis tw-break-words">{String(value || "-")}</p>
         ))}
     </>
   );

@@ -1,17 +1,17 @@
-import { getCacheItemDefaultValue, setCacheItem } from '../services/dataManagement';
-import { atom, selector } from 'recoil';
-import { capture } from '../services/sentry';
-import { organisationState } from './auth';
-import { dateRegex, looseUuidRegex } from '../utils';
-import { toast } from 'react-toastify';
+import { getCacheItemDefaultValue, setCacheItem } from "../services/dataManagement";
+import { atom, selector } from "recoil";
+import { capture } from "../services/sentry";
+import { organisationState } from "./auth";
+import { dateRegex, looseUuidRegex } from "../utils";
+import { toast } from "react-toastify";
 
-const collectionName = 'report';
+const collectionName = "report";
 export const reportsState = atom({
   key: collectionName,
   default: selector({
-    key: 'report/default',
+    key: "report/default",
     get: async () => {
-      const cache = await getCacheItemDefaultValue('report', []);
+      const cache = await getCacheItemDefaultValue("report", []);
       return cache;
     },
   }),
@@ -23,7 +23,7 @@ export const reportsState = atom({
         const duplicateReports = Object.entries(
           newValue.reduce((reportsByDate, report) => {
             // TIL: undefined < '2022-11-25' === false. So we need to check if report.date is defined.
-            if (!report.date || report.date < '2022-11-25') return reportsByDate;
+            if (!report.date || report.date < "2022-11-25") return reportsByDate;
             if (!reportsByDate[`${report.date}-${report.team}`]) reportsByDate[`${report.date}-${report.team}`] = [];
             reportsByDate[`${report.date}-${report.team}`].push(report);
             return reportsByDate;
@@ -31,7 +31,7 @@ export const reportsState = atom({
         ).filter(([key, reportsByDate]) => reportsByDate.length > 1);
         if (duplicateReports.length > 0) {
           for (const [key, reportsByDate] of duplicateReports) {
-            capture('Duplicated reports ' + key, {
+            capture("Duplicated reports " + key, {
               extra: {
                 [key]: reportsByDate.map((report) => ({
                   _id: report._id,
@@ -53,32 +53,32 @@ export const reportsState = atom({
 });
 
 export const servicesSelector = selector({
-  key: 'servicesSelector',
+  key: "servicesSelector",
   get: ({ get }) => {
     const organisation = get(organisationState);
     if (organisation.groupedServices) return organisation.groupedServices;
-    return [{ groupTitle: 'Tous mes services', services: organisation.services ?? [] }];
+    return [{ groupTitle: "Tous mes services", services: organisation.services ?? [] }];
   },
 });
 
 export const flattenedServicesSelector = selector({
-  key: 'flattenedServicesSelector',
+  key: "flattenedServicesSelector",
   get: ({ get }) => {
     const groupedServices = get(servicesSelector);
     return groupedServices.reduce((allServices, { services }) => [...allServices, ...services], []);
   },
 });
 
-const encryptedFields = ['description', 'services', 'team', 'date', 'collaborations', 'oldDateSystem'];
+const encryptedFields = ["description", "services", "team", "date", "collaborations", "oldDateSystem"];
 
 export const prepareReportForEncryption = (report, { checkRequiredFields = true } = {}) => {
   if (!!checkRequiredFields) {
     try {
       if (!looseUuidRegex.test(report.team)) {
-        throw new Error('Report is missing team');
+        throw new Error("Report is missing team");
       }
       if (!dateRegex.test(report.date)) {
-        throw new Error('Report is missing date');
+        throw new Error("Report is missing date");
       }
     } catch (error) {
       toast.error(

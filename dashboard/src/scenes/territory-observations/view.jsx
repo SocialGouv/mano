@@ -1,17 +1,17 @@
-import React from 'react';
-import styled from 'styled-components';
-import { useRecoilValue } from 'recoil';
-import UserName from '../../components/UserName';
-import { customFieldsObsSelector } from '../../recoil/territoryObservations';
-import CustomFieldDisplay from '../../components/CustomFieldDisplay';
-import { currentTeamState } from '../../recoil/auth';
-import { formatDateTimeWithNameOfDay } from '../../services/date';
-import TagTeam from '../../components/TagTeam';
+import React from "react";
+import styled from "styled-components";
+import { useRecoilValue } from "recoil";
+import UserName from "../../components/UserName";
+import { customFieldsObsSelector } from "../../recoil/territoryObservations";
+import CustomFieldDisplay from "../../components/CustomFieldDisplay";
+import { currentTeamState } from "../../recoil/auth";
+import { formatDateTimeWithNameOfDay } from "../../services/date";
+import TagTeam from "../../components/TagTeam";
 
 const fieldIsEmpty = (value) => {
   if (value === null) return true;
   if (value === undefined) return true;
-  if (typeof value === 'string' && !value.length) return true;
+  if (typeof value === "string" && !value.length) return true;
   if (Array.isArray(value) && !value.length) return true;
   return false;
 };
@@ -22,7 +22,7 @@ const View = ({ obs, onDelete, onClick, noBorder, noTeams }) => {
 
   return (
     <StyledObservation noBorder={noBorder}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <UserName id={obs.user} wrapper={(name) => <span className="author">{name}</span>} />
         {!noTeams && (
           <div style={{ marginLeft: 150 }}>
@@ -39,8 +39,8 @@ const View = ({ obs, onDelete, onClick, noBorder, noTeams }) => {
             const { name, label } = field;
             return (
               <Item key={name} fieldIsEmpty={fieldIsEmpty(obs[name])}>
-                {label}:{' '}
-                {!!['textarea'].includes(field.type) ? (
+                {label}:{" "}
+                {!!["textarea"].includes(field.type) ? (
                   <div className="tw-pl-8">
                     <CustomFieldDisplay type={field.type} value={obs[field.name]} />
                   </div>
@@ -62,7 +62,7 @@ const View = ({ obs, onDelete, onClick, noBorder, noTeams }) => {
 
 const Item = styled.span`
   display: inline-block;
-  ${(props) => props.fieldIsEmpty && 'opacity: 0.25;'}
+  ${(props) => props.fieldIsEmpty && "opacity: 0.25;"}
 `;
 
 const StyledObservation = styled.div`
@@ -70,7 +70,7 @@ const StyledObservation = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  ${(props) => !props.noBorder && 'border-top: 1px solid #cacaca;'}
+  ${(props) => !props.noBorder && "border-top: 1px solid #cacaca;"}
   .author {
     font-weight: bold;
     color: #0056b3;

@@ -1,16 +1,16 @@
-import { useMemo } from 'react';
-import { useRecoilValue } from 'recoil';
-import UserName from '../../../components/UserName';
-import { teamsState, userState } from '../../../recoil/auth';
-import { personFieldsIncludingCustomFieldsSelector } from '../../../recoil/persons';
-import { formatDateWithFullMonth, dayjsInstance } from '../../../services/date';
-import { customFieldsMedicalFileSelector } from '../../../recoil/medicalFiles';
+import { useMemo } from "react";
+import { useRecoilValue } from "recoil";
+import UserName from "../../../components/UserName";
+import { teamsState, userState } from "../../../recoil/auth";
+import { personFieldsIncludingCustomFieldsSelector } from "../../../recoil/persons";
+import { formatDateWithFullMonth, dayjsInstance } from "../../../services/date";
+import { customFieldsMedicalFileSelector } from "../../../recoil/medicalFiles";
 
 // FIX: there was a bug in history at some point, where the whole person was saved in the history
 // this function removes those entries
 export const cleanHistory = (history = []) => {
   return history.filter((h) => {
-    if (JSON.stringify(h.data).includes('encryptedEntityKey')) return false;
+    if (JSON.stringify(h.data).includes("encryptedEntityKey")) return false;
     return true;
   });
 };
@@ -48,14 +48,14 @@ export default function PersonHistory({ person }) {
           {history.map((h) => {
             return (
               <tr key={h.date} className="tw-cursor-default">
-                <td>{dayjsInstance(h.date).format('DD/MM/YYYY HH:mm')}</td>
+                <td>{dayjsInstance(h.date).format("DD/MM/YYYY HH:mm")}</td>
                 <td>
                   <UserName id={h.user} />
                 </td>
                 <td className="tw-max-w-prose">
                   {Object.entries(h.data).map(([key, value]) => {
                     const personField = allPossibleFields.find((f) => f.name === key);
-                    if (key === 'merge') {
+                    if (key === "merge") {
                       return (
                         <p className="tw-flex tw-flex-col" key={key}>
                           <span>
@@ -67,39 +67,39 @@ export default function PersonHistory({ person }) {
                         </p>
                       );
                     }
-                    if (key === 'assignedTeams') {
+                    if (key === "assignedTeams") {
                       return (
                         <p className="tw-flex tw-flex-col" key={key}>
                           <span>{personField?.label} : </span>
                           <code className="tw-text-main">
-                            "{(value.oldValue || []).map((teamId) => teams.find((t) => t._id === teamId)?.name).join(', ')}"
+                            "{(value.oldValue || []).map((teamId) => teams.find((t) => t._id === teamId)?.name).join(", ")}"
                           </code>
                           <span>↓</span>
                           <code className="tw-text-main">
-                            "{(value.newValue || []).map((teamId) => teams.find((t) => t._id === teamId)?.name).join(', ')}"
+                            "{(value.newValue || []).map((teamId) => teams.find((t) => t._id === teamId)?.name).join(", ")}"
                           </code>
                         </p>
                       );
                     }
-                    if (key === 'outOfActiveListReasons') {
+                    if (key === "outOfActiveListReasons") {
                       if (!value.newValue.length) return null;
                       return (
                         <p className="tw-flex tw-flex-col" key={key}>
                           <span>{personField?.label}: </span>
-                          <code className="tw-text-main">{value.newValue.join(', ')}</code>
+                          <code className="tw-text-main">{value.newValue.join(", ")}</code>
                         </p>
                       );
                     }
-                    if (key === 'outOfActiveList') {
+                    if (key === "outOfActiveList") {
                       return (
                         <p className="tw-flex tw-flex-col" key={key}>
                           <span className="tw-text-main">
-                            {value.newValue === true ? 'Sortie de file active' : 'Réintégration dans la file active'}
+                            {value.newValue === true ? "Sortie de file active" : "Réintégration dans la file active"}
                           </span>
                         </p>
                       );
                     }
-                    if (key === 'outOfActiveListDate') {
+                    if (key === "outOfActiveListDate") {
                       if (!value.newValue) return null;
                       return (
                         <p className="tw-flex tw-flex-col" key={key}>
@@ -111,18 +111,19 @@ export default function PersonHistory({ person }) {
                     return (
                       <p
                         key={key}
-                        data-test-id={`${personField?.label || 'Champs personnalisé supprimé'}: ${JSON.stringify(
-                          value.oldValue || ''
-                        )} ➔ ${JSON.stringify(value.newValue)}`}>
+                        data-test-id={`${personField?.label || "Champs personnalisé supprimé"}: ${JSON.stringify(
+                          value.oldValue || ""
+                        )} ➔ ${JSON.stringify(value.newValue)}`}
+                      >
                         <span className="tw-inline-flex tw-w-full tw-items-center tw-justify-between">
-                          {personField?.label || 'Champs personnalisé supprimé'} :
+                          {personField?.label || "Champs personnalisé supprimé"} :
                           {personField?.isMedicalFile && <i className="tw-text-xs"> Dossier médical</i>}
                         </span>
                         <br />
-                        <code className={personField?.isMedicalFile ? 'tw-text-blue-900' : 'tw-text-main'}>
-                          {JSON.stringify(value.oldValue || '')}
-                        </code>{' '}
-                        ➔ <code className={personField?.isMedicalFile ? 'tw-text-blue-900' : 'tw-text-main'}>{JSON.stringify(value.newValue)}</code>
+                        <code className={personField?.isMedicalFile ? "tw-text-blue-900" : "tw-text-main"}>
+                          {JSON.stringify(value.oldValue || "")}
+                        </code>{" "}
+                        ➔ <code className={personField?.isMedicalFile ? "tw-text-blue-900" : "tw-text-main"}>{JSON.stringify(value.newValue)}</code>
                       </p>
                     );
                   })}
@@ -132,7 +133,7 @@ export default function PersonHistory({ person }) {
           })}
           {person?.createdAt && (
             <tr key={person.createdAt} className="tw-cursor-default">
-              <td>{dayjsInstance(person.createdAt).format('DD/MM/YYYY HH:mm')}</td>
+              <td>{dayjsInstance(person.createdAt).format("DD/MM/YYYY HH:mm")}</td>
               <td>
                 <UserName id={person.user} />
               </td>

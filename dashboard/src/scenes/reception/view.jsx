@@ -1,34 +1,34 @@
-import React, { useMemo, useState, useRef, useEffect } from 'react';
-import { Modal, ModalBody, ModalHeader } from 'reactstrap';
-import { useHistory, useLocation } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { SmallHeader } from '../../components/header';
-import { formatDateWithNameOfDay, getIsDayWithinHoursOffsetOfPeriod, isToday, now, startOfToday } from '../../services/date';
-import { currentTeamReportsSelector } from '../../recoil/selectors';
-import SelectAndCreatePerson from './SelectAndCreatePerson';
-import ButtonCustom from '../../components/ButtonCustom';
-import ActionsCalendar from '../../components/ActionsCalendar';
-import SelectStatus from '../../components/SelectStatus';
-import { actionsState, TODO } from '../../recoil/actions';
-import { currentTeamState, userState, organisationState } from '../../recoil/auth';
-import { personsState } from '../../recoil/persons';
-import { selector, selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
-import API from '../../services/api';
-import dayjs from 'dayjs';
-import { passagesState, preparePassageForEncryption } from '../../recoil/passages';
-import useTitle from '../../services/useTitle';
-import { capture } from '../../services/sentry';
-import { consultationsState } from '../../recoil/consultations';
-import plusIcon from '../../assets/icons/plus-icon.svg';
-import PersonName from '../../components/PersonName';
-import Table from '../../components/table';
-import Passage from '../../components/Passage';
-import UserName from '../../components/UserName';
-import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
-import ReceptionService from '../../components/ReceptionService';
+import React, { useMemo, useState, useRef, useEffect } from "react";
+import { Modal, ModalBody, ModalHeader } from "reactstrap";
+import { useHistory, useLocation } from "react-router-dom";
+import { toast } from "react-toastify";
+import { SmallHeader } from "../../components/header";
+import { formatDateWithNameOfDay, getIsDayWithinHoursOffsetOfPeriod, isToday, now, startOfToday } from "../../services/date";
+import { currentTeamReportsSelector } from "../../recoil/selectors";
+import SelectAndCreatePerson from "./SelectAndCreatePerson";
+import ButtonCustom from "../../components/ButtonCustom";
+import ActionsCalendar from "../../components/ActionsCalendar";
+import SelectStatus from "../../components/SelectStatus";
+import { actionsState, TODO } from "../../recoil/actions";
+import { currentTeamState, userState, organisationState } from "../../recoil/auth";
+import { personsState } from "../../recoil/persons";
+import { selector, selectorFamily, useRecoilValue, useSetRecoilState } from "recoil";
+import API from "../../services/api";
+import dayjs from "dayjs";
+import { passagesState, preparePassageForEncryption } from "../../recoil/passages";
+import useTitle from "../../services/useTitle";
+import { capture } from "../../services/sentry";
+import { consultationsState } from "../../recoil/consultations";
+import plusIcon from "../../assets/icons/plus-icon.svg";
+import PersonName from "../../components/PersonName";
+import Table from "../../components/table";
+import Passage from "../../components/Passage";
+import UserName from "../../components/UserName";
+import useCreateReportAtDateIfNotExist from "../../services/useCreateReportAtDateIfNotExist";
+import ReceptionService from "../../components/ReceptionService";
 
 const actionsForCurrentTeamSelector = selector({
-  key: 'actionsForCurrentTeamSelector',
+  key: "actionsForCurrentTeamSelector",
   get: ({ get }) => {
     const actions = get(actionsState);
     const currentTeam = get(currentTeamState);
@@ -37,7 +37,7 @@ const actionsForCurrentTeamSelector = selector({
 });
 
 const consultationsByAuthorizationSelector = selector({
-  key: 'consultationsByAuthorizationSelector',
+  key: "consultationsByAuthorizationSelector",
   get: ({ get }) => {
     const user = get(userState);
     const consultations = get(consultationsState);
@@ -48,7 +48,7 @@ const consultationsByAuthorizationSelector = selector({
 });
 
 const actionsByStatusSelector = selectorFamily({
-  key: 'actionsByStatusSelector',
+  key: "actionsByStatusSelector",
   get:
     ({ status }) =>
     ({ get }) => {
@@ -58,7 +58,7 @@ const actionsByStatusSelector = selectorFamily({
 });
 
 const consultationsByStatusSelector = selectorFamily({
-  key: 'consultationsByStatusSelector',
+  key: "consultationsByStatusSelector",
   get:
     ({ status }) =>
     ({ get }) => {
@@ -68,7 +68,7 @@ const consultationsByStatusSelector = selectorFamily({
 });
 
 const todaysReportSelector = selector({
-  key: 'todaysReportSelector',
+  key: "todaysReportSelector",
   get: ({ get }) => {
     const teamsReports = get(currentTeamReportsSelector);
     return teamsReports.find((rep) => isToday(rep.date));
@@ -76,7 +76,7 @@ const todaysReportSelector = selector({
 });
 
 const todaysPassagesSelector = selector({
-  key: 'todaysPassagesSelector',
+  key: "todaysPassagesSelector",
   get: ({ get }) => {
     const passages = get(passagesState);
     const currentTeam = get(currentTeamState);
@@ -96,7 +96,7 @@ const todaysPassagesSelector = selector({
 });
 
 const Reception = () => {
-  useTitle('Accueil');
+  useTitle("Accueil");
 
   const currentTeam = useRecoilValue(currentTeamState);
   const organisation = useRecoilValue(organisationState);
@@ -127,7 +127,7 @@ const Reception = () => {
   }, [todaysReport?._id]);
 
   const [selectedPersons, setSelectedPersons] = useState(() => {
-    const params = new URLSearchParams(location.search)?.get('persons')?.split(',');
+    const params = new URLSearchParams(location.search)?.get("persons")?.split(",");
     if (!params) return [];
     return params.map((id) => persons.find((p) => p._id === id)).filter(Boolean);
   });
@@ -135,11 +135,11 @@ const Reception = () => {
     persons = persons?.filter(Boolean) || [];
     const searchParams = new URLSearchParams(location.search);
     searchParams.set(
-      'persons',
+      "persons",
       persons
         .map((p) => p?._id)
         .filter(Boolean)
-        .join(',')
+        .join(",")
     );
     setSelectedPersons(persons);
     history.replace({ pathname: location.pathname, search: searchParams.toString() });
@@ -158,7 +158,7 @@ const Reception = () => {
     };
     // optimistic UI
     setPassages((passages) => [newPassage, ...passages]);
-    const response = await API.post({ path: '/passage', body: preparePassageForEncryption(newPassage) });
+    const response = await API.post({ path: "/passage", body: preparePassageForEncryption(newPassage) });
     if (response.ok) {
       setPassages((passages) => [response.decryptedData, ...passages.filter((p) => p.optimisticId !== optimisticId)]);
       if (!reportCreatedRef.current) {
@@ -185,7 +185,7 @@ const Reception = () => {
       // optimistic UI
       setPassages((passages) => [...newPassages, ...passages]);
       for (const [index, passage] of Object.entries(newPassages)) {
-        const response = await API.post({ path: '/passage', body: preparePassageForEncryption(passage) });
+        const response = await API.post({ path: "/passage", body: preparePassageForEncryption(passage) });
         if (response.ok) {
           setPassages((passages) => [response.decryptedData, ...passages.filter((p) => p.optimisticId !== index)]);
           if (!reportCreatedRef.current) {
@@ -206,8 +206,8 @@ const Reception = () => {
       <SmallHeader
         title={
           <span data-test-id="reception-title">
-            Accueil du <b>{formatDateWithNameOfDay(now())}</b> de l'équipe {currentTeam.nightSession ? 'de nuit ' : ''}
-            <b>{currentTeam.name || ''}</b>
+            Accueil du <b>{formatDateWithNameOfDay(now())}</b> de l'équipe {currentTeam.nightSession ? "de nuit " : ""}
+            <b>{currentTeam.name || ""}</b>
           </span>
         }
       />
@@ -224,20 +224,20 @@ const Reception = () => {
           icon={plusIcon}
           onClick={() => {
             const searchParams = new URLSearchParams(history.location.search);
-            searchParams.set('newAction', true);
+            searchParams.set("newAction", true);
             searchParams.set(
-              'personIds',
+              "personIds",
               selectedPersons
                 .map((p) => p?._id)
                 .filter(Boolean)
-                .join(',')
+                .join(",")
             );
             history.push(`?${searchParams.toString()}`);
           }}
           color="primary"
           title="Action"
-          padding={'8px 14px'}
-          style={{ height: 'fit-content' }}
+          padding={"8px 14px"}
+          style={{ height: "fit-content" }}
         />
 
         {Boolean(user.healthcareProfessional) && (
@@ -246,15 +246,15 @@ const Reception = () => {
               icon={plusIcon}
               onClick={() => {
                 const searchParams = new URLSearchParams(history.location.search);
-                searchParams.set('newConsultation', true);
-                if (selectedPersons?.[0]._id) searchParams.set('personId', selectedPersons?.[0]._id);
+                searchParams.set("newConsultation", true);
+                if (selectedPersons?.[0]._id) searchParams.set("personId", selectedPersons?.[0]._id);
                 history.push(`?${searchParams.toString()}`);
               }}
               color="primary"
               disabled={!selectedPersons.length || selectedPersons.length > 1}
               title="Consultation"
-              padding={'8px 14px'}
-              style={{ height: 'fit-content' }}
+              padding={"8px 14px"}
+              style={{ height: "fit-content" }}
             />
           </>
         )}
@@ -262,10 +262,10 @@ const Reception = () => {
           <ButtonCustom
             onClick={onAddPassageForPersons}
             color="primary"
-            style={{ height: 'fit-content' }}
+            style={{ height: "fit-content" }}
             icon={plusIcon}
             title="Passage"
-            padding={'8px 14px'}
+            padding={"8px 14px"}
             disabled={addingPassage || !selectedPersons.length}
           />
         )}
@@ -280,25 +280,25 @@ const Reception = () => {
           </div>
           <ActionsCalendar
             actions={dataConsolidated}
-            columns={['Heure', 'Nom', 'Personne suivie', 'Statut']}
+            columns={["Heure", "Nom", "Personne suivie", "Statut"]}
             isNightSession={currentTeam.nightSession}
           />
         </div>
         <div className="tw-flex tw-basis-4/12 tw-flex-col">
           {!!organisation.passagesEnabled && (
-            <div className="tw-mb-4 tw-flex tw-flex-col tw-items-center tw-gap-4 tw-rounded-lg tw-bg-gray-100 tw-py-8 tw-px-2 tw-text-center">
+            <div className="tw-mb-4 tw-flex tw-flex-col tw-items-center tw-gap-4 tw-rounded-lg tw-bg-gray-100 tw-px-2 tw-py-8 tw-text-center">
               <h5 id="passages-title">
-                {passages.length} passage{passages.length > 1 ? 's' : ''}
+                {passages.length} passage{passages.length > 1 ? "s" : ""}
               </h5>
               <ButtonCustom onClick={onAddAnonymousPassage} color="primary" icon={plusIcon} title="Passage anonyme" id="add-anonymous-passage" />
               {!!passages.length && reportCreatedRef.current && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                   <ButtonCustom onClick={() => setTodaysPassagesOpen(true)} color="link" title="Voir les passages d'aujourd'hui" padding="0px" />
                 </div>
               )}
             </div>
           )}
-          <div className="tw-mb-4 tw-flex tw-flex-col tw-items-center tw-gap-4 tw-rounded-lg tw-bg-gray-100 tw-py-8 tw-px-2 tw-text-center">
+          <div className="tw-mb-4 tw-flex tw-flex-col tw-items-center tw-gap-4 tw-rounded-lg tw-bg-gray-100 tw-px-2 tw-py-8 tw-text-center">
             <h5>Services</h5>
             <div className="tw-mt-4 tw-text-left">
               <ReceptionService
@@ -306,7 +306,7 @@ const Reception = () => {
                 onUpdateServices={setServices}
                 team={currentTeam}
                 report={todaysReport}
-                dateString={startOfToday().format('YYYY-MM-DD')}
+                dateString={startOfToday().format("YYYY-MM-DD")}
               />
             </div>
           </div>
@@ -330,32 +330,32 @@ const PassagesToday = ({ passages, isOpen, setOpen }) => {
             className="Table"
             onRowClick={setPassageToEdit}
             data={passages}
-            rowKey={'_id'}
+            rowKey={"_id"}
             columns={[
               {
-                title: 'Heure',
-                dataKey: 'date',
+                title: "Heure",
+                dataKey: "date",
                 render: (passage) => {
-                  const time = dayjs(passage.date).format('HH:mm');
+                  const time = dayjs(passage.date).format("HH:mm");
                   // anonymous comment migrated from `report.passages`
                   // have no time
                   // have no user assigned either
-                  if (time === '00:00' && !passage.user) return null;
+                  if (time === "00:00" && !passage.user) return null;
                   return <span>{time}</span>;
                 },
               },
               {
-                title: 'Personne suivie',
-                dataKey: 'person',
+                title: "Personne suivie",
+                dataKey: "person",
                 render: (passage) =>
-                  passage.person ? <PersonName item={passage} /> : <span style={{ opacity: 0.3, fontStyle: 'italic' }}>Anonyme</span>,
+                  passage.person ? <PersonName item={passage} /> : <span style={{ opacity: 0.3, fontStyle: "italic" }}>Anonyme</span>,
               },
               {
-                title: 'Enregistré par',
-                dataKey: 'user',
+                title: "Enregistré par",
+                dataKey: "user",
                 render: (passage) => (passage.user ? <UserName id={passage.user} /> : null),
               },
-              { title: 'Commentaire', dataKey: 'comment' },
+              { title: "Commentaire", dataKey: "comment" },
             ]}
           />
         )}

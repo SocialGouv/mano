@@ -1,5 +1,5 @@
-import { UUIDV4 } from './uuid';
-import { Document, Folder } from './document';
+import { UUIDV4 } from "./uuid";
+import { Document, Folder } from "./document";
 
 export interface TreatmentInstance {
   _id: string;

@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
-import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader, Input, Label } from 'reactstrap';
-import { useHistory } from 'react-router-dom';
-import { Formik } from 'formik';
-import { toast } from 'react-toastify';
-import personIcon from '../../assets/icons/person-icon.svg';
+import React, { useState } from "react";
+import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader, Input, Label } from "reactstrap";
+import { useHistory } from "react-router-dom";
+import { Formik } from "formik";
+import { toast } from "react-toastify";
+import personIcon from "../../assets/icons/person-icon.svg";
 
-import ButtonCustom from '../../components/ButtonCustom';
-import { currentTeamState, userState } from '../../recoil/auth';
-import { personsState, usePreparePersonForEncryption } from '../../recoil/persons';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import API from '../../services/api';
-import SelectTeamMultiple from '../../components/SelectTeamMultiple';
-import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
-import dayjs from 'dayjs';
+import ButtonCustom from "../../components/ButtonCustom";
+import { currentTeamState, userState } from "../../recoil/auth";
+import { personsState, usePreparePersonForEncryption } from "../../recoil/persons";
+import { useRecoilState, useRecoilValue } from "recoil";
+import API from "../../services/api";
+import SelectTeamMultiple from "../../components/SelectTeamMultiple";
+import useCreateReportAtDateIfNotExist from "../../services/useCreateReportAtDateIfNotExist";
+import dayjs from "dayjs";
 
 const CreatePerson = ({ refreshable }) => {
   const [open, setOpen] = useState(false);
@@ -38,27 +38,28 @@ const CreatePerson = ({ refreshable }) => {
         <ModalHeader toggle={() => setOpen(false)}>Créer une nouvelle personne</ModalHeader>
         <ModalBody>
           <Formik
-            initialValues={{ name: '', assignedTeams: [currentTeam?._id] }}
+            initialValues={{ name: "", assignedTeams: [currentTeam?._id] }}
             onSubmit={async (body, actions) => {
-              if (!body.name?.trim()?.length) return toast.error('Une personne doit avoir un nom');
-              if (!body.assignedTeams?.length) return toast.error('Une personne doit être suivie par au moins une équipe');
+              if (!body.name?.trim()?.length) return toast.error("Une personne doit avoir un nom");
+              if (!body.assignedTeams?.length) return toast.error("Une personne doit être suivie par au moins une équipe");
               const existingPerson = persons.find((p) => p.name === body.name);
-              if (existingPerson) return toast.error('Une personne existe déjà à ce nom');
+              if (existingPerson) return toast.error("Une personne existe déjà à ce nom");
               body.followedSince = dayjs();
               body.user = user._id;
               const response = await API.post({
-                path: '/person',
+                path: "/person",
                 body: preparePersonForEncryption(body),
               });
               if (response.ok) {
-                setPersons((persons) => [response.decryptedData, ...persons].sort((p1, p2) => (p1.name || '').localeCompare(p2.name || '')));
-                toast.success('Création réussie !');
+                setPersons((persons) => [response.decryptedData, ...persons].sort((p1, p2) => (p1.name || "").localeCompare(p2.name || "")));
+                toast.success("Création réussie !");
                 setOpen(false);
                 actions.setSubmitting(false);
                 history.push(`/person/${response.decryptedData._id}`);
                 await createReportAtDateIfNotExist(dayjs());
               }
-            }}>
+            }}
+          >
             {({ values, handleChange, handleSubmit, isSubmitting }) => (
               <React.Fragment>
                 <Row>
@@ -72,7 +73,7 @@ const CreatePerson = ({ refreshable }) => {
                     <FormGroup>
                       <Label htmlFor="person-select-assigned-team">Équipe(s) en charge</Label>
                       <SelectTeamMultiple
-                        onChange={(teamIds) => handleChange({ target: { value: teamIds, name: 'assignedTeams' } })}
+                        onChange={(teamIds) => handleChange({ target: { value: teamIds, name: "assignedTeams" } })}
                         value={values.assignedTeams}
                         colored
                         inputId="person-select-assigned-team"
@@ -86,7 +87,7 @@ const CreatePerson = ({ refreshable }) => {
                   <ButtonCustom
                     onClick={() => !isSubmitting && handleSubmit()}
                     disabled={!!isSubmitting || !values.name?.trim()?.length}
-                    title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}
+                    title={isSubmitting ? "Sauvegarde..." : "Sauvegarder"}
                   />
                 </div>
               </React.Fragment>

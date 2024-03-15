@@ -1,26 +1,26 @@
-import React, { useMemo, useRef, useState } from 'react';
-import { toast } from 'react-toastify';
-import { personsState, usePreparePersonForEncryption } from '../../recoil/persons';
-import { selector, useRecoilState, useRecoilValue } from 'recoil';
-import AsyncSelect from 'react-select/async-creatable';
-import API from '../../services/api';
-import { formatBirthDate, formatCalendarDate } from '../../services/date';
-import { TODO, actionsState } from '../../recoil/actions';
-import { passagesState } from '../../recoil/passages';
-import { rencontresState } from '../../recoil/rencontres';
-import { useHistory } from 'react-router-dom';
-import ButtonCustom from '../../components/ButtonCustom';
-import { currentTeamState, organisationState, userState } from '../../recoil/auth';
-import ExclamationMarkButton from '../../components/tailwind/ExclamationMarkButton';
-import { theme } from '../../config';
-import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
-import dayjs from 'dayjs';
+import React, { useMemo, useRef, useState } from "react";
+import { toast } from "react-toastify";
+import { personsState, usePreparePersonForEncryption } from "../../recoil/persons";
+import { selector, useRecoilState, useRecoilValue } from "recoil";
+import AsyncSelect from "react-select/async-creatable";
+import API from "../../services/api";
+import { formatBirthDate, formatCalendarDate } from "../../services/date";
+import { TODO, actionsState } from "../../recoil/actions";
+import { passagesState } from "../../recoil/passages";
+import { rencontresState } from "../../recoil/rencontres";
+import { useHistory } from "react-router-dom";
+import ButtonCustom from "../../components/ButtonCustom";
+import { currentTeamState, organisationState, userState } from "../../recoil/auth";
+import ExclamationMarkButton from "../../components/tailwind/ExclamationMarkButton";
+import { theme } from "../../config";
+import useCreateReportAtDateIfNotExist from "../../services/useCreateReportAtDateIfNotExist";
+import dayjs from "dayjs";
 
 function removeDiatricsAndAccents(str) {
-  return (str || '')
+  return (str || "")
     .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 }
 
 function personsToOptions(persons, actions, passages, rencontres, urgentActions) {
@@ -36,14 +36,14 @@ function personsToOptions(persons, actions, passages, rencontres, urgentActions)
 }
 
 const searchablePersonsSelector = selector({
-  key: 'searchablePersonsSelector',
+  key: "searchablePersonsSelector",
   get: ({ get }) => {
     const persons = get(personsState);
     return persons.map((person) => {
       return {
         ...person,
         searchString: [removeDiatricsAndAccents(person.name), removeDiatricsAndAccents(person.otherNames), formatBirthDate(person.birthdate)]
-          .join(' ')
+          .join(" ")
           .toLowerCase(),
       };
     });
@@ -52,8 +52,8 @@ const searchablePersonsSelector = selector({
 
 // This function is used to filter persons by search string. It ignores diacritics and accents.
 const filterEasySearch = (search, items = []) => {
-  const searchNormalized = removeDiatricsAndAccents((search || '').toLocaleLowerCase());
-  const searchTerms = searchNormalized.split(' ');
+  const searchNormalized = removeDiatricsAndAccents((search || "").toLocaleLowerCase());
+  const searchTerms = searchNormalized.split(" ");
   // Items that have exact match in the beginning of the search string are first.
   const firstItems = items.filter((item) => item.searchString.startsWith(searchNormalized));
   const firstItemsIds = new Set(firstItems.map((item) => item._id));
@@ -169,29 +169,29 @@ const SelectAndCreatePerson = ({ value, onChange, inputId, classNamePrefix }) =>
       isDisabled={isDisabled}
       isSearchable
       onChange={onChange}
-      placeholder={'Entrez un nom, une date de naissance…'}
+      placeholder={"Entrez un nom, une date de naissance…"}
       onCreateOption={async (name) => {
         const existingPerson = persons.find((p) => p.name === name);
-        if (existingPerson) return toast.error('Un utilisateur existe déjà à ce nom');
+        if (existingPerson) return toast.error("Un utilisateur existe déjà à ce nom");
         setIsDisabled(true);
         const newPerson = { name, assignedTeams: [currentTeam._id], followedSince: dayjs(), user: user._id };
         const currentValue = value || [];
         onChange([...currentValue, { ...newPerson, __isNew__: true }]);
         const personResponse = await API.post({
-          path: '/person',
+          path: "/person",
           body: preparePersonForEncryption(newPerson),
         });
         setIsDisabled(false);
         if (personResponse.ok) {
-          setPersons((persons) => [personResponse.decryptedData, ...persons].sort((p1, p2) => (p1?.name || '').localeCompare(p2?.name || '')));
-          toast.success('Nouvelle personne ajoutée !');
+          setPersons((persons) => [personResponse.decryptedData, ...persons].sort((p1, p2) => (p1?.name || "").localeCompare(p2?.name || "")));
+          toast.success("Nouvelle personne ajoutée !");
           onChange([...currentValue, personResponse.decryptedData]);
           await createReportAtDateIfNotExist(dayjs());
         }
       }}
       value={value}
       formatOptionLabel={(person, options) => {
-        if (options.context === 'menu') {
+        if (options.context === "menu") {
           if (person.__isNew__) return <span>Créer "{person.value}"</span>;
           return <Person person={person} />;
         }
@@ -202,7 +202,7 @@ const SelectAndCreatePerson = ({ value, onChange, inputId, classNamePrefix }) =>
       creatable
       onKeyDown={(e, b) => {
         // prevent create Person on Enter press
-        if (e.key === 'Enter' && !optionsExist.current) e.preventDefault();
+        if (e.key === "Enter" && !optionsExist.current) e.preventDefault();
       }}
       inputId={inputId}
       classNamePrefix={classNamePrefix}
@@ -230,7 +230,8 @@ const PersonSelected = ({ person }) => {
         // onTouchEnd required to work on tablet
         // see https://github.com/JedWatson/react-select/issues/3117#issuecomment-1286232693 for similar issue
         onTouchEnd={onClick}
-        className="noprint tw-ml-2 tw-p-0 tw-text-sm tw-font-semibold tw-text-main hover:tw-underline">
+        className="noprint tw-ml-2 tw-p-0 tw-text-sm tw-font-semibold tw-text-main hover:tw-underline"
+      >
         Accéder au dossier
       </button>
     </div>
@@ -241,7 +242,7 @@ const Person = ({ person }) => {
   const history = useHistory();
   const user = useRecoilValue(userState);
   return (
-    <div className="-tw-mt-2 tw-border-t tw-border-t-gray-300 tw-pt-2.5 tw-pb-1">
+    <div className="-tw-mt-2 tw-border-t tw-border-t-gray-300 tw-pb-1 tw-pt-2.5">
       <div className="tw-mb-1 tw-flex tw-gap-1">
         <div className="tw-grow">
           {person.outOfActiveList ? <b style={{ color: theme.black25 }}>Sortie de file active : {person.name}</b> : <b>{person.name}</b>}
@@ -268,9 +269,9 @@ const Person = ({ person }) => {
         <div className="tw-flex tw-gap-1 tw-text-xs">
           <AdditionalInfo
             label="Date de sortie de file active"
-            value={person.outOfActiveListDate ? formatCalendarDate(person.outOfActiveListDate) : 'Non renseignée'}
+            value={person.outOfActiveListDate ? formatCalendarDate(person.outOfActiveListDate) : "Non renseignée"}
           />
-          <AdditionalInfo label="Motif" value={person.outOfActiveListReasons?.join(', ')} />
+          <AdditionalInfo label="Motif" value={person.outOfActiveListReasons?.join(", ")} />
         </div>
       )}
       <div className="tw-flex tw-gap-2 tw-text-xs">
@@ -279,7 +280,7 @@ const Person = ({ person }) => {
           value={
             !person.lastUrgentAction
               ? null
-              : ['restricted-access'].includes(user.role)
+              : ["restricted-access"].includes(user.role)
               ? formatCalendarDate(person.lastUrgentAction.completedAt || person.lastUrgentAction.dueAt)
               : `${person.lastUrgentAction?.name} - ${formatCalendarDate(person.lastUrgentAction.completedAt || person.lastUrgentAction.dueAt)}`
           }
@@ -289,7 +290,7 @@ const Person = ({ person }) => {
           value={
             !person.lastAction || person.lastUrgentAction?._id === person.lastAction._id
               ? null
-              : ['restricted-access'].includes(user.role)
+              : ["restricted-access"].includes(user.role)
               ? formatCalendarDate(person.lastAction.completedAt || person.lastAction.dueAt)
               : `${person.lastAction?.name} - ${formatCalendarDate(person.lastAction.completedAt || person.lastAction.dueAt)}`
           }

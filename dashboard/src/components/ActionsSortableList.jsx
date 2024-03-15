@@ -1,39 +1,39 @@
-import React, { useMemo } from 'react';
-import { useHistory } from 'react-router-dom';
-import { useRecoilValue } from 'recoil';
-import Table from './table';
-import DateBloc from './DateBloc';
-import ActionOrConsultationName from './ActionOrConsultationName';
-import PersonName from './PersonName';
-import { formatTime } from '../services/date';
-import { CANCEL, DONE, sortActionsOrConsultations } from '../recoil/actions';
-import { currentTeamState, organisationState, userState } from '../recoil/auth';
-import ExclamationMarkButton from './tailwind/ExclamationMarkButton';
-import useTitle from '../services/useTitle';
-import ConsultationButton from './ConsultationButton';
-import { disableConsultationRow } from '../recoil/consultations';
-import TagTeam from './TagTeam';
-import { useLocalStorage } from '../services/useLocalStorage';
-import Page from './pagination';
-import useSearchParamState from '../services/useSearchParamState';
-import DescriptionIcon from './DescriptionIcon';
-import { AgendaMutedIcon } from '../assets/icons/AgendaMutedIcon';
-import ActionStatusSelect from './ActionStatusSelect';
+import React, { useMemo } from "react";
+import { useHistory } from "react-router-dom";
+import { useRecoilValue } from "recoil";
+import Table from "./table";
+import DateBloc from "./DateBloc";
+import ActionOrConsultationName from "./ActionOrConsultationName";
+import PersonName from "./PersonName";
+import { formatTime } from "../services/date";
+import { CANCEL, DONE, sortActionsOrConsultations } from "../recoil/actions";
+import { currentTeamState, organisationState, userState } from "../recoil/auth";
+import ExclamationMarkButton from "./tailwind/ExclamationMarkButton";
+import useTitle from "../services/useTitle";
+import ConsultationButton from "./ConsultationButton";
+import { disableConsultationRow } from "../recoil/consultations";
+import TagTeam from "./TagTeam";
+import { useLocalStorage } from "../services/useLocalStorage";
+import Page from "./pagination";
+import useSearchParamState from "../services/useSearchParamState";
+import DescriptionIcon from "./DescriptionIcon";
+import { AgendaMutedIcon } from "../assets/icons/AgendaMutedIcon";
+import ActionStatusSelect from "./ActionStatusSelect";
 
 const ActionsSortableList = ({ data, limit }) => {
-  useTitle('Agenda');
+  useTitle("Agenda");
   const history = useHistory();
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
   const organisation = useRecoilValue(organisationState);
-  const [sortBy, setSortBy] = useLocalStorage('actions-consultations-sortBy', 'dueAt');
-  const [sortOrder, setSortOrder] = useLocalStorage('actions-consultations-sortOrder', 'ASC');
-  const [page, setPage] = useSearchParamState('page', 0, { resetToDefaultIfTheFollowingValueChange: currentTeam?._id });
+  const [sortBy, setSortBy] = useLocalStorage("actions-consultations-sortBy", "dueAt");
+  const [sortOrder, setSortOrder] = useLocalStorage("actions-consultations-sortOrder", "ASC");
+  const [page, setPage] = useSearchParamState("page", 0, { resetToDefaultIfTheFollowingValueChange: currentTeam?._id });
 
   const dataSorted = useMemo(() => {
     return [...data].sort(sortActionsOrConsultations(sortBy, sortOrder)).map((a) => {
-      if (a.urgent) return { ...a, style: { backgroundColor: '#fecaca99' } };
-      if (a.isConsultation) return { ...a, style: { backgroundColor: '#DDF4FF99' } };
+      if (a.urgent) return { ...a, style: { backgroundColor: "#fecaca99" } };
+      if (a.isConsultation) return { ...a, style: { backgroundColor: "#DDF4FF99" } };
       return a;
     });
   }, [data, sortBy, sortOrder]);
@@ -58,22 +58,22 @@ const ActionsSortableList = ({ data, limit }) => {
     <>
       <Table
         data={dataConsolidatedPaginated}
-        rowKey={'_id'}
+        rowKey={"_id"}
         onRowClick={(actionOrConsultation) => {
           const searchParams = new URLSearchParams(history.location.search);
           if (actionOrConsultation.isConsultation) {
-            searchParams.set('consultationId', actionOrConsultation._id);
+            searchParams.set("consultationId", actionOrConsultation._id);
             history.push(`?${searchParams.toString()}`);
           } else {
-            searchParams.set('actionId', actionOrConsultation._id);
+            searchParams.set("actionId", actionOrConsultation._id);
             history.push(`?${searchParams.toString()}`);
           }
         }}
         rowDisabled={(actionOrConsultation) => disableConsultationRow(actionOrConsultation, user)}
         columns={[
           {
-            title: '',
-            dataKey: 'urgentOrGroupOrConsultation',
+            title: "",
+            dataKey: "urgentOrGroupOrConsultation",
             small: true,
             onSortOrder: setSortOrder,
             onSortBy: setSortBy,
@@ -95,13 +95,13 @@ const ActionsSortableList = ({ data, limit }) => {
             },
           },
           {
-            title: 'Date',
-            dataKey: 'dueAt' || '_id',
+            title: "Date",
+            dataKey: "dueAt" || "_id",
             onSortOrder: setSortOrder,
             onSortBy: setSortBy,
             sortBy,
             sortOrder,
-            style: { width: '90px' },
+            style: { width: "90px" },
             small: true,
             render: (action) => {
               return (
@@ -115,37 +115,37 @@ const ActionsSortableList = ({ data, limit }) => {
             },
           },
           {
-            title: 'Nom',
+            title: "Nom",
             onSortOrder: setSortOrder,
             onSortBy: setSortBy,
             sortBy,
             sortOrder,
-            dataKey: 'name',
+            dataKey: "name",
             render: (action) => <ActionOrConsultationName item={action} />,
           },
           {
-            title: 'Personne suivie',
+            title: "Personne suivie",
             onSortOrder: setSortOrder,
             onSortBy: setSortBy,
             sortBy,
             sortOrder,
-            dataKey: 'person',
+            dataKey: "person",
             render: (action) => <PersonName item={action} />,
           },
           {
-            title: 'Statut',
+            title: "Statut",
             onSortOrder: setSortOrder,
             onSortBy: setSortBy,
             small: true,
             sortBy,
             sortOrder,
-            dataKey: 'status',
-            style: { width: '85px' },
+            dataKey: "status",
+            style: { width: "85px" },
             render: (action) => <ActionStatusSelect action={action} />,
           },
           {
-            title: 'Équipe(s) en charge',
-            dataKey: 'team',
+            title: "Équipe(s) en charge",
+            dataKey: "team",
             render: (a) => {
               if (!Array.isArray(a?.teams)) return <TagTeam teamId={a?.team} />;
               return (

@@ -1,22 +1,22 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { FormGroup, Input, Label, Row, Col } from 'reactstrap';
+import React, { useCallback, useEffect, useState } from "react";
+import { FormGroup, Input, Label, Row, Col } from "reactstrap";
 
-import { useParams, useHistory } from 'react-router-dom';
-import { Formik } from 'formik';
-import { toast } from 'react-toastify';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useParams, useHistory } from "react-router-dom";
+import { Formik } from "formik";
+import { toast } from "react-toastify";
+import { useRecoilState, useRecoilValue } from "recoil";
 
-import { SmallHeaderWithBackButton } from '../../components/header';
-import Loading from '../../components/loading';
-import ButtonCustom from '../../components/ButtonCustom';
-import SelectTeamMultiple from '../../components/SelectTeamMultiple';
-import SelectRole from '../../components/SelectRole';
-import { organisationState, userState } from '../../recoil/auth';
-import API from '../../services/api';
-import useTitle from '../../services/useTitle';
-import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
-import { emailRegex } from '../../utils';
-import { capture } from '../../services/sentry';
+import { SmallHeaderWithBackButton } from "../../components/header";
+import Loading from "../../components/loading";
+import ButtonCustom from "../../components/ButtonCustom";
+import SelectTeamMultiple from "../../components/SelectTeamMultiple";
+import SelectRole from "../../components/SelectRole";
+import { organisationState, userState } from "../../recoil/auth";
+import API from "../../services/api";
+import useTitle from "../../services/useTitle";
+import DeleteButtonAndConfirmModal from "../../components/DeleteButtonAndConfirmModal";
+import { emailRegex } from "../../utils";
+import { capture } from "../../services/sentry";
 
 const View = () => {
   const [localUser, setLocalUser] = useState(null);
@@ -46,9 +46,10 @@ const View = () => {
         type="button"
         className="tw-absolute tw-bottom-0 tw-right-0 tw-m-4 tw-rounded tw-bg-white tw-p-2 tw-text-sm tw-text-white tw-opacity-0"
         onClick={() => {
-          capture(new Error('Test Capture Error Sentry Manually'));
-          throw new Error('Test Throw Error Sentry Manually');
-        }}>
+          capture(new Error("Test Capture Error Sentry Manually"));
+          throw new Error("Test Throw Error Sentry Manually");
+        }}
+      >
         Test Sentry
       </button>
       <Formik
@@ -63,9 +64,9 @@ const View = () => {
         enableReinitialize
         onSubmit={async (body, actions) => {
           try {
-            if (!body.team?.length) return toast.error('Au moins une équipe est obligatoire');
-            if (body.email && !emailRegex.test(body.email)) return toast.error('Email invalide');
-            if (!body.name) return toast.error('Le nom doit faire au moins un caractère');
+            if (!body.team?.length) return toast.error("Au moins une équipe est obligatoire");
+            if (body.email && !emailRegex.test(body.email)) return toast.error("Email invalide");
+            if (!body.name) return toast.error("Le nom doit faire au moins un caractère");
             body.organisation = organisation._id;
             const res = await API.put({ path: `/user/${id}`, body });
             if (!res.ok) return actions.setSubmitting(false);
@@ -74,12 +75,13 @@ const View = () => {
               setUser(data);
             }
             actions.setSubmitting(false);
-            toast.success('Mis à jour !');
+            toast.success("Mis à jour !");
           } catch (errorUpdatingUser) {
-            console.log('error in updating user', errorUpdatingUser);
+            console.log("error in updating user", errorUpdatingUser);
             toast.error(errorUpdatingUser.message);
           }
-        }}>
+        }}
+      >
         {({ values, handleChange, handleSubmit, isSubmitting }) => (
           <React.Fragment>
             <Row>
@@ -107,7 +109,7 @@ const View = () => {
                   <Label htmlFor="team">Équipes</Label>
                   <div>
                     <SelectTeamMultiple
-                      onChange={(teamIds) => handleChange({ target: { value: teamIds, name: 'team' } })}
+                      onChange={(teamIds) => handleChange({ target: { value: teamIds, name: "team" } })}
                       organisation={organisation._id}
                       value={values.team || []}
                       colored
@@ -123,17 +125,17 @@ const View = () => {
                   <SelectRole handleChange={handleChange} value={values.role} />
                 </FormGroup>
               </Col>
-              {values.role !== 'restricted-access' && (
+              {values.role !== "restricted-access" && (
                 <Col md={12}>
                   <Label htmlFor="healthcareProfessional" style={{ marginBottom: 0 }}>
                     <input
                       type="checkbox"
                       id="healthcareProfessional"
-                      style={{ marginRight: '0.5rem' }}
+                      style={{ marginRight: "0.5rem" }}
                       name="healthcareProfessional"
                       checked={values.healthcareProfessional}
                       onChange={() => {
-                        handleChange({ target: { value: !values.healthcareProfessional, name: 'healthcareProfessional' } });
+                        handleChange({ target: { value: !values.healthcareProfessional, name: "healthcareProfessional" } });
                       }}
                     />
                     Professionnel·le de santé
@@ -144,7 +146,7 @@ const View = () => {
                 </Col>
               )}
             </Row>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: "1rem" }}>
               {id !== user._id && (
                 <DeleteButtonAndConfirmModal
                   title={`Voulez-vous vraiment supprimer l'utilisateur ${values.name}`}
@@ -152,13 +154,14 @@ const View = () => {
                   onConfirm={async () => {
                     const res = await API.delete({ path: `/user/${id}` });
                     if (!res.ok) return;
-                    toast.success('Suppression réussie');
+                    toast.success("Suppression réussie");
                     history.goBack();
-                  }}>
-                  <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>Cette opération est irréversible</span>
+                  }}
+                >
+                  <span style={{ marginBottom: 30, display: "block", width: "100%", textAlign: "center" }}>Cette opération est irréversible</span>
                 </DeleteButtonAndConfirmModal>
               )}
-              <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} />
+              <ButtonCustom title={"Mettre à jour"} loading={isSubmitting} onClick={handleSubmit} />
             </div>
           </React.Fragment>
         )}

@@ -1,42 +1,42 @@
-import React, { useEffect, useState } from 'react';
-import { Col, FormGroup, Input, Modal, ModalBody, ModalHeader, Row, Label } from 'reactstrap';
-import { Formik } from 'formik';
-import { toast } from 'react-toastify';
-import styled from 'styled-components';
-import Table from '../../components/table';
-import ButtonCustom from '../../components/ButtonCustom';
+import React, { useEffect, useState } from "react";
+import { Col, FormGroup, Input, Modal, ModalBody, ModalHeader, Row, Label } from "reactstrap";
+import { Formik } from "formik";
+import { toast } from "react-toastify";
+import styled from "styled-components";
+import Table from "../../components/table";
+import ButtonCustom from "../../components/ButtonCustom";
 
-import Loading from '../../components/loading';
-import API from '../../services/api';
-import { formatAge, formatDateWithFullMonth } from '../../services/date';
-import useTitle from '../../services/useTitle';
-import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
-import { capture } from '../../services/sentry';
-import { useRecoilValue } from 'recoil';
-import { userState } from '../../recoil/auth';
-import { emailRegex } from '../../utils';
-import SelectRole from '../../components/SelectRole';
-import SelectCustom from '../../components/SelectCustom';
+import Loading from "../../components/loading";
+import API from "../../services/api";
+import { formatAge, formatDateWithFullMonth } from "../../services/date";
+import useTitle from "../../services/useTitle";
+import DeleteButtonAndConfirmModal from "../../components/DeleteButtonAndConfirmModal";
+import { capture } from "../../services/sentry";
+import { useRecoilValue } from "recoil";
+import { userState } from "../../recoil/auth";
+import { emailRegex } from "../../utils";
+import SelectRole from "../../components/SelectRole";
+import SelectCustom from "../../components/SelectCustom";
 
 const List = () => {
   const [organisations, setOrganisations] = useState(null);
   const user = useRecoilValue(userState);
   const [updateKey, setUpdateKey] = useState(null);
-  const [sortBy, setSortBy] = useState('countersTotal');
-  const [sortOrder, setSortOrder] = useState('DESC');
+  const [sortBy, setSortBy] = useState("countersTotal");
+  const [sortOrder, setSortOrder] = useState("DESC");
   const [refresh, setRefresh] = useState(false);
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [openCreateUserModal, setOpenCreateUserModal] = useState(false);
   const [selectedOrganisation, setSelectedOrganisation] = useState(null);
 
-  useTitle('Organisations');
+  useTitle("Organisations");
 
   useEffect(() => {
     (async () => {
       if (!refresh) return;
-      const { data } = await API.get({ path: '/organisation', query: { withCounters: true } });
+      const { data } = await API.get({ path: "/organisation", query: { withCounters: true } });
       const sortedDataAscendant = data?.sort((org1, org2) => (org1[sortBy] > org2[sortBy] ? 1 : -1));
-      setOrganisations(sortOrder === 'ASC' ? sortedDataAscendant : [...(sortedDataAscendant || [])].reverse());
+      setOrganisations(sortOrder === "ASC" ? sortedDataAscendant : [...(sortedDataAscendant || [])].reverse());
       setUpdateKey((k) => k + 1);
       setRefresh(false);
     })();
@@ -45,7 +45,7 @@ const List = () => {
 
   useEffect(() => {
     const sortedDataAscendant = organisations?.sort((org1, org2) => (org1[sortBy] > org2[sortBy] ? 1 : -1));
-    setOrganisations(sortOrder === 'ASC' ? sortedDataAscendant : [...(sortedDataAscendant || [])].reverse());
+    setOrganisations(sortOrder === "ASC" ? sortedDataAscendant : [...(sortedDataAscendant || [])].reverse());
     setUpdateKey((k) => k + 1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sortBy, sortOrder]);
@@ -77,8 +77,8 @@ const List = () => {
           key={updateKey}
           columns={[
             {
-              title: 'Nom',
-              dataKey: 'name',
+              title: "Nom",
+              dataKey: "name",
               onSortOrder: setSortOrder,
               onSortBy: setSortBy,
               sortOrder,
@@ -92,13 +92,13 @@ const List = () => {
               ),
             },
             {
-              title: 'Créée le',
-              dataKey: 'createdAt',
+              title: "Créée le",
+              dataKey: "createdAt",
               render: (o) => (
                 <div>
-                  {formatDateWithFullMonth(o.createdAt || '')}
+                  {formatDateWithFullMonth(o.createdAt || "")}
                   <br />
-                  <small className="tw-text-gray-500">il y a {o.createdAt ? formatAge(o.createdAt) : 'un certain temps'}</small>
+                  <small className="tw-text-gray-500">il y a {o.createdAt ? formatAge(o.createdAt) : "un certain temps"}</small>
                 </div>
               ),
               onSortOrder: setSortOrder,
@@ -107,9 +107,9 @@ const List = () => {
               sortBy,
             },
             {
-              title: 'Utilisateurs',
-              dataKey: 'users',
-              sortableKey: 'users',
+              title: "Utilisateurs",
+              dataKey: "users",
+              sortableKey: "users",
               onSortOrder: setSortOrder,
               onSortBy: setSortBy,
               sortOrder,
@@ -119,9 +119,9 @@ const List = () => {
               },
             },
             {
-              title: 'Compteurs',
-              dataKey: 'counters',
-              sortableKey: 'countersTotal',
+              title: "Compteurs",
+              dataKey: "counters",
+              sortableKey: "countersTotal",
               onSortOrder: setSortOrder,
               onSortBy: setSortBy,
               sortOrder,
@@ -157,23 +157,23 @@ const List = () => {
               },
             },
             {
-              title: 'Dernier chiffrement',
-              dataKey: 'encryptionLastUpdateAt',
+              title: "Dernier chiffrement",
+              dataKey: "encryptionLastUpdateAt",
               sortBy,
               sortOrder,
               onSortOrder: setSortOrder,
               onSortBy: setSortBy,
               render: (o) => (
                 <div>
-                  {o.encryptionLastUpdateAt ? formatDateWithFullMonth(o.encryptionLastUpdateAt) : 'Pas encore chiffrée'}
+                  {o.encryptionLastUpdateAt ? formatDateWithFullMonth(o.encryptionLastUpdateAt) : "Pas encore chiffrée"}
                   <br />
-                  <small className="tw-text-gray-500">{o.encryptionLastUpdateAt ? 'il y a ' + formatAge(o.encryptionLastUpdateAt) : ''}</small>
+                  <small className="tw-text-gray-500">{o.encryptionLastUpdateAt ? "il y a " + formatAge(o.encryptionLastUpdateAt) : ""}</small>
                 </div>
               ),
             },
             {
-              title: 'Action',
-              dataKey: 'delete',
+              title: "Action",
+              dataKey: "delete",
               render: (organisation) => {
                 return (
                   <div className="tw-grid tw-gap-2">
@@ -183,7 +183,8 @@ const List = () => {
                           setSelectedOrganisation(organisation);
                           setOpenCreateUserModal(true);
                         }}
-                        className="button-classic">
+                        className="button-classic"
+                      >
                         Ajouter un utilisateur
                       </button>
                     </div>
@@ -195,15 +196,16 @@ const List = () => {
                           try {
                             const res = await API.delete({ path: `/organisation/${organisation._id}` });
                             if (res.ok) {
-                              toast.success('Organisation supprimée');
+                              toast.success("Organisation supprimée");
                               setRefresh(true);
                             }
                           } catch (organisationDeleteError) {
                             capture(organisationDeleteError, { extra: { organisation }, user });
                             toast.error(organisationDeleteError.message);
                           }
-                        }}>
-                        <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
+                        }}
+                      >
+                        <span style={{ marginBottom: 30, display: "block", width: "100%", textAlign: "center" }}>
                           Cette opération est irréversible
                           <br />
                           et entrainera la suppression définitive de toutes les données liées à l'organisation&nbsp;:
@@ -217,7 +219,7 @@ const List = () => {
               },
             },
           ]}
-          rowKey={'_id'}
+          rowKey={"_id"}
           onRowClick={null}
         />
       )}
@@ -226,12 +228,12 @@ const List = () => {
 };
 
 const StyledCounters = styled.p`
-  ${(p) => p.total < 10 && 'opacity: 0.5;'}
-  ${(p) => p.total === 0 && 'opacity: 0.1;'}
-  ${(p) => p.total > 200 && 'font-weight: 500;'}
-  ${(p) => p.total > 2000 && 'font-weight: 600;'}
-  ${(p) => p.total > 5000 && 'font-weight: 700;'}
-  ${(p) => p.total > 10000 && 'font-weight: 800;'}
+  ${(p) => p.total < 10 && "opacity: 0.5;"}
+  ${(p) => p.total === 0 && "opacity: 0.1;"}
+  ${(p) => p.total > 200 && "font-weight: 500;"}
+  ${(p) => p.total > 2000 && "font-weight: 600;"}
+  ${(p) => p.total > 5000 && "font-weight: 700;"}
+  ${(p) => p.total > 10000 && "font-weight: 800;"}
 `;
 
 const Create = ({ onChange, open, setOpen }) => {
@@ -241,10 +243,10 @@ const Create = ({ onChange, open, setOpen }) => {
         <ModalHeader toggle={() => setOpen(false)}>Créer une nouvelle organisation et un administrateur</ModalHeader>
         <ModalBody>
           <Formik
-            initialValues={{ orgName: '', name: '', email: '', orgId: '' }}
+            initialValues={{ orgName: "", name: "", email: "", orgId: "" }}
             validate={(values) => {
               const errors = {};
-              if (!values.name) errors.name = 'Le nom est obligatoire';
+              if (!values.name) errors.name = "Le nom est obligatoire";
               if (!values.orgName) errors.orgName = "Le nom de l'organisation est obligatoire";
               if (!values.orgId) errors.orgId = "L'identifiant est obligatoire";
               if (!values.email) errors.email = "L'email est obligatoire";
@@ -253,17 +255,18 @@ const Create = ({ onChange, open, setOpen }) => {
             }}
             onSubmit={async (body, actions) => {
               try {
-                const orgRes = await API.post({ path: '/organisation', body });
+                const orgRes = await API.post({ path: "/organisation", body });
                 actions.setSubmitting(false);
                 if (!orgRes.ok) return;
-                toast.success('Création réussie !');
+                toast.success("Création réussie !");
                 onChange();
                 setOpen(false);
               } catch (orgCreationError) {
-                console.log('error in creating organisation', orgCreationError);
+                console.log("error in creating organisation", orgCreationError);
                 toast.error(orgCreationError.message);
               }
-            }}>
+            }}
+          >
             {({ values, handleChange, handleSubmit, isSubmitting, touched, errors }) => (
               <React.Fragment>
                 <Row>
@@ -328,27 +331,28 @@ const CreateUser = ({ onChange, open, setOpen, organisation }) => {
         <ModalHeader toggle={() => setOpen(false)}>Créer un utilisateur pour {organisation.orgId}</ModalHeader>
         <ModalBody>
           <Formik
-            initialValues={{ name: '', email: '', phone: '', team, healthcareProfessional: false }}
+            initialValues={{ name: "", email: "", phone: "", team, healthcareProfessional: false }}
             onSubmit={async (body, actions) => {
               try {
                 if (!body.email) return toast.error("L'email est obligatoire");
                 if (!emailRegex.test(body.email)) return toast.error("L'email est invalide");
-                if (!body.role) return toast.error('Le rôle est obligatoire');
+                if (!body.role) return toast.error("Le rôle est obligatoire");
 
                 body.organisation = organisation._id;
-                const { ok } = await API.post({ path: '/user', body });
+                const { ok } = await API.post({ path: "/user", body });
                 if (!ok) {
                   return false;
                 }
-                toast.success('Création réussie !');
+                toast.success("Création réussie !");
                 onChange();
                 setOpen(false);
               } catch (orgCreationError) {
-                console.log('error in creating organisation', orgCreationError);
+                console.log("error in creating organisation", orgCreationError);
                 actions.setSubmitting(false);
                 toast.error(orgCreationError.message);
               }
-            }}>
+            }}
+          >
             {({ values, handleChange, handleSubmit, isSubmitting, touched, errors }) => (
               <React.Fragment>
                 <Row>
@@ -378,7 +382,7 @@ const CreateUser = ({ onChange, open, setOpen, organisation }) => {
                         <SelectCustom
                           name="name"
                           options={team}
-                          onChange={(teams) => handleChange({ target: { value: teams?.map((t) => t._id) || [], name: 'team' } })}
+                          onChange={(teams) => handleChange({ target: { value: teams?.map((t) => t._id) || [], name: "team" } })}
                           value={values.team.map((_teamId) => team.find((_team) => _team._id === _teamId))}
                           getOptionValue={(team) => team._id}
                           getOptionLabel={(team) => team.name}
@@ -399,14 +403,14 @@ const CreateUser = ({ onChange, open, setOpen, organisation }) => {
                     <label htmlFor="healthcareProfessional" style={{ marginBottom: 0 }}>
                       <input
                         type="checkbox"
-                        style={{ marginRight: '0.5rem' }}
+                        style={{ marginRight: "0.5rem" }}
                         name="healthcareProfessional"
                         id="healthcareProfessional"
                         checked={values.healthcareProfessional}
                         onChange={() => {
                           handleChange({
                             target: {
-                              name: 'healthcareProfessional',
+                              name: "healthcareProfessional",
                               checked: Boolean(!values.healthcareProfessional),
                               value: Boolean(!values.healthcareProfessional),
                             },

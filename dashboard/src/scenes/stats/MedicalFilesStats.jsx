@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { CustomResponsivePie } from './charts';
-import { getPieData } from './utils';
-import CustomFieldsStats from './CustomFieldsStats';
-import Filters, { filterData } from '../../components/Filters';
-import { AgeRangeBar, SelectedPersonsModal } from './PersonsStats';
-import { capture } from '../../services/sentry';
+import React, { useState } from "react";
+import { CustomResponsivePie } from "./charts";
+import { getPieData } from "./utils";
+import CustomFieldsStats from "./CustomFieldsStats";
+import Filters, { filterData } from "../../components/Filters";
+import { AgeRangeBar, SelectedPersonsModal } from "./PersonsStats";
+import { capture } from "../../services/sentry";
 
 const MedicalFilesStats = ({ filterBase, filterPersons, setFilterPersons, personsForStats, customFieldsMedicalFile, personFields, title }) => {
   const [personsModalOpened, setPersonsModalOpened] = useState(false);
@@ -15,17 +15,17 @@ const MedicalFilesStats = ({ filterBase, filterPersons, setFilterPersons, person
   const onSliceClick = (newSlice, fieldName, personConcerned = personsForStats) => {
     const newSlicefield = filterBase.find((f) => f.field === fieldName);
     if (!newSlicefield) {
-      capture('newSlicefield not found', { fieldName, filterBase });
+      capture("newSlicefield not found", { fieldName, filterBase });
       return;
     }
     setSliceField(newSlicefield);
     setSliceValue(newSlice);
     const slicedData =
-      newSlicefield.type === 'boolean'
-        ? personConcerned.filter((p) => (newSlice === 'Non' ? !p[newSlicefield.field] : !!p[newSlicefield.field]))
+      newSlicefield.type === "boolean"
+        ? personConcerned.filter((p) => (newSlice === "Non" ? !p[newSlicefield.field] : !!p[newSlicefield.field]))
         : filterData(
             personConcerned,
-            [{ ...newSlicefield, value: newSlice, type: newSlicefield.field === 'outOfActiveList' ? 'boolean' : newSlicefield.field }],
+            [{ ...newSlicefield, value: newSlice, type: newSlicefield.field === "outOfActiveList" ? "boolean" : newSlicefield.field }],
             true
           );
     setSlicedData(slicedData);
@@ -38,7 +38,7 @@ const MedicalFilesStats = ({ filterBase, filterPersons, setFilterPersons, person
       <AgeRangeBar
         persons={personsForStats}
         onItemClick={(newSlice, data) => {
-          setSliceField(personFields.find((f) => f.name === 'birthdate'));
+          setSliceField(personFields.find((f) => f.name === "birthdate"));
           setSliceValue(newSlice);
           setSlicedData(data);
           setPersonsModalOpened(true);
@@ -48,9 +48,9 @@ const MedicalFilesStats = ({ filterBase, filterPersons, setFilterPersons, person
         title="Genre"
         field="gender"
         onItemClick={(newSlice) => {
-          onSliceClick(newSlice, 'gender');
+          onSliceClick(newSlice, "gender");
         }}
-        data={getPieData(personsForStats, 'gender', { options: personFields.find((f) => f.name === 'gender').options })}
+        data={getPieData(personsForStats, "gender", { options: personFields.find((f) => f.name === "gender").options })}
         help={`Couverture médicale des ${title} dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
       />
       <CustomFieldsStats

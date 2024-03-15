@@ -1,111 +1,111 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import OutsideClickHandler from 'react-outside-click-handler';
-import { dayjsInstance, dateForDatePicker } from '../services/date';
-import DatePicker from 'react-datepicker';
+import React, { useState, useEffect, useCallback } from "react";
+import OutsideClickHandler from "react-outside-click-handler";
+import { dayjsInstance, dateForDatePicker } from "../services/date";
+import DatePicker from "react-datepicker";
 
 const getOffsetFromToday = (value, unit, end) => {
   const a = dayjsInstance();
   const b = a.subtract(value, unit);
-  return end ? b.endOf('day') : b.startOf('day');
+  return end ? b.endOf("day") : b.startOf("day");
 };
 
 export const statsPresets = [
   {
-    label: 'Toutes les données',
+    label: "Toutes les données",
     period: { startDate: null, endDate: null },
   },
   {
     label: "Aujourd'hui",
-    period: { startDate: dayjsInstance().startOf('day'), endDate: dayjsInstance().endOf('day') },
+    period: { startDate: dayjsInstance().startOf("day"), endDate: dayjsInstance().endOf("day") },
   },
   {
-    label: 'Hier',
-    period: { startDate: getOffsetFromToday(1, 'day'), endDate: getOffsetFromToday(1, 'day', true) },
+    label: "Hier",
+    period: { startDate: getOffsetFromToday(1, "day"), endDate: getOffsetFromToday(1, "day", true) },
   },
   {
-    label: 'Cette semaine',
-    period: { startDate: dayjsInstance().startOf('week'), endDate: dayjsInstance().endOf('week') },
+    label: "Cette semaine",
+    period: { startDate: dayjsInstance().startOf("week"), endDate: dayjsInstance().endOf("week") },
   },
   {
-    label: 'La semaine dernière',
-    period: { startDate: dayjsInstance().startOf('week').subtract(1, 'week'), endDate: dayjsInstance().endOf('week').subtract(1, 'week') },
+    label: "La semaine dernière",
+    period: { startDate: dayjsInstance().startOf("week").subtract(1, "week"), endDate: dayjsInstance().endOf("week").subtract(1, "week") },
   },
   {
-    label: 'Ce mois-ci',
-    period: { startDate: dayjsInstance().startOf('month'), endDate: dayjsInstance().endOf('month') },
+    label: "Ce mois-ci",
+    period: { startDate: dayjsInstance().startOf("month"), endDate: dayjsInstance().endOf("month") },
   },
   {
-    label: 'Le mois dernier',
-    period: { startDate: dayjsInstance().subtract(1, 'month').startOf('month'), endDate: dayjsInstance().subtract(1, 'month').endOf('month') },
+    label: "Le mois dernier",
+    period: { startDate: dayjsInstance().subtract(1, "month").startOf("month"), endDate: dayjsInstance().subtract(1, "month").endOf("month") },
   },
   {
-    label: 'Les trois derniers mois glissants',
-    period: { startDate: dayjsInstance().subtract(3, 'month'), endDate: dayjsInstance() },
+    label: "Les trois derniers mois glissants",
+    period: { startDate: dayjsInstance().subtract(3, "month"), endDate: dayjsInstance() },
   },
   {
-    label: 'Les six derniers mois glissants',
-    period: { startDate: dayjsInstance().subtract(6, 'month'), endDate: dayjsInstance() },
+    label: "Les six derniers mois glissants",
+    period: { startDate: dayjsInstance().subtract(6, "month"), endDate: dayjsInstance() },
   },
   {
-    label: 'Ce semestre',
+    label: "Ce semestre",
     period: {
-      startDate: dayjsInstance().get('month') < 6 ? dayjsInstance().startOf('year') : dayjsInstance().startOf('year').add(6, 'month'),
-      endDate: dayjsInstance().get('month') < 6 ? dayjsInstance().startOf('year').add(5, 'month').endOf('month') : dayjsInstance().endOf('year'),
+      startDate: dayjsInstance().get("month") < 6 ? dayjsInstance().startOf("year") : dayjsInstance().startOf("year").add(6, "month"),
+      endDate: dayjsInstance().get("month") < 6 ? dayjsInstance().startOf("year").add(5, "month").endOf("month") : dayjsInstance().endOf("year"),
     },
   },
   {
-    label: 'Le dernier semestre',
+    label: "Le dernier semestre",
     period: {
       startDate:
-        dayjsInstance().get('month') < 6 ? dayjsInstance().subtract(1, 'year').startOf('year').add(6, 'month') : dayjsInstance().startOf('year'),
+        dayjsInstance().get("month") < 6 ? dayjsInstance().subtract(1, "year").startOf("year").add(6, "month") : dayjsInstance().startOf("year"),
       endDate:
-        dayjsInstance().get('month') < 6
-          ? dayjsInstance().subtract(1, 'year').endOf('year')
-          : dayjsInstance().startOf('year').add(5, 'month').endOf('month'),
+        dayjsInstance().get("month") < 6
+          ? dayjsInstance().subtract(1, "year").endOf("year")
+          : dayjsInstance().startOf("year").add(5, "month").endOf("month"),
     },
   },
   {
-    label: 'Cette année',
-    period: { startDate: dayjsInstance().startOf('year'), endDate: dayjsInstance().endOf('year') },
+    label: "Cette année",
+    period: { startDate: dayjsInstance().startOf("year"), endDate: dayjsInstance().endOf("year") },
   },
   {
     label: "L'année dernière",
-    period: { startDate: dayjsInstance().subtract(1, 'year').startOf('year'), endDate: dayjsInstance().subtract(1, 'year').endOf('year') },
+    period: { startDate: dayjsInstance().subtract(1, "year").startOf("year"), endDate: dayjsInstance().subtract(1, "year").endOf("year") },
   },
 ];
 
 export const reportsPresets = [
   {
     label: "Aujourd'hui",
-    period: { startDate: dayjsInstance().startOf('day'), endDate: dayjsInstance().endOf('day') },
+    period: { startDate: dayjsInstance().startOf("day"), endDate: dayjsInstance().endOf("day") },
   },
   {
-    label: 'Hier',
-    period: { startDate: getOffsetFromToday(1, 'day'), endDate: getOffsetFromToday(1, 'day', true) },
+    label: "Hier",
+    period: { startDate: getOffsetFromToday(1, "day"), endDate: getOffsetFromToday(1, "day", true) },
   },
   {
-    label: 'Cette semaine',
-    period: { startDate: dayjsInstance().startOf('week'), endDate: dayjsInstance().endOf('week') },
+    label: "Cette semaine",
+    period: { startDate: dayjsInstance().startOf("week"), endDate: dayjsInstance().endOf("week") },
   },
   {
-    label: 'La semaine dernière',
-    period: { startDate: dayjsInstance().startOf('week').subtract(1, 'week'), endDate: dayjsInstance().endOf('week').subtract(1, 'week') },
+    label: "La semaine dernière",
+    period: { startDate: dayjsInstance().startOf("week").subtract(1, "week"), endDate: dayjsInstance().endOf("week").subtract(1, "week") },
   },
   {
-    label: 'Ce mois-ci',
-    period: { startDate: dayjsInstance().startOf('month'), endDate: dayjsInstance().endOf('month') },
+    label: "Ce mois-ci",
+    period: { startDate: dayjsInstance().startOf("month"), endDate: dayjsInstance().endOf("month") },
   },
   {
-    label: 'Le mois dernier',
-    period: { startDate: dayjsInstance().subtract(1, 'month').startOf('month'), endDate: dayjsInstance().subtract(1, 'month').endOf('month') },
+    label: "Le mois dernier",
+    period: { startDate: dayjsInstance().subtract(1, "month").startOf("month"), endDate: dayjsInstance().subtract(1, "month").endOf("month") },
   },
 ];
 
 export const formatPeriod = ({ preset, period }) => {
   if (!!preset) return preset;
   if (!!period.startDate && !!period.endDate) {
-    const startFormatted = dayjsInstance(period.startDate).format('D MMM YYYY');
-    const endFormatted = dayjsInstance(period.endDate).format('D MMM YYYY');
+    const startFormatted = dayjsInstance(period.startDate).format("D MMM YYYY");
+    const endFormatted = dayjsInstance(period.endDate).format("D MMM YYYY");
     if (startFormatted === endFormatted) return startFormatted;
     return `Du ${startFormatted} au ${endFormatted}`;
   }
@@ -121,8 +121,8 @@ const DateRangePickerWithPresets = ({ period, setPeriod, preset, setPreset, remo
   }, []);
 
   useEffect(() => {
-    window.addEventListener('resize', handleWindowResize);
-    return () => window.removeEventListener('resize', handleWindowResize);
+    window.addEventListener("resize", handleWindowResize);
+    return () => window.removeEventListener("resize", handleWindowResize);
   });
 
   useEffect(() => {
@@ -131,8 +131,8 @@ const DateRangePickerWithPresets = ({ period, setPeriod, preset, setPreset, remo
     // but on the day after, the period "Aujourd'hui" will be kept to 2023-06-23
     // so the user will see "Aujourd'hui" but the period will actually be yesterday
     // so we need to reset the period everyday
-    const dateOnWhichThePeriodWasSetByTheUser = window.localStorage.getItem('user-set-the-period-on-date');
-    if (dateOnWhichThePeriodWasSetByTheUser !== dayjsInstance().format('YYYY-MM-DD')) {
+    const dateOnWhichThePeriodWasSetByTheUser = window.localStorage.getItem("user-set-the-period-on-date");
+    if (dateOnWhichThePeriodWasSetByTheUser !== dayjsInstance().format("YYYY-MM-DD")) {
       if (defaultPreset) {
         setPreset(defaultPreset.label);
         setPeriod({
@@ -143,7 +143,7 @@ const DateRangePickerWithPresets = ({ period, setPeriod, preset, setPreset, remo
         setPeriod({ startDate: null, endDate: null });
         removePreset();
       }
-      window.localStorage.setItem('user-set-the-period-on-date', dayjsInstance().format('YYYY-MM-DD'));
+      window.localStorage.setItem("user-set-the-period-on-date", dayjsInstance().format("YYYY-MM-DD"));
     }
   });
 
@@ -183,20 +183,22 @@ const DateRangePickerWithPresets = ({ period, setPeriod, preset, setPreset, remo
     <div className="noprint tw-relative tw-min-w-[15rem]">
       <button
         type="button"
-        className="tw-min-w-[15rem] tw-rounded-lg tw-border tw-border-gray-300 tw-bg-transparent tw-py-1 tw-px-4 tw-shadow-none"
-        onClick={openDatePicker}>
+        className="tw-min-w-[15rem] tw-rounded-lg tw-border tw-border-gray-300 tw-bg-transparent tw-px-4 tw-py-1 tw-shadow-none"
+        onClick={openDatePicker}
+      >
         {formatPeriod({ preset, period })}
       </button>
       {!!showDatePicker && (
         <OutsideClickHandler onOutsideClick={closeDatePicker}>
           <div className="stats-datepicker tw-absolute tw-top-12 tw-z-20 tw-flex tw-flex-nowrap tw-items-center tw-justify-end tw-overflow-x-auto tw-rounded-lg tw-border tw-border-gray-300 tw-bg-white tw-pl-56 lg:tw-min-w-[45rem]">
-            <div className="tw-absolute tw-top-0 tw-left-0 tw-bottom-0 tw-ml-2 tw-box-border tw-flex tw-max-h-full tw-w-56 tw-flex-1 tw-flex-col tw-items-start tw-justify-start tw-overflow-y-scroll">
+            <div className="tw-absolute tw-bottom-0 tw-left-0 tw-top-0 tw-ml-2 tw-box-border tw-flex tw-max-h-full tw-w-56 tw-flex-1 tw-flex-col tw-items-start tw-justify-start tw-overflow-y-scroll">
               {presets.map((p) => (
                 <button
                   type="button"
                   className="tw-w-full tw-rounded-lg tw-border-0 tw-bg-white tw-p-1 tw-text-center hover:tw-bg-main25"
                   key={p.label}
-                  onClick={() => setPresetRequest(p)}>
+                  onClick={() => setPresetRequest(p)}
+                >
                   {p.label}
                 </button>
               ))}

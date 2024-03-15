@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 const AgendaIcon = ({ size = 30 }) => (
   <svg width={size} height={size} viewBox="0 0 196 200">

@@ -1,7 +1,7 @@
-import Select from 'react-select';
-import CreatableSelect from 'react-select/creatable';
-import { theme } from '../config';
-import type { GroupBase, Props } from 'react-select';
+import Select from "react-select";
+import CreatableSelect from "react-select/creatable";
+import { theme } from "../config";
+import type { GroupBase, Props } from "react-select";
 
 interface CustomProps<Option, IsMulti extends boolean = false, Group extends GroupBase<Option> = GroupBase<Option>>
   extends Props<Option, IsMulti, Group> {
@@ -18,7 +18,7 @@ function SelectCustom<Option, IsMulti extends boolean = false, Group extends Gro
     <Component
       styles={filterStyles}
       placeholder="Choisir..."
-      noOptionsMessage={() => 'Aucun résultat'}
+      noOptionsMessage={() => "Aucun résultat"}
       formatCreateLabel={(inputValue) => `Ajouter "${inputValue}"`}
       theme={(defaultTheme) => ({
         ...defaultTheme,
@@ -40,7 +40,7 @@ function SelectCustom<Option, IsMulti extends boolean = false, Group extends Gro
 
 const filterStyles = {
   // control: (styles) => ({ ...styles, borderWidth: 0 }),
-  indicatorSeparator: (styles: any) => ({ ...styles, borderWidth: 0, backgroundColor: 'transparent' }),
+  indicatorSeparator: (styles: any) => ({ ...styles, borderWidth: 0, backgroundColor: "transparent" }),
   menuPortal: (provided: any) => ({ ...provided, zIndex: 10000 }),
   menu: (provided: any) => ({ ...provided, zIndex: 10000 }),
 };

@@ -1,7 +1,7 @@
-import { getDuration } from './utils';
-import Card from '../../components/Card';
+import { getDuration } from "./utils";
+import Card from "../../components/Card";
 
-export const Block = ({ data, title = 'Nombre de personnes suivies', help = null }) => (
+export const Block = ({ data, title = "Nombre de personnes suivies", help = null }) => (
   <div className="tw-px-4 tw-py-2 md:tw-basis-1/2 lg:tw-basis-1/3">
     <Card title={title} count={Array.isArray(data) ? String(data.length) : data} help={help} />
   </div>
@@ -17,7 +17,7 @@ export const BlockDateWithTime = ({ data, field, help }) => {
   const durationFromNowToAverage = Date.now() - averageField;
   const [count, unit] = getDuration(durationFromNowToAverage);
 
-  return <Card title={field.label + ' (moyenne)'} unit={unit} count={count} help={help} />;
+  return <Card title={field.label + " (moyenne)"} unit={unit} count={count} help={help} />;
 };
 
 const twoDecimals = (number) => Math.round(number * 100) / 100;
@@ -37,7 +37,7 @@ export const BlockTotal = ({ title, unit, data, field, help }) => {
       help={help}
       children={
         <span className="font-weight-normal">
-          Moyenne: <strong>{isNaN(avg) ? '-' : twoDecimals(avg)}</strong>
+          Moyenne: <strong>{isNaN(avg) ? "-" : twoDecimals(avg)}</strong>
         </span>
       }
     />

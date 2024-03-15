@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, Input, Col, Row, ModalHeader, ModalBody, FormGroup, Label } from 'reactstrap';
-import { toast } from 'react-toastify';
-import { Formik } from 'formik';
-import ButtonCustom from './ButtonCustom';
-import SelectUser from './SelectUser';
-import { teamsState, userState } from '../recoil/auth';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import API from '../services/api';
-import { passagesState, preparePassageForEncryption } from '../recoil/passages';
-import SelectTeam from './SelectTeam';
-import SelectPerson from './SelectPerson';
-import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
-import DatePicker from './DatePicker';
-import { outOfBoundariesDate } from '../services/date';
-import AutoResizeTextarea from './AutoresizeTextArea';
+import React, { useEffect, useState } from "react";
+import { Modal, Input, Col, Row, ModalHeader, ModalBody, FormGroup, Label } from "reactstrap";
+import { toast } from "react-toastify";
+import { Formik } from "formik";
+import ButtonCustom from "./ButtonCustom";
+import SelectUser from "./SelectUser";
+import { teamsState, userState } from "../recoil/auth";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import API from "../services/api";
+import { passagesState, preparePassageForEncryption } from "../recoil/passages";
+import SelectTeam from "./SelectTeam";
+import SelectPerson from "./SelectPerson";
+import useCreateReportAtDateIfNotExist from "../services/useCreateReportAtDateIfNotExist";
+import DatePicker from "./DatePicker";
+import { outOfBoundariesDate } from "../services/date";
+import AutoResizeTextarea from "./AutoresizeTextArea";
 
 const Passage = ({ passage, personId, onFinished }) => {
   const user = useRecoilValue(userState);
@@ -34,11 +34,11 @@ const Passage = ({ passage, personId, onFinished }) => {
   };
 
   const onDeletePassage = async () => {
-    const confirm = window.confirm('Êtes-vous sûr ?');
+    const confirm = window.confirm("Êtes-vous sûr ?");
     if (confirm) {
       const passageRes = await API.delete({ path: `/passage/${passage._id}` });
       if (passageRes.ok) {
-        toast.success('Suppression réussie');
+        toast.success("Suppression réussie");
         setOpen(false);
         onFinished();
         setPassages((passages) => passages.filter((p) => p._id !== passage._id));
@@ -53,18 +53,18 @@ const Passage = ({ passage, personId, onFinished }) => {
   return (
     <>
       <Modal zIndex={5000} isOpen={!!open && !!passage} toggle={onCancelRequest} size="lg" backdrop="static">
-        <ModalHeader toggle={onCancelRequest}>{isNew ? 'Enregistrer un passage' : 'Éditer le passage'}</ModalHeader>
+        <ModalHeader toggle={onCancelRequest}>{isNew ? "Enregistrer un passage" : "Éditer le passage"}</ModalHeader>
         <ModalBody>
           <Formik
             initialValues={{ date: new Date(), ...passage, anonymousNumberOfPassages: 1, persons: passage?.person ? [passage.person] : [] }}
             onSubmit={async (body, actions) => {
               if (!body.user) return toast.error("L'utilisateur est obligatoire");
-              if (!body.date) return toast.error('La date est obligatoire');
-              if (outOfBoundariesDate(body.date)) return toast.error('La date est hors limites (entre 1900 et 2100)');
+              if (!body.date) return toast.error("La date est obligatoire");
+              if (outOfBoundariesDate(body.date)) return toast.error("La date est hors limites (entre 1900 et 2100)");
               if (!body.team) return toast.error("L'équipe est obligatoire");
-              if (body.anonymous && !body.anonymousNumberOfPassages) return toast.error('Veuillez spécifier le nombre de passages anonymes');
+              if (body.anonymous && !body.anonymousNumberOfPassages) return toast.error("Veuillez spécifier le nombre de passages anonymes");
               if (!body.anonymous && (showMultiSelect ? !body.persons?.length : !body.person?.length))
-                return toast.error('Veuillez spécifier une personne');
+                return toast.error("Veuillez spécifier une personne");
 
               if (isNew) {
                 const newPassage = {
@@ -78,7 +78,7 @@ const Passage = ({ passage, personId, onFinished }) => {
                 if (body.anonymous) {
                   for (let i = 0; i < body.anonymousNumberOfPassages; i++) {
                     const response = await API.post({
-                      path: '/passage',
+                      path: "/passage",
                       body: preparePassageForEncryption(newPassage),
                     });
                     if (response.ok) {
@@ -89,7 +89,7 @@ const Passage = ({ passage, personId, onFinished }) => {
                 } else if (showMultiSelect) {
                   for (const person of body.persons) {
                     const response = await API.post({
-                      path: '/passage',
+                      path: "/passage",
                       body: preparePassageForEncryption({ ...newPassage, person }),
                     });
                     if (response.ok) {
@@ -99,7 +99,7 @@ const Passage = ({ passage, personId, onFinished }) => {
                   await createReportAtDateIfNotExist(body.date);
                 } else {
                   const response = await API.post({
-                    path: '/passage',
+                    path: "/passage",
                     body: preparePassageForEncryption({ ...newPassage, person: body.person }),
                   });
                   if (response.ok) {
@@ -110,7 +110,7 @@ const Passage = ({ passage, personId, onFinished }) => {
 
                 setOpen(false);
                 onFinished();
-                toast.success(body.person?.length > 1 ? 'Passage enregistré !' : 'Passages enregistrés !');
+                toast.success(body.person?.length > 1 ? "Passage enregistré !" : "Passages enregistrés !");
                 actions.setSubmitting(false);
                 return;
               }
@@ -130,9 +130,10 @@ const Passage = ({ passage, personId, onFinished }) => {
               if (!response.ok) return;
               setOpen(false);
               onFinished();
-              toast.success('Passage mis à jour');
+              toast.success("Passage mis à jour");
               actions.setSubmitting(false);
-            }}>
+            }}
+          >
             {({ values, handleChange, handleSubmit, isSubmitting }) => {
               return (
                 <React.Fragment>
@@ -144,10 +145,10 @@ const Passage = ({ passage, personId, onFinished }) => {
                             <input
                               type="checkbox"
                               id="create-anonymous-passages"
-                              style={{ marginRight: '0.5rem' }}
+                              style={{ marginRight: "0.5rem" }}
                               name="anonymous"
                               checked={values.anonymous}
-                              onChange={() => handleChange({ target: { value: !values.anonymous, name: 'anonymous' } })}
+                              onChange={() => handleChange({ target: { value: !values.anonymous, name: "anonymous" } })}
                             />
                             Passage(s) anonyme(s) <br />
                             <small className="text-muted">Cochez cette case pour enregistrer plutôt des passages anonymes</small>
@@ -204,7 +205,7 @@ const Passage = ({ passage, personId, onFinished }) => {
                         <SelectUser
                           inputId="update-passage-user-select"
                           value={values.user || user._id}
-                          onChange={(userId) => handleChange({ target: { value: userId, name: 'user' } })}
+                          onChange={(userId) => handleChange({ target: { value: userId, name: "user" } })}
                         />
                       </FormGroup>
                     </Col>
@@ -212,16 +213,16 @@ const Passage = ({ passage, personId, onFinished }) => {
                       <FormGroup>
                         <Label htmlFor="update-passage-team-select">Sous l'équipe</Label>
                         <SelectTeam
-                          teams={user.role === 'admin' ? teams : user.teams}
+                          teams={user.role === "admin" ? teams : user.teams}
                           teamId={values.team}
-                          onChange={(team) => handleChange({ target: { value: team._id, name: 'team' } })}
+                          onChange={(team) => handleChange({ target: { value: team._id, name: "team" } })}
                           inputId="update-passage-team-select"
                         />
                       </FormGroup>
                     </Col>
                   </Row>
                   <br />
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+                  <div style={{ display: "flex", justifyContent: "flex-end", gap: "1rem" }}>
                     {!isNew && <ButtonCustom title="Supprimer" type="button" color="danger" onClick={onDeletePassage} />}
                     <ButtonCustom title="Enregistrer" loading={isSubmitting} onClick={() => !isSubmitting && handleSubmit()} />
                   </div>

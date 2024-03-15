@@ -1,13 +1,13 @@
-import { useMemo, useState } from 'react';
-import { useRecoilValue } from 'recoil';
-import { useLocation, useHistory } from 'react-router-dom';
-import Passage from '../../../components/Passage';
-import Rencontre from '../../../components/Rencontre';
-import TagTeam from '../../../components/TagTeam';
-import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../../components/tailwind/Modal';
-import { currentTeamState, usersState, userState, organisationState } from '../../../recoil/auth';
-import { dayjsInstance, formatDateTimeWithNameOfDay } from '../../../services/date';
-import { FullScreenIcon } from '../../../assets/icons/FullScreenIcon';
+import { useMemo, useState } from "react";
+import { useRecoilValue } from "recoil";
+import { useLocation, useHistory } from "react-router-dom";
+import Passage from "../../../components/Passage";
+import Rencontre from "../../../components/Rencontre";
+import TagTeam from "../../../components/TagTeam";
+import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "../../../components/tailwind/Modal";
+import { currentTeamState, usersState, userState, organisationState } from "../../../recoil/auth";
+import { dayjsInstance, formatDateTimeWithNameOfDay } from "../../../services/date";
+import { FullScreenIcon } from "../../../assets/icons/FullScreenIcon";
 
 export default function PassagesRencontres({ person }) {
   const users = useRecoilValue(usersState);
@@ -15,24 +15,24 @@ export default function PassagesRencontres({ person }) {
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
   const [fullScreen, setFullScreen] = useState(false);
-  const [selected, setSelected] = useState(organisation.passagesEnabled ? 'passages' : 'rencontres');
+  const [selected, setSelected] = useState(organisation.passagesEnabled ? "passages" : "rencontres");
   const history = useHistory();
   const { search } = useLocation();
   const currentPassageId = useMemo(() => {
     const searchParams = new URLSearchParams(search);
-    return searchParams.get('passageId');
+    return searchParams.get("passageId");
   }, [search]);
   const currentRencontreId = useMemo(() => {
     const searchParams = new URLSearchParams(search);
-    return searchParams.get('rencontreId');
+    return searchParams.get("rencontreId");
   }, [search]);
 
   const personPassages = useMemo(
-    () => [...(person?.passages || [])].sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), 'day') ? 1 : -1)),
+    () => [...(person?.passages || [])].sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), "day") ? 1 : -1)),
     [person]
   );
   const personRencontres = useMemo(
-    () => [...(person?.rencontres || [])].sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), 'day') ? 1 : -1)),
+    () => [...(person?.rencontres || [])].sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), "day") ? 1 : -1)),
     [person]
   );
   const handleAddPassage = () => {
@@ -44,13 +44,13 @@ export default function PassagesRencontres({ person }) {
 
   const currentPassage = useMemo(() => {
     if (!currentPassageId) return null;
-    if (currentPassageId === 'new') return { person: person._id, user: user._id, team: currentTeam._id };
+    if (currentPassageId === "new") return { person: person._id, user: user._id, team: currentTeam._id };
     return personPassages.find((p) => p._id === currentPassageId);
   }, [currentPassageId, personPassages, person, user, currentTeam]);
 
   const currentRencontre = useMemo(() => {
     if (!currentRencontreId) return null;
-    if (currentRencontreId === 'new') return { person: person._id, user: user._id, team: currentTeam._id };
+    if (currentRencontreId === "new") return { person: person._id, user: user._id, team: currentTeam._id };
     return personRencontres.find((p) => p._id === currentRencontreId);
   }, [currentRencontreId, personRencontres, person, user, currentTeam]);
 
@@ -65,22 +65,24 @@ export default function PassagesRencontres({ person }) {
           {organisation.passagesEnabled && (
             <button
               className={
-                selected === 'passages'
-                  ? 'tw-rounded-t tw-border-t tw-border-l tw-border-r tw-border-slate-300 tw-p-1.5'
-                  : 'tw-border-b tw-border-slate-300 tw-p-1.5'
+                selected === "passages"
+                  ? "tw-rounded-t tw-border-l tw-border-r tw-border-t tw-border-slate-300 tw-p-1.5"
+                  : "tw-border-b tw-border-slate-300 tw-p-1.5"
               }
-              onClick={() => setSelected('passages')}>
+              onClick={() => setSelected("passages")}
+            >
               Passages ({personPassages.length})
             </button>
           )}
           {organisation.rencontresEnabled && (
             <button
               className={
-                selected === 'rencontres'
-                  ? 'tw-rounded-t tw-border-t tw-border-l tw-border-r tw-border-slate-300 tw-p-1.5'
-                  : 'tw-border-b tw-border-slate-300 tw-p-1.5'
+                selected === "rencontres"
+                  ? "tw-rounded-t tw-border-l tw-border-r tw-border-t tw-border-slate-300 tw-p-1.5"
+                  : "tw-border-b tw-border-slate-300 tw-p-1.5"
               }
-              onClick={() => setSelected('rencontres')}>
+              onClick={() => setSelected("rencontres")}
+            >
               Rencontres ({personRencontres.length})
             </button>
           )}
@@ -88,18 +90,20 @@ export default function PassagesRencontres({ person }) {
         <div className="flex-col tw-flex tw-items-center tw-gap-2">
           <button
             className="tw-text-md tw-h-8 tw-w-8 tw-rounded-full tw-bg-main tw-font-bold tw-text-white tw-transition hover:tw-scale-125"
-            aria-label={selected === 'passages' ? 'Ajouter un passage' : 'Ajouter une rencontre'}
+            aria-label={selected === "passages" ? "Ajouter un passage" : "Ajouter une rencontre"}
             onClick={() => {
-              if (selected === 'rencontres') handleAddRencontre();
+              if (selected === "rencontres") handleAddRencontre();
               else handleAddPassage();
-            }}>
+            }}
+          >
             ＋
           </button>
-          {(selected === 'passages' ? Boolean(personPassages.length) : Boolean(personRencontres.length)) && (
+          {(selected === "passages" ? Boolean(personPassages.length) : Boolean(personRencontres.length)) && (
             <button
               title={`Passer les ${selected} en plein écran`}
               className="tw-h-6 tw-w-6 tw-rounded-full tw-text-main tw-transition hover:tw-scale-125"
-              onClick={() => setFullScreen(true)}>
+              onClick={() => setFullScreen(true)}
+            >
               <FullScreenIcon />
             </button>
           )}
@@ -108,7 +112,7 @@ export default function PassagesRencontres({ person }) {
       <ModalContainer open={!!fullScreen} size="prose" onClose={() => setFullScreen(false)}>
         <ModalHeader title={`${selected.capitalize()} de  ${person?.name} (${personPassages.length})`}></ModalHeader>
         <ModalBody>
-          {selected === 'passages' ? (
+          {selected === "passages" ? (
             <PassagesTable personPassages={personPassages} users={users} />
           ) : (
             <RencontresTable personRencontres={personRencontres} users={users} />
@@ -122,10 +126,11 @@ export default function PassagesRencontres({ person }) {
             type="button"
             className="button-submit"
             onClick={() => {
-              if (selected === 'rencontres') handleAddRencontre();
+              if (selected === "rencontres") handleAddRencontre();
               else handleAddPassage();
-            }}>
-            ＋ Ajouter {selected === 'rencontres' ? 'une rencontre' : 'un passage'}
+            }}
+          >
+            ＋ Ajouter {selected === "rencontres" ? "une rencontre" : "un passage"}
           </button>
         </ModalFooter>
       </ModalContainer>
@@ -143,7 +148,7 @@ export default function PassagesRencontres({ person }) {
           history.replace(`/person/${person._id}`);
         }}
       />
-      {selected === 'passages' && !personPassages.length && (
+      {selected === "passages" && !personPassages.length && (
         <div className="tw-mt-8 tw-w-full tw-text-center tw-text-gray-300">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -155,7 +160,8 @@ export default function PassagesRencontres({ person }) {
             stroke="currentColor"
             fill="none"
             strokeLinecap="round"
-            strokeLinejoin="round">
+            strokeLinejoin="round"
+          >
             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
             <circle cx={12} cy={12} r={9}></circle>
             <polyline points="12 7 12 12 15 15"></polyline>
@@ -163,7 +169,7 @@ export default function PassagesRencontres({ person }) {
           Aucun passage
         </div>
       )}
-      {selected === 'rencontres' && !personRencontres.length && (
+      {selected === "rencontres" && !personRencontres.length && (
         <div className="tw-mt-8 tw-w-full tw-text-center tw-text-gray-300">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -175,7 +181,8 @@ export default function PassagesRencontres({ person }) {
             stroke="currentColor"
             fill="none"
             strokeLinecap="round"
-            strokeLinejoin="round">
+            strokeLinejoin="round"
+          >
             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
             <circle cx={12} cy={12} r={9}></circle>
             <polyline points="12 7 12 12 15 15"></polyline>
@@ -183,7 +190,7 @@ export default function PassagesRencontres({ person }) {
           Aucune rencontre
         </div>
       )}
-      {selected === 'passages' ? (
+      {selected === "passages" ? (
         <PassagesTable personPassages={personPassages} users={users} />
       ) : (
         <RencontresTable personRencontres={personRencontres} users={users} />
@@ -203,11 +210,12 @@ function PassagesTable({ personPassages, users }) {
               key={passage._id}
               onClick={() => {
                 history.push(`/person/${passage.person}?passageId=${passage._id}`);
-              }}>
+              }}
+            >
               <td>
                 <div>{formatDateTimeWithNameOfDay(passage.date || passage.createdAt)}</div>
-                <div style={{ overflowWrap: 'anywhere' }}>
-                  {(passage.comment || '').split('\n').map((e, i) => (
+                <div style={{ overflowWrap: "anywhere" }}>
+                  {(passage.comment || "").split("\n").map((e, i) => (
                     <p key={e + i}>{e}</p>
                   ))}
                 </div>
@@ -235,11 +243,12 @@ function RencontresTable({ personRencontres, users }) {
               key={rencontre._id}
               onClick={() => {
                 history.push(`/person/${rencontre.person}?rencontreId=${rencontre._id}`);
-              }}>
+              }}
+            >
               <td>
                 <div>{formatDateTimeWithNameOfDay(rencontre.date || rencontre.createdAt)}</div>
-                <div style={{ overflowWrap: 'anywhere' }}>
-                  {(rencontre.comment || '').split('\n').map((e, i) => (
+                <div style={{ overflowWrap: "anywhere" }}>
+                  {(rencontre.comment || "").split("\n").map((e, i) => (
                     <p key={e + i}>{e}</p>
                   ))}
                 </div>

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import QuestionMarkButton from './QuestionMarkButton';
-import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from './tailwind/Modal';
+import React, { useState } from "react";
+import QuestionMarkButton from "./QuestionMarkButton";
+import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "./tailwind/Modal";
 
 const HelpButtonAndModal = ({ title, help }) => {
   const [helpOpen, setHelpOpen] = useState(false);
@@ -21,7 +21,7 @@ const HelpModal = ({ open, setOpen, title, help }) => {
       <ModalHeader title={title} />
       <ModalBody>
         <div className="tw-flex tw-flex-col tw-gap-4  tw-px-8 tw-py-4">
-          <p className="tw-mb-0" dangerouslySetInnerHTML={{ __html: help.split('\n').join('<br>') }} />
+          <p className="tw-mb-0" dangerouslySetInnerHTML={{ __html: help.split("\n").join("<br>") }} />
         </div>
       </ModalBody>
       <ModalFooter>
@@ -31,7 +31,8 @@ const HelpModal = ({ open, setOpen, title, help }) => {
           className="button-cancel"
           onClick={() => {
             setOpen(false);
-          }}>
+          }}
+        >
           Fermer
         </button>
       </ModalFooter>

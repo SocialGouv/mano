@@ -1,8 +1,8 @@
-import { UUIDV4 } from './uuid';
+import { UUIDV4 } from "./uuid";
 
 export interface ActionInstance {
   _id: string;
-  status: 'TODO' | 'DONE' | 'CANCEL';
+  status: "TODO" | "DONE" | "CANCEL";
   person?: UUIDV4;
   organisation: UUIDV4;
   user: UUIDV4;

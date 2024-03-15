@@ -1,20 +1,20 @@
-import React, { useMemo, useState } from 'react';
-import { useRecoilValue } from 'recoil';
-import { useHistory, useLocation } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { Formik } from 'formik';
-import ExclamationMarkButton from './tailwind/ExclamationMarkButton';
-import TagTeam from './TagTeam';
-import { currentTeamState, organisationState, userState, usersState } from '../recoil/auth';
-import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from './tailwind/Modal';
-import { dayjsInstance, formatDateTimeWithNameOfDay } from '../services/date';
-import SelectUser from './SelectUser';
-import { FullScreenIcon } from '../assets/icons/FullScreenIcon';
-import DatePicker from './DatePicker';
-import { outOfBoundariesDate } from '../services/date';
-import AutoResizeTextarea from './AutoresizeTextArea';
-import UserName from './UserName';
-import CustomFieldDisplay from './CustomFieldDisplay';
+import React, { useMemo, useState } from "react";
+import { useRecoilValue } from "recoil";
+import { useHistory, useLocation } from "react-router-dom";
+import { toast } from "react-toastify";
+import { Formik } from "formik";
+import ExclamationMarkButton from "./tailwind/ExclamationMarkButton";
+import TagTeam from "./TagTeam";
+import { currentTeamState, organisationState, userState, usersState } from "../recoil/auth";
+import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "./tailwind/Modal";
+import { dayjsInstance, formatDateTimeWithNameOfDay } from "../services/date";
+import SelectUser from "./SelectUser";
+import { FullScreenIcon } from "../assets/icons/FullScreenIcon";
+import DatePicker from "./DatePicker";
+import { outOfBoundariesDate } from "../services/date";
+import AutoResizeTextarea from "./AutoresizeTextArea";
+import UserName from "./UserName";
+import CustomFieldDisplay from "./CustomFieldDisplay";
 
 /*
 3 components:
@@ -43,7 +43,7 @@ import CustomFieldDisplay from './CustomFieldDisplay';
 
 export function CommentsModule({
   comments = [],
-  title = 'Commentaires',
+  title = "Commentaires",
   typeForNewComment, // person|action|passage|rencontre|medical-file|consultation|treatment
   personId = null,
   actionId = null,
@@ -52,11 +52,11 @@ export function CommentsModule({
   canToggleUrgentCheck = false,
   onDeleteComment,
   onSubmitComment,
-  color = 'main', // main|blue-900
+  color = "main", // main|blue-900
 }) {
-  if (!typeForNewComment) throw new Error('typeForNewComment is required');
-  if (!onDeleteComment) throw new Error('onDeleteComment is required');
-  if (!onSubmitComment) throw new Error('onSubmitComment is required');
+  if (!typeForNewComment) throw new Error("typeForNewComment is required");
+  if (!onDeleteComment) throw new Error("onDeleteComment is required");
+  if (!onSubmitComment) throw new Error("onSubmitComment is required");
   const [modalCreateOpen, setModalCreateOpen] = useState(false);
   const [commentToDisplay, setCommentToDisplay] = useState(null);
   const [commentToEdit, setCommentToEdit] = useState(null);
@@ -67,19 +67,21 @@ export function CommentsModule({
       {!!showPanel ? (
         <div className="tw-relative">
           <div className="tw-sticky tw-top-0 tw-z-10 tw-flex tw-bg-white tw-p-3 tw-shadow-sm">
-            <h4 className="tw-flex-1 tw-text-xl">Commentaires {comments.length ? `(${comments.length})` : ''}</h4>
+            <h4 className="tw-flex-1 tw-text-xl">Commentaires {comments.length ? `(${comments.length})` : ""}</h4>
             <div className="flex-col tw-flex tw-items-center tw-gap-2">
               <button
                 aria-label="Ajouter un commentaire"
                 className={`tw-text-md tw-h-8 tw-w-8 tw-rounded-full tw-bg-${color} tw-font-bold tw-text-white tw-transition hover:tw-scale-125`}
-                onClick={() => setModalCreateOpen(true)}>
+                onClick={() => setModalCreateOpen(true)}
+              >
                 ＋
               </button>
               {Boolean(comments.length) && (
                 <button
                   title="Passer les commentaires en plein écran"
                   className={`tw-h-6 tw-w-6 tw-rounded-full tw-text-${color} tw-transition hover:tw-scale-125`}
-                  onClick={() => setFullScreen(true)}>
+                  onClick={() => setFullScreen(true)}
+                >
                   <FullScreenIcon />
                 </button>
               )}
@@ -188,7 +190,7 @@ function CommentsTable({ comments, onDisplayComment, onEditComment, onAddComment
   if (!comments.length) {
     return (
       <div className="tw-flex tw-flex-col tw-items-center tw-gap-6">
-        <div className="tw-mt-8 tw-mb-2 tw-w-full tw-text-center tw-text-gray-300">
+        <div className="tw-mb-2 tw-mt-8 tw-w-full tw-text-center tw-text-gray-300">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="tw-mx-auto tw-h-16 tw-w-16 tw-text-gray-200"
@@ -199,7 +201,8 @@ function CommentsTable({ comments, onDisplayComment, onEditComment, onAddComment
             stroke="currentColor"
             fill="none"
             strokeLinecap="round"
-            strokeLinejoin="round">
+            strokeLinejoin="round"
+          >
             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
             <path d="M3 20l1.3 -3.9a9 8 0 1 1 3.4 2.9l-4.7 1"></path>
             <line x1={12} y1={12} x2={12} y2="12.01"></line>
@@ -227,57 +230,59 @@ function CommentsTable({ comments, onDisplayComment, onEditComment, onAddComment
       <table className="table">
         <tbody className="small">
           {(comments || []).map((comment, i) => {
-            if (!comment.type) throw new Error('type is required');
-            const isNotEditable = (!!searchParams.get('consultationId') || !!searchParams.get('treatmentId')) && comment.user !== user._id;
+            if (!comment.type) throw new Error("type is required");
+            const isNotEditable = (!!searchParams.get("consultationId") || !!searchParams.get("treatmentId")) && comment.user !== user._id;
             return (
               <tr
                 key={comment._id}
-                title={isNotEditable ? "Ce commentaire peut seulement être modifié par l'utilisateur qui l'a créé" : ''}
-                className={[`tw-bg-${color} tw-w-full`, i % 2 ? 'tw-bg-opacity-0' : 'tw-bg-opacity-5', isNotEditable && '!tw-cursor-not-allowed']
+                title={isNotEditable ? "Ce commentaire peut seulement être modifié par l'utilisateur qui l'a créé" : ""}
+                className={[`tw-bg-${color} tw-w-full`, i % 2 ? "tw-bg-opacity-0" : "tw-bg-opacity-5", isNotEditable && "!tw-cursor-not-allowed"]
                   .filter(Boolean)
-                  .join(' ')}>
+                  .join(" ")}
+              >
                 <td
                   onClick={() => {
                     switch (comment.type) {
-                      case 'action':
-                      case 'person':
-                      case 'medical-file':
+                      case "action":
+                      case "person":
+                      case "medical-file":
                         onDisplayComment(comment);
                         break;
-                      case 'passage':
+                      case "passage":
                         history.push(`/person/${comment.person}?passageId=${comment.passage}`);
                         break;
-                      case 'rencontre':
+                      case "rencontre":
                         history.push(`/person/${comment.person}?rencontreId=${comment.rencontre}`);
                         break;
-                      case 'consultation':
-                        if (searchParams.get('newConsultation') === 'true') {
+                      case "consultation":
+                        if (searchParams.get("newConsultation") === "true") {
                           onEditComment(comment);
                           break;
                         }
-                        if (searchParams.get('consultationId') === comment.consultation._id) {
+                        if (searchParams.get("consultationId") === comment.consultation._id) {
                           if (comment.user === user._id) onEditComment(comment);
                           break;
                         }
-                        searchParams.set('consultationId', comment.consultation._id);
+                        searchParams.set("consultationId", comment.consultation._id);
                         history.push(`?${searchParams.toString()}`);
                         break;
-                      case 'treatment':
-                        if (searchParams.get('newTreatment') === 'true') {
+                      case "treatment":
+                        if (searchParams.get("newTreatment") === "true") {
                           onEditComment(comment);
                           break;
                         }
-                        if (searchParams.get('treatmentId') === comment.treatment._id) {
+                        if (searchParams.get("treatmentId") === comment.treatment._id) {
                           if (comment.user === user._id) onEditComment(comment);
                           break;
                         }
-                        searchParams.set('treatmentId', comment.treatment._id);
+                        searchParams.set("treatmentId", comment.treatment._id);
                         history.push(`?${searchParams.toString()}`);
                         break;
                       default:
                         break;
                     }
-                  }}>
+                  }}
+                >
                   <div className="tw-mx-auto tw-flex tw-w-full tw-max-w-prose tw-flex-col tw-gap-2 tw-overflow-hidden">
                     <div className="tw-mb-4 tw-flex tw-items-center tw-align-middle">
                       {!!comment.urgent && <ExclamationMarkButton className="tw-mr-4" />}
@@ -290,13 +295,13 @@ function CommentsTable({ comments, onDisplayComment, onEditComment, onAddComment
                         </span>
                       )}
                       <div className="[overflow-wrap:anywhere]">
-                        {(comment.comment || '').split('\n').map((e, i) => (
+                        {(comment.comment || "").split("\n").map((e, i) => (
                           <p key={e + i} className="tw-mb-0">
                             {e}
                           </p>
                         ))}
                       </div>
-                      {!!withClickableLabel && ['treatment', 'consultation', 'action', 'passage', 'rencontre'].includes(comment.type) && (
+                      {!!withClickableLabel && ["treatment", "consultation", "action", "passage", "rencontre"].includes(comment.type) && (
                         <button
                           type="button"
                           className="tw-ml-auto tw-block"
@@ -304,40 +309,41 @@ function CommentsTable({ comments, onDisplayComment, onEditComment, onAddComment
                             e.stopPropagation();
                             const searchParams = new URLSearchParams(location.search);
                             switch (comment.type) {
-                              case 'action':
-                                searchParams.set('actionId', comment.action);
+                              case "action":
+                                searchParams.set("actionId", comment.action);
                                 history.push(`?${searchParams.toString()}`);
                                 break;
-                              case 'person':
+                              case "person":
                                 history.push(`/person/${comment.person}`);
                                 break;
-                              case 'passage':
+                              case "passage":
                                 history.push(`/person/${comment.person}?passageId=${comment.passage}`);
                                 break;
-                              case 'rencontre':
+                              case "rencontre":
                                 history.push(`/person/${comment.person}?rencontreId=${comment.rencontre}`);
                                 break;
-                              case 'consultation':
-                                searchParams.set('consultationId', comment.consultation._id);
+                              case "consultation":
+                                searchParams.set("consultationId", comment.consultation._id);
                                 history.push(`?${searchParams.toString()}`);
                                 break;
-                              case 'treatment':
-                                searchParams.set('treatmentId', comment.treatment._id);
+                              case "treatment":
+                                searchParams.set("treatmentId", comment.treatment._id);
                                 history.push(`?${searchParams.toString()}`);
                                 break;
-                              case 'medical-file':
+                              case "medical-file":
                                 history.push(`/person/${comment.person}?tab=Dossier+Médical`);
                                 break;
                               default:
                                 break;
                             }
-                          }}>
+                          }}
+                        >
                           <div className="tw-rounded tw-border tw-border-blue-900 tw-bg-blue-900/10 tw-px-1">
-                            {comment.type === 'treatment' && 'Traitement'}
-                            {comment.type === 'consultation' && 'Consultation'}
-                            {comment.type === 'action' && 'Action'}
-                            {comment.type === 'passage' && 'Passage'}
-                            {comment.type === 'rencontre' && 'Rencontre'}
+                            {comment.type === "treatment" && "Traitement"}
+                            {comment.type === "consultation" && "Consultation"}
+                            {comment.type === "action" && "Action"}
+                            {comment.type === "passage" && "Passage"}
+                            {comment.type === "rencontre" && "Rencontre"}
                           </div>
                         </button>
                       )}
@@ -359,7 +365,7 @@ function CommentsTable({ comments, onDisplayComment, onEditComment, onAddComment
   );
 }
 
-function CommentDisplay({ comment, onClose, onEditComment, canToggleUrgentCheck, canToggleGroupCheck, color = 'main' }) {
+function CommentDisplay({ comment, onClose, onEditComment, canToggleUrgentCheck, canToggleGroupCheck, color = "main" }) {
   const user = useRecoilValue(userState);
 
   const isEditable = useMemo(() => {
@@ -423,7 +429,8 @@ function CommentDisplay({ comment, onClose, onEditComment, canToggleUrgentCheck,
             className="button-cancel"
             onClick={() => {
               onClose();
-            }}>
+            }}
+          >
             Fermer
           </button>
           <button type="submit" onClick={onEditComment} className={`button-submit !tw-bg-${color}`} disabled={!isEditable}>
@@ -463,18 +470,19 @@ function CommentModal({
       <ModalContainer
         open
         onClose={() => {
-          window.sessionStorage.removeItem('currentComment');
+          window.sessionStorage.removeItem("currentComment");
           onClose();
         }}
-        size="3xl">
-        <ModalHeader toggle={onClose} title={isNewComment ? 'Créer un commentaire' : 'Éditer le commentaire'} />
+        size="3xl"
+      >
+        <ModalHeader toggle={onClose} title={isNewComment ? "Créer un commentaire" : "Éditer le commentaire"} />
         <Formik
-          initialValues={{ urgent: false, group: false, ...comment, comment: comment.comment || window.sessionStorage.getItem('currentComment') }}
+          initialValues={{ urgent: false, group: false, ...comment, comment: comment.comment || window.sessionStorage.getItem("currentComment") }}
           onSubmit={async (body, actions) => {
-            if (!body.date && !isNewComment) return toast.error('La date est obligatoire');
-            if (!body.comment) return toast.error('Le commentaire est obligatoire');
+            if (!body.date && !isNewComment) return toast.error("La date est obligatoire");
+            if (!body.comment) return toast.error("Le commentaire est obligatoire");
             if (!isNewComment && (!body.date || outOfBoundariesDate(body.date)))
-              return toast.error('La date de création est hors limites (entre 1900 et 2100)');
+              return toast.error("La date de création est hors limites (entre 1900 et 2100)");
 
             const commentBody = {
               comment: body.comment,
@@ -490,18 +498,19 @@ function CommentModal({
             };
 
             if (comment._id) commentBody._id = comment._id;
-            if (commentBody.type === 'action' && !commentBody.action) throw new Error('action is required');
-            if (commentBody.type === 'person' && !commentBody.person) throw new Error('person is required');
+            if (commentBody.type === "action" && !commentBody.action) throw new Error("action is required");
+            if (commentBody.type === "person" && !commentBody.person) throw new Error("person is required");
             if (!isNewComment && comment.user !== user._id) {
-              commentBody.comment = `${commentBody.comment}\n\nModifié par ${user.name} le ${dayjsInstance().format('DD/MM/YYYY à HH:mm')}`;
+              commentBody.comment = `${commentBody.comment}\n\nModifié par ${user.name} le ${dayjsInstance().format("DD/MM/YYYY à HH:mm")}`;
             }
 
             await onSubmit(commentBody, isNewComment);
 
             actions.setSubmitting(false);
-            window.sessionStorage.removeItem('currentComment');
+            window.sessionStorage.removeItem("currentComment");
             onClose();
-          }}>
+          }}
+        >
           {({ values, handleChange, isSubmitting, handleSubmit }) => (
             <React.Fragment>
               <ModalBody className="tw-px-4 tw-py-2">
@@ -513,7 +522,7 @@ function CommentModal({
                         inputId="user"
                         isDisabled={true}
                         value={values.user || user._id}
-                        onChange={(userId) => handleChange({ target: { value: userId, name: 'user' } })}
+                        onChange={(userId) => handleChange({ target: { value: userId, name: "user" } })}
                       />
                     </div>
                     <div className="tw-flex tw-flex-1 tw-flex-col">
@@ -535,10 +544,10 @@ function CommentModal({
                         id="comment"
                         name="comment"
                         placeholder="Tapez votre commentaire ici..."
-                        value={values.comment || ''}
+                        value={values.comment || ""}
                         rows={7}
                         onChange={(e) => {
-                          window.sessionStorage.setItem('currentComment', e.target.value);
+                          window.sessionStorage.setItem("currentComment", e.target.value);
                           handleChange(e);
                         }}
                       />
@@ -588,9 +597,10 @@ function CommentModal({
                   name="cancel"
                   className="button-cancel"
                   onClick={() => {
-                    window.sessionStorage.removeItem('currentComment');
+                    window.sessionStorage.removeItem("currentComment");
                     onClose();
-                  }}>
+                  }}
+                >
                   Annuler
                 </button>
                 {!isNewComment && (
@@ -599,11 +609,12 @@ function CommentModal({
                     className="button-destructive"
                     disabled={isSubmitting || !isEditable}
                     onClick={async () => {
-                      if (!window.confirm('Voulez-vous vraiment supprimer ce commentaire ?')) return;
-                      window.sessionStorage.removeItem('currentComment');
+                      if (!window.confirm("Voulez-vous vraiment supprimer ce commentaire ?")) return;
+                      window.sessionStorage.removeItem("currentComment");
                       await onDelete(comment);
                       onClose();
-                    }}>
+                    }}
+                  >
                     Supprimer
                   </button>
                 )}

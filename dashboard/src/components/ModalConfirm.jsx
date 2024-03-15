@@ -1,33 +1,33 @@
-import React from 'react';
-import { atom, useRecoilState } from 'recoil';
-import { ModalContainer, ModalFooter, ModalBody, ModalHeader } from './tailwind/Modal';
+import React from "react";
+import { atom, useRecoilState } from "recoil";
+import { ModalContainer, ModalFooter, ModalBody, ModalHeader } from "./tailwind/Modal";
 
 const closedState = {
   open: false,
   options: {
-    title: 'Voulez-vous enregistrer cet élément ?',
-    subTitle: '',
+    title: "Voulez-vous enregistrer cet élément ?",
+    subTitle: "",
     buttons: [
       {
-        text: 'Enregistrer',
-        onClick: async () => console.log('onClick'),
+        text: "Enregistrer",
+        onClick: async () => console.log("onClick"),
       },
       {
-        text: 'Ne pas enregistrer',
-        onClick: async () => console.log('onBack'),
-        style: 'danger', // available styles: primary | secondary | cancel | danger | warning
+        text: "Ne pas enregistrer",
+        onClick: async () => console.log("onBack"),
+        style: "danger", // available styles: primary | secondary | cancel | danger | warning
       },
       {
-        text: 'Annuler',
-        style: 'link',
-        onClick: async () => console.log('cancel'),
+        text: "Annuler",
+        style: "link",
+        onClick: async () => console.log("cancel"),
       },
     ],
   },
 };
 
 export const modalConfirmState = atom({
-  key: 'modalConfirmState',
+  key: "modalConfirmState",
   default: closedState,
 });
 
@@ -49,7 +49,8 @@ const ModalConfirm = () => {
       size="lg"
       onAfterLeave={() => {
         setModalConfirmState(closedState);
-      }}>
+      }}
+    >
       <ModalHeader title={title} />
       {!!subTitle && (
         <ModalBody>
@@ -66,7 +67,8 @@ const ModalConfirm = () => {
             onClick={async () => {
               onClick?.();
               close();
-            }}>
+            }}
+          >
             {text}
           </button>
         ))}

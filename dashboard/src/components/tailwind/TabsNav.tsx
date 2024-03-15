@@ -20,12 +20,13 @@ export default function TabsNav({ tabs, className, onClick, activeTabIndex, rend
                 onClick(tab, index);
               }}
               className={[
-                activeTabIndex === index ? 'tw-bg-main/10 tw-text-black' : 'tw-hover:text-gray-700 tw-text-main',
-                'tw-rounded-md tw-px-3 tw-py-2 tw-text-sm tw-font-medium',
+                activeTabIndex === index ? "tw-bg-main/10 tw-text-black" : "tw-hover:text-gray-700 tw-text-main",
+                "tw-rounded-md tw-px-3 tw-py-2 tw-text-sm tw-font-medium",
               ]
                 .filter(Boolean)
-                .join(' ')}
-              aria-current={activeTabIndex ? 'page' : undefined}>
+                .join(" ")}
+              aria-current={activeTabIndex ? "page" : undefined}
+            >
               {renderTab(tab)}
             </button>
           </li>

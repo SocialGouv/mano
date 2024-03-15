@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from "react";
 
-export default function AutoResizeTextarea({ name, value, onChange, rows = 1, placeholder = 'Description', id }) {
+export default function AutoResizeTextarea({ name, value, onChange, rows = 1, placeholder = "Description", id }) {
   const [resizedHeight, setResizedHeight] = useState(null);
   const textbox = useRef(null);
   useEffect(() => {
@@ -35,8 +35,8 @@ export default function AutoResizeTextarea({ name, value, onChange, rows = 1, pl
 
   return (
     <div className="tw-relative tw-h-min tw-w-full tw-grow">
-      <div aria-hidden className="tw-pointer-events-none tw-invisible tw-py-1.5 tw-px-3" placeholder={placeholder} style={style}>
-        {value?.split('\n').map((item, key) => (
+      <div aria-hidden className="tw-pointer-events-none tw-invisible tw-px-3 tw-py-1.5" placeholder={placeholder} style={style}>
+        {value?.split("\n").map((item, key) => (
           <span key={key}>
             {item}
             <br />
@@ -49,7 +49,7 @@ export default function AutoResizeTextarea({ name, value, onChange, rows = 1, pl
         name={name}
         id={id || name}
         onChange={onChange}
-        className="tw-absolute tw-inset-0 tw-h-full tw-w-full tw-py-1.5 tw-px-3"
+        className="tw-absolute tw-inset-0 tw-h-full tw-w-full tw-px-3 tw-py-1.5"
         placeholder={placeholder}
         rows={rows}
       />

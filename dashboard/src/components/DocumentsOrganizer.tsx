@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import SortableJS from 'sortablejs';
-import type { DocumentWithLinkedItem, DocumentOrFolderId, FolderWithLinkedItem, Folder } from '../types/document';
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import SortableJS from "sortablejs";
+import type { DocumentWithLinkedItem, DocumentOrFolderId, FolderWithLinkedItem, Folder } from "../types/document";
 // import UserName from './UserName';
-import { useRecoilValue } from 'recoil';
-import { organisationAuthentifiedState } from '../recoil/auth';
-import UserName from './UserName';
-import { formatDateTimeWithNameOfDay } from '../services/date';
+import { useRecoilValue } from "recoil";
+import { organisationAuthentifiedState } from "../recoil/auth";
+import UserName from "./UserName";
+import { formatDateTimeWithNameOfDay } from "../services/date";
 
 type Item = DocumentWithLinkedItem | FolderWithLinkedItem;
 
@@ -25,9 +25,9 @@ interface DocumentsOrganizerProps {
   onSave: (newOrder: Array<Item>) => Promise<boolean>;
   onFolderClick: (folder: FolderForTree) => void;
   onDocumentClick: (document: DocumentForTree) => void;
-  color: 'main' | 'blue-900';
-  htmlId: 'social' | 'family' | 'medical';
-  rootFolderName?: 'Dossier Racine' | '👪 Documents familiaux';
+  color: "main" | "blue-900";
+  htmlId: "social" | "family" | "medical";
+  rootFolderName?: "Dossier Racine" | "👪 Documents familiaux";
 }
 
 const modalWidth = window.innerWidth * 0.9;
@@ -37,13 +37,13 @@ const informationsStyle = { flexBasis: informationsWidth };
 export default function DocumentsOrganizer({
   items,
   htmlId,
-  rootFolderName = 'Dossier Racine',
+  rootFolderName = "Dossier Racine",
   onSave,
   onFolderClick,
   onDocumentClick,
   color,
 }: DocumentsOrganizerProps) {
-  const [openedFolderIds, setOpenedFolderIds] = useState<DocumentOrFolderId[]>(['root']);
+  const [openedFolderIds, setOpenedFolderIds] = useState<DocumentOrFolderId[]>(["root"]);
 
   const itemsRef = useRef(items);
   const documentsTree = useMemo(() => {
@@ -59,11 +59,11 @@ export default function DocumentsOrganizer({
     let elements = document.getElementById(`${htmlId}-documents`)?.querySelectorAll('[data-visible="true"]') || [];
     for (let i = 0; i < elements.length; i++) {
       if (i % 2 === 0) {
-        elements[i].classList.add('before:tw-bg-opacity-0');
-        elements[i].classList.remove('before:tw-bg-opacity-5');
+        elements[i].classList.add("before:tw-bg-opacity-0");
+        elements[i].classList.remove("before:tw-bg-opacity-5");
       } else {
-        elements[i].classList.add('before:tw-bg-opacity-5');
-        elements[i].classList.remove('before:tw-bg-opacity-0');
+        elements[i].classList.add("before:tw-bg-opacity-5");
+        elements[i].classList.remove("before:tw-bg-opacity-0");
       }
     }
   }, [documentsTree, htmlId, openedFolderIds]);
@@ -77,7 +77,7 @@ export default function DocumentsOrganizer({
   const onListChange = useCallback(
     async (save: boolean) => {
       if (!rootRef.current) return;
-      if (htmlId === 'family') return;
+      if (htmlId === "family") return;
       setIsSaving(true);
       const elementsNewState = getElementsNewState(rootRef.current.children[0] as HTMLDivElement);
       const newOrder = elementsNewState.map((newItem) => {
@@ -116,14 +116,15 @@ export default function DocumentsOrganizer({
         // key={reloadTreeKey}
 
         ref={rootRef}
-        className="tw-overflow-x-hidden tw-pb-10 tw-text-gray-800">
+        className="tw-overflow-x-hidden tw-pb-10 tw-text-gray-800"
+      >
         <Branch
           key={JSON.stringify(items)}
           parentId="root"
           movable={false}
           position={0}
           folder={documentsTree}
-          level={rootFolderName === 'Dossier Racine' ? -1 : 0} // -1 because root is not displayed and we want all the root items to be stuck to the left
+          level={rootFolderName === "Dossier Racine" ? -1 : 0} // -1 because root is not displayed and we want all the root items to be stuck to the left
           htmlId={htmlId}
           initShowOpen
           onListChange={onListChange}
@@ -135,7 +136,7 @@ export default function DocumentsOrganizer({
         />
       </div>
       {!!isSaving && (
-        <div className="tw-pointer-events-none tw-absolute tw-top-0 tw-left-0 tw-h-full tw-w-full tw-bg-gray-500 tw-opacity-25">
+        <div className="tw-pointer-events-none tw-absolute tw-left-0 tw-top-0 tw-h-full tw-w-full tw-bg-gray-500 tw-opacity-25">
           {/* <Loader color="#bbbbbb" size={40} /> */}
         </div>
       )}
@@ -148,7 +149,7 @@ interface BranchProps {
   level: number;
   position: number;
   movable?: boolean;
-  htmlId: 'social' | 'family' | 'medical';
+  htmlId: "social" | "family" | "medical";
   parentId: DocumentOrFolderId;
   initShowOpen: boolean;
   onListChange: (save: boolean) => void;
@@ -156,7 +157,7 @@ interface BranchProps {
   onDocumentClick: (document: DocumentForTree) => void;
   setOpenedFolderIds: (ids: DocumentOrFolderId[]) => void;
   openedFolderIds: DocumentOrFolderId[];
-  color: 'main' | 'blue-900';
+  color: "main" | "blue-900";
 }
 
 function Branch({
@@ -183,13 +184,13 @@ function Branch({
   const sortableRef = useRef<SortableJS>();
   useEffect(() => {
     if (!gridRef.current) return;
-    if (htmlId === 'family') return;
+    if (htmlId === "family") return;
     sortableRef.current = SortableJS.create(gridRef.current, {
       animation: 150,
       group: `${htmlId}-documents`,
       invertSwap: true,
       // swapThreshold: 0.5,
-      filter: '.unmovable', // 'unmovable' class is not draggable
+      filter: ".unmovable", // 'unmovable' class is not draggable
       onEnd: () => onListChange(true),
     });
   }, [onListChange, htmlId]);
@@ -201,16 +202,18 @@ function Branch({
       data-parentid={parentId}
       data-id={folder._id}
       data-type="folder"
-      className="tw-relative tw-flex tw-flex-col">
-      {folder.name !== 'Dossier Racine' && (
+      className="tw-relative tw-flex tw-flex-col"
+    >
+      {folder.name !== "Dossier Racine" && (
         <span
-          data-visible={parentIsOpen ? 'true' : 'false'}
+          data-visible={parentIsOpen ? "true" : "false"}
           className={[
-            'tw-relative tw-inline-flex tw-max-w-full tw-justify-between tw-text-ellipsis tw-whitespace-nowrap tw-py-2 tw-pl-4',
+            "tw-relative tw-inline-flex tw-max-w-full tw-justify-between tw-text-ellipsis tw-whitespace-nowrap tw-py-2 tw-pl-4",
             `before:tw-pointer-events-none before:tw-absolute before:tw-right-0 before:tw-top-0 before:tw-h-full before:tw-bg-${color}`,
             `before:-tw-left-${level * 10}`,
-            movable ? '' : 'unmovable',
-          ].join(' ')}>
+            movable ? "" : "unmovable",
+          ].join(" ")}
+        >
           <div className="tw-flex tw-w-full tw-justify-between tw-overflow-hidden">
             <div className="tw-flex tw-flex-1 tw-items-center tw-overflow-hidden tw-pr-5">
               <small
@@ -221,9 +224,10 @@ function Branch({
                   } else {
                     setOpenedFolderIds([...openedFolderIds, folder._id]);
                   }
-                }}>
+                }}
+              >
                 {/* open ? arrow down : arrow right */}
-                {open ? '\u25BC' : '\u25B6'}
+                {open ? "\u25BC" : "\u25B6"}
               </small>
               <button
                 type="button"
@@ -232,10 +236,11 @@ function Branch({
                   const notRootFolder = folder as FolderForTree;
                   onFolderClick(notRootFolder);
                 }}
-                className={['tw-inline-flex tw-flex-1 tw-gap-x-2 tw-overflow-hidden', movable ? 'tw-cursor-default' : '!tw-cursor-not-allowed'].join(
-                  ' '
-                )}>
-                <span>{open ? '📂' : '📁'}</span>
+                className={["tw-inline-flex tw-flex-1 tw-gap-x-2 tw-overflow-hidden", movable ? "tw-cursor-default" : "!tw-cursor-not-allowed"].join(
+                  " "
+                )}
+              >
+                <span>{open ? "📂" : "📁"}</span>
                 <span className="tw-truncate">{folder.name}</span>
                 <span>({folder.children?.length || 0})</span>
               </button>
@@ -247,19 +252,21 @@ function Branch({
       {/* Folder's children */}
       <div
         ref={gridRef}
-        id={`child-container-${folder._id || 'root'}`}
-        className={['tw-flex tw-flex-col', level >= 0 ? 'tw-pl-10' : '', !open ? 'tw-hidden' : ''].join(' ')}>
+        id={`child-container-${folder._id || "root"}`}
+        className={["tw-flex tw-flex-col", level >= 0 ? "tw-pl-10" : "", !open ? "tw-hidden" : ""].join(" ")}
+      >
         {!folder.children?.length && !!open && (
           <p
             data-id="empty-folder"
             className={[
-              'unmovable tw-mb-1 tw-block tw-overflow-hidden tw-text-ellipsis tw-whitespace-nowrap tw-py-px tw-text-left tw-text-xs tw-text-gray-400',
-            ].join(' ')}>
+              "unmovable tw-mb-1 tw-block tw-overflow-hidden tw-text-ellipsis tw-whitespace-nowrap tw-py-px tw-text-left tw-text-xs tw-text-gray-400",
+            ].join(" ")}
+          >
             <span>Dossier vide</span>
           </p>
         )}
         {folder.children?.map((child, index) => {
-          if (child.type === 'folder') {
+          if (child.type === "folder") {
             child = child as FolderForTree;
             return (
               <Branch
@@ -306,7 +313,7 @@ interface DocumentRowProps {
   parentIsOpen: boolean;
   parentId: DocumentOrFolderId;
   onDocumentClick: (document: DocumentForTree) => void;
-  color: 'main' | 'blue-900';
+  color: "main" | "blue-900";
 }
 
 function DocumentRow({ document, level, parentIsOpen, position, parentId, color, onDocumentClick }: DocumentRowProps) {
@@ -314,22 +321,24 @@ function DocumentRow({ document, level, parentIsOpen, position, parentId, color,
 
   return (
     <div
-      data-visible={parentIsOpen ? 'true' : 'false'}
+      data-visible={parentIsOpen ? "true" : "false"}
       key={document._id}
       data-position={position}
       data-parentid={parentId}
       data-id={document._id}
       className={[
-        'tw-relative tw-flex tw-justify-between tw-text-ellipsis tw-whitespace-nowrap tw-pl-4 tw-text-gray-800',
+        "tw-relative tw-flex tw-justify-between tw-text-ellipsis tw-whitespace-nowrap tw-pl-4 tw-text-gray-800",
         `before:tw-pointer-events-none before:tw-absolute before:tw-right-0 before:tw-top-0 before:tw-h-full before:tw-bg-${color}`,
         `before:-tw-left-${level * 10}`,
-        !!document.group ? 'unmovable' : '',
-      ].join(' ')}>
+        !!document.group ? "unmovable" : "",
+      ].join(" ")}
+    >
       <div className="tw-flex tw-w-full tw-justify-between tw-overflow-hidden">
         <button
           type="button"
           onClick={() => onDocumentClick(document)}
-          className="tw-inline-flex tw-flex-1 tw-overflow-hidden tw-py-2 tw-pr-5 tw-text-left">
+          className="tw-inline-flex tw-flex-1 tw-overflow-hidden tw-py-2 tw-pr-5 tw-text-left"
+        >
           {!!organisation.groupsEnabled && !!document.group && (
             <span className="tw-mr-2 tw-text-xl" aria-label="Document familial" title="Document familial">
               👪
@@ -348,8 +357,8 @@ function DocumentRow({ document, level, parentIsOpen, position, parentId, color,
 }
 
 function Informations({ item }: { item: Item | FolderForTree | RootForTree }) {
-  if (item.type === 'folder') {
-    if (['root', 'treatment', 'consultation'].includes(item._id)) return null;
+  if (item.type === "folder") {
+    if (["root", "treatment", "consultation"].includes(item._id)) return null;
   }
   return (
     <div style={informationsStyle} className="tw-flex tw-shrink-0 tw-items-center tw-text-xs tw-text-gray-600">
@@ -363,15 +372,15 @@ function Informations({ item }: { item: Item | FolderForTree | RootForTree }) {
   );
 }
 
-const buildFolderTree = (items: Item[], rootFolderName: 'Dossier Racine' | '👪 Documents familiaux') => {
-  const rootFolderItem: Omit<Item, 'linkedItem'> = {
-    _id: 'root',
+const buildFolderTree = (items: Item[], rootFolderName: "Dossier Racine" | "👪 Documents familiaux") => {
+  const rootFolderItem: Omit<Item, "linkedItem"> = {
+    _id: "root",
     name: rootFolderName,
     position: 0,
-    parentId: 'NA', // for type safety easiness purpose
-    type: 'folder',
+    parentId: "NA", // for type safety easiness purpose
+    type: "folder",
     createdAt: new Date(),
-    createdBy: 'we do not care',
+    createdBy: "we do not care",
     movable: false,
   } as Item;
 
@@ -395,16 +404,16 @@ const buildFolderTree = (items: Item[], rootFolderName: 'Dossier Racine' | '👪
         return a.position - b.position;
       })
       .map((item) => {
-        if (item.type === 'folder') {
+        if (item.type === "folder") {
           return {
             ...item,
-            parentId: item.parentId || 'root',
+            parentId: item.parentId || "root",
             children: findChildren(item),
           } as FolderForTree;
         }
         return {
           ...item,
-          parentId: item.parentId || 'root',
+          parentId: item.parentId || "root",
         } as DocumentForTree;
       });
     return children;
@@ -428,15 +437,15 @@ const findChildrenRecursive = async (folder: HTMLDivElement, allItems: ItemState
   if (childrenContainer === null) return;
   for (const [index, child] of Object.entries(Array.from(childrenContainer.children))) {
     const childElement = child as HTMLDivElement;
-    if (childElement.dataset.id === 'empty-folder') continue;
-    if (childElement.dataset.id === 'family-documents') continue;
+    if (childElement.dataset.id === "empty-folder") continue;
+    if (childElement.dataset.id === "family-documents") continue;
     const updatedChild = {
       position: Number(index) + 1,
       parentId: folder.dataset.id,
       _id: childElement.dataset.id,
     };
     allItems.push(updatedChild);
-    if (childElement.dataset.type === 'folder') findChildrenRecursive(childElement, allItems);
+    if (childElement.dataset.type === "folder") findChildrenRecursive(childElement, allItems);
   }
 };
 

@@ -1,23 +1,23 @@
-import React, { useState } from 'react';
-import { utils, writeFile } from '@e965/xlsx';
+import React, { useState } from "react";
+import { utils, writeFile } from "@e965/xlsx";
 
-import ButtonCustom from '../../components/ButtonCustom';
-import { flattenedCustomFieldsPersonsSelector, personsState } from '../../recoil/persons';
-import { customFieldsObsSelector, territoryObservationsState } from '../../recoil/territoryObservations';
-import { organisationState, teamsState, usersState, userState } from '../../recoil/auth';
-import { commentsState } from '../../recoil/comments';
-import { actionsState } from '../../recoil/actions';
-import { placesState } from '../../recoil/places';
-import { reportsState } from '../../recoil/reports';
-import { territoriesState } from '../../recoil/territory';
-import { useRecoilValue } from 'recoil';
-import { passagesState } from '../../recoil/passages';
-import { rencontresState } from '../../recoil/rencontres';
-import { consultationsState } from '../../recoil/consultations';
-import { customFieldsMedicalFileSelector, medicalFileState } from '../../recoil/medicalFiles';
-import { treatmentsState } from '../../recoil/treatments';
-import API from '../../services/api';
-import { toast } from 'react-toastify';
+import ButtonCustom from "../../components/ButtonCustom";
+import { flattenedCustomFieldsPersonsSelector, personsState } from "../../recoil/persons";
+import { customFieldsObsSelector, territoryObservationsState } from "../../recoil/territoryObservations";
+import { organisationState, teamsState, usersState, userState } from "../../recoil/auth";
+import { commentsState } from "../../recoil/comments";
+import { actionsState } from "../../recoil/actions";
+import { placesState } from "../../recoil/places";
+import { reportsState } from "../../recoil/reports";
+import { territoriesState } from "../../recoil/territory";
+import { useRecoilValue } from "recoil";
+import { passagesState } from "../../recoil/passages";
+import { rencontresState } from "../../recoil/rencontres";
+import { consultationsState } from "../../recoil/consultations";
+import { customFieldsMedicalFileSelector, medicalFileState } from "../../recoil/medicalFiles";
+import { treatmentsState } from "../../recoil/treatments";
+import API from "../../services/api";
+import { toast } from "react-toastify";
 
 const createSheet = (data) => {
   /*
@@ -27,7 +27,7 @@ const createSheet = (data) => {
   ]
    */
 
-  const encryptionFields = ['encryptedEntityKey', 'entityKey'];
+  const encryptionFields = ["encryptedEntityKey", "entityKey"];
 
   const header = [
     ...data
@@ -50,13 +50,13 @@ const createSheet = (data) => {
           row.push(null);
           continue;
         }
-        if (typeof value === 'string') {
+        if (typeof value === "string") {
           // https://stackoverflow.com/questions/26837514/a-new-idea-on-how-to-beat-the-32-767-text-limit-in-excel
           row.push(value.substring(0, 32766));
           continue;
         }
-        if (typeof value[0] === 'string') {
-          row.push(value.join(', ').substring(0, 32766));
+        if (typeof value[0] === "string") {
+          row.push(value.join(", ").substring(0, 32766));
           continue;
         }
         row.push(JSON.stringify(value).substring(0, 32766));
@@ -149,38 +149,38 @@ const ExportData = () => {
     const reports = allReports.map((r) => {
       const report = {};
       for (const key of Object.keys(r)) {
-        if (key === 'services') continue;
+        if (key === "services") continue;
         report[key] = r[key];
       }
-      const reportServices = JSON.parse(r.services || '{}');
+      const reportServices = JSON.parse(r.services || "{}");
       for (const service of organisation.services || []) {
         report[service] = reportServices[service];
       }
       return report;
     });
     // actions
-    utils.book_append_sheet(workbook, createSheet(allActions), 'actions');
-    utils.book_append_sheet(workbook, createSheet(persons), 'personnes suivies');
-    utils.book_append_sheet(workbook, createSheet(allComments), 'comments');
-    utils.book_append_sheet(workbook, createSheet(allTerritories), 'territoires');
-    utils.book_append_sheet(workbook, createSheet(observations), 'observations de territoires');
-    utils.book_append_sheet(workbook, createSheet(allPlaces), 'lieux fréquentés');
-    utils.book_append_sheet(workbook, createSheet(teams), 'équipes');
-    utils.book_append_sheet(workbook, createSheet(users), 'utilisateurs');
-    utils.book_append_sheet(workbook, createSheet(reports), 'comptes rendus');
-    utils.book_append_sheet(workbook, createSheet(allPassages), 'passages');
-    utils.book_append_sheet(workbook, createSheet(allServices), 'services');
-    utils.book_append_sheet(workbook, createSheet(allRencontres), 'rencontres');
+    utils.book_append_sheet(workbook, createSheet(allActions), "actions");
+    utils.book_append_sheet(workbook, createSheet(persons), "personnes suivies");
+    utils.book_append_sheet(workbook, createSheet(allComments), "comments");
+    utils.book_append_sheet(workbook, createSheet(allTerritories), "territoires");
+    utils.book_append_sheet(workbook, createSheet(observations), "observations de territoires");
+    utils.book_append_sheet(workbook, createSheet(allPlaces), "lieux fréquentés");
+    utils.book_append_sheet(workbook, createSheet(teams), "équipes");
+    utils.book_append_sheet(workbook, createSheet(users), "utilisateurs");
+    utils.book_append_sheet(workbook, createSheet(reports), "comptes rendus");
+    utils.book_append_sheet(workbook, createSheet(allPassages), "passages");
+    utils.book_append_sheet(workbook, createSheet(allServices), "services");
+    utils.book_append_sheet(workbook, createSheet(allRencontres), "rencontres");
     if (user.healthcareProfessional) {
-      utils.book_append_sheet(workbook, createSheet(consultations), 'consultations');
-      utils.book_append_sheet(workbook, createSheet(allTreatments), 'treatments');
-      utils.book_append_sheet(workbook, createSheet(medicalFiles), 'medical-files');
+      utils.book_append_sheet(workbook, createSheet(consultations), "consultations");
+      utils.book_append_sheet(workbook, createSheet(allTreatments), "treatments");
+      utils.book_append_sheet(workbook, createSheet(medicalFiles), "medical-files");
     }
-    writeFile(workbook, 'data.xlsx');
+    writeFile(workbook, "data.xlsx");
     setIsExporting(false);
   };
 
-  if (!['admin'].includes(user.role)) return null;
+  if (!["admin"].includes(user.role)) return null;
 
   return (
     <ButtonCustom

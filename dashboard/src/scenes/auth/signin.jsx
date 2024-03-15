@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import validator from 'validator';
-import { Link, useHistory } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { detect } from 'detect-browser';
-import ButtonCustom from '../../components/ButtonCustom';
-import { DEFAULT_ORGANISATION_KEY } from '../../config';
-import PasswordInput from '../../components/PasswordInput';
-import { currentTeamState, organisationState, sessionInitialDateTimestamp, teamsState, usersState, userState } from '../../recoil/auth';
-import API, { setOrgEncryptionKey, authTokenState } from '../../services/api';
-import { useDataLoader } from '../../components/DataLoader';
-import useMinimumWidth from '../../services/useMinimumWidth';
-import { deploymentShortCommitSHAState } from '../../recoil/version';
+import React, { useState, useEffect } from "react";
+import validator from "validator";
+import { Link, useHistory } from "react-router-dom";
+import { toast } from "react-toastify";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { detect } from "detect-browser";
+import ButtonCustom from "../../components/ButtonCustom";
+import { DEFAULT_ORGANISATION_KEY } from "../../config";
+import PasswordInput from "../../components/PasswordInput";
+import { currentTeamState, organisationState, sessionInitialDateTimestamp, teamsState, usersState, userState } from "../../recoil/auth";
+import API, { setOrgEncryptionKey, authTokenState } from "../../services/api";
+import { useDataLoader } from "../../components/DataLoader";
+import useMinimumWidth from "../../services/useMinimumWidth";
+import { deploymentShortCommitSHAState } from "../../recoil/version";
 
 const SignIn = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
@@ -32,17 +32,17 @@ const SignIn = () => {
   const setToken = useSetRecoilState(authTokenState);
   const deploymentCommit = useRecoilValue(deploymentShortCommitSHAState);
 
-  const [signinForm, setSigninForm] = useState({ email: '', password: '', orgEncryptionKey: DEFAULT_ORGANISATION_KEY || '' });
-  const [signinFormErrors, setSigninFormErrors] = useState({ email: '', password: '', orgEncryptionKey: '' });
+  const [signinForm, setSigninForm] = useState({ email: "", password: "", orgEncryptionKey: DEFAULT_ORGANISATION_KEY || "" });
+  const [signinFormErrors, setSigninFormErrors] = useState({ email: "", password: "", orgEncryptionKey: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const isDesktop = useMinimumWidth('sm');
+  const isDesktop = useMinimumWidth("sm");
 
   useEffect(() => {
     if (isLoading !== true) return;
     if (isDesktop && !!organisation?.receptionEnabled) {
-      history.push('/reception');
+      history.push("/reception");
     } else {
-      history.push('/action');
+      history.push("/action");
     }
   }, [history, organisation, isLoading, isDesktop]);
 
@@ -51,7 +51,7 @@ const SignIn = () => {
   const onLogout = async () => {
     await API.logout();
     setShowErrors(false);
-    setUserName('');
+    setUserName("");
     setShowSelectTeam(false);
     setShowEncryption(false);
     setShowPassword(false);
@@ -60,18 +60,18 @@ const SignIn = () => {
 
   useEffect(() => {
     (async () => {
-      const { token, ok, user } = await API.get({ path: '/user/signin-token' });
+      const { token, ok, user } = await API.get({ path: "/user/signin-token" });
       if (ok && token && user) {
         setAuthViaCookie(true);
         const { organisation } = user;
-        if (organisation._id !== window.localStorage.getItem('mano-organisationId')) {
+        if (organisation._id !== window.localStorage.getItem("mano-organisationId")) {
           await resetCache();
         }
-        window.localStorage.setItem('mano-organisationId', organisation._id);
+        window.localStorage.setItem("mano-organisationId", organisation._id);
         setOrganisation(organisation);
         setUserName(user.name);
         setUser(user);
-        if (!!organisation.encryptionEnabled && !['superadmin'].includes(user.role)) setShowEncryption(true);
+        if (!!organisation.encryptionEnabled && !["superadmin"].includes(user.role)) setShowEncryption(true);
       }
 
       return setLoading(false);
@@ -82,9 +82,9 @@ const SignIn = () => {
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
-      const emailError = !authViaCookie && !validator.isEmail(signinForm.email) ? 'Adresse email invalide' : '';
-      const passwordError = !authViaCookie && validator.isEmpty(signinForm.password) ? 'Ce champ est obligatoire' : '';
-      const orgEncryptionKeyError = !!showEncryption && validator.isEmpty(signinForm.orgEncryptionKey) ? 'Ce champ est obligatoire' : '';
+      const emailError = !authViaCookie && !validator.isEmail(signinForm.email) ? "Adresse email invalide" : "";
+      const passwordError = !authViaCookie && validator.isEmpty(signinForm.password) ? "Ce champ est obligatoire" : "";
+      const orgEncryptionKeyError = !!showEncryption && validator.isEmpty(signinForm.orgEncryptionKey) ? "Ce champ est obligatoire" : "";
       if (emailError || passwordError || orgEncryptionKeyError) {
         setShowErrors(true);
         setSigninFormErrors({ email: emailError, password: passwordError, orgEncryptionKey: orgEncryptionKeyError });
@@ -104,57 +104,57 @@ const SignIn = () => {
         body.browseros = browser.os;
       }
 
-      const { user, token, ok } = authViaCookie ? await API.get({ path: '/user/signin-token' }) : await API.post({ path: '/user/signin', body });
+      const { user, token, ok } = authViaCookie ? await API.get({ path: "/user/signin-token" }) : await API.post({ path: "/user/signin", body });
       if (!ok) return setIsSubmitting(false);
       const { organisation } = user;
-      if (organisation._id !== window.localStorage.getItem('mano-organisationId')) {
+      if (organisation._id !== window.localStorage.getItem("mano-organisationId")) {
         await resetCache();
       }
       setOrganisation(organisation);
       setUser(user);
-      if (!!organisation.encryptionEnabled && !showEncryption && !['superadmin'].includes(user.role)) {
+      if (!!organisation.encryptionEnabled && !showEncryption && !["superadmin"].includes(user.role)) {
         setShowEncryption(true);
         return setIsSubmitting(false);
       }
       if (token) setToken(token);
       setSessionInitialTimestamp(Date.now());
-      window.localStorage.setItem('mano-organisationId', organisation._id);
-      if (!['superadmin'].includes(user.role) && !!signinForm.orgEncryptionKey) {
+      window.localStorage.setItem("mano-organisationId", organisation._id);
+      if (!["superadmin"].includes(user.role) && !!signinForm.orgEncryptionKey) {
         const encryptionIsValid = await setOrgEncryptionKey(signinForm.orgEncryptionKey.trim(), organisation);
         if (!encryptionIsValid) return setIsSubmitting(false);
       }
       // now login !
       // superadmin
-      if (['superadmin'].includes(user.role)) {
+      if (["superadmin"].includes(user.role)) {
         setIsSubmitting(false);
-        history.push('/organisation');
+        history.push("/organisation");
         return;
       }
-      const teamResponse = await API.get({ path: '/team' });
+      const teamResponse = await API.get({ path: "/team" });
       const teams = teamResponse.data;
-      const usersResponse = await API.get({ path: '/user', query: { minimal: true } });
+      const usersResponse = await API.get({ path: "/user", query: { minimal: true } });
       const users = usersResponse.data;
       setTeams(teams);
       setUsers(users);
       // onboarding
-      if (!organisation.encryptionEnabled && ['admin'].includes(user.role)) {
+      if (!organisation.encryptionEnabled && ["admin"].includes(user.role)) {
         history.push(`/organisation/${organisation._id}`);
         return;
       }
       if (!teams.length) {
-        history.push('/team');
+        history.push("/team");
         return;
       }
       // basic login
-      if (user.teams.length === 1 || (process.env.NODE_ENV === 'development' && import.meta.env.SKIP_TEAMS === 'true')) {
+      if (user.teams.length === 1 || (process.env.NODE_ENV === "development" && import.meta.env.SKIP_TEAMS === "true")) {
         setCurrentTeam(user.teams[0]);
         onSigninValidated();
         return;
       }
       setShowSelectTeam(true);
     } catch (signinError) {
-      console.log('error signin', signinError);
-      toast.error('Mauvais identifiants');
+      console.log("error signin", signinError);
+      toast.error("Mauvais identifiants");
     }
   };
   const handleChangeRequest = (e) => {
@@ -185,8 +185,8 @@ const SignIn = () => {
   }
 
   return (
-    <div className="tw-mx-10 tw-my-0 tw-w-full tw-max-w-lg tw-overflow-y-auto tw-overflow-x-hidden tw-rounded-lg tw-bg-white tw-px-7 tw-pt-10 tw-pb-2 tw-text-black sm:tw-drop-shadow-2xl">
-      <h1 className="tw-mb-6 tw-text-center tw-text-3xl tw-font-bold">{userName ? `Bienvenue ${userName?.split(' ')?.[0]}` : 'Bienvenue'}&nbsp;!</h1>
+    <div className="tw-mx-10 tw-my-0 tw-w-full tw-max-w-lg tw-overflow-y-auto tw-overflow-x-hidden tw-rounded-lg tw-bg-white tw-px-7 tw-pb-2 tw-pt-10 tw-text-black sm:tw-drop-shadow-2xl">
+      <h1 className="tw-mb-6 tw-text-center tw-text-3xl tw-font-bold">{userName ? `Bienvenue ${userName?.split(" ")?.[0]}` : "Bienvenue"}&nbsp;!</h1>
       <form onSubmit={handleSubmit} method="POST">
         {!authViaCookie && (
           <>
@@ -223,7 +223,7 @@ const SignIn = () => {
               </div>
               {!!showErrors && <p className="tw-text-xs tw-text-red-500">{signinFormErrors.password}</p>}
             </div>
-            <div className="tw-mb-5 -tw-mt-5 tw-text-right tw-text-sm">
+            <div className="-tw-mt-5 tw-mb-5 tw-text-right tw-text-sm">
               <Link to="/auth/forgot">Première connexion ou mot de passe oublié&nbsp;?</Link>
             </div>
           </>
@@ -268,7 +268,7 @@ const SignIn = () => {
             className="tw-m-auto tw-font-[Helvetica] !tw-text-base !tw-font-normal"
           />
         )}
-        <p className="tw-mx-auto tw-mt-5 tw-mb-0 tw-block tw-text-center tw-text-xs tw-text-gray-500">Version&nbsp;: {deploymentCommit}</p>
+        <p className="tw-mx-auto tw-mb-0 tw-mt-5 tw-block tw-text-center tw-text-xs tw-text-gray-500">Version&nbsp;: {deploymentCommit}</p>
       </form>
     </div>
   );

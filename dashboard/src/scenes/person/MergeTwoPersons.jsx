@@ -1,52 +1,52 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Col, Button, Row, Modal, ModalBody, ModalHeader } from 'reactstrap';
-import styled from 'styled-components';
-import { Formik } from 'formik';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { toast } from 'react-toastify';
-import dayjs from 'dayjs';
-import ButtonCustom from '../../components/ButtonCustom';
+import React, { useEffect, useMemo, useState } from "react";
+import { Col, Button, Row, Modal, ModalBody, ModalHeader } from "reactstrap";
+import styled from "styled-components";
+import { Formik } from "formik";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { toast } from "react-toastify";
+import dayjs from "dayjs";
+import ButtonCustom from "../../components/ButtonCustom";
 import {
   allowedPersonFieldsInHistorySelector,
   personFieldsIncludingCustomFieldsSelector,
   personsState,
   usePreparePersonForEncryption,
-} from '../../recoil/persons';
-import SelectCustom from '../../components/SelectCustom';
-import CustomFieldInput from '../../components/CustomFieldInput';
-import SelectTeamMultiple from '../../components/SelectTeamMultiple';
-import UserName from '../../components/UserName';
-import Table from '../../components/table';
-import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
-import API, { encryptItem } from '../../services/api';
-import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
-import { actionsState, prepareActionForEncryption } from '../../recoil/actions';
-import { passagesState, preparePassageForEncryption } from '../../recoil/passages';
-import { rencontresState, prepareRencontreForEncryption } from '../../recoil/rencontres';
-import { prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from '../../recoil/relPersonPlace';
-import { consultationsState, prepareConsultationForEncryption } from '../../recoil/consultations';
-import { prepareTreatmentForEncryption, treatmentsState } from '../../recoil/treatments';
-import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../recoil/medicalFiles';
-import { useDataLoader } from '../../components/DataLoader';
-import { getDuration } from '../stats/utils';
+} from "../../recoil/persons";
+import SelectCustom from "../../components/SelectCustom";
+import CustomFieldInput from "../../components/CustomFieldInput";
+import SelectTeamMultiple from "../../components/SelectTeamMultiple";
+import UserName from "../../components/UserName";
+import Table from "../../components/table";
+import { currentTeamState, organisationState, teamsState, userState } from "../../recoil/auth";
+import API, { encryptItem } from "../../services/api";
+import { commentsState, prepareCommentForEncryption } from "../../recoil/comments";
+import { actionsState, prepareActionForEncryption } from "../../recoil/actions";
+import { passagesState, preparePassageForEncryption } from "../../recoil/passages";
+import { rencontresState, prepareRencontreForEncryption } from "../../recoil/rencontres";
+import { prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from "../../recoil/relPersonPlace";
+import { consultationsState, prepareConsultationForEncryption } from "../../recoil/consultations";
+import { prepareTreatmentForEncryption, treatmentsState } from "../../recoil/treatments";
+import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from "../../recoil/medicalFiles";
+import { useDataLoader } from "../../components/DataLoader";
+import { getDuration } from "../stats/utils";
 
 const getRawValue = (field, value) => {
   try {
-    if (field.type === 'text') return <span>{value}</span>;
-    if (field.type === 'textarea') return <span>{value}</span>;
-    if (field.type === 'number') return <span>{value}</span>;
-    if (field.type === 'date') return <span>{dayjs(value).format('DD/MM/YYYY')}</span>;
-    if (field.type === 'date-with-time') return <span>{dayjs(value).format('DD/MM/YYYY HH:mm')}</span>;
-    if (field.type === 'duration') return <span>{getDuration(dayjs(value).unix()).join(' ')}</span>;
-    if (field.type === 'yes-no') return <span>{value}</span>;
-    if (field.type === 'enum') return <span>{value}</span>;
-    if (field.type === 'multi-choice') return <span>{(value || []).join(', ')}</span>;
-    if (field.type === 'boolean') return <input type="checkbox" defaultChecked={value} />;
+    if (field.type === "text") return <span>{value}</span>;
+    if (field.type === "textarea") return <span>{value}</span>;
+    if (field.type === "number") return <span>{value}</span>;
+    if (field.type === "date") return <span>{dayjs(value).format("DD/MM/YYYY")}</span>;
+    if (field.type === "date-with-time") return <span>{dayjs(value).format("DD/MM/YYYY HH:mm")}</span>;
+    if (field.type === "duration") return <span>{getDuration(dayjs(value).unix()).join(" ")}</span>;
+    if (field.type === "yes-no") return <span>{value}</span>;
+    if (field.type === "enum") return <span>{value}</span>;
+    if (field.type === "multi-choice") return <span>{(value || []).join(", ")}</span>;
+    if (field.type === "boolean") return <input type="checkbox" defaultChecked={value} />;
   } catch (e) {
     console.log(e);
     console.log(field, value);
   }
-  return '';
+  return "";
 };
 
 const initMergeValue = (field, originPerson = {}, personToMergeAndDelete = {}) => {
@@ -102,7 +102,7 @@ const MergeTwoPersons = ({ person }) => {
   const fields = useMemo(() => {
     if (!originPerson || !personToMergeAndDelete) return [];
     return [...new Set([...Object.keys(originPerson), ...Object.keys(personToMergeAndDelete)])]
-      .filter((fieldName) => !['_id', 'encryptedEntityKey', 'entityKey', 'createdAt', 'updatedAt', 'organisation', 'documents'].includes(fieldName))
+      .filter((fieldName) => !["_id", "encryptedEntityKey", "entityKey", "createdAt", "updatedAt", "organisation", "documents"].includes(fieldName))
       .map((fieldName) => allFields.find((f) => f.name === fieldName))
       .filter(Boolean);
   }, [originPerson, personToMergeAndDelete, allFields]);
@@ -112,7 +112,7 @@ const MergeTwoPersons = ({ person }) => {
     return [...new Set([...Object.keys(originPersonMedicalFile || {}), ...Object.keys(personToMergeMedicalFile || {})])]
       .filter(
         (fieldName) =>
-          !['_id', 'encryptedEntityKey', 'entityKey', 'createdAt', 'updatedAt', 'organisation', 'documents', 'person'].includes(fieldName)
+          !["_id", "encryptedEntityKey", "entityKey", "createdAt", "updatedAt", "organisation", "documents", "person"].includes(fieldName)
       )
       .map((fieldName) => customFieldsMedicalFile.find((f) => f.name === fieldName))
       .filter(Boolean);
@@ -136,7 +136,7 @@ const MergeTwoPersons = ({ person }) => {
       documents: [
         ...(originPerson.documents || []),
         ...(personToMergeAndDelete.documents || []).map((_docOrFolder) => {
-          if (_docOrFolder.type === 'folder') return _docOrFolder;
+          if (_docOrFolder.type === "folder") return _docOrFolder;
           const _doc = _docOrFolder;
           return {
             ..._doc,
@@ -164,7 +164,7 @@ const MergeTwoPersons = ({ person }) => {
       if (!!originValue?.length && !mergeValue?.length) continue;
       if (JSON.stringify(originValue) === JSON.stringify(mergeValue)) continue;
       alert(
-        'Les champs médicaux ne sont pas identiques. Vous devez être un·e professionnel·le de santé pour fusionner des dossiers médicaux différents.'
+        "Les champs médicaux ne sont pas identiques. Vous devez être un·e professionnel·le de santé pour fusionner des dossiers médicaux différents."
       );
       setPersonToMergeAndDelete(null);
       return;
@@ -176,8 +176,8 @@ const MergeTwoPersons = ({ person }) => {
       <ButtonCustom title="Fusionner avec un autre dossier" color="link" onClick={() => setOpen(true)} />
       <StyledModal isOpen={open} toggle={() => setOpen(false)} size="xl" centered>
         <ModalHeader toggle={() => setOpen(false)} color="danger">
-          <Row style={{ justifyContent: 'center', marginTop: 10 }}>
-            <Col style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }} md={4}>
+          <Row style={{ justifyContent: "center", marginTop: 10 }}>
+            <Col style={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }} md={4}>
               Fusionner
             </Col>
             <Col md={6}>
@@ -190,13 +190,13 @@ const MergeTwoPersons = ({ person }) => {
                 onChange={setOriginPerson}
                 value={originPerson}
                 getOptionValue={(i) => i._id}
-                getOptionLabel={(i) => i?.name || ''}
+                getOptionLabel={(i) => i?.name || ""}
               />
             </Col>
             <Col md={2} />
           </Row>
-          <Row style={{ justifyContent: 'center', marginTop: 10 }}>
-            <Col style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }} md={4}>
+          <Row style={{ justifyContent: "center", marginTop: 10 }}>
+            <Col style={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }} md={4}>
               avec
             </Col>
             <Col md={6}>
@@ -209,7 +209,7 @@ const MergeTwoPersons = ({ person }) => {
                 onChange={setPersonToMergeAndDelete}
                 value={personToMergeAndDelete}
                 getOptionValue={(i) => i._id}
-                getOptionLabel={(i) => i?.name || ''}
+                getOptionLabel={(i) => i?.name || ""}
               />
             </Col>
             <Col md={2} />
@@ -221,7 +221,7 @@ const MergeTwoPersons = ({ person }) => {
               initialValues={initMergedPerson}
               enableReinitialize
               onSubmit={async (body, { setSubmitting }) => {
-                if (!window.confirm('Cette opération est irréversible, êtes-vous sûr ?')) return;
+                if (!window.confirm("Cette opération est irréversible, êtes-vous sûr ?")) return;
                 if (!body.followedSince) body.followedSince = originPerson.createdAt;
                 body.entityKey = originPerson.entityKey;
 
@@ -322,7 +322,7 @@ const MergeTwoPersons = ({ person }) => {
                 })();
 
                 const response = await API.post({
-                  path: '/merge/persons',
+                  path: "/merge/persons",
                   body: {
                     mergedPerson: await encryptItem(mergedPerson),
                     mergedActions: await Promise.all(mergedActions.map(encryptItem)),
@@ -339,11 +339,11 @@ const MergeTwoPersons = ({ person }) => {
                 });
 
                 if (!response.ok) {
-                  toast.error('Échec de la fusion');
+                  toast.error("Échec de la fusion");
                   setSubmitting(false);
                   return;
                 }
-                toast.success('Fusion réussie !');
+                toast.success("Fusion réussie !");
 
                 setPersons((persons) => persons.filter((p) => p._id !== personToMergeAndDelete._id));
 
@@ -351,7 +351,8 @@ const MergeTwoPersons = ({ person }) => {
 
                 setOpen(false);
                 setSubmitting(false);
-              }}>
+              }}
+            >
               {({ values, handleChange, handleSubmit, isSubmitting }) => (
                 <>
                   <Table
@@ -360,41 +361,41 @@ const MergeTwoPersons = ({ person }) => {
                     rowKey="name"
                     columns={[
                       {
-                        dataKey: 'field',
+                        dataKey: "field",
                         render: (field) => {
-                          return <Field>{field.name === 'user' ? 'Créé(e) par' : field.label}</Field>;
+                          return <Field>{field.name === "user" ? "Créé(e) par" : field.label}</Field>;
                         },
                       },
                       {
                         title: originPerson?.name,
-                        dataKey: 'originPerson',
+                        dataKey: "originPerson",
                         render: (field) => {
-                          if (field.name === 'user')
+                          if (field.name === "user")
                             return (
                               <Col md={12}>
                                 <UserName id={originPerson.user} />
                               </Col>
                             );
-                          if (field.name === 'assignedTeams') {
-                            return <Col md={12}>{originPerson?.assignedTeams?.map((id) => teams.find((t) => t._id === id)?.name).join(', ')}</Col>;
+                          if (field.name === "assignedTeams") {
+                            return <Col md={12}>{originPerson?.assignedTeams?.map((id) => teams.find((t) => t._id === id)?.name).join(", ")}</Col>;
                           }
                           return getRawValue(field, originPerson[field.name] || originPersonMedicalFile?.[field.name]);
                         },
                       },
                       {
                         title: personToMergeAndDelete?.name,
-                        dataKey: 'personToMergeAndDelete',
+                        dataKey: "personToMergeAndDelete",
                         render: (field) => {
-                          if (field.name === 'user')
+                          if (field.name === "user")
                             return (
                               <Col md={12}>
                                 <UserName id={personToMergeAndDelete?.user} />
                               </Col>
                             );
-                          if (field.name === 'assignedTeams') {
+                          if (field.name === "assignedTeams") {
                             return (
                               <Col md={12}>
-                                {personToMergeAndDelete?.assignedTeams?.map((id) => teams.find((t) => t._id === id)?.name).join(', ')}
+                                {personToMergeAndDelete?.assignedTeams?.map((id) => teams.find((t) => t._id === id)?.name).join(", ")}
                               </Col>
                             );
                           }
@@ -402,24 +403,24 @@ const MergeTwoPersons = ({ person }) => {
                         },
                       },
                       {
-                        title: 'Je garde :',
-                        dataKey: 'keeping',
+                        title: "Je garde :",
+                        dataKey: "keeping",
                         render: (field) => {
-                          if (field.name === 'user')
+                          if (field.name === "user")
                             return (
                               <Col md={12}>
                                 <UserName
                                   id={values.user}
                                   canAddUser
-                                  handleChange={async (newUser) => handleChange({ currentTarget: { name: 'user', value: newUser } })}
+                                  handleChange={async (newUser) => handleChange({ currentTarget: { name: "user", value: newUser } })}
                                 />
                               </Col>
                             );
-                          if (field.name === 'assignedTeams')
+                          if (field.name === "assignedTeams")
                             return (
                               <Col md={12}>
                                 <SelectTeamMultiple
-                                  onChange={(teamIds) => handleChange({ target: { value: teamIds, name: 'assignedTeams' } })}
+                                  onChange={(teamIds) => handleChange({ target: { value: teamIds, name: "assignedTeams" } })}
                                   value={values.assignedTeams}
                                   colored
                                   inputId="person-select-assigned-team"
@@ -434,12 +435,12 @@ const MergeTwoPersons = ({ person }) => {
                       },
                     ]}
                   />
-                  <Row style={{ justifyContent: 'center', gap: '1rem', marginTop: '1rem' }}>
+                  <Row style={{ justifyContent: "center", gap: "1rem", marginTop: "1rem" }}>
                     <Button color="link" onClick={() => setOpen(false)}>
                       Annuler
                     </Button>
                     <Button disabled={isSubmitting} onClick={() => !isSubmitting && handleSubmit()}>
-                      {isSubmitting ? 'Fusion en cours' : 'Fusionner'}
+                      {isSubmitting ? "Fusion en cours" : "Fusionner"}
                     </Button>
                   </Row>
                 </>

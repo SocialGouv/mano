@@ -1,42 +1,42 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useHistory } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { useRecoilValue } from 'recoil';
-import { teamsState, userState } from '../../recoil/auth';
-import API from '../../services/api';
-import { formatDateWithFullMonth } from '../../services/date';
-import useTitle from '../../services/useTitle';
-import { useLocalStorage } from '../../services/useLocalStorage';
-import { ModalBody, ModalContainer, ModalHeader, ModalFooter } from '../../components/tailwind/Modal';
-import { SmallHeader } from '../../components/header';
-import SelectTeamMultiple from '../../components/SelectTeamMultiple';
-import Loading from '../../components/loading';
-import Table from '../../components/table';
-import TagTeam from '../../components/TagTeam';
-import SelectRole from '../../components/SelectRole';
-import { emailRegex } from '../../utils';
+import React, { useEffect, useMemo, useState } from "react";
+import { useHistory } from "react-router-dom";
+import { toast } from "react-toastify";
+import { useRecoilValue } from "recoil";
+import { teamsState, userState } from "../../recoil/auth";
+import API from "../../services/api";
+import { formatDateWithFullMonth } from "../../services/date";
+import useTitle from "../../services/useTitle";
+import { useLocalStorage } from "../../services/useLocalStorage";
+import { ModalBody, ModalContainer, ModalHeader, ModalFooter } from "../../components/tailwind/Modal";
+import { SmallHeader } from "../../components/header";
+import SelectTeamMultiple from "../../components/SelectTeamMultiple";
+import Loading from "../../components/loading";
+import Table from "../../components/table";
+import TagTeam from "../../components/TagTeam";
+import SelectRole from "../../components/SelectRole";
+import { emailRegex } from "../../utils";
 
-const defaultSort = (a, b, sortOrder) => (sortOrder === 'ASC' ? (a.name || '').localeCompare(b.name) : (b.name || '').localeCompare(a.name));
+const defaultSort = (a, b, sortOrder) => (sortOrder === "ASC" ? (a.name || "").localeCompare(b.name) : (b.name || "").localeCompare(a.name));
 
 const sortUsers = (sortBy, sortOrder) => (a, b) => {
-  if (sortBy === 'email') {
-    return sortOrder === 'ASC' ? a.email.localeCompare(b.email) : b.email.localeCompare(a.email);
+  if (sortBy === "email") {
+    return sortOrder === "ASC" ? a.email.localeCompare(b.email) : b.email.localeCompare(a.email);
   }
-  if (sortBy === 'role') {
+  if (sortBy === "role") {
     if (a.role === b.role) return defaultSort(a, b, sortOrder);
-    return sortOrder === 'ASC' ? a.role.localeCompare(b.role) : b.role.localeCompare(a.role);
+    return sortOrder === "ASC" ? a.role.localeCompare(b.role) : b.role.localeCompare(a.role);
   }
-  if (sortBy === 'createdAt') {
-    if (a.createdAt > b.createdAt) return sortOrder === 'ASC' ? 1 : -1;
-    if (a.createdAt < b.createdAt) return sortOrder === 'ASC' ? -1 : 1;
+  if (sortBy === "createdAt") {
+    if (a.createdAt > b.createdAt) return sortOrder === "ASC" ? 1 : -1;
+    if (a.createdAt < b.createdAt) return sortOrder === "ASC" ? -1 : 1;
     return defaultSort(a, b, sortOrder);
   }
-  if (sortBy === 'lastLoginAt') {
+  if (sortBy === "lastLoginAt") {
     if (!a.lastLoginAt && !b.lastLoginAt) return defaultSort(a, b, sortOrder);
-    if (!a.lastLoginAt) return sortOrder === 'ASC' ? 1 : -1;
-    if (!b.lastLoginAt) return sortOrder === 'ASC' ? -1 : 1;
-    if (a.lastLoginAt > b.lastLoginAt) return sortOrder === 'ASC' ? 1 : -1;
-    if (a.lastLoginAt < b.lastLoginAt) return sortOrder === 'ASC' ? -1 : 1;
+    if (!a.lastLoginAt) return sortOrder === "ASC" ? 1 : -1;
+    if (!b.lastLoginAt) return sortOrder === "ASC" ? -1 : 1;
+    if (a.lastLoginAt > b.lastLoginAt) return sortOrder === "ASC" ? 1 : -1;
+    if (a.lastLoginAt < b.lastLoginAt) return sortOrder === "ASC" ? -1 : 1;
     return defaultSort(a, b, sortOrder);
   }
   // default sort: name
@@ -48,15 +48,15 @@ const List = () => {
   const history = useHistory();
   const [refresh, setRefresh] = useState(true);
   const user = useRecoilValue(userState);
-  useTitle('Utilisateurs');
+  useTitle("Utilisateurs");
 
-  const [sortBy, setSortBy] = useLocalStorage('users-sortBy', 'createdAt');
-  const [sortOrder, setSortOrder] = useLocalStorage('users-sortOrder', 'ASC');
+  const [sortBy, setSortBy] = useLocalStorage("users-sortBy", "createdAt");
+  const [sortOrder, setSortOrder] = useLocalStorage("users-sortOrder", "ASC");
 
   const data = useMemo(() => users.sort(sortUsers(sortBy, sortOrder)), [users, sortBy, sortOrder]);
 
   useEffect(() => {
-    API.get({ path: '/user' }).then((response) => {
+    API.get({ path: "/user" }).then((response) => {
       if (response.error) {
         toast.error(response.error);
         return false;
@@ -70,39 +70,39 @@ const List = () => {
   return (
     <>
       <SmallHeader title="Utilisateurs" />
-      {['admin'].includes(user.role) && <Create users={users} onChange={() => setRefresh(true)} />}
+      {["admin"].includes(user.role) && <Create users={users} onChange={() => setRefresh(true)} />}
       <Table
         data={data}
-        rowKey={'_id'}
+        rowKey={"_id"}
         onRowClick={(user) => history.push(`/user/${user._id}`)}
         columns={[
           {
-            title: 'Nom',
-            dataKey: 'name',
+            title: "Nom",
+            dataKey: "name",
             onSortOrder: setSortOrder,
             onSortBy: setSortBy,
             sortOrder,
             sortBy,
           },
           {
-            title: 'Email',
-            dataKey: 'email',
+            title: "Email",
+            dataKey: "email",
             onSortOrder: setSortOrder,
             onSortBy: setSortBy,
             sortOrder,
             sortBy,
           },
           {
-            title: 'Téléphone',
-            dataKey: 'phone',
+            title: "Téléphone",
+            dataKey: "phone",
             onSortOrder: setSortOrder,
             onSortBy: setSortBy,
             sortOrder,
             sortBy,
           },
           {
-            title: 'Rôle',
-            dataKey: 'role',
+            title: "Rôle",
+            dataKey: "role",
             onSortOrder: setSortOrder,
             onSortBy: setSortBy,
             sortOrder,
@@ -111,14 +111,14 @@ const List = () => {
               return (
                 <>
                   <div>{user.role}</div>
-                  {user.healthcareProfessional ? <div>🧑‍⚕️ professionnel·le de santé</div> : ''}
+                  {user.healthcareProfessional ? <div>🧑‍⚕️ professionnel·le de santé</div> : ""}
                 </>
               );
             },
           },
           {
-            title: 'Équipes',
-            dataKey: 'teams',
+            title: "Équipes",
+            dataKey: "teams",
             render: (user) => {
               return (
                 <div className="tw-flex tw-flex-col tw-gap-1">
@@ -131,8 +131,8 @@ const List = () => {
           },
 
           {
-            title: 'Créé le',
-            dataKey: 'createdAt',
+            title: "Créé le",
+            dataKey: "createdAt",
             onSortOrder: setSortOrder,
             onSortBy: setSortBy,
             sortOrder,
@@ -140,8 +140,8 @@ const List = () => {
             render: (i) => formatDateWithFullMonth(i.createdAt),
           },
           {
-            title: 'Dernière connexion le',
-            dataKey: 'lastLoginAt',
+            title: "Dernière connexion le",
+            dataKey: "lastLoginAt",
             onSortOrder: setSortOrder,
             onSortBy: setSortBy,
             sortOrder,
@@ -161,10 +161,10 @@ const Create = ({ onChange, users }) => {
   const teams = useRecoilValue(teamsState);
   const initialState = useMemo(() => {
     return {
-      name: '',
-      email: '',
-      phone: '',
-      role: 'normal',
+      name: "",
+      email: "",
+      phone: "",
+      role: "normal",
       team: teams.map((t) => t._id),
       healthcareProfessional: false,
     };
@@ -181,7 +181,7 @@ const Create = ({ onChange, users }) => {
 
   const handleSubmit = async () => {
     try {
-      if (data.role === 'restricted-access') data.healthcareProfessional = false;
+      if (data.role === "restricted-access") data.healthcareProfessional = false;
       if (!data.email) {
         toast.error("L'email est obligatoire");
         return false;
@@ -191,25 +191,25 @@ const Create = ({ onChange, users }) => {
         return false;
       }
       if (!data.role) {
-        toast.error('Le rôle est obligatoire');
+        toast.error("Le rôle est obligatoire");
         return false;
       }
       if (!data.team?.length) {
-        toast.error('Veuillez sélectionner une équipe');
+        toast.error("Veuillez sélectionner une équipe");
         return false;
       }
       setIsSubmitting(true);
-      const { ok } = await API.post({ path: '/user', body: data });
+      const { ok } = await API.post({ path: "/user", body: data });
       setIsSubmitting(false);
       if (!ok) {
         return false;
       }
-      toast.success('Création réussie !');
+      toast.success("Création réussie !");
       onChange();
       setData(initialState);
       return true;
     } catch (errorCreatingUser) {
-      console.log('error in creating user', errorCreatingUser);
+      console.log("error in creating user", errorCreatingUser);
       toast.error(errorCreatingUser.message);
       setIsSubmitting(false);
       return false;
@@ -230,7 +230,8 @@ const Create = ({ onChange, users }) => {
             onSubmit={async (e) => {
               e.preventDefault();
               await handleSubmit();
-            }}>
+            }}
+          >
             <div className="tw-flex tw-w-full tw-flex-wrap">
               <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
                 <label htmlFor="email">Email</label>
@@ -250,7 +251,7 @@ const Create = ({ onChange, users }) => {
                 <label htmlFor="team">Équipe(s)</label>
                 <div className="tw-mt-1 tw-w-full">
                   <SelectTeamMultiple
-                    onChange={(teamIds) => handleChange({ target: { value: teamIds, name: 'team' } })}
+                    onChange={(teamIds) => handleChange({ target: { value: teamIds, name: "team" } })}
                     value={data.team}
                     inputId="team"
                     name="team"
@@ -269,19 +270,19 @@ const Create = ({ onChange, users }) => {
                   onChange={handleChange}
                 />
               </div> */}
-              {data.role !== 'restricted-access' && (
+              {data.role !== "restricted-access" && (
                 <div className="tw-flex tw-basis-full tw-flex-col tw-px-4 tw-py-2">
                   <label htmlFor="healthcareProfessional" style={{ marginBottom: 0 }}>
                     <input
                       type="checkbox"
-                      style={{ marginRight: '0.5rem' }}
+                      style={{ marginRight: "0.5rem" }}
                       name="healthcareProfessional"
                       id="healthcareProfessional"
                       checked={data.healthcareProfessional}
                       onChange={() => {
                         handleChange({
                           target: {
-                            name: 'healthcareProfessional',
+                            name: "healthcareProfessional",
                             checked: Boolean(!data.healthcareProfessional),
                             value: Boolean(!data.healthcareProfessional),
                           },
@@ -323,7 +324,8 @@ const Create = ({ onChange, users }) => {
               const success = await handleSubmit();
               if (success) setOpen(false);
             }}
-            disabled={isSubmitting}>
+            disabled={isSubmitting}
+          >
             Créer et fermer
           </button>
           <button type="submit" className="button-submit" form="create-user-form" disabled={isSubmitting}>

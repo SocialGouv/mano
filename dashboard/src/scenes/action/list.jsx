@@ -1,30 +1,30 @@
-import { useMemo, useState } from 'react';
-import { selectorFamily, useRecoilValue } from 'recoil';
-import { useHistory } from 'react-router-dom';
-import { SmallHeader } from '../../components/header';
-import Search from '../../components/search';
-import ActionsCalendar from '../../components/ActionsCalendar';
-import ActionsWeekly from '../../components/ActionsWeekly';
-import SelectCustom from '../../components/SelectCustom';
-import { mappedIdsToLabels, TODO } from '../../recoil/actions';
-import { currentTeamState, teamsState, userState } from '../../recoil/auth';
-import { arrayOfitemsGroupedByActionSelector, arrayOfitemsGroupedByConsultationSelector } from '../../recoil/selectors';
-import { filterBySearch } from '../search/utils';
-import useTitle from '../../services/useTitle';
-import useSearchParamState from '../../services/useSearchParamState';
-import ButtonCustom from '../../components/ButtonCustom';
-import agendaIcon from '../../assets/icons/agenda-icon.svg';
-import ActionsCategorySelect from '../../components/tailwind/ActionsCategorySelect';
-import { useLocalStorage } from '../../services/useLocalStorage';
-import SelectTeamMultiple from '../../components/SelectTeamMultiple';
-import ActionsSortableList from '../../components/ActionsSortableList';
-import { dayjsInstance } from '../../services/date';
-import useMinimumWidth from '../../services/useMinimumWidth';
+import { useMemo, useState } from "react";
+import { selectorFamily, useRecoilValue } from "recoil";
+import { useHistory } from "react-router-dom";
+import { SmallHeader } from "../../components/header";
+import Search from "../../components/search";
+import ActionsCalendar from "../../components/ActionsCalendar";
+import ActionsWeekly from "../../components/ActionsWeekly";
+import SelectCustom from "../../components/SelectCustom";
+import { mappedIdsToLabels, TODO } from "../../recoil/actions";
+import { currentTeamState, teamsState, userState } from "../../recoil/auth";
+import { arrayOfitemsGroupedByActionSelector, arrayOfitemsGroupedByConsultationSelector } from "../../recoil/selectors";
+import { filterBySearch } from "../search/utils";
+import useTitle from "../../services/useTitle";
+import useSearchParamState from "../../services/useSearchParamState";
+import ButtonCustom from "../../components/ButtonCustom";
+import agendaIcon from "../../assets/icons/agenda-icon.svg";
+import ActionsCategorySelect from "../../components/tailwind/ActionsCategorySelect";
+import { useLocalStorage } from "../../services/useLocalStorage";
+import SelectTeamMultiple from "../../components/SelectTeamMultiple";
+import ActionsSortableList from "../../components/ActionsSortableList";
+import { dayjsInstance } from "../../services/date";
+import useMinimumWidth from "../../services/useMinimumWidth";
 
-const showAsOptions = ['Calendrier', 'Liste', 'Hebdomadaire'];
+const showAsOptions = ["Calendrier", "Liste", "Hebdomadaire"];
 
 const actionsByTeamAndStatusSelector = selectorFamily({
-  key: 'actionsByTeamAndStatusSelector',
+  key: "actionsByTeamAndStatusSelector",
   get:
     ({ statuses, categories, teamIds, viewAllOrganisationData, viewNoTeamData, actionsWithNoCategory }) =>
     ({ get }) => {
@@ -65,7 +65,7 @@ const actionsByTeamAndStatusSelector = selectorFamily({
 });
 
 const consultationsByStatusSelector = selectorFamily({
-  key: 'consultationsByStatusSelector',
+  key: "consultationsByStatusSelector",
   get:
     ({ statuses, teamIds, viewAllOrganisationData, viewNoTeamData }) =>
     ({ get }) => {
@@ -89,7 +89,7 @@ const consultationsByStatusSelector = selectorFamily({
 });
 
 const dataFilteredBySearchSelector = selectorFamily({
-  key: 'dataFilteredBySearchSelector',
+  key: "dataFilteredBySearchSelector",
   get:
     ({ search, statuses, categories, teamIds, viewAllOrganisationData, viewNoTeamData, actionsWithNoCategory }) =>
     ({ get }) => {
@@ -111,23 +111,23 @@ const dataFilteredBySearchSelector = selectorFamily({
 });
 
 const List = () => {
-  useTitle('Agenda');
+  useTitle("Agenda");
   const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
   const teams = useRecoilValue(teamsState);
 
   const history = useHistory();
-  const [search, setSearch] = useSearchParamState('search', '');
+  const [search, setSearch] = useSearchParamState("search", "");
 
-  const [categories, setCategories] = useLocalStorage('action-categories', []);
-  const [statuses, setStatuses] = useLocalStorage('action-statuses', [TODO]);
-  const [selectedTeamIds, setSelectedTeamIds] = useLocalStorage('action-teams', [currentTeam._id]);
-  const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('action-allOrg', false);
-  const [viewNoTeamData, setViewNoTeamData] = useLocalStorage('action-noTeam', false);
-  const [actionsWithNoCategory, setActionsWithNoCategory] = useLocalStorage('action-noCategory', false);
+  const [categories, setCategories] = useLocalStorage("action-categories", []);
+  const [statuses, setStatuses] = useLocalStorage("action-statuses", [TODO]);
+  const [selectedTeamIds, setSelectedTeamIds] = useLocalStorage("action-teams", [currentTeam._id]);
+  const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage("action-allOrg", false);
+  const [viewNoTeamData, setViewNoTeamData] = useLocalStorage("action-noTeam", false);
+  const [actionsWithNoCategory, setActionsWithNoCategory] = useLocalStorage("action-noCategory", false);
   const [mobileBottomSheetOpened, setMobileBottomSheetOpened] = useState(false);
 
-  const [showAs, setShowAs] = useLocalStorage('action-showAs', showAsOptions[0]); // calendar, list
+  const [showAs, setShowAs] = useLocalStorage("action-showAs", showAsOptions[0]); // calendar, list
   const dataConsolidated = useRecoilValue(
     dataFilteredBySearchSelector({
       search,
@@ -139,7 +139,7 @@ const List = () => {
       actionsWithNoCategory,
     })
   );
-  const isDesktop = useMinimumWidth('sm');
+  const isDesktop = useMinimumWidth("sm");
 
   const selectedTeams = useMemo(() => {
     if (viewAllOrganisationData) return teams;
@@ -158,17 +158,17 @@ const List = () => {
       <SmallHeader
         title={
           <span>
-            Agenda{' '}
+            Agenda{" "}
             {viewAllOrganisationData ? (
               <>de toute l'organisation</>
             ) : (
               <>
-                {selectedTeamIds.length > 1 ? 'des équipes' : "de l'équipe"}{' '}
+                {selectedTeamIds.length > 1 ? "des équipes" : "de l'équipe"}{" "}
                 <b>
                   {teams
                     .filter((t) => selectedTeamIds.includes(t._id))
                     .map((e) => e?.name)
-                    .join(', ')}
+                    .join(", ")}
                 </b>
               </>
             )}
@@ -183,13 +183,13 @@ const List = () => {
             disabled={!currentTeam}
             onClick={() => {
               const searchParams = new URLSearchParams(history.location.search);
-              searchParams.set('dueAt', dayjsInstance().toISOString());
-              searchParams.set('newAction', true);
+              searchParams.set("dueAt", dayjsInstance().toISOString());
+              searchParams.set("newAction", true);
               history.push(`?${searchParams.toString()}`);
             }}
             color="primary"
             title="Créer une nouvelle action"
-            padding={'12px 24px'}
+            padding={"12px 24px"}
           />
           {Boolean(user.healthcareProfessional) && (
             <ButtonCustom
@@ -197,13 +197,13 @@ const List = () => {
               disabled={!currentTeam}
               onClick={() => {
                 const searchParams = new URLSearchParams(history.location.search);
-                searchParams.set('dueAt', dayjsInstance().toISOString());
-                searchParams.set('newConsultation', true);
+                searchParams.set("dueAt", dayjsInstance().toISOString());
+                searchParams.set("newConsultation", true);
                 history.push(`?${searchParams.toString()}`);
               }}
               color="primary"
               title="Créer une nouvelle consultation"
-              padding={'12px 24px'}
+              padding={"12px 24px"}
             />
           )}
         </div>
@@ -327,8 +327,8 @@ const List = () => {
             actions={dataConsolidated}
             onCreateAction={(date) => {
               const searchParams = new URLSearchParams(history.location.search);
-              searchParams.set('dueAt', dayjsInstance(date).toISOString());
-              searchParams.set('newAction', true);
+              searchParams.set("dueAt", dayjsInstance(date).toISOString());
+              searchParams.set("newAction", true);
               history.push(`?${searchParams.toString()}`); // Update the URL with the new search parameters.
             }}
           />

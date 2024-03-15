@@ -1,42 +1,42 @@
-import { useEffect } from 'react';
-import { atom, selector, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { toast } from 'react-toastify';
+import { useEffect } from "react";
+import { atom, selector, useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { toast } from "react-toastify";
 
-import { personsState } from '../recoil/persons';
-import { groupsState } from '../recoil/groups';
-import { treatmentsState } from '../recoil/treatments';
-import { actionsState } from '../recoil/actions';
-import { medicalFileState } from '../recoil/medicalFiles';
-import { passagesState } from '../recoil/passages';
-import { rencontresState } from '../recoil/rencontres';
-import { reportsState } from '../recoil/reports';
-import { territoriesState } from '../recoil/territory';
-import { placesState } from '../recoil/places';
-import { relsPersonPlaceState } from '../recoil/relPersonPlace';
-import { territoryObservationsState } from '../recoil/territoryObservations';
-import { consultationsState, formatConsultation } from '../recoil/consultations';
-import { commentsState } from '../recoil/comments';
-import { organisationState, userState } from '../recoil/auth';
+import { personsState } from "../recoil/persons";
+import { groupsState } from "../recoil/groups";
+import { treatmentsState } from "../recoil/treatments";
+import { actionsState } from "../recoil/actions";
+import { medicalFileState } from "../recoil/medicalFiles";
+import { passagesState } from "../recoil/passages";
+import { rencontresState } from "../recoil/rencontres";
+import { reportsState } from "../recoil/reports";
+import { territoriesState } from "../recoil/territory";
+import { placesState } from "../recoil/places";
+import { relsPersonPlaceState } from "../recoil/relPersonPlace";
+import { territoryObservationsState } from "../recoil/territoryObservations";
+import { consultationsState, formatConsultation } from "../recoil/consultations";
+import { commentsState } from "../recoil/comments";
+import { organisationState, userState } from "../recoil/auth";
 
-import { clearCache, dashboardCurrentCacheKey, getCacheItemDefaultValue, setCacheItem } from '../services/dataManagement';
-import API from '../services/api';
-import { RandomPicture, RandomPicturePreloader } from './LoaderRandomPicture';
-import ProgressBar from './LoaderProgressBar';
-import useDataMigrator from './DataMigrator';
+import { clearCache, dashboardCurrentCacheKey, getCacheItemDefaultValue, setCacheItem } from "../services/dataManagement";
+import API from "../services/api";
+import { RandomPicture, RandomPicturePreloader } from "./LoaderRandomPicture";
+import ProgressBar from "./LoaderProgressBar";
+import useDataMigrator from "./DataMigrator";
 
 // Update to flush cache.
 
-const isLoadingState = atom({ key: 'isLoadingState', default: false });
-const fullScreenState = atom({ key: 'fullScreenState', default: true });
-const progressState = atom({ key: 'progressState', default: null });
-const totalState = atom({ key: 'totalState', default: null });
-const initialLoadingTextState = 'En attente de chargement';
-export const loadingTextState = atom({ key: 'loadingTextState', default: initialLoadingTextState });
-export const initialLoadIsDoneState = atom({ key: 'initialLoadIsDoneState', default: false });
+const isLoadingState = atom({ key: "isLoadingState", default: false });
+const fullScreenState = atom({ key: "fullScreenState", default: true });
+const progressState = atom({ key: "progressState", default: null });
+const totalState = atom({ key: "totalState", default: null });
+const initialLoadingTextState = "En attente de chargement";
+export const loadingTextState = atom({ key: "loadingTextState", default: initialLoadingTextState });
+export const initialLoadIsDoneState = atom({ key: "initialLoadIsDoneState", default: false });
 export const lastLoadState = atom({
-  key: 'lastLoadState',
+  key: "lastLoadState",
   default: selector({
-    key: 'lastLoadState/default',
+    key: "lastLoadState/default",
     get: async () => {
       const cache = await getCacheItemDefaultValue(dashboardCurrentCacheKey, 0);
       return cache;
@@ -73,7 +73,7 @@ export default function DataLoader() {
   }
 
   return (
-    <div className="tw-absolute tw-top-0 tw-left-0 tw-z-[1000] tw-box-border tw-w-full">
+    <div className="tw-absolute tw-left-0 tw-top-0 tw-z-[1000] tw-box-border tw-w-full">
       <ProgressBar progress={progress} total={total} loadingText={loadingText} />
     </div>
   );
@@ -142,13 +142,13 @@ export function useDataLoader(options = { refreshOnMount: false }) {
   async function loadOrRefreshData(isStartingInitialLoad) {
     setIsLoading(true);
     setFullScreen(isStartingInitialLoad);
-    setLoadingText(isStartingInitialLoad ? 'Chargement des données' : 'Mise à jour des données');
+    setLoadingText(isStartingInitialLoad ? "Chargement des données" : "Mise à jour des données");
 
     /*
     Refresh organisation (and user), to get the latest organisation fields
     and the latest user roles
   */
-    const userResponse = await API.get({ path: '/user/me' });
+    const userResponse = await API.get({ path: "/user/me" });
     if (!userResponse.ok) return resetLoaderOnError();
     const latestOrganisation = userResponse.user.organisation;
     const latestUser = userResponse.user;
@@ -161,7 +161,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     }
 
     const statsResponse = await API.get({
-      path: '/organisation/stats',
+      path: "/organisation/stats",
       query: {
         organisation: organisationId,
         after: lastLoadValue,
@@ -175,7 +175,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
 
     // Get date from server just after getting all the stats
     // We'll set the `lastLoadValue` to this date after all the data is downloaded
-    const serverDateResponse = await API.get({ path: '/now' });
+    const serverDateResponse = await API.get({ path: "/now" });
     const serverDate = serverDateResponse.data;
 
     const stats = statsResponse.data;
@@ -194,7 +194,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       stats.comments +
       stats.consultations;
 
-    if (['admin', 'normal'].includes(latestUser.role)) {
+    if (["admin", "normal"].includes(latestUser.role)) {
       itemsCount += stats.treatments + stats.medicalFiles;
     }
 
@@ -210,9 +210,9 @@ export function useDataLoader(options = { refreshOnMount: false }) {
 
     if (stats.persons > 0) {
       let newItems = [];
-      setLoadingText('Chargement des personnes');
+      setLoadingText("Chargement des personnes");
       async function loadPersons(page = 0) {
-        const res = await API.get({ path: '/person', query: { ...query, page: String(page) } });
+        const res = await API.get({ path: "/person", query: { ...query, page: String(page) } });
         if (!res.ok) return resetLoaderOnError();
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
@@ -225,9 +225,9 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     }
     if (stats.groups > 0) {
       let newItems = [];
-      setLoadingText('Chargement des familles');
+      setLoadingText("Chargement des familles");
       async function loadGroups(page = 0) {
-        const res = await API.get({ path: '/group', query: { ...query, page: String(page) } });
+        const res = await API.get({ path: "/group", query: { ...query, page: String(page) } });
         if (!res.ok) return resetLoaderOnError();
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
@@ -240,9 +240,9 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     }
     if (stats.reports > 0) {
       let newItems = [];
-      setLoadingText('Chargement des comptes-rendus');
+      setLoadingText("Chargement des comptes-rendus");
       async function loadReports(page = 0) {
-        const res = await API.get({ path: '/report', query: { ...query, page: String(page) } });
+        const res = await API.get({ path: "/report", query: { ...query, page: String(page) } });
         if (!res.ok) return resetLoaderOnError();
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
@@ -255,9 +255,9 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     }
     if (stats.passages > 0) {
       let newItems = [];
-      setLoadingText('Chargement des passages');
+      setLoadingText("Chargement des passages");
       async function loadPassages(page = 0) {
-        const res = await API.get({ path: '/passage', query: { ...query, page: String(page) } });
+        const res = await API.get({ path: "/passage", query: { ...query, page: String(page) } });
         if (!res.ok) return resetLoaderOnError();
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
@@ -270,9 +270,9 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     }
     if (stats.rencontres > 0) {
       let newItems = [];
-      setLoadingText('Chargement des rencontres');
+      setLoadingText("Chargement des rencontres");
       async function loadRencontres(page = 0) {
-        const res = await API.get({ path: '/rencontre', query: { ...query, page: String(page) } });
+        const res = await API.get({ path: "/rencontre", query: { ...query, page: String(page) } });
         if (!res.ok) return resetLoaderOnError();
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
@@ -285,9 +285,9 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     }
     if (stats.actions > 0) {
       let newItems = [];
-      setLoadingText('Chargement des actions');
+      setLoadingText("Chargement des actions");
       async function loadActions(page = 0) {
-        const res = await API.get({ path: '/action', query: { ...query, page: String(page) } });
+        const res = await API.get({ path: "/action", query: { ...query, page: String(page) } });
         if (!res.ok) return resetLoaderOnError();
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
@@ -300,9 +300,9 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     }
     if (stats.territories > 0) {
       let newItems = [];
-      setLoadingText('Chargement des territoires');
+      setLoadingText("Chargement des territoires");
       async function loadTerritories(page = 0) {
-        const res = await API.get({ path: '/territory', query: { ...query, page: String(page) } });
+        const res = await API.get({ path: "/territory", query: { ...query, page: String(page) } });
         if (!res.ok) return resetLoaderOnError();
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
@@ -315,9 +315,9 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     }
     if (stats.places > 0) {
       let newItems = [];
-      setLoadingText('Chargement des lieux');
+      setLoadingText("Chargement des lieux");
       async function loadPlaces(page = 0) {
-        const res = await API.get({ path: '/place', query: { ...query, page: String(page) } });
+        const res = await API.get({ path: "/place", query: { ...query, page: String(page) } });
         if (!res.ok) return resetLoaderOnError();
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
@@ -330,9 +330,9 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     }
     if (stats.relsPersonPlace > 0) {
       let newItems = [];
-      setLoadingText('Chargement des relations personne-lieu');
+      setLoadingText("Chargement des relations personne-lieu");
       async function loadRelPersonPlaces(page = 0) {
-        const res = await API.get({ path: '/relPersonPlace', query: { ...query, page: String(page) } });
+        const res = await API.get({ path: "/relPersonPlace", query: { ...query, page: String(page) } });
         if (!res.ok) return resetLoaderOnError();
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
@@ -345,9 +345,9 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     }
     if (stats.territoryObservations > 0) {
       let newItems = [];
-      setLoadingText('Chargement des observations de territoire');
+      setLoadingText("Chargement des observations de territoire");
       async function loadObservations(page = 0) {
-        const res = await API.get({ path: '/territory-observation', query: { ...query, page: String(page) } });
+        const res = await API.get({ path: "/territory-observation", query: { ...query, page: String(page) } });
         if (!res.ok) return resetLoaderOnError();
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
@@ -360,9 +360,9 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     }
     if (stats.comments > 0) {
       let newItems = [];
-      setLoadingText('Chargement des commentaires');
+      setLoadingText("Chargement des commentaires");
       async function loadComments(page = 0) {
-        const res = await API.get({ path: '/comment', query: { ...query, page: String(page) } });
+        const res = await API.get({ path: "/comment", query: { ...query, page: String(page) } });
         if (!res.ok) return resetLoaderOnError();
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
@@ -375,10 +375,10 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     }
     if (stats.consultations > 0) {
       let newItems = [];
-      setLoadingText('Chargement des consultations');
+      setLoadingText("Chargement des consultations");
       async function loadConsultations(page = 0) {
         const res = await API.get({
-          path: '/consultation',
+          path: "/consultation",
           query: { ...query, page: String(page), after: isStartingInitialLoad ? 0 : lastLoadValue },
         });
         if (!res.ok) return resetLoaderOnError();
@@ -391,11 +391,11 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       const consultationsSuccess = await loadConsultations(0);
       if (!consultationsSuccess) return false;
     }
-    if (['admin', 'normal'].includes(latestUser.role) && stats.treatments > 0) {
+    if (["admin", "normal"].includes(latestUser.role) && stats.treatments > 0) {
       let newItems = [];
-      setLoadingText('Chargement des traitements');
+      setLoadingText("Chargement des traitements");
       async function loadTreatments(page = 0) {
-        const res = await API.get({ path: '/treatment', query: { ...query, page: String(page), after: isStartingInitialLoad ? 0 : lastLoadValue } });
+        const res = await API.get({ path: "/treatment", query: { ...query, page: String(page), after: isStartingInitialLoad ? 0 : lastLoadValue } });
         if (!res.ok) return resetLoaderOnError();
         setProgress((p) => p + res.data.length);
         newItems.push(...res.decryptedData);
@@ -406,12 +406,12 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       const treatmentsSuccess = await loadTreatments(0);
       if (!treatmentsSuccess) return false;
     }
-    if (['admin', 'normal'].includes(latestUser.role) && stats.medicalFiles > 0) {
+    if (["admin", "normal"].includes(latestUser.role) && stats.medicalFiles > 0) {
       let newItems = [];
-      setLoadingText('Chargement des fichiers médicaux');
+      setLoadingText("Chargement des fichiers médicaux");
       async function loadMedicalFiles(page = 0) {
         const res = await API.get({
-          path: '/medical-file',
+          path: "/medical-file",
           query: { ...query, page: String(page), after: isStartingInitialLoad ? 0 : lastLoadValue },
         });
         if (!res.ok) return resetLoaderOnError();
@@ -427,7 +427,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
 
     setIsLoading(false);
     setLastLoad(serverDate);
-    setLoadingText('En attente de rafraichissement');
+    setLoadingText("En attente de rafraichissement");
     setProgress(null);
     setTotal(null);
     setInitialLoadIsDone(true);
@@ -439,8 +439,8 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     // this can result in data corruption, we need to reset the loader
     await clearCache();
     setLastLoad(0);
-    toast.error('Désolé, une erreur est survenue lors du chargement de vos données, veuillez réessayer', {
-      onClose: () => window.location.replace('/auth'),
+    toast.error("Désolé, une erreur est survenue lors du chargement de vos données, veuillez réessayer", {
+      onClose: () => window.location.replace("/auth"),
       autoClose: 5000,
     });
     return false;

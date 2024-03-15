@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
 
-import picture1 from '../assets/MANO_livraison_elements-07_green.png';
-import picture2 from '../assets/MANO_livraison_elements-08_green.png';
-import picture3 from '../assets/MANO_livraison_elements_Plan_de_travail_green.png';
+import picture1 from "../assets/MANO_livraison_elements-07_green.png";
+import picture2 from "../assets/MANO_livraison_elements-08_green.png";
+import picture3 from "../assets/MANO_livraison_elements_Plan_de_travail_green.png";
 
 function getRandomPicture() {
   return [picture1, picture3, picture2][new Date().getMinutes() % 3];

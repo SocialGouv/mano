@@ -1,5 +1,5 @@
 // types/user.ts
-import { UUIDV4 } from './uuid';
+import { UUIDV4 } from "./uuid";
 
 export type TeamInstance = {
   _id: UUIDV4;

@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { useRecoilState } from 'recoil';
-import ButtonCustom from '../../components/ButtonCustom';
-import { userState } from '../../recoil/auth';
-import API from '../../services/api';
-import OpenNewWindowIcon from '../../components/OpenNewWindowIcon';
+import React, { useState } from "react";
+import { useRecoilState } from "recoil";
+import ButtonCustom from "../../components/ButtonCustom";
+import { userState } from "../../recoil/auth";
+import API from "../../services/api";
+import OpenNewWindowIcon from "../../components/OpenNewWindowIcon";
 
 const CGUs = () => {
   const [loading, setLoading] = useState(false);
@@ -12,7 +12,7 @@ const CGUs = () => {
   const onSigninValidated = async () => {
     setLoading(true);
     const cgusAccepted = Date.now();
-    const response = await API.put({ path: '/user', body: { cgusAccepted } });
+    const response = await API.put({ path: "/user", body: { cgusAccepted } });
     if (!response.ok) return;
     setUser({ ...user, cgusAccepted });
   };
@@ -20,8 +20,9 @@ const CGUs = () => {
   return (
     <div
       className="tw-flex tw-w-full tw-flex-col tw-items-center tw-overflow-y-auto tw-overflow-x-hidden tw-rounded-lg tw-bg-white tw-py-20 tw-text-black"
-      id="cgus">
-      <h1 className="tw-mt-20 tw-mb-4 tw-text-center tw-text-3xl tw-font-semibold tw-text-main">Conditions Générales d'Utilisation de Mano</h1>
+      id="cgus"
+    >
+      <h1 className="tw-mb-4 tw-mt-20 tw-text-center tw-text-3xl tw-font-semibold tw-text-main">Conditions Générales d'Utilisation de Mano</h1>
       <small className="tw-block tw-text-center tw-font-medium tw-italic">
         Veuillez lire et accepter les Conditions Générales d'Utilisation de Mano avant de continuer
       </small>
@@ -235,7 +236,7 @@ const CGUs = () => {
           </p>
         </section>
         <section>
-          <h2 className="tw-mt-20 tw-mb-4">Article 5 - Responsabilités</h2>
+          <h2 className="tw-mb-4 tw-mt-20">Article 5 - Responsabilités</h2>
           <h3 className="tw-mb-4">5.1 Responsabilités de SESAN</h3>
           <p>
             Les sources des informations diffusées sur l’outil sont réputées fiables mais l’outil ne garantit pas qu’elles soient exemptes de défauts,
@@ -268,12 +269,12 @@ const CGUs = () => {
           <p>
             Par ailleurs, les Organisations et utilisateurs acceptent les caractéristiques et limites d’internet et, en particulier, reconnaissent
             avoir connaissance de la nature du réseau Internet et notamment de ses performances techniques. La responsabilité de SESAN ne saurait être
-            engagée à quelque titre que ce soit, sans que cette liste ne soit limitative :{' '}
+            engagée à quelque titre que ce soit, sans que cette liste ne soit limitative :{" "}
             <ol className="tw-list-inside tw-list-disc">
               <li>En cas de modification, suspension, interruption volontaire ou non, indisponibilité totale ou partielle du Service ; </li>
               <li>
                 Pour tout ce qui est inhérent à la fiabilité de la transmission des données, aux temps d’accès, et éventuelles restrictions du réseau
-                Internet ou des réseaux qui lui sont connectés.{' '}
+                Internet ou des réseaux qui lui sont connectés.{" "}
               </li>
               <li>
                 En cas d’interruption des réseaux d’accès au Service, d’erreur de transmission ou de problèmes liés à la sécurité des transmissions,
@@ -342,7 +343,7 @@ const CGUs = () => {
           <p>Il est rappelé que le SESAN n’a pas accès aux données renseignées par le Professionnel de santé.</p>
         </section>
         <section>
-          <h2 className="tw-mt-20 tw-mb-4">Article 6 – Hébergement de données de santé</h2>
+          <h2 className="tw-mb-4 tw-mt-20">Article 6 – Hébergement de données de santé</h2>
           <p>
             Chaque Organisation et Utilisateur de santé déclare être parfaitement informé que le SESAN n’est pas hébergeur de données de Santé. Le
             SESAN fait recours à un tiers hébergeur agréé.
@@ -354,7 +355,7 @@ const CGUs = () => {
           </p>
         </section>
         <section>
-          <h2 className="tw-mt-20 tw-mb-4">Article 7 Dispositions diverses</h2>
+          <h2 className="tw-mb-4 tw-mt-20">Article 7 Dispositions diverses</h2>
           <h3 className="tw-mb-4">7.1 Stipulations diverses</h3>
           <p>
             Dans l’hypothèse où une seule ou plusieurs stipulations des présentes seraient considérées comme nulles ou non avenues, cette disposition
@@ -471,7 +472,7 @@ const CGUs = () => {
         title="Accepter et continuer"
         onClick={onSigninValidated}
       />
-      <a className="tw-mt-3 tw-mb-20 tw-block tw-text-xs" href="/cgu.pdf" target="_blank" rel="noreferrer">
+      <a className="tw-mb-20 tw-mt-3 tw-block tw-text-xs" href="/cgu.pdf" target="_blank" rel="noreferrer">
         Télécharger le .pdf <OpenNewWindowIcon />
       </a>
     </div>

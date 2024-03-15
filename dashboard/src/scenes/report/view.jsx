@@ -1,28 +1,28 @@
-import { useEffect, useMemo } from 'react';
-import { useParams } from 'react-router-dom';
-import { addOneDay, dateForDatePicker, formatDateWithNameOfDay } from '../../services/date';
-import { HeaderStyled, Title as HeaderTitle } from '../../components/header';
+import { useEffect, useMemo } from "react";
+import { useParams } from "react-router-dom";
+import { addOneDay, dateForDatePicker, formatDateWithNameOfDay } from "../../services/date";
+import { HeaderStyled, Title as HeaderTitle } from "../../components/header";
 
-import dayjs from 'dayjs';
-import { TODO } from '../../recoil/actions';
-import ButtonCustom from '../../components/ButtonCustom';
-import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
-import { reportsState } from '../../recoil/reports';
-import { selectorFamily, useRecoilValue } from 'recoil';
-import { passagesState } from '../../recoil/passages';
-import useTitle from '../../services/useTitle';
-import SelectTeamMultiple from '../../components/SelectTeamMultiple';
-import { arrayOfitemsGroupedByPersonSelector, onlyFilledObservationsTerritories } from '../../recoil/selectors';
-import { ActionsOrConsultationsReport } from './components/ActionsOrConsultationsReport';
-import ServicesReport from './components/ServicesReport';
-import DateRangePickerWithPresets, { formatPeriod, reportsPresets } from '../../components/DateRangePickerWithPresets';
-import { CommentsSocialAndMedical } from './components/CommentsReport';
-import { PassagesReport } from './components/PassagesReport';
-import { RencontresReport } from './components/RencontresReport';
-import { ObservationsReport } from './components/ObservationsReport';
-import { PersonsReport } from './components/PersonsReport';
-import Transmissions from './components/Transmissions';
-import { useLocalStorage } from '../../services/useLocalStorage';
+import dayjs from "dayjs";
+import { TODO } from "../../recoil/actions";
+import ButtonCustom from "../../components/ButtonCustom";
+import { currentTeamState, organisationState, teamsState, userState } from "../../recoil/auth";
+import { reportsState } from "../../recoil/reports";
+import { selectorFamily, useRecoilValue } from "recoil";
+import { passagesState } from "../../recoil/passages";
+import useTitle from "../../services/useTitle";
+import SelectTeamMultiple from "../../components/SelectTeamMultiple";
+import { arrayOfitemsGroupedByPersonSelector, onlyFilledObservationsTerritories } from "../../recoil/selectors";
+import { ActionsOrConsultationsReport } from "./components/ActionsOrConsultationsReport";
+import ServicesReport from "./components/ServicesReport";
+import DateRangePickerWithPresets, { formatPeriod, reportsPresets } from "../../components/DateRangePickerWithPresets";
+import { CommentsSocialAndMedical } from "./components/CommentsReport";
+import { PassagesReport } from "./components/PassagesReport";
+import { RencontresReport } from "./components/RencontresReport";
+import { ObservationsReport } from "./components/ObservationsReport";
+import { PersonsReport } from "./components/PersonsReport";
+import Transmissions from "./components/Transmissions";
+import { useLocalStorage } from "../../services/useLocalStorage";
 
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithNameOfDay(date)}`;
@@ -40,7 +40,7 @@ const getPeriodTitle = (date, nightSession) => {
 };
 
 const itemsForReportsSelector = selectorFamily({
-  key: 'itemsForReportsSelector',
+  key: "itemsForReportsSelector",
   get:
     ({ period, viewAllOrganisationData, selectedTeamsObjectWithOwnPeriod }) =>
     ({ get }) => {
@@ -60,8 +60,8 @@ const itemsForReportsSelector = selectorFamily({
       const allReports = get(reportsState);
 
       const defaultIsoDates = {
-        isoStartDate: dayjs(period.startDate).startOf('day').toISOString(),
-        isoEndDate: dayjs(period.endDate).startOf('day').add(1, 'day').toISOString(),
+        isoStartDate: dayjs(period.startDate).startOf("day").toISOString(),
+        isoEndDate: dayjs(period.endDate).startOf("day").add(1, "day").toISOString(),
       };
 
       const personsCreated = {};
@@ -81,7 +81,7 @@ const itemsForReportsSelector = selectorFamily({
         // get persons for reports for period
         const createdDate = person.followedSince || person.createdAt;
 
-        if (filterItemByTeam(person, 'assignedTeams')) {
+        if (filterItemByTeam(person, "assignedTeams")) {
           const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[person.assignedTeams] ?? defaultIsoDates;
           if (createdDate >= isoStartDate && createdDate < isoEndDate) {
             personsCreated[person._id] = person;
@@ -96,7 +96,7 @@ const itemsForReportsSelector = selectorFamily({
         }
         // get actions for period
         for (const action of person.actions || []) {
-          if (!filterItemByTeam(action, 'teams')) continue;
+          if (!filterItemByTeam(action, "teams")) continue;
           if (Array.isArray(action.teams)) {
             let isIncluded = false;
             for (const team of action.teams) {
@@ -118,7 +118,7 @@ const itemsForReportsSelector = selectorFamily({
           }
         }
         for (const consultation of person.consultations || []) {
-          if (!filterItemByTeam(consultation, 'teams')) continue;
+          if (!filterItemByTeam(consultation, "teams")) continue;
           if (Array.isArray(consultation.teams)) {
             let isIncluded = false;
             for (const team of consultation.teams) {
@@ -140,7 +140,7 @@ const itemsForReportsSelector = selectorFamily({
           }
         }
         for (const rencontre of person.rencontres || []) {
-          if (!filterItemByTeam(rencontre, 'team')) continue;
+          if (!filterItemByTeam(rencontre, "team")) continue;
           const date = rencontre.date;
           const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[rencontre.team] ?? defaultIsoDates;
           if (date < isoStartDate) continue;
@@ -148,7 +148,7 @@ const itemsForReportsSelector = selectorFamily({
           rencontres[rencontre._id] = rencontre;
         }
         for (const commentMedical of person.commentsMedical || []) {
-          if (!filterItemByTeam(commentMedical, 'team')) continue;
+          if (!filterItemByTeam(commentMedical, "team")) continue;
           const date = commentMedical.date;
           const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[commentMedical.team] ?? defaultIsoDates;
           if (date < isoStartDate) continue;
@@ -156,7 +156,7 @@ const itemsForReportsSelector = selectorFamily({
           commentsMedical[commentMedical._id] = commentMedical;
         }
         for (const comment of person.comments || []) {
-          if (!filterItemByTeam(comment, 'team')) continue;
+          if (!filterItemByTeam(comment, "team")) continue;
           const date = comment.date;
           const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[comment.team] ?? defaultIsoDates;
           if (date < isoStartDate) continue;
@@ -167,7 +167,7 @@ const itemsForReportsSelector = selectorFamily({
 
       // all passages here and not above because some passages are not linked to a person
       for (const passage of allPassages) {
-        if (!filterItemByTeam(passage, 'team')) continue;
+        if (!filterItemByTeam(passage, "team")) continue;
         const date = passage.date;
         const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[passage.team] ?? defaultIsoDates;
         if (date < isoStartDate) continue;
@@ -176,7 +176,7 @@ const itemsForReportsSelector = selectorFamily({
       }
 
       for (const observation of allObservations) {
-        if (!filterItemByTeam(observation, 'team')) continue;
+        if (!filterItemByTeam(observation, "team")) continue;
         const date = observation.observedAt;
         const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[observation.team] ?? defaultIsoDates;
         if (date < isoStartDate) continue;
@@ -185,7 +185,7 @@ const itemsForReportsSelector = selectorFamily({
       }
 
       for (const report of allReports) {
-        if (!filterItemByTeam(report, 'team')) continue;
+        if (!filterItemByTeam(report, "team")) continue;
         const date = report.date;
         const { isoStartDate, isoEndDate } = defaultIsoDates;
         if (date < isoStartDate) continue;
@@ -218,11 +218,11 @@ const View = () => {
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
   const teams = useRecoilValue(teamsState);
-  const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('reports-allOrg', teams.length === 1);
-  const [selectedTeamIds, setSelectedTeamIds] = useLocalStorage('reports-teams', [currentTeam._id]);
+  const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage("reports-allOrg", teams.length === 1);
+  const [selectedTeamIds, setSelectedTeamIds] = useLocalStorage("reports-teams", [currentTeam._id]);
 
-  const [preset, setPreset, removePreset] = useLocalStorage('reports-date-preset', null);
-  let [period, setPeriod] = useLocalStorage('reports-period', {
+  const [preset, setPreset, removePreset] = useLocalStorage("reports-date-preset", null);
+  let [period, setPeriod] = useLocalStorage("reports-period", {
     startDate: dateForDatePicker(defaultPreset.period.startDate),
     endDate: dateForDatePicker(defaultPreset.period.endDate),
   });
@@ -242,8 +242,8 @@ const View = () => {
     const teamsIdsObject = {};
     for (const team of selectedTeams) {
       const offsetHours = team.nightSession ? 12 : 0;
-      const isoStartDate = dayjs(period.startDate).startOf('day').add(offsetHours, 'hour').toISOString();
-      const isoEndDate = dayjs(period.endDate).startOf('day').add(1, 'day').add(offsetHours, 'hour').toISOString();
+      const isoStartDate = dayjs(period.startDate).startOf("day").add(offsetHours, "hour").toISOString();
+      const isoEndDate = dayjs(period.endDate).startOf("day").add(1, "day").add(offsetHours, "hour").toISOString();
       teamsIdsObject[team._id] = {
         isoStartDate,
         isoEndDate,
@@ -272,34 +272,34 @@ const View = () => {
     })
   );
 
-  useTitle(`${dayjs(dateString).format('DD-MM-YYYY')} - Compte rendu`);
+  useTitle(`${dayjs(dateString).format("DD-MM-YYYY")} - Compte rendu`);
 
   useEffect(() => {
     // for print use only
-    document.title = `Compte rendu Mano - Organisation ${organisation.name} - ${dayjs(dateString).format('DD-MM-YYYY')} - imprimé par ${user.name}`;
+    document.title = `Compte rendu Mano - Organisation ${organisation.name} - ${dayjs(dateString).format("DD-MM-YYYY")} - imprimé par ${user.name}`;
     return () => {
-      document.title = 'Mano - Admin';
+      document.title = "Mano - Admin";
     };
   });
-  const canSeeComments = ['admin', 'normal'].includes(user.role);
+  const canSeeComments = ["admin", "normal"].includes(user.role);
   return (
     <>
       <HeaderStyled className=" !tw-py-4 tw-px-0">
-        <div className="printonly tw-py-4 tw-px-8 tw-text-2xl tw-font-bold" aria-hidden>
-          Compte-rendu{' '}
+        <div className="printonly tw-px-8 tw-py-4 tw-text-2xl tw-font-bold" aria-hidden>
+          Compte-rendu{" "}
           {viewAllOrganisationData ? (
             <>global</>
           ) : (
             <>
-              {selectedTeams.length > 1 ? 'des équipes' : "de l'équipe"} {selectedTeams.map((t) => t.name).join(', ')}
+              {selectedTeams.length > 1 ? "des équipes" : "de l'équipe"} {selectedTeams.map((t) => t.name).join(", ")}
             </>
-          )}{' '}
+          )}{" "}
           - {formatPeriod({ period, preset })}
         </div>
         <div className="noprint tw-flex tw-grow">
           <HeaderTitle className="tw-w-96 tw-font-normal">
             <span>
-              Comptes rendus {viewAllOrganisationData ? <>de toutes les équipes</> : <>{selectedTeams.length > 1 ? 'des équipes' : "de l'équipe"}</>}
+              Comptes rendus {viewAllOrganisationData ? <>de toutes les équipes</> : <>{selectedTeams.length > 1 ? "des équipes" : "de l'équipe"}</>}
             </span>
           </HeaderTitle>
           <div className="tw-ml-4">
@@ -341,15 +341,15 @@ const View = () => {
           />
         </div>
         {selectedTeams.length > 1 && selectedTeams.filter((t) => t.nightSession).length > 0 && (
-          <details className="tw-py-0 tw-px-8 tw-font-normal">
+          <details className="tw-px-8 tw-py-0 tw-font-normal">
             <summary className="tw-text-xs">
               Certaines équipes travaillent de nuit 🌒, <u>cliquez ici</u> pour savoir la période concernée par chacune
             </summary>
             {selectedTeams.map((team) => (
-              <p key={team._id} className="tw-ml-5 tw-mb-0 tw-text-xs">
+              <p key={team._id} className="tw-mb-0 tw-ml-5 tw-text-xs">
                 <b>
-                  {team.nightSession ? '🌒' : '☀️'} {team?.name || ''}
-                </b>{' '}
+                  {team.nightSession ? "🌒" : "☀️"} {team?.name || ""}
+                </b>{" "}
                 - {getPeriodTitle(dateString, team?.nightSession)}
               </p>
             ))}
@@ -373,9 +373,10 @@ const View = () => {
           <div className="-tw-mx-12 tw-flex tw-h-full tw-flex-col print:tw-mx-0">
             <div
               className={[
-                'tw-mt-4 tw-flex tw-w-full tw-grow tw-basis-full tw-items-start print:tw-flex-wrap print:tw-items-stretch',
-                viewAllOrganisationData || selectedTeamIds.length ? 'tw-flex' : 'tw-hidden',
-              ].join(' ')}>
+                "tw-mt-4 tw-flex tw-w-full tw-grow tw-basis-full tw-items-start print:tw-flex-wrap print:tw-items-stretch",
+                viewAllOrganisationData || selectedTeamIds.length ? "tw-flex" : "tw-hidden",
+              ].join(" ")}
+            >
               <div className="tw-mb-12 tw-min-h-1/2 tw-basis-6/12 tw-overflow-auto print:tw-min-h-0 print:tw-basis-full">
                 <div className="tw-mb-4 tw-h-[60vh] tw-overflow-hidden tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow print:tw-h-auto print:tw-border-none print:tw-shadow-none">
                   <ActionsOrConsultationsReport
@@ -419,7 +420,7 @@ const View = () => {
                   </div>
                 )}
               </div>
-              <div className="tw-mr-2 tw-mb-12 tw-min-h-screen tw-basis-3/12 tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow print:tw-basis-full print:tw-border-none print:tw-shadow-none">
+              <div className="tw-mb-12 tw-mr-2 tw-min-h-screen tw-basis-3/12 tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow print:tw-basis-full print:tw-border-none print:tw-shadow-none">
                 <Transmissions period={period} selectedTeamsObject={selectedTeamsObject} reports={reports} />
               </div>
             </div>

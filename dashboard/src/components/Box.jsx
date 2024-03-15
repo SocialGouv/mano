@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 const Box = styled.div`
   padding: 15px 25px 20px;
   background-color: #fff;

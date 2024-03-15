@@ -1,5 +1,5 @@
-import React from 'react';
-import openNewWindow from '../assets/icons/description-icon.svg';
+import React from "react";
+import openNewWindow from "../assets/icons/description-icon.svg";
 
 const DescriptionIcon = () => (
   <div

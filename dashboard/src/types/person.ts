@@ -1,17 +1,17 @@
-import type { UUIDV4 } from './uuid';
-import type { Document, DocumentWithLinkedItem, Folder } from './document';
-import type { UserInstance } from './user';
-import type { GroupInstance } from './group';
-import type { TreatmentInstance } from './treatment';
-import type { ConsultationInstance } from './consultation';
-import type { MedicalFileInstance } from './medicalFile';
+import type { UUIDV4 } from "./uuid";
+import type { Document, DocumentWithLinkedItem, Folder } from "./document";
+import type { UserInstance } from "./user";
+import type { GroupInstance } from "./group";
+import type { TreatmentInstance } from "./treatment";
+import type { ConsultationInstance } from "./consultation";
+import type { MedicalFileInstance } from "./medicalFile";
 
 interface PersonInstanceBase {
   outOfActiveList: boolean;
   user: UUIDV4;
   name: string;
   otherNames?: string;
-  gender?: 'Aucun' | 'Homme' | 'Femme' | 'Homme transgenre' | 'Femme transgenre' | 'Non binaire' | 'Autre';
+  gender?: "Aucun" | "Homme" | "Femme" | "Homme transgenre" | "Femme transgenre" | "Non binaire" | "Autre";
   birthdate?: Date;
   description?: string;
   alertness?: boolean;

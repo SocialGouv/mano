@@ -1,40 +1,40 @@
-import React, { useMemo, Fragment } from 'react';
-import { useHistory } from 'react-router-dom';
-import DateBloc from '../../components/DateBloc';
-import Header from '../../components/header';
-import Table from '../../components/table';
-import Observation from '../territory-observations/view';
-import dayjs from 'dayjs';
-import UserName from '../../components/UserName';
-import Search from '../../components/search';
-import TagTeam from '../../components/TagTeam';
-import { organisationState, teamsState, userState } from '../../recoil/auth';
-import { actionsState, CANCEL, DONE, sortActionsOrConsultations } from '../../recoil/actions';
-import { personsState, sortPersons } from '../../recoil/persons';
-import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
-import { sortTerritories, territoriesState } from '../../recoil/territory';
-import { selector, selectorFamily, useRecoilValue } from 'recoil';
-import { itemsGroupedByPersonSelector, onlyFilledObservationsTerritories, personsObjectSelector } from '../../recoil/selectors';
-import PersonName from '../../components/PersonName';
-import { formatBirthDate, formatDateWithFullMonth, formatTime } from '../../services/date';
-import { useDataLoader } from '../../components/DataLoader';
-import { placesState } from '../../recoil/places';
-import { filterBySearch } from './utils';
-import { commentsState } from '../../recoil/comments';
-import useTitle from '../../services/useTitle';
-import ExclamationMarkButton from '../../components/tailwind/ExclamationMarkButton';
-import ConsultationButton from '../../components/ConsultationButton';
-import { useLocalStorage } from '../../services/useLocalStorage';
-import { territoryObservationsState } from '../../recoil/territoryObservations';
-import TabsNav from '../../components/tailwind/TabsNav';
-import DescriptionIcon from '../../components/DescriptionIcon';
-import { consultationsState } from '../../recoil/consultations';
-import { medicalFileState } from '../../recoil/medicalFiles';
-import { treatmentsState } from '../../recoil/treatments';
-import ActionStatusSelect from '../../components/ActionStatusSelect';
+import React, { useMemo, Fragment } from "react";
+import { useHistory } from "react-router-dom";
+import DateBloc from "../../components/DateBloc";
+import Header from "../../components/header";
+import Table from "../../components/table";
+import Observation from "../territory-observations/view";
+import dayjs from "dayjs";
+import UserName from "../../components/UserName";
+import Search from "../../components/search";
+import TagTeam from "../../components/TagTeam";
+import { organisationState, teamsState, userState } from "../../recoil/auth";
+import { actionsState, CANCEL, DONE, sortActionsOrConsultations } from "../../recoil/actions";
+import { personsState, sortPersons } from "../../recoil/persons";
+import { relsPersonPlaceState } from "../../recoil/relPersonPlace";
+import { sortTerritories, territoriesState } from "../../recoil/territory";
+import { selector, selectorFamily, useRecoilValue } from "recoil";
+import { itemsGroupedByPersonSelector, onlyFilledObservationsTerritories, personsObjectSelector } from "../../recoil/selectors";
+import PersonName from "../../components/PersonName";
+import { formatBirthDate, formatDateWithFullMonth, formatTime } from "../../services/date";
+import { useDataLoader } from "../../components/DataLoader";
+import { placesState } from "../../recoil/places";
+import { filterBySearch } from "./utils";
+import { commentsState } from "../../recoil/comments";
+import useTitle from "../../services/useTitle";
+import ExclamationMarkButton from "../../components/tailwind/ExclamationMarkButton";
+import ConsultationButton from "../../components/ConsultationButton";
+import { useLocalStorage } from "../../services/useLocalStorage";
+import { territoryObservationsState } from "../../recoil/territoryObservations";
+import TabsNav from "../../components/tailwind/TabsNav";
+import DescriptionIcon from "../../components/DescriptionIcon";
+import { consultationsState } from "../../recoil/consultations";
+import { medicalFileState } from "../../recoil/medicalFiles";
+import { treatmentsState } from "../../recoil/treatments";
+import ActionStatusSelect from "../../components/ActionStatusSelect";
 
 const personsWithFormattedBirthDateSelector = selector({
-  key: 'personsWithFormattedBirthDateSelector',
+  key: "personsWithFormattedBirthDateSelector",
   get: ({ get }) => {
     const persons = get(personsState);
     const personsWithBirthdateFormatted = persons.map((person) => ({
@@ -46,21 +46,21 @@ const personsWithFormattedBirthDateSelector = selector({
 });
 
 const personsFilteredBySearchForSearchSelector = selectorFamily({
-  key: 'personsFilteredBySearchForSearchSelector',
+  key: "personsFilteredBySearchForSearchSelector",
   get:
     ({ search, sortBy, sortOrder }) =>
     ({ get }) => {
       const persons = get(personsWithFormattedBirthDateSelector);
       const personsPopulated = get(itemsGroupedByPersonSelector);
       const user = get(userState);
-      const excludeFields = user.healthcareProfessional ? [] : ['consultations', 'treatments', 'commentsMedical', 'medicalFile'];
+      const excludeFields = user.healthcareProfessional ? [] : ["consultations", "treatments", "commentsMedical", "medicalFile"];
       if (!search?.length) return [];
       return filterBySearch(search, persons, excludeFields).map((p) => personsPopulated[p._id]);
     },
 });
 
 const actionsObjectSelector = selector({
-  key: 'actionsObjectSelector',
+  key: "actionsObjectSelector",
   get: ({ get }) => {
     const actions = get(actionsState);
     const actionsObject = {};
@@ -72,7 +72,7 @@ const actionsObjectSelector = selector({
 });
 
 const commentsPopulatedSelector = selector({
-  key: 'commentsPopulatedSelector',
+  key: "commentsPopulatedSelector",
   get: ({ get }) => {
     const comments = get(commentsState);
     const persons = get(personsObjectSelector);
@@ -83,7 +83,7 @@ const commentsPopulatedSelector = selector({
         commentsObject[comment._id] = {
           ...comment,
           person: persons[comment.person],
-          type: 'person',
+          type: "person",
         };
         continue;
       }
@@ -91,7 +91,7 @@ const commentsPopulatedSelector = selector({
         commentsObject[comment._id] = {
           ...comment,
           action: actions[comment.action],
-          type: 'action',
+          type: "action",
         };
         continue;
       }
@@ -101,7 +101,7 @@ const commentsPopulatedSelector = selector({
 });
 
 const commentsFilteredBySearchSelector = selectorFamily({
-  key: 'commentsFilteredBySearchSelector',
+  key: "commentsFilteredBySearchSelector",
   get:
     ({ search }) =>
     ({ get }) => {
@@ -113,7 +113,7 @@ const commentsFilteredBySearchSelector = selectorFamily({
     },
 });
 const territoriesObjectSelector = selector({
-  key: 'territoriesObjectSelector',
+  key: "territoriesObjectSelector",
   get: ({ get }) => {
     const territories = get(territoriesState);
     const territoriesObject = {};
@@ -125,7 +125,7 @@ const territoriesObjectSelector = selector({
 });
 
 const populatedObservationsSelector = selector({
-  key: 'populatedObservationsSelector',
+  key: "populatedObservationsSelector",
   get: ({ get }) => {
     const observations = get(territoryObservationsState);
     const territory = get(territoriesObjectSelector);
@@ -138,7 +138,7 @@ const populatedObservationsSelector = selector({
 });
 
 const observationsBySearchSelector = selectorFamily({
-  key: 'observationsBySearchSelector',
+  key: "observationsBySearchSelector",
   get:
     ({ search }) =>
     ({ get }) => {
@@ -151,16 +151,16 @@ const observationsBySearchSelector = selectorFamily({
 });
 
 const View = () => {
-  useTitle('Recherche');
+  useTitle("Recherche");
   useDataLoader({ refreshOnMount: true });
   const user = useRecoilValue(userState);
   const initTabs = useMemo(() => {
-    const defaultTabs = ['Actions', 'Personnes', 'Commentaires non médicaux', 'Lieux', 'Territoires', 'Observations'];
+    const defaultTabs = ["Actions", "Personnes", "Commentaires non médicaux", "Lieux", "Territoires", "Observations"];
     if (!user.healthcareProfessional) return defaultTabs;
-    return [...defaultTabs, 'Consultations', 'Traitements', 'Dossiers médicaux'];
+    return [...defaultTabs, "Consultations", "Traitements", "Dossiers médicaux"];
   }, [user.healthcareProfessional]);
-  const [search, setSearch] = useLocalStorage('fullsearch', '');
-  const [activeTab, setActiveTab] = useLocalStorage('fullsearch-tab', 0);
+  const [search, setSearch] = useLocalStorage("fullsearch", "");
+  const [activeTab, setActiveTab] = useLocalStorage("fullsearch-tab", 0);
 
   const allActions = useRecoilValue(actionsState);
   const allConsultations = useRecoilValue(consultationsState);
@@ -213,8 +213,8 @@ const View = () => {
   const observations = useRecoilValue(observationsBySearchSelector({ search }));
 
   const renderContent = () => {
-    if (!search) return 'Pas de recherche, pas de résultat !';
-    if (search.length < 3) return 'Recherche trop courte (moins de 3 caractères), pas de résultat !';
+    if (!search) return "Pas de recherche, pas de résultat !";
+    if (search.length < 3) return "Recherche trop courte (moins de 3 caractères), pas de résultat !";
 
     return (
       <>
@@ -232,28 +232,28 @@ const View = () => {
             !!user.healthcareProfessional && `Dossiers médicaux (${medicalFiles.length})`,
           ].filter(Boolean)}
           onClick={(tab) => {
-            if (tab.includes('Actions')) setActiveTab('Actions');
-            if (tab.includes('Consultations')) setActiveTab('Consultations');
-            if (tab.includes('Traitements')) setActiveTab('Traitements');
-            if (tab.includes('Personnes')) setActiveTab('Personnes');
-            if (tab.includes('Dossiers médicaux')) setActiveTab('Dossiers médicaux');
-            if (tab.includes('Commentaires')) setActiveTab('Commentaires non médicaux');
-            if (tab.includes('Lieux')) setActiveTab('Lieux');
-            if (tab.includes('Territoires')) setActiveTab('Territoires');
-            if (tab.includes('Observations')) setActiveTab('Observations');
+            if (tab.includes("Actions")) setActiveTab("Actions");
+            if (tab.includes("Consultations")) setActiveTab("Consultations");
+            if (tab.includes("Traitements")) setActiveTab("Traitements");
+            if (tab.includes("Personnes")) setActiveTab("Personnes");
+            if (tab.includes("Dossiers médicaux")) setActiveTab("Dossiers médicaux");
+            if (tab.includes("Commentaires")) setActiveTab("Commentaires non médicaux");
+            if (tab.includes("Lieux")) setActiveTab("Lieux");
+            if (tab.includes("Territoires")) setActiveTab("Territoires");
+            if (tab.includes("Observations")) setActiveTab("Observations");
           }}
           activeTabIndex={initTabs.findIndex((tab) => tab === activeTab)}
         />
-        <div className="[&_table]:!tw-p0 tw-w-full tw-rounded-lg tw-bg-white tw-py-4 tw-px-8 print:tw-mb-4 [&_.title]:!tw-pb-5">
-          {activeTab === 'Actions' && <Actions actions={actions} />}
-          {activeTab === 'Consultations' && <Consultations consultations={consultations} />}
-          {activeTab === 'Traitements' && <Treatments treatments={treatments} />}
-          {activeTab === 'Personnes' && <Persons persons={persons} />}
-          {activeTab === 'Dossiers médicaux' && <Persons persons={medicalFiles} />}
-          {activeTab === 'Commentaires non médicaux' && <Comments comments={comments} />}
-          {activeTab === 'Lieux' && <Places places={places} />}
-          {activeTab === 'Territoires' && <Territories territories={territories} />}
-          {activeTab === 'Observations' && <TerritoryObservations observations={observations} />}
+        <div className="[&_table]:!tw-p0 tw-w-full tw-rounded-lg tw-bg-white tw-px-8 tw-py-4 print:tw-mb-4 [&_.title]:!tw-pb-5">
+          {activeTab === "Actions" && <Actions actions={actions} />}
+          {activeTab === "Consultations" && <Consultations consultations={consultations} />}
+          {activeTab === "Traitements" && <Treatments treatments={treatments} />}
+          {activeTab === "Personnes" && <Persons persons={persons} />}
+          {activeTab === "Dossiers médicaux" && <Persons persons={medicalFiles} />}
+          {activeTab === "Commentaires non médicaux" && <Comments comments={comments} />}
+          {activeTab === "Lieux" && <Places places={places} />}
+          {activeTab === "Territoires" && <Territories territories={territories} />}
+          {activeTab === "Observations" && <TerritoryObservations observations={observations} />}
         </div>
       </>
     );
@@ -273,8 +273,8 @@ const View = () => {
 const Actions = ({ actions }) => {
   const history = useHistory();
   const organisation = useRecoilValue(organisationState);
-  const [sortBy, setSortBy] = useLocalStorage('actions-consultations-sortBy', 'dueAt');
-  const [sortOrder, setSortOrder] = useLocalStorage('actions-consultations-sortOrder', 'ASC');
+  const [sortBy, setSortBy] = useLocalStorage("actions-consultations-sortBy", "dueAt");
+  const [sortOrder, setSortOrder] = useLocalStorage("actions-consultations-sortOrder", "ASC");
 
   const data = useMemo(() => {
     return [...actions].sort(sortActionsOrConsultations(sortBy, sortOrder));
@@ -288,21 +288,21 @@ const Actions = ({ actions }) => {
     <Table
       className="Table"
       data={data.map((a) => {
-        if (a.urgent) return { ...a, style: { backgroundColor: '#fecaca' } };
+        if (a.urgent) return { ...a, style: { backgroundColor: "#fecaca" } };
         return a;
       })}
-      title={`Action${moreThanOne ? 's' : ''} (${data.length})`}
+      title={`Action${moreThanOne ? "s" : ""} (${data.length})`}
       noData="Pas d'action"
       onRowClick={(action) => {
         const searchParams = new URLSearchParams(history.location.search);
-        searchParams.set('actionId', action._id);
+        searchParams.set("actionId", action._id);
         history.push(`?${searchParams.toString()}`);
       }}
       rowKey="_id"
       columns={[
         {
-          title: '',
-          dataKey: 'urgentOrGroupOrConsultation',
+          title: "",
+          dataKey: "urgentOrGroupOrConsultation",
           small: true,
           onSortOrder: setSortOrder,
           onSortBy: setSortBy,
@@ -324,8 +324,8 @@ const Actions = ({ actions }) => {
           },
         },
         {
-          title: 'Date',
-          dataKey: 'dueAt',
+          title: "Date",
+          dataKey: "dueAt",
           onSortOrder: setSortOrder,
           onSortBy: setSortBy,
           sortBy,
@@ -333,24 +333,24 @@ const Actions = ({ actions }) => {
           render: (a) => <DateBloc date={[DONE, CANCEL].includes(a.status) ? a.completedAt : a.dueAt} />,
         },
         {
-          title: 'Heure',
-          dataKey: 'time',
+          title: "Heure",
+          dataKey: "time",
           render: (action) => {
             if (!action.dueAt || !action.withTime) return null;
             return formatTime(action.dueAt);
           },
         },
         {
-          title: 'Nom',
-          dataKey: 'name',
+          title: "Nom",
+          dataKey: "name",
           onSortOrder: setSortOrder,
           onSortBy: setSortBy,
           sortBy,
           sortOrder,
         },
         {
-          title: 'Personne suivie',
-          dataKey: 'person',
+          title: "Personne suivie",
+          dataKey: "person",
           onSortOrder: setSortOrder,
           onSortBy: setSortBy,
           sortBy,
@@ -358,8 +358,8 @@ const Actions = ({ actions }) => {
           render: (action) => <PersonName item={action} />,
         },
         {
-          title: 'Statut',
-          dataKey: 'status',
+          title: "Statut",
+          dataKey: "status",
           onSortOrder: setSortOrder,
           onSortBy: setSortBy,
           sortBy,
@@ -367,8 +367,8 @@ const Actions = ({ actions }) => {
           render: (action) => <ActionStatusSelect action={action} />,
         },
         {
-          title: 'Équipe(s) en charge',
-          dataKey: 'team',
+          title: "Équipe(s) en charge",
+          dataKey: "team",
           render: (a) => (
             <div className="px-2 tw-flex tw-flex-shrink-0 tw-flex-col tw-gap-px">
               {Array.isArray(a?.teams) ? a.teams.map((e) => <TagTeam key={e} teamId={e} />) : <TagTeam teamId={a?.team} />}
@@ -383,8 +383,8 @@ const Actions = ({ actions }) => {
 const Consultations = ({ consultations }) => {
   const history = useHistory();
   const organisation = useRecoilValue(organisationState);
-  const [sortBy, setSortBy] = useLocalStorage('actions-consultations-sortBy', 'dueAt');
-  const [sortOrder, setSortOrder] = useLocalStorage('actions-consultations-sortOrder', 'ASC');
+  const [sortBy, setSortBy] = useLocalStorage("actions-consultations-sortBy", "dueAt");
+  const [sortOrder, setSortOrder] = useLocalStorage("actions-consultations-sortOrder", "ASC");
 
   const data = useMemo(() => {
     return [...consultations].sort(sortActionsOrConsultations(sortBy, sortOrder));
@@ -398,21 +398,21 @@ const Consultations = ({ consultations }) => {
     <Table
       className="Table"
       data={data.map((a) => {
-        if (a.urgent) return { ...a, style: { backgroundColor: '#fecaca' } };
+        if (a.urgent) return { ...a, style: { backgroundColor: "#fecaca" } };
         return a;
       })}
-      title={`Consultation${moreThanOne ? 's' : ''} (${data.length})`}
+      title={`Consultation${moreThanOne ? "s" : ""} (${data.length})`}
       noData="Pas de consultation"
       onRowClick={(consultation) => {
         const searchParams = new URLSearchParams(history.location.search);
-        searchParams.set('consultationId', consultation._id);
+        searchParams.set("consultationId", consultation._id);
         history.push(`?${searchParams.toString()}`);
       }}
       rowKey="_id"
       columns={[
         {
-          title: '',
-          dataKey: 'urgentOrGroupOrConsultation',
+          title: "",
+          dataKey: "urgentOrGroupOrConsultation",
           small: true,
           onSortOrder: setSortOrder,
           onSortBy: setSortBy,
@@ -434,8 +434,8 @@ const Consultations = ({ consultations }) => {
           },
         },
         {
-          title: 'Date',
-          dataKey: 'dueAt',
+          title: "Date",
+          dataKey: "dueAt",
           onSortOrder: setSortOrder,
           onSortBy: setSortBy,
           sortBy,
@@ -443,24 +443,24 @@ const Consultations = ({ consultations }) => {
           render: (consult) => <DateBloc date={[DONE, CANCEL].includes(consult.status) ? consult.completedAt : consult.dueAt} />,
         },
         {
-          title: 'Heure',
-          dataKey: 'time',
+          title: "Heure",
+          dataKey: "time",
           render: (consultation) => {
             if (!consultation.dueAt || !consultation.withTime) return null;
             return formatTime(consultation.dueAt);
           },
         },
         {
-          title: 'Nom',
-          dataKey: 'name',
+          title: "Nom",
+          dataKey: "name",
           onSortOrder: setSortOrder,
           onSortBy: setSortBy,
           sortBy,
           sortOrder,
         },
         {
-          title: 'Personne suivie',
-          dataKey: 'person',
+          title: "Personne suivie",
+          dataKey: "person",
           onSortOrder: setSortOrder,
           onSortBy: setSortBy,
           sortBy,
@@ -468,8 +468,8 @@ const Consultations = ({ consultations }) => {
           render: (consultation) => <PersonName item={consultation} />,
         },
         {
-          title: 'Statut',
-          dataKey: 'status',
+          title: "Statut",
+          dataKey: "status",
           onSortOrder: setSortOrder,
           onSortBy: setSortBy,
           sortBy,
@@ -477,8 +477,8 @@ const Consultations = ({ consultations }) => {
           render: (consultation) => <ActionStatusSelect action={consultation} />,
         },
         {
-          title: 'Équipe(s) en charge',
-          dataKey: 'team',
+          title: "Équipe(s) en charge",
+          dataKey: "team",
           render: (consult) => (
             <div className="px-2 tw-flex tw-flex-shrink-0 tw-flex-col tw-gap-px">
               {Array.isArray(consult?.teams) ? consult.teams.map((e) => <TagTeam key={e} teamId={e} />) : <TagTeam teamId={consult?.team} />}
@@ -499,44 +499,44 @@ const Treatments = ({ treatments }) => {
     <Table
       className="Table"
       data={treatments}
-      title={`Traitement${moreThanOne ? 's' : ''} (${treatments?.length})`}
+      title={`Traitement${moreThanOne ? "s" : ""} (${treatments?.length})`}
       noData="Pas de traitement"
       onRowClick={(consultation) => {
         const searchParams = new URLSearchParams(history.location.search);
-        searchParams.set('consultationId', consultation._id);
+        searchParams.set("consultationId", consultation._id);
         history.push(`?${searchParams.toString()}`);
       }}
       rowKey="_id"
       columns={[
         {
-          title: 'Début',
-          dataKey: 'startDate',
+          title: "Début",
+          dataKey: "startDate",
           render: (treatment) => <DateBloc date={treatment.startDate} />,
         },
         {
-          title: 'Fin',
-          dataKey: 'endDate',
+          title: "Fin",
+          dataKey: "endDate",
           render: (treatment) => <DateBloc date={treatment.endDate} />,
         },
         {
-          title: 'Nom',
-          dataKey: 'name',
+          title: "Nom",
+          dataKey: "name",
         },
         {
-          title: 'Dosage',
-          dataKey: 'dosage',
+          title: "Dosage",
+          dataKey: "dosage",
         },
         {
-          title: 'Fréquence',
-          dataKey: 'frequency',
+          title: "Fréquence",
+          dataKey: "frequency",
         },
         {
-          title: 'Indication',
-          dataKey: 'indication',
+          title: "Indication",
+          dataKey: "indication",
         },
         {
-          title: 'Personne suivie',
-          dataKey: 'person',
+          title: "Personne suivie",
+          dataKey: "person",
           render: (consultation) => <PersonName item={consultation} />,
         },
       ]}
@@ -549,8 +549,8 @@ const Persons = ({ persons }) => {
   const teams = useRecoilValue(teamsState);
   const organisation = useRecoilValue(organisationState);
 
-  const [sortBy, setSortBy] = useLocalStorage('person-sortBy', 'name');
-  const [sortOrder, setSortOrder] = useLocalStorage('person-sortOrder', 'ASC');
+  const [sortBy, setSortBy] = useLocalStorage("person-sortBy", "name");
+  const [sortOrder, setSortOrder] = useLocalStorage("person-sortOrder", "ASC");
   const data = useMemo(() => {
     return [...persons].sort(sortPersons(sortBy, sortOrder));
   }, [persons, sortBy, sortOrder]);
@@ -569,14 +569,14 @@ const Persons = ({ persons }) => {
   return (
     <Table
       data={data}
-      title={`Personne${moreThanOne ? 's' : ''} suivie${moreThanOne ? 's' : ''} (${data.length})`}
-      rowKey={'_id'}
+      title={`Personne${moreThanOne ? "s" : ""} suivie${moreThanOne ? "s" : ""} (${data.length})`}
+      rowKey={"_id"}
       noData="Pas de personne suivie"
       onRowClick={(p) => history.push(`/person/${p._id}`)}
       columns={[
         {
-          title: '',
-          dataKey: 'group',
+          title: "",
+          dataKey: "group",
           onSortOrder: setSortOrder,
           onSortBy: setSortBy,
           sortOrder,
@@ -594,16 +594,16 @@ const Persons = ({ persons }) => {
           },
         },
         {
-          title: 'Nom',
-          dataKey: 'name',
+          title: "Nom",
+          dataKey: "name",
           onSortOrder: setSortOrder,
           onSortBy: setSortBy,
           sortOrder,
           sortBy,
         },
         {
-          title: 'Vigilance',
-          dataKey: 'alertness',
+          title: "Vigilance",
+          dataKey: "alertness",
           onSortOrder: setSortOrder,
           onSortBy: setSortBy,
           sortOrder,
@@ -616,17 +616,17 @@ const Persons = ({ persons }) => {
               />
             ) : null,
         },
-        { title: 'Équipe(s) en charge', dataKey: 'assignedTeams', render: (person) => <Teams teams={teams} person={person} /> },
+        { title: "Équipe(s) en charge", dataKey: "assignedTeams", render: (person) => <Teams teams={teams} person={person} /> },
         {
-          title: 'Suivi(e) depuis le',
-          dataKey: 'followedSince',
+          title: "Suivi(e) depuis le",
+          dataKey: "followedSince",
           onSortOrder: setSortOrder,
           onSortBy: setSortBy,
           sortOrder,
           sortBy,
-          render: (p) => formatDateWithFullMonth(p.followedSince || p.createdAt || ''),
+          render: (p) => formatDateWithFullMonth(p.followedSince || p.createdAt || ""),
         },
-      ].filter((c) => organisation.groupsEnabled || c.dataKey !== 'group')}
+      ].filter((c) => organisation.groupsEnabled || c.dataKey !== "group")}
     />
   );
 };
@@ -641,7 +641,7 @@ const Comments = ({ comments }) => {
   return (
     <Table
       className="Table"
-      title={`Commentaire${moreThanOne ? 's' : ''} (${comments.length})`}
+      title={`Commentaire${moreThanOne ? "s" : ""} (${comments.length})`}
       data={comments}
       noData="Pas de commentaire"
       onRowClick={(comment) => {
@@ -650,8 +650,8 @@ const Comments = ({ comments }) => {
       rowKey="_id"
       columns={[
         {
-          title: '',
-          dataKey: 'urgentOrGroup',
+          title: "",
+          dataKey: "urgentOrGroup",
           small: true,
           render: (comment) => {
             return (
@@ -667,49 +667,49 @@ const Comments = ({ comments }) => {
           },
         },
         {
-          title: 'Date',
-          dataKey: 'date',
+          title: "Date",
+          dataKey: "date",
           render: (comment) => (
             <span>
-              {dayjs(comment.date || comment.createdAt).format('ddd DD/MM/YY')}
-              <br />à {dayjs(comment.date || comment.createdAt).format('HH:mm')}
+              {dayjs(comment.date || comment.createdAt).format("ddd DD/MM/YY")}
+              <br />à {dayjs(comment.date || comment.createdAt).format("HH:mm")}
             </span>
           ),
         },
         {
-          title: 'Utilisateur',
-          dataKey: 'user',
+          title: "Utilisateur",
+          dataKey: "user",
           render: (comment) => <UserName id={comment.user} />,
         },
         {
-          title: 'Type',
-          dataKey: 'type',
-          render: (comment) => <span>{comment.type === 'action' ? 'Action' : 'Personne suivie'}</span>,
+          title: "Type",
+          dataKey: "type",
+          render: (comment) => <span>{comment.type === "action" ? "Action" : "Personne suivie"}</span>,
         },
         {
-          title: 'Nom',
-          dataKey: 'person',
+          title: "Nom",
+          dataKey: "person",
           render: (comment) => (
             <>
               <b></b>
               <b>{comment[comment.type]?.name}</b>
-              {comment.type === 'action' && (
+              {comment.type === "action" && (
                 <>
                   <br />
-                  <i>(pour {comment.person?.name || ''})</i>
+                  <i>(pour {comment.person?.name || ""})</i>
                 </>
               )}
             </>
           ),
         },
         {
-          title: 'Commentaire',
-          dataKey: 'comment',
+          title: "Commentaire",
+          dataKey: "comment",
           render: (comment) => {
             return (
               <p>
                 {comment.comment
-                  ? comment.comment.split('\n').map((c, i, a) => {
+                  ? comment.comment.split("\n").map((c, i, a) => {
                       if (i === a.length - 1) return c;
                       return (
                         <React.Fragment key={i}>
@@ -718,7 +718,7 @@ const Comments = ({ comments }) => {
                         </React.Fragment>
                       );
                     })
-                  : ''}
+                  : ""}
               </p>
             );
           },
@@ -730,8 +730,8 @@ const Comments = ({ comments }) => {
 
 const Territories = ({ territories }) => {
   const history = useHistory();
-  const [sortBy, setSortBy] = useLocalStorage('territory-sortBy', 'name');
-  const [sortOrder, setSortOrder] = useLocalStorage('territory-sortOrder', 'ASC');
+  const [sortBy, setSortBy] = useLocalStorage("territory-sortBy", "name");
+  const [sortOrder, setSortOrder] = useLocalStorage("territory-sortOrder", "ASC");
 
   const data = useMemo(() => {
     return [...territories].sort(sortTerritories(sortBy, sortOrder));
@@ -743,45 +743,45 @@ const Territories = ({ territories }) => {
   return (
     <Table
       className="Table"
-      title={`Territoire${moreThanOne ? 's' : ''} (${data.length})`}
+      title={`Territoire${moreThanOne ? "s" : ""} (${data.length})`}
       noData="Pas de territoire"
       data={data}
       onRowClick={(territory) => history.push(`/territory/${territory._id}`)}
       rowKey="_id"
       columns={[
         {
-          title: 'Nom',
-          dataKey: 'name',
+          title: "Nom",
+          dataKey: "name",
           onSortOrder: setSortOrder,
           onSortBy: setSortBy,
           sortOrder,
           sortBy,
         },
         {
-          title: 'Types',
-          dataKey: 'types',
+          title: "Types",
+          dataKey: "types",
           onSortOrder: setSortOrder,
           onSortBy: setSortBy,
           sortOrder,
           sortBy,
-          render: ({ types }) => (types ? types.join(', ') : ''),
+          render: ({ types }) => (types ? types.join(", ") : ""),
         },
         {
-          title: 'Périmètre',
-          dataKey: 'perimeter',
+          title: "Périmètre",
+          dataKey: "perimeter",
           onSortOrder: setSortOrder,
           onSortBy: setSortBy,
           sortOrder,
           sortBy,
         },
         {
-          title: 'Créé le',
-          dataKey: 'createdAt',
+          title: "Créé le",
+          dataKey: "createdAt",
           onSortOrder: setSortOrder,
           onSortBy: setSortBy,
           sortOrder,
           sortBy,
-          render: (territory) => formatDateWithFullMonth(territory.createdAt || ''),
+          render: (territory) => formatDateWithFullMonth(territory.createdAt || ""),
         },
       ]}
     />
@@ -798,15 +798,15 @@ const Places = ({ places }) => {
   return (
     <Table
       className="Table"
-      title={`Lieu${moreThanOne ? 'x' : ''} fréquenté${moreThanOne ? 's' : ''} (${places.length})`}
+      title={`Lieu${moreThanOne ? "x" : ""} fréquenté${moreThanOne ? "s" : ""} (${places.length})`}
       noData="Pas de lieu fréquenté"
       data={places}
       rowKey="_id"
       columns={[
-        { title: 'Nom', dataKey: 'name' },
+        { title: "Nom", dataKey: "name" },
         {
-          title: 'Personnes suivies',
-          dataKey: 'persons',
+          title: "Personnes suivies",
+          dataKey: "persons",
           render: (place) => (
             <p style={{ marginBottom: 0 }}>
               {relsPersonPlace
@@ -821,7 +821,7 @@ const Places = ({ places }) => {
             </p>
           ),
         },
-        { title: 'Créée le', dataKey: 'createdAt', render: (place) => formatDateWithFullMonth(place.createdAt) },
+        { title: "Créée le", dataKey: "createdAt", render: (place) => formatDateWithFullMonth(place.createdAt) },
       ]}
     />
   );
@@ -836,29 +836,29 @@ const TerritoryObservations = ({ observations }) => {
   return (
     <Table
       className="Table"
-      title={`Observation${moreThanOne ? 's' : ''} de territoire${moreThanOne ? 's' : ''}  (${observations.length})`}
+      title={`Observation${moreThanOne ? "s" : ""} de territoire${moreThanOne ? "s" : ""}  (${observations.length})`}
       noData="Pas d'observation"
       data={observations}
       onRowClick={(obs) => history.push(`/territory/${obs.territory._id}`)}
       rowKey="_id"
       columns={[
         {
-          title: 'Date',
-          dataKey: 'observedAt',
+          title: "Date",
+          dataKey: "observedAt",
           render: (obs) => (
             <span>
-              {dayjs(obs.observedAt || obs.createdAt).format('ddd DD/MM/YY')}
-              <br />à {dayjs(obs.observedAt || obs.createdAt).format('HH:mm')}
+              {dayjs(obs.observedAt || obs.createdAt).format("ddd DD/MM/YY")}
+              <br />à {dayjs(obs.observedAt || obs.createdAt).format("HH:mm")}
             </span>
           ),
         },
         {
-          title: 'Utilisateur',
-          dataKey: 'user',
+          title: "Utilisateur",
+          dataKey: "user",
           render: (obs) => <UserName id={obs.user} />,
         },
-        { title: 'Territoire', dataKey: 'territory', render: (obs) => obs?.territory?.name },
-        { title: 'Observation', dataKey: 'entityKey', render: (obs) => <Observation noBorder obs={obs} />, left: true },
+        { title: "Territoire", dataKey: "territory", render: (obs) => obs?.territory?.name },
+        { title: "Observation", dataKey: "entityKey", render: (obs) => <Observation noBorder obs={obs} />, left: true },
       ]}
     />
   );

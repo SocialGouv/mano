@@ -1,45 +1,45 @@
-import React, { useEffect, useMemo, useState, useRef } from 'react';
-import { toast } from 'react-toastify';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { useHistory, useLocation } from 'react-router-dom';
-import { actionsState, allowedActionFieldsInHistory, CANCEL, DONE, prepareActionForEncryption, TODO } from '../recoil/actions';
-import { currentTeamState, organisationState, teamsState, userState } from '../recoil/auth';
-import { dayjsInstance, now, outOfBoundariesDate } from '../services/date';
-import API from '../services/api';
-import SelectPerson from './SelectPerson';
-import SelectStatus from './SelectStatus';
-import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
-import { commentsState, prepareCommentForEncryption } from '../recoil/comments';
-import ActionsCategorySelect from './tailwind/ActionsCategorySelect';
-import { groupsState } from '../recoil/groups';
-import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from './tailwind/Modal';
-import SelectTeamMultiple from './SelectTeamMultiple';
-import DatePicker from './DatePicker';
-import AutoResizeTextarea from './AutoresizeTextArea';
-import { useDataLoader } from './DataLoader';
-import { CommentsModule } from './CommentsGeneric';
-import UserName from './UserName';
-import { itemsGroupedByActionSelector } from '../recoil/selectors';
-import CustomFieldDisplay from './CustomFieldDisplay';
-import PersonName from './PersonName';
-import TagTeam from './TagTeam';
-import TabsNav from './tailwind/TabsNav';
+import React, { useEffect, useMemo, useState, useRef } from "react";
+import { toast } from "react-toastify";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useHistory, useLocation } from "react-router-dom";
+import { actionsState, allowedActionFieldsInHistory, CANCEL, DONE, prepareActionForEncryption, TODO } from "../recoil/actions";
+import { currentTeamState, organisationState, teamsState, userState } from "../recoil/auth";
+import { dayjsInstance, now, outOfBoundariesDate } from "../services/date";
+import API from "../services/api";
+import SelectPerson from "./SelectPerson";
+import SelectStatus from "./SelectStatus";
+import useCreateReportAtDateIfNotExist from "../services/useCreateReportAtDateIfNotExist";
+import { commentsState, prepareCommentForEncryption } from "../recoil/comments";
+import ActionsCategorySelect from "./tailwind/ActionsCategorySelect";
+import { groupsState } from "../recoil/groups";
+import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "./tailwind/Modal";
+import SelectTeamMultiple from "./SelectTeamMultiple";
+import DatePicker from "./DatePicker";
+import AutoResizeTextarea from "./AutoresizeTextArea";
+import { useDataLoader } from "./DataLoader";
+import { CommentsModule } from "./CommentsGeneric";
+import UserName from "./UserName";
+import { itemsGroupedByActionSelector } from "../recoil/selectors";
+import CustomFieldDisplay from "./CustomFieldDisplay";
+import PersonName from "./PersonName";
+import TagTeam from "./TagTeam";
+import TabsNav from "./tailwind/TabsNav";
 
 export default function ActionModal() {
   const actionsObjects = useRecoilValue(itemsGroupedByActionSelector);
   const history = useHistory();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const currentActionId = searchParams.get('actionId');
-  const newAction = searchParams.get('newAction');
+  const currentActionId = searchParams.get("actionId");
+  const newAction = searchParams.get("newAction");
   const currentAction = useMemo(() => {
     if (!currentActionId) return null;
     return actionsObjects[currentActionId];
   }, [currentActionId, actionsObjects]);
-  const personId = searchParams.get('personId');
-  const personIds = searchParams.get('personIds')?.split(',').filter(Boolean);
-  const dueAt = searchParams.get('dueAt');
-  const completedAt = searchParams.get('completedAt');
+  const personId = searchParams.get("personId");
+  const personIds = searchParams.get("personIds")?.split(",").filter(Boolean);
+  const dueAt = searchParams.get("dueAt");
+  const completedAt = searchParams.get("completedAt");
 
   const [open, setOpen] = useState(false);
   const actionIdRef = useRef(currentActionId);
@@ -91,12 +91,12 @@ const newActionInitialState = (organisationId, personId, userId, dueAt, complete
   person: isMulti ? personIds : personId,
   organisation: organisationId,
   categories: [],
-  name: '',
-  description: '',
+  name: "",
+  description: "",
   urgent: false,
   group: false,
   createdAt: new Date(),
-  comment: '',
+  comment: "",
   commentUrgent: false,
 });
 
@@ -129,9 +129,9 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
     setData(initialState);
   }, [initialState]);
 
-  const [activeTab, setActiveTab] = useState('Informations');
-  const isOnePerson = typeof data?.person === 'string' || data?.person?.length === 1;
-  const onlyPerson = !isOnePerson ? null : typeof data?.person === 'string' ? data.person : data.person?.[0];
+  const [activeTab, setActiveTab] = useState("Informations");
+  const isOnePerson = typeof data?.person === "string" || data?.person?.length === 1;
+  const onlyPerson = !isOnePerson ? null : typeof data?.person === "string" ? data.person : data.person?.[0];
   const canToggleGroupCheck = !!organisation.groupsEnabled && !!onlyPerson && groups.find((group) => group.persons.includes(onlyPerson));
 
   const [isEditing, setIsEditing] = useState(isNewAction);
@@ -150,12 +150,12 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
       } else {
         body.completedAt = null;
       }
-      const response = await API.post({ path: '/action', body: prepareActionForEncryption(body) });
+      const response = await API.post({ path: "/action", body: prepareActionForEncryption(body) });
       if (response.ok) setActions((actions) => [response.decryptedData, ...actions]);
       const { createdAt } = response.decryptedData;
       await createReportAtDateIfNotExist(createdAt);
       if (!!completedAt) {
-        if (dayjsInstance(completedAt).format('YYYY-MM-DD') !== dayjsInstance(createdAt).format('YYYY-MM-DD')) {
+        if (dayjsInstance(completedAt).format("YYYY-MM-DD") !== dayjsInstance(createdAt).format("YYYY-MM-DD")) {
           await createReportAtDateIfNotExist(completedAt);
         }
       }
@@ -164,12 +164,12 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
     const body = { ...data };
     let actionsId = [];
     // What is this strange case?
-    if (typeof data.person === 'string') {
+    if (typeof data.person === "string") {
       body.person = data.person;
       const res = await handlePostNewAction(body);
       setIsSubmitting(false);
       if (res.ok) {
-        toast.success('Création réussie !');
+        toast.success("Création réussie !");
         onClose();
         actionsId.push(res.decryptedData._id);
       }
@@ -178,7 +178,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
       const res = await handlePostNewAction(body);
       setIsSubmitting(false);
       if (res.ok) {
-        toast.success('Création réussie !');
+        toast.success("Création réussie !");
         onClose();
         actionsId.push(res.decryptedData._id);
       }
@@ -189,7 +189,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
         actionsId.push(res.decryptedData._id);
       }
       setIsSubmitting(false);
-      toast.success('Création réussie !');
+      toast.success("Création réussie !");
       onClose();
     }
     // Then, save the comment if present.
@@ -206,11 +206,11 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
       const commentsToAdd = [];
       for (const actionId of actionsId) {
         const response = await API.post({
-          path: '/comment',
+          path: "/comment",
           body: prepareCommentForEncryption({ ...commentBody, action: actionId }),
         });
         if (response.ok) commentsToAdd.push(response.decryptedData);
-        else toast.error('Erreur lors de la création du commentaire');
+        else toast.error("Erreur lors de la création du commentaire");
       }
     }
     refresh();
@@ -219,7 +219,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
   const handleDuplicate = async () => {
     const { name, person, dueAt, withTime, description, categories, urgent, teams } = data;
     const response = await API.post({
-      path: '/action',
+      path: "/action",
       body: prepareActionForEncryption({
         name,
         person,
@@ -245,20 +245,20 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
         team: c.team || currentTeam._id,
         organisation: c.organisation,
       };
-      const res = await API.post({ path: '/comment', body: prepareCommentForEncryption(body) });
+      const res = await API.post({ path: "/comment", body: prepareCommentForEncryption(body) });
       if (res.ok) {
         setComments((comments) => [res.decryptedData, ...comments]);
       }
     }
     const searchParams = new URLSearchParams(history.location.search);
-    searchParams.set('actionId', response.decryptedData._id);
+    searchParams.set("actionId", response.decryptedData._id);
     history.replace(`?${searchParams.toString()}`);
     setIsSubmitting(false);
     refresh();
   };
 
   const handleDelete = async () => {
-    const confirm = window.confirm('Êtes-vous sûr ?');
+    const confirm = window.confirm("Êtes-vous sûr ?");
     if (confirm) {
       const actionRes = await API.delete({ path: `/action/${action._id}` });
       if (actionRes.ok) {
@@ -269,7 +269,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
         }
       }
       if (!actionRes.ok) return;
-      toast.success('Suppression réussie');
+      toast.success("Suppression réussie");
       history.goBack();
     }
   };
@@ -277,13 +277,13 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
   const handleUpdateAction = async () => {
     const body = { ...data };
     body.teams = Array.isArray(data.teams) ? data.teams : [data.team];
-    if (!data.teams?.length) return toast.error('Une action doit être associée à au moins une équipe.');
+    if (!data.teams?.length) return toast.error("Une action doit être associée à au moins une équipe.");
     if ([DONE, CANCEL].includes(data.status)) {
       body.completedAt = data.completedAt || now();
     } else {
       body.completedAt = null;
     }
-    if (data.completedAt && outOfBoundariesDate(data.completedAt)) return toast.error('La date de complétion est hors limites (entre 1900 et 2100)');
+    if (data.completedAt && outOfBoundariesDate(data.completedAt)) return toast.error("La date de complétion est hors limites (entre 1900 et 2100)");
     if (data.dueAt && outOfBoundariesDate(data.dueAt)) return toast.error("La date d'échéance est hors limites (entre 1900 et 2100)");
     if (!body.dueAt) body.dueAt = data.completedAt || new Date();
 
@@ -314,14 +314,14 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
     );
     await createReportAtDateIfNotExist(newAction.createdAt);
     if (!!newAction.completedAt) {
-      if (dayjsInstance(newAction.completedAt).format('YYYY-MM-DD') !== dayjsInstance(newAction.createdAt).format('YYYY-MM-DD')) {
+      if (dayjsInstance(newAction.completedAt).format("YYYY-MM-DD") !== dayjsInstance(newAction.createdAt).format("YYYY-MM-DD")) {
         await createReportAtDateIfNotExist(newAction.completedAt);
       }
     }
-    toast.success('Mise à jour !');
-    if (location.pathname !== '/stats') refresh(); // if we refresh when we're on stats page, it will remove the view we're on
+    toast.success("Mise à jour !");
+    if (location.pathname !== "/stats") refresh(); // if we refresh when we're on stats page, it will remove the view we're on
     const actionCancelled = action.status !== CANCEL && body.status === CANCEL;
-    if (actionCancelled && window.confirm('Cette action est annulée, voulez-vous la dupliquer ? Avec une date ultérieure par exemple')) {
+    if (actionCancelled && window.confirm("Cette action est annulée, voulez-vous la dupliquer ? Avec une date ultérieure par exemple")) {
       handleDuplicate();
     } else {
       onClose();
@@ -342,7 +342,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
       <ModalHeader
         title={
           <>
-            {isNewAction && 'Ajouter une action'}
+            {isNewAction && "Ajouter une action"}
             {!isNewAction && !isEditing && `Action: ${action?.name}`}
             {!isNewAction && isEditing && `Modifier l'action: ${action?.name}`}
             {!isNewAction && action?.user && (
@@ -361,45 +361,47 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
           id="add-action-form"
           onSubmit={async (e) => {
             e.preventDefault();
-            if (!data.name) return toast.error('Le nom est obligatoire');
-            if (!data.teams?.length) return toast.error('Une action doit être associée à au moins une équipe');
-            if (!isMulti && !data.person) return toast.error('La personne suivie est obligatoire');
-            if (isMulti && !data.person?.length) return toast.error('Une personne suivie est obligatoire');
+            if (!data.name) return toast.error("Le nom est obligatoire");
+            if (!data.teams?.length) return toast.error("Une action doit être associée à au moins une équipe");
+            if (!isMulti && !data.person) return toast.error("La personne suivie est obligatoire");
+            if (isMulti && !data.person?.length) return toast.error("Une personne suivie est obligatoire");
             if (!data.dueAt) return toast.error("La date d'échéance est obligatoire");
             if (outOfBoundariesDate(data.dueAt)) return toast.error("La date d'échéance est hors limites (entre 1900 et 2100)");
             if (data.completedAt && outOfBoundariesDate(data.completedAt))
-              return toast.error('La date de complétion est hors limites (entre 1900 et 2100)');
+              return toast.error("La date de complétion est hors limites (entre 1900 et 2100)");
 
             setIsSubmitting(true);
 
             if (!data._id) return handleCreateAction();
             return handleUpdateAction();
-          }}>
-          {!['restricted-access'].includes(user.role) && data?._id && (
+          }}
+        >
+          {!["restricted-access"].includes(user.role) && data?._id && (
             <TabsNav
               className="tw-px-3 tw-py-2"
-              tabs={['Informations', `Commentaires ${data?.comments?.length ? `(${data.comments.length})` : ''}`, 'Historique']}
+              tabs={["Informations", `Commentaires ${data?.comments?.length ? `(${data.comments.length})` : ""}`, "Historique"]}
               onClick={(tab, index) => {
-                if (tab.includes('Informations')) setActiveTab('Informations');
-                if (tab.includes('Commentaires')) setActiveTab('Commentaires');
-                if (tab.includes('Historique')) setActiveTab('Historique');
+                if (tab.includes("Informations")) setActiveTab("Informations");
+                if (tab.includes("Commentaires")) setActiveTab("Commentaires");
+                if (tab.includes("Historique")) setActiveTab("Historique");
                 refresh();
               }}
-              activeTabIndex={['Informations', 'Commentaires', 'Historique'].findIndex((tab) => tab === activeTab)}
+              activeTabIndex={["Informations", "Commentaires", "Historique"].findIndex((tab) => tab === activeTab)}
             />
           )}
           <div
             className={[
-              'tw-flex tw-w-full tw-flex-wrap tw-overflow-hidden sm:tw-h-[60vh] sm:tw-min-h-min',
-              activeTab !== 'Informations' && 'tw-hidden',
+              "tw-flex tw-w-full tw-flex-wrap tw-overflow-hidden sm:tw-h-[60vh] sm:tw-min-h-min",
+              activeTab !== "Informations" && "tw-hidden",
             ]
               .filter(Boolean)
-              .join(' ')}>
+              .join(" ")}
+          >
             <div className="tw-flex tw-h-full tw-w-full tw-flex-col tw-overflow-y-auto tw-py-4 tw-text-left sm:tw-flex-row ">
               <div id="right" className="tw-grid tw-min-h-full tw-flex-[2] tw-basis-2/3 tw-grid-cols-[1fr_2px] tw-pl-4 tw-pr-8">
                 <div className="tw-flex tw-flex-col tw-pr-8">
                   <div className="tw-mb-4 tw-flex tw-flex-col tw-items-start tw-justify-start">
-                    <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="name">
+                    <label className={isEditing ? "" : "tw-text-sm tw-font-semibold tw-text-main"} htmlFor="name">
                       Nom de l'action
                     </label>
                     {isEditing ? (
@@ -408,15 +410,15 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                         id="name"
                         value={data.name}
                         onChange={handleChange}
-                        className="tw-w-full tw-rounded tw-border tw-border-gray-300 tw-py-1.5 tw-px-3 tw-text-base tw-transition-all"
+                        className="tw-w-full tw-rounded tw-border tw-border-gray-300 tw-px-3 tw-py-1.5 tw-text-base tw-transition-all"
                       />
                     ) : (
                       <CustomFieldDisplay value={data.name} type="textarea" />
                     )}
                   </div>
                   <div className="tw-mb-4 tw-flex tw-flex-col tw-items-start tw-justify-start">
-                    <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="person">
-                      {isMulti ? 'Personne(s) suivie(s)' : 'Personne suivie'}
+                    <label className={isEditing ? "" : "tw-text-sm tw-font-semibold tw-text-main"} htmlFor="person">
+                      {isMulti ? "Personne(s) suivie(s)" : "Personne suivie"}
                     </label>
                     {isEditing ? (
                       <div className="tw-w-full">
@@ -427,7 +429,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                     )}
                   </div>
                   <div className="tw-mb-4 tw-flex tw-flex-col tw-items-start tw-justify-start">
-                    <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="categories">
+                    <label className={isEditing ? "" : "tw-text-sm tw-font-semibold tw-text-main"} htmlFor="categories">
                       Catégorie(s)
                     </label>
                     {isEditing ? (
@@ -435,17 +437,17 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                         <ActionsCategorySelect
                           values={data.categories}
                           id="categories"
-                          onChange={(v) => handleChange({ currentTarget: { value: v, name: 'categories' } })}
+                          onChange={(v) => handleChange({ currentTarget: { value: v, name: "categories" } })}
                           withMostUsed
                         />
                       </div>
                     ) : (
-                      <CustomFieldDisplay value={data.categories?.join(', ')} type="text" />
+                      <CustomFieldDisplay value={data.categories?.join(", ")} type="text" />
                     )}
                   </div>
-                  {!['restricted-access'].includes(user.role) && (
+                  {!["restricted-access"].includes(user.role) && (
                     <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
-                      <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="description">
+                      <label className={isEditing ? "" : "tw-text-sm tw-font-semibold tw-text-main"} htmlFor="description">
                         Description
                       </label>
                       {isEditing ? (
@@ -469,7 +471,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                               name="group"
                               checked={data.group}
                               onChange={() => {
-                                handleChange({ target: { name: 'group', checked: Boolean(!data.group), value: Boolean(!data.group) } });
+                                handleChange({ target: { name: "group", checked: Boolean(!data.group), value: Boolean(!data.group) } });
                               }}
                             />
                             Action familiale <br />
@@ -484,7 +486,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                       </label>
                     </div>
                   )}
-                  {!!isNewAction && !['restricted-access'].includes(user.role) && (
+                  {!!isNewAction && !["restricted-access"].includes(user.role) && (
                     <>
                       <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
                         <label htmlFor="create-comment-description">Commentaire (optionnel)</label>
@@ -493,7 +495,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                           name="comment"
                           value={data.comment}
                           onChange={handleChange}
-                          className="tw-w-full tw-rounded tw-border tw-border-gray-300 tw-py-1.5 tw-px-3 tw-text-base tw-transition-all"
+                          className="tw-w-full tw-rounded tw-border tw-border-gray-300 tw-px-3 tw-py-1.5 tw-text-base tw-transition-all"
                         />
                       </div>
                       <div className="tw-mb-4 tw-flex tw-flex-1 tw-flex-col tw-items-start tw-justify-start">
@@ -501,12 +503,12 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                           <input
                             type="checkbox"
                             id="create-comment-urgent"
-                            style={{ marginRight: '0.5rem' }}
+                            style={{ marginRight: "0.5rem" }}
                             name="commentUrgent"
                             checked={data.commentUrgent}
                             onChange={() => {
                               handleChange({
-                                target: { name: 'commentUrgent', checked: Boolean(!data.commentUrgent), value: Boolean(!data.commentUrgent) },
+                                target: { name: "commentUrgent", checked: Boolean(!data.commentUrgent), value: Boolean(!data.commentUrgent) },
                               });
                             }}
                           />
@@ -523,7 +525,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
               </div>
               <div id="left" className="tw-flex tw-flex-[1] tw-basis-1/3 tw-flex-col tw-pr-4">
                 <div className="tw-mb-4 tw-flex tw-flex-col tw-items-start tw-justify-start">
-                  <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="dueAt">
+                  <label className={isEditing ? "" : "tw-text-sm tw-font-semibold tw-text-main"} htmlFor="dueAt">
                     À faire le
                   </label>
                   {isEditing ? (
@@ -537,24 +539,24 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                           className="tw-mr-2"
                           checked={data.withTime || false}
                           onChange={() => {
-                            handleChange({ target: { name: 'withTime', checked: Boolean(!data.withTime), value: Boolean(!data.withTime) } });
+                            handleChange({ target: { name: "withTime", checked: Boolean(!data.withTime), value: Boolean(!data.withTime) } });
                           }}
                         />
                         <label htmlFor="withTime">Montrer l'heure</label>
                       </div>
                     </>
                   ) : (
-                    <CustomFieldDisplay value={data.dueAt} type={data.withTime ? 'date-with-time' : 'date'} />
+                    <CustomFieldDisplay value={data.dueAt} type={data.withTime ? "date-with-time" : "date"} />
                   )}
                 </div>
                 <div className="tw-mb-4 tw-flex tw-flex-col tw-items-start tw-justify-start">
-                  <label className={isEditing ? '' : 'tw-text-sm tw-font-semibold tw-text-main'} htmlFor="team">
+                  <label className={isEditing ? "" : "tw-text-sm tw-font-semibold tw-text-main"} htmlFor="team">
                     Équipe(s) en charge
                   </label>
                   {isEditing ? (
                     <div className="tw-w-full">
                       <SelectTeamMultiple
-                        onChange={(teamIds) => handleChange({ target: { value: teamIds, name: 'teams' } })}
+                        onChange={(teamIds) => handleChange({ target: { value: teamIds, name: "teams" } })}
                         value={Array.isArray(data.teams) ? data.teams : [data.team]}
                         colored
                         inputId="create-action-team-select"
@@ -578,7 +580,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                       name="urgent"
                       checked={data.urgent}
                       onChange={() => {
-                        handleChange({ target: { name: 'urgent', checked: Boolean(!data.urgent), value: Boolean(!data.urgent) } });
+                        handleChange({ target: { name: "urgent", checked: Boolean(!data.urgent), value: Boolean(!data.urgent) } });
                       }}
                     />
                     Action prioritaire <br />
@@ -590,7 +592,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                   <div className="tw-w-full">
                     <SelectStatus
                       name="status"
-                      value={data.status || ''}
+                      value={data.status || ""}
                       onChange={handleChange}
                       inputId="update-action-select-status"
                       classNamePrefix="update-action-select-status"
@@ -598,10 +600,11 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                   </div>
                 </div>
                 <div
-                  className={['tw-mb-4 tw-flex tw-flex-1 tw-flex-col', [DONE, CANCEL].includes(data.status) ? 'tw-visible' : 'tw-invisible'].join(
-                    ' '
-                  )}>
-                  <label htmlFor="completedAt">{data.status === DONE ? 'Faite le' : 'Annulée le'}</label>
+                  className={["tw-mb-4 tw-flex tw-flex-1 tw-flex-col", [DONE, CANCEL].includes(data.status) ? "tw-visible" : "tw-invisible"].join(
+                    " "
+                  )}
+                >
+                  <label htmlFor="completedAt">{data.status === DONE ? "Faite le" : "Annulée le"}</label>
                   <div>
                     <DatePicker withTime id="completedAt" name="completedAt" defaultValue={data.completedAt ?? new Date()} onChange={handleChange} />
                   </div>
@@ -609,34 +612,35 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
               </div>
             </div>
           </div>
-          {!['restricted-access'].includes(user.role) && (
+          {!["restricted-access"].includes(user.role) && (
             <div
-              className={['tw-flex tw-w-full tw-flex-col tw-gap-4 tw-overflow-y-auto sm:tw-h-[90vh]', activeTab !== 'Commentaires' && 'tw-hidden']
+              className={["tw-flex tw-w-full tw-flex-col tw-gap-4 tw-overflow-y-auto sm:tw-h-[90vh]", activeTab !== "Commentaires" && "tw-hidden"]
                 .filter(Boolean)
-                .join(' ')}>
+                .join(" ")}
+            >
               <CommentsModule
                 comments={action?.comments
-                  .map((comment) => ({ ...comment, type: 'action', person: action.person }))
+                  .map((comment) => ({ ...comment, type: "action", person: action.person }))
                   .sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt))}
                 color="main"
                 canToggleUrgentCheck
                 typeForNewComment="action"
                 actionId={action?._id}
                 onDeleteComment={async (comment) => {
-                  const confirm = window.confirm('Voulez-vous vraiment supprimer ce commentaire ?');
+                  const confirm = window.confirm("Voulez-vous vraiment supprimer ce commentaire ?");
                   if (!confirm) return false;
                   const res = await API.delete({ path: `/comment/${comment._id}` });
                   if (res.ok) setComments((comments) => comments.filter((p) => p._id !== comment._id));
                   if (!res.ok) return false;
-                  toast.success('Suppression réussie');
+                  toast.success("Suppression réussie");
                   return true;
                 }}
                 onSubmitComment={async (comment, isNewComment) => {
                   if (isNewComment) {
-                    const response = await API.post({ path: '/comment', body: prepareCommentForEncryption(comment) });
+                    const response = await API.post({ path: "/comment", body: prepareCommentForEncryption(comment) });
                     if (!response.ok) return;
                     setComments((comments) => [response.decryptedData, ...comments]);
-                    toast.success('Commentaire ajouté !');
+                    toast.success("Commentaire ajouté !");
                     await createReportAtDateIfNotExist(response.decryptedData.date);
                   } else {
                     const response = await API.put({
@@ -653,16 +657,17 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                       await createReportAtDateIfNotExist(response.decryptedData.date || response.decryptedData.createdAt);
                     }
                     if (!response.ok) return;
-                    toast.success('Commentaire mis à jour');
+                    toast.success("Commentaire mis à jour");
                   }
                 }}
               />
             </div>
           )}
           <div
-            className={['tw-flex tw-w-full tw-flex-col tw-gap-4 tw-overflow-y-auto sm:tw-h-[90vh]', activeTab !== 'Historique' && 'tw-hidden']
+            className={["tw-flex tw-w-full tw-flex-col tw-gap-4 tw-overflow-y-auto sm:tw-h-[90vh]", activeTab !== "Historique" && "tw-hidden"]
               .filter(Boolean)
-              .join(' ')}>
+              .join(" ")}
+          >
             <ActionHistory action={action} />
           </div>
         </form>
@@ -671,7 +676,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
         <button name="Fermer" type="button" className="button-cancel" onClick={() => onClose()}>
           Fermer
         </button>
-        {!['restricted-access'].includes(user.role) && !isNewAction && !!isEditing && (
+        {!["restricted-access"].includes(user.role) && !isNewAction && !!isEditing && (
           <button type="button" name="cancel" disabled={!canEdit} className="button-destructive" onClick={handleDelete}>
             Supprimer
           </button>
@@ -688,8 +693,9 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
               e.preventDefault();
               setIsEditing(true);
             }}
-            className={['button-submit', activeTab === 'Informations' ? 'tw-visible' : 'tw-invisible'].join(' ')}
-            disabled={!canEdit}>
+            className={["button-submit", activeTab === "Informations" ? "tw-visible" : "tw-invisible"].join(" ")}
+            disabled={!canEdit}
+          >
             Modifier
           </button>
         )}
@@ -716,31 +722,31 @@ function ActionHistory({ action }) {
           {history.map((h) => {
             return (
               <tr key={h.date} className="tw-cursor-default">
-                <td>{dayjsInstance(h.date).format('DD/MM/YYYY HH:mm')}</td>
+                <td>{dayjsInstance(h.date).format("DD/MM/YYYY HH:mm")}</td>
                 <td>
                   <UserName id={h.user} />
                 </td>
                 <td className="tw-max-w-prose">
                   {Object.entries(h.data).map(([key, value]) => {
                     const actionField = allowedActionFieldsInHistory.find((f) => f.name === key);
-                    if (key === 'teams') {
+                    if (key === "teams") {
                       return (
                         <p className="tw-flex tw-flex-col" key={key}>
                           <span>{actionField?.label} : </span>
-                          <code>"{(value.oldValue || []).map((teamId) => teams.find((t) => t._id === teamId)?.name).join(', ')}"</code>
+                          <code>"{(value.oldValue || []).map((teamId) => teams.find((t) => t._id === teamId)?.name).join(", ")}"</code>
                           <span>↓</span>
-                          <code>"{(value.newValue || []).map((teamId) => teams.find((t) => t._id === teamId)?.name).join(', ')}"</code>
+                          <code>"{(value.newValue || []).map((teamId) => teams.find((t) => t._id === teamId)?.name).join(", ")}"</code>
                         </p>
                       );
                     }
-                    if (key === 'person') {
+                    if (key === "person") {
                       return (
                         <p key={key}>
                           {actionField?.label} : <br />
                           <code>
                             <PersonName item={{ person: value.oldValue }} />
-                          </code>{' '}
-                          ➔{' '}
+                          </code>{" "}
+                          ➔{" "}
                           <code>
                             <PersonName item={{ person: value.newValue }} />
                           </code>
@@ -751,9 +757,10 @@ function ActionHistory({ action }) {
                     return (
                       <p
                         key={key}
-                        data-test-id={`${actionField?.label}: ${JSON.stringify(value.oldValue || '')} ➔ ${JSON.stringify(value.newValue)}`}>
+                        data-test-id={`${actionField?.label}: ${JSON.stringify(value.oldValue || "")} ➔ ${JSON.stringify(value.newValue)}`}
+                      >
                         {actionField?.label} : <br />
-                        <code>{JSON.stringify(value.oldValue || '')}</code> ➔ <code>{JSON.stringify(value.newValue)}</code>
+                        <code>{JSON.stringify(value.oldValue || "")}</code> ➔ <code>{JSON.stringify(value.newValue)}</code>
                       </p>
                     );
                   })}
@@ -763,7 +770,7 @@ function ActionHistory({ action }) {
           })}
           {!!action?.createdAt && (
             <tr key={action.createdAt} className="tw-cursor-default">
-              <td>{dayjsInstance(action.createdAt).format('DD/MM/YYYY HH:mm')}</td>
+              <td>{dayjsInstance(action.createdAt).format("DD/MM/YYYY HH:mm")}</td>
               <td>
                 <UserName id={action.user} />
               </td>

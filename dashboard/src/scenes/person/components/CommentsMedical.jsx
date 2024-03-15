@@ -1,10 +1,10 @@
-import React, { useMemo } from 'react';
-import { useSetRecoilState, useRecoilValue } from 'recoil';
-import { v4 as uuidv4 } from 'uuid';
-import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../../recoil/medicalFiles';
-import { CommentsModule } from '../../../components/CommentsGeneric';
-import API from '../../../services/api';
-import { toast } from 'react-toastify';
+import React, { useMemo } from "react";
+import { useSetRecoilState, useRecoilValue } from "recoil";
+import { v4 as uuidv4 } from "uuid";
+import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from "../../../recoil/medicalFiles";
+import { CommentsModule } from "../../../components/CommentsGeneric";
+import API from "../../../services/api";
+import { toast } from "react-toastify";
 
 const CommentsMedical = ({ person }) => {
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
@@ -40,7 +40,7 @@ const CommentsMedical = ({ person }) => {
             body: prepareMedicalFileForEncryption(customFieldsMedicalFile)(newMedicalFile),
           });
           if (!response.ok) return;
-          toast.success('Commentaire supprimé');
+          toast.success("Commentaire supprimé");
           setAllMedicalFiles((medicalFiles) => {
             return medicalFiles.map((_medicalFile) => {
               if (_medicalFile._id !== medicalFile._id) return _medicalFile;
@@ -72,7 +72,7 @@ const CommentsMedical = ({ person }) => {
             body: prepareMedicalFileForEncryption(customFieldsMedicalFile)(newMedicalFile),
           });
           if (!response.ok) return;
-          toast.success('Commentaire enregistré');
+          toast.success("Commentaire enregistré");
           setAllMedicalFiles((medicalFiles) => {
             return medicalFiles.map((_medicalFile) => {
               if (_medicalFile._id !== medicalFile._id) return _medicalFile;

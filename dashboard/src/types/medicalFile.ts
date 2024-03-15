@@ -1,5 +1,5 @@
-import { UUIDV4 } from './uuid';
-import { Document, Folder } from './document';
+import { UUIDV4 } from "./uuid";
+import { Document, Folder } from "./document";
 
 interface AdditionalProps {
   [key: string]: any;
@@ -16,4 +16,4 @@ export interface MedicalFileInstance extends AdditionalProps {
   deletedAt?: Date;
 }
 
-export interface NewMedicalFileInstance extends Omit<MedicalFileInstance, '_id' | 'createdAt' | 'updatedAt'> {}
+export interface NewMedicalFileInstance extends Omit<MedicalFileInstance, "_id" | "createdAt" | "updatedAt"> {}
