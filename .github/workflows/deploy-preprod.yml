@@ -44,8 +44,6 @@ jobs:
       # On build seulement si le dossier dashboard a été modifié
       - name: Build dashboard
         if: env.DASHBOARD_CHANGED == 'true'
-        env:
-          NEXT_TELEMETRY_DISABLED: 1
         run: |
           cd dashboard
           yarn

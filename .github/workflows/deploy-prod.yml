@@ -8,41 +8,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 10 # On récupère les 10 derniers commits
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      # On vérifie si le dossier website a été modifié pour faire un build
-      - name: Check for changes in website directory
-        id: check_changes_website
-        run: |
-          echo "WEBSITE_CHANGED=false" >> $GITHUB_ENV
-          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep 'website/'; then
-            echo "WEBSITE_CHANGED=true" >> $GITHUB_ENV
-          fi
-      # On build seulement si le dossier website a été modifié
       - name: Build website
-        if: env.WEBSITE_CHANGED == 'true'
         env:
           NEXT_TELEMETRY_DISABLED: 1
         run: |
           cd website
           yarn
           yarn build
-      # On vérifie si le dossier dashboard a été modifié pour faire un build
-      - name: Check for changes in dashboard directory
-        id: check_changes_dashboard
-        run: |
-          echo "DASHBOARD_CHANGED=false" >> $GITHUB_ENV
-          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep 'dashboard/'; then
-            echo "DASHBOARD_CHANGED=true" >> $GITHUB_ENV
-          fi
-      # On build seulement si le dossier dashboard a été modifié
       - name: Build dashboard
-        if: env.DASHBOARD_CHANGED == 'true'
-        env:
-          NEXT_TELEMETRY_DISABLED: 1
         run: |
           cd dashboard
           yarn
