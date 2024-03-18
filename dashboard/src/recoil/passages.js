@@ -20,7 +20,7 @@ export const passagesState = atom({
 const encryptedFields = ["person", "team", "user", "date", "comment"];
 
 export const preparePassageForEncryption = (passage, { checkRequiredFields = true } = {}) => {
-  if (!!checkRequiredFields) {
+  if (checkRequiredFields) {
     try {
       // we don't check the presence of a person because passage can be anonymous
       if (!looseUuidRegex.test(passage.team)) {
@@ -59,10 +59,10 @@ export const preparePassageForEncryption = (passage, { checkRequiredFields = tru
 export const sortPassages =
   (sortBy = "dueAt", sortOrder = "ASC") =>
   (a, b) => {
+    const defaultSort = (a, b) =>
+      sortOrder === "ASC" ? new Date(b.date).getTime() - new Date(a.date).getTime() : new Date(a.date).getTime() - new Date(b.date).getTime();
     if (sortBy === "date") {
-      return sortOrder === "ASC"
-      ? new Date(b.date).getTime() - new Date(a.date).getTime()
-      : new Date(a.date).getTime() - new Date(b.date).getTime();
+      return defaultSort(a, b);
     }
     if (sortBy === "person") {
       if (!a.personPopulated && !b.personPopulated) return defaultSort(a, b);

@@ -20,7 +20,7 @@ export const rencontresState = atom({
 const encryptedFields = ["person", "team", "user", "date", "comment"];
 
 export const prepareRencontreForEncryption = (rencontre, { checkRequiredFields = true } = {}) => {
-  if (!!checkRequiredFields) {
+  if (checkRequiredFields) {
     try {
       if (!looseUuidRegex.test(rencontre.person)) {
         throw new Error("Rencontre is missing person");
@@ -61,8 +61,10 @@ export const prepareRencontreForEncryption = (rencontre, { checkRequiredFields =
 export const sortRencontres =
   (sortBy = "date", sortOrder = "ASC") =>
   (a, b) => {
+    const defaultSort = (a, b) =>
+      sortOrder === "ASC" ? new Date(b.date).getTime() - new Date(a.date).getTime() : new Date(a.date).getTime() - new Date(b.date).getTime();
     if (sortBy === "date") {
-      return sortOrder === "ASC" ? new Date(b.date).getTime() - new Date(a.date).getTime() : new Date(a.date).getTime() - new Date(b.date).getTime();
+      return defaultSort(a, b);
     }
     if (sortBy === "person") {
       if (!a.personPopulated && !b.personPopulated) return defaultSort(a, b);
