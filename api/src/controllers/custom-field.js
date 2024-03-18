@@ -84,22 +84,27 @@ router.post(
 
         const updateOrg = {};
         const customFields = req.body.customFields;
+        // eslint-disable-next-line no-prototype-builtins
         if (customFields.hasOwnProperty("customFieldsObs"))
           updateOrg.customFieldsObs =
             typeof customFields.customFieldsObs === "string" ? JSON.parse(customFields.customFieldsObs) : customFields.customFieldsObs;
+        // eslint-disable-next-line no-prototype-builtins
         if (customFields.hasOwnProperty("fieldsPersonsCustomizableOptions"))
           updateOrg.fieldsPersonsCustomizableOptions =
             typeof customFields.fieldsPersonsCustomizableOptions === "string"
               ? JSON.parse(customFields.fieldsPersonsCustomizableOptions)
               : customFields.fieldsPersonsCustomizableOptions;
+        // eslint-disable-next-line no-prototype-builtins
         if (customFields.hasOwnProperty("customFieldsMedicalFile"))
           updateOrg.customFieldsMedicalFile =
             typeof customFields.customFieldsMedicalFile === "string"
               ? JSON.parse(customFields.customFieldsMedicalFile)
               : customFields.customFieldsMedicalFile;
+        // eslint-disable-next-line no-prototype-builtins
         if (customFields.hasOwnProperty("customFieldsPersons"))
           updateOrg.customFieldsPersons =
             typeof customFields.customFieldsPersons === "string" ? JSON.parse(customFields.customFieldsPersons) : customFields.customFieldsPersons;
+        // eslint-disable-next-line no-prototype-builtins
         if (customFields.hasOwnProperty("consultations"))
           updateOrg.consultations =
             typeof customFields.consultations === "string" ? JSON.parse(customFields.consultations) : customFields.consultations;

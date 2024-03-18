@@ -38,7 +38,7 @@ module.exports = (sequelize, DataTypes) => {
   };
 
   class Organisation extends Model {
-    static associate(models) {
+    static associate() {
       // See other models
     }
   }

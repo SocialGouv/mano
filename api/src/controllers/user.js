@@ -257,7 +257,7 @@ router.get(
 
 router.post(
   "/forgot_password",
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     const {
       body: { email },
     } = req;

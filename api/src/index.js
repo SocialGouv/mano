@@ -9,7 +9,6 @@ const logger = require("morgan");
 const { sequelize } = require("./db/sequelize");
 const { PORT, DEPLOY_KEY } = require("./config");
 const errors = require("./errors");
-const { sendEmail } = require("./utils/mailservice");
 
 const { SentryInit, capture } = require("./sentry");
 const Sentry = require("@sentry/node");

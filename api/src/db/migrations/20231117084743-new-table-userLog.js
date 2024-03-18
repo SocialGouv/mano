@@ -2,7 +2,7 @@
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up(queryInterface, Sequelize) {
+  async up(queryInterface) {
     await queryInterface.sequelize.query(`
       CREATE TABLE IF NOT EXISTS mano."UserLog" (
         _id uuid NOT NULL,

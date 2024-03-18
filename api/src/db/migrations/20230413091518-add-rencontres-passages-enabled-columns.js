@@ -2,7 +2,7 @@
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up(queryInterface, Sequelize) {
+  async up(queryInterface) {
     await queryInterface.sequelize.query(`
     ALTER TABLE "mano"."Organisation"
     ADD COLUMN IF NOT EXISTS "passagesEnabled" boolean DEFAULT true,

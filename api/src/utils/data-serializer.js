@@ -21,6 +21,7 @@ function serializeOrganisation(organisation) {
     groupsEnabled: organisation.groupsEnabled,
 
     /* actions settings */
+    // eslint-disable-next-line no-extra-boolean-cast
     categories: !!organisation.actionsGroupedCategories
       ? organisation.actionsGroupedCategories.reduce((flattenedCategories, group) => [...flattenedCategories, ...group.categories], [])
       : organisation.categories,
@@ -35,6 +36,7 @@ function serializeOrganisation(organisation) {
 
     /* services settings */
     groupedServices: organisation.groupedServices,
+    // eslint-disable-next-line no-extra-boolean-cast
     services: !!organisation.groupedServices
       ? organisation.groupedServices.reduce((flattenedServices, group) => [...flattenedServices, ...group.services], [])
       : organisation.services,

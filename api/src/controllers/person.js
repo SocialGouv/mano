@@ -67,7 +67,7 @@ router.post(
       },
     }),
   }).single("file"),
-  catchErrors(async (req, res, next) => {
+  catchErrors(async (req, res) => {
     const { file } = req;
     // Send back file information.
     res.send({

@@ -2,7 +2,7 @@
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up(queryInterface, Sequelize) {
+  async up(queryInterface) {
     await queryInterface.sequelize.query(`
       ALTER TABLE mano."UserLog"
       DROP CONSTRAINT IF EXISTS "UserLog_organisation_fkey",
@@ -10,7 +10,7 @@ module.exports = {
     `);
   },
 
-  async down(queryInterface, Sequelize) {
+  async down() {
     // Code to re-add constraints and indices if needed.
   },
 };

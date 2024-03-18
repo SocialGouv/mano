@@ -85,7 +85,7 @@ router.post(
       await Report.restore({ where: { _id: deletedReport._id } });
     }
 
-    const [data, _created] = await Report.findOrCreate({
+    const [data] = await Report.findOrCreate({
       where: { organisation: req.user.organisation, team: req.body.team, date: req.body.date },
       defaults: {
         encrypted: req.body.encrypted,

@@ -1,35 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-const crypto = require("crypto");
 const { z } = require("zod");
 const { catchErrors } = require("../errors");
 const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
-const { looseUuidRegex, isoDateRegex } = require("../utils");
+const { looseUuidRegex } = require("../utils");
 const { capture } = require("../sentry");
 const validateUser = require("../middleware/validateUser");
 const { serializeOrganisation } = require("../utils/data-serializer");
-const {
-  Organisation,
-  Person,
-  Action,
-  Comment,
-  Consultation,
-  Treatment,
-  MedicalFile,
-  Place,
-  Report,
-  Team,
-  User,
-  RelUserTeam,
-  RelPersonPlace,
-  Passage,
-  TerritoryObservation,
-  Territory,
-  Rencontre,
-  sequelize,
-  Group,
-} = require("../db/sequelize");
+const { Organisation, TerritoryObservation, sequelize } = require("../db/sequelize");
 
 router.put(
   "/:migrationName",

@@ -33,7 +33,7 @@ router.get(
   "/",
   passport.authenticate("user", { session: false }),
   validateUser(["superadmin", "admin", "normal", "restricted-access"]),
-  catchErrors(async (req, res, next) => {
+  catchErrors(async (req, res) => {
     const data = await Team.findAll({ where: { organisation: req.user.organisation }, include: ["Organisation"] });
     return res.status(200).send({ ok: true, data });
   })
@@ -81,7 +81,9 @@ router.put(
       return next(error);
     }
     const updateTeam = {};
+    // eslint-disable-next-line no-prototype-builtins
     if (req.body.hasOwnProperty("name")) updateTeam.name = req.body.name;
+    // eslint-disable-next-line no-prototype-builtins
     if (req.body.hasOwnProperty("nightSession")) updateTeam.nightSession = req.body.nightSession;
 
     const query = { where: { _id: req.params._id, organisation: req.user.organisation } };

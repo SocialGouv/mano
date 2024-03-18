@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
@@ -31,8 +32,6 @@ const { looseUuidRegex, customFieldSchema, positiveIntegerRegex } = require("../
 const { serializeOrganisation } = require("../utils/data-serializer");
 const { defaultSocialCustomFields, defaultMedicalCustomFields } = require("../utils/custom-fields/person");
 const { mailBienvenueHtml } = require("../utils/mail-bienvenue");
-
-const JWT_MAX_AGE = 60 * 60 * 3; // 3 hours in s
 
 router.get(
   "/stats",
@@ -123,7 +122,7 @@ router.post(
     }
     const { orgName, name, email, orgId } = req.body;
     const user = await User.findOne({ where: { email } });
-    if (!!user) return res.status(400).send({ ok: false, error: "Cet email existe déjà dans une autre organisation" });
+    if (user) return res.status(400).send({ ok: false, error: "Cet email existe déjà dans une autre organisation" });
 
     const organisation = await Organisation.create(
       {

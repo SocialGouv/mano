@@ -7,7 +7,7 @@ const { catchErrors } = require("../errors");
 const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
 const validateUser = require("../middleware/validateUser");
 const { looseUuidRegex, positiveIntegerRegex } = require("../utils");
-const { Consultation, sequelize } = require("../db/sequelize");
+const { Consultation } = require("../db/sequelize");
 
 const TODO = "A FAIRE";
 const DONE = "FAIT";

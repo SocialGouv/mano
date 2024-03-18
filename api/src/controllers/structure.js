@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");

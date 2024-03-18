@@ -9,7 +9,7 @@ const validateEncryptionAndMigrations = require("../middleware/validateEncryptio
 const { capture } = require("../sentry");
 const validateUser = require("../middleware/validateUser");
 const { serializeOrganisation } = require("../utils/data-serializer");
-const { Report, Organisation, Service, sequelize } = require("../db/sequelize");
+const { Organisation, Service, sequelize } = require("../db/sequelize");
 
 router.post(
   "/team/:team/date/:date",
@@ -109,7 +109,7 @@ router.get(
 router.get(
   "/all",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res, next) => {
+  catchErrors(async (req, res) => {
     const services = await Service.findAll({ where: { organisation: req.user.organisation } });
 
     const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
