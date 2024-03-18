@@ -4,13 +4,16 @@ import Passage from "../../../components/Passage";
 import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from "../../../components/tailwind/Modal";
 import { FullScreenIcon } from "../../../assets/icons/FullScreenIcon";
 import Table from "../../../components/table";
-import { currentTeamState, userState } from "../../../recoil/auth";
+import { currentTeamState, userState, usersState } from "../../../recoil/auth";
 import { useRecoilValue } from "recoil";
 import UserName from "../../../components/UserName";
 import TagTeam from "../../../components/TagTeam";
 import PersonName from "../../../components/PersonName";
 import DateBloc from "../../../components/DateBloc";
 import Card from "../../../components/Card";
+import { useLocalStorage } from "../../../services/useLocalStorage";
+import { sortPassages } from "../../../recoil/passages";
+import { personsObjectSelector } from "../../../recoil/selectors";
 
 export const PassagesReport = ({ passages, period, selectedTeams }) => {
   const [fullScreen, setFullScreen] = useState(false);
@@ -56,8 +59,26 @@ export const PassagesReport = ({ passages, period, selectedTeams }) => {
 
 const PassagesTable = ({ period, passages, selectedTeams }) => {
   const currentTeam = useRecoilValue(currentTeamState);
+  const persons = useRecoilValue(personsObjectSelector);
   const user = useRecoilValue(userState);
+  const users = useRecoilValue(usersState);
   const [passageToEdit, setPassageToEdit] = useState(null);
+  const [sortBy, setSortBy] = useLocalStorage("report-passage-sortBy", "dueAt");
+  const [sortOrder, setSortOrder] = useLocalStorage("report-passage-sortOrder", "ASC");
+
+  const passagesPopulated = useMemo(() => {
+    return passages.map((passage) => {
+      return {
+        ...passage,
+        personPopulated: persons[passage.person],
+        userPopulated: users.find((u) => u._id === passage.user),
+      };
+    });
+  }, [passages, persons]);
+
+  const passagesSorted = useMemo(() => {
+    return [...passagesPopulated].sort(sortPassages(sortBy, sortOrder));
+  }, [passagesPopulated, sortBy, sortOrder]);
 
   const numberOfAnonymousPassages = useMemo(() => passages.filter((p) => !p.person)?.length, [passages]);
   const numberOfNonAnonymousPassages = useMemo(() => passages.filter((p) => !!p.person)?.length, [passages]);
@@ -104,12 +125,16 @@ const PassagesTable = ({ period, passages, selectedTeams }) => {
           <Table
             className="Table"
             onRowClick={setPassageToEdit}
-            data={passages}
+            data={passagesSorted}
             rowKey={"_id"}
             columns={[
               {
                 title: "Date",
                 dataKey: "date",
+                onSortOrder: setSortOrder,
+                onSortBy: setSortBy,
+                sortBy,
+                sortOrder,
                 render: (passage) => {
                   // anonymous comment migrated from `report.passages`
                   // have no time
@@ -128,15 +153,23 @@ const PassagesTable = ({ period, passages, selectedTeams }) => {
               {
                 title: "Personne suivie",
                 dataKey: "person",
+                onSortOrder: setSortOrder,
+                onSortBy: setSortBy,
+                sortBy,
+                sortOrder,
                 render: (passage) =>
                   passage.person ? <PersonName showOtherNames item={passage} /> : <span style={{ opacity: 0.3, fontStyle: "italic" }}>Anonyme</span>,
               },
               {
                 title: "Enregistré par",
                 dataKey: "user",
+                onSortOrder: setSortOrder,
+                onSortBy: setSortBy,
+                sortBy,
+                sortOrder,
                 render: (passage) => (passage.user ? <UserName id={passage.user} /> : null),
               },
-              { title: "Commentaire", dataKey: "comment" },
+              { title: "Commentaire", dataKey: "comment", onSortOrder: setSortOrder, onSortBy: setSortBy, sortBy, sortOrder },
               {
                 title: "Équipe en charge",
                 dataKey: "team",

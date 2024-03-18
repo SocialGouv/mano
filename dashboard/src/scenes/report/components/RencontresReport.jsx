@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from "../../../components/tailwind/Modal";
 import { FullScreenIcon } from "../../../assets/icons/FullScreenIcon";
 import Table from "../../../components/table";
-import { currentTeamState, userState } from "../../../recoil/auth";
+import { currentTeamState, userState, usersState } from "../../../recoil/auth";
 import { useRecoilValue } from "recoil";
 import UserName from "../../../components/UserName";
 import TagTeam from "../../../components/TagTeam";
@@ -11,6 +11,9 @@ import PersonName from "../../../components/PersonName";
 import DateBloc from "../../../components/DateBloc";
 import Card from "../../../components/Card";
 import Rencontre from "../../../components/Rencontre";
+import { personsObjectSelector } from "../../../recoil/selectors";
+import { sortRencontres } from "../../../recoil/rencontres";
+import { useLocalStorage } from "../../../services/useLocalStorage";
 
 export const RencontresReport = ({ rencontres, period, selectedTeams }) => {
   const [fullScreen, setFullScreen] = useState(false);
@@ -56,8 +59,27 @@ export const RencontresReport = ({ rencontres, period, selectedTeams }) => {
 
 const RencontresTable = ({ period, rencontres, selectedTeams }) => {
   const currentTeam = useRecoilValue(currentTeamState);
+  const persons = useRecoilValue(personsObjectSelector);
   const user = useRecoilValue(userState);
+  const users = useRecoilValue(usersState);
   const [rencontreToEdit, setRencontreToEdit] = useState(null);
+
+  const [sortBy, setSortBy] = useLocalStorage("report-rencontre-sortBy", "dueAt");
+  const [sortOrder, setSortOrder] = useLocalStorage("report-rencontre-sortOrder", "ASC");
+
+  const rencontresPopulated = useMemo(() => {
+    return rencontres.map((rencontre) => {
+      return {
+        ...rencontre,
+        personPopulated: persons[rencontre.person],
+        userPopulated: rencontre.user ? users.find((u) => u._id === rencontre.user) : undefined,
+      };
+    });
+  }, [rencontres, persons]);
+
+  const rencontresSorted = useMemo(() => {
+    return [...rencontresPopulated].sort(sortRencontres(sortBy, sortOrder));
+  }, [rencontresPopulated, sortBy, sortOrder]);
 
   const numberOfNonAnonymousRencontres = useMemo(() => rencontres.filter((p) => !!p.person)?.length, [rencontres]);
 
@@ -95,12 +117,16 @@ const RencontresTable = ({ period, rencontres, selectedTeams }) => {
           <Table
             className="Table"
             onRowClick={setRencontreToEdit}
-            data={rencontres}
+            data={rencontresSorted}
             rowKey={"_id"}
             columns={[
               {
                 title: "Date",
                 dataKey: "date",
+                onSortOrder: setSortOrder,
+                onSortBy: setSortBy,
+                sortBy,
+                sortOrder,
                 render: (rencontre) => {
                   // anonymous comment migrated from `report.rencontres`
                   // have no time
@@ -119,6 +145,10 @@ const RencontresTable = ({ period, rencontres, selectedTeams }) => {
               {
                 title: "Personne suivie",
                 dataKey: "person",
+                onSortOrder: setSortOrder,
+                onSortBy: setSortBy,
+                sortBy,
+                sortOrder,
                 render: (rencontre) =>
                   rencontre.person ? (
                     <PersonName showOtherNames item={rencontre} />
@@ -129,9 +159,13 @@ const RencontresTable = ({ period, rencontres, selectedTeams }) => {
               {
                 title: "Enregistré par",
                 dataKey: "user",
+                onSortOrder: setSortOrder,
+                onSortBy: setSortBy,
+                sortBy,
+                sortOrder,
                 render: (rencontre) => (rencontre.user ? <UserName id={rencontre.user} /> : null),
               },
-              { title: "Commentaire", dataKey: "comment" },
+              { title: "Commentaire", dataKey: "comment", onSortOrder: setSortOrder, onSortBy: setSortBy, sortBy, sortOrder },
               {
                 title: "Équipe en charge",
                 dataKey: "team",
