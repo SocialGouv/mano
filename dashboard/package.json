@@ -9,6 +9,7 @@
     "@headlessui/react": "^1.7.4",
     "@nivo/bar": "^0.80.0",
     "@nivo/core": "^0.80.0",
+    "@nivo/line": "0.80.0",
     "@nivo/pie": "^0.80.0",
     "@nivo/stream": "^0.84.0",
     "@react-hookz/web": "^23.0.0",

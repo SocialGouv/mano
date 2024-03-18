@@ -1078,6 +1078,27 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@nivo/line@npm:0.80.0":
+  version: 0.80.0
+  resolution: "@nivo/line@npm:0.80.0"
+  dependencies:
+    "@nivo/annotations": "npm:0.80.0"
+    "@nivo/axes": "npm:0.80.0"
+    "@nivo/colors": "npm:0.80.0"
+    "@nivo/legends": "npm:0.80.0"
+    "@nivo/scales": "npm:0.80.0"
+    "@nivo/tooltip": "npm:0.80.0"
+    "@nivo/voronoi": "npm:0.80.0"
+    "@react-spring/web": "npm:9.4.5"
+    d3-shape: "npm:^1.3.5"
+  peerDependencies:
+    "@nivo/core": 0.80.0
+    prop-types: ">= 15.5.10 < 16.0.0"
+    react: ">= 16.14.0 < 19.0.0"
+  checksum: 5df225e70d37a4c974af8a24f3b6b573f408f54425cf53516129c65079768d1bff97fc63adcd71186dfbc8f61d8694694f4da3e50a2bff084026bbeb473d30e0
+  languageName: node
+  linkType: hard
+
 "@nivo/pie@npm:^0.80.0":
   version: 0.80.0
   resolution: "@nivo/pie@npm:0.80.0"
@@ -1183,6 +1204,19 @@ __metadata:
     "@nivo/core": "npm:0.84.0"
     "@react-spring/web": "npm:9.4.5 || ^9.7.2"
   checksum: c9b52157951359c573b9bbe8e976d73f217694d89f2df470272a22d89b428fcab8d4e2c1e030104de5c2cf4fc06c0895ba7f4e56d93be2f42c25a836e1503038
+  languageName: node
+  linkType: hard
+
+"@nivo/voronoi@npm:0.80.0":
+  version: 0.80.0
+  resolution: "@nivo/voronoi@npm:0.80.0"
+  dependencies:
+    d3-delaunay: "npm:^5.3.0"
+    d3-scale: "npm:^3.2.3"
+  peerDependencies:
+    "@nivo/core": 0.80.0
+    react: ">= 16.14.0 < 19.0.0"
+  checksum: 0a7eabf098bd580546e83a6b7039ac62a460d2142e7a593a10cadf630b32523b714af73787064340a78107d585d0ff5991dfeda14eadeab6fb68985646a4482c
   languageName: node
   linkType: hard
 
@@ -3310,6 +3344,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"d3-delaunay@npm:^5.3.0":
+  version: 5.3.0
+  resolution: "d3-delaunay@npm:5.3.0"
+  dependencies:
+    delaunator: "npm:4"
+  checksum: 214aaddd01c58cadcfeea917ff7b7c3202083ac66fe5948d14558385d1ce495b33498ce10a3188ff144377d3da2f2ad72c2c3885407c325a24266c8f4c09347e
+  languageName: node
+  linkType: hard
+
 "d3-format@npm:1 - 2":
   version: 2.0.0
   resolution: "d3-format@npm:2.0.0"
@@ -3425,6 +3468,7 @@ __metadata:
     "@headlessui/react": "npm:^1.7.4"
     "@nivo/bar": "npm:^0.80.0"
     "@nivo/core": "npm:^0.80.0"
+    "@nivo/line": "npm:0.80.0"
     "@nivo/pie": "npm:^0.80.0"
     "@nivo/stream": "npm:^0.84.0"
     "@react-hookz/web": "npm:^23.0.0"
@@ -3565,6 +3609,13 @@ __metadata:
     has-property-descriptors: "npm:^1.0.0"
     object-keys: "npm:^1.1.1"
   checksum: 1e09acd814c3761f2355d9c8a18fbc2b5d2e1073e1302245c134e96aacbff51b152e2a6f5f5db23af3c43e26f4e3a0d42f569aa4135f49046246c934bfb8e1dc
+  languageName: node
+  linkType: hard
+
+"delaunator@npm:4":
+  version: 4.0.1
+  resolution: "delaunator@npm:4.0.1"
+  checksum: 8d5be959a4bf79e5297ca58a3dc223434302200ac0efc2cee5434755b557957a824ee32328ed97f69df93d3819e063f3b4637dd6db4d14d50aa8591aeb6f98a7
   languageName: node
   linkType: hard
 

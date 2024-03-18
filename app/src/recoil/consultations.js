@@ -9,7 +9,26 @@ export const consultationsState = atom({
   default: [],
 });
 
-export const encryptedFields = ['name', 'type', 'person', 'user', 'teams', 'documents', 'comments', 'history'];
+export const encryptedFields = [
+  'name',
+  'type',
+  'person',
+  'user',
+  'teams',
+  'documents',
+  'comments',
+  'history',
+  // Medical constants
+  'constantes-poids',
+  'constantes-frequence-cardiaque',
+  'constantes-taille',
+  'constantes-saturation-o2',
+  'constantes-temperature',
+  'constantes-glycemie-capillaire',
+  'constantes-frequence-respiratoire',
+  'constantes-tension-arterielle-systolique',
+  'constantes-tension-arterielle-diastolique',
+];
 
 export const consultationFieldsSelector = selector({
   key: 'consultationFieldsSelector',

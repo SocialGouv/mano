@@ -13,7 +13,27 @@ export const consultationsState = atom<ConsultationInstance[]>({
   default: [],
 });
 
-const encryptedFields: Array<keyof ConsultationInstance> = ["name", "type", "person", "user", "teams", "documents", "comments", "history"];
+const encryptedFields: Array<keyof ConsultationInstance> = [
+  // Normal fields
+  "name",
+  "type",
+  "person",
+  "user",
+  "teams",
+  "documents",
+  "comments",
+  "history",
+  // Medical constants
+  "constantes-poids",
+  "constantes-frequence-cardiaque",
+  "constantes-taille",
+  "constantes-saturation-o2",
+  "constantes-temperature",
+  "constantes-glycemie-capillaire",
+  "constantes-frequence-respiratoire",
+  "constantes-tension-arterielle-systolique",
+  "constantes-tension-arterielle-diastolique",
+];
 
 export const consultationFieldsSelector = selector({
   key: "consultationFieldsSelector",

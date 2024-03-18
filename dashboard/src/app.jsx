@@ -188,7 +188,7 @@ const RestrictedRoute = ({ component: Component, _isLoggedIn, ...rest }) => {
     padding: 0 !important;
     overflow: initial;
         */}
-        <main className="print:!tw-ml-0 tw-relative tw-flex tw-grow tw-basis-full tw-flex-col tw-overflow-auto tw-overflow-x-hidden tw-overflow-y-scroll tw-px-2 sm:tw-px-12 sm:tw-pb-12 sm:tw-pt-4 print:tw-h-auto print:tw-max-w-full print:tw-overflow-visible print:tw-p-0">
+        <main className="tw-relative tw-flex tw-grow tw-basis-full tw-flex-col tw-overflow-auto tw-overflow-x-hidden tw-overflow-y-scroll tw-px-2 sm:tw-px-12 sm:tw-pb-12 sm:tw-pt-4 print:!tw-ml-0 print:tw-h-auto print:tw-max-w-full print:tw-overflow-visible print:tw-p-0">
           <SentryRoute {...rest} render={(props) => (user ? <Component {...props} /> : <Redirect to={{ pathname: "/auth" }} />)} />
         </main>
       </div>
