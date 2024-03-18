@@ -56,7 +56,7 @@ export default function DocumentsOrganizer({
 
   useEffect(() => {
     // we want to keep alternate line colors
-    let elements = document.getElementById(`${htmlId}-documents`)?.querySelectorAll('[data-visible="true"]') || [];
+    const elements = document.getElementById(`${htmlId}-documents`)?.querySelectorAll('[data-visible="true"]') || [];
     for (let i = 0; i < elements.length; i++) {
       if (i % 2 === 0) {
         elements[i].classList.add("before:tw-bg-opacity-0");

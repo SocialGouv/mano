@@ -160,7 +160,7 @@ export const usePreparePersonForEncryption = () => {
       ...encryptedFields,
     ];
     const decrypted: any = {};
-    for (let field of encryptedFieldsIncludingCustom) {
+    for (const field of encryptedFieldsIncludingCustom) {
       decrypted[field] = person[field] as never;
     }
     return {

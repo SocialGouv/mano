@@ -52,7 +52,7 @@ export const prepareTreatmentForEncryption = (treatment: TreatmentInstance, { ch
     }
   }
   const decrypted: any = {};
-  for (let field of encryptedFields) {
+  for (const field of encryptedFields) {
     decrypted[field] = treatment[field];
   }
   return {

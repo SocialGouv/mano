@@ -41,7 +41,7 @@ export const prepareMedicalFileForEncryption =
     }
     const encryptedFieldsIncludingCustom = [...customFieldsMedicalFile.map((f) => f.name), ...encryptedFields];
     const decrypted: any = {};
-    for (let field of encryptedFieldsIncludingCustom) {
+    for (const field of encryptedFieldsIncludingCustom) {
       decrypted[field] = medicalFile[field];
     }
     return {

@@ -23,7 +23,7 @@ const EvolutiveStatsSelector = ({ onChange, selection, title = "", saveInURLPara
 
   function getFilterOptionsByField(fieldName: FilterField["name"] | null, base: IndicatorsBase, index: number) {
     if (!fieldName) return [];
-    let current = base.find((field) => field.name === fieldName);
+    const current = base.find((field) => field.name === fieldName);
     if (!current) {
       onChange(
         selection.filter((_f, i) => i !== index),
@@ -35,6 +35,7 @@ const EvolutiveStatsSelector = ({ onChange, selection, title = "", saveInURLPara
     if (["boolean"].includes(current.type)) return ["Oui", "Non"];
     if (current?.name === "outOfActiveList") return current.options || [];
     if (current?.options?.length) {
+      // eslint-disable-next-line no-unsafe-optional-chaining
       return [...current?.options, "Non renseigné"].filter((option) => {
         if (!option) return false;
         if (option.includes("Choisissez un genre")) return false;

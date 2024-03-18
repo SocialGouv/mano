@@ -31,7 +31,7 @@ const encryptedFields: Array<keyof GroupInstance> = ["persons", "relations"];
 export const prepareGroupForEncryption = (group: GroupInstance) => {
   const decrypted: any = {};
 
-  for (let field of encryptedFields) {
+  for (const field of encryptedFields) {
     decrypted[field] = group[field];
   }
 

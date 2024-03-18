@@ -47,6 +47,7 @@ function getValuesOptionsByField(field: CustomOrPredefinedField, fieldsMap: Fiel
   if (["boolean"].includes(current.type)) return ["Oui", "Non"];
   if (current?.name === "outOfActiveList") return current.options ?? ["Oui", "Non"];
   if (current?.options?.length) {
+    // eslint-disable-next-line no-unsafe-optional-chaining
     return [...current?.options, "Non renseigné"].filter((option) => {
       if (option.includes("Choisissez un genre")) return false;
       return true;
@@ -104,7 +105,7 @@ function getPersonSnapshotAtDate({
   if (!history?.length) return snapshot;
   const reversedHistory = [...history].reverse();
   for (const historyItem of reversedHistory) {
-    let historyDate = dayjsInstance(historyItem.date).format("YYYYMMDD");
+    const historyDate = dayjsInstance(historyItem.date).format("YYYYMMDD");
     if (historyDate < snapshotDate) return snapshot;
     for (const historyChangeField of Object.keys(historyItem.data)) {
       const oldValue = getValueByField(historyChangeField, fieldsMap, historyItem.data[historyChangeField].oldValue);
@@ -223,7 +224,7 @@ export const evolutiveStatsPersonSelector = selectorFamily({
         if (!!history?.length) {
           const reversedHistory = [...history].reverse();
           for (const historyItem of reversedHistory) {
-            let historyDate = dayjsInstance(historyItem.date).format("YYYYMMDD");
+            const historyDate = dayjsInstance(historyItem.date).format("YYYYMMDD");
             while (currentDate > historyDate && currentDate > minimumDate) {
               currentDate = dayjsInstance(currentDate).subtract(1, "day").format("YYYYMMDD");
               for (const field of indicatorsBase) {
