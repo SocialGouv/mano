@@ -21,7 +21,7 @@ export default function Download() {
           </span>
         </a>
       </section>
-      <Footer skipFirstParagraph />
+      <Footer />
     </div>
   );
 }

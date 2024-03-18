@@ -61,14 +61,15 @@ export default function Index() {
               <div className="text-center grid gap-2">
                 <div>Mélissa Saiter</div>
                 <div>
-                  <a href="mailto:m.saiter.mano@gmail.com" className="text-[#00897f] hover:underline">
-                    m.saiter.mano@gmail.com
+                  <a href="mailto:melissa.saiter@sesan.fr" className="text-[#00897f] hover:underline">
+                    melissa.saiter@sesan.fr
                   </a>
                 </div>
-                <div>
-                  <a href="tel:+33613233345" className="hover:underline">
-                    06 13 23 33 45
+                <div className="flex items-center justify-center">
+                  <a href="tel:+33749082710" className="hover:underline">
+                    07 49 08 27 10
                   </a>
+                  <span className="text-[10px] text-white bg-[#00897f] rounded px-1 ml-2">nouveau</span>
                 </div>
 
                 <div className="text-xs mt-4 max-w-sm mx-auto">
@@ -88,14 +89,15 @@ export default function Index() {
               <div className="text-center grid gap-2">
                 <div>Yoann Kittery</div>
                 <div>
-                  <a href="mailto:ykittery.mano@gmail.com" className="text-[#00897f] hover:underline">
-                    ykittery.mano@gmail.com
+                  <a href="mailto:yoann.kittery@sesan.fr" className="text-[#00897f] hover:underline">
+                    yoann.kittery@sesan.fr
                   </a>
                 </div>
-                <div>
-                  <a href="tel:+330683982966" className="hover:underline">
-                    06 83 98 29 66
+                <div className="flex items-center justify-center">
+                  <a href="tel:+330745164004" className="hover:underline">
+                    07 45 16 40 04
                   </a>
+                  <span className="text-[10px] text-white bg-[#00897f] rounded px-1 ml-2">nouveau</span>
                 </div>
 
                 <div className="text-xs mt-4  max-w-sm mx-auto">

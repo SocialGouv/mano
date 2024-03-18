@@ -47,8 +47,13 @@ export default function UnBugButton() {
               <li>
                 Si le problème persiste, contactez votre chargé de déploiement&nbsp;:
                 <ul className="tw-list-disc">
-                  <li>Yoann - ykittery.mano@gmail.com (06&nbsp;83&nbsp;98&nbsp;29&nbsp;66)</li>
-                  <li>Melissa - m.saiter.mano@gmail.com (06&nbsp;13&nbsp;23&nbsp;33&nbsp;45)</li>
+                  <li>Yoann - yoann.kittery@sesan.fr (07&nbsp;45&nbsp;16&nbsp;40&nbsp;04)
+                  <span className="tw-text-xs tw-text-white tw-bg-red-700 tw-rounded tw-px-1 tw-pb-0.5 tw-ml-2">nouveau</span>
+                  </li>
+                  <li>
+                    Melissa - melissa.saiter@sesan.fr (07&nbsp;49&nbsp;08&nbsp;27&nbsp;10)
+                    <span className="tw-text-xs tw-text-white tw-bg-red-700 tw-rounded tw-px-1 tw-pb-0.5 tw-ml-2">nouveau</span>
+                  </li>
                 </ul>
               </li>
             </ul>

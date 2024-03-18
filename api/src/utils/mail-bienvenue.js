@@ -39,11 +39,11 @@ Pour télécharger l’application, c’est PAR ICI !
 <br />
 <p>Si vous avez des questions ou avez besoin d'assistance, n'hésitez pas à nous contacter votre chargé·e de déploiement&nbsp;:</p>
 <p>Melissa Saiter&nbsp;:<br />
-m.saiter.mano@gmail.com - +33 6 13 23 33 45<br />
+melissa.saiter@sesan.fr - 07 49 08 27 10<br />
 <span style="font-size: 12px;">Île-de-France, Hauts-de-France, Auvergne&nbsp;Rhone&nbsp;Alpes, Grand&nbsp;Est, Normandie, Bretagne, Guadeloupe et Martinique</span></p>
 <br />
 <p>Yoann Kittery&nbsp;:<br />
-ykittery.mano@gmail.com - +33 6 83 98 29 66<br />
+yoann.kittery@sesan.fr - 07 45 16 40 04<br />
 <span style="font-size: 12px;">Île-de-france, PACA, Occitanie, Nouvelle&nbsp;Aquitaine, Pays&nbsp;de&nbsp;la&nbsp;Loire, Centre&nbsp;Val&nbsp;de&nbsp;Loire, Corse,
 Réunion</span></p>
 <br />

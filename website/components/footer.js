@@ -2,10 +2,10 @@ import { HiOutlineMail } from "react-icons/hi";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
-export default function Footer({ skipFirstParagraph }) {
-  const guillaume = "Zy5kZW1pcmhhbkBhdXJvcmUuYXNzby5mcg==";
-  const melissa = "bS5zYWl0ZXIubWFub0BnbWFpbC5jb20=";
-  const yoann = "eWtpdHRlcnkubWFub0BnbWFpbC5jb20=";
+export default function Footer() {
+  const guillaume = "Z3VpbGxhdW1lLmRlbWlyaGFuQHNlc2FuLmZy";
+  const melissa = "bWVsaXNzYS5zYWl0ZXJAc2VzYW4uZnI=";
+  const yoann = "eW9hbm4ua2l0dGVyeUBzZXNhbi5mcg==";
   const [emailGuillaume, setEmailGuillaume] = useState("");
   const [emailMelissa, setEmailMelissa] = useState("");
   const [emailYoann, setEmailYoann] = useState("");
