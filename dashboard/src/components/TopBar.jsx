@@ -30,7 +30,7 @@ const TopBar = () => {
       >
         <div className="tw-flex tw-flex-1 tw-items-center tw-justify-start">
           <div className="tw-mr-4 tw-w-max tw-text-left tw-text-sm tw-font-semibold tw-tracking-tighter">
-            {["superadmin"].includes(user.role) ? "Support" : organisation?.name}
+            {["superadmin"].includes(user.role) ? "🤖 Mano Superadmin Console" : organisation?.name}
           </div>
           {!["superadmin"].includes(user.role) && (
             <SelectTeam

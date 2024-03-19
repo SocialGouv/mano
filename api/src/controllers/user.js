@@ -16,7 +16,6 @@ const { capture } = require("../sentry");
 const { ExtractJwt } = require("passport-jwt");
 const { serializeUserWithTeamsAndOrganisation, serializeTeam } = require("../utils/data-serializer");
 const { mailBienvenueHtml } = require("../utils/mail-bienvenue");
-const organisation = require("../models/organisation");
 
 const EMAIL_OR_PASSWORD_INVALID = "EMAIL_OR_PASSWORD_INVALID";
 const PASSWORD_NOT_VALIDATED = "PASSWORD_NOT_VALIDATED";
@@ -532,17 +531,21 @@ router.get(
   validateUser(["admin", "normal", "superadmin", "restricted-access"]),
   catchErrors(async (req, res, next) => {
     try {
-      z.optional(z.literal("true")).parse(req.query.minimal);
+      z.object({
+        minimal: z.optional(z.literal("true")),
+        ...(req.user.role === "superadmin" ? { organisation: z.optional(z.string().regex(looseUuidRegex)) } : {}),
+      }).parse(req.query);
     } catch (e) {
       const error = new Error(`Invalid request in get users: ${e}`);
       error.status = 400;
       return next(error);
     }
 
-    const users = await User.findAll({ where: { organisation: req.user.organisation } });
+    const organisationId = req.user.role === "superadmin" && req.query.organisation ? req.query.organisation : req.user.organisation;
+    const users = await User.findAll({ where: { organisation: organisationId } });
     const data = [];
 
-    if (req.user.role !== "admin" || req.query.minimal === "true") {
+    if ((req.user.role !== "admin" && req.user.role !== "superadmin") || req.query.minimal === "true") {
       for (let user of users) {
         data.push({ name: user.name, _id: user._id });
       }
@@ -749,6 +752,37 @@ router.delete(
     await user.destroy({ transaction: tx });
     await tx.commit();
     res.status(200).send({ ok: true });
+  })
+);
+
+router.post(
+  "/generate-link",
+  passport.authenticate("user", { session: false }),
+  validateUser(["superadmin"]),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.object({
+        _id: z.string().regex(looseUuidRegex),
+      }).parse(req.body);
+    } catch (e) {
+      const error = new Error(`Invalid request in generate token: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+
+    console.log("coucou");
+
+    const _id = req.body._id;
+    const user = await User.findOne({ where: { _id } });
+    if (!user) return res.status(404).send({ ok: false, error: "Not Found" });
+
+    const token = crypto.randomBytes(20).toString("hex");
+    user.forgotPasswordResetToken = token;
+    user.forgotPasswordResetExpires = new Date(Date.now() + 60 * 60 * 24 * 30 * 1000); // 30 days
+    const link = `https://espace-mano.sesan.fr/auth/reset?token=${token}`;
+    await user.save();
+
+    return res.status(200).send({ ok: true, data: { link } });
   })
 );
 

@@ -17,8 +17,10 @@ import { userState } from "../../recoil/auth";
 import { emailRegex } from "../../utils";
 import SelectRole from "../../components/SelectRole";
 import SelectCustom from "../../components/SelectCustom";
+import { useHistory } from "react-router-dom";
 
 const List = () => {
+  const history = useHistory();
   const [organisations, setOrganisations] = useState(null);
   const user = useRecoilValue(userState);
   const [updateKey, setUpdateKey] = useState(null);
@@ -179,6 +181,16 @@ const List = () => {
                   <div className="tw-grid tw-gap-2">
                     <div>
                       <button
+                        className="button-classic"
+                        onClick={() => {
+                          history.push(`/organisation/${organisation._id}/user`);
+                        }}
+                      >
+                        Voir les utilisateurs
+                      </button>
+                    </div>
+                    <div>
+                      <button
                         onClick={() => {
                           setSelectedOrganisation(organisation);
                           setOpenCreateUserModal(true);
@@ -208,7 +220,7 @@ const List = () => {
                         <span style={{ marginBottom: 30, display: "block", width: "100%", textAlign: "center" }}>
                           Cette opération est irréversible
                           <br />
-                          et entrainera la suppression définitive de toutes les données liées à l'organisation&nbsp;:
+                          et entrainera la suppression définitive de toutes les données liées à l’organisation&nbsp;:
                           <br />
                           équipes, utilisateurs, personnes suivies, actions, territoires, commentaires et observations, comptes-rendus...
                         </span>
@@ -290,14 +302,14 @@ const Create = ({ onChange, open, setOpen }) => {
                 <Row>
                   <Col md={6}>
                     <FormGroup>
-                      <Label htmlFor="name">Nom de l'administrateur</Label>
+                      <Label htmlFor="name">Nom de l’administrateur</Label>
                       <Input name="name" id="name" value={values.name} onChange={handleChange} />
                       {touched.name && errors.name && <span className="tw-text-xs tw-text-red-500">{errors.name}</span>}
                     </FormGroup>
                   </Col>
                   <Col md={6}>
                     <FormGroup>
-                      <Label htmlFor="email">Email de l'administrateur</Label>
+                      <Label htmlFor="email">Email de l’administrateur</Label>
                       <Input name="email" id="email" value={values.email} onChange={handleChange} />
                       {touched.email && errors.email && <span className="tw-text-xs tw-text-red-500">{errors.email}</span>}
                     </FormGroup>
@@ -353,7 +365,7 @@ const CreateUser = ({ onChange, open, setOpen, organisation }) => {
               }
             }}
           >
-            {({ values, handleChange, handleSubmit, isSubmitting, touched, errors }) => (
+            {({ values, handleChange, handleSubmit, isSubmitting }) => (
               <React.Fragment>
                 <Row>
                   <Col md={6}>

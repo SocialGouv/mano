@@ -9,8 +9,10 @@ export type UserInstance = {
   lastLoginAt: Date | null;
   termsAccepted: Date | null;
   cgusAccepted: Date | null;
+  phone: string | null;
   healthcareProfessional: boolean | null;
   role: "normal" | "admin"; // Add other roles if available.
   team?: UUIDV4[];
   teams?: UUIDV4[];
+  createdAt?: Date;
 };
