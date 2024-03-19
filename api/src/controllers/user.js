@@ -770,8 +770,6 @@ router.post(
       return next(error);
     }
 
-    console.log("coucou");
-
     const _id = req.body._id;
     const user = await User.findOne({ where: { _id } });
     if (!user) return res.status(404).send({ ok: false, error: "Not Found" });
