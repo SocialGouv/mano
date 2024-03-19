@@ -83,7 +83,7 @@ const PersonCustomFieldsSettings = () => {
       body: { customFieldsPersons: newCustomFieldsPersons },
     });
     if (response.ok) {
-      toast.success("Type de consultation supprimé", { autoclose: 2000 });
+      toast.success("Groupe supprimé", { autoclose: 2000 });
       setOrganisation(response.data);
       refresh();
     } else {
