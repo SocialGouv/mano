@@ -28,8 +28,10 @@ const notFound = (req, res, next) => {
   Development Error Handler
 
   In development we show good error messages so if we hit a syntax error or any other previously un-handled error, we can show good info on what happened
+  Attention ! Il ne faut jamais supprimer le "next", même s'il n'est pas utilisé
 */
-const sendError = (err, req, res) => {
+// eslint-disable-next-line no-unused-vars
+const sendError = (err, req, res, next) => {
   const { body, query, user, params, route, method, originalUrl, headers } = req;
   const { version, platform } = headers;
   capture(err, { extra: { body, query, params, route, method, originalUrl, version, platform }, user });
