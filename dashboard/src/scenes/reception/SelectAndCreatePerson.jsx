@@ -4,7 +4,7 @@ import { personsState, usePreparePersonForEncryption } from "../../recoil/person
 import { selector, useRecoilState, useRecoilValue } from "recoil";
 import AsyncSelect from "react-select/async-creatable";
 import API from "../../services/api";
-import { formatBirthDate, formatCalendarDate } from "../../services/date";
+import { formatBirthDate, formatCalendarDate, isToday } from "../../services/date";
 import { TODO, actionsState } from "../../recoil/actions";
 import { passagesState } from "../../recoil/passages";
 import { rencontresState } from "../../recoil/rencontres";
@@ -295,7 +295,18 @@ const Person = ({ person }) => {
               : `${person.lastAction?.name} - ${formatCalendarDate(person.lastAction.completedAt || person.lastAction.dueAt)}`
           }
         />
-        <AdditionalInfo label="Dernier passage" value={person.lastPassage?.date ? formatCalendarDate(person.lastPassage?.date) : null} />
+        <AdditionalInfo
+          label="Dernier passage"
+          value={
+            person.lastPassage?.date ? (
+              isToday(person.lastPassage?.date) ? (
+                <span className="tw-rounded tw-bg-green-700 tw-px-1 tw-py-0.5 tw-font-bold tw-text-white">Aujourd’hui</span>
+              ) : (
+                formatCalendarDate(person.lastPassage?.date)
+              )
+            ) : null
+          }
+        />
         <AdditionalInfo label="Tel" value={person.phone} />
       </div>
     </div>
