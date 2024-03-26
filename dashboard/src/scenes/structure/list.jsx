@@ -176,7 +176,7 @@ const Structure = ({ structure: initStructure, onSuccess, open, onClose, onOpen 
     <div className="tw-flex tw-w-full tw-justify-end">
       <ButtonCustom onClick={onOpen} color="primary" title="Créer une nouvelle structure" padding="12px 24px" />
       <ModalContainer open={open} onClose={onResetAndClose} size="full">
-        <ModalHeader title="Créer une structure" />
+        <ModalHeader title={!initStructure?._id ? "Créer une structure" : "Modifier une structure"} />
         <ModalBody className="tw-pb-4">
           <form id="create-structure-form" className="tw-flex tw-w-full tw-flex-row tw-flex-wrap" onSubmit={onSubmit}>
             <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
