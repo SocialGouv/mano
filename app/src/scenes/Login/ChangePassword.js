@@ -32,7 +32,7 @@ const checkErrorPassword = (password) => {
 
 const codesToErrors = {
   IS_EMPTY: 'Le mot de passe ne peut pas être vide',
-  IS_TOO_SHORT_OR_TOO_LONG: 'Le mot de passe doit avoir entre 6 et 32 caractères',
+  IS_TOO_SHORT_OR_TOO_LONG: 'Le mot de passe doit avoir entre 8 et 32 caractères',
   NO_NUMBER: 'Le mot de passe doit avoir au moins un chiffre',
   NO_LETTER: 'Le mot de passe doit avoir au moins une lettre',
   NO_UPPERCASE: 'Le mot de passe doit avoir au moins une lettre majuscule',
@@ -41,7 +41,7 @@ const codesToErrors = {
 };
 
 const codesToHints = {
-  IS_TOO_SHORT_OR_TOO_LONG: 'entre 6 et 32 caractères',
+  IS_TOO_SHORT_OR_TOO_LONG: 'entre 8 et 32 caractères',
   NO_NUMBER: 'au moins un chiffre',
   NO_LETTER: 'au moins une lettre',
   NO_UPPERCASE: 'au moins une majuscule',

@@ -7,7 +7,7 @@ function validatePassword(password) {
   const schema = new passwordValidator();
   schema
     .is()
-    .min(6) // Minimum length 6
+    .min(8) // Minimum length 8
     .is()
     .max(32) // Maximum length 32
     .has()

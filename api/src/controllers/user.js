@@ -21,7 +21,7 @@ const EMAIL_OR_PASSWORD_INVALID = "EMAIL_OR_PASSWORD_INVALID";
 const PASSWORD_NOT_VALIDATED = "PASSWORD_NOT_VALIDATED";
 
 const passwordCheckError =
-  "Le mot de passe n'est pas valide. Il doit comprendre 6 caractères, au moins une lettre, un chiffre et un caractère spécial";
+  "Le mot de passe n'est pas valide. Il doit comprendre 8 caractères, au moins une lettre, un chiffre et un caractère spécial";
 
 const JWT_MAX_AGE = 60 * 60 * 13; // 13 hours in s, a bit more than a working day, so disconnect every night
 const COOKIE_MAX_AGE = JWT_MAX_AGE * 1000;
