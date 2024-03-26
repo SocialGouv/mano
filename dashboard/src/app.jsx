@@ -15,7 +15,6 @@ import Organisation from "./scenes/organisation";
 import Action from "./scenes/action";
 import Territory from "./scenes/territory";
 import Structure from "./scenes/structure";
-import Place from "./scenes/place";
 import Team from "./scenes/team";
 import Stats from "./scenes/stats";
 import SearchView from "./scenes/search";
@@ -135,7 +134,6 @@ const App = ({ resetRecoil }) => {
           <RestrictedRoute path="/account" component={Account} />
           <RestrictedRoute path="/user" component={User} />
           <RestrictedRoute path="/person" component={Person} />
-          <RestrictedRoute path="/place" component={Place} />
           <RestrictedRoute path="/action" component={Action} />
           <RestrictedRoute path="/territory" component={Territory} />
           <RestrictedRoute path="/structure" component={Structure} />
