@@ -249,7 +249,12 @@ const TerritoryObservation = ({ route, navigation }) => {
           })}
         </ScrollView>
       ) : null}
-      <ScrollView keyboardShouldPersistTaps="handled" className="bg-white p-4" ref={scrollViewRef} testID="observation">
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        className="bg-white p-4"
+        ref={scrollViewRef}
+        testID="observation"
+        contentContainerStyle={{ paddingBottom: 20 }}>
         <View className="mt-3">
           {editable && obsDB?._id ? (
             <DateAndTimeInput label="Observation faite le" setDate={(a) => setDate(a)} date={date} showTime showDay withTime />
