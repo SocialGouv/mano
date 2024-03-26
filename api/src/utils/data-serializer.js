@@ -47,7 +47,11 @@ function serializeOrganisation(organisation) {
     /* custom fields consultations */
     consultations: organisation.consultations,
     /* custom fields observations */
-    customFieldsObs: organisation.customFieldsObs,
+    groupedCustomFieldsObs: organisation.groupedCustomFieldsObs,
+    // This works as usual (before the migration) because the default group is the only one
+    // Autrement dit, si quelqu'un n'a pas mis à jour l'app ou le dashboard, il a tous ses champs
+    // d'observation en vrac comme avant.
+    customFieldsObs: (organisation.groupedCustomFieldsObs || []).reduce((flattenedFields, group) => [...flattenedFields, ...group.fields], []),
     /* fixed fields persons */
     personFields: personFields,
     /* custom fields persons: fields with customizavble options only */

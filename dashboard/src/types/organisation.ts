@@ -33,6 +33,7 @@ export interface OrganisationInstance {
   groupedServices?: GroupedServices[];
 
   customFieldsObs: CustomField[];
+  groupedCustomFieldsObs?: CustomFieldsGroup[];
   personFields: PredefinedField[];
   customFieldsPersons: CustomFieldsGroup[];
   customFieldsMedicalFile: CustomField[];

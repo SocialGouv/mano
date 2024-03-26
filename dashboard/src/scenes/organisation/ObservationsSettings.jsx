@@ -1,11 +1,16 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useDataLoader } from "../../components/DataLoader";
 import { organisationState } from "../../recoil/auth";
 import API, { encryptItem } from "../../services/api";
 import { toast } from "react-toastify";
 import DragAndDropSettings from "./DragAndDropSettings";
-import { customFieldsObsSelector, prepareObsForEncryption, territoryObservationsState } from "../../recoil/territoryObservations";
+import {
+  customFieldsObsSelector,
+  groupedCustomFieldsObsSelector,
+  prepareObsForEncryption,
+  territoryObservationsState,
+} from "../../recoil/territoryObservations";
 import CustomFieldSetting from "../../components/CustomFieldSetting";
 import { EditCustomField } from "../../components/TableCustomFields";
 
@@ -19,38 +24,90 @@ const sanitizeFields = (field) => {
 
 const ObservationsSettings = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
-  const customFieldsObs = useRecoilValue(customFieldsObsSelector);
-  const dataFormatted = useMemo(() => {
-    return [
-      {
-        groupTitle: "Observations de territoire",
-        items: customFieldsObs,
-      },
-    ];
-  }, [customFieldsObs]);
+  const flatCustomFieldsObs = useRecoilValue(customFieldsObsSelector);
+  const groupedCustomFieldsObs = useRecoilValue(groupedCustomFieldsObsSelector);
+
+  const dataFormatted = groupedCustomFieldsObs.map((group) => ({
+    groupTitle: group.name,
+    items: group.fields,
+  }));
 
   const { refresh } = useDataLoader();
 
-  const onDragAndDrop = useCallback(
-    async ([{ items }]) => {
-      const reorderedCustomFields = items.map((fieldName, index) => customFieldsObs.find((field) => field.name === fieldName)).map(sanitizeFields);
+  const onAddGroup = async (name) => {
+    const res = await API.put({
+      path: `/organisation/${organisation._id}`,
+      body: { groupedCustomFieldsObs: [...groupedCustomFieldsObs, { name, fields: [] }] },
+    });
+    if (res.ok) {
+      toast.success("Groupe ajouté", { autoclose: 2000 });
+      setOrganisation(res.data);
+    }
+    refresh();
+  };
 
-      try {
-        const response = await API.put({
-          path: `/organisation/${organisation._id}`,
-          body: { customFieldsObs: reorderedCustomFields },
-        });
-        if (response.ok) {
-          toast.success("Mise à jour !");
-          setOrganisation(response.data);
-          refresh();
-        }
-      } catch (orgUpdateError) {
-        console.log("error in updating organisation", orgUpdateError);
-        toast.error(orgUpdateError.message);
+  const onGroupTitleChange = async (oldName, newName) => {
+    if (!newName) {
+      toast.error("Vous devez saisir un nom pour le groupe de champs personnalisés");
+      return;
+    }
+    const newCustomFieldsObs = groupedCustomFieldsObs.map((type) => {
+      if (type.name !== oldName) return type;
+      return {
+        ...type,
+        name: newName,
+      };
+    });
+
+    const oldOrganisation = organisation;
+    const response = await API.put({
+      path: `/organisation/${organisation._id}`,
+      body: { groupedCustomFieldsObs: newCustomFieldsObs },
+    });
+    if (response.ok) {
+      refresh();
+      setOrganisation(response.data);
+      toast.success("Groupe mise à jour. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
+    } else {
+      setOrganisation(oldOrganisation);
+      toast.error("Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !");
+    }
+  };
+
+  const onDeleteGroup = async (name) => {
+    const newCustomFieldsObs = groupedCustomFieldsObs.filter((type) => type.name !== name);
+
+    const oldOrganisation = organisation;
+
+    const response = await API.put({
+      path: `/organisation/${organisation._id}`,
+      body: { groupedCustomFieldsObs: newCustomFieldsObs },
+    });
+    if (response.ok) {
+      toast.success("Groupe d'observations de territoire supprimé", { autoclose: 2000 });
+      setOrganisation(response.data);
+      refresh();
+    } else {
+      setOrganisation(oldOrganisation);
+    }
+  };
+
+  const onDragAndDrop = useCallback(
+    async (newCustomFieldsObs) => {
+      newCustomFieldsObs = newCustomFieldsObs.map((group) => ({
+        name: group.groupTitle,
+        fields: group.items.map((customFieldName) => flatCustomFieldsObs.find((f) => f.name === customFieldName)),
+      }));
+      const res = await API.put({
+        path: `/organisation/${organisation._id}`,
+        body: { groupedCustomFieldsObs: newCustomFieldsObs },
+      });
+      if (res.ok) {
+        setOrganisation(res.data);
+        refresh();
       }
     },
-    [customFieldsObs, organisation._id, refresh, setOrganisation]
+    [flatCustomFieldsObs, organisation._id, refresh, setOrganisation]
   );
 
   return (
@@ -61,22 +118,37 @@ const ObservationsSettings = () => {
       ItemComponent={ObservationCustomField}
       NewItemComponent={AddField}
       onDragAndDrop={onDragAndDrop}
+      addButtonCaption="Ajouter un groupe de champs personnalisés"
+      onAddGroup={onAddGroup}
+      onGroupTitleChange={onGroupTitleChange}
+      onDeleteGroup={onDeleteGroup}
     />
   );
 };
 
-const AddField = () => {
-  const customFieldsObs = useRecoilValue(customFieldsObsSelector);
-
+const AddField = ({ groupTitle: typeName }) => {
+  const groupedCustomFieldsObs = useRecoilValue(groupedCustomFieldsObsSelector);
+  const flatCustomFieldsObs = useRecoilValue(customFieldsObsSelector);
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const [isAddingField, setIsAddingField] = useState(false);
   const { refresh } = useDataLoader();
 
   const onAddField = async (newField) => {
     try {
+      if (flatCustomFieldsObs.map((e) => e.label).includes(newField.label)) {
+        return toast.error(`Ce nom de champ existe déjà dans un autre groupe`);
+      }
+
+      const newCustomFieldsObs = groupedCustomFieldsObs.map((type) => {
+        if (type.name !== typeName) return type;
+        return {
+          ...type,
+          fields: [...type.fields, newField].map(sanitizeFields),
+        };
+      });
       const response = await API.put({
         path: `/organisation/${organisation._id}`,
-        body: { customFieldsObs: [...customFieldsObs, newField] },
+        body: { groupedCustomFieldsObs: newCustomFieldsObs },
       });
       if (response.ok) {
         toast.success("Mise à jour !");
@@ -134,20 +206,27 @@ const replaceOldChoiceByNewChoice = (data, oldChoice, newChoice, field) => {
     .filter(Boolean);
 };
 
-const ObservationCustomField = ({ item: customField }) => {
+const ObservationCustomField = ({ item: customField, groupTitle: typeName }) => {
   const [isSelected, setIsSelected] = useState(false);
   const [isEditingField, setIsEditingField] = useState(false);
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const observations = useRecoilValue(territoryObservationsState);
-  const customFieldsObs = useRecoilValue(customFieldsObsSelector);
+  const groupedCustomFieldsObs = useRecoilValue(groupedCustomFieldsObsSelector);
 
   const { refresh } = useDataLoader();
 
   const onSaveField = async (editedField) => {
     try {
+      const newCustomFieldsObs = groupedCustomFieldsObs.map((type) => {
+        if (type.name !== typeName) return type;
+        return {
+          ...type,
+          fields: type.fields.map((field) => (field.name !== editedField.name ? field : editedField)).map(sanitizeFields),
+        };
+      });
       const response = await API.put({
         path: `/organisation/${organisation._id}`,
-        body: { customFieldsObs: customFieldsObs.map((field) => (field.name !== editedField.name ? field : editedField)) },
+        body: { groupedCustomFieldsObs: newCustomFieldsObs },
       });
       if (response.ok) {
         toast.success("Mise à jour !");
@@ -161,25 +240,33 @@ const ObservationCustomField = ({ item: customField }) => {
     setIsEditingField(false);
   };
 
-  const onEditChoice = async ({ oldChoice, newChoice, field, fields }) => {
-    const updatedFields = customFieldsObs.map((_field) =>
-      _field.name !== field.name
-        ? _field
-        : {
-            ..._field,
-            options: _field.options.map((option) => (option === oldChoice ? newChoice : option)),
-          }
-    );
+  const onEditChoice = async ({ oldChoice, newChoice, field }) => {
+    const newCustomFieldsObs = groupedCustomFieldsObs.map((type) => {
+      if (type.name !== typeName) return type;
+      return {
+        ...type,
+        fields: type.fields.map((_field) =>
+          _field.name !== field.name
+            ? _field
+            : {
+                ..._field,
+                options: _field.options.map((option) => (option === oldChoice ? newChoice : option)),
+              }
+        ),
+      };
+    });
     setIsEditingField(false);
     const updatedObservations = replaceOldChoiceByNewChoice(observations, oldChoice, newChoice, field);
+
+    const newCustomFieldsObsFlat = newCustomFieldsObs.reduce((acc, type) => [...acc, ...type.fields], []);
 
     const response = await API.post({
       path: "/custom-field",
       body: {
         customFields: {
-          customFieldsObs: updatedFields,
+          groupedCustomFieldsObs: newCustomFieldsObs,
         },
-        observations: await Promise.all(updatedObservations.map(prepareObsForEncryption(updatedFields)).map(encryptItem)),
+        observations: await Promise.all(updatedObservations.map(prepareObsForEncryption(newCustomFieldsObsFlat)).map(encryptItem)),
       },
     });
     if (response.ok) {
@@ -191,9 +278,16 @@ const ObservationCustomField = ({ item: customField }) => {
 
   const onDeleteField = async () => {
     try {
+      const newCustomFieldsObs = groupedCustomFieldsObs.map((type) => {
+        if (type.name !== typeName) return type;
+        return {
+          ...type,
+          fields: type.fields.filter((field) => field.name !== customField.name),
+        };
+      });
       const response = await API.put({
         path: `/organisation/${organisation._id}`,
-        body: { customFieldsObs: customFieldsObs.filter((field) => field.name !== customField.name) },
+        body: { groupedCustomFieldsObs: newCustomFieldsObs },
       });
       if (response.ok) {
         toast.success("Mise à jour !");

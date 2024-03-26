@@ -22,8 +22,17 @@ export const customFieldsObsSelector = selector({
   key: "customFieldsObsSelector",
   get: ({ get }) => {
     const organisation = get(organisationState);
-    if (Array.isArray(organisation.customFieldsObs)) return organisation.customFieldsObs;
+    if (Array.isArray(organisation.customFieldsObs) && organisation.customFieldsObs.length) return organisation.customFieldsObs;
     return defaultCustomFields;
+  },
+});
+
+export const groupedCustomFieldsObsSelector = selector({
+  key: "groupedCustomFieldsObsSelector",
+  get: ({ get }) => {
+    const organisation = get(organisationState);
+    if (Array.isArray(organisation.groupedCustomFieldsObs) && organisation.groupedCustomFieldsObs.length) return organisation.groupedCustomFieldsObs;
+    return [{ name: "Groupe par défaut", fields: defaultCustomFields }];
   },
 });
 
@@ -92,7 +101,7 @@ const compulsoryEncryptedFields = ["territory", "user", "team", "observedAt"];
 export const prepareObsForEncryption =
   (customFields) =>
   (obs, { checkRequiredFields = true } = {}) => {
-    if (!!checkRequiredFields) {
+    if (checkRequiredFields) {
       try {
         if (!looseUuidRegex.test(obs.territory)) {
           throw new Error("Observation is missing territory");

@@ -140,6 +140,7 @@ const AddService = ({ groupTitle, services, onDragAndDrop }) => {
     if (!newService) return toast.error("Vous devez saisir un nom pour le service");
     if (flattenedServices.includes(newService)) {
       const existingGroupTitle = groupedServices.find(({ services }) => services.includes(newService)).groupTitle;
+      // eslint-disable-next-line no-irregular-whitespace
       return toast.error(`Ce service existe déjà : ${existingGroupTitle} > ${newService}`);
     }
     const newGroupedServices = groupedServices.map((group) => {

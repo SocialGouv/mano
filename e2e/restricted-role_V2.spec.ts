@@ -212,7 +212,6 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
   await page.getByText("Nombre de personnes non connues hommes rencontrées: 3Nombre de personnes non con").click();
-  await page.getByRole("dialog").click();
   await page.getByRole("dialog").getByLabel("Commentaire", { exact: true }).fill("modifier une observation");
   await page.getByLabel("Nombre de personnes non connues hommes rencontrées").click();
   await page.getByLabel("Nombre de personnes non connues hommes rencontrées").fill("2");

@@ -161,7 +161,7 @@ test("test", async ({ page }) => {
   await page.getByRole("link", { name: "Territoires" }).click();
   await page.getByText(testTerritoire).click();
   await page.getByText("Un commentaire").click();
-  await page.getByRole("button", { name: "Close" }).click();
+  await page.getByRole("button", { name: "Annuler" }).click();
   await page.getByRole("link", { name: "Agenda" }).click();
   await page.getByText(monAction).click();
   await page.getByRole("button", { name: "Commentaires (1)" }).click();

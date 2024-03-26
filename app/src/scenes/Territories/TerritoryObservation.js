@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, View } from 'react-native';
-import ScrollContainer from '../../components/ScrollContainer';
+import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
 import Button from '../../components/Button';
@@ -10,7 +10,12 @@ import styled from 'styled-components';
 import { MyText } from '../../components/MyText';
 import CustomFieldInput from '../../components/CustomFieldInput';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { customFieldsObsSelector, prepareObsForEncryption, territoryObservationsState } from '../../recoil/territoryObservations';
+import {
+  customFieldsObsSelector,
+  groupedCustomFieldsObsSelector,
+  prepareObsForEncryption,
+  territoryObservationsState,
+} from '../../recoil/territoryObservations';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import API from '../../services/api';
 import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
@@ -26,6 +31,8 @@ const TerritoryObservation = ({ route, navigation }) => {
   const currentTeam = useRecoilValue(currentTeamState);
   const organisation = useRecoilValue(organisationState);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
+  const groupedCustomFieldsObs = useRecoilValue(groupedCustomFieldsObsSelector);
+  const fieldsGroupNames = groupedCustomFieldsObs.map((f) => f.name).filter((f) => f);
   const [allTerritoryOservations, setTerritoryObservations] = useRecoilState(territoryObservationsState);
   const [obsDB, setObsDB] = useState(() => allTerritoryOservations.find((obs) => obs._id === route.params?.obs?._id) || {});
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
@@ -46,6 +53,7 @@ const TerritoryObservation = ({ route, navigation }) => {
     [customFieldsObs]
   );
 
+  const [activeTab, setActiveTab] = useState(fieldsGroupNames[0]);
   const [updating, setUpdating] = useState(false);
   const [editable, setEditable] = useState(route?.params?.editable || false);
   const [obs, setObs] = useState(castToTerritoryObservation(route.params.obs));
@@ -228,32 +236,50 @@ const TerritoryObservation = ({ route, navigation }) => {
         saving={updating}
         testID="observation"
       />
-      <ScrollContainer ref={scrollViewRef} testID="observation">
-        <View>
+      {fieldsGroupNames.length > 1 ? (
+        <ScrollView horizontal className="flex-grow-0 gap-4 flex-shrink-0 px-2 bg-white border-b border-b-gray-300">
+          {fieldsGroupNames.map((name) => {
+            return (
+              <TouchableOpacity key={name} onPress={() => setActiveTab(name)}>
+                <View className={`p-4 bg-white ${name === activeTab ? 'border-b-green-700 border-b-4' : ''}`}>
+                  <Text>{name}</Text>
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      ) : null}
+      <ScrollView keyboardShouldPersistTaps="handled" className="bg-white p-4" ref={scrollViewRef} testID="observation">
+        <View className="mt-3">
           {editable && obsDB?._id ? (
             <DateAndTimeInput label="Observation faite le" setDate={(a) => setDate(a)} date={date} showTime showDay withTime />
           ) : (
             <CreatedAt>{new Date(date).getLocaleDateAndTime('fr')}</CreatedAt>
           )}
-          {customFieldsObs
-            .filter((f) => f)
-            .filter((f) => f.enabled || f.enabledTeams?.includes(currentTeam._id))
-            .map((field) => {
-              const { label, name, type } = field;
-              return (
-                <CustomFieldInput
-                  key={label}
-                  label={label}
-                  field={field}
-                  value={obs[name]}
-                  handleChange={(newValue) => onChange({ [name]: newValue })}
-                  editable={editable}
-                  ref={(r) => (refs.current[`${name}-ref`] = r)}
-                  onFocus={() => _scrollToInput(refs.current[`${name}-ref`])}
-                />
-              );
-            })}
-
+          {groupedCustomFieldsObs.map((group) => {
+            return (
+              <View key={group.name} className={group.name !== activeTab ? 'hidden' : ''}>
+                {group.fields
+                  .filter((f) => f)
+                  .filter((f) => f.enabled || (f.enabledTeams || []).includes(currentTeam._id))
+                  .map((field) => {
+                    const { label, name, type } = field;
+                    return (
+                      <CustomFieldInput
+                        key={label}
+                        label={label}
+                        field={field}
+                        value={obs[name]}
+                        handleChange={(newValue) => onChange({ [name]: newValue })}
+                        editable={editable}
+                        ref={(r) => (refs.current[`${name}-ref`] = r)}
+                        onFocus={() => _scrollToInput(refs.current[`${name}-ref`])}
+                      />
+                    );
+                  })}
+              </View>
+            );
+          })}
           <ButtonsContainer>
             {obsDB?._id ? (
               <>
@@ -270,7 +296,7 @@ const TerritoryObservation = ({ route, navigation }) => {
             )}
           </ButtonsContainer>
         </View>
-      </ScrollContainer>
+      </ScrollView>
     </SceneContainer>
   );
 };

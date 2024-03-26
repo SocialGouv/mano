@@ -28,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.JSONB, // example: [{"groupTitle": "injection", categories: ["Garrot", "1cc"]}, { "groupTitle": "inhalation", "categories": ["Kit base", "Grille"]}]
     },
     services: DataTypes.ARRAY(DataTypes.TEXT),
-    customFieldsObs: DataTypes.JSONB,
+    groupedCustomFieldsObs: DataTypes.JSONB,
     fieldsPersonsCustomizableOptions: DataTypes.JSONB,
     customFieldsPersons: DataTypes.JSONB,
     customFieldsMedicalFile: DataTypes.JSONB,

@@ -28,7 +28,7 @@ const {
 } = require("../db/sequelize");
 const mailservice = require("../utils/mailservice");
 const validateUser = require("../middleware/validateUser");
-const { looseUuidRegex, customFieldSchema, positiveIntegerRegex } = require("../utils");
+const { looseUuidRegex, customFieldSchema, positiveIntegerRegex, customFieldGroupSchema } = require("../utils");
 const { serializeOrganisation } = require("../utils/data-serializer");
 const { defaultSocialCustomFields, defaultMedicalCustomFields } = require("../utils/custom-fields/person");
 const { mailBienvenueHtml } = require("../utils/mail-bienvenue");
@@ -254,7 +254,7 @@ router.put(
         structuresGroupedCategories: z.optional(z.array(z.object({ groupTitle: z.string(), categories: z.array(z.string().min(1)) }))),
         groupedServices: z.optional(z.array(z.object({ groupedServices: z.string(), services: z.array(z.string().min(1)) }))),
         collaborations: z.optional(z.array(z.string().min(1))),
-        customFieldsObs: z.optional(z.array(customFieldSchema)),
+        groupedCustomFieldsObs: z.optional(z.array(customFieldGroupSchema)),
         fieldsPersonsCustomizableOptions: z.optional(z.array(customFieldSchema)),
         customFieldsPersons: z.optional(
           z.array(
@@ -316,8 +316,9 @@ router.put(
     if (req.body.hasOwnProperty("structuresGroupedCategories")) updateOrg.structuresGroupedCategories = req.body.structuresGroupedCategories;
     if (req.body.hasOwnProperty("groupedServices")) updateOrg.groupedServices = req.body.groupedServices;
     if (req.body.hasOwnProperty("collaborations")) updateOrg.collaborations = req.body.collaborations;
-    if (req.body.hasOwnProperty("customFieldsObs"))
-      updateOrg.customFieldsObs = typeof req.body.customFieldsObs === "string" ? JSON.parse(req.body.customFieldsObs) : req.body.customFieldsObs;
+    if (req.body.hasOwnProperty("groupedCustomFieldsObs"))
+      updateOrg.groupedCustomFieldsObs =
+        typeof req.body.groupedCustomFieldsObs === "string" ? JSON.parse(req.body.groupedCustomFieldsObs) : req.body.groupedCustomFieldsObs;
     if (req.body.hasOwnProperty("fieldsPersonsCustomizableOptions"))
       updateOrg.fieldsPersonsCustomizableOptions =
         typeof req.body.fieldsPersonsCustomizableOptions === "string"

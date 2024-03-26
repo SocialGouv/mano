@@ -52,6 +52,13 @@ const customFieldSchema = z
   })
   .strict();
 
+const customFieldGroupSchema = z
+  .object({
+    name: z.string().min(1),
+    fields: z.array(customFieldSchema),
+  })
+  .strict();
+
 function sanitizeAll(text) {
   return sanitizeHtml(text || "", { allowedTags: [], allowedAttributes: {} });
 }
@@ -68,5 +75,6 @@ module.exports = {
   dateRegex,
   isoDateRegex,
   customFieldSchema,
+  customFieldGroupSchema,
   sanitizeAll,
 };

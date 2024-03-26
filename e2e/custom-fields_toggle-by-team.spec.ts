@@ -236,10 +236,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
 
   await page.locator(`data-test-id=${testObsTerritoryField}`).click();
 
-  await page
-    .locator('div[role="document"]:has-text("Modifier l\'observation×Nombre de personnes non connues hommes rencontréesNombre ")')
-    .getByRole("button", { name: "Close" })
-    .click();
+  await page.getByText("AnnulerLoading...Sauvegarder").getByRole("button", { name: "Annuler" }).click();
 
   /*
   Test the restrictions on the fields
@@ -274,8 +271,5 @@ test("Create custom fields filtered by team", async ({ page }) => {
 
   await expect(page.locator(`data-test-id=${testObsTerritoryField}`)).toBeHidden();
 
-  await page
-    .locator('div[role="document"]:has-text("Modifier l\'observation×Nombre de personnes non connues hommes rencontréesNombre ")')
-    .getByRole("button", { name: "Close" })
-    .click();
+  await page.getByText("AnnulerLoading...Sauvegarder").getByRole("button", { name: "Annuler" }).click();
 });
