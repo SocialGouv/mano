@@ -226,6 +226,8 @@ const TerritoryObservation = ({ route, navigation }) => {
     }, 250);
   };
 
+  const currentGroup = groupedCustomFieldsObs.find((group) => group.name === activeTab);
+
   return (
     <SceneContainer>
       <ScreenTitle
@@ -261,30 +263,26 @@ const TerritoryObservation = ({ route, navigation }) => {
           ) : (
             <CreatedAt>{new Date(date).getLocaleDateAndTime('fr')}</CreatedAt>
           )}
-          {groupedCustomFieldsObs.map((group) => {
-            return (
-              <View key={group.name} className={group.name !== activeTab ? 'hidden' : ''}>
-                {group.fields
-                  .filter((f) => f)
-                  .filter((f) => f.enabled || (f.enabledTeams || []).includes(currentTeam._id))
-                  .map((field) => {
-                    const { label, name, type } = field;
-                    return (
-                      <CustomFieldInput
-                        key={label}
-                        label={label}
-                        field={field}
-                        value={obs[name]}
-                        handleChange={(newValue) => onChange({ [name]: newValue })}
-                        editable={editable}
-                        ref={(r) => (refs.current[`${name}-ref`] = r)}
-                        onFocus={() => _scrollToInput(refs.current[`${name}-ref`])}
-                      />
-                    );
-                  })}
-              </View>
-            );
-          })}
+          <View key={currentGroup.name}>
+            {currentGroup.fields
+              .filter((f) => f)
+              .filter((f) => f.enabled || (f.enabledTeams || []).includes(currentTeam._id))
+              .map((field) => {
+                const { label, name, type } = field;
+                return (
+                  <CustomFieldInput
+                    key={label}
+                    label={label}
+                    field={field}
+                    value={obs[name]}
+                    handleChange={(newValue) => onChange({ [name]: newValue })}
+                    editable={editable}
+                    ref={(r) => (refs.current[`${name}-ref`] = r)}
+                    onFocus={() => _scrollToInput(refs.current[`${name}-ref`])}
+                  />
+                );
+              })}
+          </View>
           <ButtonsContainer>
             {obsDB?._id ? (
               <>
