@@ -5,6 +5,7 @@ import type { IndicatorsSelection } from "../types/evolutivesStats";
 import { dayjsInstance } from "../services/date";
 import { ResponsiveStream } from "@nivo/stream";
 import { useMemo } from "react";
+import { capture } from "../services/sentry";
 
 interface EvolutiveStatsViewerProps {
   evolutiveStatsIndicators: IndicatorsSelection;
@@ -16,62 +17,65 @@ interface EvolutiveStatsViewerProps {
 }
 
 export default function EvolutiveStatsViewer({ evolutiveStatsIndicators, period, persons }: EvolutiveStatsViewerProps) {
-  const startDate = period.startDate;
-  const endDate = period.endDate;
-  const indicatorsBase = useRecoilValue(evolutiveStatsIndicatorsBaseSelector);
-  const evolutiveStatsPerson = useRecoilValue(
-    evolutiveStatsPersonSelector({
-      persons,
-      startDate: period.startDate ? dayjsInstance(period.startDate).format("YYYY-MM-DD") : null,
-      evolutiveStatsIndicators,
-    })
-  );
-  if (!evolutiveStatsIndicators.length) return null;
-  const indicator = evolutiveStatsIndicators[0];
-  if (!indicator.fieldName) return null;
-
-  const startDateFormatted = dayjsInstance(startDate ?? startHistoryFeatureDate);
-  const endDateFormatted = endDate ? dayjsInstance(endDate) : dayjsInstance();
-
-  if (startDateFormatted.isSame(endDateFormatted)) return null;
-
-  const fieldStart = indicator.fromValue;
-  const fieldEnd = indicator.toValue;
-
-  const field = indicatorsBase.find((field) => field.name === indicator.fieldName);
-
-  if (fieldEnd == null) {
-    return (
-      <>
-        <h4 className="tw-mb-4">
-          Évolution du champ {field?.label} entre le {startDateFormatted.format("DD/MM/YYYY")} et le {endDateFormatted.format("DD/MM/YYYY")}
-        </h4>
-
-        <MyResponsiveStream
-          startDateFormatted={startDateFormatted}
-          endDateFormatted={endDateFormatted}
-          indicator={indicator}
-          evolutiveStatsPerson={evolutiveStatsPerson}
-        />
-      </>
+  try {
+    const startDate = period.startDate;
+    const endDate = period.endDate;
+    const indicatorsBase = useRecoilValue(evolutiveStatsIndicatorsBaseSelector);
+    const evolutiveStatsPerson = useRecoilValue(
+      evolutiveStatsPersonSelector({
+        persons,
+        startDate: period.startDate ? dayjsInstance(period.startDate).format("YYYY-MM-DD") : null,
+        endDate: period.endDate ? dayjsInstance(period.endDate).format("YYYY-MM-DD") : dayjsInstance().format("YYYY-MM-DD"),
+        evolutiveStatsIndicators,
+      })
     );
-  }
+    if (!evolutiveStatsIndicators.length) return null;
+    const indicator = evolutiveStatsIndicators[0];
+    if (!indicator.fieldName) return null;
 
-  const valueStart = evolutiveStatsPerson[indicator.fieldName][fieldStart][startDateFormatted.format("YYYYMMDD")];
-  const valueEnd = evolutiveStatsPerson[indicator.fieldName][fieldEnd][endDateFormatted.format("YYYYMMDD")];
+    const startDateFormatted = dayjsInstance(startDate ?? startHistoryFeatureDate);
+    const endDateFormatted = endDate ? dayjsInstance(endDate) : dayjsInstance();
 
-  return (
-    <div className="tw-flex tw-w-full tw-justify-around">
-      <div className="tw-flex tw-shrink-0 tw-basis-1/4 tw-flex-col tw-items-center tw-justify-end tw-gap-y-4">
-        <h5>Au {startDateFormatted.format("DD/MM/YYYY")}</h5>
-        <div className="tw-flex tw-w-full tw-flex-col tw-items-center tw-justify-around tw-rounded-lg tw-border tw-p-4">
-          <p className="tw-text-6xl tw-font-bold tw-text-main">{valueStart}</p>
-          <p>{fieldStart}</p>
-        </div>
-      </div>
-      {valueStart !== 0 && (
+    if (startDateFormatted.isSame(endDateFormatted)) return null;
+
+    const fieldStart = indicator.fromValue;
+    const fieldEnd = indicator.toValue;
+
+    const field = indicatorsBase.find((field) => field.name === indicator.fieldName);
+
+    if (fieldStart == null) return null;
+
+    if (fieldEnd == null) {
+      return (
         <>
-          <div className="tw-flex tw-basis-1/2 tw-flex-col tw-items-center tw-justify-end tw-gap-y-4">
+          <h4 className="tw-mb-4">
+            Évolution du champ {field?.label} entre le {startDateFormatted.format("DD/MM/YYYY")} et le {endDateFormatted.format("DD/MM/YYYY")}
+          </h4>
+
+          <StreamChart
+            startDateFormatted={startDateFormatted}
+            endDateFormatted={endDateFormatted}
+            indicator={indicator}
+            evolutiveStatsPerson={evolutiveStatsPerson}
+          />
+        </>
+      );
+    }
+
+    const valueStart = evolutiveStatsPerson?.[indicator.fieldName]?.[fieldStart]?.[startDateFormatted.format("YYYYMMDD")];
+    const valueEnd = evolutiveStatsPerson?.[indicator.fieldName]?.[fieldEnd]?.[endDateFormatted.format("YYYYMMDD")];
+
+    return (
+      <div className="tw-flex tw-w-full tw-justify-around">
+        <div className="tw-flex tw-shrink-0 tw-basis-1/4 tw-flex-col tw-items-center tw-justify-end tw-gap-y-4">
+          <h5>Au {startDateFormatted.format("DD/MM/YYYY")}</h5>
+          <div className="tw-flex tw-w-full tw-flex-col tw-items-center tw-justify-around tw-rounded-lg tw-border tw-p-4">
+            <p className="tw-text-6xl tw-font-bold tw-text-main">{valueStart}</p>
+            <p>{fieldStart}</p>
+          </div>
+        </div>
+        <div className="tw-flex tw-basis-1/2 tw-flex-col tw-items-center tw-justify-end tw-gap-y-4">
+          {valueStart > 0 && (
             <div className="tw-flex tw-flex-col tw-items-center tw-justify-around tw-p-4">
               <p className="tw-text-6xl tw-font-bold tw-text-main">{Math.round((valueEnd / valueStart) * 1000) / 10}%</p>
               <p className="tw-m-0 tw-text-center">
@@ -85,21 +89,34 @@ export default function EvolutiveStatsViewer({ evolutiveStatsIndicators, period,
                 <strong>{fieldEnd}</strong> au {endDateFormatted.format("DD/MM/YYYY")}
               </p>
             </div>
+          )}
+        </div>
+        <div className="tw-flex tw-shrink-0 tw-basis-1/4 tw-flex-col tw-items-center tw-justify-end tw-gap-y-4">
+          <h5>Au {endDateFormatted.format("DD/MM/YYYY")}</h5>
+          <div className="tw-flex tw-w-full tw-flex-col tw-items-center tw-justify-around tw-rounded-lg tw-border tw-p-4">
+            <p className="tw-text-6xl tw-font-bold tw-text-main">{valueEnd}</p>
+            <p>{fieldEnd}</p>
           </div>
-          <div className="tw-flex tw-shrink-0 tw-basis-1/4 tw-flex-col tw-items-center tw-justify-end tw-gap-y-4">
-            <h5>Au {endDateFormatted.format("DD/MM/YYYY")}</h5>
-            <div className="tw-flex tw-w-full tw-flex-col tw-items-center tw-justify-around tw-rounded-lg tw-border tw-p-4">
-              <p className="tw-text-6xl tw-font-bold tw-text-main">{valueEnd}</p>
-              <p>{fieldEnd}</p>
-            </div>
-          </div>
-        </>
-      )}
+        </div>
+      </div>
+    );
+  } catch (error) {
+    capture(error, {
+      extra: {
+        evolutiveStatsIndicators,
+        period,
+      },
+    });
+  }
+  return (
+    <div>
+      <h4>Erreur</h4>
+      <p>Une erreur est survenue lors de l'affichage des statistiques évolutives. Les équipes techniques ont été prévenues</p>
     </div>
   );
 }
 
-function MyResponsiveStream({ indicator, evolutiveStatsPerson, startDateFormatted, endDateFormatted }: any) {
+function StreamChart({ indicator, evolutiveStatsPerson, startDateFormatted, endDateFormatted }: any) {
   const chartData = useMemo(() => {
     if (!indicator.fieldName) return { data: [], legend: [], keys: [] };
     const data = [];

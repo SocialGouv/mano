@@ -560,18 +560,17 @@ const Stats = () => {
           />
         </div>
         <div className="tw-min-w-[15rem] tw-basis-1/3 tw-p-0">
-          {activeTab.includes("Personnes") &&
-            ["fdaed30a-5add-46d7-b08a-60d7a5a60aa2", "00000000-5f5a-89e2-2e60-88fa20cc50bf"].includes(organisation._id) && (
-              <button
-                type="button"
-                className={!evolutivesStatsActivated ? "button-classic" : "button-submit"}
-                onClick={() => {
-                  setEvolutivesStatsActivated(!evolutivesStatsActivated);
-                }}
-              >
-                Affichage évolutif {evolutivesStatsActivated ? "activé" : "désactivé"}
-              </button>
-            )}
+          {activeTab.includes("Personnes") && (
+            <button
+              type="button"
+              className={!evolutivesStatsActivated ? "button-classic" : "button-submit"}
+              onClick={() => {
+                setEvolutivesStatsActivated(!evolutivesStatsActivated);
+              }}
+            >
+              Affichage évolutif {evolutivesStatsActivated ? "activé" : "désactivé"}
+            </button>
+          )}
         </div>
         <div className="tw-ml-auto tw-flex tw-basis-1/3 tw-items-center tw-justify-end">
           <ButtonCustom color="link" title="Imprimer" onClick={window.print} />
