@@ -8,7 +8,7 @@ import { teamsState, userState } from "../../recoil/auth";
 import API from "../../services/api";
 import { customFieldsObsSelector } from "../../recoil/territoryObservations";
 import { territoriesState } from "../../recoil/territory";
-import { flattenedCustomFieldsConsultationsSelector } from "../../recoil/consultations";
+import { consultationFieldsSelector } from "../../recoil/consultations";
 
 // Source: https://tailwindui.com/components/application-ui/elements/dropdowns
 export default function ExportFormattedData({ personCreated, personUpdated, actions, rencontres, passages, observations, consultations }) {
@@ -18,7 +18,7 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
   const user = useRecoilValue(userState);
   const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
-  const consultationsFields = useRecoilValue(flattenedCustomFieldsConsultationsSelector);
+  const consultationsFields = useRecoilValue(consultationFieldsSelector);
   const [users, setUsers] = useState([]);
 
   async function fetchUsers() {
@@ -40,6 +40,7 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
           if (field.name === "assignedTeams") {
             fields[field.label] = (person[field.name] || []).map((t) => teams.find((person) => person._id === t)?.name)?.join(", ");
           } else if (field.name === "user") {
+            //
           } else if (["date", "date-with-time", "duration"].includes(field.type))
             fields[field.label || field.name] = person[field.name]
               ? dayjsInstance(person[field.name]).format(field.type === "date" ? "YYYY-MM-DD" : "YYYY-MM-DD HH:mm")
@@ -87,15 +88,21 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
       "Personne suivie - Nom": persons.find((p) => p._id === consultation.person)?.name,
       "Personne suivie - id": persons.find((p) => p._id === consultation.person)?._id,
       Type: consultation.type,
-      ...consultationsFields.reduce((fields, field) => {
-        if (["date", "date-with-time", "duration"].includes(field.type))
-          fields[field.label || field.name] = consultation[field.name]
-            ? dayjsInstance(consultation[field.name]).format(field.type === "date" ? "YYYY-MM-DD" : "YYYY-MM-DD HH:mm")
-            : "";
-        else if (["boolean"].includes(field.type)) fields[field.label || field.name] = consultation[field.name] ? "Oui" : "Non";
-        else if (["yes-no"].includes(field.type)) fields[field.label || field.name] = consultation[field.name];
-        else if (Array.isArray(consultation[field.name])) fields[field.label || field.name] = consultation[field.name].join(", ");
-        else fields[field.label || field.name] = consultation[field.name];
+      ...consultationsFields.reduce((fields, type) => {
+        for (const field of type.fields) {
+          // On a besoin de préciser le nom du type de consultation, pour éviter les doublons de clés.
+          // Par exemple, certains champs ont le même nom dans plusieurs types de consultation (sans parler des champs qui s'appellent "Type")
+          // See: https://www.notion.so/mano-sesan/Bug-export-des-consultations-Les-champs-sont-bien-remplis-dans-la-consultation-mais-dans-l-export-l-71e2c677536544d1abb757235f966f15?pvs=4
+          const key = `${field.label || field.name} - ${type.name}`;
+          if (["date", "date-with-time", "duration"].includes(field.type))
+            fields[key] = consultation[field.name]
+              ? dayjsInstance(consultation[field.name]).format(field.type === "date" ? "YYYY-MM-DD" : "YYYY-MM-DD HH:mm")
+              : "";
+          else if (["boolean"].includes(field.type)) fields[key] = consultation[field.name] ? "Oui" : "Non";
+          else if (["yes-no"].includes(field.type)) fields[key] = consultation[field.name];
+          else if (Array.isArray(consultation[field.name])) fields[key] = consultation[field.name].join(", ");
+          else fields[key] = consultation[field.name];
+        }
         return fields;
       }, {}),
       "Complétée le": consultation.completedAt ? dayjsInstance(consultation.completedAt).format("YYYY-MM-DD HH:mm") : "",
