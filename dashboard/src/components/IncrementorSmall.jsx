@@ -1,14 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { useDebounce } from "react-use";
+import { useEffect, useState } from "react";
+import { useDebouncedCallback } from "use-debounce";
 import API from "../services/api";
 import { capture } from "../services/sentry";
 
 export default function IncrementorSmall({ service, team, date, count: initialValue, onUpdated, dataTestId, disabled = false, className = "" }) {
-  const [value, setValue] = useState(initialValue);
-
-  useEffect(() => setValue(initialValue), [initialValue]);
-
-  useDebounce(
+  const debounced = useDebouncedCallback(
     function updateServiceInDatabase() {
       if (value === initialValue || disabled) return;
       if (!date || !team || date === "undefined") {
@@ -19,8 +15,19 @@ export default function IncrementorSmall({ service, team, date, count: initialVa
       });
     },
     import.meta.env.TEST === "true" ? 0 : 1000,
-    [value]
+    { maxWait: 4000 }
   );
+
+  const [value, setValue] = useState(initialValue);
+  useEffect(() => setValue(initialValue), [initialValue]);
+  useEffect(() => debounced(value), [debounced, value]);
+  useEffect(
+    () => () => {
+      debounced.flush();
+    },
+    [debounced]
+  );
+
   return (
     <div className={["tw-mb-2.5 tw-flex tw-gap-0.5 print:tw-max-w-sm", className].join(" ")}>
       <p id={`${service}-title`} className="tw-m-0 tw-flex-grow tw-text-black75">
