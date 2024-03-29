@@ -30,7 +30,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
   const territories = useRecoilValue(territoriesState);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
   const groupedCustomFieldsObs = useRecoilValue(groupedCustomFieldsObsSelector);
-  const setTerritoryObs = useSetRecoilState(territoryObservationsState);
+  const setTerritoryObservations = useSetRecoilState(territoryObservationsState);
   const fieldsGroupNames = groupedCustomFieldsObs.map((f) => f.name).filter((f) => f);
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState(fieldsGroupNames[0]);
@@ -44,7 +44,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
   const addTerritoryObs = async (obs) => {
     const res = await API.post({ path: "/territory-observation", body: prepareObsForEncryption(customFieldsObs)(obs) });
     if (res.ok) {
-      setTerritoryObs((territoryObservations) =>
+      setTerritoryObservations((territoryObservations) =>
         [res.decryptedData, ...territoryObservations].sort((a, b) => new Date(b.observedAt || b.createdAt) - new Date(a.observedAt || a.createdAt))
       );
       await createReportAtDateIfNotExist(res.decryptedData.observedAt);
@@ -55,7 +55,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
   const updateTerritoryObs = async (obs) => {
     const res = await API.put({ path: `/territory-observation/${obs._id}`, body: prepareObsForEncryption(customFieldsObs)(obs) });
     if (res.ok) {
-      setTerritoryObs((territoryObservations) =>
+      setTerritoryObservations((territoryObservations) =>
         territoryObservations
           .map((a) => {
             if (a._id === obs._id) return res.decryptedData;
@@ -66,6 +66,19 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
       await createReportAtDateIfNotExist(res.decryptedData.observedAt);
     }
     return res;
+  };
+
+  const onDelete = async (id) => {
+    const confirm = window.confirm("Êtes-vous sûr ?");
+    if (confirm) {
+      const res = await API.delete({ path: `/territory-observation/${id}` });
+      if (res.ok) {
+        setTerritoryObservations((territoryObservations) => territoryObservations.filter((p) => p._id !== id));
+      }
+      if (!res.ok) return;
+      toast.success("Suppression réussie");
+      setOpen(false);
+    }
   };
 
   return (
@@ -198,6 +211,11 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
               <button className="button-cancel" onClick={() => setOpen(false)}>
                 Annuler
               </button>
+              {observation._id ? (
+                <button className="button-destructive !tw-ml-0" onClick={() => onDelete(observation._id)}>
+                  Supprimer
+                </button>
+              ) : null}
               <ButtonCustom disabled={isSubmitting} loading={isSubmitting} onClick={() => !isSubmitting && handleSubmit()} title="Sauvegarder" />
             </ModalFooter>
           </ModalContainer>

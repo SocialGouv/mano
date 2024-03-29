@@ -236,7 +236,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
 
   await page.locator(`data-test-id=${testObsTerritoryField}`).click();
 
-  await page.getByText("AnnulerLoading...Sauvegarder").getByRole("button", { name: "Annuler" }).click();
+  await page.getByRole("button", { name: "Annuler" }).click();
 
   /*
   Test the restrictions on the fields
@@ -267,9 +267,6 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("cell", { name: territoryName }).click();
 
   await expect(page.getByText("Test champ perso observation: Magique")).toBeHidden();
-  await page.getByText("Nombre de personnes non connues hommes rencontrées:").click();
 
   await expect(page.locator(`data-test-id=${testObsTerritoryField}`)).toBeHidden();
-
-  await page.getByText("AnnulerLoading...Sauvegarder").getByRole("button", { name: "Annuler" }).click();
 });

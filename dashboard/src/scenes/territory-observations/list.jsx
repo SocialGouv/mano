@@ -3,16 +3,26 @@ import styled from "styled-components";
 import { toast } from "react-toastify";
 
 import ButtonCustom from "../../components/ButtonCustom";
-import Observation from "./view";
 import CreateObservation from "../../components/CreateObservation";
-import { territoryObservationsState } from "../../recoil/territoryObservations";
-import { useRecoilState } from "recoil";
+import { customFieldsObsSelector, territoryObservationsState } from "../../recoil/territoryObservations";
+import { useRecoilState, useRecoilValue } from "recoil";
 import API from "../../services/api";
+import Table from "../../components/table";
+import { useLocalStorage } from "../../services/useLocalStorage";
+import { formatDateWithFullMonth } from "../../services/date";
+import UserName from "../../components/UserName";
+import { currentTeamState } from "../../recoil/auth";
+import CustomFieldDisplay from "../../components/CustomFieldDisplay";
+import TagTeam from "../../components/TagTeam";
 
 const List = ({ territory = {} }) => {
+  const [sortBy, setSortBy] = useLocalStorage("territory-obs-sortBy", "name");
+  const [sortOrder, setSortOrder] = useLocalStorage("territory-obs-sortOrder", "ASC");
   const [territoryObservations, setTerritoryObservations] = useRecoilState(territoryObservationsState);
+  const team = useRecoilValue(currentTeamState);
   const [observation, setObservation] = useState({});
   const [openObservationModale, setOpenObservationModale] = useState(null);
+  const customFieldsObs = useRecoilValue(customFieldsObsSelector);
 
   const observations = useMemo(
     () =>
@@ -54,17 +64,67 @@ const List = ({ territory = {} }) => {
           />
         </div>
       </div>
-      {observations.map((obs) => (
-        <Observation
-          key={obs._id}
-          obs={obs}
-          onDelete={deleteData}
-          onClick={() => {
-            setObservation(obs);
-            setOpenObservationModale((k) => k + 1);
-          }}
-        />
-      ))}
+      <Table
+        data={observations}
+        rowKey={"_id"}
+        noData={`Pas encore d'observations pour ce territoire`}
+        onRowClick={(obs) => {
+          setObservation(obs);
+          setOpenObservationModale((k) => k + 1);
+        }}
+        columns={[
+          {
+            title: "Date",
+            dataKey: "observedAt",
+            onSortOrder: setSortOrder,
+            onSortBy: setSortBy,
+            sortOrder,
+            sortBy,
+            render: (obs) => formatDateWithFullMonth(obs.createdAt || ""),
+          },
+          {
+            title: "Créée par",
+            dataKey: "user",
+            onSortOrder: setSortOrder,
+            onSortBy: setSortBy,
+            sortOrder,
+            sortBy,
+            render: (obs) => <UserName id={obs.user} />,
+          },
+          {
+            title: "Observations",
+            dataKey: "infos",
+            render: (obs) => (
+              <div className="tw-text-xs">
+                {customFieldsObs
+                  .filter((f) => f)
+                  .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
+                  .filter((f) => obs[f.name])
+                  .map((field) => {
+                    const { name, label } = field;
+                    return (
+                      <div key={name}>
+                        {label}:{" "}
+                        {["textarea"].includes(field.type) ? (
+                          <div className="tw-pl-8">
+                            <CustomFieldDisplay type={field.type} value={obs[field.name]} />
+                          </div>
+                        ) : (
+                          <CustomFieldDisplay type={field.type} value={obs[field.name]} />
+                        )}
+                      </div>
+                    );
+                  })}
+              </div>
+            ),
+          },
+          {
+            title: "Équipe en charge",
+            dataKey: "team",
+            render: (obs) => <TagTeam teamId={obs?.team} />,
+          },
+        ]}
+      />
       <CreateObservation observation={{ ...observation, territory: observation.territory || territory?._id }} forceOpen={openObservationModale} />
     </>
   );

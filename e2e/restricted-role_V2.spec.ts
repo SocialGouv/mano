@@ -200,11 +200,6 @@ test("test", async ({ page }) => {
   // test sur les territoires
   await page.getByRole("link", { name: "Territoires" }).click();
   await page.getByText("nouveauterritoire").click();
-  page.once("dialog", (dialog) => {
-    console.log(`Dialog message: ${dialog.message()}`);
-    dialog.dismiss().catch(() => {});
-  });
-  await page.getByRole("button", { name: "Supprimer l'observation" }).nth(1).click();
   await page.getByRole("button", { name: "Nouvelle observation" }).click();
   await page.getByRole("dialog").getByLabel("Commentaire", { exact: true }).fill("ajout d'une observation");
   await page.getByLabel("Nombre de personnes non connues femmes rencontrées").click();

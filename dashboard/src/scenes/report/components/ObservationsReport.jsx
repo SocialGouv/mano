@@ -7,11 +7,11 @@ import Table from "../../../components/table";
 import TagTeam from "../../../components/TagTeam";
 import DateBloc from "../../../components/DateBloc";
 import CreateObservation from "../../../components/CreateObservation";
-import Observation from "../../territory-observations/view";
 import { territoriesState } from "../../../recoil/territory";
 import { dayjsInstance } from "../../../services/date";
-import { teamsState, usersState } from "../../../recoil/auth";
+import { currentTeamState, teamsState, usersState } from "../../../recoil/auth";
 import { customFieldsObsSelector } from "../../../recoil/territoryObservations";
+import CustomFieldDisplay from "../../../components/CustomFieldDisplay";
 
 export const ObservationsReport = ({ observations, period, selectedTeams }) => {
   const [fullScreen, setFullScreen] = useState(false);
@@ -60,6 +60,7 @@ const ObservationsTable = ({ period, observations, selectedTeams }) => {
   const [openObservationModaleKey, setOpenObservationModaleKey] = useState(0);
   const territories = useRecoilValue(territoriesState);
   const teams = useRecoilValue(teamsState);
+  const team = useRecoilValue(currentTeamState);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
   const users = useRecoilValue(usersState);
 
@@ -158,7 +159,34 @@ const ObservationsTable = ({ period, observations, selectedTeams }) => {
                 },
               },
               { title: "Territoire", dataKey: "territory", render: (obs) => territories.find((t) => t._id === obs.territory)?.name },
-              { title: "Observation", dataKey: "entityKey", render: (obs) => <Observation noTeams noBorder obs={obs} />, left: true },
+              {
+                title: "Observation",
+                dataKey: "entityKey",
+                render: (obs) => (
+                  <div className="tw-text-xs">
+                    {customFieldsObs
+                      .filter((f) => f)
+                      .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
+                      .filter((f) => obs[f.name])
+                      .map((field) => {
+                        const { name, label } = field;
+                        return (
+                          <div key={name}>
+                            {label}:{" "}
+                            {["textarea"].includes(field.type) ? (
+                              <div className="tw-pl-8">
+                                <CustomFieldDisplay type={field.type} value={obs[field.name]} />
+                              </div>
+                            ) : (
+                              <CustomFieldDisplay type={field.type} value={obs[field.name]} />
+                            )}
+                          </div>
+                        );
+                      })}
+                  </div>
+                ),
+                left: true,
+              },
               {
                 title: "Équipe en charge",
                 dataKey: "team",

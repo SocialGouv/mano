@@ -4,7 +4,7 @@ import { utils, writeFile } from "@e965/xlsx";
 import SelectCustom from "../../components/SelectCustom";
 import CustomFieldsStats from "./CustomFieldsStats";
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "../../components/tailwind/Modal";
-import { teamsState, usersState } from "../../recoil/auth";
+import { currentTeamState, teamsState, usersState } from "../../recoil/auth";
 import TagTeam from "../../components/TagTeam";
 import Table from "../../components/table";
 import { dayjsInstance } from "../../services/date";
@@ -12,7 +12,7 @@ import { customFieldsObsSelector } from "../../recoil/territoryObservations";
 import CreateObservation from "../../components/CreateObservation";
 import { filterData } from "../../components/Filters";
 import DateBloc from "../../components/DateBloc";
-import Observation from "../../scenes/territory-observations/view";
+import CustomFieldDisplay from "../../components/CustomFieldDisplay";
 
 const ObservationsStats = ({ territories, setSelectedTerritories, observations, customFieldsObs, allFilters }) => {
   const [obsModalOpened, setObsModalOpened] = useState(false);
@@ -98,6 +98,7 @@ const SelectedObsModal = ({ open, onClose, observations, territories, title, onA
   const [observationToEdit, setObservationToEdit] = useState({});
   const [openObservationModaleKey, setOpenObservationModaleKey] = useState(0);
   const teams = useRecoilValue(teamsState);
+  const team = useRecoilValue(currentTeamState);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
   const users = useRecoilValue(usersState);
 
@@ -189,7 +190,34 @@ const SelectedObsModal = ({ open, onClose, observations, territories, title, onA
                   },
                 },
                 { title: "Territoire", dataKey: "territory", render: (obs) => territories.find((t) => t._id === obs.territory)?.name },
-                { title: "Observation", dataKey: "entityKey", render: (obs) => <Observation noTeams noBorder obs={obs} />, left: true },
+                {
+                  title: "Observation",
+                  dataKey: "entityKey",
+                  render: (obs) => (
+                    <div className="tw-text-xs">
+                      {customFieldsObs
+                        .filter((f) => f)
+                        .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
+                        .filter((f) => obs[f.name])
+                        .map((field) => {
+                          const { name, label } = field;
+                          return (
+                            <div key={name}>
+                              {label}:{" "}
+                              {["textarea"].includes(field.type) ? (
+                                <div className="tw-pl-8">
+                                  <CustomFieldDisplay type={field.type} value={obs[field.name]} />
+                                </div>
+                              ) : (
+                                <CustomFieldDisplay type={field.type} value={obs[field.name]} />
+                              )}
+                            </div>
+                          );
+                        })}
+                    </div>
+                  ),
+                  left: true,
+                },
                 {
                   title: "Équipe en charge",
                   dataKey: "team",

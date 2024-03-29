@@ -3,12 +3,11 @@ import { useHistory } from "react-router-dom";
 import DateBloc from "../../components/DateBloc";
 import Header from "../../components/header";
 import Table from "../../components/table";
-import Observation from "../territory-observations/view";
 import dayjs from "dayjs";
 import UserName from "../../components/UserName";
 import Search from "../../components/search";
 import TagTeam from "../../components/TagTeam";
-import { organisationState, teamsState, userState } from "../../recoil/auth";
+import { currentTeamState, organisationState, teamsState, userState } from "../../recoil/auth";
 import { actionsState, CANCEL, DONE, sortActionsOrConsultations } from "../../recoil/actions";
 import { personsState, sortPersons } from "../../recoil/persons";
 import { relsPersonPlaceState } from "../../recoil/relPersonPlace";
@@ -25,13 +24,14 @@ import useTitle from "../../services/useTitle";
 import ExclamationMarkButton from "../../components/tailwind/ExclamationMarkButton";
 import ConsultationButton from "../../components/ConsultationButton";
 import { useLocalStorage } from "../../services/useLocalStorage";
-import { territoryObservationsState } from "../../recoil/territoryObservations";
+import { customFieldsObsSelector, territoryObservationsState } from "../../recoil/territoryObservations";
 import TabsNav from "../../components/tailwind/TabsNav";
 import DescriptionIcon from "../../components/DescriptionIcon";
 import { consultationsState } from "../../recoil/consultations";
 import { medicalFileState } from "../../recoil/medicalFiles";
 import { treatmentsState } from "../../recoil/treatments";
 import ActionStatusSelect from "../../components/ActionStatusSelect";
+import CustomFieldDisplay from "../../components/CustomFieldDisplay";
 
 const personsWithFormattedBirthDateSelector = selector({
   key: "personsWithFormattedBirthDateSelector",
@@ -829,6 +829,8 @@ const Places = ({ places }) => {
 
 const TerritoryObservations = ({ observations }) => {
   const history = useHistory();
+  const team = useRecoilValue(currentTeamState);
+  const customFieldsObs = useRecoilValue(customFieldsObsSelector);
 
   if (!observations?.length) return <div />;
   const moreThanOne = observations.length > 1;
@@ -858,7 +860,34 @@ const TerritoryObservations = ({ observations }) => {
           render: (obs) => <UserName id={obs.user} />,
         },
         { title: "Territoire", dataKey: "territory", render: (obs) => obs?.territory?.name },
-        { title: "Observation", dataKey: "entityKey", render: (obs) => <Observation noBorder obs={obs} />, left: true },
+        {
+          title: "Observation",
+          dataKey: "entityKey",
+          render: (obs) => (
+            <div className="tw-text-xs">
+              {customFieldsObs
+                .filter((f) => f)
+                .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
+                .filter((f) => obs[f.name])
+                .map((field) => {
+                  const { name, label } = field;
+                  return (
+                    <div key={name}>
+                      {label}:{" "}
+                      {["textarea"].includes(field.type) ? (
+                        <div className="tw-pl-8">
+                          <CustomFieldDisplay type={field.type} value={obs[field.name]} />
+                        </div>
+                      ) : (
+                        <CustomFieldDisplay type={field.type} value={obs[field.name]} />
+                      )}
+                    </div>
+                  );
+                })}
+            </div>
+          ),
+          left: true,
+        },
       ]}
     />
   );
