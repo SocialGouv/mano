@@ -1,12 +1,10 @@
 import { useMemo, useState } from "react";
 import styled from "styled-components";
-import { toast } from "react-toastify";
 
 import ButtonCustom from "../../components/ButtonCustom";
 import CreateObservation from "../../components/CreateObservation";
 import { customFieldsObsSelector, territoryObservationsState } from "../../recoil/territoryObservations";
-import { useRecoilState, useRecoilValue } from "recoil";
-import API from "../../services/api";
+import { useRecoilValue } from "recoil";
 import Table from "../../components/table";
 import { useLocalStorage } from "../../services/useLocalStorage";
 import { formatDateWithFullMonth } from "../../services/date";
@@ -18,7 +16,7 @@ import TagTeam from "../../components/TagTeam";
 const List = ({ territory = {} }) => {
   const [sortBy, setSortBy] = useLocalStorage("territory-obs-sortBy", "name");
   const [sortOrder, setSortOrder] = useLocalStorage("territory-obs-sortOrder", "ASC");
-  const [territoryObservations, setTerritoryObservations] = useRecoilState(territoryObservationsState);
+  const territoryObservations = useRecoilValue(territoryObservationsState);
   const team = useRecoilValue(currentTeamState);
   const [observation, setObservation] = useState({});
   const [openObservationModale, setOpenObservationModale] = useState(null);
@@ -33,18 +31,6 @@ const List = ({ territory = {} }) => {
   );
 
   if (!observations) return null;
-
-  const deleteData = async (id) => {
-    const confirm = window.confirm("Êtes-vous sûr ?");
-    if (confirm) {
-      const res = await API.delete({ path: `/territory-observation/${id}` });
-      if (res.ok) {
-        setTerritoryObservations((territoryObservations) => territoryObservations.filter((p) => p._id !== id));
-      }
-      if (!res.ok) return;
-      toast.success("Suppression réussie");
-    }
-  };
 
   return (
     <>
