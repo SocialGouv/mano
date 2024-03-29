@@ -32,11 +32,11 @@ test("test", async ({ page }) => {
     await page.getByRole("button", { name: "Ajouter un champ" }).nth(1).click();
     await addCustomField(page, "Drogues à fumer", "Choix multiple dans une liste", ["Pétard merde je me suis trompé", "Crack", "Pipe à crack"]);
 
-    await page.getByRole("button", { name: "Dossier Médical 🧑‍⚕️" }).click();
+    await page.getByRole("button", { name: "Dossier Médical" }).click();
     await page.getByRole("button", { name: "Ajouter un champ" }).click();
     await addCustomField(page, "Douleur", "Choix multiple dans une liste", ["Colonne vertébrale merde je me suis trompé", "Bras", "Jambe"]);
 
-    await page.getByRole("button", { name: "Consultations 🧑‍⚕️" }).click();
+    await page.getByRole("button", { name: "Consultations" }).click();
     await page.getByRole("button", { name: "Ajouter un type de consultations" }).click();
     await page.getByPlaceholder("Titre du groupe").fill("Infirmier");
     await page.getByRole("dialog", { name: "Ajouter un groupe" }).getByRole("button", { name: "Ajouter" }).click();
@@ -190,7 +190,7 @@ test("test", async ({ page }) => {
     await page.getByRole("dialog", { name: "Éditer le choix: Pétard merde je me suis trompé" }).getByRole("button", { name: "Enregistrer" }).click();
     await page.getByText("Choix mis à jour !").click();
 
-    await page.getByRole("button", { name: "Dossier Médical 🧑‍⚕️" }).click();
+    await page.getByRole("button", { name: "Dossier Médical" }).click();
     await page.hover('[data-test-id="Douleur"]');
     await page
       .getByRole("button", {
@@ -211,7 +211,7 @@ test("test", async ({ page }) => {
       .click();
     await page.getByText("Choix mis à jour !").click();
 
-    await page.getByRole("button", { name: "Consultations 🧑‍⚕️" }).click();
+    await page.getByRole("button", { name: "Consultations" }).click();
     await page.hover('[data-test-id="Poils au nez"]');
     await page
       .getByRole("button", {

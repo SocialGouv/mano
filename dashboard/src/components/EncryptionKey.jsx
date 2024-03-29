@@ -55,6 +55,7 @@ const EncryptionKey = ({ isMain }) => {
       setEncryptingStatus("Chiffrement des données...");
       const encryptedVerificationKey = await encryptVerificationKey(hashedOrgEncryptionKey);
 
+      // eslint-disable-next-line no-inner-declarations
       async function recrypt(path, callback = null) {
         setEncryptingStatus(`Chiffrement des données : (${path.replace("/", "")}s)`);
         const cryptedItems = await API.get({

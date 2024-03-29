@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { MouseEventHandler, useEffect, useRef, useState } from "react";
 import { FormGroup, Input, Label, Row, Col } from "reactstrap";
 import { Formik } from "formik";
 import { toast } from "react-toastify";
@@ -33,12 +33,12 @@ import PersonCustomFieldsSettings from "./PersonCustomFieldsSettings";
 import StructuresCategoriesSettings from "./StructuresCategoriesSettings";
 
 const getSettingTitle = (tabId) => {
-  if (tabId === "infos") return "Infos";
+  if (tabId === "infos") return "Informations";
   if (tabId === "encryption") return "Chiffrement";
   if (tabId === "reception") return "Accueil";
   if (tabId === "persons") return "Personnes";
-  if (tabId === "consultations") return "Consultations 🧑‍⚕️ ";
-  if (tabId === "medicalFile") return "Dossier Médical 🧑‍⚕️";
+  if (tabId === "consultations") return "Consultations";
+  if (tabId === "medicalFile") return "Dossier Médical";
   if (tabId === "actions") return "Actions";
   if (tabId === "structures") return "Structures";
   if (tabId === "territories") return "Territoires";
@@ -50,6 +50,14 @@ const getSettingTitle = (tabId) => {
 
 function TabTitle({ children }) {
   return <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">{children}</h3>;
+}
+
+function MenuButton({ selected, text, onClick }: { selected: boolean; text: string; onClick: () => void }) {
+  return (
+    <button className={["tw-text-sm ", selected ? "tw-text-main tw-font-semibold" : "tw-text-zinc-800"].join(" ")} onClick={onClick}>
+      {text}
+    </button>
+  );
 }
 
 const View = () => {
@@ -98,103 +106,34 @@ const View = () => {
 
   return (
     <div className="tw--m-12 tw--mt-4 tw-flex tw-h-[calc(100%+4rem)] tw-flex-col">
-      <h2 className="tw-m-0 tw-border-b tw-border-b-gray-300 tw-bg-main tw-bg-opacity-10 tw-p-4 tw-text-2xl">
-        Configuration de l'organisation {organisation.name}
-      </h2>
       <div className="tw-flex tw-flex-1 tw-overflow-hidden">
-        <nav
-          className="tw-flex tw-h-full tw-w-52 tw-shrink-0 tw-flex-col tw-items-start tw-bg-main  tw-bg-opacity-10 tw-pl-2.5 tw-pt-5"
-          title="Navigation dans la configuration de l'organisation"
-        >
-          <button
-            className={["tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold", tab === "infos" ? "tw-text-main" : "tw-text-zinc-600"].join(" ")}
-            onClick={() => setTab("infos")}
-          >
-            Infos
-          </button>
-          <button
-            className={["tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold", tab === "encryption" ? "tw-text-main" : "tw-text-zinc-600"].join(" ")}
-            onClick={() => setTab("encryption")}
-          >
-            Chiffrement
-          </button>
-          <hr />
-          <button
-            className={["tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold", tab === "reception" ? "tw-text-main" : "tw-text-zinc-600"].join(" ")}
-            onClick={() => setTab("reception")}
-          >
-            Accueil de jour
-          </button>
-          <button
-            className={["tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold", tab === "persons" ? "tw-text-main" : "tw-text-zinc-600"].join(" ")}
-            onClick={() => setTab("persons")}
-            disabled={!organisation.encryptionEnabled}
-          >
-            Personnes suivies
-          </button>
-          <button
-            className={["tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold", tab === "medicalFile" ? "tw-text-main" : "tw-text-zinc-600"].join(" ")}
-            onClick={() => setTab("medicalFile")}
-          >
-            Dossier Médical 🧑‍⚕️
-          </button>
-          <button
-            className={["tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold", tab === "consultations" ? "tw-text-main" : "tw-text-zinc-600"].join(" ")}
-            onClick={() => setTab("consultations")}
-          >
-            Consultations 🧑‍⚕️
-          </button>
-
-          <button
-            className={["tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold", tab === "actions" ? "tw-text-main" : "tw-text-zinc-600"].join(" ")}
-            onClick={() => setTab("actions")}
-          >
-            Actions
-          </button>
-          <button
-            className={["tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold", tab === "structures" ? "tw-text-main" : "tw-text-zinc-600"].join(" ")}
-            onClick={() => setTab("structures")}
-          >
-            Structures
-          </button>
-          <button
-            className={["tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold", tab === "territories" ? "tw-text-main" : "tw-text-zinc-600"].join(" ")}
-            onClick={() => setTab("territories")}
-            disabled={!organisation.encryptionEnabled}
-          >
-            Territoires
-          </button>
-          <button
-            className={["tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold", tab === "rencontres-passages" ? "tw-text-main" : "tw-text-zinc-600"].join(
-              " "
-            )}
-            onClick={() => setTab("rencontres-passages")}
-            disabled={!organisation.encryptionEnabled}
-          >
-            Passages/rencontres
-          </button>
-          <hr />
-          <button
-            className={["tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold", tab === "import" ? "tw-text-main" : "tw-text-zinc-600"].join(" ")}
-            onClick={() => setTab("import")}
-          >
-            Import de personnes suivies
-          </button>
-          <button
-            className={["tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold", tab === "import-configuration" ? "tw-text-main" : "tw-text-zinc-600"].join(
-              " "
-            )}
-            onClick={() => setTab("import-configuration")}
-          >
-            Import de configuration
-          </button>
-          <button
-            className={["tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold", tab === "export" ? "tw-text-main" : "tw-text-zinc-600"].join(" ")}
-            onClick={() => setTab("export")}
-          >
-            Export des données
-          </button>
-        </nav>
+        <div className="tw-flex tw-h-full tw-w-56 tw-shrink-0 tw-flex-col tw-items-start tw-bg-main tw-px-2 tw-pt-2">
+          <div className="tw-text-white tw-font-bold tw-text-sm mt-4">Général</div>
+          <div className="rounded tw-mx-auto tw-w-full tw-p-2 my-2 tw-flex tw-bg-main25 tw-flex-col tw-gap-2 tw-items-start tw">
+            <MenuButton selected={tab === "infos"} text="Informations" onClick={() => setTab("infos")} />
+            <MenuButton selected={tab === "encryption"} text="Chiffrement" onClick={() => setTab("encryption")} />
+          </div>
+          <div className="tw-text-white tw-font-bold  tw-text-sm mt-3">Paramétrage de l’activité</div>
+          <div className="rounded tw-mx-auto tw-w-full tw-p-2 my-2 tw-flex tw-bg-main25 tw-flex-col tw-gap-2 tw-items-start tw">
+            <MenuButton selected={tab === "reception"} text="Accueil de jour" onClick={() => setTab("reception")} />
+            <MenuButton selected={tab === "actions"} text="Actions" onClick={() => setTab("actions")} />
+            <MenuButton selected={tab === "structures"} text="Structures" onClick={() => setTab("structures")} />
+            <MenuButton selected={tab === "territories"} text="Territoires" onClick={() => setTab("territories")} />
+            <MenuButton selected={tab === "rencontres-passages"} text="Passages/rencontres" onClick={() => setTab("rencontres-passages")} />
+            <MenuButton selected={tab === "consultations"} text="Consultations" onClick={() => setTab("consultations")} />
+          </div>
+          <div className="tw-text-white tw-font-bold tw-text-sm mt-3">Personnes suivies</div>
+          <div className="rounded tw-mx-auto tw-w-full tw-p-2 my-2 tw-flex tw-bg-main25 tw-flex-col tw-gap-2 tw-items-start tw">
+            <MenuButton selected={tab === "persons"} text="Personnes suivies" onClick={() => setTab("persons")} />
+            <MenuButton selected={tab === "medicalFile"} text="Dossier Médical" onClick={() => setTab("medicalFile")} />
+          </div>
+          <div className="tw-text-white tw-font-bold tw-text-sm mt-3">Import et export</div>
+          <div className="rounded tw-mx-auto tw-w-full tw-p-2 my-2 tw-flex tw-bg-main25 tw-flex-col tw-gap-2 tw-items-start tw">
+            <MenuButton selected={tab === "import"} text="Import de personnes suivies" onClick={() => setTab("import")} />
+            <MenuButton selected={tab === "import-configuration"} text="Import de configuration" onClick={() => setTab("import-configuration")} />
+            <MenuButton selected={tab === "export"} text="Export des données" onClick={() => setTab("export")} />
+          </div>
+        </div>
         <div ref={scrollContainer} className="tw-basis-full tw-overflow-auto tw-px-6 tw-py-4">
           <Formik
             initialValues={{
@@ -258,7 +197,11 @@ const View = () => {
                             équipes, utilisateurs, personnes suivies, actions, territoires, commentaires et observations, comptes-rendus...
                           </span>
                         </DeleteButtonAndConfirmModal>
-                        <ButtonCustom title="Mettre à jour" loading={isSubmitting} onClick={handleSubmit} />
+                        <ButtonCustom
+                          title="Mettre à jour"
+                          loading={isSubmitting}
+                          onClick={handleSubmit as unknown as MouseEventHandler<HTMLButtonElement>}
+                        />
                       </div>
                     </>
                   );
@@ -306,7 +249,7 @@ const View = () => {
                             title={"Mettre à jour"}
                             disabled={values.receptionEnabled === organisation.receptionEnabled}
                             loading={isSubmitting}
-                            onClick={handleSubmit}
+                            onClick={handleSubmit as unknown as MouseEventHandler<HTMLButtonElement>}
                           />
                         </div>
                         <hr />
@@ -340,7 +283,7 @@ const View = () => {
                           title={"Mettre à jour"}
                           disabled={values.territoriesEnabled === organisation.territoriesEnabled}
                           loading={isSubmitting}
-                          onClick={handleSubmit}
+                          onClick={handleSubmit as unknown as MouseEventHandler<HTMLButtonElement>}
                         />
                       </div>
                       <hr />
@@ -390,7 +333,7 @@ const View = () => {
                             values.rencontresEnabled === organisation.rencontresEnabled && values.passagesEnabled === organisation.passagesEnabled
                           }
                           loading={isSubmitting}
-                          onClick={handleSubmit}
+                          onClick={handleSubmit as unknown as MouseEventHandler<HTMLButtonElement>}
                         />
                       </div>
                       <hr />
@@ -424,7 +367,7 @@ const View = () => {
                               title={"Mettre à jour"}
                               disabled={values.groupsEnabled === organisation.groupsEnabled}
                               loading={isSubmitting}
-                              onClick={handleSubmit}
+                              onClick={handleSubmit as unknown as MouseEventHandler<HTMLButtonElement>}
                             />
                           </div>
                           <hr />
@@ -451,7 +394,7 @@ const View = () => {
                             </Col>
                           </Row>
                           <div className="tw-mb-10 tw-flex tw-justify-end">
-                            <EncryptionKey />
+                            <EncryptionKey isMain={undefined} />
                           </div>
                         </>
                       )}

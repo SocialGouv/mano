@@ -59,7 +59,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.locator(".Toastify__close-button").last().click();
 
-  await page.getByRole("button", { name: "Dossier Médical 🧑‍⚕️" }).click();
+  await page.getByRole("button", { name: "Dossier Médical" }).click();
 
   await page.getByRole("button", { name: "Ajouter un champ" }).click();
 
@@ -68,7 +68,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.locator(".Toastify__close-button").last().click();
 
-  await page.getByRole("button", { name: "Consultations 🧑‍⚕️" }).click();
+  await page.getByRole("button", { name: "Consultations" }).click();
 
   await page.getByRole("button", { name: "Ajouter un champ" }).click();
 
@@ -162,7 +162,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Mise à jour !").click();
 
-  await page.getByRole("button", { name: "Dossier Médical 🧑‍⚕️" }).click();
+  await page.getByRole("button", { name: "Dossier Médical" }).click();
   await page.hover(`[data-test-id='${testMedicalFileField}']`);
   await page
     .getByRole("button", {
@@ -174,7 +174,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Mise à jour !").click();
 
-  await page.getByRole("button", { name: "Consultations 🧑‍⚕️" }).click();
+  await page.getByRole("button", { name: "Consultations" }).click();
 
   await page.hover(`[data-test-id="${testConsultationField}"]`);
   await page

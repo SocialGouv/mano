@@ -24,7 +24,7 @@ test("merging normal user with health data", async ({ page }) => {
     await loginWith(page, "admin1@example.org");
 
     await page.getByRole("link", { name: "Organisation" }).click();
-    await page.getByRole("button", { name: "Dossier Médical 🧑‍⚕️" }).click();
+    await page.getByRole("button", { name: "Dossier Médical" }).click();
     await page.getByRole("button", { name: "Ajouter un champ" }).click();
     await page.getByLabel("Nom").fill("Multi-champ");
     await changeReactSelectValue(page, "type", "Choix multiple dans une liste");
