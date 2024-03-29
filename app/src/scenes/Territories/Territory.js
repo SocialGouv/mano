@@ -21,6 +21,7 @@ const castToTerritory = (territory = {}) => ({
   user: territory.user || '',
   types: territory.types || [],
   perimeter: territory.perimeter?.trim() || '',
+  description: territory.description?.trim() || '',
   entityKey: territory.entityKey || '',
 });
 
@@ -138,7 +139,7 @@ const Territory = ({ route, navigation }) => {
     ]);
   };
 
-  const { name, types, perimeter } = territory;
+  const { name, types, perimeter, description } = territory;
 
   return (
     <SceneContainer>
@@ -169,6 +170,14 @@ const Territory = ({ route, navigation }) => {
             value={perimeter}
             placeholder="De la rue XXX à la rue XXX"
             editable={editable}
+          />
+          <InputLabelled
+            label="Description"
+            onChangeText={(description) => setTerritory((t) => ({ ...t, description }))}
+            value={description}
+            placeholder="Description du territoire"
+            editable={editable}
+            multiline
           />
           <ButtonsContainer>
             <DeleteButtonAndConfirmModal

@@ -65,13 +65,13 @@ const List = () => {
       />
       <Row style={{ marginBottom: 40 }}>
         <Col>
-          <CreateTerritory organisation={organisation} />
+          <CreateTerritory />
         </Col>
       </Row>
       <Row style={{ marginBottom: 40, borderBottom: "1px solid #ddd" }}>
         <Col md={12} style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
           <label htmlFor="search" style={{ marginRight: 20, width: 250, flexShrink: 0 }}>
-            Recherche :{" "}
+            Recherche&nbsp;:{" "}
           </label>
           <Search placeholder="Par mot clé, présent dans le nom, une observation, ..." value={search} onChange={setSearch} />
         </Col>
@@ -129,13 +129,10 @@ const List = () => {
   );
 };
 
-const CreateTerritory = () => {
+export const CreateTerritory = () => {
   const [open, setOpen] = useState(false);
-  const history = useHistory();
   const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
-
-  const setTerritories = useSetRecoilState(territoriesState);
 
   return (
     <div className="tw-flex tw-w-full tw-justify-end">
@@ -148,69 +145,104 @@ const CreateTerritory = () => {
           padding="12px 24px"
         />
       )}
-      <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
-        <ModalHeader toggle={() => setOpen(false)}>Créer un nouveau territoire</ModalHeader>
-        <ModalBody>
-          <Formik
-            initialValues={{ name: "", types: [], perimeter: "" }}
-            onSubmit={async (body, actions) => {
-              if (!body.name) return toast.error("Le nom est obligatoire");
+      <TerritoryModal open={open} setOpen={setOpen} />
+    </div>
+  );
+};
+
+export function TerritoryModal({ open, setOpen, territory = {} }) {
+  const history = useHistory();
+  const setTerritories = useSetRecoilState(territoriesState);
+  const user = useRecoilValue(userState);
+  const isNew = !territory._id;
+  const initialValues = { name: "", types: [], perimeter: "", description: "", ...territory };
+
+  return (
+    <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
+      <ModalHeader toggle={() => setOpen(false)}>Créer un nouveau territoire</ModalHeader>
+      <ModalBody>
+        <Formik
+          initialValues={initialValues}
+          onSubmit={async (body, actions) => {
+            if (!body.name) return toast.error("Le nom est obligatoire");
+
+            if (isNew) {
               const res = await API.post({ path: "/territory", body: prepareTerritoryForEncryption({ ...body, user: user._id }) });
               if (res.ok) {
                 setTerritories((territories) => [res.decryptedData, ...territories]);
-              }
-              actions.setSubmitting(false);
-              if (res.ok) {
+                actions.setSubmitting(false);
                 toast.success("Création réussie !");
                 setOpen(false);
                 history.push(`/territory/${res.data._id}`);
               }
-            }}
-          >
-            {({ values, handleChange, handleSubmit, isSubmitting }) => (
-              <React.Fragment>
-                <Row>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label htmlFor="name">Nom</Label>
-                      <Input name="name" id="name" value={values.name} onChange={handleChange} />
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label htmlFor="territory-select-types">Types</Label>
-                      <SelectCustom
-                        options={territoryTypes.map((_option) => ({ value: _option, label: _option }))}
-                        name="types"
-                        onChange={(values) => handleChange({ currentTarget: { value: values.map((v) => v.value), name: "types" } })}
-                        isClearable={false}
-                        isMulti
-                        value={values.types?.map((_option) => ({ value: _option, label: _option })) || []}
-                        getOptionValue={(i) => i.value}
-                        getOptionLabel={(i) => i.label}
-                        inputId="territory-select-types"
-                        classNamePrefix="territory-select-types"
-                      />
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label htmlFor="perimeter">Périmètre</Label>
-                      <Input name="perimeter" id="perimeter" value={values.perimeter} onChange={handleChange} />
-                    </FormGroup>
-                  </Col>
-                </Row>
-                <br />
-                <div className="tw-mt-4 tw-flex tw-justify-end">
-                  <ButtonCustom disabled={isSubmitting} onClick={handleSubmit} title="Sauvegarder" />
-                </div>
-              </React.Fragment>
-            )}
-          </Formik>
-        </ModalBody>
-      </Modal>
-    </div>
+            } else {
+              const res = await API.put({
+                path: `/territory/${territory._id}`,
+                body: prepareTerritoryForEncryption({ ...body, user: body.user || user._id }),
+              });
+              if (res.ok) {
+                setTerritories((territories) =>
+                  territories.map((a) => {
+                    if (a._id === territory._id) return res.decryptedData;
+                    return a;
+                  })
+                );
+                actions.setSubmitting(false);
+                toast.success("Mis à jour !");
+                setOpen(false);
+              }
+            }
+          }}
+        >
+          {({ values, handleChange, handleSubmit, isSubmitting }) => (
+            <React.Fragment>
+              <Row>
+                <Col md={6}>
+                  <FormGroup>
+                    <Label htmlFor="name">Nom</Label>
+                    <Input name="name" id="name" value={values.name} onChange={handleChange} />
+                  </FormGroup>
+                </Col>
+                <Col md={6}>
+                  <FormGroup>
+                    <Label htmlFor="territory-select-types">Types</Label>
+                    <SelectCustom
+                      options={territoryTypes.map((_option) => ({ value: _option, label: _option }))}
+                      name="types"
+                      onChange={(values) => handleChange({ currentTarget: { value: values.map((v) => v.value), name: "types" } })}
+                      isClearable={false}
+                      isMulti
+                      value={values.types?.map((_option) => ({ value: _option, label: _option })) || []}
+                      getOptionValue={(i) => i.value}
+                      getOptionLabel={(i) => i.label}
+                      inputId="territory-select-types"
+                      classNamePrefix="territory-select-types"
+                    />
+                  </FormGroup>
+                </Col>
+                <Col md={6}>
+                  <FormGroup>
+                    <Label htmlFor="description">Description</Label>
+                    <Input name="description" id="description" value={values.description} onChange={handleChange} type="textarea" rows={3} />
+                  </FormGroup>
+                </Col>
+                <Col md={6}>
+                  <FormGroup>
+                    <Label htmlFor="perimeter">Périmètre</Label>
+                    <Input name="perimeter" id="perimeter" value={values.perimeter} onChange={handleChange} />
+                  </FormGroup>
+                </Col>
+              </Row>
+              <br />
+              <div className="tw-mt-2 tw-flex tw-justify-end">
+                <ButtonCustom disabled={isSubmitting} onClick={handleSubmit} title="Sauvegarder" />
+              </div>
+            </React.Fragment>
+          )}
+        </Formik>
+      </ModalBody>
+    </Modal>
   );
-};
+}
 
 export default List;

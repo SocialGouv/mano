@@ -10,7 +10,7 @@ export const territoriesState = atom({
   effects: [({ onSet }) => onSet(async (newValue) => storage.set('territory', JSON.stringify(newValue)))],
 });
 
-const encryptedFields = ['name', 'perimeter', 'types', 'user'];
+const encryptedFields = ['name', 'perimeter', 'description', 'types', 'user'];
 
 export const prepareTerritoryForEncryption = (territory) => {
   try {

@@ -1,6 +1,5 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import styled from "styled-components";
-import { Col, Row } from "reactstrap";
 import { toast } from "react-toastify";
 
 import ButtonCustom from "../../components/ButtonCustom";
@@ -39,13 +38,11 @@ const List = ({ territory = {} }) => {
 
   return (
     <>
-      <Row style={{ marginTop: "30px", marginBottom: "5px" }}>
-        <Col md={9}>
+      <div className="tw-flex tw-items-center tw-mt-12 tw-mb-6">
+        <div className="tw-flex-1 tw-mt-2">
           <Title>Observations</Title>
-        </Col>
-      </Row>
-      <Row style={{ marginBottom: "30px", justifyContent: "flex-end" }}>
-        <Col md={3}>
+        </div>
+        <div>
           <ButtonCustom
             onClick={() => {
               setObservation({});
@@ -55,8 +52,8 @@ const List = ({ territory = {} }) => {
             title="Nouvelle observation"
             padding="12px 24px"
           />
-        </Col>
-      </Row>
+        </div>
+      </div>
       {observations.map((obs) => (
         <Observation
           key={obs._id}

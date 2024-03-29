@@ -17,10 +17,10 @@ export const territoriesState = atom({
   effects: [({ onSet }) => onSet(async (newValue) => setCacheItem(collectionName, newValue))],
 });
 
-const encryptedFields = ["name", "perimeter", "types", "user"];
+const encryptedFields = ["name", "perimeter", "description", "types", "user"];
 
 export const prepareTerritoryForEncryption = (territory, { checkRequiredFields = true } = {}) => {
-  if (!!checkRequiredFields) {
+  if (checkRequiredFields) {
     try {
       if (!territory.name) {
         throw new Error("Territory is missing name");
