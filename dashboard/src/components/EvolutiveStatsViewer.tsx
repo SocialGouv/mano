@@ -1,8 +1,7 @@
 import { useRecoilValue } from "recoil";
-import { evolutiveStatsIndicatorsBaseSelector, evolutiveStatsPersonSelector, startHistoryFeatureDate } from "../recoil/evolutiveStats";
+import { evolutiveStatsForPersonsSelector } from "../recoil/evolutiveStats";
 import type { PersonPopulated } from "../types/person";
 import type { IndicatorsSelection } from "../types/evolutivesStats";
-import { dayjsInstance } from "../services/date";
 import { ResponsiveStream } from "@nivo/stream";
 import { useMemo } from "react";
 import { capture } from "../services/sentry";
@@ -18,84 +17,70 @@ interface EvolutiveStatsViewerProps {
 
 export default function EvolutiveStatsViewer({ evolutiveStatsIndicators, period, persons }: EvolutiveStatsViewerProps) {
   try {
-    const startDate = period.startDate;
-    const endDate = period.endDate;
-    const indicatorsBase = useRecoilValue(evolutiveStatsIndicatorsBaseSelector);
     const evolutiveStatsPerson = useRecoilValue(
-      evolutiveStatsPersonSelector({
+      evolutiveStatsForPersonsSelector({
         persons,
-        startDate: period.startDate ? dayjsInstance(period.startDate).format("YYYY-MM-DD") : null,
-        endDate: period.endDate ? dayjsInstance(period.endDate).format("YYYY-MM-DD") : dayjsInstance().format("YYYY-MM-DD"),
+        startDate: period.startDate,
+        endDate: period.endDate,
         evolutiveStatsIndicators,
       })
     );
-    if (!evolutiveStatsIndicators.length) return null;
-    const indicator = evolutiveStatsIndicators[0];
-    if (!indicator.fieldName) return null;
+    if (!evolutiveStatsPerson) return null;
+    const {
+      startDateConsolidated,
+      endDateConsolidated,
+      fieldLabel,
+      valueStart,
+      valueEnd,
+      countStart,
+      countEnd,
+      fieldData, // structure example for field gender: { 'Homme': { 20240101: 1, 20240102: 2, 20240103: 3 }, 'Femme': { 20240101: 4, 20240102: 5, 20240103: 6 } }
+    } = evolutiveStatsPerson;
 
-    const startDateFormatted = dayjsInstance(startDate ?? startHistoryFeatureDate);
-    const endDateFormatted = endDate ? dayjsInstance(endDate) : dayjsInstance();
-
-    if (startDateFormatted.isSame(endDateFormatted)) return null;
-
-    const fieldStart = indicator.fromValue;
-    const fieldEnd = indicator.toValue;
-
-    const field = indicatorsBase.find((field) => field.name === indicator.fieldName);
-
-    if (fieldStart == null) return null;
-
-    if (fieldEnd == null) {
+    if (valueStart == null) return null;
+    if (valueEnd == null) {
       return (
         <>
           <h4 className="tw-mb-4">
-            Évolution du champ {field?.label} entre le {startDateFormatted.format("DD/MM/YYYY")} et le {endDateFormatted.format("DD/MM/YYYY")}
+            Évolution du champ {fieldLabel} entre le {startDateConsolidated.format("DD/MM/YYYY")} et le {endDateConsolidated.format("DD/MM/YYYY")}
           </h4>
 
-          <StreamChart
-            startDateFormatted={startDateFormatted}
-            endDateFormatted={endDateFormatted}
-            indicator={indicator}
-            evolutiveStatsPerson={evolutiveStatsPerson}
-          />
+          <StreamChart startDateConsolidated={startDateConsolidated} endDateConsolidated={endDateConsolidated} fieldData={fieldData} />
         </>
       );
     }
 
-    const valueStart = evolutiveStatsPerson?.[indicator.fieldName]?.[fieldStart]?.[startDateFormatted.format("YYYYMMDD")];
-    const valueEnd = evolutiveStatsPerson?.[indicator.fieldName]?.[fieldEnd]?.[endDateFormatted.format("YYYYMMDD")];
-
     return (
       <div className="tw-flex tw-w-full tw-justify-around">
         <div className="tw-flex tw-shrink-0 tw-basis-1/4 tw-flex-col tw-items-center tw-justify-end tw-gap-y-4">
-          <h5>Au {startDateFormatted.format("DD/MM/YYYY")}</h5>
+          <h5>Au {startDateConsolidated.format("DD/MM/YYYY")}</h5>
           <div className="tw-flex tw-w-full tw-flex-col tw-items-center tw-justify-around tw-rounded-lg tw-border tw-p-4">
-            <p className="tw-text-6xl tw-font-bold tw-text-main">{valueStart}</p>
-            <p>{fieldStart}</p>
+            <p className="tw-text-6xl tw-font-bold tw-text-main">{countStart}</p>
+            <p>{valueStart}</p>
           </div>
         </div>
         <div className="tw-flex tw-basis-1/2 tw-flex-col tw-items-center tw-justify-end tw-gap-y-4">
-          {valueStart > 0 && (
+          {countStart > 0 && (
             <div className="tw-flex tw-flex-col tw-items-center tw-justify-around tw-p-4">
-              <p className="tw-text-6xl tw-font-bold tw-text-main">{Math.round((valueEnd / valueStart) * 1000) / 10}%</p>
+              <p className="tw-text-6xl tw-font-bold tw-text-main">{Math.round((countEnd / countStart) * 1000) / 10}%</p>
               <p className="tw-m-0 tw-text-center">
                 des{" "}
                 <strong>
-                  {field?.label}: {fieldStart}
+                  {fieldLabel}: {valueStart}
                 </strong>{" "}
-                au {startDateFormatted.format("DD/MM/YYYY")}
+                au {startDateConsolidated.format("DD/MM/YYYY")}
                 <br />
-                {fieldStart === fieldEnd ? " sont restés à " : " ont évolué vers "}
-                <strong>{fieldEnd}</strong> au {endDateFormatted.format("DD/MM/YYYY")}
+                {valueStart === valueEnd ? " sont restés à " : " ont évolué vers "}
+                <strong>{valueEnd}</strong> au {endDateConsolidated.format("DD/MM/YYYY")}
               </p>
             </div>
           )}
         </div>
         <div className="tw-flex tw-shrink-0 tw-basis-1/4 tw-flex-col tw-items-center tw-justify-end tw-gap-y-4">
-          <h5>Au {endDateFormatted.format("DD/MM/YYYY")}</h5>
+          <h5>Au {endDateConsolidated.format("DD/MM/YYYY")}</h5>
           <div className="tw-flex tw-w-full tw-flex-col tw-items-center tw-justify-around tw-rounded-lg tw-border tw-p-4">
-            <p className="tw-text-6xl tw-font-bold tw-text-main">{valueEnd}</p>
-            <p>{fieldEnd}</p>
+            <p className="tw-text-6xl tw-font-bold tw-text-main">{countEnd}</p>
+            <p>{valueEnd}</p>
           </div>
         </div>
       </div>
@@ -116,16 +101,14 @@ export default function EvolutiveStatsViewer({ evolutiveStatsIndicators, period,
   );
 }
 
-function StreamChart({ indicator, evolutiveStatsPerson, startDateFormatted, endDateFormatted }: any) {
+function StreamChart({ fieldData, startDateConsolidated, endDateConsolidated }: any) {
   const chartData = useMemo(() => {
-    if (!indicator.fieldName) return { data: [], legend: [], keys: [] };
     const data = [];
     const legend = [];
-    const fieldData = evolutiveStatsPerson[indicator.fieldName];
-    const daysDiff = endDateFormatted.diff(startDateFormatted, "days");
+    const daysDiff = endDateConsolidated.diff(startDateConsolidated, "days");
     const spacing = Math.floor(Math.max(1, daysDiff / 6));
     for (let i = 0; i < daysDiff; i += spacing) {
-      const date = startDateFormatted.add(i, "days");
+      const date = startDateConsolidated.add(i, "days");
       legend.push(date.format("DD/MM/YYYY"));
       const dateValue: any = {};
       for (const option of Object.keys(fieldData)) {
@@ -135,10 +118,10 @@ function StreamChart({ indicator, evolutiveStatsPerson, startDateFormatted, endD
       data.push(dateValue);
     }
     // end date
-    legend.push(endDateFormatted.format("DD/MM/YYYY"));
+    legend.push(endDateConsolidated.format("DD/MM/YYYY"));
     const lastDateValue: Record<string, number> = {};
     for (const option of Object.keys(fieldData)) {
-      const value = fieldData[option][endDateFormatted.format("YYYYMMDD")];
+      const value = fieldData[option][endDateConsolidated.format("YYYYMMDD")];
       lastDateValue[option] = value;
     }
     data.push(lastDateValue);
@@ -146,7 +129,7 @@ function StreamChart({ indicator, evolutiveStatsPerson, startDateFormatted, endD
       .sort((a, b) => b[1] - a[1])
       .map((entry) => entry[0]);
     return { data, legend, keys };
-  }, [startDateFormatted, endDateFormatted, evolutiveStatsPerson, indicator.fieldName]);
+  }, [startDateConsolidated, endDateConsolidated, fieldData]);
 
   return (
     <div>
@@ -222,8 +205,8 @@ function StreamChart({ indicator, evolutiveStatsPerson, startDateFormatted, endD
           <thead>
             <tr>
               <td className="tw-border tw-border-zinc-400 tw-p-1">Option</td>
-              <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center">Au {startDateFormatted.format("DD/MM/YYYY")}</td>
-              <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center">Au {endDateFormatted.format("DD/MM/YYYY")}</td>
+              <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center">Au {startDateConsolidated.format("DD/MM/YYYY")}</td>
+              <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center">Au {endDateConsolidated.format("DD/MM/YYYY")}</td>
               <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center">Différence</td>
               <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center">Différence (%)</td>
             </tr>

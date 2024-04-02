@@ -1,4 +1,4 @@
-name: Playwright Tests
+name: Tests - Playrwright and Jest
 on:
   pull_request:
     branches: [main]
@@ -29,14 +29,18 @@ jobs:
           # cache-dependency-path: "**/yarn.lock"
       - name: Install dependencies
         run: yarn
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
 
       - name: Install dashboard dependencies
         run: yarn --cwd ./dashboard
 
+      - name: Run Dashboard Jest tests
+        run: yarn --cwd ./dashboard test
+
       - name: Install api dependencies
         run: yarn --cwd ./api
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
 
       - name: Init DB
         run: yarn test:init-db
