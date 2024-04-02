@@ -51,7 +51,7 @@ Réunion</span></p>
 <p>Si vous n'avez pas encore été formé à Mano, inscrivez-vous à une session de formation (environ 1h30) (C'est obligatoire et gratuit !) en sélectionnant un créneau via le lien ci-dessous&nbsp;:</p>
 <ul>
 <li>
-<a href="https://cal.com/m-saiter-mano/je-souhaite-une-demonstration-de-l-outil-mano?duration=60">
+<a href="https://cal.com/msaiter/je-souhaite-une-demonstration-de-l-outil-mano?duration=60">
 Reservez un temps de présentation de l’outil MANO (Melissa)
 </a>
 </li>

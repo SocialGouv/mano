@@ -79,7 +79,7 @@ export default function Index() {
                   <a
                     target="_blank"
                     className="mx-auto p-3 px-4 md:px-8 space-x-2 transition-all bg-shamrock-400/10 hover:bg-shamrock-400 text-[#00897f] hover:text-white border border-shamrock-400 flex-center rounded-xl"
-                    href="https://cal.com/m-saiter-mano/je-souhaite-une-demonstration-de-l-outil-mano?duration=60"
+                    href="https://cal.com/msaiter/je-souhaite-une-demonstration-de-l-outil-mano?duration=60"
                   >
                     <AgendaIcon size={40} />
                     <div className="text-left pl-4">Reservez un temps de présentation de l’outil MANO</div>
