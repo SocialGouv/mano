@@ -22,15 +22,12 @@ export const actionsCreatedForReport = selectorFamily({
   get:
     ({ date }) =>
     ({ get }) => {
-      const now = Date.now();
-      console.log('actionsCreatedForReport start');
       const actions = get(actionsState);
       const currentTeam = get(currentTeamState);
       const filteredActions = actions
         ?.filter((a) => (Array.isArray(a.teams) ? a.teams.includes(currentTeam?._id) : a.team === currentTeam?._id))
         .filter((a) => getIsDayWithinHoursOffsetOfDay(a.createdAt, date, currentTeam?.nightSession ? 12 : 0))
         .filter((a) => !getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam?.nightSession ? 12 : 0));
-      console.log('actionsCreatedForReport', Date.now() - now);
       return filteredActions;
     },
 });
@@ -40,15 +37,12 @@ export const actionsCompletedOrCanceledForReport = selectorFamily({
   get:
     ({ date, status }) =>
     ({ get }) => {
-      const now = Date.now();
-      console.log('actionsCompletedOrCanceledForReport start');
       const actions = get(actionsState);
       const currentTeam = get(currentTeamState);
       const filteredActions = actions
         ?.filter((a) => (Array.isArray(a.teams) ? a.teams.includes(currentTeam?._id) : a.team === currentTeam?._id))
         .filter((a) => a.status === status)
         .filter((a) => getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam?.nightSession ? 12 : 0));
-      console.log('actionsCompletedOrCanceledForReport', Date.now() - now);
       return filteredActions;
     },
 });

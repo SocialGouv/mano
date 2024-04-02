@@ -331,8 +331,6 @@ const PersonSummary = ({
               Alert.alert(response.error || response.code);
               return;
             }
-
-            console.log('response', response);
             setComments((comments) => [response.decryptedData, ...comments]);
             await createReportAtDateIfNotExist(response.decryptedData.date);
           }}

@@ -14,8 +14,6 @@ const keyExtractor = (item) => item._id;
 const RencontresForReport = ({ navigation, route }) => {
   const date = route?.params?.date;
   const rencontres = useRecoilValue(rencontresForReport({ date }));
-  console.log('date', date);
-  console.log('rencontres', rencontres);
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
   const currentTeam = useRecoilValue(currentTeamState);
 

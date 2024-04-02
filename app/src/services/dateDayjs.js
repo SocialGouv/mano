@@ -56,8 +56,6 @@ export function formatBirthDateAndAge(date) {
   return `${formatAge(date)} ans (${formatBirthDate(date)})`;
 }
 
-console.log(formatAge(new Date('1995-01-01')));
-
 export function formatCalendarDate(date) {
   if (dayjs(date).isSame(dayjs(), 'day')) {
     return "Aujourd'hui";
