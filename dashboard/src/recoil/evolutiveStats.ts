@@ -203,7 +203,7 @@ export function computeEvolutiveStatsForPersons({
     persons = persons.filter((p) => {
       const snapshot = getPersonSnapshotAtDate({ person: p, snapshotDate: minimumDateForEvolutiveStats, fieldsMap });
       if (!snapshot) return false;
-      const isGood = getValueByField(indicatorFieldName, fieldsMap, snapshot[indicatorFieldName]).includes(indicator.fromValue);
+      const isGood = getValueByField(indicatorFieldName, fieldsMap, snapshot[indicatorFieldName]) === indicator.fromValue;
       return isGood;
     });
   }

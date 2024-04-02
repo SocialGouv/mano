@@ -103,7 +103,7 @@ describe("Stats evolutives", () => {
     expect(mockedCapture).toHaveBeenCalledTimes(2);
   });
 
-  test("more complexe example should work properly", () => {
+  test("multiple changes example should work properly", () => {
     const computed = computeEvolutiveStatsForPersons({
       startDate: "2024-01-01T00:00:00.000Z",
       endDate: "2024-04-01T00:00:00.000Z",
@@ -159,6 +159,46 @@ describe("Stats evolutives", () => {
     expect(computed.countStart).toBe(1);
     expect(computed.valueEnd).toBe("Femme");
     expect(computed.countEnd).toBe(1);
+    expect(dayjs(computed.startDateConsolidated).format("YYYY-MM-DD")).toBe("2024-01-01");
+    expect(dayjs(computed.endDateConsolidated).format("YYYY-MM-DD")).toBe("2024-04-01");
+  });
+
+  test("checking the exact value for the `fromValue`: 'Homme' and 'Homme transgenre' is not the same", () => {
+    const computed = computeEvolutiveStatsForPersons({
+      startDate: "2024-01-01T00:00:00.000Z",
+      endDate: "2024-04-01T00:00:00.000Z",
+      evolutiveStatsIndicatorsBase: mockedEvolutiveStatsIndicatorsBase,
+      evolutiveStatsIndicators: [
+        {
+          fieldName: "gender",
+          fromValue: "Homme",
+          toValue: "Femme",
+          type: "enum",
+        },
+      ],
+      persons: [
+        {
+          ...personBase,
+          gender: "Femme",
+          history: [
+            {
+              date: dayjs("2024-04-02").toDate(),
+              data: {
+                gender: {
+                  oldValue: "Homme transgenre",
+                  newValue: "Femme",
+                },
+              },
+              user: "XXX",
+            },
+          ],
+        },
+      ],
+    });
+    expect(computed.valueStart).toBe("Homme");
+    expect(computed.countStart).toBe(0);
+    expect(computed.valueEnd).toBe("Femme");
+    expect(computed.countEnd).toBe(0);
     expect(dayjs(computed.startDateConsolidated).format("YYYY-MM-DD")).toBe("2024-01-01");
     expect(dayjs(computed.endDateConsolidated).format("YYYY-MM-DD")).toBe("2024-04-01");
   });
