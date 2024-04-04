@@ -477,109 +477,151 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                   <label className={isEditing ? "" : "tw-text-sm tw-font-semibold tw-text-blue-900"} htmlFor="constantes-poids">
                     Poids (kg)
                   </label>
-                  <input
-                    className="tailwindui"
-                    value={data["constantes-poids"]}
-                    onChange={handleChange}
-                    type="number"
-                    min="3"
-                    max="400"
-                    name="constantes-poids"
-                    placeholder="100"
-                  />
+                  {!isEditing ? (
+                    <div>
+                      <CustomFieldDisplay type="number" value={data["constantes-poids"]} />
+                    </div>
+                  ) : (
+                    <input
+                      className="tailwindui"
+                      value={data["constantes-poids"]}
+                      onChange={handleChange}
+                      type="number"
+                      min="3"
+                      max="400"
+                      name="constantes-poids"
+                      placeholder="100"
+                    />
+                  )}
                 </div>
                 <div>
                   <label className={isEditing ? "" : "tw-text-sm tw-font-semibold tw-text-blue-900"} htmlFor="constantes-taille">
                     Taille (cm)
                   </label>
-                  <input
-                    value={data["constantes-taille"]}
-                    onChange={handleChange}
-                    className="tailwindui"
-                    type="number"
-                    min="40"
-                    max="240"
-                    name="constantes-taille"
-                    placeholder="160"
-                  />
+                  {!isEditing ? (
+                    <div>
+                      <CustomFieldDisplay type="number" value={data["constantes-taille"]} />
+                    </div>
+                  ) : (
+                    <input
+                      value={data["constantes-taille"]}
+                      onChange={handleChange}
+                      className="tailwindui"
+                      type="number"
+                      min="40"
+                      max="240"
+                      name="constantes-taille"
+                      placeholder="160"
+                    />
+                  )}
                 </div>
                 <div>
                   <label className={isEditing ? "" : "tw-text-sm tw-font-semibold tw-text-blue-900"} htmlFor="constantes-frequence-cardiaque">
                     Fréquence cardiaque (bpm)
                   </label>
-                  <input
-                    value={data["constantes-frequence-cardiaque"]}
-                    onChange={handleChange}
-                    className="tailwindui"
-                    type="number"
-                    min="20"
-                    max="240"
-                    name="constantes-frequence-cardiaque"
-                    placeholder="60"
-                  />
+                  {!isEditing ? (
+                    <div>
+                      <CustomFieldDisplay type="number" value={data["constantes-frequence-cardiaque"]} />
+                    </div>
+                  ) : (
+                    <input
+                      value={data["constantes-frequence-cardiaque"]}
+                      onChange={handleChange}
+                      className="tailwindui"
+                      type="number"
+                      min="20"
+                      max="240"
+                      name="constantes-frequence-cardiaque"
+                      placeholder="60"
+                    />
+                  )}
                 </div>
                 <div>
                   <label className={isEditing ? "" : "tw-text-sm tw-font-semibold tw-text-blue-900"} htmlFor="constantes-frequence-respiratoire">
                     Fréq. respiratoire (mvts/min)
                   </label>
-                  <input
-                    value={data["constantes-frequence-respiratoire"]}
-                    onChange={handleChange}
-                    className="tailwindui"
-                    type="number"
-                    min="1"
-                    max="90"
-                    name="constantes-frequence-respiratoire"
-                    placeholder="15"
-                  />
+                  {!isEditing ? (
+                    <div>
+                      <CustomFieldDisplay type="number" value={data["constantes-frequence-respiratoire"]} />{" "}
+                    </div>
+                  ) : (
+                    <input
+                      value={data["constantes-frequence-respiratoire"]}
+                      onChange={handleChange}
+                      className="tailwindui"
+                      type="number"
+                      min="1"
+                      max="90"
+                      name="constantes-frequence-respiratoire"
+                      placeholder="15"
+                    />
+                  )}
                 </div>
                 <div>
                   <label className={isEditing ? "" : "tw-text-sm tw-font-semibold tw-text-blue-900"} htmlFor="constantes-saturation-o2">
                     Saturation en oxygène (%)
                   </label>
-                  <input
-                    value={data["constantes-saturation-o2"]}
-                    onChange={handleChange}
-                    className="tailwindui"
-                    type="number"
-                    min="50"
-                    max="150"
-                    name="constantes-saturation-o2"
-                    placeholder="95"
-                  />
+                  {!isEditing ? (
+                    <div>
+                      <CustomFieldDisplay type="number" value={data["constantes-saturation-o2"]} />{" "}
+                    </div>
+                  ) : (
+                    <input
+                      value={data["constantes-saturation-o2"]}
+                      onChange={handleChange}
+                      className="tailwindui"
+                      type="number"
+                      min="50"
+                      max="150"
+                      name="constantes-saturation-o2"
+                      placeholder="95"
+                    />
+                  )}
                 </div>
                 <div>
                   <label className={isEditing ? "" : "tw-text-sm tw-font-semibold tw-text-blue-900"} htmlFor="constantes-glycemie-capillaire">
                     Glycémie capillaire (g/L)
                   </label>
-                  <input
-                    value={data["constantes-glycemie-capillaire"]}
-                    onChange={handleChange}
-                    className="tailwindui"
-                    type="number"
-                    min="0"
-                    max="2"
-                    step="0.1"
-                    name="constantes-glycemie-capillaire"
-                    placeholder="1"
-                  />
+                  {!isEditing ? (
+                    <div>
+                      <CustomFieldDisplay type="number" value={data["constantes-glycemie-capillaire"]} />
+                    </div>
+                  ) : (
+                    <input
+                      value={data["constantes-glycemie-capillaire"]}
+                      onChange={handleChange}
+                      className="tailwindui"
+                      type="number"
+                      min="0"
+                      max="2"
+                      step="0.1"
+                      name="constantes-glycemie-capillaire"
+                      placeholder="1"
+                    />
+                  )}
                 </div>
 
                 <div>
                   <label className={isEditing ? "" : "tw-text-sm tw-font-semibold tw-text-blue-900"} htmlFor="constantes-temperature">
                     Température (°C)
                   </label>
-                  <input
-                    value={data["constantes-temperature"]}
-                    onChange={handleChange}
-                    className="tailwindui"
-                    type="number"
-                    min="35"
-                    max="43"
-                    step="0.1"
-                    name="constantes-temperature"
-                    placeholder="38"
-                  />
+                  {!isEditing ? (
+                    <div>
+                      <CustomFieldDisplay type="number" value={data["constantes-temperature"]} />{" "}
+                    </div>
+                  ) : (
+                    <input
+                      value={data["constantes-temperature"]}
+                      onChange={handleChange}
+                      className="tailwindui"
+                      type="number"
+                      min="35"
+                      max="43"
+                      step="0.1"
+                      name="constantes-temperature"
+                      placeholder="38"
+                    />
+                  )}
                 </div>
                 <div>
                   <label
@@ -589,26 +631,44 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                     Tension artérielle (mmHg)
                   </label>
                   <div className="tw-grid tw-grid-cols-2 tw-gap-1">
-                    <input
-                      value={data["constantes-tension-arterielle-systolique"]}
-                      onChange={handleChange}
-                      className="tailwindui"
-                      type="number"
-                      min="10"
-                      max="200"
-                      name="constantes-tension-arterielle-systolique"
-                      placeholder="Systolique"
-                    />
-                    <input
-                      value={data["constantes-tension-arterielle-diastolique"]}
-                      onChange={handleChange}
-                      className="tailwindui"
-                      type="number"
-                      min="10"
-                      max="200"
-                      name="constantes-tension-arterielle-diastolique"
-                      placeholder="Diastolique"
-                    />
+                    {!isEditing ? (
+                      <CustomFieldDisplay
+                        type="text"
+                        value={
+                          data["constantes-tension-arterielle-systolique"] ? `${data["constantes-tension-arterielle-systolique"]} syst.` : undefined
+                        }
+                      />
+                    ) : (
+                      <input
+                        value={data["constantes-tension-arterielle-systolique"]}
+                        onChange={handleChange}
+                        className="tailwindui"
+                        type="number"
+                        min="10"
+                        max="200"
+                        name="constantes-tension-arterielle-systolique"
+                        placeholder="Systolique"
+                      />
+                    )}
+                    {!isEditing ? (
+                      <CustomFieldDisplay
+                        type="text"
+                        value={
+                          data["constantes-tension-arterielle-diastolique"] ? `${data["constantes-tension-arterielle-diastolique"]} dias.` : undefined
+                        }
+                      />
+                    ) : (
+                      <input
+                        value={data["constantes-tension-arterielle-diastolique"]}
+                        onChange={handleChange}
+                        className="tailwindui"
+                        type="number"
+                        min="10"
+                        max="200"
+                        name="constantes-tension-arterielle-diastolique"
+                        placeholder="Diastolique"
+                      />
+                    )}
                   </div>
                 </div>
               </div>
