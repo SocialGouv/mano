@@ -41,7 +41,7 @@ const View = () => {
           <div>
             Types&nbsp;:{" "}
             <b>
-              <i>{territory.types.join(", ")}</i>
+              <i>{(territory.types || []).join(", ")}</i>
             </b>
           </div>
           <div>
