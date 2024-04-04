@@ -22,11 +22,12 @@ const CustomFieldsStats = ({ customFields, data, additionalCols = [], dataTestId
             <Card
               title={col.title}
               count={col.value}
-              children={<div></div>}
               dataTestId={dataTestId}
               help={help?.(col.title.capitalize())}
               onClick={col.onBlockClick ? col.onBlockClick : null}
-            />
+            >
+              <div></div>
+            </Card>
           </div>
         ))}
       </div>
