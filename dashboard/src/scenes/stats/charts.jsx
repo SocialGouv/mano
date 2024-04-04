@@ -80,7 +80,7 @@ export const CustomResponsivePie = ({ data = [], title, onItemClick, help }) => 
   );
 };
 
-const getItemValue = (item) => Object.values(item)[1];
+const getItemValue = (item) => item[item.name];
 
 export const CustomResponsiveBar = ({
   title,
@@ -131,15 +131,17 @@ export const CustomResponsiveBar = ({
       <div className="tw-flex tw-basis-1/3 tw-items-center tw-justify-center">
         <table className="tw-w-full tw-border tw-border-zinc-400">
           <tbody>
-            {[...data].map((item) => (
-              <tr key={item.name} onClick={() => onClick({ id: item.name })}>
-                <td className="tw-border tw-border-zinc-400 tw-p-1">{item.name}</td>
-                <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center">{getItemValue(item)}</td>
-                <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center">{`${
-                  Math.round((getItemValue(item) / (isMultiChoice ? totalForMultiChoice : total)) * 1000) / 10
-                }%`}</td>
-              </tr>
-            ))}
+            {[...data].map((item) => {
+              return (
+                <tr key={item.name} onClick={() => onClick({ id: item.name })}>
+                  <td className="tw-border tw-border-zinc-400 tw-p-1">{item.name}</td>
+                  <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center">{getItemValue(item)}</td>
+                  <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center">{`${
+                    Math.round((getItemValue(item) / (isMultiChoice ? totalForMultiChoice : total)) * 1000) / 10
+                  }%`}</td>
+                </tr>
+              );
+            })}
             {!isMultiChoice && (
               <tr>
                 <td className="tw-border tw-border-zinc-400 tw-p-1 tw-font-bold ">Total</td>
