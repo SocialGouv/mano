@@ -7,7 +7,7 @@ import Button from './Button';
 
 const initNumberToShow = 10;
 
-const SubList = ({ label, onAdd, data = [], renderItem, ifEmpty, children, testID = 'list' }) => {
+const SubList = ({ label, onAdd, data, renderItem, ifEmpty, children, testID = 'list' }) => {
   const [expanded, setExpanded] = useState(false);
   const [numberToShow, setNumberToShow] = useState(initNumberToShow);
 
@@ -17,7 +17,7 @@ const SubList = ({ label, onAdd, data = [], renderItem, ifEmpty, children, testI
 
   const renderList = () => {
     if (!expanded) return null;
-    if (!data) return <Spinner />;
+    if (!Array.isArray(data)) return null;
     if (!data.length) {
       return (
         <EmptyContainer>
@@ -38,7 +38,7 @@ const SubList = ({ label, onAdd, data = [], renderItem, ifEmpty, children, testI
     <>
       <ListLabel testID={`${testID}-label`}>
         <ButtonExpand onPress={() => setExpanded(!expanded)} expanded={expanded} testID={`${testID}-expand`} />
-        <LabelStyled>{`${label}${data !== null ? ` (${data.length})` : ''}`}</LabelStyled>
+        <LabelStyled>{`${label}${data != null ? ` (${data.length})` : ''}`}</LabelStyled>
         {Boolean(onAdd) && <Button caption="Ajouter" onPress={onAdd} noBorder testID={`${testID}-add`} />}
       </ListLabel>
       {!!children && expanded && <ChildrenContainer>{children}</ChildrenContainer>}

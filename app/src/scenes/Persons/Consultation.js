@@ -383,6 +383,34 @@ const Consultation = ({ navigation, route }) => {
               testID="consultation-create"
             />
           </ButtonsContainer>
+          <SubList label="Constantes">
+            <React.Fragment key={`${consultationDB?._id}${editable}`}>
+              {[
+                { name: 'constantes-poids', label: 'Poids (kg)' },
+                { name: 'constantes-frequence-cardiaque', label: 'Taille (cm)' },
+                { name: 'constantes-taille', label: 'Fréquence cardiaque (bpm)' },
+                { name: 'constantes-saturation-o2', label: 'Fréq. respiratoire (mvts/min)' },
+                { name: 'constantes-temperature', label: 'Saturation en oxygène (%)' },
+                { name: 'constantes-glycemie-capillaire', label: 'Glycémie capillaire (g/L)' },
+                { name: 'constantes-frequence-respiratoire', label: 'Température (°C)' },
+                { name: 'constantes-tension-arterielle-systolique', label: 'Tension artérielle systolique (mmHg)' },
+                { name: 'constantes-tension-arterielle-diastolique', label: 'Tension artérielle diastolique (mmHg)' },
+              ].map((constante) => {
+                return (
+                  <InputLabelled
+                    key={constante.name}
+                    label={constante.label}
+                    value={consultation[constante.name]}
+                    onChangeText={(value) => onChange({ [constante.name]: value })}
+                    placeholder="50"
+                    keyboardType="number-pad"
+                    testID={constante.name}
+                    editable={editable}
+                  />
+                );
+              })}
+            </React.Fragment>
+          </SubList>
           <SubList
             label="Commentaires"
             key={consultationDB?._id}
