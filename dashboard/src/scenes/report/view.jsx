@@ -169,6 +169,9 @@ const itemsForReportsSelector = selectorFamily({
       for (const passage of allPassages) {
         if (!filterItemByTeam(passage, "team")) continue;
         const date = passage.date;
+        // Je ne sais pas pourquoi, mais il semblerait que certains passages n'aient pas de date.
+        // cf: https://www.notion.so/mano-sesan/Bug-affichage-des-passage-6f539d3706c04b27b1290a39763d91e5
+        if (!date) continue;
         const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[passage.team] ?? defaultIsoDates;
         if (date < isoStartDate) continue;
         if (date >= isoEndDate) continue;
