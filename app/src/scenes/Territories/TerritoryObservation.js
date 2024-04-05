@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
 import Button from '../../components/Button';
@@ -9,7 +8,7 @@ import ButtonDelete from '../../components/ButtonDelete';
 import styled from 'styled-components';
 import { MyText } from '../../components/MyText';
 import CustomFieldInput from '../../components/CustomFieldInput';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import {
   customFieldsObsSelector,
   groupedCustomFieldsObsSelector,
@@ -20,6 +19,10 @@ import { currentTeamState, organisationState, userState } from '../../recoil/aut
 import API from '../../services/api';
 import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
 import DateAndTimeInput from '../../components/DateAndTimeInput';
+import { prepareRencontreForEncryption, rencontresState } from '../../recoil/rencontres';
+import { useFocusEffect } from '@react-navigation/native';
+import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
+import { PersonName } from '../Persons/PersonRow';
 
 const cleanValue = (value) => {
   if (typeof value === 'string') return (value || '').trim();
@@ -36,6 +39,10 @@ const TerritoryObservation = ({ route, navigation }) => {
   const [allTerritoryOservations, setTerritoryObservations] = useRecoilState(territoryObservationsState);
   const [obsDB, setObsDB] = useState(() => allTerritoryOservations.find((obs) => obs._id === route.params?.obs?._id) || {});
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
+  const [rencontresInProgress, setRencontresInProgress] = useState([]);
+  const setRencontres = useSetRecoilState(rencontresState);
+  const rencontres = useRecoilValue(rencontresState);
+  const personsObject = useRecoilValue(itemsGroupedByPersonSelector);
 
   const castToTerritoryObservation = useCallback(
     (territoryObservation = {}) => {
@@ -61,6 +68,13 @@ const TerritoryObservation = ({ route, navigation }) => {
     castToTerritoryObservation(route.params.obs).observedAt || castToTerritoryObservation(route.params.obs).createdAt || Date.now()
   );
   const onChange = (newProps) => setObs((o) => ({ ...o, ...newProps }));
+
+  const rencontresForObs = useMemo(() => {
+    if (!obsDB?._id || !rencontres) return [];
+    return rencontres?.filter((r) => obsDB?._id && r.observation === obsDB?._id) || [];
+  }, [rencontres, obsDB?._id]);
+
+  const currentRencontres = [...rencontresInProgress, ...rencontresForObs];
 
   const onBack = () => {
     backRequestHandledRef.current = true;
@@ -90,6 +104,25 @@ const TerritoryObservation = ({ route, navigation }) => {
     return onCreateTerritoryObservation();
   };
 
+  const saveRencontres = async (obsId) => {
+    if (obsId && rencontresInProgress.length > 0) {
+      const newRencontres = [];
+      for (const rencontre of rencontresInProgress) {
+        const response = await API.post({
+          path: '/rencontre',
+          body: prepareRencontreForEncryption({ ...rencontre, observation: obsId }),
+        });
+        if (response.error) {
+          Alert.alert(response.error);
+          continue;
+        }
+        newRencontres.push(response.decryptedData);
+      }
+      setRencontres((rencontres) => [...rencontres, ...newRencontres]);
+      setRencontresInProgress([]);
+    }
+  };
+
   const onCreateTerritoryObservation = async () => {
     setUpdating(true);
     const response = await API.post({
@@ -109,11 +142,13 @@ const TerritoryObservation = ({ route, navigation }) => {
       Alert.alert(response.error || response.code);
       return false;
     }
-    Alert.alert('Nouvelle observation créée !');
+
     setObs(castToTerritoryObservation(response.decryptedData));
     setTerritoryObservations((territoryObservations) => [response.decryptedData, ...territoryObservations]);
     await createReportAtDateIfNotExist(response.decryptedData.observedAt);
     setObsDB(response.decryptedData);
+    await saveRencontres(response.decryptedData._id);
+    Alert.alert('Nouvelle observation créée !');
     setUpdating(false);
     setEditable(false);
     return onBack();
@@ -148,6 +183,7 @@ const TerritoryObservation = ({ route, navigation }) => {
     await createReportAtDateIfNotExist(response.decryptedData.observedAt);
     setObsDB(response.decryptedData);
     Alert.alert('Observation mise à jour !');
+    await saveRencontres(response.decryptedData._id);
     setUpdating(false);
     setEditable(false);
     return true;
@@ -183,11 +219,12 @@ const TerritoryObservation = ({ route, navigation }) => {
       ...castToTerritoryObservation(obs),
       observedAt: date,
     };
+    if (rencontresInProgress.length > 0) return false;
     if (JSON.stringify(castToTerritoryObservation(obsDB)) !== JSON.stringify(castToTerritoryObservation(newTerritoryObservation))) {
       return false;
     }
     return true;
-  }, [castToTerritoryObservation, obs, obsDB, date]);
+  }, [castToTerritoryObservation, obs, obsDB, date, rencontresInProgress.length]);
 
   const onGoBackRequested = () => {
     if (isUpdateDisabled) return onBack();
@@ -226,6 +263,15 @@ const TerritoryObservation = ({ route, navigation }) => {
     }, 250);
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      const newRencontresInProgress = route?.params?.rencontresInProgress;
+      if (newRencontresInProgress) {
+        setRencontresInProgress((rencontresInProgress) => [...rencontresInProgress, ...newRencontresInProgress]);
+      }
+    }, [route?.params?.rencontresInProgress])
+  );
+
   const currentGroup = groupedCustomFieldsObs.find((group) => group.name === activeTab);
 
   return (
@@ -238,19 +284,23 @@ const TerritoryObservation = ({ route, navigation }) => {
         saving={updating}
         testID="observation"
       />
-      {fieldsGroupNames.length > 1 ? (
-        <ScrollView horizontal className="flex-grow-0 gap-4 flex-shrink-0 px-2 bg-white border-b border-b-gray-300">
-          {fieldsGroupNames.map((name) => {
-            return (
-              <TouchableOpacity key={name} onPress={() => setActiveTab(name)}>
-                <View className={`p-4 bg-white ${name === activeTab ? 'border-b-green-700 border-b-4' : ''}`}>
-                  <Text>{name}</Text>
-                </View>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
-      ) : null}
+
+      <ScrollView horizontal className="flex-grow-0 gap-4 flex-shrink-0 px-2 bg-white border-b border-b-gray-300">
+        {fieldsGroupNames.map((name) => {
+          return (
+            <TouchableOpacity key={name} onPress={() => setActiveTab(name)}>
+              <View className={`p-4 bg-white ${name === activeTab ? 'border-b-green-700 border-b-4' : ''}`}>
+                <Text>{fieldsGroupNames.length > 1 ? name : 'Informations'}</Text>
+              </View>
+            </TouchableOpacity>
+          );
+        })}
+        <TouchableOpacity key="rencontres" onPress={() => setActiveTab('rencontres')}>
+          <View className={`p-4 bg-white ${activeTab === 'rencontres' ? 'border-b-green-700 border-b-4' : ''}`}>
+            <Text>Rencontres</Text>
+          </View>
+        </TouchableOpacity>
+      </ScrollView>
       <ScrollView
         keyboardShouldPersistTaps="handled"
         className="bg-white p-4"
@@ -263,26 +313,76 @@ const TerritoryObservation = ({ route, navigation }) => {
           ) : (
             <CreatedAt>{new Date(date).getLocaleDateAndTime('fr')}</CreatedAt>
           )}
-          <View key={currentGroup.name}>
-            {currentGroup.fields
-              .filter((f) => f)
-              .filter((f) => f.enabled || (f.enabledTeams || []).includes(currentTeam._id))
-              .map((field) => {
-                const { label, name, type } = field;
+          {activeTab === 'rencontres' ? (
+            <View key="rencontres" className="mb-4">
+              {!currentRencontres.length ? (
+                <View className="pb-6">
+                  <Text className="font-semibold">Aucune rencontre enregistrée pour le moment.</Text>
+                  <Text className="mt-1 text-gray-700">
+                    Vous pouvez cliquer sur le bouton pour ajouter des rencontres qui seront associées à l'observation et donc au territoire
+                    (n'oubliez pas de sauvegarder l'observation à la fin)
+                  </Text>
+                </View>
+              ) : null}
+              <View className="mb-2">
+                <Button
+                  caption={'Ajouter une rencontre'}
+                  onPress={() => {
+                    navigation.push('TerritoryObservationRencontre', {
+                      obs: obsDB,
+                      territory: route.params.territory,
+                      fromRoute: 'TerritoryObservation',
+                    });
+                  }}
+                  disabled={false}
+                  loading={false}
+                />
+              </View>
+              {currentRencontres.length ? <Text className="text-lg font-bold">Personnes rencontrées</Text> : null}
+              {currentRencontres.map((rencontre) => {
+                const person = personsObject[rencontre.person];
                 return (
-                  <CustomFieldInput
-                    key={label}
-                    label={label}
-                    field={field}
-                    value={obs[name]}
-                    handleChange={(newValue) => onChange({ [name]: newValue })}
-                    editable={editable}
-                    ref={(r) => (refs.current[`${name}-ref`] = r)}
-                    onFocus={() => _scrollToInput(refs.current[`${name}-ref`])}
-                  />
+                  <View key={rencontre._id + rencontre.person} className="bg-gray-100 rounded p-4 my-2 flex flex-row">
+                    <View className="grow">
+                      <PersonName person={person} />
+                    </View>
+                    {!rencontre._id ? (
+                      <View className="shrink-0 !w-16 items-center flex">
+                        <TouchableOpacity
+                          className="bg-red-700 px-2 py-1 rounded"
+                          onPress={() => {
+                            setRencontresInProgress((rencontresInProgress) => rencontresInProgress.filter((r) => r.person !== rencontre.person));
+                          }}>
+                          <Text className="text-white font-bold">Retirer</Text>
+                        </TouchableOpacity>
+                      </View>
+                    ) : null}
+                  </View>
                 );
               })}
-          </View>
+            </View>
+          ) : (
+            <View key={currentGroup.name}>
+              {currentGroup.fields
+                .filter((f) => f)
+                .filter((f) => f.enabled || (f.enabledTeams || []).includes(currentTeam._id))
+                .map((field) => {
+                  const { label, name, type } = field;
+                  return (
+                    <CustomFieldInput
+                      key={label}
+                      label={label}
+                      field={field}
+                      value={obs[name]}
+                      handleChange={(newValue) => onChange({ [name]: newValue })}
+                      editable={editable}
+                      ref={(r) => (refs.current[`${name}-ref`] = r)}
+                      onFocus={() => _scrollToInput(refs.current[`${name}-ref`])}
+                    />
+                  );
+                })}
+            </View>
+          )}
           <ButtonsContainer>
             {obsDB?._id ? (
               <>

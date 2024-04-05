@@ -10,7 +10,7 @@ export const rencontresState = atom({
   effects: [({ onSet }) => onSet(async (newValue) => storage.set('rencontre', JSON.stringify(newValue)))],
 });
 
-const encryptedFields = ['person', 'team', 'user', 'date', 'comment'];
+const encryptedFields = ['person', 'team', 'user', 'date', 'observation', 'comment'];
 
 export const prepareRencontreForEncryption = (rencontre) => {
   try {

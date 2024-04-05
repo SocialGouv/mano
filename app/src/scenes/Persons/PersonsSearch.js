@@ -29,7 +29,8 @@ const PersonsSearch = ({ navigation, route }) => {
   };
 
   const onSelectPerson = (person) => {
-    navigation.navigate(route.params.fromRoute, { person }, { merge: true });
+    // We need to keep some of the previous params. Maybe we could use navigation.pop later.
+    navigation.navigate(route.params.fromRoute, { ...route.params, person }, { merge: true });
   };
 
   const onBack = async () => {

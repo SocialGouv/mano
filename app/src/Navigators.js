@@ -62,6 +62,7 @@ import { currentTeamState, organisationState, teamsState, userState } from './re
 import { appCurrentCacheKey, clearCache } from './services/dataManagement';
 import useResetAllCachedDataRecoilStates from './recoil/reset';
 import CGUsAcceptance from './scenes/Login/CGUsAcceptance';
+import TerritoryObservationRencontre from './scenes/Territories/TerritoryObservationRencontre';
 
 const ActionsStack = createStackNavigator();
 const ActionsNavigator = () => {
@@ -129,6 +130,8 @@ const TerritoriesNavigator = () => {
       <TerritoriesStack.Screen name="NewTerritoryForm" component={NewTerritoryForm} />
       <TerritoriesStack.Screen name="Territory" component={Territory} />
       <TerritoriesStack.Screen name="TerritoryObservation" component={TerritoryObservation} />
+      <TerritoriesStack.Screen name="TerritoryObservationRencontre" component={TerritoryObservationRencontre} />
+      <TerritoriesStack.Screen name="PersonsSearch" component={PersonsSearch} />
     </TerritoriesStack.Navigator>
   );
 };

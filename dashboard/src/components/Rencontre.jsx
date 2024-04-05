@@ -15,7 +15,7 @@ import DatePicker from "./DatePicker";
 import { outOfBoundariesDate } from "../services/date";
 import AutoResizeTextarea from "./AutoresizeTextArea";
 
-const Rencontre = ({ rencontre, personId, onFinished }) => {
+const Rencontre = ({ rencontre, personId, onFinished, onSave }) => {
   const user = useRecoilValue(userState);
   const teams = useRecoilValue(teamsState);
   const [open, setOpen] = useState(false);
@@ -56,7 +56,12 @@ const Rencontre = ({ rencontre, personId, onFinished }) => {
         <ModalHeader toggle={onCancelRequest}>{isNew ? "Enregistrer une rencontre" : "Éditer la rencontre"}</ModalHeader>
         <ModalBody>
           <Formik
-            initialValues={{ date: new Date(), ...rencontre, anonymousNumberOfRencontres: 1, persons: rencontre?.person ? [rencontre.person] : [] }}
+            initialValues={{
+              date: new Date(),
+              ...rencontre,
+              anonymousNumberOfRencontres: 1,
+              persons: rencontre?.person ? [rencontre.person] : rencontre?.persons ? rencontre?.persons : [],
+            }}
             onSubmit={async (body, actions) => {
               if (!body.user) return toast.error("L'utilisateur est obligatoire");
               if (!body.date) return toast.error("La date est obligatoire");
@@ -74,23 +79,29 @@ const Rencontre = ({ rencontre, personId, onFinished }) => {
                   comment: body.comment,
                 };
 
-                if (showMultiSelect) {
-                  for (const person of body.persons) {
+                if (onSave) {
+                  // Sometimes we don't want to actually save the rencontre, but just to get the data.
+                  // Par exemple quand on veut ajouter une rencontre à une observation pas encore créee.
+                  onSave(showMultiSelect ? body.persons.map((person) => ({ ...newRencontre, person })) : [newRencontre]);
+                } else {
+                  if (showMultiSelect) {
+                    for (const person of body.persons) {
+                      const response = await API.post({
+                        path: "/rencontre",
+                        body: prepareRencontreForEncryption({ ...newRencontre, person }),
+                      });
+                      if (response.ok) {
+                        setRencontres((rencontres) => [response.decryptedData, ...rencontres]);
+                      }
+                    }
+                  } else {
                     const response = await API.post({
                       path: "/rencontre",
-                      body: prepareRencontreForEncryption({ ...newRencontre, person }),
+                      body: prepareRencontreForEncryption({ ...newRencontre, person: body.person }),
                     });
                     if (response.ok) {
                       setRencontres((rencontres) => [response.decryptedData, ...rencontres]);
                     }
-                  }
-                } else {
-                  const response = await API.post({
-                    path: "/rencontre",
-                    body: prepareRencontreForEncryption({ ...newRencontre, person: body.person }),
-                  });
-                  if (response.ok) {
-                    setRencontres((rencontres) => [response.decryptedData, ...rencontres]);
                   }
                 }
 

@@ -17,7 +17,7 @@ export const rencontresState = atom({
   effects: [({ onSet }) => onSet(async (newValue) => setCacheItem(collectionName, newValue))],
 });
 
-const encryptedFields = ["person", "team", "user", "date", "comment"];
+const encryptedFields = ["person", "team", "user", "date", "observation", "comment"];
 
 export const prepareRencontreForEncryption = (rencontre, { checkRequiredFields = true } = {}) => {
   if (checkRequiredFields) {
