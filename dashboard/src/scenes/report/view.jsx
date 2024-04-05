@@ -399,26 +399,26 @@ const View = () => {
               <div className="tw-mx-4 tw-mb-12 tw-basis-3/12 print:tw-basis-full">
                 <div className="tw-mb-4 tw-grid tw-grid-cols-new-report-squares tw-gap-4 print:tw-flex print:tw-flex-col">
                   {organisation.passagesEnabled && (
-                    <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow-2xl print:tw-border-none print:tw-bg-transparent print:tw-shadow-none">
+                    <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow print:tw-border-none print:tw-bg-transparent print:tw-shadow-none">
                       <PassagesReport passages={passages} period={period} selectedTeams={selectedTeams} />
                     </div>
                   )}
                   {organisation.rencontresEnabled && (
-                    <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow-2xl print:tw-border-none print:tw-bg-transparent print:tw-shadow-none">
+                    <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow print:tw-border-none print:tw-bg-transparent print:tw-shadow-none">
                       <RencontresReport rencontres={rencontres} period={period} selectedTeams={selectedTeams} />
                     </div>
                   )}
                   {organisation.territoriesEnabled && (
-                    <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow-2xl print:tw-border-none print:tw-bg-transparent print:tw-shadow-none">
+                    <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow print:tw-border-none print:tw-bg-transparent print:tw-shadow-none">
                       <ObservationsReport observations={observations} period={period} selectedTeams={selectedTeams} />
                     </div>
                   )}
-                  <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow-2xl print:tw-border-none print:tw-bg-transparent print:tw-shadow-none">
+                  <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow print:tw-border-none print:tw-bg-transparent print:tw-shadow-none">
                     <PersonsReport personsCreated={personsCreated} period={period} selectedTeams={selectedTeams} />
                   </div>
                 </div>
                 {organisation.receptionEnabled && (
-                  <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-white tw-shadow-2xl print:tw-border-none print:tw-bg-transparent print:tw-shadow-none">
+                  <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-white tw-shadow print:tw-border-none print:tw-bg-transparent print:tw-shadow-none">
                     <ServicesReport selectedTeamsObject={selectedTeamsObject} period={period} />
                   </div>
                 )}
