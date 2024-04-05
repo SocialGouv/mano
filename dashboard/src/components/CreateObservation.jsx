@@ -219,18 +219,22 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
                             classNamePrefix="person-select-and-create-reception"
                           />
                         </div>
-                        <button
-                          className="button-submit"
-                          onClick={() => {
-                            setRencontre({
-                              persons: selectedPersons.map((p) => p._id),
-                              user: user._id,
-                              team: team._id,
-                            });
-                          }}
-                        >
-                          + Rencontre
-                        </button>
+                        <div className="tw-flex tw-justify-end tw-w-32 tw-min-w-32">
+                          <div>
+                            <button
+                              className="button-submit"
+                              onClick={() => {
+                                setRencontre({
+                                  persons: selectedPersons.map((p) => p._id),
+                                  user: user._id,
+                                  team: team._id,
+                                });
+                              }}
+                            >
+                              + Rencontre
+                            </button>
+                          </div>
+                        </div>
                       </div>
                       <Table
                         className="Table"
