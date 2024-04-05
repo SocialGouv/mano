@@ -13,10 +13,13 @@ import DeleteButtonAndConfirmModal from "../../components/DeleteButtonAndConfirm
 import { userState } from "../../recoil/auth";
 import BackButton from "../../components/backButton";
 import { TerritoryModal } from "./list";
+import { useLocalStorage } from "../../services/useLocalStorage";
 
 const View = () => {
   const { id } = useParams();
   const history = useHistory();
+  const [, setActiveTab] = useLocalStorage("stats-tabCaption");
+  const [, setSelectedTerritories] = useLocalStorage("stats-territories");
   const user = useRecoilValue(userState);
   const [territories, setTerritories] = useRecoilState(territoriesState);
   const [territoryObservations, setTerritoryObservations] = useRecoilState(territoryObservationsState);
@@ -54,9 +57,19 @@ const View = () => {
         <div>
           Description&nbsp;: <i>{territory.description || "..."}</i>
         </div>
-        <div className="tw-flex tw-justify-end tw-gap-2">
+        <div className="tw-flex tw-justify-end">
           {!["restricted-access"].includes(user.role) && (
             <>
+              <button
+                className="button-submit !tw-bg-blue-900"
+                onClick={() => {
+                  setActiveTab("Observations");
+                  setSelectedTerritories([territory]);
+                  history.push("/stats");
+                }}
+              >
+                Statistiques du territoire
+              </button>
               <DeleteButtonAndConfirmModal
                 title={`Voulez-vous vraiment supprimer le territoire ${territory.name}`}
                 textToConfirm={territory.name}
@@ -81,13 +94,14 @@ const View = () => {
                   et entrainera la suppression définitive de toutes les observations liées au territoire.
                 </span>
               </DeleteButtonAndConfirmModal>
-              <ButtonCustom
-                title={"Modifier"}
-                loading={false}
+              <button
+                className="button-submit"
                 onClick={() => {
                   setModalOpen(true);
                 }}
-              />
+              >
+                Modifier
+              </button>
             </>
           )}
         </div>

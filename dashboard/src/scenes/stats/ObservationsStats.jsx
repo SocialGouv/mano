@@ -14,7 +14,7 @@ import { filterData } from "../../components/Filters";
 import DateBloc from "../../components/DateBloc";
 import CustomFieldDisplay from "../../components/CustomFieldDisplay";
 
-const ObservationsStats = ({ territories, setSelectedTerritories, observations, customFieldsObs, allFilters }) => {
+const ObservationsStats = ({ territories, selectedTerritories, setSelectedTerritories, observations, customFieldsObs, allFilters }) => {
   const [obsModalOpened, setObsModalOpened] = useState(false);
   const [sliceField, setSliceField] = useState(null);
   const [sliceValue, setSliceValue] = useState(null);
@@ -45,6 +45,7 @@ const ObservationsStats = ({ territories, setSelectedTerritories, observations, 
           options={territories}
           name="place"
           placeholder="Tous les territoires"
+          value={selectedTerritories?.map((t) => ({ _id: t._id, name: t.name })) || []}
           onChange={(t) => {
             setSelectedTerritories(t);
           }}
