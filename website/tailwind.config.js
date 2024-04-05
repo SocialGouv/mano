@@ -5,6 +5,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        mano: "#226854",
         black: "#0C1024",
         shamrock: {
           50: "#EBF8F8",
