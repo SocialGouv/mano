@@ -61,6 +61,8 @@ app.set("json replacer", (k, v) => (v === null ? undefined : v));
 // Pre middleware
 app.use(express.urlencoded({ extended: true }));
 app.use((req, res, next) => {
+  // if you change these values, you need to change them also in
+  // https://github.com/mano-sesan/mano/blob/main/.server/vhost/api-mano.sesan.fr#L1
   const limitedSize = req.path.startsWith("/encrypt") ? "350mb" : "50mb";
   express.json({ limit: limitedSize })(req, res, next);
 });
