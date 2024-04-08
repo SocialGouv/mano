@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { HiMenu } from "react-icons/hi";
 
 const AgendaIcon = ({ size = 30 }) => (
   <svg width={size} height={size} viewBox="0 0 196 200">
@@ -14,43 +15,138 @@ const AgendaIcon = ({ size = 30 }) => (
 );
 
 export default function NewIndex() {
+  const [showHamburgerMenu, setShowHamburgerMenu] = useState(false);
+  const [connexionUrl, setConnexionUrl] = useState("https://espace-mano.sesan.fr/auth");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      if (window.location.hostname === "preprod-mano.sesan.fr") {
+        setConnexionUrl("https://preprod-espace-mano.sesan.fr/auth");
+      } else if (window.location.hostname === "localhost") {
+        setConnexionUrl("http://localhost:8083/auth");
+      }
+    }
+  }, []);
+
   return (
     <>
-      <header className="flex gap-8 p-2 w-full border-b border-gray-300 items-center shadow mb-8">
-        <img src="/logo.svg" alt="Logo" className="w-12 h-12" />
-        <div className="grow">
-          <ul className="sm:flex flex-row gap-8 hidden">
-            <li className="hover:underline decoration-mano underline-offset-2 cursor-pointer">Comment ça marche</li>
-            <li className="hover:underline decoration-mano underline-offset-2 cursor-pointer">Sécurité des données</li>
-            <li className="hover:underline decoration-mano underline-offset-2 cursor-pointer">Ils nous font confiance</li>
-            <li className="hover:underline decoration-mano underline-offset-2 cursor-pointer">Qui sommes nous</li>
+      <header className="sticky top-0 z-50 bg-white flex gap-8 p-2 w-full border-b border-gray-300 items-center shadow mb-8">
+        <img src="/logo.svg" alt="Logo" className="w-12 h-12" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} />
+        <div className="text-2xl">Mano</div>
+        <div className="hidden md:block grow lg:text-base text-sm">
+          <ul className="md:flex flex-row gap-8 hidden">
+            <li className={`hover:underline decoration-mano underline-offset-2 cursor-pointer`}>
+              <a href="#comment-ça-marche">Comment ça marche</a>
+            </li>
+            <li className={`hover:underline decoration-mano underline-offset-2 cursor-pointer`}>
+              <a href="#sécurité">Sécurité des données</a>
+            </li>
+            <li className={`hover:underline decoration-mano underline-offset-2 cursor-pointer`}>
+              <a href="#confiance">Ils nous font confiance</a>
+            </li>
+            <li className={`hover:underline decoration-mano underline-offset-2 cursor-pointer`}>
+              <a href="#qui-sommes-nous">Qui sommes nous</a>
+            </li>
           </ul>
         </div>
-        <button className="inline-flex w-full cursor-pointer justify-center rounded-md border border-transparent bg-mano px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-mano focus:outline-none focus:ring-2 focus:ring-mano focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30 sm:ml-3 sm:w-auto">
-          Se connecter
-        </button>
+        <a
+          href={connexionUrl}
+          className="hidden md:inline-flex w-full cursor-pointer justify-center rounded-md border border-transparent bg-mano px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-mano focus:outline-none focus:ring-2 focus:ring-mano focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30 sm:ml-3 sm:w-auto"
+        >
+          Se&nbsp;connecter
+        </a>
+
+        <div className="md:hidden flex grow justify-end mr-2">
+          <HiMenu
+            className="text-2xl text-black"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowHamburgerMenu(!showHamburgerMenu);
+            }}
+          />
+        </div>
+        {showHamburgerMenu && (
+          <div className="absolute top-16 right-0 bg-white shadow w-full">
+            <ul className="flex flex-col">
+              <li className={`hover:underline decoration-mano underline-offset-2 cursor-pointer p-4 border-b`}>
+                <a
+                  href="#comment-ça-marche"
+                  onClick={() => {
+                    setShowHamburgerMenu(false);
+                  }}
+                >
+                  Comment ça marche
+                </a>
+              </li>
+              <li className={`hover:underline decoration-mano underline-offset-2 cursor-pointer p-4 border-b`}>
+                <a
+                  href="#sécurité"
+                  onClick={() => {
+                    setShowHamburgerMenu(false);
+                  }}
+                >
+                  Sécurité des données
+                </a>
+              </li>
+              <li className={`hover:underline decoration-mano underline-offset-2 cursor-pointer p-4 border-b`}>
+                <a
+                  href="#confiance"
+                  onClick={() => {
+                    setShowHamburgerMenu(false);
+                  }}
+                >
+                  Ils nous font confiance
+                </a>
+              </li>
+              <li className={`hover:underline decoration-mano underline-offset-2 cursor-pointer p-4 border-b`}>
+                <a
+                  href="#qui-sommes-nous"
+                  onClick={() => {
+                    setShowHamburgerMenu(false);
+                  }}
+                >
+                  Qui sommes nous
+                </a>
+              </li>
+              <li className={`hover:underline decoration-mano underline-offset-2 cursor-pointer p-4 border-b`}>
+                <a
+                  href="#"
+                  onClick={() => {
+                    setShowHamburgerMenu(false);
+                  }}
+                >
+                  Se connecter
+                </a>
+              </li>
+            </ul>
+          </div>
+        )}
       </header>
-      <main>
+      <main
+        onClick={() => {
+          setShowHamburgerMenu(false);
+        }}
+      >
         <div className="container my-16">
-          <div className="flex items-center mx-auto justify-center gap-8">
+          <div className="flex sm:flex-row flex-col items-center mx-auto justify-center gap-8">
             <img src="/logo.svg" alt="Logo" className="w-24 h-24" />
-            <h1 className="text-4xl">
+            <h1 className="text-4xl m-4 sm:m-0 sm:text-left text-center">
               Faciliter votre travail, mieux agir
               <br />
               auprès de vos publics
             </h1>
           </div>
-          <div className="max-w-[600px] text-center mx-auto my-8">
+          <div className="max-w-[600px] text-center mx-auto my-8 sm:block hidden">
             Mano, l’outil numérique pour les professionnels accompagnant des publics précaires. Un service gratuit, sécurisé, personnalisable, pensé
             par et pour le terrain.
           </div>
           <img src="https://placehold.co/300x200/png" alt="Screenshot" className="mx-auto" />
         </div>
         <div className="bg-slate-100 py-8">
-          <h2 className="text-2xl text-center mx-4">Vous souhaitez en savoir plus ? Contactez nous !</h2>
-          <div className="grid grid-cols-2 gap-8 max-w-[800px] mx-auto my-8">
-            <div className="border rounded shadow p-4 bg-white">
-              <div className="text-center grid gap-2">
+          <h2 className="text-2xl text-center mx-4">Vous souhaitez en savoir plus&nbsp;? Contactez nous&nbsp;!</h2>
+          <div className="grid sm:grid-cols-2 gap-8 max-w-[800px] mx-auto my-8">
+            <div className="border rounded shadow p-4 bg-white md:mx-0 mx-2 flex flex-col">
+              <div className="text-center grid gap-2 grow">
                 <div>Mélissa Saiter</div>
                 <div>
                   <a href="mailto:melissa.saiter@sesan.fr" className="text-mano hover:underline">
@@ -67,67 +163,90 @@ export default function NewIndex() {
                 <div className="text-xs mt-4 max-w-sm mx-auto">
                   Île-de-France, Hauts-de-France, Auvergne&nbsp;Rhone&nbsp;Alpes, Grand&nbsp;Est, Normandie, Bretagne, Guadeloupe et Martinique
                 </div>
-                <div className="py-4">
-                  <a
-                    target="_blank"
-                    className="flex mx-8 my-4 bg-sky-600 text-white px-4 py-2 rounded shadow text-sm"
-                    href="https://cal.com/msaiter/je-souhaite-une-demonstration-de-l-outil-mano?duration=60"
-                  >
-                    <div className="text-left">Reservez un temps de présentation de l’outil MANO</div>
-                    <AgendaIcon size={42} />
-                  </a>
-                </div>
+              </div>
+              <div className="py-4">
+                <a
+                  target="_blank"
+                  className="flex my-4 bg-sky-600 text-white px-4 py-2 rounded shadow text-sm max-w-72 mx-auto"
+                  href="https://cal.com/msaiter/je-souhaite-une-demonstration-de-l-outil-mano?duration=60"
+                >
+                  <div className="text-left">Reservez un temps de présentation de l’outil MANO</div>
+                  <AgendaIcon size={42} />
+                </a>
               </div>
             </div>
-            <div className="border rounded shadow p-4 bg-white">
-              <div className="text-center grid gap-2">
-                <div>Melissa Saiter</div>
+            <div className="border rounded shadow p-4 bg-white md:mx-0 mx-2 flex flex-col">
+              <div className="text-center grid gap-2 grow">
+                <div>Yoann Kittery</div>
                 <div>
-                  <a href="mailto:melissa.saiter@sesan.fr" className="text-mano hover:underline">
-                    melissa.saiter@sesan.fr
+                  <a href="mailto:yoann.kittery@sesan.fr" className="text-mano hover:underline">
+                    yoann.kittery@sesan.fr
                   </a>
                 </div>
                 <div className="flex items-center justify-center">
                   <a href="tel:+33749082710" className="hover:underline">
-                    07 49 08 27 10
+                    07 45 16 40 04
                   </a>
                   <span className="text-[10px] text-white bg-mano rounded px-1 ml-2">nouveau</span>
                 </div>
 
                 <div className="text-xs mt-4 max-w-sm mx-auto">
-                  Île-de-France, Hauts-de-France, Auvergne&nbsp;Rhone&nbsp;Alpes, Grand&nbsp;Est, Normandie, Bretagne, Guadeloupe et Martinique
+                  Île-de-france, PACA, Occitanie, Nouvelle&nbsp;Aquitaine, Pays&nbsp;de&nbsp;la&nbsp;Loire, Centre&nbsp;Val&nbsp;de&nbsp;Loire, Corse,
+                  Réunion
                 </div>
-                <div className="py-4">
-                  <a
-                    target="_blank"
-                    className="flex mx-8 my-4 bg-sky-600 text-white px-4 py-2 rounded shadow text-sm"
-                    href="https://cal.com/msaiter/je-souhaite-une-demonstration-de-l-outil-mano?duration=60"
-                  >
-                    <div className="text-left">Reservez un temps de présentation de l’outil MANO</div>
-                    <AgendaIcon size={42} />
-                  </a>
-                </div>
+              </div>
+              <div className="py-4">
+                <a
+                  target="_blank"
+                  className="flex my-4 bg-sky-600 text-white px-4 py-2 rounded shadow text-sm max-w-72 mx-auto"
+                  href="https://cal.com/msaiter/je-souhaite-une-demonstration-de-l-outil-mano?duration=60"
+                >
+                  <div className="text-left">Reservez un temps de présentation de l’outil MANO</div>
+                  <AgendaIcon size={42} />
+                </a>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="mt-8">
+        <div className="mt-8 relative">
+          <div id="comment-ça-marche" className="absolute -top-16"></div>
           <div className="max-w-[1000px] mx-auto">
             <h2 className="text-2xl text-left mx-4 py-8">Comment ça marche</h2>
           </div>
           <div className="bg-slate-100 py-8">
-            <div className="grid grid-cols-3 items-center max-w-[1000px] mx-auto gap-8">
-              <div className="col-span-2 self-start">
+            <div className="grid sm:grid-cols-3 items-center max-w-[1000px] mx-auto gap-8">
+              <div className="sm:col-span-2 px-4 sm:px-0 self-start">
                 <FaqBox title="Centralisez vos données">
                   Forgez une mémoire collective en regroupant toutes les données essentielles concernant le suivi de vos bénéficiaires dans un dossier
                   personnel, facilement accessible par tous les membres de votre équipe
                 </FaqBox>
-                <FaqBox title="N’oubliez plus vos tâches et rendez-vous">Lorem ipsum dolor sit amet</FaqBox>
-                <FaqBox title="Comprenez votre activité et votre public">Lorem ipsum dolor sit amet</FaqBox>
-                <FaqBox title="Entièrement adaptable à vos besoins">Lorem ipsum dolor sit amet</FaqBox>
-                <FaqBox title="Un dossier médical sécurisé">Lorem ipsum dolor sit amet</FaqBox>
-                <FaqBox title="Disponible où que vous soyez">Lorem ipsum dolor sit amet</FaqBox>
+                <FaqBox title="N’oubliez plus vos tâches et rendez-vous">
+                  Évitez les oublis et gardez le fil de toutes vos actions, suivis et soins à fournir à vos bénéficiaires.
+                </FaqBox>
+                <FaqBox title="Comprenez votre activité et votre public">
+                  Les informations que vous saisissez dans Mano sont instantanément converties en données statistiques. Analyser les besoins de votre
+                  public, évaluer votre activité, et rédiger vos rapports n'a jamais été aussi simple
+                </FaqBox>
+                <FaqBox title="Entièrement adaptable à vos besoins">
+                  Prenez le contrôle en personnalisant les informations que vous recueillez dans les dossiers de vos bénéficiaires, lors de vos
+                  consultations, et dans la définition des activités de votre équipe ainsi que des services offerts. Être autonome ne signifie pas
+                  être isolé ! Nous sommes là pour vous accompagner dans cette démarche de structuration.
+                </FaqBox>
+                <FaqBox title="Un dossier médical sécurisé">
+                  <p>
+                    Les membres de votre équipe médicale ont accès à une section dédiée à la santé des personnes accompagnées dans chaque dossier,
+                    restreinte uniquement à ces professionnels.
+                  </p>
+                  <p className="mt-4">
+                    Cela leur permet de regrouper les informations concernant l'accompagnement médical, les traitements, les soins prodigués, le suivi
+                    des paramètres vitaux, et de planifier des consultations avec leurs patients.
+                  </p>
+                </FaqBox>
+                <FaqBox title="Disponible où que vous soyez">
+                  Mano est accessible aussi bien en déplacement que depuis vos bureaux. Que vous interveniez sur le terrain, en hébergement diffus, en
+                  centre de soin ou dans d'autres lieux d'accueil, Mano est à portée de main à tout moment.
+                </FaqBox>
               </div>
               <div>
                 <img src="https://placehold.co/300x200/png" alt="Screenshot" className="mx-auto" />
@@ -135,40 +254,84 @@ export default function NewIndex() {
             </div>
           </div>
         </div>
-        <div className="mt-8">
+        <div className="mt-8 relative">
+          <div id="sécurité" className="absolute -top-16"></div>
           <div className="max-w-[1000px] mx-auto">
-            <h2 className="text-2xl text-right mx-4 py-8">Sécurité des données</h2>
+            <h2 className="text-2xl sm:text-right mx-4 py-8">Sécurité des données</h2>
           </div>
           <div className="bg-slate-100 py-8">
-            <div className="grid grid-cols-3 items-center max-w-[1000px] mx-auto gap-8">
+            <div className="grid sm:grid-cols-3 items-center max-w-[1000px] mx-auto gap-8">
               <div>
                 <img src="https://placehold.co/300x200/png" alt="Screenshot" className="mx-auto" />
               </div>
-              <div className="col-span-2 self-start">
-                <FaqBox title="Hébergement certifié HDS">Lorem ipsum dolor sit amet</FaqBox>
-                <FaqBox title="Vous êtes les seuls à accéder à vos données">Lorem ipsum dolor sit amet</FaqBox>
-                <FaqBox title="Procédure d’effacement de vos données">Lorem ipsum dolor sit amet</FaqBox>
-                <FaqBox title="Une charte d’utilisation co-écrite avec nos utilisateurs">Lorem ipsum dolor sit amet</FaqBox>
+              <div className="px-4 sm:px-0 sm:col-span-2 self-start">
+                <FaqBox title="Hébergement certifié HDS">
+                  <b>Qu'est-ce que l'hébergement HDS&nbsp;?</b> L'hébergement HDS, ou Hébergement de Données de Santé, désigne un type
+                  d'infrastructure sécurisée dédiée au stockage et au traitement des données médicales sensibles. Conformément à la réglementation en
+                  vigueur, les données de santé doivent être hébergées dans des structures certifiées HDS pour garantir leur confidentialité et leur
+                  sécurité.
+                  <p className="mt-2">Les caractéristiques de l'hébergement HDS&nbsp;:</p>
+                  <ul className="list-disc ml-4 space-y-2 my-2">
+                    <li>
+                      Sécurité renforcée&nbsp;: Les centres d'hébergement HDS disposent de dispositifs de sécurité avancés, tels que des systèmes de
+                      cryptage et de sauvegarde régulière, pour protéger les données médicales contre tout accès non autorisé.
+                    </li>
+                    <li>
+                      Respect de la réglementation&nbsp;: L'hébergement HDS est soumis à des normes strictes définies par la réglementation française
+                      en matière de protection des données de santé, notamment le référentiel de sécurité de l'Agence des Systèmes d'Information
+                      Partagés de Santé (ASIP Santé).
+                    </li>
+                    <li>
+                      Disponibilité et accessibilité&nbsp;: Les services d'hébergement HDS offrent une disponibilité élevée et une accessibilité
+                      permanente aux données médicales, permettant aux professionnels de santé d'y accéder en tout temps et en tout lieu, dans le
+                      respect des règles de sécurité.
+                    </li>
+                    <li>
+                      Traçabilité des accès&nbsp;: Les plateformes d'hébergement HDS enregistrent et traçent tous les accès aux données de santé,
+                      garantissant ainsi une traçabilité complète des consultations et des modifications effectuées.
+                    </li>
+                  </ul>
+                  <b>Pourquoi choisir l'hébergement HDS&nbsp;?</b> En optant pour l'hébergement HDS, les établissements de santé, les professionnels
+                  de santé et les acteurs du secteur médical peuvent bénéficier d'une solution sécurisée et conforme à la réglementation pour la
+                  gestion et la protection des données de santé, assurant ainsi la confidentialité et l'intégrité des informations médicales de leurs
+                  patients.
+                </FaqBox>
+                <FaqBox title="Vous êtes les seuls à accéder à vos données">
+                  Vos données sont chiffrées de bout en bout, ce qui signifie que vous êtes les seuls à pouvoir y accéder. Votre confidentialité est
+                  notre priorité.
+                </FaqBox>
+                <FaqBox title="Procédure d’effacement de vos données">
+                  Un bouton dédié autorise les administrateurs à effacer instantanément toutes les données de la plateforme en cas d'urgence.
+                </FaqBox>
+                <FaqBox title="Une charte d’utilisation co-écrite avec nos utilisateurs">
+                  Avec nos utilisateurs, nous avons élaboré une charte destinée à encadrer l'usage de la plateforme. Elle établit les règles pour la
+                  saisie de données, assure le consentement des bénéficiaires, renforce la sécurité et promeut les bonnes pratiques. Notre
+                  collaboration vise à améliorer l'expérience pour tous.
+                </FaqBox>
               </div>
             </div>
           </div>
         </div>
-        <div className="container mt-8 mx-auto">
-          <h2 className="text-2xl text-center mx-4 py-8">Ils nous font confiance</h2>
-        </div>
-        <div className="bg-slate-100 py-8">
-          <div className="grid grid-cols-2 gap-8 max-w-[800px] mx-auto">
-            <img src="https://placehold.co/500x300/png" alt="Screenshot" />
-            <img src="https://placehold.co/500x300/png" alt="Screenshot" />
+        <div className="mt-8 relative">
+          <div id="confiance" className="absolute -top-16"></div>
+          <div className="container mx-auto">
+            <h2 className="text-2xl text-center mx-4 py-8">Ils nous font confiance</h2>
           </div>
-          <Carousel />
+          <div className="bg-slate-100 py-8">
+            <div className="grid sm:grid-cols-2 gap-8 max-w-[800px] sm:px-0 px-2 mx-auto items-center justify-center">
+              <img src="https://placehold.co/500x300/png" alt="Screenshot" />
+              <img src="https://placehold.co/500x300/png" alt="Screenshot" />
+            </div>
+            <Carousel />
+          </div>
         </div>
-        <div className="mt-8">
+        <div className="mt-8 relative">
+          <div id="qui-sommes-nous" className="absolute -top-16"></div>
           <div className="max-w-[1000px] mx-auto">
-            <h2 className="text-2xl text-right mx-4 py-8">Qui sommes-nous ?</h2>
+            <h2 className="text-2xl sm:text-right mx-4 py-8">Qui sommes-nous ?</h2>
           </div>
-          <div className="grid grid-cols-3 gap-8 max-w-[1000px] mx-auto text-sm">
-            <div className="bg-mano rounded p-6 text-white">
+          <div className="grid md:grid-cols-3 gap-8 max-w-[1000px] mx-auto text-sm">
+            <div className="bg-mano rounded p-6 text-white md:mx-0 mx-2">
               <h3 className="text-lg font-semibold mb-4">Notre histoire</h3>
               <div>
                 Mano, c’est un service public numérique dont la mission est de proposer un outil adapté aux pratiques de ses utilisateurs, pensé par
@@ -177,7 +340,7 @@ export default function NewIndex() {
                 sociaux, et attérit au GIP Sesan pour péréniser son action au long-cours.
               </div>
             </div>
-            <div className="bg-mano rounded p-6 text-white">
+            <div className="bg-mano rounded p-6 text-white md:mx-0 mx-2">
               <h3 className="text-lg font-semibold mb-4">Notre approche</h3>
               <div>
                 <ul className="list-disc ml-4 space-y-2">
@@ -188,7 +351,7 @@ export default function NewIndex() {
                 </ul>
               </div>
             </div>
-            <div className="bg-mano rounded p-6 text-white">
+            <div className="bg-mano rounded p-6 text-white md:mx-0 mx-2">
               <h3 className="text-lg font-semibold mb-4">Qui nous finance ?!</h3>
               <div>
                 Mano est financé par les agences régionales de santé (ARS) d’Île-de-France, de Bretagne, de Normandie, d’Occitanie, de
@@ -196,46 +359,46 @@ export default function NewIndex() {
               </div>
             </div>
           </div>
-        </div>
-        <div className="mt-8">
-          <div className="max-w-[1000px] mx-auto">
-            <h2 className="text-2xl text-center mx-4 py-8">L’équipe</h2>
-          </div>
-          <div>
-            <div className="grid grid-cols-5 max-w-[800px] mx-auto">
-              <div className="mx-auto flex flex-col items-center justify-center text-center">
-                <img src="/yo.png" alt="Logo" className="w-16 h-16" />
-                <div>
-                  Yoann KITTERY
-                  <div className="text-sm">Chargé de déploiement</div>
+          <div className="mt-8">
+            <div className="max-w-[1000px] mx-auto">
+              <h2 className="text-2xl text-center mx-4 py-8">L’équipe</h2>
+            </div>
+            <div>
+              <div className="grid md:grid-cols-5 sm:grid-cols-3 grid-cols-2 gap-y-8 gap-x-2 max-w-[800px] mx-auto">
+                <div className="mx-auto flex flex-col items-center justify-center text-center">
+                  <img src="/team/a.png" alt="Logo" className="w-16 h-16" />
+                  <div className="sm:h-24 h-18">
+                    Arnaud AMBROSELLI
+                    <div className="text-sm">Développeur </div>
+                  </div>
                 </div>
-              </div>
-              <div className="mx-auto flex flex-col items-center justify-center text-center">
-                <img src="/yo.png" alt="Logo" className="w-16 h-16" />
-                <div>
-                  Yoann KITTERY
-                  <div className="text-sm">Chargé de déploiement</div>
+                <div className="mx-auto flex flex-col items-center justify-center text-center">
+                  <img src="/team/g.png" alt="Logo" className="w-16 h-16" />
+                  <div className="sm:h-24 h-18">
+                    Guillaume DEMIRHAN
+                    <div className="text-sm">Porteur du projet</div>
+                  </div>
                 </div>
-              </div>
-              <div className="mx-auto flex flex-col items-center justify-center text-center">
-                <img src="/yo.png" alt="Logo" className="w-16 h-16" />
-                <div>
-                  Yoann KITTERY
-                  <div className="text-sm">Chargé de déploiement</div>
+                <div className="mx-auto flex flex-col items-center justify-center text-center">
+                  <img src="/team/r.png" alt="Logo" className="w-16 h-16" />
+                  <div className="sm:h-24 h-18">
+                    Raphaël HUCHET
+                    <div className="text-sm">Développeur</div>
+                  </div>
                 </div>
-              </div>
-              <div className="mx-auto flex flex-col items-center justify-center text-center">
-                <img src="/yo.png" alt="Logo" className="w-16 h-16" />
-                <div>
-                  Yoann KITTERY
-                  <div className="text-sm">Chargé de déploiement</div>
+                <div className="mx-auto flex flex-col items-center justify-center text-center">
+                  <img src="/team/y.png" alt="Logo" className="w-16 h-16" />
+                  <div className="sm:h-24 h-18">
+                    Yoann KITTERY
+                    <div className="text-sm">Chargé de déploiement</div>
+                  </div>
                 </div>
-              </div>
-              <div className="mx-auto flex flex-col items-center justify-center text-center">
-                <img src="/yo.png" alt="Logo" className="w-16 h-16" />
-                <div>
-                  Yoann KITTERY
-                  <div className="text-sm">Chargé de déploiement</div>
+                <div className="mx-auto flex flex-col items-center justify-center text-center">
+                  <img src="/team/m.png" alt="Logo" className="w-16 h-16" />
+                  <div className="sm:h-24 h-18">
+                    Mélissa SAITER
+                    <div className="text-sm">Chargé de déploiement</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -243,12 +406,32 @@ export default function NewIndex() {
         </div>
       </main>
       <footer className="w-full bg-mano mt-16 border text-white p-8">
-        <ul className="flex flex-row gap-4">
-          <li>Accessibilité : non conforme</li>
-          <li>Mentions légales</li>
-          <li>Conditions générales d'utilisation</li>
-          <li>Statistiques</li>
-          <li>Politique de confidentialité</li>
+        <ul className="flex md:flex-row flex-col gap-4">
+          <li>
+            <a href={"/legal.pdf"} target="_blank" className="hover:underline">
+              Accessibilité : non conforme
+            </a>
+          </li>
+          <li>
+            <a href={"/legal.pdf"} target="_blank" className="hover:underline">
+              Mentions légales
+            </a>
+          </li>
+          <li>
+            <a href={"/cgu.pdf"} target="_blank" className="hover:underline">
+              Conditions générales d'utilisation
+            </a>
+          </li>
+          <li>
+            <a href={"/new-stats.pdf"} className="hover:underline">
+              Statistiques
+            </a>
+          </li>
+          <li>
+            <a href={"/privacy.pdf"} target="_blank" className="hover:underline">
+              Politique de confidentialité
+            </a>
+          </li>
         </ul>
         <div className="text-xs mt-4">2020-présent, Mano - Tous droits réservés </div>
       </footer>
@@ -285,11 +468,28 @@ function Carousel() {
   const data = [
     {
       quote: "C’est excellent de pouvoir participer développement de l'outil en tant que professionnel du terrain",
-      author: ["Valentin Rault", "Maraude Equipe Mobile EGO"],
+      author: ["Valentin Rault", "Maraude Equipe Mobile", "EGO"],
     },
     {
       quote: "Nous avons une une grande liberté pour faire évoluer mano selon nos besoins et cela fait la différence",
-      author: ["Laïla", "Infirmière Coordinatrice"],
+      author: ["Laïla", "Infirmière Coordinatrice", "EMSP"],
+    },
+    {
+      quote: "C'est une petite révolution pour nous",
+      author: ["Inès", "Cheffe de service", "Maraude d’intervention Sociale"],
+    },
+    {
+      quote: "L’outil est rapide à remplir, il permet de ne pas passer trop de temps administratif pour privilégier le face à face.",
+      author: ["Claire", "Coordinatrice", "CAARUD"],
+    },
+    {
+      quote: "Je mettais 4 jours à sortir mes statistiques pour mes rapports d’activité. Maintenant ça me prends 4 minutes.",
+      author: ["Françoise", "Cheffe de service CHU", "Veille sociale"],
+    },
+    {
+      quote:
+        "Mano me permet de n’avoir qu’un seul outil de travail, où je peux transmettre toutes les informations nécessaires, et d’y stocker tous les documents importants.",
+      author: ["Jérémie", "Educateur spécialisé", "CAARUD"],
     },
   ];
   const length = data.length;
@@ -311,7 +511,7 @@ function Carousel() {
         </svg>
       </button>
       <div className="grow bg-white p-8 rounded">
-        <div className="text-lg italic font-semibold text-mano h-20">«&nbsp;{data[current].quote}&nbsp;»</div>
+        <div className="text-lg italic font-semibold text-mano min-h-24">«&nbsp;{data[current].quote}&nbsp;»</div>
         <div className="text-right mt-8">
           {data[current].author.map((e) => (
             <div>{e}</div>
