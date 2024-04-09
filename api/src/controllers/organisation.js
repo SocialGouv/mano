@@ -25,6 +25,7 @@ const {
   TerritoryObservation,
   UserLog,
   Team,
+  sequelize,
 } = require("../db/sequelize");
 const mailservice = require("../utils/mailservice");
 const validateUser = require("../middleware/validateUser");
@@ -398,6 +399,308 @@ router.get(
     }
     const data = await Team.findAll({ where: { organisation: req.params.id }, include: ["Organisation"] });
     return res.status(200).send({ ok: true, data });
+  })
+);
+
+// Récupère la liste complète des données supprimée pour une organisation
+router.get(
+  "/:id/deleted-data",
+  passport.authenticate("user", { session: false }),
+  validateUser(["admin"]),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.object({
+        id: z.string().regex(looseUuidRegex),
+      }).parse(req.params);
+    } catch (e) {
+      const error = new Error(`Invalid request in deleted data get`);
+      error.status = 400;
+      return next(error);
+    }
+
+    const canViewDeleted = req.user.organisation === req.params.id;
+    if (!canViewDeleted) return res.status(403).send({ ok: false, error: "Forbidden" });
+
+    const query = { where: { deletedAt: { [Op.ne]: null }, organisation: req.user.organisation }, paranoid: false };
+    const defaultAttributes = ["_id", "encrypted", "encryptedEntityKey", "organisation", "createdAt", "updatedAt", "deletedAt"];
+
+    const places = await Place.findAll(query, defaultAttributes);
+    const relsPersonPlace = await RelPersonPlace.findAll(query, defaultAttributes);
+    const actions = await Action.findAll(query, defaultAttributes);
+    const persons = await Person.findAll(query, defaultAttributes);
+    const groups = await Group.findAll(query, defaultAttributes);
+    const comments = await Comment.findAll(query, defaultAttributes);
+    const passages = await Passage.findAll(query, defaultAttributes);
+    const rencontres = await Rencontre.findAll(query, defaultAttributes);
+    const consultations = await Consultation.findAll(query, defaultAttributes);
+    const medicalFiles = await MedicalFile.findAll(query, defaultAttributes);
+    const treatments = await Treatment.findAll(query, defaultAttributes);
+
+    return res.status(200).send({
+      ok: true,
+      data: {
+        places,
+        relsPersonPlace,
+        actions,
+        persons,
+        groups,
+        comments,
+        passages,
+        rencontres,
+        consultations,
+        medicalFiles,
+        treatments,
+      },
+    });
+  })
+);
+
+// Restaure des données arbitraires dans une organisation (pas de vérification de cohérence)
+router.post(
+  "/:id/restore-deleted-data",
+  passport.authenticate("user", { session: false }),
+  validateUser(["admin"]),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.object({
+        id: z.string().regex(looseUuidRegex),
+      }).parse(req.params);
+    } catch (e) {
+      const error = new Error(`Invalid request in restore-deleted-data post`);
+      error.status = 400;
+      return next(error);
+    }
+    const arraysOfIdsToDelete = [
+      "groups",
+      "persons",
+      "actions",
+      "comments",
+      "passages",
+      "rencontres",
+      "consultations",
+      "treatments",
+      "medicalFiles",
+      "relsPersonPlaces",
+    ];
+    for (const key of arraysOfIdsToDelete) {
+      try {
+        z.array(z.string().regex(looseUuidRegex)).parse(req.body[key]);
+      } catch (e) {
+        const error = new Error(`Invalid request in restore-deleted-data post ${key}: ${e}`);
+        error.status = 400;
+        return next(error);
+      }
+    }
+
+    await sequelize.transaction(async (tx) => {
+      const { persons, groups, actions, comments, passages, rencontres, consultations, treatments, medicalFiles, relsPersonPlaces } = req.body;
+      if (persons.length) {
+        await sequelize.query(
+          'UPDATE "mano"."Person" SET "deletedAt" = NULL, "updatedAt" = NOW() WHERE "_id" IN (:ids) AND "organisation" = :organisation',
+          {
+            replacements: { ids: persons, organisation: req.user.organisation },
+            transaction: tx,
+          }
+        );
+      }
+      if (groups.length) {
+        await sequelize.query(
+          'UPDATE "mano"."Group" SET "deletedAt" = NULL, "updatedAt" = NOW() WHERE "_id" IN (:ids) AND "organisation" = :organisation',
+          {
+            replacements: { ids: groups, organisation: req.user.organisation },
+            transaction: tx,
+          }
+        );
+      }
+      if (actions.length) {
+        await sequelize.query(
+          'UPDATE "mano"."Action" SET "deletedAt" = NULL, "updatedAt" = NOW() WHERE "_id" IN (:ids) AND "organisation" = :organisation',
+          {
+            replacements: { ids: actions, organisation: req.user.organisation },
+            transaction: tx,
+          }
+        );
+      }
+      if (comments.length) {
+        await sequelize.query(
+          'UPDATE "mano"."Comment" SET "deletedAt" = NULL, "updatedAt" = NOW() WHERE "_id" IN (:ids) AND "organisation" = :organisation',
+          {
+            replacements: { ids: comments, organisation: req.user.organisation },
+            transaction: tx,
+          }
+        );
+      }
+      if (passages.length) {
+        await sequelize.query(
+          'UPDATE "mano"."Passage" SET "deletedAt" = NULL, "updatedAt" = NOW() WHERE "_id" IN (:ids) AND "organisation" = :organisation',
+          {
+            replacements: { ids: passages, organisation: req.user.organisation },
+            transaction: tx,
+          }
+        );
+      }
+      if (rencontres.length) {
+        await sequelize.query(
+          'UPDATE "mano"."Rencontre" SET "deletedAt" = NULL, "updatedAt" = NOW() WHERE "_id" IN (:ids) AND "organisation" = :organisation',
+          {
+            replacements: { ids: rencontres, organisation: req.user.organisation },
+            transaction: tx,
+          }
+        );
+      }
+      if (consultations.length) {
+        await sequelize.query(
+          'UPDATE "mano"."Consultation" SET "deletedAt" = NULL, "updatedAt" = NOW() WHERE "_id" IN (:ids) AND "organisation" = :organisation',
+          {
+            replacements: { ids: consultations, organisation: req.user.organisation },
+            transaction: tx,
+          }
+        );
+      }
+      if (treatments.length) {
+        await sequelize.query(
+          'UPDATE "mano"."Treatment" SET "deletedAt" = NULL, "updatedAt" = NOW() WHERE "_id" IN (:ids) AND "organisation" = :organisation',
+          {
+            replacements: { ids: treatments, organisation: req.user.organisation },
+            transaction: tx,
+          }
+        );
+      }
+      if (medicalFiles.length) {
+        await sequelize.query(
+          'UPDATE "mano"."MedicalFile" SET "deletedAt" = NULL, "updatedAt" = NOW() WHERE "_id" IN (:ids) AND "organisation" = :organisation',
+          {
+            replacements: { ids: medicalFiles, organisation: req.user.organisation },
+            transaction: tx,
+          }
+        );
+      }
+      if (relsPersonPlaces.length) {
+        await sequelize.query(
+          'UPDATE "mano"."RelPersonPlace" SET "deletedAt" = NULL, "updatedAt" = NOW() WHERE "_id" IN (:ids) AND "organisation" = :organisation',
+          {
+            replacements: { ids: relsPersonPlaces, organisation: req.user.organisation },
+            transaction: tx,
+          }
+        );
+      }
+    });
+
+    res.status(200).send({ ok: true });
+  })
+);
+
+// SUpprime définitivement des données arbitraires dans une organisation (pas de vérification de cohérence)
+router.delete(
+  "/:id/permanent-delete-data",
+  passport.authenticate("user", { session: false }),
+  validateUser(["admin"]),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.object({
+        id: z.string().regex(looseUuidRegex),
+      }).parse(req.params);
+    } catch (e) {
+      const error = new Error(`Invalid request in permanent-delete-data delete`);
+      error.status = 400;
+      return next(error);
+    }
+    const arraysOfIdsToDelete = [
+      "groups",
+      "persons",
+      "actions",
+      "comments",
+      "passages",
+      "rencontres",
+      "consultations",
+      "treatments",
+      "medicalFiles",
+      "relsPersonPlaces",
+    ];
+    for (const key of arraysOfIdsToDelete) {
+      try {
+        z.array(z.string().regex(looseUuidRegex)).parse(req.body[key]);
+      } catch (e) {
+        const error = new Error(`Invalid request in restore-deleted-data post ${key}: ${e}`);
+        error.status = 400;
+        return next(error);
+      }
+    }
+
+    await sequelize.transaction(async (tx) => {
+      const { persons, groups, actions, comments, passages, rencontres, consultations, treatments, medicalFiles, relsPersonPlaces } = req.body;
+      if (persons.length) {
+        await sequelize.query('delete from "mano"."Person" where "deletedAt" is not null and "_id" in (:ids) and "organisation" = :organisation', {
+          replacements: { ids: persons, organisation: req.user.organisation },
+          transaction: tx,
+        });
+      }
+      if (groups.length) {
+        await sequelize.query('delete from "mano"."Group" where "deletedAt" is not null and "_id" in (:ids) and "organisation" = :organisation', {
+          replacements: { ids: groups, organisation: req.user.organisation },
+          transaction: tx,
+        });
+      }
+      if (actions.length) {
+        await sequelize.query('delete from "mano"."Action" where "deletedAt" is not null and "_id" in (:ids) and "organisation" = :organisation', {
+          replacements: { ids: actions, organisation: req.user.organisation },
+          transaction: tx,
+        });
+      }
+      if (comments.length) {
+        await sequelize.query('delete from "mano"."Comment" where "deletedAt" is not null and "_id" in (:ids) and "organisation" = :organisation', {
+          replacements: { ids: comments, organisation: req.user.organisation },
+          transaction: tx,
+        });
+      }
+      if (passages.length) {
+        await sequelize.query('delete from "mano"."Passage" where "deletedAt" is not null and "_id" in (:ids) and "organisation" = :organisation', {
+          replacements: { ids: passages, organisation: req.user.organisation },
+          transaction: tx,
+        });
+      }
+      if (rencontres.length) {
+        await sequelize.query('delete from "mano"."Rencontre" where "deletedAt" is not null and "_id" in (:ids) and "organisation" = :organisation', {
+          replacements: { ids: rencontres, organisation: req.user.organisation },
+          transaction: tx,
+        });
+      }
+      if (consultations.length) {
+        await sequelize.query(
+          'delete from "mano"."Consultation" where "deletedAt" is not null and "_id" in (:ids) and "organisation" = :organisation',
+          {
+            replacements: { ids: consultations, organisation: req.user.organisation },
+            transaction: tx,
+          }
+        );
+      }
+      if (treatments.length) {
+        await sequelize.query('delete from "mano"."Treatment" where "deletedAt" is not null and "_id" in (:ids) and "organisation" = :organisation', {
+          replacements: { ids: treatments, organisation: req.user.organisation },
+          transaction: tx,
+        });
+      }
+      if (medicalFiles.length) {
+        await sequelize.query(
+          'delete from "mano"."MedicalFile" where "deletedAt" is not null and "_id" in (:ids) and "organisation" = :organisation',
+          {
+            replacements: { ids: medicalFiles, organisation: req.user.organisation },
+            transaction: tx,
+          }
+        );
+      }
+      if (relsPersonPlaces.length) {
+        await sequelize.query(
+          'delete from "mano"."RelPersonPlace" where "deletedAt" is not null and "_id" in (:ids) and "organisation" = :organisation',
+          {
+            replacements: { ids: relsPersonPlaces, organisation: req.user.organisation },
+            transaction: tx,
+          }
+        );
+      }
+    });
+
+    res.status(200).send({ ok: true });
   })
 );
 

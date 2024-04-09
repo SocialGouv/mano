@@ -25,7 +25,7 @@ export const authTokenState = atom({ key: "authTokenState", default: null });
 /* methods */
 export const setOrgEncryptionKey = async (orgEncryptionKey, { encryptedVerificationKey = null, needDerivation = true } = {}) => {
   const newHashedOrgEncryptionKey = needDerivation ? await derivedMasterKey(orgEncryptionKey) : orgEncryptionKey;
-  if (!!encryptedVerificationKey) {
+  if (encryptedVerificationKey) {
     const encryptionKeyIsValid = await checkEncryptedVerificationKey(encryptedVerificationKey, newHashedOrgEncryptionKey);
     if (!encryptionKeyIsValid) {
       toast.error(
@@ -85,10 +85,10 @@ export async function decryptAndEncryptItem(item, oldHashedOrgEncryptionKey, new
   return item;
 }
 
-const decryptDBItem = async (item, { path, encryptedVerificationKey = null } = {}) => {
+const decryptDBItem = async (item, { path, encryptedVerificationKey = null, decryptDeleted = false } = {}) => {
   if (!enableEncrypt) return item;
   if (!item.encrypted) return item;
-  if (!!item.deletedAt) return item;
+  if (item.deletedAt && !decryptDeleted) return item;
   if (!item.encryptedEntityKey) return item;
   try {
     const { content, entityKey } = await decrypt(item.encrypted, item.encryptedEntityKey, hashedOrgEncryptionKey);
@@ -116,7 +116,7 @@ const decryptDBItem = async (item, { path, encryptedVerificationKey = null } = {
         path,
       },
     });
-    if (!!encryptedVerificationKey) {
+    if (encryptedVerificationKey) {
       toast.error(
         "Désolé, un élément n'a pas pu être déchiffré. L'équipe technique a été prévenue, nous reviendrons vers vous dans les meilleurs délais."
       );
@@ -193,7 +193,16 @@ const deleteFile = async ({ path }) => {
   return response.json();
 };
 
-const execute = async ({ method, path = "", body = null, query = {}, headers = {}, forceMigrationLastUpdate = null, skipDecrypt = false } = {}) => {
+const execute = async ({
+  method,
+  path = "",
+  body = null,
+  query = {},
+  headers = {},
+  forceMigrationLastUpdate = null,
+  skipDecrypt = false,
+  decryptDeleted = false,
+} = {}) => {
   const organisation = getRecoil(organisationState) || {};
   const tokenCached = getRecoil(authTokenState);
   const { encryptionLastUpdateAt, encryptionEnabled, encryptedVerificationKey, migrationLastUpdateAt } = organisation;
@@ -269,6 +278,13 @@ const execute = async ({ method, path = "", body = null, query = {}, headers = {
         }
       }
       if (skipDecrypt) {
+        return res;
+      } else if (decryptDeleted) {
+        res.decryptedData = {};
+        for (const [key, value] of Object.entries(res.data)) {
+          const decryptedEntries = await Promise.all(value.map((item) => decryptDBItem(item, { path, encryptedVerificationKey, decryptDeleted })));
+          res.decryptedData[key] = decryptedEntries;
+        }
         return res;
       } else if (!!res.data && Array.isArray(res.data)) {
         const decryptedData = await Promise.all(res.data.map((item) => decryptDBItem(item, { path, encryptedVerificationKey })));
