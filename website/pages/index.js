@@ -277,7 +277,7 @@ export default function NewIndex() {
               </div>
             </div>
           </div>
-          <div className="mt-8">
+          <div className="my-8">
             <div className="max-w-[1000px] mx-auto">
               <h2 className="text-2xl text-center mx-4 py-8">L’équipe</h2>
             </div>
@@ -285,53 +285,78 @@ export default function NewIndex() {
               <div className="grid md:grid-cols-5 sm:grid-cols-3 grid-cols-2 gap-y-8 gap-x-2 max-w-[800px] mx-auto">
                 <div className="mx-auto flex flex-col items-center justify-center text-center">
                   <img src="/team/a.png" alt="Logo" className="w-16 h-16" />
-                  <div className="sm:h-24 h-18">
+                  <div>
                     Arnaud
                     <br />
                     AMBROSELLI
-                    <div className="text-sm mt-1">Développeur </div>
+                    <div className="text-sm mt-1 h-10">Développeur </div>
+                    <div className="mt-2">
+                      <a href="mailto:arnaud@ambroselli.io" target="_blank">
+                        <img src="/message.png" alt="Mail" className="hover:brightness-125 inline-block w-8 h-8" />
+                      </a>
+                    </div>
                   </div>
                 </div>
                 <div className="mx-auto flex flex-col items-center justify-center text-center">
                   <img src="/team/g.png" alt="Logo" className="w-16 h-16" />
-                  <div className="sm:h-24 h-18">
+                  <div>
                     Guillaume
                     <br />
                     DEMIRHAN
-                    <div className="text-sm mt-1">Porteur du projet</div>
+                    <div className="text-sm mt-1 h-10">Porteur du projet</div>
+                    <div className="mt-2">
+                      <a href="mailto:guillaume.demirhan@sesan.fr" target="_blank">
+                        <img src="/message.png" alt="Mail" className="hover:brightness-125 inline-block w-8 h-8" />
+                      </a>
+                    </div>
                   </div>
                 </div>
                 <div className="mx-auto flex flex-col items-center justify-center text-center">
                   <img src="/team/r.png" alt="Logo" className="w-16 h-16" />
-                  <div className="sm:h-24 h-18">
+                  <div>
                     Raphaël
                     <br />
                     HUCHET
-                    <div className="text-sm mt-1">Développeur</div>
+                    <div className="text-sm mt-1 h-10">Développeur</div>
+                    <div className="mt-2">
+                      <a href="mailto:raph@selego.co" target="_blank">
+                        <img src="/message.png" alt="Mail" className="hover:brightness-125 inline-block w-8 h-8" />
+                      </a>
+                    </div>
                   </div>
                 </div>
                 <div className="mx-auto flex flex-col items-center justify-center text-center">
                   <img src="/team/y.png" alt="Logo" className="w-16 h-16" />
-                  <div className="sm:h-24 h-18">
+                  <div>
                     Yoann
                     <br />
                     KITTERY
-                    <div className="text-sm mt-1">Chargé de déploiement</div>
+                    <div className="text-sm mt-1 h-10">Chargé de déploiement</div>
+                    <div className="mt-2">
+                      <a href="mailto:yoann.kittery@sesan.fr" target="_blank">
+                        <img src="/message.png" alt="Mail" className="hover:brightness-125 inline-block w-8 h-8" />
+                      </a>
+                    </div>
                   </div>
                 </div>
                 <div className="mx-auto flex flex-col items-center justify-center text-center">
                   <img src="/team/m.png" alt="Logo" className="w-16 h-16" />
-                  <div className="sm:h-24 h-18">
+                  <div>
                     Mélissa
                     <br />
                     SAITER
-                    <div className="text-sm mt-1">Chargée de déploiement</div>
+                    <div className="text-sm mt-1 h-10">Chargée de déploiement</div>
+                    <div className="mt-2">
+                      <a href="mailto:melissa.saiter@sesan.fr" target="_blank">
+                        <img src="/message.png" alt="Mail" className="hover:brightness-125 inline-block w-8 h-8" />
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <div className="my-12">
+          <div className="my-12 pt-12">
             <a href="https://www.sesan.fr/" target="_blank">
               <img src="/sesan.png" alt="Photo" className="mx-auto md:max-w-[600px]" />
             </a>
