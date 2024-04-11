@@ -59,7 +59,7 @@ export default function NewIndex() {
                 </div>
 
                 <div className="text-xs mt-4 max-w-sm mx-auto">
-                  Île-de-France, Hauts-de-France, Auvergne&nbsp;Rhone&nbsp;Alpes, Grand&nbsp;Est, Normandie, Bretagne, Guadeloupe et Martinique
+                  Île-de-France, Hauts-de-France, Auvergne&nbsp;Rhone&nbsp;Alpes, Grand&nbsp;Est, Normandie, Guadeloupe et Martinique
                 </div>
               </div>
               <div className="pt-4">
@@ -89,8 +89,8 @@ export default function NewIndex() {
                 </div>
 
                 <div className="text-xs mt-4 max-w-sm mx-auto">
-                  Île-de-france, PACA, Occitanie, Nouvelle&nbsp;Aquitaine, Pays&nbsp;de&nbsp;la&nbsp;Loire, Centre&nbsp;Val&nbsp;de&nbsp;Loire, Corse,
-                  Réunion
+                  Île-de-france, PACA, Occitanie, Bretagne, Nouvelle&nbsp;Aquitaine, Pays&nbsp;de&nbsp;la&nbsp;Loire,
+                  Centre&nbsp;Val&nbsp;de&nbsp;Loire, Corse et Réunion
                 </div>
               </div>
               <div className="pt-4">
@@ -117,14 +117,14 @@ export default function NewIndex() {
               <div className="sm:col-span-2 px-4 sm:px-0 self-start">
                 <FaqBox title="Centralisez vos données">
                   Forgez une mémoire collective en regroupant toutes les données essentielles concernant le suivi de vos bénéficiaires dans un dossier
-                  personnel, facilement accessible par tous les membres de votre équipe
+                  personnel, facilement accessible par tous les membres de votre équipe.
                 </FaqBox>
                 <FaqBox title="N’oubliez plus vos tâches et rendez-vous">
                   Évitez les oublis et gardez le fil de toutes vos actions, suivis et soins à fournir à vos bénéficiaires.
                 </FaqBox>
                 <FaqBox title="Comprenez votre activité et votre public">
                   Les informations que vous saisissez dans Mano sont instantanément converties en données statistiques. Analyser les besoins de votre
-                  public, évaluer votre activité, et rédiger vos rapports n'a jamais été aussi simple
+                  public, évaluer votre activité, et rédiger vos rapports n'a jamais été aussi simple.
                 </FaqBox>
                 <FaqBox title="Entièrement adaptable à vos besoins">
                   Prenez le contrôle en personnalisant les informations que vous recueillez dans les dossiers de vos bénéficiaires, lors de vos
@@ -286,36 +286,46 @@ export default function NewIndex() {
                 <div className="mx-auto flex flex-col items-center justify-center text-center">
                   <img src="/team/a.png" alt="Logo" className="w-16 h-16" />
                   <div className="sm:h-24 h-18">
-                    Arnaud AMBROSELLI
-                    <div className="text-sm">Développeur </div>
+                    Arnaud
+                    <br />
+                    AMBROSELLI
+                    <div className="text-sm mt-1">Développeur </div>
                   </div>
                 </div>
                 <div className="mx-auto flex flex-col items-center justify-center text-center">
                   <img src="/team/g.png" alt="Logo" className="w-16 h-16" />
                   <div className="sm:h-24 h-18">
-                    Guillaume DEMIRHAN
-                    <div className="text-sm">Porteur du projet</div>
+                    Guillaume
+                    <br />
+                    DEMIRHAN
+                    <div className="text-sm mt-1">Porteur du projet</div>
                   </div>
                 </div>
                 <div className="mx-auto flex flex-col items-center justify-center text-center">
                   <img src="/team/r.png" alt="Logo" className="w-16 h-16" />
                   <div className="sm:h-24 h-18">
-                    Raphaël HUCHET
-                    <div className="text-sm">Développeur</div>
+                    Raphaël
+                    <br />
+                    HUCHET
+                    <div className="text-sm mt-1">Développeur</div>
                   </div>
                 </div>
                 <div className="mx-auto flex flex-col items-center justify-center text-center">
                   <img src="/team/y.png" alt="Logo" className="w-16 h-16" />
                   <div className="sm:h-24 h-18">
-                    Yoann KITTERY
-                    <div className="text-sm">Chargé de déploiement</div>
+                    Yoann
+                    <br />
+                    KITTERY
+                    <div className="text-sm mt-1">Chargé de déploiement</div>
                   </div>
                 </div>
                 <div className="mx-auto flex flex-col items-center justify-center text-center">
                   <img src="/team/m.png" alt="Logo" className="w-16 h-16" />
                   <div className="sm:h-24 h-18">
-                    Mélissa SAITER
-                    <div className="text-sm">Chargé de déploiement</div>
+                    Mélissa
+                    <br />
+                    SAITER
+                    <div className="text-sm mt-1">Chargée de déploiement</div>
                   </div>
                 </div>
               </div>
