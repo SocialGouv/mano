@@ -192,7 +192,7 @@ const SelectAndCreatePerson = ({ value, onChange, inputId, classNamePrefix }) =>
       value={value}
       formatOptionLabel={(person, options) => {
         if (options.context === "menu") {
-          if (person.__isNew__) return <span>Créer "{person.value}"</span>;
+          if (person.__isNew__) return <span>Créer «&nbsp;{person.value}&nbsp;»</span>;
           return <Person person={person} />;
         }
         if (person.__isNew__) return <span>Création de {person.name}...</span>;
@@ -200,7 +200,7 @@ const SelectAndCreatePerson = ({ value, onChange, inputId, classNamePrefix }) =>
       }}
       format
       creatable
-      onKeyDown={(e, b) => {
+      onKeyDown={(e) => {
         // prevent create Person on Enter press
         if (e.key === "Enter" && !optionsExist.current) e.preventDefault();
       }}
@@ -281,8 +281,8 @@ const Person = ({ person }) => {
             !person.lastUrgentAction
               ? null
               : ["restricted-access"].includes(user.role)
-              ? formatCalendarDate(person.lastUrgentAction.completedAt || person.lastUrgentAction.dueAt)
-              : `${person.lastUrgentAction?.name} - ${formatCalendarDate(person.lastUrgentAction.completedAt || person.lastUrgentAction.dueAt)}`
+                ? formatCalendarDate(person.lastUrgentAction.completedAt || person.lastUrgentAction.dueAt)
+                : `${person.lastUrgentAction?.name} - ${formatCalendarDate(person.lastUrgentAction.completedAt || person.lastUrgentAction.dueAt)}`
           }
         />
         <AdditionalInfo
@@ -291,8 +291,8 @@ const Person = ({ person }) => {
             !person.lastAction || person.lastUrgentAction?._id === person.lastAction._id
               ? null
               : ["restricted-access"].includes(user.role)
-              ? formatCalendarDate(person.lastAction.completedAt || person.lastAction.dueAt)
-              : `${person.lastAction?.name} - ${formatCalendarDate(person.lastAction.completedAt || person.lastAction.dueAt)}`
+                ? formatCalendarDate(person.lastAction.completedAt || person.lastAction.dueAt)
+                : `${person.lastAction?.name} - ${formatCalendarDate(person.lastAction.completedAt || person.lastAction.dueAt)}`
           }
         />
         <AdditionalInfo
@@ -300,7 +300,9 @@ const Person = ({ person }) => {
           value={
             person.lastPassage?.date ? (
               isToday(person.lastPassage?.date) ? (
-                <span className="tw-rounded tw-bg-green-700 tw-px-1 tw-py-0.5 tw-font-bold tw-text-white">Aujourd’hui</span>
+                <div className="tw-mt-1">
+                  <div className="tw-rounded tw-bg-violet-700 tw-px-1 tw-py-0.5 tw-font-bold tw-text-white tw-w-fit">Aujourd’hui</div>
+                </div>
               ) : (
                 formatCalendarDate(person.lastPassage?.date)
               )
