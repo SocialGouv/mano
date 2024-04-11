@@ -97,7 +97,7 @@ export default function NewIndex() {
                 <a
                   target="_blank"
                   className="flex my-4 bg-sky-600 text-white px-4 py-2 rounded shadow text-sm max-w-72 mx-auto"
-                  href="https://cal.com/msaiter/je-souhaite-une-demonstration-de-l-outil-mano?duration=60"
+                  href="https://cal.com/ykittery-mano/reservez-un-temps-de-presentation-de-l-outil-mano?duration=60"
                 >
                   <div className="text-left">Reservez un temps de présentation de l’outil MANO</div>
                   <AgendaIcon size={42} />
@@ -270,7 +270,7 @@ export default function NewIndex() {
               </div>
             </div>
             <div className="bg-mano rounded p-6 text-white md:mx-0 mx-2">
-              <h3 className="text-lg font-semibold mb-4">Qui nous finance ?!</h3>
+              <h3 className="text-lg font-semibold mb-4">Qui nous finance</h3>
               <div>
                 Mano est financé par les agences régionales de santé (ARS) d’Île-de-France, de Bretagne, de Normandie, d’Occitanie, de
                 Bourgogne-Franche-Conté, et des Pays de la Loire
@@ -322,7 +322,9 @@ export default function NewIndex() {
             </div>
           </div>
           <div className="my-12">
-            <img src="/sesan.png" alt="Photo" className="mx-auto md:max-w-[600px]" />
+            <a href="https://www.sesan.fr/" target="_blank">
+              <img src="/sesan.png" alt="Photo" className="mx-auto md:max-w-[600px]" />
+            </a>
           </div>
         </div>
       </main>
