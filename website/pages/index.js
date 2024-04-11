@@ -25,7 +25,7 @@ export default function NewIndex() {
           setShowMenu(false);
         }}
       >
-        <div className="container my-16">
+        <div className="container my-16 mx-auto">
           <div className="flex md:flex-row flex-col items-center mx-auto justify-center gap-8">
             <img src="/logo.png" alt="Logo" className="w-24 h-24" />
             <h1 className="text-4xl p-4 max-w-[640px] text-center">Faciliter votre travail, mieux agir auprès de vos publics</h1>
