@@ -18,23 +18,23 @@ export default function Download() {
   }, []);
 
   return (
-    <div>
+    <>
       <Header />
-      <div className="w-full h-18"></div>
-      <section className="relative h-[50vh] flex items-center">
+      <section className="relative h-[40vh] flex items-center">
         <a
-          className="mx-auto py-4 px-12 space-x-2 text-white transition-all bg-shamrock-400 rounded-xl bg-opacity-100 hover:bg-opacity-30 inline-flex justify-between items-center text-center"
+          className="mt-12 mx-auto py-4 px-12 space-x-2 text-white transition-all bg-mano rounded bg-opacity-100 hover:bg-opacity-30 inline-flex justify-between items-center text-center"
           download
           href={url}
         >
           <HiOutlineDownload className="text-lg mr-4 block" />
           <span suppressHydrationWarning className="text-base font-medium">
-            Télécharger
+            Télécharger Mano
             <br />v{mobileAppVersion}
           </span>
         </a>
       </section>
+      <img src="/mano-tel.png" alt="Screenshot" className="mx-auto w-[600px] pt-12" />
       <Footer />
-    </div>
+    </>
   );
 }

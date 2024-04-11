@@ -1,23 +1,16 @@
-import { useEffect, useState } from "react";
 import Head from "next/head";
-import Link from "next/link";
-
+import { useEffect, useState } from "react";
 import { HiMenu } from "react-icons/hi";
 
-export default function Header() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [connexionUrl, setConnexionUrl] = useState("https://dashboard-mano.fabrique.social.gouv.fr/auth");
-
-  useEffect(() => {
-    document.body.addEventListener("click", () => setIsOpen(false));
-  });
+export default function Header({ showMenu, setShowMenu }) {
+  const [connexionUrl, setConnexionUrl] = useState("https://espace-mano.sesan.fr/auth");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       if (window.location.hostname === "preprod-mano.sesan.fr") {
         setConnexionUrl("https://preprod-espace-mano.sesan.fr/auth");
-      } else if (window.location.hostname === "mano.sesan.fr") {
-        setConnexionUrl("https://espace-mano.sesan.fr/auth");
+      } else if (window.location.hostname === "localhost") {
+        setConnexionUrl("http://localhost:8083/auth");
       }
     }
   }, []);
@@ -25,51 +18,108 @@ export default function Header() {
   return (
     <>
       <Head>
-        <link rel="shortcut icon" href="/logo-green.png" />
+        <link rel="shortcut icon" href="/logo.png" />
         <title>Mano | Un service gratuit dédié aux professionnel·le·s de maraude et de lieux d’accueil.</title>
       </Head>
-      <header className="z-20 flex items-center justify-between w-full px-4 py-5 bg-white border-b md:px-6 border-shamrock-50">
-        <a className="flex items-center" href="/">
-          <img className="w-10 mr-3" src="/logo-green.png" alt="logo" />
-          <p className="text-2xl font-medium text-black">Mano</p>
+      <header className="text-gray-700 sticky top-0 z-50 bg-white flex gap-6 xl:gap-8 p-2 w-full border-b border-gray-300 items-center shadow mb-8">
+        <img src="/logo.png" alt="Logo" className="w-12 h-12 cursor-pointer" onClick={() => (window.location.href = "/")} />
+        <div
+          className="text-2xl md:hidden block cursor-pointer"
+          onClick={() => {
+            window.location.href = "/";
+          }}
+        >
+          Mano
+        </div>
+        <div className="hidden md:block grow lg:text-base text-sm">
+          <ul className="md:flex flex-row gap-8 hidden">
+            <li className={`hover:underline decoration-mano underline-offset-2 cursor-pointer`}>
+              <a href="/#comment-ça-marche">Comment ça marche</a>
+            </li>
+            <li className={`hover:underline decoration-mano underline-offset-2 cursor-pointer`}>
+              <a href="/#sécurité">Sécurité des données</a>
+            </li>
+            <li className={`hover:underline decoration-mano underline-offset-2 cursor-pointer`}>
+              <a href="/#confiance">Ils nous font confiance</a>
+            </li>
+            <li className={`hover:underline decoration-mano underline-offset-2 cursor-pointer`}>
+              <a href="/#qui-sommes-nous">Qui sommes nous</a>
+            </li>
+          </ul>
+        </div>
+        <a
+          href={connexionUrl}
+          className="hidden md:inline-flex w-full cursor-pointer justify-center rounded-md border border-transparent bg-mano px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-mano focus:outline-none focus:ring-2 focus:ring-mano focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30 sm:ml-3 sm:w-auto"
+        >
+          Se&nbsp;connecter
         </a>
-        {/* Mobile */}
-        <button className="block lg:hidden">
+
+        <div className="md:hidden flex grow justify-end mr-2">
           <HiMenu
             className="text-2xl text-black"
             onClick={(e) => {
               e.stopPropagation();
-              setIsOpen(true);
+              setShowMenu(!showMenu);
             }}
           />
-        </button>
-        <div
-          className={`fixed inset-y-0 right-0 lg:justify-end transform shadow-xl lg:shadow-none lg:transform-none lg:w-auto lg:relative lg:border-0 transition-transform z-10 flex flex-col items-start bg-white border-t-4 border-shamrock-400 lg:space-x-6 lg:items-center lg:flex-row w-72 md:w-96 ${
-            isOpen ? "translate-x-0" : "translate-x-full"
-          }`}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <MenuLink name="MANO, à quoi ça sert ?" target="/#pourquoi-mano" />
-          <MenuLink name="La protection des données" target="/#la-protection-des-donnees" />
-          <MenuLink name="Qui sommes nous ?" target="/#qui-sommes-nous" />
-          <MenuLink name="Ils nous font confiance" target="/#ils-nous-font-confiance" />
-          {/* <MenuLink name="Ils nous apprécient" target="/#ils-nous-apprecient" /> */}
-          <MenuLink name="Nous contacter" target="/#contact" />
-          <MenuLink name="FAQ" target="/faq" />
-          <MenuLink full name="Se connecter" target={connexionUrl} />
         </div>
+        {showMenu && (
+          <div className="absolute top-16 right-0 bg-white shadow w-full">
+            <ul className="flex flex-col">
+              <li className={`hover:underline decoration-mano underline-offset-2 cursor-pointer p-4 border-b`}>
+                <a
+                  href="#comment-ça-marche"
+                  onClick={() => {
+                    setShowMenu(false);
+                  }}
+                >
+                  Comment ça marche
+                </a>
+              </li>
+              <li className={`hover:underline decoration-mano underline-offset-2 cursor-pointer p-4 border-b`}>
+                <a
+                  href="#sécurité"
+                  onClick={() => {
+                    setShowMenu(false);
+                  }}
+                >
+                  Sécurité des données
+                </a>
+              </li>
+              <li className={`hover:underline decoration-mano underline-offset-2 cursor-pointer p-4 border-b`}>
+                <a
+                  href="#confiance"
+                  onClick={() => {
+                    setShowMenu(false);
+                  }}
+                >
+                  Ils nous font confiance
+                </a>
+              </li>
+              <li className={`hover:underline decoration-mano underline-offset-2 cursor-pointer p-4 border-b`}>
+                <a
+                  href="#qui-sommes-nous"
+                  onClick={() => {
+                    setShowMenu(false);
+                  }}
+                >
+                  Qui sommes nous
+                </a>
+              </li>
+              <li className={`hover:underline decoration-mano underline-offset-2 cursor-pointer p-4 border-b`}>
+                <a
+                  href="#"
+                  onClick={() => {
+                    setShowMenu(false);
+                  }}
+                >
+                  Se connecter
+                </a>
+              </li>
+            </ul>
+          </div>
+        )}
       </header>
     </>
   );
 }
-
-const MenuLink = ({ name, target = "#", full = false }) => (
-  <Link
-    href={target}
-    className={`w-full p-4 text-sm font-medium text-black transition-all opacity-50 lg:w-auto lg:text-xs lg:p-0 hover:opacity-100 ${
-      full && "hidden lg:block rounded-lg lg:px-4 lg:py-2 text-white br-4 bg-shamrock-500 "
-    }`}
-  >
-    {name}
-  </Link>
-);

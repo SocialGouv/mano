@@ -3,13 +3,10 @@ import Footer from "../components/footer";
 import { useEffect, useState } from "react";
 
 const Stats = () => {
-  const [src, setSrc] = useState("https://metabase-mano.fabrique.social.gouv.fr/public/dashboard/825cc4ad-b502-4483-aa78-c2af56032bc9");
+  const [src, setSrc] = useState("https://preprod-metabase-mano.sesan.fr/public/dashboard/d30b0c39-6e14-4bbb-9e64-a367a6fdb073");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      if (window.location.hostname === "preprod-mano.sesan.fr") {
-        setSrc("https://preprod-metabase-mano.sesan.fr/public/dashboard/d30b0c39-6e14-4bbb-9e64-a367a6fdb073");
-      }
       if (window.location.hostname === "mano.sesan.fr") {
         setSrc("https://metabase-mano.sesan.fr/public/dashboard/dbd4c9fc-9f6d-4386-8dce-d923ae8458de");
       }
