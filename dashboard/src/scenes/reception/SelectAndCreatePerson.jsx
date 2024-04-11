@@ -192,7 +192,7 @@ const SelectAndCreatePerson = ({ value, onChange, inputId, classNamePrefix }) =>
       value={value}
       formatOptionLabel={(person, options) => {
         if (options.context === "menu") {
-          if (person.__isNew__) return <span>Créer «&nbsp;{person.value}&nbsp;»</span>;
+          if (person.__isNew__) return <span>Créer "{person.value}"</span>;
           return <Person person={person} />;
         }
         if (person.__isNew__) return <span>Création de {person.name}...</span>;
