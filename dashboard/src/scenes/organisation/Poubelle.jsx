@@ -116,7 +116,7 @@ export default function Poubelle() {
     <div>
       <div className="tw-mb-8 tw-border-l-4 tw-border-orange-500 tw-bg-orange-100 tw-p-4 tw-text-orange-700" role="alert">
         Vous retrouvez ici les dossiers des personnes supprimeés, uniquement accessibles par les comptes administrateurs. Vous devez les supprimer
-        définitivement après une période de rétention de 6 mois, conformément à la réglementation RGPD. Vous pouvez également restaurer les dossiers
+        définitivement après une période de rétention de 2 ans, conformément à la réglementation RGPD. Vous pouvez également restaurer les dossiers
         supprimés par erreur.
       </div>
       <div className="mt-8">
@@ -203,7 +203,7 @@ export default function Poubelle() {
                   <>
                     <div
                       className={
-                        dayjsInstance(p.deletedAt).isAfter(dayjsInstance().add(-6, "month")) ? "tw-font-bold" : "tw-font-bold tw-text-red-500"
+                        dayjsInstance(p.deletedAt).isAfter(dayjsInstance().add(-2, "year")) ? "tw-font-bold" : "tw-font-bold tw-text-red-500"
                       }
                     >
                       {formatDateWithFullMonth(p.deletedAt)}
