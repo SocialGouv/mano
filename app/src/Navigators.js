@@ -53,6 +53,7 @@ import Report from './scenes/Reports/Report';
 import Actions from './scenes/Reports/Actions';
 import CommentsForReport from './scenes/Reports/CommentsForReport';
 import RencontresForReport from './scenes/Reports/RencontresForReport';
+import PassagesForReport from './scenes/Reports/PassagesForReport';
 import Observations from './scenes/Reports/Observations';
 import Collaborations from './scenes/Reports/Collaborations';
 import Treatment from './scenes/Persons/Treatment';
@@ -171,6 +172,7 @@ const ReportsNavigator = () => {
 
       <ReportsStack.Screen name="CommentsForReport" component={CommentsForReport} />
       <ReportsStack.Screen name="RencontresForReport" component={RencontresForReport} />
+      <ReportsStack.Screen name="PassagesForReport" component={PassagesForReport} />
       <ReportsStack.Screen name="Actions" component={Actions} />
       <ReportsStack.Screen name="Observations" component={Observations} />
     </ReportsStack.Navigator>

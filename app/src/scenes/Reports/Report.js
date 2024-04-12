@@ -24,6 +24,7 @@ import {
   commentsForReport,
   currentTeamReportsSelector,
   observationsForReport,
+  passagesForReport,
   rencontresForReport,
 } from './selectors';
 import { getPeriodTitle } from './utils';
@@ -79,6 +80,7 @@ const Report = ({ navigation, route }) => {
   const actionsCanceled = useRecoilValue(actionsCompletedOrCanceledForReport({ date: day, status: CANCEL }));
   const comments = useRecoilValue(commentsForReport({ date: day }));
   const rencontres = useRecoilValue(rencontresForReport({ date: day }));
+  const passages = useRecoilValue(passagesForReport({ date: day }));
   const observations = useRecoilValue(observationsForReport({ date: day }));
   const organisation = useRecoilValue(organisationState);
 
@@ -270,6 +272,12 @@ const Report = ({ navigation, route }) => {
           caption={`Rencontres (${rencontres.length})`}
           onPress={() => navigation.navigate('RencontresForReport', { date: day })}
           disabled={!rencontres.length}
+        />
+        <Row
+          withNextButton
+          caption={`Passages (${passages.length})`}
+          onPress={() => navigation.navigate('PassagesForReport', { date: day })}
+          disabled={!passages.length}
         />
         {!!organisation.territoriesEnabled && (
           <>

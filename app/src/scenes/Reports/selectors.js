@@ -7,6 +7,7 @@ import { actionsObjectSelector, itemsGroupedByPersonSelector } from '../../recoi
 import { territoryObservationsState } from '../../recoil/territoryObservations';
 import { getIsDayWithinHoursOffsetOfDay } from '../../services/dateDayjs';
 import { rencontresState } from '../../recoil/rencontres';
+import { passagesState } from '../../recoil/passages';
 
 export const currentTeamReportsSelector = selector({
   key: 'currentTeamReportsSelector',
@@ -101,6 +102,19 @@ export const rencontresForReport = selectorFamily({
       const rencontres = get(rencontresState);
       const currentTeam = get(currentTeamState);
       return rencontres
+        .filter((o) => o.team === currentTeam._id)
+        .filter((o) => getIsDayWithinHoursOffsetOfDay(o.observedAt || o.createdAt, date, currentTeam?.nightSession ? 12 : 0));
+    },
+});
+
+export const passagesForReport = selectorFamily({
+  key: 'passagesForReport',
+  get:
+    ({ date }) =>
+    ({ get }) => {
+      const passages = get(passagesState);
+      const currentTeam = get(currentTeamState);
+      return passages
         .filter((o) => o.team === currentTeam._id)
         .filter((o) => getIsDayWithinHoursOffsetOfDay(o.observedAt || o.createdAt, date, currentTeam?.nightSession ? 12 : 0));
     },
