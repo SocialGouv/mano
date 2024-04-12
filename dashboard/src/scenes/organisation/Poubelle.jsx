@@ -9,6 +9,7 @@ import { dayjsInstance, formatAge, formatDateWithFullMonth } from "../../service
 import { organisationState } from "../../recoil/auth";
 import TagTeam from "../../components/TagTeam";
 import { useDataLoader } from "../../components/DataLoader";
+import Loading from "../../components/loading";
 
 async function fetchPersons(organisationId) {
   const res = await API.get({ path: "/organisation/" + organisationId + "/deleted-data", query: {}, decryptDeleted: true });
@@ -19,7 +20,7 @@ export default function Poubelle() {
   const { refresh } = useDataLoader();
   const history = useHistory();
   const organisation = useRecoilValue(organisationState);
-  const [persons, setPersons] = useState([]);
+  const [persons, setPersons] = useState();
   const [data, setData] = useState(null);
   const [sortBy, setSortBy] = useLocalStorage("person-poubelle-sortBy", "name");
   const [sortOrder, setSortOrder] = useLocalStorage("person-poubelle-sortOrder", "ASC");
@@ -112,13 +113,17 @@ export default function Poubelle() {
     }
   };
 
+  if (!persons)
+    return (
+      <>
+        <Disclaimer />
+        <Loading />
+      </>
+    );
+
   return (
     <div>
-      <div className="tw-mb-8 tw-border-l-4 tw-border-orange-500 tw-bg-orange-100 tw-p-4 tw-text-orange-700" role="alert">
-        Vous retrouvez ici les dossiers des personnes supprimeés, uniquement accessibles par les comptes administrateurs. Vous devez les supprimer
-        définitivement après une période de rétention de 2 ans, conformément à la réglementation RGPD. Vous pouvez également restaurer les dossiers
-        supprimés par erreur.
-      </div>
+      <Disclaimer />
       <div className="mt-8">
         <Table
           data={persons}
@@ -242,6 +247,16 @@ export default function Poubelle() {
           ].filter((c) => organisation.groupsEnabled || c.dataKey !== "group")}
         />
       </div>
+    </div>
+  );
+}
+
+function Disclaimer() {
+  return (
+    <div className="tw-mb-8 tw-border-l-4 tw-border-orange-500 tw-bg-orange-100 tw-p-4 tw-text-orange-700" role="alert">
+      Vous retrouvez ici les dossiers des personnes supprimeés, uniquement accessibles par les comptes administrateurs. Vous devez les supprimer
+      définitivement après une période de rétention de 2 ans, conformément à la réglementation RGPD. Vous pouvez également restaurer les dossiers
+      supprimés par erreur.
     </div>
   );
 }
