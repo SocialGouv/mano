@@ -59,7 +59,7 @@ export default function NewIndex() {
                 </div>
 
                 <div className="text-xs mt-4 max-w-sm mx-auto">
-                  Île-de-France, Hauts-de-France, Auvergne&nbsp;Rhone&nbsp;Alpes, Grand&nbsp;Est, Normandie, Guadeloupe et Martinique
+                  Île-de-France, Hauts-de-France, Bretagne, Auvergne&nbsp;Rhone&nbsp;Alpes, Grand&nbsp;Est, Normandie, Guadeloupe et Martinique
                 </div>
               </div>
               <div className="pt-4">
@@ -89,8 +89,8 @@ export default function NewIndex() {
                 </div>
 
                 <div className="text-xs mt-4 max-w-sm mx-auto">
-                  Île-de-france, PACA, Occitanie, Bretagne, Nouvelle&nbsp;Aquitaine, Pays&nbsp;de&nbsp;la&nbsp;Loire,
-                  Centre&nbsp;Val&nbsp;de&nbsp;Loire, Corse et Réunion
+                  Île-de-france, PACA, Occitanie, Nouvelle&nbsp;Aquitaine, Pays&nbsp;de&nbsp;la&nbsp;Loire, Centre&nbsp;Val&nbsp;de&nbsp;Loire, Corse
+                  et Réunion
                 </div>
               </div>
               <div className="pt-4">
