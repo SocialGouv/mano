@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import SelectCustom from "./SelectCustom";
 import { dayjsInstance } from "../services/date";
-import type { FilterField } from "../types/field";
+import type { FilterableField } from "../types/field";
 import type { IndicatorValue, IndicatorsSelection, IndicatorsBase } from "../types/evolutivesStats";
 import { useRecoilValue } from "recoil";
 import { evolutiveStatsIndicatorsBaseSelector } from "../recoil/evolutiveStats";
@@ -21,7 +21,7 @@ const EvolutiveStatsSelector = ({ onChange, selection, title = "", saveInURLPara
   const onAddIndicator = () => onChange([...selection, emptySelection], saveInURLParams);
   const selectCustomOptions = indicatorsBase.map((_indicator) => ({ label: _indicator.label, value: _indicator.name })) || [];
 
-  function getFilterOptionsByField(fieldName: FilterField["name"] | null, base: IndicatorsBase, index: number) {
+  function getFilterOptionsByField(fieldName: FilterableField["name"] | null, base: IndicatorsBase, index: number) {
     if (!fieldName) return [];
     const current = base.find((field) => field.name === fieldName);
     if (!current) {

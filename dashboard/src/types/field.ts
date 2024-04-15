@@ -33,14 +33,7 @@ export interface CustomFieldsGroup {
   fields: CustomField[];
 }
 
-export interface UndefinedFilterField {
-  field?: string;
-  name?: string;
-  label?: string;
-  type?: FieldType;
-  options?: string[];
-}
-export interface FilterField {
+export interface FilterableField {
   field: string;
   name: string;
   label: string;
