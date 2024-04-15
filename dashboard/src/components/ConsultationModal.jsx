@@ -593,7 +593,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                       className="tailwindui"
                       type="number"
                       min="0"
-                      max="2"
+                      max="4"
                       step="0.1"
                       name="constantes-glycemie-capillaire"
                       placeholder="1"
