@@ -107,27 +107,31 @@ function StreamChart({ fieldData, startDateConsolidated, endDateConsolidated }: 
     const legend = [];
     const daysDiff = endDateConsolidated.diff(startDateConsolidated, "days");
     const spacing = Math.floor(Math.max(1, daysDiff / 6));
+    // end date
+    const keys = Object.keys(fieldData)
+      .map((option) => ({
+        key: option,
+        value: fieldData[option][endDateConsolidated.format("YYYYMMDD")],
+      }))
+      .sort((a, b) => b.value - a.value)
+      .map((entry) => entry.key);
+    const lastDateValue: Record<(typeof keys)[number], number> = {} as any;
+    for (const option of keys) {
+      const value = fieldData[option][endDateConsolidated.format("YYYYMMDD")];
+      lastDateValue[option] = value;
+    }
     for (let i = 0; i < daysDiff; i += spacing) {
       const date = startDateConsolidated.add(i, "days");
       legend.push(date.format("DD/MM/YYYY"));
       const dateValue: any = {};
-      for (const option of Object.keys(fieldData)) {
+      for (const option of keys) {
         const value = fieldData[option][date.format("YYYYMMDD")];
         dateValue[option] = value;
       }
       data.push(dateValue);
     }
-    // end date
-    legend.push(endDateConsolidated.format("DD/MM/YYYY"));
-    const lastDateValue: Record<string, number> = {};
-    for (const option of Object.keys(fieldData)) {
-      const value = fieldData[option][endDateConsolidated.format("YYYYMMDD")];
-      lastDateValue[option] = value;
-    }
     data.push(lastDateValue);
-    const keys = Object.entries(lastDateValue)
-      .sort((a, b) => b[1] - a[1])
-      .map((entry) => entry[0]);
+    legend.push(endDateConsolidated.format("DD/MM/YYYY"));
     return { data, legend, keys };
   }, [startDateConsolidated, endDateConsolidated, fieldData]);
 
@@ -167,7 +171,7 @@ function StreamChart({ fieldData, startDateConsolidated, endDateConsolidated }: 
           curve="basis"
           enableGridX={true}
           enableGridY={false}
-          offsetType="diverging"
+          offsetType="none"
           colors={{ scheme: "set2" }}
           fillOpacity={0.85}
           borderColor={{ theme: "background" }}
