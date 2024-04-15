@@ -203,7 +203,7 @@ export const CustomResponsiveBar = ({
           }}
           axisLeft={{
             tickSize: 5,
-            format: (e) => (e ? Math.floor(e) === e && e : ""),
+            format: (e) => (e ? (Math.floor(e) === e ? e : "") : ""),
             tickPadding: 5,
             tickRotation: 0,
             legend: axisTitleY,
