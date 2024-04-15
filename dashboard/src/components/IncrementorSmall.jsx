@@ -52,7 +52,11 @@ export default function IncrementorSmall({ service, team, date, count: initialVa
         // type="number"
         value={value}
         disabled={disabled}
-        onChange={(e) => setValue(Number(e.currentTarget.value))}
+        onChange={(e) => {
+          if (!isNaN(Number(e.currentTarget.value))) {
+            setValue(Number(e.currentTarget.value));
+          }
+        }}
       />
       <button
         className="tw-my-auto tw-flex tw-w-8 tw-flex-shrink-0 tw-items-center tw-justify-center tw-rounded-md tw-border tw-border-main tw-bg-none tw-text-main hover:tw-bg-main hover:tw-text-white disabled:tw-cursor-not-allowed disabled:tw-border-gray-400 disabled:tw-bg-none disabled:tw-text-gray-400"
