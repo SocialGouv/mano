@@ -107,7 +107,8 @@ const itemsForStatsSelector = selectorFamily({
 
       const personsCreated = [];
       const personsUpdated = [];
-      const personsWithActions = {};
+      // Les personnes suivies ayant des actions
+      const personsUpdatedWithActions = {};
       const actionsFilteredByPersons = {};
       const consultationsFilteredByPersons = [];
       const personsWithConsultations = {};
@@ -153,7 +154,9 @@ const itemsForStatsSelector = selectorFamily({
           if (!filterItemByTeam(action, "teams")) continue;
           if (noPeriodSelected) {
             actionsFilteredByPersons[action._id] = action;
-            personsWithActions[person._id] = person;
+            // On veut seulement les personnes considérées comme suivies
+            // Pour ne pas avoir plus de personnes suivies concernées par les actions que de personnes suivies
+            if (personsUpdated[person._id]) personsUpdatedWithActions[person._id] = person;
             continue;
           }
           const date = action.completedAt || action.dueAt;
@@ -172,7 +175,8 @@ const itemsForStatsSelector = selectorFamily({
             if (date >= isoEndDate) continue;
           }
           actionsFilteredByPersons[action._id] = action;
-          personsWithActions[person._id] = person;
+          // Voir ci-dessus (pourquoi on limite aux personnes suivies)
+          if (personsUpdated[person._id]) personsUpdatedWithActions[person._id] = person;
         }
         for (const consultation of person.consultations || []) {
           if (!filterItemByTeam(consultation, "teams")) continue;
@@ -240,7 +244,7 @@ const itemsForStatsSelector = selectorFamily({
       return {
         personsCreated: Object.values(personsCreated),
         personsUpdated: Object.values(personsUpdated),
-        personsWithActions: Object.keys(personsWithActions).length,
+        personsUpdatedWithActions: Object.keys(personsUpdatedWithActions).length,
         actionsFilteredByPersons: Object.values(actionsFilteredByPersons),
         personsWithConsultations: Object.keys(personsWithConsultations).length,
         consultationsFilteredByPersons,
@@ -357,7 +361,7 @@ const Stats = () => {
   const {
     personsCreated,
     personsUpdated,
-    personsWithActions,
+    personsUpdatedWithActions,
     actionsFilteredByPersons,
     personsWithConsultations,
     consultationsFilteredByPersons,
@@ -600,7 +604,7 @@ const Stats = () => {
             rencontres={rencontresFilteredByPersons}
             actions={actionsWithDetailedGroupAndCategories}
             // numberOfActionsPerPersonConcernedByActions={numberOfActionsPerPersonConcernedByActions}
-            personsWithActions={personsWithActions}
+            personsUpdatedWithActions={personsUpdatedWithActions}
             // filter by persons
             filterBase={filterPersonsWithAllFields()}
             filterPersons={filterPersons}
@@ -624,7 +628,7 @@ const Stats = () => {
             actionsCategories={actionsCategories}
             filterableActionsCategories={filterableActionsCategories}
             // filter by persons
-            personsWithActions={personsWithActions}
+            personsUpdatedWithActions={personsUpdatedWithActions}
             filterBase={filterPersonsWithAllFields()}
             filterPersons={filterPersons}
             setFilterPersons={setFilterPersons}

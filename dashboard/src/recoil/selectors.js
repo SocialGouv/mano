@@ -190,7 +190,7 @@ export const itemsGroupedByPersonSelector = selector({
       personsObject[action.person].interactions.push(action.dueAt);
       personsObject[action.person].interactions.push(action.createdAt);
       personsObject[action.person].interactions.push(action.completedAt);
-      if (!!action.group) {
+      if (action.group) {
         const group = personsObject[action.person].group;
         if (!group) continue;
         for (const person of group.persons) {
@@ -214,7 +214,7 @@ export const itemsGroupedByPersonSelector = selector({
       personsObject[comment.person].comments = personsObject[comment.person].comments || [];
       personsObject[comment.person].comments.push({ ...comment, type: "person", date: comment.date || comment.createdAt });
       personsObject[comment.person].interactions.push(comment.date || comment.createdAt);
-      if (!!comment.group) {
+      if (comment.group) {
         const group = personsObject[comment.person].group;
         if (!group) continue;
         for (const person of group.persons) {
@@ -541,7 +541,7 @@ export const populatedPassagesSelector = selector({
         if (!!passage.person && !allPersonsAsObject[passage.person]) return null;
         return {
           ...passage,
-          type: !!passage.person ? "Non-anonyme" : "Anonyme",
+          type: passage.person ? "Non-anonyme" : "Anonyme",
           gender: !passage.person ? null : allPersonsAsObject[passage.person].gender || "Non renseigné",
         };
       })

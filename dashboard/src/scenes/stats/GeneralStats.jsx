@@ -8,7 +8,7 @@ const GeneralStats = ({
   rencontres,
   actions,
   // numberOfActionsPerPersonConcernedByActions,
-  personsWithActions,
+  personsUpdatedWithActions,
   filterBase,
   filterPersons,
   setFilterPersons,
@@ -46,9 +46,9 @@ const GeneralStats = ({
           help={`Moyenne d'actions créées par "personne suivie" <b>pour lesquelles au moins une action a été créée</b> dans la période définie.\n\nSi aucune période n'est définie, on considère la totalité des actions par rapport à la totalité des personnes.`}
         /> */}
         <Block
-          data={personsWithActions}
+          data={personsUpdatedWithActions}
           title="Nombre de personnes suivies concernées par au moins une action"
-          help={`Nombre de personnes suivies <b>pour lesquelles au moins une action a été créée</b> dans la période définie.\n\nSi aucune période n'est définie, on considère la totalité des actions par rapport à la totalité des personnes.`}
+          help={`Nombre de personnes suivies par les équipes sélectionnées <b>pour lesquelles au moins une action a été créée</b> dans la période définie.\n\nSi aucune période n'est définie, on considère la totalité des actions par rapport à la totalité des personnes.`}
         />
       </div>
     </>

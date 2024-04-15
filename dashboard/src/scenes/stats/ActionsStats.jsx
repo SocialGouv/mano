@@ -25,7 +25,7 @@ const ActionsStats = ({
   filterBase,
   filterPersons,
   setFilterPersons,
-  personsWithActions,
+  personsUpdatedWithActions,
 }) => {
   const [actionsModalOpened, setActionsModalOpened] = useState(false);
   const [groupSlice, setGroupSlice] = useState(null);
@@ -61,9 +61,10 @@ const ActionsStats = ({
 
   const filterTitle = useMemo(() => {
     if (!filterPersons.length) return `Filtrer par personnes suivies :`;
-    if (personsWithActions === 1) return `Filtrer par personnes suivies (${personsWithActions} personne concernée par le filtre actuel) :`;
-    return `Filtrer par personnes suivies (${personsWithActions} personnes concernées par le filtre actuel) :`;
-  }, [filterPersons, personsWithActions]);
+    if (personsUpdatedWithActions === 1)
+      return `Filtrer par personnes suivies (${personsUpdatedWithActions} personne associée aux équipes en charges séléctionnées concernée par le filtre actuel) :`;
+    return `Filtrer par personnes suivies (${personsUpdatedWithActions} personnes associées aux équipes en charges séléctionnées concernées par le filtre actuel) :`;
+  }, [filterPersons, personsUpdatedWithActions]);
 
   return (
     <>
