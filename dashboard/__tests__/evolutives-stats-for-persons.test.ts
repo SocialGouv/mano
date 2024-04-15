@@ -71,7 +71,7 @@ describe("Stats evolutives", () => {
           gender: "Homme",
           history: [
             {
-              date: dayjs("2024-01-01").toDate(),
+              date: dayjs("2024-01-02").toDate(),
               data: {
                 gender: {
                   oldValue: "Homme",
@@ -238,6 +238,46 @@ describe("Stats evolutives", () => {
     expect(computed.valueStart).toBe("Non renseigné");
     expect(computed.countStart).toBe(1);
     expect(computed.valueEnd).toBe("Femme");
+    expect(computed.countEnd).toBe(1);
+    expect(dayjs(computed.startDateConsolidated).format("YYYY-MM-DD")).toBe("2024-01-01");
+    expect(dayjs(computed.endDateConsolidated).format("YYYY-MM-DD")).toBe("2024-04-01");
+  });
+
+  test("If a history change is the same a period start date, we ignore it", () => {
+    const computed = computeEvolutiveStatsForPersons({
+      startDate: "2024-01-01T00:00:00.000Z",
+      endDate: "2024-04-01T00:00:00.000Z",
+      evolutiveStatsIndicatorsBase: mockedEvolutiveStatsIndicatorsBase,
+      evolutiveStatsIndicators: [
+        {
+          fieldName: "resources",
+          fromValue: "Non renseigné",
+          toValue: "RSA",
+          type: "enum",
+        },
+      ],
+      persons: [
+        {
+          ...personBase,
+          resources: ["RSA"],
+          history: [
+            {
+              date: dayjs("2024-12-31").toDate(),
+              data: {
+                resources: {
+                  oldValue: "",
+                  newValue: ["RSA"],
+                },
+              },
+              user: "XXX",
+            },
+          ],
+        },
+      ],
+    });
+    expect(computed.valueStart).toBe("Non renseigné");
+    expect(computed.countStart).toBe(1);
+    expect(computed.valueEnd).toBe("RSA");
     expect(computed.countEnd).toBe(1);
     expect(dayjs(computed.startDateConsolidated).format("YYYY-MM-DD")).toBe("2024-01-01");
     expect(dayjs(computed.endDateConsolidated).format("YYYY-MM-DD")).toBe("2024-04-01");

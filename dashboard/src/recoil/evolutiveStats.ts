@@ -107,7 +107,12 @@ function getPersonSnapshotAtDate({
   const reversedHistory = [...history].reverse();
   for (const historyItem of reversedHistory) {
     const historyDate = dayjsInstance(historyItem.date).format("YYYYMMDD");
-    if (historyDate < snapshotDate) return snapshot;
+    // history is: before the date
+    // snapshot is: after the date
+    // what should we do for a history change on the same day as the snapshot ?
+    // 2 options: we keep the snapshot, or we keep the history change
+    // we keep the snapshot because it's more coherent with L258-L259
+    if (historyDate <= snapshotDate) return snapshot; // if snapshot's day is history's day, we return the snapshot
     for (const historyChangeField of Object.keys(historyItem.data)) {
       const oldValue = getValueByField(historyChangeField, fieldsMap, historyItem.data[historyChangeField].oldValue);
       const historyNewValue = getValueByField(historyChangeField, fieldsMap, historyItem.data[historyChangeField].newValue);
