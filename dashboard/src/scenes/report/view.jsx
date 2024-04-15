@@ -23,6 +23,7 @@ import { ObservationsReport } from "./components/ObservationsReport";
 import { PersonsReport } from "./components/PersonsReport";
 import Transmissions from "./components/Transmissions";
 import { useLocalStorage } from "../../services/useLocalStorage";
+import { filterPersonByAssignedTeam } from "../../utils/filter-person";
 
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithNameOfDay(date)}`;
@@ -81,7 +82,7 @@ const itemsForReportsSelector = selectorFamily({
         // get persons for reports for period
         const createdDate = person.followedSince || person.createdAt;
 
-        if (filterItemByTeam(person, "assignedTeams")) {
+        if (filterPersonByAssignedTeam(viewAllOrganisationData, selectedTeamsObjectWithOwnPeriod, person.assignedTeams, person.forTeamFiltering)) {
           const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[person.assignedTeams] ?? defaultIsoDates;
           if (createdDate >= isoStartDate && createdDate < isoEndDate) {
             personsCreated[person._id] = person;

@@ -5,6 +5,7 @@ import type { GroupInstance } from "./group";
 import type { TreatmentInstance } from "./treatment";
 import type { ConsultationInstance } from "./consultation";
 import type { MedicalFileInstance } from "./medicalFile";
+import type { CustomField } from "./field";
 
 interface PersonInstanceBase {
   outOfActiveList: boolean;
@@ -22,10 +23,9 @@ interface PersonInstanceBase {
   outOfActiveListDate?: Date;
   outOfActiveListReasons?: string[];
   documents?: Array<Document | Folder>;
-  [key: string]: any;
 }
 
-type PersonField = keyof PersonInstanceBase | string;
+type PersonField = keyof PersonInstanceBase | CustomField["name"];
 
 export interface PersonInstance extends PersonInstanceBase {
   _id: UUIDV4;
@@ -44,7 +44,15 @@ export interface PersonInstance extends PersonInstanceBase {
       }
     >;
   }>;
+  [key: CustomField["name"]]: any;
 }
+
+export type ForTeamFilteringType = Array<{
+  date: string;
+  assignedTeams: UUIDV4[];
+  outOfActiveList: boolean;
+  def: "today" | "change-teams" | "created";
+}>;
 
 export interface PersonPopulated extends PersonInstance {
   userPopulated: UserInstance;
@@ -54,6 +62,7 @@ export interface PersonPopulated extends PersonInstance {
   interactions: Date[];
   lastUpdateCheckForGDPR: Date;
   group?: GroupInstance;
+  forTeamFiltering: ForTeamFilteringType;
   documentsForModule?: DocumentWithLinkedItem[];
   groupDocuments?: DocumentWithLinkedItem[];
   actions?: any[];

@@ -2,14 +2,16 @@ import React, { useState, useEffect, useCallback } from "react";
 import OutsideClickHandler from "react-outside-click-handler";
 import { dayjsInstance, dateForDatePicker } from "../services/date";
 import DatePicker from "react-datepicker";
+import type { Dayjs, ManipulateType } from "dayjs";
+import type { Period, Preset } from "../types/date";
 
-const getOffsetFromToday = (value, unit, end) => {
+const getOffsetFromToday = (value: number, unit: ManipulateType, end = false): Dayjs => {
   const a = dayjsInstance();
   const b = a.subtract(value, unit);
   return end ? b.endOf("day") : b.startOf("day");
 };
 
-export const statsPresets = [
+export const statsPresets: Array<Preset> = [
   {
     label: "Toutes les données",
     period: { startDate: null, endDate: null },
@@ -74,7 +76,7 @@ export const statsPresets = [
   },
 ];
 
-export const reportsPresets = [
+export const reportsPresets: Array<Preset> = [
   {
     label: "Aujourd'hui",
     period: { startDate: dayjsInstance().startOf("day"), endDate: dayjsInstance().endOf("day") },
@@ -101,7 +103,7 @@ export const reportsPresets = [
   },
 ];
 
-export const formatPeriod = ({ preset, period }) => {
+export const formatPeriod = ({ preset, period }: { preset: string | null; period: Period }): string => {
   if (!!preset) return preset;
   if (!!period.startDate && !!period.endDate) {
     const startFormatted = dayjsInstance(period.startDate).format("D MMM YYYY");
@@ -111,6 +113,7 @@ export const formatPeriod = ({ preset, period }) => {
   }
   return `Entre... et le...`;
 };
+
 // https://reactdatepicker.com/#example-date-range
 const DateRangePickerWithPresets = ({ period, setPeriod, preset, setPreset, removePreset, presets, defaultPreset }) => {
   const [showDatePicker, setShowDatepicker] = useState(false);
@@ -147,13 +150,13 @@ const DateRangePickerWithPresets = ({ period, setPeriod, preset, setPreset, remo
     }
   });
 
-  const openDatePicker = (event) => {
+  const openDatePicker = (event: any) => {
     if (!!showDatePicker) return event.preventDefault();
     setShowDatepicker(true);
   };
 
   const [localStartDate, setLocalStartDate] = useState(null);
-  const onChange = (dates) => {
+  const onChange = (dates: [Date, Date]) => {
     const [startDate, endDate] = dates;
     // to prevent big calculations in parent component when only startDate is selected
     // we just save the startDate in local state, waiting for the endDate

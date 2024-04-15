@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
-import type { CustomOrPredefinedField } from "../../src/types/field";
-import type { PersonInstance } from "../../src/types/person";
+import type { CustomOrPredefinedField } from "../src/types/field";
+import type { PersonInstance } from "../src/types/person";
 
 export const personBase: PersonInstance = {
   _id: "1",

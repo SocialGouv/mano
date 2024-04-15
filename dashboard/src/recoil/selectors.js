@@ -1,9 +1,9 @@
-import { currentTeamState, userState, usersState } from "./auth";
+import { currentTeamState, teamsState, userState, usersState } from "./auth";
 import { personsState } from "./persons";
 import { placesState } from "./places";
 import { relsPersonPlaceState } from "./relPersonPlace";
 import { reportsState } from "./reports";
-import { ageFromBirthdateAsYear, dayjsInstance, formatBirthDate } from "../services/date";
+import { ageFromBirthdateAsYear, dayjsInstance, formatBirthDate, startOfToday } from "../services/date";
 import { customFieldsObsSelector, territoryObservationsState } from "./territoryObservations";
 import { selector } from "recoil";
 import { actionsState } from "./actions";
@@ -84,12 +84,18 @@ export const itemsGroupedByPersonSelector = selector({
   key: "itemsGroupedByPersonSelector",
   get: ({ get }) => {
     const persons = get(personsState);
-    const originalPersonsObject = {};
     const personsObject = {};
     const user = get(userState);
+    const allTeams = get(teamsState);
+    const allTeamIds = allTeams.map((t) => t._id);
     const usersObject = get(usersObjectSelector);
     for (const person of persons) {
-      originalPersonsObject[person._id] = { name: person.name, _id: person._id };
+      let latestTeamFilteringItem = {
+        date: startOfToday().toISOString(),
+        assignedTeams: person.assignedTeams?.length ? person.assignedTeams : allTeamIds,
+        outOfActiveList: person.outOfActiveList, // organisation level
+        def: "today",
+      };
       personsObject[person._id] = {
         ...person,
         followedSince: person.followedSince || person.createdAt,
@@ -103,11 +109,29 @@ export const itemsGroupedByPersonSelector = selector({
         // https://github.com/SocialGouv/mano/blob/34a86a3e6900b852e0b3fe828a03e6721d200973/dashboard/src/scenes/person/OutOfActiveList.js#L22
         // This was causing a bug in the "person suivies" stats, where people who were not out of active list were counted as out of active list.
         outOfActiveListDate: person.outOfActiveList ? person.outOfActiveListDate : null,
+        forTeamFiltering: [latestTeamFilteringItem],
       };
-      if (!person.history?.length) continue;
-      for (const historyEntry of person.history) {
-        personsObject[person._id].interactions.push(historyEntry.date);
+      if (person.history?.length) {
+        for (const historyEntry of person.history) {
+          personsObject[person._id].interactions.push(historyEntry.date);
+          if (historyEntry.data.assignedTeams) {
+            let nextTeamFilteringItem = {
+              date: dayjsInstance(historyEntry.date).startOf("day").toISOString(),
+              assignedTeams: historyEntry.data.assignedTeams.newValue?.length ? historyEntry.data.assignedTeams.newValue : allTeamIds,
+              outOfActiveList: latestTeamFilteringItem.outOfActiveList,
+              def: "change-teams",
+            };
+            latestTeamFilteringItem = nextTeamFilteringItem;
+            personsObject[person._id].forTeamFiltering.push(nextTeamFilteringItem);
+          }
+        }
       }
+      personsObject[person._id].forTeamFiltering.push({
+        date: person.createdAt,
+        assignedTeams: latestTeamFilteringItem.assignedTeams,
+        outOfActiveList: latestTeamFilteringItem.outOfActiveList,
+        def: "created",
+      });
     }
     const actions = Object.values(get(actionsWithCommentsSelector));
     const comments = get(commentsState);

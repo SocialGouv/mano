@@ -35,6 +35,7 @@ import ButtonCustom from "../../components/ButtonCustom";
 import dayjs from "dayjs";
 import { filterItem } from "../../components/Filters";
 import TabsNav from "../../components/tailwind/TabsNav";
+import { filterPersonByAssignedTeam } from "../../utils/filter-person";
 
 const tabs = [
   "Général",
@@ -129,7 +130,7 @@ const itemsForStatsSelector = selectorFamily({
         // get persons for stats for period
         const createdDate = person.followedSince || person.createdAt;
 
-        if (filterItemByTeam(person, "assignedTeams")) {
+        if (filterPersonByAssignedTeam(viewAllOrganisationData, selectedTeamsObjectWithOwnPeriod, person.assignedTeams, person.forTeamFiltering)) {
           if (noPeriodSelected) {
             personsUpdated[person._id] = person;
             personsCreated[person._id] = person;

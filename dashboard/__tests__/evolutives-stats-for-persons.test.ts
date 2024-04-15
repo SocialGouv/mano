@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 import { computeEvolutiveStatsForPersons } from "../src/recoil/evolutiveStats";
-import { mockedEvolutiveStatsIndicatorsBase, personBase } from "./evolutives-stats-for-persons/mocks";
+import { mockedEvolutiveStatsIndicatorsBase, personBase } from "./mocks";
 import * as SentryService from "../src/services/sentry";
 
 // Mock the capture function from Sentry service
