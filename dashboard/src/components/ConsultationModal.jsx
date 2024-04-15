@@ -487,7 +487,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                       value={data["constantes-poids"]}
                       onChange={handleChange}
                       type="number"
-                      min="3"
+                      min="1"
                       max="400"
                       name="constantes-poids"
                       placeholder="100"
@@ -508,8 +508,8 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                       onChange={handleChange}
                       className="tailwindui"
                       type="number"
-                      min="40"
-                      max="240"
+                      min="20"
+                      max="280"
                       name="constantes-taille"
                       placeholder="160"
                     />
