@@ -35,8 +35,8 @@ router.post(
     try {
       z.object({
         groupedCustomFieldsObs: z.optional(z.array(customFieldGroupSchema)),
+        groupedCustomFieldsMedicalFile: z.optional(z.array(customFieldGroupSchema)),
         fieldsPersonsCustomizableOptions: z.optional(z.array(customFieldSchema)),
-        customFieldsMedicalFile: z.optional(z.array(customFieldSchema)),
         customFieldsPersons: z.optional(z.array(customFieldGroupSchema)),
         consultations: z.optional(z.array(customFieldGroupSchema)),
       }).parse(req.body.customFields);
@@ -83,11 +83,11 @@ router.post(
               ? JSON.parse(customFields.fieldsPersonsCustomizableOptions)
               : customFields.fieldsPersonsCustomizableOptions;
         // eslint-disable-next-line no-prototype-builtins
-        if (customFields.hasOwnProperty("customFieldsMedicalFile"))
-          updateOrg.customFieldsMedicalFile =
-            typeof customFields.customFieldsMedicalFile === "string"
-              ? JSON.parse(customFields.customFieldsMedicalFile)
-              : customFields.customFieldsMedicalFile;
+        if (customFields.hasOwnProperty("groupedCustomFieldsMedicalFile"))
+          updateOrg.groupedCustomFieldsMedicalFile =
+            typeof customFields.groupedCustomFieldsMedicalFile === "string"
+              ? JSON.parse(customFields.groupedCustomFieldsMedicalFile)
+              : customFields.groupedCustomFieldsMedicalFile;
         // eslint-disable-next-line no-prototype-builtins
         if (customFields.hasOwnProperty("customFieldsPersons"))
           updateOrg.customFieldsPersons =

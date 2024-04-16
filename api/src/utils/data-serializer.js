@@ -2,6 +2,12 @@ const { defaultMedicalFileCustomFields } = require("./custom-fields/medicalFile"
 const { fieldsPersonsCustomizableOptions, personFields } = require("./custom-fields/person");
 
 function serializeOrganisation(organisation) {
+  const defaultGroupedMedicalFileCustomFields = [
+    {
+      name: "Groupe par défaut",
+      fields: defaultMedicalFileCustomFields,
+    },
+  ];
   return {
     _id: organisation._id,
     name: organisation.name,
@@ -61,8 +67,12 @@ function serializeOrganisation(organisation) {
     /* kept for retro-compatibility */
     customFieldsPersonsSocial: (organisation.customFieldsPersons || []).find(({ name }) => name === "Informations sociales")?.fields || [],
     customFieldsPersonsMedical: (organisation.customFieldsPersons || []).find(({ name }) => name === "Informations de santé")?.fields || [],
-
-    customFieldsMedicalFile: organisation.customFieldsMedicalFile || defaultMedicalFileCustomFields,
+    groupedCustomFieldsMedicalFile: organisation.groupedCustomFieldsMedicalFile || defaultGroupedMedicalFileCustomFields,
+    // See above (groupedCustomFieldsObs and customFieldsObs) for explanation
+    customFieldsMedicalFile: (organisation.groupedCustomFieldsMedicalFile || defaultGroupedMedicalFileCustomFields).reduce(
+      (flattenedFields, group) => [...flattenedFields, ...group.fields],
+      []
+    ),
   };
 }
 

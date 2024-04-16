@@ -37,6 +37,7 @@ export interface OrganisationInstance {
   personFields: PredefinedField[];
   customFieldsPersons: CustomFieldsGroup[];
   customFieldsMedicalFile: CustomField[];
+  groupedCustomFieldsMedicalFile?: CustomFieldsGroup[];
   fieldsPersonsCustomizableOptions: CustomField[];
   consultations: CustomFieldsGroup[];
 

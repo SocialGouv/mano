@@ -1,11 +1,16 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useDataLoader } from "../../components/DataLoader";
 import { organisationState } from "../../recoil/auth";
 import API, { encryptItem } from "../../services/api";
 import { toast } from "react-toastify";
 import DragAndDropSettings from "./DragAndDropSettings";
-import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from "../../recoil/medicalFiles";
+import {
+  customFieldsMedicalFileSelector,
+  groupedCustomFieldsMedicalFileSelector,
+  medicalFileState,
+  prepareMedicalFileForEncryption,
+} from "../../recoil/medicalFiles";
 import CustomFieldSetting from "../../components/CustomFieldSetting";
 import { EditCustomField } from "../../components/TableCustomFields";
 
@@ -19,40 +24,89 @@ const sanitizeFields = (field) => {
 
 const MedicalFileSettings = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
-  const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
-  const dataFormatted = useMemo(() => {
-    return [
-      {
-        groupTitle: "Dossier médical",
-        items: customFieldsMedicalFile,
-      },
-    ];
-  }, [customFieldsMedicalFile]);
+  const flatCustomFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
+  const groupedCustomFieldsMedicalFile = useRecoilValue(groupedCustomFieldsMedicalFileSelector);
+  const dataFormatted = groupedCustomFieldsMedicalFile.map((group) => ({
+    groupTitle: group.name,
+    items: group.fields,
+  }));
 
   const { refresh } = useDataLoader();
 
-  const onDragAndDrop = useCallback(
-    async ([{ items }]) => {
-      const reorderedCustomFields = items
-        .map((fieldName, index) => customFieldsMedicalFile.find((field) => field.name === fieldName))
-        .map(sanitizeFields);
+  const onAddGroup = async (name) => {
+    const res = await API.put({
+      path: `/organisation/${organisation._id}`,
+      body: { groupedCustomFieldsMedicalFile: [...groupedCustomFieldsMedicalFile, { name, fields: [] }] },
+    });
+    if (res.ok) {
+      toast.success("Groupe ajouté", { autoclose: 2000 });
+      setOrganisation(res.data);
+    }
+    refresh();
+  };
 
-      try {
-        const response = await API.put({
-          path: `/organisation/${organisation._id}`,
-          body: { customFieldsMedicalFile: reorderedCustomFields },
-        });
-        if (response.ok) {
-          toast.success("Mise à jour !");
-          setOrganisation(response.data);
-          refresh();
-        }
-      } catch (orgUpdateError) {
-        console.log("error in updating organisation", orgUpdateError);
-        toast.error(orgUpdateError.message);
+  const onGroupTitleChange = async (oldName, newName) => {
+    if (!newName) {
+      toast.error("Vous devez saisir un nom pour le groupe de champs personnalisés");
+      return;
+    }
+    const newCustomFieldsMedicalFile = groupedCustomFieldsMedicalFile.map((type) => {
+      if (type.name !== oldName) return type;
+      return {
+        ...type,
+        name: newName,
+      };
+    });
+
+    const oldOrganisation = organisation;
+    const response = await API.put({
+      path: `/organisation/${organisation._id}`,
+      body: { groupedCustomFieldsMedicalFile: newCustomFieldsMedicalFile },
+    });
+    if (response.ok) {
+      refresh();
+      setOrganisation(response.data);
+      toast.success("Groupe mise à jour. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
+    } else {
+      setOrganisation(oldOrganisation);
+      toast.error("Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !");
+    }
+  };
+
+  const onDeleteGroup = async (name) => {
+    const newCustomFieldsMedicalFile = groupedCustomFieldsMedicalFile.filter((type) => type.name !== name);
+
+    const oldOrganisation = organisation;
+
+    const response = await API.put({
+      path: `/organisation/${organisation._id}`,
+      body: { groupedCustomFieldsMedicalFile: newCustomFieldsMedicalFile },
+    });
+    if (response.ok) {
+      toast.success("Groupe de champs de dossier médical supprimé", { autoclose: 2000 });
+      setOrganisation(response.data);
+      refresh();
+    } else {
+      setOrganisation(oldOrganisation);
+    }
+  };
+
+  const onDragAndDrop = useCallback(
+    async (newCustomFieldsMedicalFile) => {
+      newCustomFieldsMedicalFile = newCustomFieldsMedicalFile.map((group) => ({
+        name: group.groupTitle,
+        fields: group.items.map((customFieldName) => flatCustomFieldsMedicalFile.find((f) => f.name === customFieldName)),
+      }));
+      const res = await API.put({
+        path: `/organisation/${organisation._id}`,
+        body: { groupedCustomFieldsMedicalFile: newCustomFieldsMedicalFile },
+      });
+      if (res.ok) {
+        setOrganisation(res.data);
+        refresh();
       }
     },
-    [customFieldsMedicalFile, organisation._id, refresh, setOrganisation]
+    [flatCustomFieldsMedicalFile, organisation._id, refresh, setOrganisation]
   );
 
   return (
@@ -63,22 +117,37 @@ const MedicalFileSettings = () => {
       ItemComponent={MedicalFileCustomField}
       NewItemComponent={AddField}
       onDragAndDrop={onDragAndDrop}
+      addButtonCaption="Ajouter un groupe de champs personnalisés"
+      onAddGroup={onAddGroup}
+      onGroupTitleChange={onGroupTitleChange}
+      onDeleteGroup={onDeleteGroup}
     />
   );
 };
 
-const AddField = () => {
-  const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
-
+const AddField = ({ groupTitle: typeName }) => {
+  const groupedCustomFieldsMedicalFile = useRecoilValue(groupedCustomFieldsMedicalFileSelector);
+  const flatCustomFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const [isAddingField, setIsAddingField] = useState(false);
   const { refresh } = useDataLoader();
 
   const onAddField = async (newField) => {
     try {
+      if (flatCustomFieldsMedicalFile.map((e) => e.label).includes(newField.label)) {
+        return toast.error(`Ce nom de champ existe déjà dans un autre groupe`);
+      }
+
+      const newCustomFieldsMedicalFile = groupedCustomFieldsMedicalFile.map((type) => {
+        if (type.name !== typeName) return type;
+        return {
+          ...type,
+          fields: [...type.fields, newField].map(sanitizeFields),
+        };
+      });
       const response = await API.put({
         path: `/organisation/${organisation._id}`,
-        body: { customFieldsMedicalFile: [...customFieldsMedicalFile, newField] },
+        body: { groupedCustomFieldsMedicalFile: newCustomFieldsMedicalFile },
       });
       if (response.ok) {
         toast.success("Mise à jour !");
@@ -136,20 +205,27 @@ const replaceOldChoiceByNewChoice = (data, oldChoice, newChoice, field) => {
     .filter(Boolean);
 };
 
-const MedicalFileCustomField = ({ item: customField }) => {
+const MedicalFileCustomField = ({ item: customField, groupTitle: typeName }) => {
   const [isSelected, setIsSelected] = useState(false);
   const [isEditingField, setIsEditingField] = useState(false);
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const medicalFiles = useRecoilValue(medicalFileState);
-  const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
+  const groupedCustomFieldsMedicalFile = useRecoilValue(groupedCustomFieldsMedicalFileSelector);
 
   const { refresh } = useDataLoader();
 
   const onSaveField = async (editedField) => {
     try {
+      const newCustomFieldsMedicalFile = groupedCustomFieldsMedicalFile.map((type) => {
+        if (type.name !== typeName) return type;
+        return {
+          ...type,
+          fields: type.fields.map((field) => (field.name !== editedField.name ? field : editedField)).map(sanitizeFields),
+        };
+      });
       const response = await API.put({
         path: `/organisation/${organisation._id}`,
-        body: { customFieldsMedicalFile: customFieldsMedicalFile.map((field) => (field.name !== editedField.name ? field : editedField)) },
+        body: { groupedCustomFieldsMedicalFile: newCustomFieldsMedicalFile },
       });
       if (response.ok) {
         toast.success("Mise à jour !");
@@ -163,25 +239,33 @@ const MedicalFileCustomField = ({ item: customField }) => {
     setIsEditingField(false);
   };
 
-  const onEditChoice = async ({ oldChoice, newChoice, field, fields }) => {
-    const updatedFields = customFieldsMedicalFile.map((_field) =>
-      _field.name !== field.name
-        ? _field
-        : {
-            ..._field,
-            options: _field.options.map((option) => (option === oldChoice ? newChoice : option)),
-          }
-    );
+  const onEditChoice = async ({ oldChoice, newChoice, field }) => {
+    const newCustomFieldsMedicalFile = groupedCustomFieldsMedicalFile.map((type) => {
+      if (type.name !== typeName) return type;
+      return {
+        ...type,
+        fields: type.fields.map((_field) =>
+          _field.name !== field.name
+            ? _field
+            : {
+                ..._field,
+                options: _field.options.map((option) => (option === oldChoice ? newChoice : option)),
+              }
+        ),
+      };
+    });
     setIsEditingField(false);
     const updatedMedicalFiles = replaceOldChoiceByNewChoice(medicalFiles, oldChoice, newChoice, field);
+
+    const newCustomFieldsMedicalFileFlat = newCustomFieldsMedicalFile.reduce((acc, type) => [...acc, ...type.fields], []);
 
     const response = await API.post({
       path: "/custom-field",
       body: {
         customFields: {
-          customFieldsMedicalFile: updatedFields,
+          groupedCustomFieldsMedicalFile: newCustomFieldsMedicalFile,
         },
-        medicalFiles: await Promise.all(updatedMedicalFiles.map(prepareMedicalFileForEncryption(updatedFields)).map(encryptItem)),
+        medicalFiles: await Promise.all(updatedMedicalFiles.map(prepareMedicalFileForEncryption(newCustomFieldsMedicalFileFlat)).map(encryptItem)),
       },
     });
     if (response.ok) {
@@ -193,9 +277,16 @@ const MedicalFileCustomField = ({ item: customField }) => {
 
   const onDeleteField = async () => {
     try {
+      const newCustomFieldsMedicalFile = groupedCustomFieldsMedicalFile.map((type) => {
+        if (type.name !== typeName) return type;
+        return {
+          ...type,
+          fields: type.fields.filter((field) => field.name !== customField.name),
+        };
+      });
       const response = await API.put({
         path: `/organisation/${organisation._id}`,
-        body: { customFieldsMedicalFile: customFieldsMedicalFile.filter((field) => field.name !== customField.name) },
+        body: { groupedCustomFieldsMedicalFile: newCustomFieldsMedicalFile },
       });
       if (response.ok) {
         toast.success("Mise à jour !");

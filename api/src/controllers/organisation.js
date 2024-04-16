@@ -265,7 +265,7 @@ router.put(
             })
           )
         ),
-        customFieldsMedicalFile: z.optional(z.array(customFieldSchema)),
+        groupedCustomFieldsMedicalFile: z.optional(z.array(customFieldGroupSchema)),
         consultations: z.optional(
           z.array(
             z.object({
@@ -328,9 +328,11 @@ router.put(
     if (req.body.hasOwnProperty("customFieldsPersons"))
       updateOrg.customFieldsPersons =
         typeof req.body.customFieldsPersons === "string" ? JSON.parse(req.body.customFieldsPersons) : req.body.customFieldsPersons;
-    if (req.body.hasOwnProperty("customFieldsMedicalFile"))
-      updateOrg.customFieldsMedicalFile =
-        typeof req.body.customFieldsMedicalFile === "string" ? JSON.parse(req.body.customFieldsMedicalFile) : req.body.customFieldsMedicalFile;
+    if (req.body.hasOwnProperty("groupedCustomFieldsMedicalFile"))
+      updateOrg.groupedCustomFieldsMedicalFile =
+        typeof req.body.groupedCustomFieldsMedicalFile === "string"
+          ? JSON.parse(req.body.groupedCustomFieldsMedicalFile)
+          : req.body.groupedCustomFieldsMedicalFile;
     if (req.body.hasOwnProperty("consultations"))
       updateOrg.consultations = typeof req.body.consultations === "string" ? JSON.parse(req.body.consultations) : req.body.consultations;
     if (req.body.hasOwnProperty("encryptedVerificationKey")) updateOrg.encryptedVerificationKey = req.body.encryptedVerificationKey;

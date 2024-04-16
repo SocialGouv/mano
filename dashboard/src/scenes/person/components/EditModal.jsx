@@ -20,7 +20,12 @@ import { toast } from "react-toastify";
 import API from "../../../services/api";
 import { cleanHistory } from "./PersonHistory";
 import DatePicker from "../../../components/DatePicker";
-import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from "../../../recoil/medicalFiles";
+import {
+  customFieldsMedicalFileSelector,
+  groupedCustomFieldsMedicalFileSelector,
+  medicalFileState,
+  prepareMedicalFileForEncryption,
+} from "../../../recoil/medicalFiles";
 
 export default function EditModal({ person, selectedPanel, onClose, isMedicalFile = false }) {
   const [openPanels, setOpenPanels] = useState([selectedPanel]);
@@ -30,18 +35,23 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
   const allowedFieldsInHistory = useRecoilValue(allowedPersonFieldsInHistorySelector);
   const team = useRecoilValue(currentTeamState);
   const [persons, setPersons] = useRecoilState(personsState);
-  const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
+  const flatCustomFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
+  const groupedCustomFieldsMedicalFile = useRecoilValue(groupedCustomFieldsMedicalFileSelector);
   const setAllMedicalFiles = useSetRecoilState(medicalFileState);
   const medicalFile = person.medicalFile;
 
-  const customFieldsMedicalFileWithLegacyFields = useMemo(() => {
-    const c = [...customFieldsMedicalFile];
+  const groupedCustomFieldsMedicalFileWithLegacyFields = useMemo(() => {
+    const c = structuredClone(groupedCustomFieldsMedicalFile);
     const structureMedical = flattenedCustomFieldsPersons.find((e) => e.name === "structureMedical");
-    if (structureMedical) c.unshift(structureMedical);
+    if (structureMedical) {
+      c[0].fields = [structureMedical, ...c[0].fields];
+    }
     const healthInsurances = flattenedCustomFieldsPersons.find((e) => e.name === "healthInsurances");
-    if (healthInsurances) c.unshift(healthInsurances);
+    if (healthInsurances) {
+      c[0].fields = [healthInsurances, ...c[0].fields];
+    }
     return c;
-  }, [customFieldsMedicalFile, flattenedCustomFieldsPersons]);
+  }, [groupedCustomFieldsMedicalFile, flattenedCustomFieldsPersons]);
 
   const preparePersonForEncryption = usePreparePersonForEncryption();
   const personFields = useRecoilValue(personFieldsSelector);
@@ -314,18 +324,18 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                 data: {},
               };
               for (const key in bodyMedicalFile) {
-                if (!customFieldsMedicalFile.map((field) => field.name).includes(key)) continue;
+                if (!flatCustomFieldsMedicalFile.map((field) => field.name).includes(key)) continue;
                 if (bodyMedicalFile[key] !== medicalFile[key]) {
                   historyEntry.data[key] = { oldValue: medicalFile[key], newValue: bodyMedicalFile[key] };
                 }
               }
-              if (!!Object.keys(historyEntry.data).length) {
+              if (Object.keys(historyEntry.data).length) {
                 bodyMedicalFile.history = [...(medicalFile.history || []), historyEntry];
               }
 
               const mfResponse = await API.put({
                 path: `/medical-file/${medicalFile._id}`,
-                body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({ ...medicalFile, ...bodyMedicalFile }),
+                body: prepareMedicalFileForEncryption(flatCustomFieldsMedicalFile)({ ...medicalFile, ...bodyMedicalFile }),
               });
               let success = mfResponse.ok;
               if (success) {
@@ -355,9 +365,9 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                 for (const key in bodySocial) {
                   if (!allowedFieldsInHistory.includes(key)) continue;
                   if (bodySocial[key] !== person[key]) historyEntry.data[key] = { oldValue: person[key], newValue: bodySocial[key] };
-                  if (!!Object.keys(historyEntry.data).length) bodySocial.history = [...cleanHistory(person.history || []), historyEntry];
+                  if (Object.keys(historyEntry.data).length) bodySocial.history = [...cleanHistory(person.history || []), historyEntry];
                 }
-                if (!!Object.keys(historyEntry.data).length) bodySocial.history = [...(person.history || []), historyEntry];
+                if (Object.keys(historyEntry.data).length) bodySocial.history = [...(person.history || []), historyEntry];
 
                 const personResponse = await API.put({
                   path: `/person/${person._id}`,
@@ -387,45 +397,50 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
             {({ values, handleChange, handleSubmit, isSubmitting, setFieldValue }) => {
               return (
                 <>
-                  <div key={"Dossier Médical"}>
-                    <div
-                      className="tw-mb-4 tw-flex tw-cursor-pointer tw-border-b tw-pb-2 tw-text-lg tw-font-semibold"
-                      onClick={() => {
-                        if (openPanels.includes("Dossier Médical")) {
-                          setOpenPanels(openPanels.filter((p) => p !== "Dossier Médical"));
-                        } else {
-                          setOpenPanels([...openPanels, "Dossier Médical"]);
-                        }
-                      }}
-                    >
-                      <div className="tw-flex-1">Dossier Médical</div>
-                      <div>{!openPanels.includes("Dossier Médical") ? "+" : "-"}</div>
-                    </div>
+                  {groupedCustomFieldsMedicalFileWithLegacyFields.map(({ name, fields }, index) => {
+                    const key = groupedCustomFieldsMedicalFileWithLegacyFields.length === 1 ? "Dossier Médical" : name;
+                    return (
+                      <div key={key}>
+                        <div
+                          className="tw-mb-4 tw-flex tw-cursor-pointer tw-border-b tw-pb-2 tw-text-lg tw-font-semibold"
+                          onClick={() => {
+                            if (openPanels.includes(key)) {
+                              setOpenPanels(openPanels.filter((p) => p !== key));
+                            } else {
+                              setOpenPanels([...openPanels, key]);
+                            }
+                          }}
+                        >
+                          <div className="tw-flex-1">{key}</div>
+                          <div>{!openPanels.includes(key) ? "+" : "-"}</div>
+                        </div>
 
-                    <div className="[overflow-wrap:anywhere]">
-                      {openPanels.includes("Dossier Médical") && (
-                        <>
-                          <Row>
-                            {customFieldsMedicalFileWithLegacyFields
-                              .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
-                              .map((field) => (
-                                <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
-                              ))}
-                          </Row>
-                          <div className="tw-flex tw-items-end tw-justify-end tw-gap-2">
-                            <ButtonCustom disabled={isSubmitting} color="secondary" onClick={onClose} title="Annuler" />
-                            <ButtonCustom
-                              disabled={isSubmitting || JSON.stringify(person) === JSON.stringify(values)}
-                              color="primary"
-                              type="submit"
-                              onClick={handleSubmit}
-                              title="Enregistrer"
-                            />
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </div>
+                        <div className="[overflow-wrap:anywhere]">
+                          {openPanels.includes(key) && (
+                            <>
+                              <Row>
+                                {fields
+                                  .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
+                                  .map((field) => (
+                                    <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
+                                  ))}
+                              </Row>
+                              <div className="tw-flex tw-items-end tw-justify-end tw-gap-2">
+                                <ButtonCustom disabled={isSubmitting} color="secondary" onClick={onClose} title="Annuler" />
+                                <ButtonCustom
+                                  disabled={isSubmitting || JSON.stringify(person) === JSON.stringify(values)}
+                                  color="primary"
+                                  type="submit"
+                                  onClick={handleSubmit}
+                                  title="Enregistrer"
+                                />
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </>
               );
             }}

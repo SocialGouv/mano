@@ -7,7 +7,12 @@ import DeletePersonButton from "./DeletePersonButton";
 import OutOfActiveList from "../OutOfActiveList";
 import MergeTwoPersons from "../MergeTwoPersons";
 import { flattenedCustomFieldsPersonsSelector } from "../../../recoil/persons";
-import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from "../../../recoil/medicalFiles";
+import {
+  customFieldsMedicalFileSelector,
+  groupedCustomFieldsMedicalFileSelector,
+  medicalFileState,
+  prepareMedicalFileForEncryption,
+} from "../../../recoil/medicalFiles";
 import { Treatments } from "./Treatments";
 import { useEffect, useMemo } from "react";
 import PersonDocumentsMedical from "./PersonDocumentsMedical";
@@ -16,7 +21,7 @@ import API from "../../../services/api";
 import CommentsMedical from "./CommentsMedical";
 import type { PersonPopulated } from "../../../types/person";
 import type { MedicalFileInstance } from "../../../types/medicalFile";
-import type { CustomField } from "../../../types/field";
+import type { CustomField, CustomFieldsGroup } from "../../../types/field";
 import Constantes from "./Constantes";
 import { DISABLED_FEATURES } from "../../../config";
 
@@ -26,12 +31,14 @@ interface MedicalFileProps {
 
 export default function MedicalFile({ person }: MedicalFileProps) {
   const user = useRecoilValue(userAuthentifiedState);
-  const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
+  const flatCustomFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
+  const groupedCustomFieldsMedicalFile = useRecoilValue(groupedCustomFieldsMedicalFileSelector);
   const flattenedCustomFieldsPersons = useRecoilValue(flattenedCustomFieldsPersonsSelector);
   const organisation = useRecoilValue(organisationAuthentifiedState);
   // These custom fields are displayed by default, because they where displayed before they became custom fields
-  const customFieldsMedicalFileWithLegacyFields: CustomField[] = useMemo(() => {
-    const c = [...customFieldsMedicalFile];
+  // Maybe we should reconsider this legacy in 2024-2025.
+  const groupedCustomFieldsMedicalFileWithLegacyFields: CustomFieldsGroup[] = useMemo(() => {
+    const c = structuredClone(groupedCustomFieldsMedicalFile);
     if (flattenedCustomFieldsPersons.find((e) => e.name === "structureMedical")) {
       const structureMedicalField: CustomField = {
         name: "structureMedical",
@@ -41,7 +48,7 @@ export default function MedicalFile({ person }: MedicalFileProps) {
         required: false,
         showInStats: true,
       };
-      c.unshift(structureMedicalField);
+      c[0].fields = [structureMedicalField, ...c[0].fields];
     }
     if (flattenedCustomFieldsPersons.find((e) => e.name === "healthInsurances")) {
       const healthInsurancesField: CustomField = {
@@ -52,10 +59,10 @@ export default function MedicalFile({ person }: MedicalFileProps) {
         showInStats: true,
         required: true,
       };
-      c.unshift(healthInsurancesField);
+      c[0].fields = [healthInsurancesField, ...c[0].fields];
     }
     return c;
-  }, [customFieldsMedicalFile, flattenedCustomFieldsPersons]);
+  }, [groupedCustomFieldsMedicalFile, flattenedCustomFieldsPersons]);
 
   const setAllMedicalFiles = useSetRecoilState(medicalFileState);
   const medicalFile = person.medicalFile;
@@ -64,7 +71,7 @@ export default function MedicalFile({ person }: MedicalFileProps) {
     if (!medicalFile) {
       API.post({
         path: "/medical-file",
-        body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({
+        body: prepareMedicalFileForEncryption(flatCustomFieldsMedicalFile)({
           person: person._id,
           documents: [],
           organisation: organisation._id,
@@ -94,15 +101,18 @@ export default function MedicalFile({ person }: MedicalFileProps) {
       {!["restricted-access"].includes(user.role) && (
         <>
           <div className="noprint tw-grid tw-grid-cols-12 tw-gap-4 tw-pt-4">
-            <div className="tw-col-span-6 tw-flex tw-min-h-[200px] tw-flex-col tw-gap-4">
-              <PersonCustomFields
-                isMedicalFile
-                key={"Dossier Médical"}
-                person={person}
-                sectionName={"Dossier Médical"}
-                fields={customFieldsMedicalFileWithLegacyFields}
-                colspan={6}
-              />
+            <div className="tw-col-span-6 tw-flex tw-flex-col tw-gap-4">
+              {groupedCustomFieldsMedicalFileWithLegacyFields.map(({ name, fields }) => {
+                return (
+                  <PersonCustomFields
+                    isMedicalFile
+                    key={name}
+                    person={person}
+                    sectionName={groupedCustomFieldsMedicalFileWithLegacyFields.length > 1 ? name : "Dossier Médical"}
+                    fields={fields}
+                  />
+                );
+              })}
             </div>
             <div className="tw-col-span-6 tw-flex tw-min-h-full tw-flex-col tw-gap-4">
               <div className="tw-min-h-[200px] tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">

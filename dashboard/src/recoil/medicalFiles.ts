@@ -21,6 +21,16 @@ export const customFieldsMedicalFileSelector = selector<CustomField[]>({
   },
 });
 
+export const groupedCustomFieldsMedicalFileSelector = selector({
+  key: "groupedCustomFieldsMedicalFileSelector",
+  get: ({ get }) => {
+    const organisation = get(organisationAuthentifiedState);
+    if (Array.isArray(organisation.groupedCustomFieldsMedicalFile) && organisation.groupedCustomFieldsMedicalFile.length)
+      return organisation.groupedCustomFieldsMedicalFile;
+    return [{ name: "Groupe par défaut", fields: defaultMedicalFileCustomFields }];
+  },
+});
+
 const encryptedFields = ["person", "documents", "comments", "history"];
 
 export const prepareMedicalFileForEncryption =

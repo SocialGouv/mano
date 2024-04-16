@@ -31,7 +31,7 @@ module.exports = (sequelize, DataTypes) => {
     groupedCustomFieldsObs: DataTypes.JSONB,
     fieldsPersonsCustomizableOptions: DataTypes.JSONB,
     customFieldsPersons: DataTypes.JSONB,
-    customFieldsMedicalFile: DataTypes.JSONB,
+    groupedCustomFieldsMedicalFile: DataTypes.JSONB,
     migrating: { type: DataTypes.BOOLEAN, default: false },
     migrations: DataTypes.ARRAY(DataTypes.TEXT),
     migrationLastUpdateAt: DataTypes.DATE,

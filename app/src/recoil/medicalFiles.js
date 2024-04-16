@@ -13,8 +13,21 @@ export const customFieldsMedicalFileSelector = selector({
   key: 'customFieldsMedicalFileSelector',
   get: ({ get }) => {
     const organisation = get(organisationState);
-    if (Array.isArray(organisation.customFieldsMedicalFile)) return organisation.customFieldsMedicalFile;
+    if (Array.isArray(organisation.customFieldsMedicalFile) && organisation.customFieldsMedicalFile.length) {
+      return organisation.customFieldsMedicalFile;
+    }
     return defaultMedicalFileCustomFields;
+  },
+});
+
+export const groupedCustomFieldsMedicalFileSelector = selector({
+  key: 'groupedCustomFieldsMedicalFileSelector',
+  get: ({ get }) => {
+    const organisation = get(organisationState);
+    if (Array.isArray(organisation.groupedCustomFieldsMedicalFile) && organisation.groupedCustomFieldsMedicalFile.length) {
+      return organisation.groupedCustomFieldsMedicalFile;
+    }
+    return [{ name: 'Groupe par défaut', fields: defaultMedicalFileCustomFields }];
   },
 });
 
