@@ -229,7 +229,7 @@ export function TerritoryModal({ open, setOpen, territory = {} }) {
                 <Col md={6}>
                   <FormGroup>
                     <Label htmlFor="perimeter">Périmètre</Label>
-                    <Input name="perimeter" id="perimeter" value={values.perimeter} onChange={handleChange} />
+                    <Input name="perimeter" id="perimeter" value={values.perimeter} onChange={handleChange} type="textarea" rows={3} />
                   </FormGroup>
                 </Col>
               </Row>
