@@ -203,7 +203,7 @@ const itemsForStatsSelector = selectorFamily({
           consultationsFilteredByPersons.push(consultation);
           personsWithConsultations[person._id] = person;
         }
-        if (!!person.passages?.length) {
+        if (person.passages?.length) {
           for (const passage of person.passages) {
             if (!filterItemByTeam(passage, "team")) continue;
             if (noPeriodSelected) {
@@ -222,11 +222,11 @@ const itemsForStatsSelector = selectorFamily({
             }
           }
         }
-        if (!!person.rencontres?.length) {
+        if (person.rencontres?.length) {
           for (const rencontre of person.rencontres) {
             if (!filterItemByTeam(rencontre, "team")) continue;
             if (noPeriodSelected) {
-              rencontresFilteredByPersons.push(rencontre);
+              rencontresFilteredByPersons.push({ ...rencontre, gender: person.gender });
               personsWithRencontres[person._id] = person;
               continue;
             }
@@ -234,7 +234,7 @@ const itemsForStatsSelector = selectorFamily({
             const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[rencontre.team] ?? defaultIsoDates;
             if (date < isoStartDate) continue;
             if (date >= isoEndDate) continue;
-            rencontresFilteredByPersons.push(rencontre);
+            rencontresFilteredByPersons.push({ ...rencontre, gender: person.gender });
             personsWithRencontres[person._id] = person;
             if (createdDate < isoStartDate) personsInRencontresBeforePeriod[person._id] = person;
           }
@@ -398,7 +398,7 @@ const Stats = () => {
       if (!!actionsStatuses.length && !actionsStatuses.includes(action.status)) {
         continue;
       }
-      if (!!action.categories?.length) {
+      if (action.categories?.length) {
         for (const category of action.categories) {
           actionsDetailed.push({
             ...action,
@@ -422,7 +422,7 @@ const Stats = () => {
 
   const passages = useMemo(() => {
     const activeFilters = filterPersons.filter((f) => f.value);
-    if (!!activeFilters.length) {
+    if (activeFilters.length) {
       if (activeFilters.length > 1) return passagesFilteredByPersons;
       const filter = activeFilters[0];
       if (filter.type !== filterMakingThingsClearAboutOutOfActiveListStatus.type) return passagesFilteredByPersons;
@@ -448,7 +448,7 @@ const Stats = () => {
       if (!viewAllOrganisationData) {
         if (!selectedTeamsObjectWithOwnPeriod[observation.team]) continue;
       }
-      if (!!selectedTerritories.length) {
+      if (selectedTerritories.length) {
         if (!selectedTerritories.some((t) => t._id === observation.territory)) continue;
       }
       const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[observation.team] ?? defaultIsoDates;

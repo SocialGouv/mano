@@ -35,11 +35,7 @@ const RencontresStats = ({
       <CustomResponsivePie
         title="Répartition des rencontres"
         help={`Répartition par genre des rencontres non-anonymes (c'est-à-dire attachées à une personne) enregistrées dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des rencontres.`}
-        data={getPieData(
-          rencontres.filter((p) => !!p.gender),
-          "gender",
-          { options: [...personFields.find((f) => f.name === "gender").options, "Non précisé"] }
-        )}
+        data={getPieData(rencontres, "gender", { options: [...personFields.find((f) => f.name === "gender").options, "Non précisé"] })}
       />
       <CustomResponsivePie
         title="Nombre de personnes différentes rencontrées"
