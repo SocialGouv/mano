@@ -66,7 +66,7 @@ const List = ({ territory = {} }) => {
             onSortBy: setSortBy,
             sortOrder,
             sortBy,
-            render: (obs) => formatDateWithFullMonth(obs.createdAt || ""),
+            render: (obs) => formatDateWithFullMonth(obs.observedAt || obs.createdAt),
           },
           {
             title: "Créée par",
