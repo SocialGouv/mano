@@ -33,7 +33,7 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Modifier" }).click();
   await page.getByLabel("Nom (facultatif)").fill("Avec un nom");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
-  await page.getByText("Consultation Médicale").click();
+  await page.getByRole("cell", { name: "Avec un nom Médicale" }).click();
   await page.getByRole("button", { name: "Historique" }).click();
   await page.locator('[data-test-id="Nom\\: \\"\\" ➔ \\"Avec un nom\\""]').click();
 });
