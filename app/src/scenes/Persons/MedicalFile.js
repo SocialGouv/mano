@@ -41,7 +41,13 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
   const allTreatments = useRecoilValue(treatmentsState);
   const setAllMedicalFiles = useSetRecoilState(medicalFileState);
 
-  const consultations = useMemo(() => (allConsultations || []).filter((c) => c.person === personDB?._id), [allConsultations, personDB?._id]);
+  const consultations = useMemo(
+    () =>
+      (allConsultations || [])
+        .filter((c) => c.person === personDB?._id)
+        .sort((p1, p2) => ((p1.completedAt || p1.dueAt) > (p2.completedAt || p2.dueAt) ? -1 : 1)),
+    [allConsultations, personDB?._id]
+  );
 
   const treatments = useMemo(() => (allTreatments || []).filter((t) => t.person === personDB?._id), [allTreatments, personDB?._id]);
 
@@ -103,7 +109,7 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
         .flat() || [];
     const otherDocs = medicalFile?.documents || [];
     return [...ordonnances, ...consultationsDocs, ...otherDocs].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  }, [consultations, medicalFile, treatments]);
+  }, [consultations, medicalFile, treatments, user._id]);
 
   const allMedicalComments = useMemo(() => {
     const treatmentsComments =
