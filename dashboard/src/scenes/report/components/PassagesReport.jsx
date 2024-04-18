@@ -74,14 +74,11 @@ const PassagesTable = ({ period, passages, selectedTeams }) => {
         userPopulated: users.find((u) => u._id === passage.user),
       };
     });
-  }, [passages, persons]);
+  }, [passages, persons, users]);
 
   const passagesSorted = useMemo(() => {
     return [...passagesPopulated].sort(sortPassages(sortBy, sortOrder));
   }, [passagesPopulated, sortBy, sortOrder]);
-
-  const numberOfAnonymousPassages = useMemo(() => passages.filter((p) => !p.person)?.length, [passages]);
-  const numberOfNonAnonymousPassages = useMemo(() => passages.filter((p) => !!p.person)?.length, [passages]);
 
   return (
     <>
@@ -102,24 +99,6 @@ const PassagesTable = ({ period, passages, selectedTeams }) => {
             >
               Ajouter un passage
             </button>
-          </div>
-        </div>
-        <div className="tw-mb-4 tw-flex tw-justify-around">
-          <div className="tw-basis-1/4">
-            <Card
-              countId="report-passages-anonymous-count"
-              title="Nombre de passages anonymes"
-              count={numberOfAnonymousPassages}
-              unit={`passage${numberOfAnonymousPassages > 1 ? "s" : ""}`}
-            />
-          </div>
-          <div className="tw-basis-1/4">
-            <Card
-              countId="report-passages-non-anonymous-count"
-              title="Nombre de passages non-anonymes"
-              count={numberOfNonAnonymousPassages}
-              unit={`passage${numberOfNonAnonymousPassages > 1 ? "s" : ""}`}
-            />
           </div>
         </div>
         <Passage passage={passageToEdit} personId={passageToEdit?.person} onFinished={() => setPassageToEdit(null)} />

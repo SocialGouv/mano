@@ -56,8 +56,8 @@ test("test", async ({ page }) => {
   await page.getByRole("link", { name: "Comptes rendus" }).click();
   await expect(page.getByText("3", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Passer les passages en plein écran" }).click();
-  await expect(page.getByRole("dialog", { name: "Passages (3)" }).getByText("Nombre de passages anonymes 1passage")).toBeVisible();
-  await expect(page.getByRole("dialog", { name: "Passages (3)" }).getByText("Nombre de passages non-anonymes 2passages")).toBeVisible();
+  await expect(page.getByRole("dialog", { name: "Passages (3)" }).getByRole("cell", { name: "Anonyme" })).toBeVisible();
+  await expect(page.getByRole("dialog", { name: "Passages (3)" }).getByRole("cell", { name: "test passage", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Ajouter un passage" }).click();
   await page.locator(".person__input-container").click();
   await page.locator("#react-select-persons-option-0").click();

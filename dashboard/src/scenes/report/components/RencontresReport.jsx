@@ -9,7 +9,6 @@ import UserName from "../../../components/UserName";
 import TagTeam from "../../../components/TagTeam";
 import PersonName from "../../../components/PersonName";
 import DateBloc, { TimeBlock } from "../../../components/DateBloc";
-import Card from "../../../components/Card";
 import Rencontre from "../../../components/Rencontre";
 import { personsObjectSelector } from "../../../recoil/selectors";
 import { sortRencontres } from "../../../recoil/rencontres";
@@ -75,13 +74,11 @@ const RencontresTable = ({ period, rencontres, selectedTeams }) => {
         userPopulated: rencontre.user ? users.find((u) => u._id === rencontre.user) : undefined,
       };
     });
-  }, [rencontres, persons]);
+  }, [rencontres, persons, users]);
 
   const rencontresSorted = useMemo(() => {
     return [...rencontresPopulated].sort(sortRencontres(sortBy, sortOrder));
   }, [rencontresPopulated, sortBy, sortOrder]);
-
-  const numberOfNonAnonymousRencontres = useMemo(() => rencontres.filter((p) => !!p.person)?.length, [rencontres]);
 
   return (
     <>
@@ -102,16 +99,6 @@ const RencontresTable = ({ period, rencontres, selectedTeams }) => {
             >
               Ajouter une rencontre
             </button>
-          </div>
-        </div>
-        <div className="noprint tw-mb-4 tw-flex tw-justify-around">
-          <div className="tw-basis-1/4">
-            <Card
-              countId="report-rencontres-non-anonymous-count"
-              title="Nombre de rencontres"
-              count={numberOfNonAnonymousRencontres}
-              unit={`rencontre${numberOfNonAnonymousRencontres > 1 ? "s" : ""}`}
-            />
           </div>
         </div>
         <Rencontre rencontre={rencontreToEdit} personId={rencontreToEdit?.person} onFinished={() => setRencontreToEdit(null)} />
