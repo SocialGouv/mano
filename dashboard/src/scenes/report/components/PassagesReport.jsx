@@ -87,20 +87,22 @@ const PassagesTable = ({ period, passages, selectedTeams }) => {
     <>
       <div className="tw-px-4 tw-py-2 print:tw-mb-4 print:tw-px-0">
         <div className="noprint tw-mb-5 tw-flex tw-justify-between">
-          <h3 className="tw-w-full tw-px-3 tw-py-2 tw-text-xl tw-font-medium tw-text-black">Passages</h3>
-          <button
-            type="button"
-            className="button-submit tw-mb-2.5 tw-ml-auto"
-            onClick={() =>
-              setPassageToEdit({
-                date: dayjs(period.startDate),
-                user: user._id,
-                team: selectedTeams?.length === 1 ? selectedTeams[0]._id : currentTeam._id,
-              })
-            }
-          >
-            Ajouter un passage
-          </button>
+          <h3 className="tw-w-grow tw-px-3 tw-py-2 tw-text-xl tw-font-medium tw-text-black">Passages</h3>
+          <div>
+            <button
+              type="button"
+              className="button-submit tw-mb-2 tw-ml-auto"
+              onClick={() =>
+                setPassageToEdit({
+                  date: dayjs(period.startDate),
+                  user: user._id,
+                  team: selectedTeams?.length === 1 ? selectedTeams[0]._id : currentTeam._id,
+                })
+              }
+            >
+              Ajouter un passage
+            </button>
+          </div>
         </div>
         <div className="tw-mb-4 tw-flex tw-justify-around">
           <div className="tw-basis-1/4">
