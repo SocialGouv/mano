@@ -5,7 +5,7 @@ import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from "../../../co
 import { FullScreenIcon } from "../../../assets/icons/FullScreenIcon";
 import Table from "../../../components/table";
 import TagTeam from "../../../components/TagTeam";
-import DateBloc from "../../../components/DateBloc";
+import DateBloc, { TimeBlock } from "../../../components/DateBloc";
 import CreateObservation from "../../../components/CreateObservation";
 import { territoriesState } from "../../../recoil/territory";
 import { dayjsInstance } from "../../../services/date";
@@ -146,14 +146,10 @@ const ObservationsTable = ({ period, observations, selectedTeams }) => {
                 title: "Date",
                 dataKey: "observedAt",
                 render: (obs) => {
-                  // anonymous comment migrated from `report.observations`
-                  // have no time
-                  // have no user assigned either
-                  const time = dayjsInstance(obs.observedAt).format("D MMM HH:mm");
                   return (
                     <>
                       <DateBloc date={obs.observedAt} />
-                      <span className="tw-mb-2 tw-block tw-w-full tw-text-center tw-opacity-50">{time === "00:00" && !obs.user ? null : time}</span>
+                      <TimeBlock time={obs.observedAt} />
                     </>
                   );
                 },

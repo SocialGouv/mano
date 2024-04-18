@@ -7,7 +7,7 @@ import Table from "../../../components/table";
 import UserName from "../../../components/UserName";
 import TagTeam from "../../../components/TagTeam";
 import PersonName from "../../../components/PersonName";
-import DateBloc from "../../../components/DateBloc";
+import DateBloc, { TimeBlock } from "../../../components/DateBloc";
 import { useLocalStorage } from "../../../services/useLocalStorage";
 
 export const PersonsReport = ({ personsCreated, period, selectedTeams }) => {
@@ -81,7 +81,7 @@ const PersonsTable = ({ period, personsCreated, selectedTeams }) => {
                   return (
                     <>
                       <DateBloc date={person.createdAt} />
-                      <span className="tw-mb-2 tw-block tw-w-full tw-text-center tw-opacity-50">{dayjs(person.createdAt).format("HH:mm")}</span>
+                      <TimeBlock time={person.createdAt} />
                     </>
                   );
                 },

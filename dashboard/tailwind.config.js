@@ -44,6 +44,7 @@ export default {
         main75: "#617e71",
         main50: "#95a9a0",
         main25: "#cad4cf",
+        "mano-sombre": "#374B43",
         black: "#1D2021",
         black75: "#3b3b3b",
         black50: "#777777",

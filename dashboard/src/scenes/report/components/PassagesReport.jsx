@@ -9,7 +9,7 @@ import { useRecoilValue } from "recoil";
 import UserName from "../../../components/UserName";
 import TagTeam from "../../../components/TagTeam";
 import PersonName from "../../../components/PersonName";
-import DateBloc from "../../../components/DateBloc";
+import DateBloc, { TimeBlock } from "../../../components/DateBloc";
 import Card from "../../../components/Card";
 import { useLocalStorage } from "../../../services/useLocalStorage";
 import { sortPassages } from "../../../recoil/passages";
@@ -138,16 +138,10 @@ const PassagesTable = ({ period, passages, selectedTeams }) => {
                 sortBy,
                 sortOrder,
                 render: (passage) => {
-                  // anonymous comment migrated from `report.passages`
-                  // have no time
-                  // have no user assigned either
-                  const time = dayjs(passage.date).format("D MMM HH:mm");
                   return (
                     <>
                       <DateBloc date={passage.date} />
-                      <span className="tw-mb-2 tw-block tw-w-full tw-text-center tw-opacity-50">
-                        {time === "00:00" && !passage.user ? null : time}
-                      </span>
+                      <TimeBlock time={passage.date} />
                     </>
                   );
                 },

@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { useHistory } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import Table from "./table";
-import DateBloc from "./DateBloc";
+import DateBloc, { TimeBlock } from "./DateBloc";
 import ActionOrConsultationName from "./ActionOrConsultationName";
 import PersonName from "./PersonName";
 import { formatTime } from "../services/date";
@@ -107,9 +107,7 @@ const ActionsSortableList = ({ data, limit }) => {
               return (
                 <>
                   <DateBloc date={[DONE, CANCEL].includes(action.status) ? action.completedAt : action.dueAt} />
-                  <span className="tw-mb-2 tw-block tw-w-full tw-text-center tw-opacity-50">
-                    {!action.dueAt || !action.withTime ? null : formatTime(action.dueAt)}
-                  </span>
+                  {!action.dueAt || !action.withTime ? null : <TimeBlock time={action.dueAt} />}
                 </>
               );
             },

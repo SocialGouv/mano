@@ -26,7 +26,7 @@ import SelectAndCreatePerson from "../scenes/reception/SelectAndCreatePerson";
 import Rencontre from "./Rencontre";
 import { prepareRencontreForEncryption, rencontresState } from "../recoil/rencontres";
 import { useLocalStorage } from "../services/useLocalStorage";
-import DateBloc from "./DateBloc";
+import DateBloc, { TimeBlock } from "./DateBloc";
 import PersonName from "./PersonName";
 import UserName from "./UserName";
 import TagTeam from "./TagTeam";
@@ -264,16 +264,10 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
                             sortBy,
                             sortOrder,
                             render: (rencontre) => {
-                              // anonymous comment migrated from `report.rencontres`
-                              // have no time
-                              // have no user assigned either
-                              const time = dayjsInstance(rencontre.date).format("HH:mm");
                               return (
                                 <>
                                   <DateBloc date={rencontre.date} />
-                                  <span className="tw-block tw-w-full tw-text-center tw-opacity-50">
-                                    {time === "00:00" && !rencontre.user ? null : time}
-                                  </span>
+                                  <TimeBlock time={rencontre.date} />
                                 </>
                               );
                             },

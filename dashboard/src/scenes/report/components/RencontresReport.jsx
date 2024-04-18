@@ -8,7 +8,7 @@ import { useRecoilValue } from "recoil";
 import UserName from "../../../components/UserName";
 import TagTeam from "../../../components/TagTeam";
 import PersonName from "../../../components/PersonName";
-import DateBloc from "../../../components/DateBloc";
+import DateBloc, { TimeBlock } from "../../../components/DateBloc";
 import Card from "../../../components/Card";
 import Rencontre from "../../../components/Rencontre";
 import { personsObjectSelector } from "../../../recoil/selectors";
@@ -130,16 +130,10 @@ const RencontresTable = ({ period, rencontres, selectedTeams }) => {
                 sortBy,
                 sortOrder,
                 render: (rencontre) => {
-                  // anonymous comment migrated from `report.rencontres`
-                  // have no time
-                  // have no user assigned either
-                  const time = dayjs(rencontre.date).format("D MMM HH:mm");
                   return (
                     <>
                       <DateBloc date={rencontre.date} />
-                      <span className="tw-mb-2 tw-block tw-w-full tw-text-center tw-opacity-50">
-                        {time === "00:00" && !rencontre.user ? null : time}
-                      </span>
+                      <TimeBlock time={rencontre.date} />
                     </>
                   );
                 },

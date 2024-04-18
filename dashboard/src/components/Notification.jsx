@@ -9,7 +9,7 @@ import { commentsState, prepareCommentForEncryption } from "../recoil/comments";
 import { personsState } from "../recoil/persons";
 import { formatTime } from "../services/date";
 import ButtonCustom from "./ButtonCustom";
-import DateBloc from "./DateBloc";
+import DateBloc, { TimeBlock } from "./DateBloc";
 import Table from "./table";
 import UserName from "./UserName";
 import API from "../services/api";
@@ -228,7 +228,7 @@ const Comments = ({ setShowModal, comments }) => {
               return (
                 <>
                   <DateBloc date={comment.date || comment.createdAt} />
-                  <span className="tw-block tw-w-full tw-text-center tw-opacity-50">{dayjs(comment.date || comment.createdAt).format("HH:mm")}</span>
+                  <TimeBlock time={comment.date || comment.createdAt} />
                 </>
               );
             },

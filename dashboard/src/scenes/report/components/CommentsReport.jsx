@@ -12,7 +12,7 @@ import UserName from "../../../components/UserName";
 import TagTeam from "../../../components/TagTeam";
 import PersonName from "../../../components/PersonName";
 import { useLocalStorage } from "../../../services/useLocalStorage";
-import DateBloc from "../../../components/DateBloc";
+import DateBloc, { TimeBlock } from "../../../components/DateBloc";
 import { sortComments } from "../../../recoil/comments";
 
 export const CommentsSocialAndMedical = ({ comments, commentsMedical }) => {
@@ -181,10 +181,8 @@ const CommentsTable = ({ data, activeTab }) => {
             return (
               <>
                 <DateBloc date={comment.date || comment.createdAt} />
-                <span className="tw-mb-2 tw-block tw-w-full tw-text-center tw-opacity-50">
-                  {dayjs(comment.date || comment.createdAt).format("HH:mm")}
-                </span>
-                <div className="tw-mb-2 tw-flex tw-items-center tw-justify-center tw-gap-1">
+                <TimeBlock time={comment.date || comment.createdAt} />
+                <div className="tw-mt-1 tw-flex tw-items-center tw-justify-center tw-gap-1">
                   {!!comment.urgent && <ExclamationMarkButton />}
                   {!!organisation.groupsEnabled && !!comment.group && (
                     <span className="tw-text-3xl" aria-label="Commentaire familial" title="Commentaire familial">
