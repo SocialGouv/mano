@@ -8,7 +8,7 @@ import { customFieldsPersonsSelector } from "../../recoil/persons";
 import { newCustomField, typeOptions } from "../../utils";
 import { customFieldsMedicalFileSelector } from "../../recoil/medicalFiles";
 import { organisationState } from "../../recoil/auth";
-import { customFieldsObsSelector } from "../../recoil/territoryObservations";
+import { groupedCustomFieldsObsSelector } from "../../recoil/territoryObservations";
 import { servicesSelector } from "../../recoil/reports";
 import { actionsCategoriesSelector } from "../../recoil/actions";
 import API from "../../services/api";
@@ -23,7 +23,7 @@ const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HT
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const customFieldsPersons = useRecoilValue(customFieldsPersonsSelector);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
-  const customFieldsObs = useRecoilValue(customFieldsObsSelector);
+  const groupedCustomFieldsObs = useRecoilValue(groupedCustomFieldsObsSelector);
   const groupedServices = useRecoilValue(servicesSelector);
   const actionsGroupedCategories = useRecoilValue(actionsCategoriesSelector);
   const consultationFields = organisation!.consultations;
@@ -157,8 +157,18 @@ const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HT
                 utils.book_append_sheet(
                   workbook,
                   utils.aoa_to_sheet([
-                    ["Intitulé du champ", "Type de champ", "Choix"],
-                    ...customFieldsObs.map((e) => [e.label, typeOptions.find((t) => t.value === e.type)!.label, (e.options || []).join(",")]),
+                    ["Rubrique", "Intitulé du champ", "Type de champ", "Choix"],
+                    ...groupedCustomFieldsObs.reduce((acc, curr) => {
+                      return [
+                        ...acc,
+                        ...curr.fields.map((e) => [
+                          curr.name,
+                          e.label,
+                          typeOptions.find((t) => t.value === e.type)!.label,
+                          (e.options || []).join(","),
+                        ]),
+                      ];
+                    }, [] as string[][]),
                   ]),
                   "Observation de territoire"
                 );
@@ -262,8 +272,8 @@ const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HT
                                     </div>
                                   ))
                                 : value
-                                ? String(value)
-                                : ""}
+                                  ? String(value)
+                                  : ""}
                               {errors.some((error) => error.line === i && error.col === j) && (
                                 <div className="tw-italic tw-text-red-600">
                                   {errors.find((error) => error.line === i && error.col === j)?.message}
@@ -309,7 +319,7 @@ const typeOptionsLabels = [
   "Choix multiple dans une liste",
   "Case à cocher",
 ] as const;
-type TypeOptionLabel = typeof typeOptionsLabels[number];
+type TypeOptionLabel = (typeof typeOptionsLabels)[number];
 
 function isTypeOptionLabel(type: string): type is TypeOptionLabel {
   return typeOptionsLabels.includes(type as any);
@@ -332,13 +342,13 @@ const sheetNames = [
   "Liste des services",
   "Catégories d action",
 ] as const;
-type SheetName = typeof sheetNames[number];
+type SheetName = (typeof sheetNames)[number];
 
 const workbookColumns: Record<SheetName, string[]> = {
   "Infos social et médical": ["Rubrique", "Intitulé du champ", "Type de champ", "Choix"],
   "Dossier médical": ["Intitulé du champ", "Type de champ", "Choix"],
   Consultation: ["Consultation type pour", "Intitulé du champ", "Type de champ", "Choix"],
-  "Observation de territoire": ["Intitulé du champ", "Type de champ", "Choix"],
+  "Observation de territoire": ["Rubrique", "Intitulé du champ", "Type de champ", "Choix"],
   "Liste des services": ["Liste des services", "Groupe"],
   "Catégories d action": ["Liste des catégories d'action", "Groupe d'action"],
 };
@@ -417,13 +427,14 @@ function processConfigWorkbook(workbook: WorkBook): WorkbookData {
       }
 
       if (sheetName === "Observation de territoire") {
-        const [intitule, type, choix] = row;
-        if (!intitule) data[sheetName].errors.push({ line: parseInt(key), col: 0, message: `L'intitulé du champ est manquant` });
-        if (!type) data[sheetName].errors.push({ line: parseInt(key), col: 1, message: `Le type de champ est manquant` });
+        const [rubrique, intitule, type, choix] = row;
+        if (!rubrique) data[sheetName].errors.push({ line: parseInt(key), col: 0, message: `La rubrique est manquante` });
+        if (!intitule) data[sheetName].errors.push({ line: parseInt(key), col: 1, message: `L'intitulé du champ est manquant` });
+        if (!type) data[sheetName].errors.push({ line: parseInt(key), col: 2, message: `Le type de champ est manquant` });
         if (requiresOptions(type as TypeOptionLabel) && !choix)
-          data[sheetName].errors.push({ line: parseInt(key), col: 2, message: `Les choix sont manquants` });
-        if (!isTypeOptionLabel(type)) data[sheetName].errors.push({ line: parseInt(key), col: 1, message: `Le type ${type} n'existe pas` });
-        data[sheetName].data.push(trimAllValues({ intitule, type, choix: choix?.split(",") || [] }));
+          data[sheetName].errors.push({ line: parseInt(key), col: 3, message: `Les choix sont manquants` });
+        if (!isTypeOptionLabel(type)) data[sheetName].errors.push({ line: parseInt(key), col: 2, message: `Le type ${type} n'existe pas` });
+        data[sheetName].data.push(trimAllValues({ rubrique, intitule, type, choix: choix?.split(",") || [] }));
       }
 
       if (sheetName === "Liste des services") {
@@ -538,46 +549,74 @@ function getUpdatedOrganisationFromWorkbookData(organisation: OrganisationInstan
       }, [] as CustomFieldsGroup[]);
       if (customFields.length) updatedOrganisation.consultations = customFields;
     }
-
     if (sheetName === "Observation de territoire") {
       const customFields = sheetData.data.reduce((acc, curr) => {
+        const rubrique = curr.rubrique as string;
         const intitule = curr.intitule as string;
         const type = curr.type as TypeOptionLabel;
         const options = curr.choix as string[];
-        const previousOrganisationField = organisation.customFieldsObs?.find((e) => e.label === intitule);
-        acc.push(mergerFieldWithPrevious({ label: intitule, type: toFieldType(type), options }, previousOrganisationField));
-        return acc;
-      }, [] as CustomField[]);
-      if (customFields.length) updatedOrganisation.customFieldsObs = customFields;
-    }
-    if (sheetName === "Liste des services") {
-      const services = sheetData.data.reduce((acc, curr) => {
-        const service = curr.service as string;
-        const groupe = curr.groupe as string;
-        const groupeIndex = acc.findIndex((e) => e.groupTitle === groupe);
+        const rubriqueIndex = acc.findIndex((e) => e.name === rubrique);
 
-        if (groupeIndex === -1) {
-          acc.push({ groupTitle: groupe, services: [service] });
+        const previousOrganisationField = organisation.groupedCustomFieldsObs
+          ?.find((e) => e.name === rubrique)
+          ?.fields.find((f) => f.label === intitule);
+
+        if (rubriqueIndex === -1) {
+          acc.push({
+            name: rubrique,
+            fields: [mergerFieldWithPrevious({ label: intitule, type: toFieldType(type), options }, previousOrganisationField)],
+          });
         } else {
-          acc[groupeIndex].services.push(service);
+          acc[rubriqueIndex].fields.push(
+            mergerFieldWithPrevious(
+              {
+                label: intitule,
+                type: toFieldType(type),
+                options,
+              },
+              previousOrganisationField
+            )
+          );
         }
         return acc;
-      }, [] as { groupTitle: string; services: string[] }[]);
+      }, [] as CustomFieldsGroup[]);
+      if (customFields.length) updatedOrganisation.groupedCustomFieldsObs = customFields;
+    }
+
+    if (sheetName === "Liste des services") {
+      const services = sheetData.data.reduce(
+        (acc, curr) => {
+          const service = curr.service as string;
+          const groupe = curr.groupe as string;
+          const groupeIndex = acc.findIndex((e) => e.groupTitle === groupe);
+
+          if (groupeIndex === -1) {
+            acc.push({ groupTitle: groupe, services: [service] });
+          } else {
+            acc[groupeIndex].services.push(service);
+          }
+          return acc;
+        },
+        [] as { groupTitle: string; services: string[] }[]
+      );
       if (services.length) updatedOrganisation.groupedServices = services;
     }
     if (sheetName === "Catégories d action") {
-      const categories = sheetData.data.reduce((acc, curr) => {
-        const categorie = curr.categorie as string;
-        const groupe = curr.groupe as string;
-        const groupeIndex = acc.findIndex((e) => e.groupTitle === groupe);
+      const categories = sheetData.data.reduce(
+        (acc, curr) => {
+          const categorie = curr.categorie as string;
+          const groupe = curr.groupe as string;
+          const groupeIndex = acc.findIndex((e) => e.groupTitle === groupe);
 
-        if (groupeIndex === -1) {
-          acc.push({ groupTitle: groupe, categories: [categorie] });
-        } else {
-          acc[groupeIndex].categories.push(categorie);
-        }
-        return acc;
-      }, [] as { groupTitle: string; categories: string[] }[]);
+          if (groupeIndex === -1) {
+            acc.push({ groupTitle: groupe, categories: [categorie] });
+          } else {
+            acc[groupeIndex].categories.push(categorie);
+          }
+          return acc;
+        },
+        [] as { groupTitle: string; categories: string[] }[]
+      );
       if (categories.length) updatedOrganisation.actionsGroupedCategories = categories;
     }
   }
