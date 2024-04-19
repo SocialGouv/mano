@@ -3,8 +3,13 @@ import { evolutiveStatsForPersonsSelector } from "../recoil/evolutiveStats";
 import type { PersonPopulated } from "../types/person";
 import type { IndicatorsSelection } from "../types/evolutivesStats";
 import { ResponsiveStream } from "@nivo/stream";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { capture } from "../services/sentry";
+import type { Dayjs } from "dayjs";
+import type { FilterableField } from "../types/field";
+import type { EvolutiveStatsPersonFields, EvolutiveStatOption, EvolutiveStatDateYYYYMMDD } from "../types/evolutivesStats";
+import { filterData } from "./Filters";
+import { SelectedPersonsModal } from "../scenes/stats/PersonsStats";
 
 interface EvolutiveStatsViewerProps {
   evolutiveStatsIndicators: IndicatorsSelection;
@@ -13,9 +18,10 @@ interface EvolutiveStatsViewerProps {
     endDate: string;
   };
   persons: Array<PersonPopulated>;
+  filterBase: Array<FilterableField>;
 }
 
-export default function EvolutiveStatsViewer({ evolutiveStatsIndicators, period, persons }: EvolutiveStatsViewerProps) {
+export default function EvolutiveStatsViewer({ evolutiveStatsIndicators, period, persons, filterBase }: EvolutiveStatsViewerProps) {
   try {
     const evolutiveStatsPerson = useRecoilValue(
       evolutiveStatsForPersonsSelector({
@@ -35,6 +41,8 @@ export default function EvolutiveStatsViewer({ evolutiveStatsIndicators, period,
       countStart,
       countEnd,
       fieldData, // structure example for field gender: { 'Homme': { 20240101: 1, 20240102: 2, 20240103: 3 }, 'Femme': { 20240101: 4, 20240102: 5, 20240103: 6 } }
+      personsAtStartByValue,
+      personsAtEndByValue,
     } = evolutiveStatsPerson;
 
     if (valueStart == null) return null;
@@ -45,7 +53,14 @@ export default function EvolutiveStatsViewer({ evolutiveStatsIndicators, period,
             Évolution du champ {fieldLabel} entre le {startDateConsolidated.format("DD/MM/YYYY")} et le {endDateConsolidated.format("DD/MM/YYYY")}
           </h4>
 
-          <StreamChart startDateConsolidated={startDateConsolidated} endDateConsolidated={endDateConsolidated} fieldData={fieldData} />
+          <StreamChart
+            personsAtStartByValue={personsAtStartByValue}
+            personsAtEndByValue={personsAtEndByValue}
+            startDateConsolidated={startDateConsolidated}
+            endDateConsolidated={endDateConsolidated}
+            fieldData={fieldData}
+            field={filterBase.find((f) => f.name === evolutiveStatsIndicators[0].fieldName)}
+          />
         </>
       );
     }
@@ -101,7 +116,21 @@ export default function EvolutiveStatsViewer({ evolutiveStatsIndicators, period,
   );
 }
 
-function StreamChart({ fieldData, startDateConsolidated, endDateConsolidated }: any) {
+function StreamChart({
+  fieldData,
+  startDateConsolidated,
+  endDateConsolidated,
+  personsAtStartByValue,
+  personsAtEndByValue,
+  field,
+}: {
+  fieldData: Record<string, Record<string, number>>;
+  startDateConsolidated: Dayjs;
+  endDateConsolidated: Dayjs;
+  personsAtStartByValue: Record<EvolutiveStatOption, Array<PersonPopulated>>;
+  personsAtEndByValue: Record<EvolutiveStatOption, Array<PersonPopulated>>;
+  field: FilterableField;
+}) {
   const chartData = useMemo(() => {
     const data = [];
     const legend = [];
@@ -204,15 +233,65 @@ function StreamChart({ fieldData, startDateConsolidated, endDateConsolidated }: 
           ]}
         />
       </div>
+      <EvolutiveStatsTable
+        chartData={chartData}
+        startDateConsolidated={startDateConsolidated}
+        endDateConsolidated={endDateConsolidated}
+        personsAtStartByValue={personsAtStartByValue}
+        personsAtEndByValue={personsAtEndByValue}
+        field={field}
+      />
+    </div>
+  );
+}
+
+function EvolutiveStatsTable({
+  personsAtStartByValue,
+  personsAtEndByValue,
+  chartData,
+  startDateConsolidated,
+  endDateConsolidated,
+  field,
+}: {
+  personsAtStartByValue: Record<EvolutiveStatOption, Array<PersonPopulated>>;
+  personsAtEndByValue: Record<EvolutiveStatOption, Array<PersonPopulated>>;
+  chartData: {
+    data: Array<Record<string, number>>;
+    keys: Array<string>;
+    legend: any;
+  };
+  startDateConsolidated: Dayjs;
+  endDateConsolidated: Dayjs;
+  field: FilterableField;
+}) {
+  const [personsModalOpened, setPersonsModalOpened] = useState(false);
+  const [sliceDate, setSliceDate] = useState(null);
+  const [sliceField, setSliceField] = useState(null);
+  const [sliceValue, setSliceValue] = useState(null);
+  const [slicedData, setSlicedData] = useState([]);
+
+  const onLineClick = (date: string, option: string, personsByValue: Record<EvolutiveStatOption, Array<PersonPopulated>>) => {
+    setSliceDate(date);
+    setSliceField(field);
+    setSliceValue(option);
+    const slicedData = personsByValue[option];
+    setSlicedData(slicedData);
+    setPersonsModalOpened(true);
+  };
+
+  return (
+    <>
       <div className="tw-flex tw-basis-1/3 tw-items-center tw-justify-center">
         <table className="tw-w-full tw-border tw-border-zinc-400">
           <thead>
             <tr>
-              <td className="tw-border tw-border-zinc-400 tw-p-1">Option</td>
-              <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center">Au {startDateConsolidated.format("DD/MM/YYYY")}</td>
-              <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center">Au {endDateConsolidated.format("DD/MM/YYYY")}</td>
-              <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center">Différence</td>
-              <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center">Différence (%)</td>
+              <td className="tw-cursor-default tw-border tw-border-zinc-400 tw-p-1">Option</td>
+              <td className="tw-cursor-default tw-border tw-border-zinc-400 tw-p-1 tw-text-center">
+                Au {startDateConsolidated.format("DD/MM/YYYY")}
+              </td>
+              <td className="tw-cursor-default tw-border tw-border-zinc-400 tw-p-1 tw-text-center">Au {endDateConsolidated.format("DD/MM/YYYY")}</td>
+              <td className="tw-cursor-default tw-border tw-border-zinc-400 tw-p-1 tw-text-center">Différence</td>
+              <td className="tw-cursor-default tw-border tw-border-zinc-400 tw-p-1 tw-text-center">Différence (%)</td>
             </tr>
           </thead>
           <tbody>
@@ -224,17 +303,59 @@ function StreamChart({ fieldData, startDateConsolidated, endDateConsolidated }: 
               const percentDiff = startValue === 0 || endValue === 0 ? 0 : Math.round((diff / startValue) * 1000) / 10;
               return (
                 <tr key={option}>
-                  <td className="tw-border tw-border-zinc-400 tw-p-1">{option}</td>
-                  <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center">{startValue}</td>
-                  <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center">{endValue}</td>
-                  <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center">{diff === 0 ? "" : `${sign}${diff}`}</td>
-                  <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center">{percentDiff === 0 ? "" : `${sign}${percentDiff}%`}</td>
+                  <td className="tw-cursor-default tw-border tw-border-zinc-400 tw-p-1">{option}</td>
+                  <td
+                    onClick={() => {
+                      onLineClick(startDateConsolidated.format("DD/MM/YYYY"), option, personsAtStartByValue);
+                    }}
+                    className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center"
+                  >
+                    {startValue}
+                  </td>
+                  <td
+                    onClick={() => {
+                      onLineClick(endDateConsolidated.format("DD/MM/YYYY"), option, personsAtEndByValue);
+                    }}
+                    className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center"
+                  >
+                    {endValue}
+                  </td>
+                  <td className="tw-cursor-default tw-border tw-border-zinc-400 tw-p-1 tw-text-center">{diff === 0 ? "" : `${sign}${diff}`}</td>
+                  <td className="tw-cursor-default tw-border tw-border-zinc-400 tw-p-1 tw-text-center">
+                    {percentDiff === 0 ? "" : `${sign}${percentDiff}%`}
+                  </td>
                 </tr>
               );
             })}
           </tbody>
         </table>
       </div>
-    </div>
+      <SelectedPersonsModal
+        open={personsModalOpened}
+        onClose={() => {
+          setPersonsModalOpened(false);
+        }}
+        persons={slicedData}
+        sliceField={sliceField}
+        onAfterLeave={() => {
+          setSliceDate(null);
+          setSliceField(null);
+          setSliceValue(null);
+          setSlicedData([]);
+        }}
+        title={
+          <p className="tw-basis-1/2">
+            {`${sliceField?.label} au ${sliceDate}: ${sliceValue} (${slicedData.length})`}
+            <br />
+            <br />
+            <small className="tw-text-gray-500 tw-block tw-text-xs">
+              Attention: cette liste affiche les personnes <strong>telles qu'elles sont aujourd'hui</strong>, et non pas telles qu'elles sont au{" "}
+              {sliceDate}.
+              <br /> Pour en savoir plus sur l'évolution de chaque personne, cliquez dessus et consultez son historique.
+            </small>
+          </p>
+        }
+      />
+    </>
   );
 }

@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import type { CustomOrPredefinedField } from "../src/types/field";
-import type { PersonInstance } from "../src/types/person";
+import type { PersonInstance, PersonPopulated } from "../src/types/person";
+import type { UserInstance } from "../src/types/user";
 import type { ReportInstance } from "../src/types/report";
 
 export const personBase: PersonInstance = {
@@ -18,14 +19,30 @@ export const personBase: PersonInstance = {
   description: "Description",
 };
 
-const evolutiveStatsIndicators = [
-  {
-    fieldName: "custom-2023-06-16T08-50-52-737Z",
-    fromValue: "Française",
-    toValue: "Hors UE",
-    type: "enum",
-  },
-];
+const userBase: UserInstance = {
+  _id: "XXX",
+  email: "xxx@xx.xx",
+  name: "John Doe",
+  organisation: "XXX",
+  cgusAccepted: new Date(),
+  role: "normal",
+  healthcareProfessional: false,
+  termsAccepted: new Date(),
+  createdAt: new Date(),
+  lastLoginAt: new Date(),
+  phone: "0123456789",
+};
+
+export const personPopulated: PersonPopulated = {
+  ...personBase,
+  userPopulated: userBase,
+  formattedBirthDate: "01/01/1990",
+  age: 32,
+  formattedPhoneNumber: "01 23 45 67 89",
+  interactions: [dayjs("2023-01-01").toDate()],
+  lastUpdateCheckForGDPR: new Date(),
+  forTeamFiltering: [],
+};
 
 export const mockedEvolutiveStatsIndicatorsBase: Array<CustomOrPredefinedField> = [
   {

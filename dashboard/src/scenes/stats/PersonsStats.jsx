@@ -79,11 +79,16 @@ export default function PersonStats({
         <>
           <EvolutiveStatsSelector
             title={<h4 className="tw-inline tw-text-lg tw-text-black75">Évolution des indicateurs</h4>}
-            base={filterBase}
+            filterBase={filterBase}
             selection={evolutiveStatsIndicators}
             onChange={setEvolutiveStatsIndicators}
           />
-          <EvolutiveStatsViewer evolutiveStatsIndicators={evolutiveStatsIndicators} period={period} persons={personsForStats} />
+          <EvolutiveStatsViewer
+            evolutiveStatsIndicators={evolutiveStatsIndicators}
+            period={period}
+            persons={personsForStats}
+            filterBase={filterBase}
+          />
         </>
       ) : (
         <>
@@ -577,7 +582,7 @@ export const SelectedPersonsModal = ({ open, onClose, persons, title, onAfterLea
         title={
           <div className="tw-flex tw-w-full tw-items-center tw-justify-between">
             {title}{" "}
-            <button onClick={exportXlsx} className="button-submit tw-ml-auto tw-mr-20">
+            <button onClick={exportXlsx} className="button-submit tw-ml-auto">
               Télécharger un export
             </button>
           </div>

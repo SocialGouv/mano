@@ -1,8 +1,8 @@
 import { selector, selectorFamily } from "recoil";
 import { capture } from "../services/sentry";
-import type { PersonInstance } from "../types/person";
+import type { PersonPopulated } from "../types/person";
 import type { CustomOrPredefinedField } from "../types/field";
-import type { Indicator, IndicatorsSelection } from "../types/evolutivesStats";
+import type { IndicatorsSelection } from "../types/evolutivesStats";
 import type { EvolutiveStatsPersonFields, EvolutiveStatOption, EvolutiveStatDateYYYYMMDD } from "../types/evolutivesStats";
 import { dayjsInstance } from "../services/date";
 import { personFieldsIncludingCustomFieldsSelector } from "./persons";
@@ -95,10 +95,10 @@ function getPersonSnapshotAtDate({
   snapshotDate,
   fieldsMap,
 }: {
-  person: PersonInstance;
+  person: PersonPopulated;
   fieldsMap: FieldsMap;
   snapshotDate: string; // YYYYMMDD
-}): PersonInstance | null {
+}): PersonPopulated | null {
   let snapshot = structuredClone(person);
   const followedSince = dayjsInstance(snapshot.followedSince || snapshot.createdAt).format("YYYYMMDD");
   if (followedSince > snapshotDate) return null;
@@ -147,6 +147,8 @@ type EvolutiveStatRenderData = {
   valueEnd: EvolutiveStatOption;
   startDateConsolidated: Dayjs;
   endDateConsolidated: Dayjs;
+  personsAtStartByValue: Record<EvolutiveStatOption, Array<PersonPopulated>>;
+  personsAtEndByValue: Record<EvolutiveStatOption, Array<PersonPopulated>>;
 };
 
 export function computeEvolutiveStatsForPersons({
@@ -158,7 +160,7 @@ export function computeEvolutiveStatsForPersons({
 }: {
   startDate: string | null;
   endDate: string | null;
-  persons: Array<PersonInstance>;
+  persons: Array<PersonPopulated>;
   evolutiveStatsIndicators: IndicatorsSelection;
   evolutiveStatsIndicatorsBase: Array<CustomOrPredefinedField>;
 }): EvolutiveStatRenderData | null {
@@ -179,11 +181,15 @@ export function computeEvolutiveStatsForPersons({
   const endDateConsolidated = endDate ? dayjsInstance(dayjsInstance(endDate).endOf("day").format("YYYY-MM-DD")) : dayjsInstance();
   if (startDateConsolidated.isSame(endDateConsolidated)) return null;
 
+  const startDateFormatted = startDateConsolidated.format("YYYYMMDD");
+  const endDateFormatted = endDateConsolidated.format("YYYYMMDD");
+
   // we create an object with all the dates between the start and the end
   const dates: Record<EvolutiveStatDateYYYYMMDD, number> = {};
   const minimumDateForEvolutiveStats = startDateConsolidated.format("YYYYMMDD");
   let date = minimumDateForEvolutiveStats;
-  const lastDate = endDateConsolidated.format("YYYYMMDD");
+  const tonight = dayjsInstance().endOf("day").format("YYYYMMDD");
+  const lastDate = endDateFormatted > tonight ? endDateFormatted : tonight;
   while (date <= lastDate) {
     dates[date] = 0;
     date = dayjsInstance(date).add(1, "day").format("YYYYMMDD");
@@ -227,6 +233,8 @@ export function computeEvolutiveStatsForPersons({
     }
   }
 
+  const personsAtStartByValue: Record<EvolutiveStatOption, Array<PersonPopulated>> = {};
+  const personsAtEndByValue: Record<EvolutiveStatOption, Array<PersonPopulated>> = {};
   for (const person of persons) {
     const followedSince = dayjsInstance(person.followedSince || person.createdAt).format("YYYYMMDD");
     const minimumDate = followedSince < minimumDateForEvolutiveStats ? minimumDateForEvolutiveStats : followedSince;
@@ -245,6 +253,18 @@ export function computeEvolutiveStatsForPersons({
             personsFieldsInHistoryObject[field.name][value][currentDate] = 0;
           }
           personsFieldsInHistoryObject[field.name][value][currentDate]++;
+          if (currentDate === endDateFormatted) {
+            if (!personsAtEndByValue[value]) {
+              personsAtEndByValue[value] = [];
+            }
+            personsAtEndByValue[value].push(person);
+          }
+          if (currentDate === startDateFormatted) {
+            if (!personsAtStartByValue[value]) {
+              personsAtStartByValue[value] = [];
+            }
+            personsAtStartByValue[value].push(person);
+          }
         } catch (error) {
           capture(error, { extra: { field, value, currentDate } });
         }
@@ -270,6 +290,18 @@ export function computeEvolutiveStatsForPersons({
                   personsFieldsInHistoryObject[field.name][value][currentDate] = 0;
                 }
                 personsFieldsInHistoryObject[field.name][value][currentDate]++;
+                if (currentDate === endDateFormatted) {
+                  if (!personsAtEndByValue[value]) {
+                    personsAtEndByValue[value] = [];
+                  }
+                  personsAtEndByValue[value].push(person);
+                }
+                if (currentDate === startDateFormatted) {
+                  if (!personsAtStartByValue[value]) {
+                    personsAtStartByValue[value] = [];
+                  }
+                  personsAtStartByValue[value].push(person);
+                }
               } catch (error) {
                 capture(error, { extra: { field, value, currentDate } });
               }
@@ -314,6 +346,18 @@ export function computeEvolutiveStatsForPersons({
               personsFieldsInHistoryObject[field.name][value][currentDate] = 0;
             }
             personsFieldsInHistoryObject[field.name][value][currentDate]++;
+            if (currentDate === endDateFormatted) {
+              if (!personsAtEndByValue[value]) {
+                personsAtEndByValue[value] = [];
+              }
+              personsAtEndByValue[value].push(person);
+            }
+            if (currentDate === startDateFormatted) {
+              if (!personsAtStartByValue[value]) {
+                personsAtStartByValue[value] = [];
+              }
+              personsAtStartByValue[value].push(person);
+            }
           } catch (error) {
             capture(error, { extra: { field, value, currentDate } });
           }
@@ -325,20 +369,19 @@ export function computeEvolutiveStatsForPersons({
   const valueStart = indicator?.fromValue;
   const valueEnd = indicator?.toValue;
 
-  const startDateFormatted = dayjsInstance(startDate ?? startHistoryFeatureDate);
-  const endDateFormatted = endDate ? dayjsInstance(endDate) : dayjsInstance();
-
   const fieldData = personsFieldsInHistoryObject[indicatorFieldName ?? ""] ?? {};
 
   return {
     fieldData,
     fieldLabel,
-    countStart: fieldData?.[valueStart]?.[startDateFormatted.format("YYYYMMDD")] ?? 0,
-    countEnd: fieldData?.[valueEnd]?.[endDateFormatted.format("YYYYMMDD")] ?? 0,
+    countStart: fieldData?.[valueStart]?.[startDateFormatted] ?? 0,
+    countEnd: fieldData?.[valueEnd]?.[endDateFormatted] ?? 0,
     valueStart,
     valueEnd,
     startDateConsolidated,
     endDateConsolidated,
+    personsAtStartByValue,
+    personsAtEndByValue,
   };
 }
 
@@ -353,7 +396,7 @@ export const evolutiveStatsForPersonsSelector = selectorFamily({
     }: {
       startDate: string | null;
       endDate: string | null;
-      persons: Array<PersonInstance>;
+      persons: Array<PersonPopulated>;
       evolutiveStatsIndicators: IndicatorsSelection;
     }) =>
     ({ get }) => {

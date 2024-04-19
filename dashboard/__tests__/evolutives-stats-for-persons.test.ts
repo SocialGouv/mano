@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 import { computeEvolutiveStatsForPersons } from "../src/recoil/evolutiveStats";
-import { mockedEvolutiveStatsIndicatorsBase, personBase } from "./mocks";
+import { mockedEvolutiveStatsIndicatorsBase, personPopulated } from "./mocks";
 import * as SentryService from "../src/services/sentry";
 
 // Mock the capture function from Sentry service
@@ -27,7 +27,7 @@ describe("Stats evolutives", () => {
       ],
       persons: [
         {
-          ...personBase,
+          ...personPopulated,
           gender: "Femme",
           history: [
             {
@@ -67,7 +67,7 @@ describe("Stats evolutives", () => {
       ],
       persons: [
         {
-          ...personBase,
+          ...personPopulated,
           gender: "Homme",
           history: [
             {
@@ -118,7 +118,7 @@ describe("Stats evolutives", () => {
       ],
       persons: [
         {
-          ...personBase,
+          ...personPopulated,
           gender: "Femme",
           history: [
             {
@@ -158,7 +158,7 @@ describe("Stats evolutives", () => {
     expect(computed.valueStart).toBe("Homme");
     expect(computed.countStart).toBe(1);
     expect(computed.valueEnd).toBe("Femme");
-    expect(computed.countEnd).toBe(1);
+    expect(computed.countEnd).toBe(0);
     expect(dayjs(computed.startDateConsolidated).format("YYYY-MM-DD")).toBe("2024-01-01");
     expect(dayjs(computed.endDateConsolidated).format("YYYY-MM-DD")).toBe("2024-04-01");
   });
@@ -178,7 +178,7 @@ describe("Stats evolutives", () => {
       ],
       persons: [
         {
-          ...personBase,
+          ...personPopulated,
           gender: "Femme",
           history: [
             {
@@ -218,7 +218,7 @@ describe("Stats evolutives", () => {
       ],
       persons: [
         {
-          ...personBase,
+          ...personPopulated,
           gender: "Femme",
           history: [
             {
@@ -258,11 +258,11 @@ describe("Stats evolutives", () => {
       ],
       persons: [
         {
-          ...personBase,
+          ...personPopulated,
           resources: ["RSA"],
           history: [
             {
-              date: dayjs("2024-12-31").toDate(),
+              date: dayjs("2024-01-01T00:00:00.000Z").toDate(),
               data: {
                 resources: {
                   oldValue: "",
@@ -276,9 +276,9 @@ describe("Stats evolutives", () => {
       ],
     });
     expect(computed.valueStart).toBe("Non renseigné");
-    expect(computed.countStart).toBe(1);
+    expect(computed.countStart).toBe(0);
     expect(computed.valueEnd).toBe("RSA");
-    expect(computed.countEnd).toBe(1);
+    expect(computed.countEnd).toBe(0);
     expect(dayjs(computed.startDateConsolidated).format("YYYY-MM-DD")).toBe("2024-01-01");
     expect(dayjs(computed.endDateConsolidated).format("YYYY-MM-DD")).toBe("2024-04-01");
   });
@@ -298,7 +298,7 @@ describe("Stats evolutives", () => {
       ],
       persons: [
         {
-          ...personBase,
+          ...personPopulated,
           resources: ["RSA"],
           history: [
             {
@@ -331,5 +331,45 @@ describe("Stats evolutives", () => {
     expect(computed.countEnd).toBe(1);
     expect(dayjs(computed.startDateConsolidated).format("YYYY-MM-DD")).toBe("2024-01-01");
     expect(dayjs(computed.endDateConsolidated).format("YYYY-MM-DD")).toBe("2024-04-01");
+  });
+
+  test("If the end of the period is in the future, it should work", () => {
+    const computed = computeEvolutiveStatsForPersons({
+      startDate: "2024-01-01T00:00:00.000Z",
+      endDate: dayjs().add(10, "days").toISOString(),
+      evolutiveStatsIndicatorsBase: mockedEvolutiveStatsIndicatorsBase,
+      evolutiveStatsIndicators: [
+        {
+          fieldName: "gender",
+          fromValue: "Non renseigné",
+          toValue: "Femme",
+          type: "enum",
+        },
+      ],
+      persons: [
+        {
+          ...personPopulated,
+          gender: "Femme",
+          history: [
+            {
+              date: dayjs().toDate(),
+              data: {
+                gender: {
+                  oldValue: "",
+                  newValue: "Femme",
+                },
+              },
+              user: "XXX",
+            },
+          ],
+        },
+      ],
+    });
+    expect(computed.valueStart).toBe("Non renseigné");
+    expect(computed.countStart).toBe(1);
+    expect(computed.valueEnd).toBe("Femme");
+    expect(computed.countEnd).toBe(1);
+    expect(dayjs(computed.startDateConsolidated).format("YYYY-MM-DD")).toBe("2024-01-01");
+    expect(dayjs(computed.endDateConsolidated).format("YYYY-MM-DD")).toBe(dayjs().add(10, "days").format("YYYY-MM-DD"));
   });
 });
