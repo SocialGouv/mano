@@ -60,7 +60,7 @@ export default function PassagesRencontres({ person }) {
 
   return (
     <div className="tw-relative">
-      <div className="tw-sticky tw-top-0 tw-z-10 tw-mb-3 tw-flex tw-bg-white tw-p-3 tw-text-main tw-shadow-sm">
+      <div className="tw-sticky tw-top-0 tw-z-10 tw-flex tw-bg-white tw-p-2 tw-text-main">
         <div className="tw-flex tw-flex-1">
           {organisation.passagesEnabled && (
             <button
@@ -213,15 +213,23 @@ function PassagesTable({ personPassages, users }) {
               }}
             >
               <td>
-                <div>{formatDateTimeWithNameOfDay(passage.date || passage.createdAt)}</div>
-                <div style={{ overflowWrap: "anywhere" }}>
-                  {(passage.comment || "").split("\n").map((e, i) => (
-                    <p key={e + i}>{e}</p>
-                  ))}
+                <div className="tw-flex tw-text-black50 tw-capitalize tw-mb-1 tw-text-xs tw-items-center">
+                  <div>{formatDateTimeWithNameOfDay(passage.date || passage.createdAt)}</div>
                 </div>
-                <div className="small">Créé par {users.find((e) => e._id === passage.user)?.name}</div>
-                <div className="tw-max-w-fit">
-                  <TagTeam teamId={passage.team} />
+                {passage.comment ? (
+                  <div style={{ overflowWrap: "anywhere" }}>
+                    {(passage.comment || "").split("\n").map((e, i) => (
+                      <p className="tw-m-0 tw-p-0" key={e + i}>
+                        {e}
+                      </p>
+                    ))}
+                  </div>
+                ) : null}
+                <div className="tw-flex tw-mt-1 tw-text-xs tw-items-center">
+                  <div className="tw-grow tw-text-black50">Créé par {users.find((e) => e._id === passage.user)?.name}</div>
+                  <div className="tw-max-w-fit">
+                    <TagTeam teamId={passage.team} />
+                  </div>
                 </div>
               </td>
             </tr>
@@ -246,15 +254,30 @@ function RencontresTable({ personRencontres, users }) {
               }}
             >
               <td>
-                <div>{formatDateTimeWithNameOfDay(rencontre.date || rencontre.createdAt)}</div>
-                <div style={{ overflowWrap: "anywhere" }}>
-                  {(rencontre.comment || "").split("\n").map((e, i) => (
-                    <p key={e + i}>{e}</p>
-                  ))}
+                <div className="tw-flex tw-text-black50 tw-capitalize tw-mb-1 tw-text-xs tw-items-center">
+                  <div className="tw-grow">{formatDateTimeWithNameOfDay(rencontre.date || rencontre.createdAt)}</div>
+                  {rencontre.territoryObject ? (
+                    <div>
+                      <div className="tw-truncate	 tw-max-w-24	tw-bg-black tw-py-0.5 tw-px-1 tw-rounded tw-text-white tw-text-xs">
+                        {rencontre.territoryObject.name}
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
-                <div className="small">Créé par {users.find((e) => e._id === rencontre.user)?.name}</div>
-                <div className="tw-max-w-fit">
-                  <TagTeam teamId={rencontre.team} />
+                {rencontre.comment ? (
+                  <div style={{ overflowWrap: "anywhere" }}>
+                    {(rencontre.comment || "").split("\n").map((e, i) => (
+                      <p className="tw-m-0 tw-p-0" key={e + i}>
+                        {e}
+                      </p>
+                    ))}
+                  </div>
+                ) : null}
+                <div className="tw-flex tw-mt-1 tw-text-xs tw-items-center">
+                  <div className="tw-grow tw-text-black50">Créé par {users.find((e) => e._id === rencontre.user)?.name}</div>
+                  <div className="tw-max-w-fit">
+                    <TagTeam teamId={rencontre.team} />
+                  </div>
                 </div>
               </td>
             </tr>

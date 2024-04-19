@@ -14,6 +14,7 @@ import { medicalFileState } from "./medicalFiles";
 import { treatmentsState } from "./treatments";
 import { rencontresState } from "./rencontres";
 import { groupsState } from "./groups";
+import { territoriesState } from "./territory";
 
 const tomorrow = dayjsInstance().add(1, "day").format("YYYY-MM-DD");
 
@@ -143,6 +144,8 @@ export const itemsGroupedByPersonSelector = selector({
     const places = get(placesObjectSelector);
     const rencontres = get(rencontresState);
     const groups = get(groupsState);
+    const observations = get(territoryObservationsState);
+    const territories = get(territoriesState);
 
     for (const group of groups) {
       for (const person of group.persons) {
@@ -333,10 +336,51 @@ export const itemsGroupedByPersonSelector = selector({
         });
       }
     }
+
+    // Cette zone sert à récupérer les territoires liés au rencontres (par rebonds via l'observation)
+    // On pourra se débarasser de ça quand on aura des territoires directement liés aux observations,
+    // autrement dit, en créant un objet enrichi d'observations avec leur territoires.
+    const rencontresObject = {};
+    const rencontresByObservations = {};
     for (const rencontre of rencontres) {
       if (!personsObject[rencontre.person]) continue;
+      rencontresObject[rencontre._id] = rencontre;
+      if (!rencontre.observation) continue;
+      if (!rencontresByObservations[rencontre.observation]) rencontresByObservations[rencontre.observation] = [];
+      rencontresByObservations[rencontre.observation].push(rencontre._id);
+    }
+
+    const observationsForRencontresObject = {};
+    const observationsByTerritories = {};
+    for (const observation of observations) {
+      if (!rencontresByObservations[observation._id]) continue;
+      observationsForRencontresObject[observation._id] = { territory: observation.territory }; // Plus tard on pourra enrichir, pour l'instant on n'a besoin que de ça.
+      if (!observationsByTerritories[observation.territory]) observationsByTerritories[observation.territory] = [];
+      observationsByTerritories[observation.territory].push(observation._id);
+    }
+
+    const territoriesForObservationsForRencontresObject = {};
+    for (const territory of territories) {
+      if (!observationsByTerritories[territory._id]) continue;
+      territoriesForObservationsForRencontresObject[territory._id] = { name: territory.name };
+    }
+    // Fin de la zone nommée au dessus
+
+    for (const rencontre of Object.values(rencontresObject)) {
+      if (!personsObject[rencontre.person]) continue;
       personsObject[rencontre.person].rencontres = personsObject[rencontre.person].rencontres || [];
-      personsObject[rencontre.person].rencontres.push(rencontre);
+      if (rencontre.observation) {
+        const observationObject = observationsForRencontresObject[rencontre.observation];
+        const territoryObject = territoriesForObservationsForRencontresObject[observationObject.territory];
+        personsObject[rencontre.person].rencontres.push({
+          ...rencontre,
+          observationObject,
+          territoryObject,
+        });
+      } else {
+        personsObject[rencontre.person].rencontres.push(rencontre);
+      }
+
       personsObject[rencontre.person].interactions.push(rencontre.date || rencontre.createdAt);
       if (rencontre.comment) {
         personsObject[rencontre.person].comments = personsObject[rencontre.person].comments || [];
