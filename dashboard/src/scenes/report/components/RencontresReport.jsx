@@ -148,7 +148,26 @@ const RencontresTable = ({ period, rencontres, selectedTeams }) => {
                 sortOrder,
                 render: (rencontre) => (rencontre.user ? <UserName id={rencontre.user} /> : null),
               },
+
               { title: "Commentaire", dataKey: "comment", onSortOrder: setSortOrder, onSortBy: setSortBy, sortBy, sortOrder },
+              {
+                title: "Territoire",
+                dataKey: "territory",
+                onSortOrder: setSortOrder,
+                onSortBy: setSortBy,
+                sortBy,
+                sortOrder,
+                render: (r) => {
+                  if (!r.territoryObject) return null;
+                  return (
+                    <div className="tw-flex tw-items-center tw-justify-center">
+                      <div className="tw-bg-black tw-py-0.5 tw-px-1 tw-rounded tw-w-fit tw-text-white tw-text-xs">
+                        {r.territoryObject?.name || ""}
+                      </div>
+                    </div>
+                  );
+                },
+              },
               {
                 title: "Équipe en charge",
                 dataKey: "team",
