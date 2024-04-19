@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import type { CustomOrPredefinedField } from "../src/types/field";
 import type { PersonInstance } from "../src/types/person";
+import type { ReportInstance } from "../src/types/report";
 
 export const personBase: PersonInstance = {
   _id: "1",
@@ -319,3 +320,15 @@ export const mockedEvolutiveStatsIndicatorsBase: Array<CustomOrPredefinedField> 
     filterable: true,
   },
 ];
+
+export const reportMock: ReportInstance = {
+  _id: "1",
+  organisation: "XXX",
+
+  entityKey: "XXX",
+  createdAt: "2023-01-01",
+  updatedAt: "2023-01-01",
+
+  team: "TEAM_A_ID",
+  date: "2023-01-01",
+};

@@ -31,6 +31,7 @@ export interface OrganisationInstance {
   rencontresEnabled?: boolean;
 
   groupedServices?: GroupedServices[];
+  services?: string[]; // deprecated
 
   customFieldsObs: CustomField[];
   groupedCustomFieldsObs?: CustomFieldsGroup[];

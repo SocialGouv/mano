@@ -4,6 +4,9 @@ import { capture } from "../services/sentry";
 import { organisationState } from "./auth";
 import { dateRegex, looseUuidRegex } from "../utils";
 import { toast } from "react-toastify";
+import API from "../services/api";
+import type { ReportInstance, ReadyToEncryptReportInstance } from "../types/report";
+import { keepOnlyOneReportAndReturnReportToDelete } from "../utils/delete-duplicated-reports";
 
 const collectionName = "report";
 export const reportsState = atom({
@@ -17,20 +20,24 @@ export const reportsState = atom({
   }),
   effects: [
     ({ onSet }) =>
-      onSet(async (newValue) => {
+      onSet(async (newValue: Array<ReportInstance>) => {
         setCacheItem(collectionName, newValue);
         /* check if duplicate reports */
         const duplicateReports = Object.entries(
-          newValue.reduce((reportsByDate, report) => {
+          newValue.reduce<Record<string, Array<ReportInstance>>>((reportsByDate, report) => {
             // TIL: undefined < '2022-11-25' === false. So we need to check if report.date is defined.
             if (!report.date || report.date < "2022-11-25") return reportsByDate;
             if (!reportsByDate[`${report.date}-${report.team}`]) reportsByDate[`${report.date}-${report.team}`] = [];
             reportsByDate[`${report.date}-${report.team}`].push(report);
             return reportsByDate;
           }, {})
-        ).filter(([key, reportsByDate]) => reportsByDate.length > 1);
+        ).filter(([_key, reportsByDate]) => reportsByDate.length > 1);
         if (duplicateReports.length > 0) {
           for (const [key, reportsByDate] of duplicateReports) {
+            const reportsToDelete = keepOnlyOneReportAndReturnReportToDelete(reportsByDate);
+            for (const reportToDelete of reportsToDelete) {
+              await API.delete({ path: `report/${reportToDelete._id}` });
+            }
             capture("Duplicated reports " + key, {
               extra: {
                 [key]: reportsByDate.map((report) => ({
@@ -44,6 +51,20 @@ export const reportsState = atom({
                   collaborations: report.collaborations,
                   organisation: report.organisation,
                 })),
+                reportsToDelete: reportsToDelete.map((report) => ({
+                  _id: report._id,
+                  date: report.date,
+                  team: report.team,
+                  services: report.services,
+                  createdAt: report.createdAt,
+                  deletedAt: report.deletedAt,
+                  description: report.description,
+                  collaborations: report.collaborations,
+                  organisation: report.organisation,
+                })),
+              },
+              tags: {
+                unique_id: key,
               },
             });
           }
@@ -71,7 +92,7 @@ export const flattenedServicesSelector = selector({
 
 const encryptedFields = ["description", "services", "team", "date", "collaborations", "oldDateSystem"];
 
-export const prepareReportForEncryption = (report, { checkRequiredFields = true } = {}) => {
+export function prepareReportForEncryption(report: ReportInstance, { checkRequiredFields = true } = {}): ReadyToEncryptReportInstance {
   if (!!checkRequiredFields) {
     try {
       if (!looseUuidRegex.test(report.team)) {
@@ -104,4 +125,4 @@ export const prepareReportForEncryption = (report, { checkRequiredFields = true 
     decrypted,
     entityKey: report.entityKey,
   };
-};
+}
