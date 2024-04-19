@@ -371,12 +371,17 @@ export const itemsGroupedByPersonSelector = selector({
       personsObject[rencontre.person].rencontres = personsObject[rencontre.person].rencontres || [];
       if (rencontre.observation) {
         const observationObject = observationsForRencontresObject[rencontre.observation];
-        const territoryObject = territoriesForObservationsForRencontresObject[observationObject.territory];
-        personsObject[rencontre.person].rencontres.push({
-          ...rencontre,
-          observationObject,
-          territoryObject,
-        });
+        if (!observationObject) {
+          // concurrence entre la création de la rencontre et de l'observation -> l'obs n'est pas encore disponible
+          personsObject[rencontre.person].rencontres.push(rencontre);
+        } else {
+          const territoryObject = territoriesForObservationsForRencontresObject[observationObject.territory];
+          personsObject[rencontre.person].rencontres.push({
+            ...rencontre,
+            observationObject,
+            territoryObject,
+          });
+        }
       } else {
         personsObject[rencontre.person].rencontres.push(rencontre);
       }
