@@ -79,7 +79,7 @@ function getValueByField(fieldName: CustomOrPredefinedField["name"], fieldsMap: 
       return value;
     }
     if (value == null || value === "") {
-      return ["Non renseigné"];
+      return [];
     }
     return [value];
   }
