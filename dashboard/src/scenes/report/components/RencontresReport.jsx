@@ -83,8 +83,7 @@ const RencontresTable = ({ period, rencontres, selectedTeams }) => {
   return (
     <>
       <div className="tw-px-4 tw-py-2 print:tw-mb-4 print:tw-px-0">
-        <div className="noprint tw-mb-5 tw-flex tw-justify-between">
-          <h3 className="tw-w-grow tw-px-3 tw-py-2 tw-text-xl tw-font-medium tw-text-black">Rencontres</h3>
+        <div className="noprint tw-mb-5 tw-flex tw-justify-end">
           <div>
             <button
               type="button"

@@ -62,9 +62,6 @@ const PersonsTable = ({ period, personsCreated, selectedTeams }) => {
   return (
     <>
       <div className="tw-px-4 tw-py-2 print:tw-mb-4 print:tw-px-0">
-        <div className="noprint tw-mb-5 tw-flex tw-justify-between">
-          <h3 className="tw-w-full tw-px-3 tw-py-2 tw-text-xl tw-font-medium tw-text-black">Personnes créées</h3>
-        </div>
         {!!personsCreated.length && (
           <Table
             className="Table"

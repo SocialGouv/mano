@@ -113,8 +113,7 @@ const ObservationsTable = ({ period, observations, selectedTeams }) => {
   return (
     <>
       <div className="tw-px-4 tw-py-2 print:tw-mb-4 print:tw-px-0">
-        <div className="noprint tw-mb-5 tw-flex tw-justify-between">
-          <h3 className="tw-w-full tw-px-3 tw-py-2 tw-text-2xl tw-font-medium tw-text-black">Observations</h3>
+        <div className="noprint tw-mb-5 tw-flex tw-justify-end">
           <button onClick={exportXlsx} className="button-submit tw-ml-auto tw-mr-4">
             Télécharger un export
           </button>
