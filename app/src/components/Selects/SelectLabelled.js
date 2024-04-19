@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled, { css } from 'styled-components/native';
 import { Picker } from '@react-native-picker/picker';
 import { Platform, TouchableOpacity, Modal } from 'react-native';
 import InputLabelled from '../InputLabelled';

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import { ActivityIndicator } from 'react-native';
 import colors from '../../utils/colors';
 import SceneContainer from '../../components/SceneContainer';

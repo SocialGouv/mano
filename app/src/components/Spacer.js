@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 
 const Spacer = ({ height = 20, grow }) => <SpacerStyled height={height} grow={grow} />;
 

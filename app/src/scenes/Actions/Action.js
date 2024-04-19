@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { Alert } from 'react-native';
 import * as Sentry from '@sentry/react-native';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import ScrollContainer from '../../components/ScrollContainer';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';

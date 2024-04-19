@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import { ActivityIndicator, Animated, StatusBar, StyleSheet, TouchableOpacity, View, SafeAreaView } from 'react-native';
 import { MyText } from './MyText';
 import colors from '../utils/colors';

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import { Alert, Keyboard, Linking, StatusBar, TouchableWithoutFeedback, View } from 'react-native';
 import RNBootSplash from 'react-native-bootsplash';
 import AsyncStorage from '@react-native-async-storage/async-storage';

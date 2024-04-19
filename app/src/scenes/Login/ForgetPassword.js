@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import { Alert, View } from 'react-native';
 import API from '../../services/api';
 import SceneContainer from '../../components/SceneContainer';

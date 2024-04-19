@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 
 import ButtonRight from './ButtonRight';
 import RowContainer from './RowContainer';

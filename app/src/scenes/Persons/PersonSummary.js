@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useRef } from 'react';
 import { Alert, Linking, Text } from 'react-native';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import * as Sentry from '@sentry/react-native';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import dayjs from 'dayjs';

@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import { TouchableWithoutFeedback } from 'react-native';
 import Label from './Label';
 import InputMultilineAutoAdjust from './InputMultilineAutoAdjust';

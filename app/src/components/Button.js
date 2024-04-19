@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import { TouchableOpacity, ActivityIndicator, TouchableWithoutFeedback, Dimensions } from 'react-native';
 import { MyText } from './MyText';
 import colors from '../utils/colors';

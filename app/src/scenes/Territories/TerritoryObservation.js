@@ -5,7 +5,7 @@ import ScreenTitle from '../../components/ScreenTitle';
 import Button from '../../components/Button';
 import ButtonsContainer from '../../components/ButtonsContainer';
 import ButtonDelete from '../../components/ButtonDelete';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import { MyText } from '../../components/MyText';
 import CustomFieldInput from '../../components/CustomFieldInput';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';

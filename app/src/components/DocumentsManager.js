@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Alert, Modal } from 'react-native';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { useRecoilValue } from 'recoil';
 import ScrollContainer from './ScrollContainer';

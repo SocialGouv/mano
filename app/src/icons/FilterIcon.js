@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import Svg, { Path } from 'react-native-svg';
 
 const SvgStyled = styled(Svg)``;

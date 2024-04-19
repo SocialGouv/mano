@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import { Linking, Dimensions } from 'react-native';
 import Pdf from 'react-native-pdf';
 import API from '../../services/api';

@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import React from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import Svg, { G, Path } from 'react-native-svg';
 
 const SvgStyled = styled(Svg)``;

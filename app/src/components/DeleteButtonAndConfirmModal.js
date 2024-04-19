@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import { Alert, Modal } from 'react-native';
 import colors from '../utils/colors';
 import ButtonDelete from './ButtonDelete';

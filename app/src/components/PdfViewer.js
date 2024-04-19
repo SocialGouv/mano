@@ -3,7 +3,7 @@ import React from 'react';
 import { Dimensions, Linking } from 'react-native';
 
 import Pdf from 'react-native-pdf';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import SceneContainer from './SceneContainer';
 import ScreenTitle from './ScreenTitle';
 

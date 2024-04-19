@@ -10,7 +10,7 @@ import { refreshTriggerState } from '../../components/Loader';
 import { SectionListStyled } from '../../components/Lists';
 import ActionRow from '../../components/ActionRow';
 import CommentRow from '../Comments/CommentRow';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import { MyText } from '../../components/MyText';
 import { ListEmptyUrgent, ListEmptyUrgentAction, ListEmptyUrgentComment } from '../../components/ListEmptyContainer';
 import { actionsObjectSelector, itemsGroupedByPersonSelector } from '../../recoil/selectors';

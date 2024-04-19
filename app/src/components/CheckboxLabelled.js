@@ -1,20 +1,19 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled, { css } from 'styled-components/native';
 import colors from '../utils/colors';
 import { MyText } from './MyText';
+import { TouchableWithoutFeedback } from 'react-native';
 
 const CheckboxLabelled = ({ _id, label, onPress, value, bold, alone = false }) => (
-  <Touchable onPress={() => onPress({ _id, value: !value, label })}>
+  <TouchableWithoutFeedback onPress={() => onPress({ _id, value: !value, label })}>
     <Container alone={alone}>
       <CheckBoxContainer bold={bold}>
         <CheckBox isSelected={Boolean(value)} />
       </CheckBoxContainer>
       {label && <LabelStyled bold={bold}>{label}</LabelStyled>}
     </Container>
-  </Touchable>
+  </TouchableWithoutFeedback>
 );
-
-const Touchable = styled.TouchableWithoutFeedback``;
 
 const Container = styled.View`
   flex-direction: row;

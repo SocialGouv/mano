@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import CheckboxLabelled from '../CheckboxLabelled';
 import InputLabelled from '../InputLabelled';
 import Label from '../Label';

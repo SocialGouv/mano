@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import { Text, Alert } from 'react-native';
 import API from '../services/api';
 import FileViewer from 'react-native-file-viewer';

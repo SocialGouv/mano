@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Alert, View } from 'react-native';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import Button from '../../components/Button';
 import DateAndTimeInput from '../../components/DateAndTimeInput';
 import InputMultilineAutoAdjust from '../../components/InputMultilineAutoAdjust';

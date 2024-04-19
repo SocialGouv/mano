@@ -2,7 +2,7 @@ import { useIsFocused } from '@react-navigation/native';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, InteractionManager } from 'react-native';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import InputLabelled from '../../components/InputLabelled';
 import Label from '../../components/Label';
 import { MyText } from '../../components/MyText';

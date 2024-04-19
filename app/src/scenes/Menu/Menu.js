@@ -53,7 +53,7 @@ const Menu = ({ navigation }) => {
               caption="Test Sentry"
               onPress={() => {
                 capture('Test Sentry Capture', { extra: { test: 'test' } });
-                throw new Error('Test Sentry Error Crash');
+                // throw new Error('Test Sentry Error Crash');
               }}
             />
             <Spacer height={30} />

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import { Platform } from 'react-native';
 import Spinner from './Spinner';
 import { MyText, MyTextInput } from './MyText';

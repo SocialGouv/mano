@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import { useRecoilValue } from 'recoil';
 import { MyText } from './MyText';
 import colors from '../utils/colors';

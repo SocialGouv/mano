@@ -11,7 +11,7 @@ import ScreenTitle from './ScreenTitle';
 import ScrollContainer from './ScrollContainer';
 import { FlashList } from '@shopify/flash-list';
 import Search from './Search';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import colors from '../utils/colors';
 
 const categoriesSortedByMostUsedSelector = selector({

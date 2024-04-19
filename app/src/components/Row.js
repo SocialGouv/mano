@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled, { css } from 'styled-components/native';
 import ButtonRight from './ButtonRight';
 import RowContainer from './RowContainer';
 import { MyText } from './MyText';

@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import SceneContainer from '../../components/SceneContainer';
 import colors from '../../utils/colors';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useRecoilValue } from 'recoil';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import { usersState } from '../recoil/auth';
 import { MyText } from './MyText';
 

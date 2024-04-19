@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/native';
 import { Dimensions } from 'react-native';
 import API from '../services/api';
 import { MyText } from './MyText';

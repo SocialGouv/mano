@@ -2,12 +2,12 @@
 
 buildscript {
     ext {
-        buildToolsVersion = "33.0.0"
+        buildToolsVersion = "34.0.0"
         minSdkVersion = 23
-        compileSdkVersion = 33
-        targetSdkVersion = 33
-        kotlinVersion = '1.6.21' // (check what the latest version is!)
-        ndkVersion = "23.1.7779620"
+        compileSdkVersion = 34
+        targetSdkVersion = 34
+        kotlinVersion = '1.8.0'
+        ndkVersion = "25.1.8937393"
     }
     repositories {
         google()
@@ -50,3 +50,6 @@ subprojects {
         }
     }
 }
+
+apply plugin: "com.facebook.react.rootproject"
+
