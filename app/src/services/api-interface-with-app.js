@@ -1,9 +1,6 @@
 import { Alert, Linking, Platform } from 'react-native';
 import { MANO_DOWNLOAD_URL } from '../config';
 import API from './api';
-import fetchRetry from 'fetch-retry';
-
-API.fetch = fetchRetry(fetch);
 
 API.platform = Platform.OS;
 

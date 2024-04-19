@@ -9,7 +9,8 @@ import { organisationState } from "../recoil/auth";
 import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey, encryptFile, decryptFile } from "./encryption";
 import { AppSentry, capture } from "./sentry";
 import { deploymentCommitState, deploymentDateState } from "../recoil/version";
-const fetch = fetchRetry(window.fetch);
+
+const fetchWithFetchRetry = fetchRetry(fetch);
 
 const getUrl = (path, query = {}) => {
   return new URI().scheme(SCHEME).host(HOST).path(path).query(query).toString();
@@ -241,11 +242,16 @@ const execute = async ({
       };
     }
 
-    options.retries = 10;
-    options.retryDelay = 2000;
-
     const url = getUrl(path, query);
-    const response = await fetch(url, options);
+    const response =
+      method === "GET"
+        ? await fetchWithFetchRetry(url, {
+            ...options,
+            retries: 10,
+            retryDelay: 2000,
+          })
+        : await fetch(url, options);
+
     if (response.headers.has("x-api-deployment-commit")) {
       setRecoil(deploymentCommitState, response.headers.get("x-api-deployment-commit"));
       if (!window.localStorage.getItem("deploymentCommit")) {
