@@ -26,7 +26,7 @@ const List = () => {
   const [updateKey, setUpdateKey] = useState(null);
   const [sortBy, setSortBy] = useState("countersTotal");
   const [sortOrder, setSortOrder] = useState("DESC");
-  const [refresh, setRefresh] = useState(false);
+  const [refresh, setRefresh] = useState(true);
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [openCreateUserModal, setOpenCreateUserModal] = useState(false);
   const [selectedOrganisation, setSelectedOrganisation] = useState(null);
@@ -58,17 +58,10 @@ const List = () => {
     <>
       <Create onChange={() => setRefresh(true)} open={openCreateModal} setOpen={setOpenCreateModal} />
       <CreateUser onChange={() => setRefresh(true)} open={openCreateUserModal} setOpen={setOpenCreateUserModal} organisation={selectedOrganisation} />
-      {!refresh && !total ? (
-        <div className="tw-flex tw-h-full tw-w-full tw-flex-col tw-items-center tw-justify-center tw-gap-2">
-          <ButtonCustom onClick={() => setRefresh(true)} color="primary" title="Voir les organisations existantes" />
-          <ButtonCustom onClick={() => setOpenCreateModal(true)} color="primary" title="Créer une nouvelle organisation" />
-        </div>
-      ) : (
-        <div className="tw-mb-10 tw-mt-4 tw-flex tw-w-full tw-justify-between">
-          <h2 className="tw-text-2xl">Organisations utilisant Mano ({total})</h2>
-          <ButtonCustom onClick={() => setOpenCreateModal(true)} color="primary" title="Créer une nouvelle organisation" />
-        </div>
-      )}
+      <div className="tw-mb-10 tw-mt-4 tw-flex tw-w-full tw-justify-between">
+        <h2 className="tw-text-2xl">Organisations utilisant Mano ({total})</h2>
+        <ButtonCustom onClick={() => setOpenCreateModal(true)} color="primary" title="Créer une nouvelle organisation" />
+      </div>
       {!organisations?.length ? (
         refresh ? (
           <Loading />
