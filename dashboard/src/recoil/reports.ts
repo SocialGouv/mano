@@ -93,7 +93,7 @@ export const flattenedServicesSelector = selector({
 const encryptedFields = ["description", "services", "team", "date", "collaborations", "oldDateSystem"];
 
 export function prepareReportForEncryption(report: ReportInstance, { checkRequiredFields = true } = {}): ReadyToEncryptReportInstance {
-  if (!!checkRequiredFields) {
+  if (checkRequiredFields) {
     try {
       if (!looseUuidRegex.test(report.team)) {
         throw new Error("Report is missing team");
@@ -110,7 +110,7 @@ export function prepareReportForEncryption(report: ReportInstance, { checkRequir
     }
   }
   const decrypted = {};
-  for (let field of encryptedFields) {
+  for (const field of encryptedFields) {
     decrypted[field] = report[field];
   }
   return {

@@ -35,7 +35,7 @@ export const allowedTreatmentFieldsInHistory = [
 ];
 
 export const prepareTreatmentForEncryption = (treatment: TreatmentInstance, { checkRequiredFields = true } = {}) => {
-  if (!!checkRequiredFields) {
+  if (checkRequiredFields) {
     try {
       if (!looseUuidRegex.test(treatment.person)) {
         throw new Error("Treatment is missing person");

@@ -20,7 +20,7 @@ export const relsPersonPlaceState = atom({
 const encryptedFields = ["place", "person", "user"];
 
 export const prepareRelPersonPlaceForEncryption = (relPersonPlace, { checkRequiredFields = true } = {}) => {
-  if (!!checkRequiredFields) {
+  if (checkRequiredFields) {
     try {
       if (!looseUuidRegex.test(relPersonPlace.person)) {
         throw new Error("RelPersonPlace is missing person");

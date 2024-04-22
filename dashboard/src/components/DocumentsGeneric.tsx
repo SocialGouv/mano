@@ -66,7 +66,7 @@ export function DocumentsModule({
 
   return (
     <>
-      {!!showPanel ? (
+      {showPanel ? (
         <div className="tw-relative">
           <div className="tw-sticky tw-top-0 tw-z-10 tw-flex tw-items-center tw-bg-white tw-p-3">
             <h4 className="tw-flex-1 tw-text-xl">Documents {onlyDocuments.length ? `(${onlyDocuments.length})` : ""}</h4>
@@ -225,12 +225,12 @@ function DocumentsFullScreen({
                     .filter((doc) => {
                       if (doc.type === "document") {
                         const document = doc as DocumentWithLinkedItem;
-                        if (!!document.group) return false;
+                        if (document.group) return false;
                       }
                       return true;
                     })
                     .map((doc) => {
-                      if (!!doc.parentId) return doc;
+                      if (doc.parentId) return doc;
                       return {
                         ...doc,
                         parentId: "root",
@@ -391,7 +391,7 @@ function DocumentTable({
                 aria-label={`Document ${doc.name}`}
                 className={[
                   `tw-w-full tw-border-t tw-border-zinc-200 tw-bg-${color}`,
-                  Boolean(index % 2) ? "tw-bg-opacity-0" : "tw-bg-opacity-5",
+                  index % 2 ? "tw-bg-opacity-0" : "tw-bg-opacity-5",
                 ].join(" ")}
                 onClick={() => {
                   onDisplayDocument(doc);

@@ -142,7 +142,7 @@ const Filters = ({
   title?: string;
   saveInURLParams?: boolean;
 }) => {
-  filters = !!filters.length ? filters : [{ field: null, type: null, value: null }];
+  filters = filters.length ? filters : [{ field: null, type: null, value: null }];
   const onAddFilter = () => onChange([...filters, {}], saveInURLParams);
   const filterFields = base.filter((_filter) => _filter.field !== "alertness").map((f) => ({ label: f.label, field: f.field, type: f.type }));
 

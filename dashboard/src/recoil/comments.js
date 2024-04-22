@@ -20,7 +20,7 @@ export const commentsState = atom({
 const encryptedFields = ["comment", "person", "action", "group", "team", "user", "date", "urgent"];
 
 export const prepareCommentForEncryption = (comment, { checkRequiredFields = true } = {}) => {
-  if (!!checkRequiredFields) {
+  if (checkRequiredFields) {
     try {
       if (!looseUuidRegex.test(comment.person) && !looseUuidRegex.test(comment.action)) {
         throw new Error("Comment is missing person or action");
@@ -55,7 +55,7 @@ export const prepareCommentForEncryption = (comment, { checkRequiredFields = tru
   };
 };
 
-export const sortComments = (sortBy, sortOrder) => (a, b) => {
+export const sortComments = (_sortBy, sortOrder) => (a, b) => {
   // sortBy is always `date` for now
   return sortOrder === "ASC" ? new Date(b.date).getTime() - new Date(a.date).getTime() : new Date(a.date).getTime() - new Date(b.date).getTime();
 };

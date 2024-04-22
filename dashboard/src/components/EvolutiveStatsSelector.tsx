@@ -17,7 +17,7 @@ const emptySelection = { fieldName: null, type: null, fromValue: null, toValue: 
 const EvolutiveStatsSelector = ({ onChange, selection, title = "", saveInURLParams = false }: EvolutiveStatsSelectorProps) => {
   const indicatorsBase = useRecoilValue(evolutiveStatsIndicatorsBaseSelector);
 
-  selection = !!selection.length ? selection : [emptySelection];
+  selection = selection.length ? selection : [emptySelection];
   const onAddIndicator = () => onChange([...selection, emptySelection], saveInURLParams);
   const selectCustomOptions = indicatorsBase.map((_indicator) => ({ label: _indicator.label, value: _indicator.name })) || [];
 

@@ -16,7 +16,7 @@ const getDataAsSearchParam = (data, defaultValue) => {
   if (typeof defaultValue === "boolean") return Boolean(data);
   try {
     return JSON.parse(data);
-  } catch (e) {
+  } catch (_e) {
     // should be string
     return data;
   }
@@ -24,7 +24,7 @@ const getDataAsSearchParam = (data, defaultValue) => {
 
 // NOTE: its not possible to update two different URLSearchParams very quickly, the second one cancels the first one
 
-const useSearchParamState = (param, defaultAndInitialValue, { resetToDefaultIfTheFollowingValueChange = null, debug = false } = {}) => {
+const useSearchParamState = (param, defaultAndInitialValue, { resetToDefaultIfTheFollowingValueChange = null } = {}) => {
   const history = useHistory();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -33,7 +33,7 @@ const useSearchParamState = (param, defaultAndInitialValue, { resetToDefaultIfTh
   });
 
   const setStateRequest = (newState, { sideEffect = null } = {}) => {
-    if (!!window) {
+    if (window) {
       const searchParams = new URLSearchParams(location.search);
       searchParams.set(param, setDataAsSearchParam(newState));
       if (Array.isArray(sideEffect) && sideEffect?.length === 2) {

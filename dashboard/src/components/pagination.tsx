@@ -1,7 +1,7 @@
 import Pagination from "react-js-pagination";
 import { Col, Row } from "reactstrap";
 
-const Page = ({ page = 0, limit = 20, total = 0, onChange = ({ page }: { page: number }) => {} }) => (
+const Page = ({ page = 0, limit = 20, total = 0, onChange = (_args: { page: number }) => {} }) => (
   <Row>
     <Col md={12} style={{ marginTop: 10, marginBottom: 10 }}>
       <div style={{ display: "flex", flexDirection: "row", alignItems: "center", marginTop: "1rem" }}>

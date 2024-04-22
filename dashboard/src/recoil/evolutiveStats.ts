@@ -271,7 +271,7 @@ export function computeEvolutiveStatsForPersons({
       }
     }
     const history = person.history;
-    if (!!history?.length) {
+    if (history?.length) {
       const reversedHistory = [...history].reverse();
       for (const historyItem of reversedHistory) {
         const historyDate = dayjsInstance(historyItem.date).format("YYYYMMDD");

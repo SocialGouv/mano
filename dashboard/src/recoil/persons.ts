@@ -140,7 +140,7 @@ export const usePreparePersonForEncryption = () => {
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
   const personFields = useRecoilValue(personFieldsSelector) as PredefinedField[];
   const preparePersonForEncryption = (person: PersonInstance, { checkRequiredFields = true } = {}) => {
-    if (!!checkRequiredFields) {
+    if (checkRequiredFields) {
       try {
         if (!person.name) {
           throw new Error("Person is missing name");

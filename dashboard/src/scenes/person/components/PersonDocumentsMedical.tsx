@@ -83,7 +83,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
       },
     ];
     for (const consultation of consultations) {
-      if (!!consultation?.onlyVisibleBy?.length) {
+      if (consultation?.onlyVisibleBy?.length) {
         if (!consultation.onlyVisibleBy.includes(user._id)) continue;
       }
       for (const document of consultation.documents || []) {

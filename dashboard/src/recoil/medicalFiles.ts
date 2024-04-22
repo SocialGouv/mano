@@ -36,7 +36,7 @@ const encryptedFields = ["person", "documents", "comments", "history"];
 export const prepareMedicalFileForEncryption =
   (customFieldsMedicalFile: CustomField[]) =>
   (medicalFile: MedicalFileInstance | NewMedicalFileInstance, { checkRequiredFields = true } = {}) => {
-    if (!!checkRequiredFields) {
+    if (checkRequiredFields) {
       try {
         if (!looseUuidRegex.test(medicalFile.person)) {
           throw new Error("MedicalFile is missing person");

@@ -1,16 +1,12 @@
 import type { PersonPopulated } from "../types/person";
 import type { UUIDV4 } from "../types/uuid";
 import type { PeriodISODate } from "../types/date";
-import { dayjsInstance } from "../services/date";
-
-const startHistoryFeatureDate = "2022-09-23";
 
 export function filterPersonByAssignedTeam(
   viewAllOrganisationData: boolean,
   selectedTeamsObjectWithOwnPeriod: Record<UUIDV4, PeriodISODate>,
   assignedTeams: PersonPopulated["assignedTeams"],
-  forTeamFiltering: PersonPopulated["forTeamFiltering"],
-  debug = false
+  forTeamFiltering: PersonPopulated["forTeamFiltering"]
 ) {
   if (viewAllOrganisationData) return true;
   if (!assignedTeams?.length) return true; // no assignedTeam is currently forbidden, but hasn't always been the case
@@ -29,7 +25,7 @@ export function filterPersonByAssignedTeam(
   // 3. no assigned team period is found in the selected period
   // 4. period doesn't matter (isoStartDate === null and isoEndDate === null) and assigned team has NOT been included in history
 
-  for (let [teamId, { isoEndDate, isoStartDate }] of Object.entries(selectedTeamsObjectWithOwnPeriod)) {
+  for (const [teamId, { isoEndDate, isoStartDate }] of Object.entries(selectedTeamsObjectWithOwnPeriod)) {
     // GOOD TO KNOW: forTeamFiltering is sorted by date from the oldest to the newest
     // first we need to handle the case of isoStartDate === null and isoEndDate === null (no period)
     if (isoStartDate === null && isoEndDate === null) {

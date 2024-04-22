@@ -330,7 +330,7 @@ function DocumentRow({ document, level, parentIsOpen, position, parentId, color,
         "tw-relative tw-flex tw-justify-between tw-text-ellipsis tw-whitespace-nowrap tw-pl-4 tw-text-gray-800",
         `before:tw-pointer-events-none before:tw-absolute before:tw-right-0 before:tw-top-0 before:tw-h-full before:tw-bg-${color}`,
         `before:-tw-left-${level * 10}`,
-        !!document.group ? "unmovable" : "",
+        document.group ? "unmovable" : "",
       ].join(" ")}
     >
       <div className="tw-flex tw-w-full tw-justify-between tw-overflow-hidden">

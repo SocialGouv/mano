@@ -104,7 +104,7 @@ export const reportsPresets: Array<Preset> = [
 ];
 
 export const formatPeriod = ({ preset, period }: { preset: string | null; period: Period }): string => {
-  if (!!preset) return preset;
+  if (preset) return preset;
   if (!!period.startDate && !!period.endDate) {
     const startFormatted = dayjsInstance(period.startDate).format("D MMM YYYY");
     const endFormatted = dayjsInstance(period.endDate).format("D MMM YYYY");
@@ -151,7 +151,7 @@ const DateRangePickerWithPresets = ({ period, setPeriod, preset, setPreset, remo
   });
 
   const openDatePicker = (event: any) => {
-    if (!!showDatePicker) return event.preventDefault();
+    if (showDatePicker) return event.preventDefault();
     setShowDatepicker(true);
   };
 

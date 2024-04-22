@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import API from "../../services/api";
 import { UserInstance } from "../../types/user";
 import { TeamInstance } from "../../types/team";
@@ -23,9 +23,9 @@ export default function OrganisationUsers({
   const [isGeneratingLinkForUser, setIsGeneratingLinkForUser] = useState<false | string>(false);
   const [generatedLink, setGeneratedLink] = useState<[string, string] | undefined>();
 
-  function onClose() {
+  const onClose = useCallback(() => {
     setOpen(false);
-  }
+  }, [setOpen]);
 
   useEffect(() => {
     if (organisation?._id && open) {
@@ -39,7 +39,7 @@ export default function OrganisationUsers({
     } else {
       onClose();
     }
-  }, [organisation?._id, open, openCreateUserModal]);
+  }, [organisation?._id, open, openCreateUserModal, onClose]);
 
   return (
     <ModalContainer open={open} onClose={onClose} size="full">
