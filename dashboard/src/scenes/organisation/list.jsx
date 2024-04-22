@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Col, Row } from "reactstrap";
 import { ModalBody, ModalHeader, ModalFooter, ModalContainer } from "../../components/tailwind/Modal";
 import { Formik } from "formik";
 import { toast } from "react-toastify";
@@ -7,6 +6,7 @@ import styled from "styled-components";
 import Table from "../../components/table";
 import ButtonCustom from "../../components/ButtonCustom";
 
+import OrganisationUsers from "./OrganisationUsers";
 import Loading from "../../components/loading";
 import API from "../../services/api";
 import { formatAge, formatDateWithFullMonth } from "../../services/date";
@@ -30,7 +30,9 @@ const List = () => {
   const [refresh, setRefresh] = useState(true);
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [openCreateUserModal, setOpenCreateUserModal] = useState(false);
+  const [openUserListModal, setOpenUserListModal] = useState(false);
   const [selectedOrganisation, setSelectedOrganisation] = useState(null);
+  const [open, setOpen] = useState(false);
 
   useTitle("Organisations");
 
@@ -58,6 +60,13 @@ const List = () => {
   return (
     <>
       <Create onChange={() => setRefresh(true)} open={openCreateModal} setOpen={setOpenCreateModal} />
+      <OrganisationUsers
+        open={openUserListModal}
+        organisation={selectedOrganisation}
+        setOpen={setOpenUserListModal}
+        setOpenCreateUserModal={setOpenCreateUserModal}
+        openCreateUserModal={openCreateUserModal}
+      />
       <CreateUser onChange={() => setRefresh(true)} open={openCreateUserModal} setOpen={setOpenCreateUserModal} organisation={selectedOrganisation} />
       <div className="tw-mb-10 tw-mt-4 tw-flex tw-w-full tw-justify-between">
         <h2 className="tw-text-2xl">Organisations utilisant Mano ({total})</h2>
@@ -178,8 +187,10 @@ const List = () => {
                     <div>
                       <button
                         className="button-classic"
+                        type="button"
                         onClick={() => {
-                          history.push(`/organisation/${organisation._id}/user`);
+                          setSelectedOrganisation(organisation);
+                          setOpenUserListModal(true);
                         }}
                       >
                         Voir les utilisateurs
@@ -187,6 +198,7 @@ const List = () => {
                     </div>
                     <div>
                       <button
+                        type="button"
                         onClick={() => {
                           setSelectedOrganisation(organisation);
                           setOpenCreateUserModal(true);
