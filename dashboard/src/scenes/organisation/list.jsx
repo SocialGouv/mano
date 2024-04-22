@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Col, FormGroup, Input, Modal, ModalBody, ModalHeader, Row, Label } from "reactstrap";
+import { Col, Row } from "reactstrap";
+import { ModalBody, ModalHeader, ModalFooter, ModalContainer } from "../../components/tailwind/Modal";
 import { Formik } from "formik";
 import { toast } from "react-toastify";
 import styled from "styled-components";
@@ -173,7 +174,7 @@ const List = () => {
               dataKey: "delete",
               render: (organisation) => {
                 return (
-                  <div className="tw-grid tw-gap-2">
+                  <div className="tw-flex-col tw-flex tw-gap-y-2">
                     <div>
                       <button
                         className="button-classic"
@@ -190,7 +191,7 @@ const List = () => {
                           setSelectedOrganisation(organisation);
                           setOpenCreateUserModal(true);
                         }}
-                        className="button-classic"
+                        className="button-classic tw-text-left"
                       >
                         Ajouter un utilisateur
                       </button>
@@ -246,86 +247,95 @@ const StyledCounters = styled.p`
 const Create = ({ onChange, open, setOpen }) => {
   return (
     <>
-      <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
-        <ModalHeader toggle={() => setOpen(false)}>Créer une nouvelle organisation et un administrateur</ModalHeader>
-        <ModalBody>
-          <Formik
-            initialValues={{ orgName: "", name: "", email: "", orgId: "", city: "" }}
-            validate={(values) => {
-              const errors = {};
-              if (!values.name) errors.name = "Le nom est obligatoire";
-              if (!values.orgName) errors.orgName = "Le nom de l'organisation est obligatoire";
-              if (!values.orgId) errors.orgId = "L'identifiant est obligatoire";
-              if (!values.city) errors.city = "La ville est obligatoire";
-              if (!values.email) errors.email = "L'email est obligatoire";
-              else if (!emailRegex.test(values.email)) errors.email = "L'email est invalide";
-              return errors;
-            }}
-            onSubmit={async (body, actions) => {
-              try {
-                const orgRes = await API.post({ path: "/organisation", body });
-                actions.setSubmitting(false);
-                if (!orgRes.ok) return;
-                toast.success("Création réussie !");
-                onChange();
-                setOpen(false);
-              } catch (orgCreationError) {
-                console.log("error in creating organisation", orgCreationError);
-                toast.error(orgCreationError.message);
-              }
-            }}
-          >
-            {({ values, handleChange, handleSubmit, isSubmitting, touched, errors }) => (
-              <React.Fragment>
-                <Row>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label htmlFor="orgName">Nom</Label>
-                      <Input name="orgName" id="orgName" value={values.orgName} onChange={handleChange} />
-                      {touched.orgName && errors.orgName && <span className="tw-text-xs tw-text-red-500">{errors.orgName}</span>}
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label htmlFor="orgName">
-                        Identifiant interne <small>(non modifiable)</small>
-                      </Label>
-                      <Input name="orgId" id="orgId" value={values.orgId} onChange={handleChange} />
-                      {touched.orgId && errors.orgId && <span className="tw-text-xs tw-text-red-500">{errors.orgId}</span>}
-                    </FormGroup>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col md={12}>
-                    <FormGroup>
-                      <Label htmlFor="city">Ville</Label>
-                      <Input name="city" id="city" value={values.city} onChange={handleChange} />
-                      {touched.city && errors.city && <span className="tw-text-xs tw-text-red-500">{errors.city}</span>}
-                    </FormGroup>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label htmlFor="name">Nom de l’administrateur</Label>
-                      <Input name="name" id="name" value={values.name} onChange={handleChange} />
-                      {touched.name && errors.name && <span className="tw-text-xs tw-text-red-500">{errors.name}</span>}
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label htmlFor="email">Email de l’administrateur</Label>
-                      <Input name="email" id="email" value={values.email} onChange={handleChange} />
-                      {touched.email && errors.email && <span className="tw-text-xs tw-text-red-500">{errors.email}</span>}
-                    </FormGroup>
-                  </Col>
-                </Row>
-                <ButtonCustom loading={isSubmitting} onClick={handleSubmit} title="Créer" />
-              </React.Fragment>
-            )}
-          </Formik>
-        </ModalBody>
-      </Modal>
+      <ModalContainer open={open} onClose={() => setOpen(false)} size="3xl" blurryBackground>
+        <ModalHeader title="Créer une nouvelle organisation et un administrateur" />
+        <Formik
+          initialValues={{ orgName: "", name: "", email: "", orgId: "", city: "" }}
+          validate={(values) => {
+            const errors = {};
+            if (!values.name) errors.name = "Le nom est obligatoire";
+            if (!values.orgName) errors.orgName = "Le nom de l'organisation est obligatoire";
+            if (!values.orgId) errors.orgId = "L'identifiant est obligatoire";
+            if (!values.city) errors.city = "La ville est obligatoire";
+            if (!values.email) errors.email = "L'email est obligatoire";
+            else if (!emailRegex.test(values.email)) errors.email = "L'email est invalide";
+            return errors;
+          }}
+          onSubmit={async (body, actions) => {
+            try {
+              const orgRes = await API.post({ path: "/organisation", body });
+              actions.setSubmitting(false);
+              if (!orgRes.ok) return;
+              toast.success("Création réussie !");
+              onChange();
+              setOpen(false);
+            } catch (orgCreationError) {
+              console.log("error in creating organisation", orgCreationError);
+              toast.error(orgCreationError.message);
+            }
+          }}
+        >
+          {({ values, handleChange, handleSubmit, isSubmitting, touched, errors }) => (
+            <>
+              <ModalBody className="tw-px-4 tw-py-2 tw-pb-20">
+                <React.Fragment>
+                  <div className="-tw-mx-4 tw-flex tw-flex-row tw-flex-wrap">
+                    <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
+                      <div className="tw-mb-4">
+                        <label htmlFor="orgName">Nom</label>
+                        <input className="tailwindui" name="orgName" id="orgName" value={values.orgName} onChange={handleChange} />
+                        {touched.orgName && errors.orgName && <span className="tw-text-xs tw-text-red-500">{errors.orgName}</span>}
+                      </div>
+                    </div>
+                    <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
+                      <div className="tw-mb-4">
+                        <label htmlFor="orgName">
+                          Identifiant interne <small>(non modifiable)</small>
+                        </label>
+                        <input className="tailwindui" name="orgId" id="orgId" value={values.orgId} onChange={handleChange} />
+                        {touched.orgId && errors.orgId && <span className="tw-text-xs tw-text-red-500">{errors.orgId}</span>}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="-tw-mx-4 tw-flex tw-flex-row tw-flex-wrap">
+                    <div className="tw-flex tw-basis-full tw-flex-col tw-px-4 tw-py-2">
+                      <div className="tw-mb-4">
+                        <label htmlFor="city">Ville</label>
+                        <input className="tailwindui" name="city" id="city" value={values.city} onChange={handleChange} />
+                        {touched.city && errors.city && <span className="tw-text-xs tw-text-red-500">{errors.city}</span>}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="-tw-mx-4 tw-flex tw-flex-row tw-flex-wrap">
+                    <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
+                      <div className="tw-mb-4">
+                        <label htmlFor="name">Nom de l’administrateur</label>
+                        <input className="tailwindui" name="name" id="name" value={values.name} onChange={handleChange} />
+                        {touched.name && errors.name && <span className="tw-text-xs tw-text-red-500">{errors.name}</span>}
+                      </div>
+                    </div>
+                    <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
+                      <div className="tw-mb-4">
+                        <label htmlFor="email">Email de l’administrateur</label>
+                        <input className="tailwindui" name="email" id="email" value={values.email} onChange={handleChange} />
+                        {touched.email && errors.email && <span className="tw-text-xs tw-text-red-500">{errors.email}</span>}
+                      </div>
+                    </div>
+                  </div>
+                </React.Fragment>
+              </ModalBody>
+              <ModalFooter>
+                <button type="button" name="cancel" className="button-cancel" onClick={() => setOpen(false)}>
+                  Annuler
+                </button>
+                <button className="button-submit" onClick={handleSubmit}>
+                  Créer
+                </button>
+              </ModalFooter>
+            </>
+          )}
+        </Formik>
+      </ModalContainer>
     </>
   );
 };
@@ -344,109 +354,118 @@ const CreateUser = ({ onChange, open, setOpen, organisation }) => {
 
   return (
     <>
-      <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
-        <ModalHeader toggle={() => setOpen(false)}>Créer un utilisateur pour {organisation.orgId}</ModalHeader>
-        <ModalBody>
-          <Formik
-            initialValues={{ name: "", email: "", phone: "", team, healthcareProfessional: false }}
-            onSubmit={async (body, actions) => {
-              try {
-                if (!body.email) return toast.error("L'email est obligatoire");
-                if (!emailRegex.test(body.email)) return toast.error("L'email est invalide");
-                if (!body.role) return toast.error("Le rôle est obligatoire");
+      <ModalContainer open={open} onClose={() => setOpen(false)} size="3xl" blurryBackground>
+        <Formik
+          initialValues={{ name: "", email: "", phone: "", team, healthcareProfessional: false }}
+          onSubmit={async (body, actions) => {
+            try {
+              if (!body.email) return toast.error("L'email est obligatoire");
+              if (!emailRegex.test(body.email)) return toast.error("L'email est invalide");
+              if (!body.role) return toast.error("Le rôle est obligatoire");
 
-                body.organisation = organisation._id;
-                const { ok } = await API.post({ path: "/user", body });
-                if (!ok) {
-                  return false;
-                }
-                toast.success("Création réussie !");
-                onChange();
-                setOpen(false);
-              } catch (orgCreationError) {
-                console.log("error in creating organisation", orgCreationError);
-                actions.setSubmitting(false);
-                toast.error(orgCreationError.message);
+              body.organisation = organisation._id;
+              const { ok } = await API.post({ path: "/user", body });
+              if (!ok) {
+                return false;
               }
-            }}
-          >
-            {({ values, handleChange, handleSubmit, isSubmitting }) => (
-              <React.Fragment>
-                <Row>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label htmlFor="name">Nom</Label>
-                      <Input name="name" id="name" value={values.name} onChange={handleChange} />
-                    </FormGroup>
-                  </Col>
-
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label htmlFor="email">Email</Label>
-                      <Input name="email" id="email" value={values.email} onChange={handleChange} />
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label htmlFor="phone">Téléphone</Label>
-                      <Input name="phone" id="phone" value={values.phone} onChange={handleChange} />
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label htmlFor="team">Équipes</Label>
-                      <div>
-                        <SelectCustom
-                          name="name"
-                          options={team}
-                          onChange={(teams) => handleChange({ target: { value: teams?.map((t) => t._id) || [], name: "team" } })}
-                          value={values.team.map((_teamId) => team.find((_team) => _team._id === _teamId))}
-                          getOptionValue={(team) => team._id}
-                          getOptionLabel={(team) => team.name}
-                          isMulti
-                          isDisabled={team.length === 0}
-                          inputId="team"
-                        />
+              toast.success("Création réussie !");
+              onChange();
+              setOpen(false);
+            } catch (orgCreationError) {
+              console.log("error in creating organisation", orgCreationError);
+              actions.setSubmitting(false);
+              toast.error(orgCreationError.message);
+            }
+          }}
+        >
+          {({ values, handleChange, handleSubmit, isSubmitting }) => (
+            <>
+              <ModalHeader title={`Créer un utilisateur pour ${organisation.orgId}`} />
+              <ModalBody className="tw-px-4 tw-py-2 tw-pb-20">
+                <React.Fragment>
+                  <div className="-tw-mx-4 tw-flex tw-flex-row tw-flex-wrap">
+                    <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
+                      <div className="tw-mb-4">
+                        <label htmlFor="name">Nom</label>
+                        <input className="tailwindui" name="name" id="name" value={values.name} onChange={handleChange} />
                       </div>
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label htmlFor="role">Role</Label>
-                      <SelectRole handleChange={handleChange} value={values.role} />
-                    </FormGroup>
-                  </Col>
-                  <div className="tw-flex tw-basis-full tw-flex-col tw-px-4 tw-py-2">
-                    <label htmlFor="healthcareProfessional" style={{ marginBottom: 0 }}>
-                      <input
-                        type="checkbox"
-                        style={{ marginRight: "0.5rem" }}
-                        name="healthcareProfessional"
-                        id="healthcareProfessional"
-                        checked={values.healthcareProfessional}
-                        onChange={() => {
-                          handleChange({
-                            target: {
-                              name: "healthcareProfessional",
-                              checked: Boolean(!values.healthcareProfessional),
-                              value: Boolean(!values.healthcareProfessional),
-                            },
-                          });
-                        }}
-                      />
-                      Professionnel·le de santé
-                    </label>
-                    <div>
-                      <small className="text-muted">Un professionnel·le de santé a accès au dossier médical complet des personnes.</small>
+                    </div>
+
+                    <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
+                      <div className="tw-mb-4">
+                        <label htmlFor="email">Email</label>
+                        <input className="tailwindui" type="email" name="email" id="email" value={values.email} onChange={handleChange} />
+                      </div>
+                    </div>
+                    <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
+                      <div className="tw-mb-4">
+                        <label htmlFor="phone">Téléphone</label>
+                        <input className="tailwindui" type="tel" name="phone" id="phone" value={values.phone} onChange={handleChange} />
+                      </div>
+                    </div>
+                    <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
+                      <div className="tw-mb-4">
+                        <label htmlFor="team">Équipes</label>
+                        <div>
+                          <SelectCustom
+                            name="name"
+                            options={team}
+                            onChange={(teams) => handleChange({ target: { value: teams?.map((t) => t._id) || [], name: "team" } })}
+                            value={values.team.map((_teamId) => team.find((_team) => _team._id === _teamId))}
+                            getOptionValue={(team) => team._id}
+                            getOptionLabel={(team) => team.name}
+                            isMulti
+                            isDisabled={team.length === 0}
+                            inputId="team"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
+                      <div className="tw-mb-4">
+                        <label htmlFor="role">Role</label>
+                        <SelectRole handleChange={handleChange} value={values.role} />
+                      </div>
+                    </div>
+                    <div className="tw-flex tw-basis-full tw-flex-col tw-px-4 tw-py-2">
+                      <label htmlFor="healthcareProfessional" className="tw-mb-0">
+                        <input
+                          type="checkbox"
+                          className="tw-mr-2"
+                          name="healthcareProfessional"
+                          id="healthcareProfessional"
+                          checked={values.healthcareProfessional}
+                          onChange={() => {
+                            handleChange({
+                              target: {
+                                name: "healthcareProfessional",
+                                checked: Boolean(!values.healthcareProfessional),
+                                value: Boolean(!values.healthcareProfessional),
+                              },
+                            });
+                          }}
+                        />
+                        Professionnel·le de santé
+                      </label>
+                      <div>
+                        <small className="text-muted">Un professionnel·le de santé a accès au dossier médical complet des personnes.</small>
+                      </div>
                     </div>
                   </div>
-                </Row>
-                <ButtonCustom loading={isSubmitting} onClick={handleSubmit} title="Créer" />
-              </React.Fragment>
-            )}
-          </Formik>
-        </ModalBody>
-      </Modal>
+                </React.Fragment>
+              </ModalBody>
+              <ModalFooter>
+                <button type="button" name="cancel" className="button-cancel" onClick={() => setOpen(false)}>
+                  Annuler
+                </button>
+                <button className="button-submit" onClick={handleSubmit}>
+                  Créer
+                </button>
+              </ModalFooter>
+            </>
+          )}
+        </Formik>
+      </ModalContainer>
     </>
   );
 };

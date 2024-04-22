@@ -45,7 +45,7 @@
 div.tailwindui,
 input.tailwindui,
 textarea.tailwindui {
-  @apply tw-relative tw-mt-1 tw-block tw-w-full tw-appearance-none tw-rounded tw-border tw-border-gray-300 tw-px-2 tw-py-2 tw-text-base tw-shadow-sm focus:tw-border-indigo-500 focus:tw-ring-indigo-500 sm:tw-text-sm;
+  @apply tw-relative tw-mt-1 tw-block tw-w-full tw-appearance-none tw-rounded tw-border tw-border-gray-300 tw-px-2 tw-py-2 tw-text-base tw-shadow-sm focus:tw-border-main focus:tw-ring-main sm:tw-text-sm;
 }
 label.tailwindui {
   @apply tw-mb-2 tw-block tw-text-gray-700;
