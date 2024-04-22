@@ -90,6 +90,8 @@ const List = () => {
                   {o.name}
                   <br />
                   <small className="tw-text-gray-500">ID: {o.orgId}</small>
+                  <br />
+                  <small className="tw-text-gray-500">Ville: {o.city}</small>
                 </div>
               ),
             },
@@ -255,12 +257,13 @@ const Create = ({ onChange, open, setOpen }) => {
         <ModalHeader toggle={() => setOpen(false)}>Créer une nouvelle organisation et un administrateur</ModalHeader>
         <ModalBody>
           <Formik
-            initialValues={{ orgName: "", name: "", email: "", orgId: "" }}
+            initialValues={{ orgName: "", name: "", email: "", orgId: "", city: "" }}
             validate={(values) => {
               const errors = {};
               if (!values.name) errors.name = "Le nom est obligatoire";
               if (!values.orgName) errors.orgName = "Le nom de l'organisation est obligatoire";
               if (!values.orgId) errors.orgId = "L'identifiant est obligatoire";
+              if (!values.city) errors.city = "La ville est obligatoire";
               if (!values.email) errors.email = "L'email est obligatoire";
               else if (!emailRegex.test(values.email)) errors.email = "L'email est invalide";
               return errors;
@@ -296,6 +299,15 @@ const Create = ({ onChange, open, setOpen }) => {
                       </Label>
                       <Input name="orgId" id="orgId" value={values.orgId} onChange={handleChange} />
                       {touched.orgId && errors.orgId && <span className="tw-text-xs tw-text-red-500">{errors.orgId}</span>}
+                    </FormGroup>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col md={12}>
+                    <FormGroup>
+                      <Label htmlFor="city">Ville</Label>
+                      <Input name="city" id="city" value={values.city} onChange={handleChange} />
+                      {touched.city && errors.city && <span className="tw-text-xs tw-text-red-500">{errors.city}</span>}
                     </FormGroup>
                   </Col>
                 </Row>

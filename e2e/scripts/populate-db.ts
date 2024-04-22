@@ -24,6 +24,7 @@ async function createUsersAndOrgas() {
 
   for (let i = 1; i < 12; i++) {
     const orgId = uuidv4();
+    const city = "Rouen";
     const adminId = uuidv4();
     const healthProfessionalId = uuidv4();
     const normalUserId = uuidv4();
@@ -46,7 +47,8 @@ async function createUsersAndOrgas() {
         services,
         "receptionEnabled",
         collaborations,
-        "fieldsPersonsCustomizableOptions"
+        "fieldsPersonsCustomizableOptions",
+        city
       ) VALUES (
         $1,
         $3,
@@ -59,9 +61,10 @@ async function createUsersAndOrgas() {
         '{Café,Douche,Repas,Kit,"Don chaussures","Distribution seringue"}',
         true,
         '{"Ma première collab"}',
-        '[{"name": "outOfActiveListReasons", "type": "multi-choice", "label": "Motif(s) de sortie de file active", "enabled": true, "options": ["Relai vers autre structure", "Hébergée", "Décès", "Incarcération", "Départ vers autre région", "Perdu de vue", "Hospitalisation", "Reconduite à la frontière"], "showInStats": true}]'
+        '[{"name": "outOfActiveListReasons", "type": "multi-choice", "label": "Motif(s) de sortie de file active", "enabled": true, "options": ["Relai vers autre structure", "Hébergée", "Décès", "Incarcération", "Départ vers autre région", "Perdu de vue", "Hospitalisation", "Reconduite à la frontière"], "showInStats": true}]',
+        $4
       );`,
-      [orgId, date, `Orga Test - ${i}`]
+      [orgId, date, `Orga Test - ${i}`, city]
     );
 
     await client.query(
