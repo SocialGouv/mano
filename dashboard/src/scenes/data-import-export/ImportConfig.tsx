@@ -1,4 +1,4 @@
-import { MutableRefObject, useRef, useState } from "react";
+import React, { MutableRefObject, useRef, useState } from "react";
 import { utils, read, writeFile, WorkBook } from "@e965/xlsx";
 import { toast } from "react-toastify";
 import { useRecoilState, useRecoilValue } from "recoil";
@@ -7,12 +7,13 @@ import ButtonCustom from "../../components/ButtonCustom";
 import { customFieldsPersonsSelector } from "../../recoil/persons";
 import { newCustomField, typeOptions } from "../../utils";
 import { groupedCustomFieldsMedicalFileSelector } from "../../recoil/medicalFiles";
-import { organisationState } from "../../recoil/auth";
+import { organisationState, teamsState } from "../../recoil/auth";
 import { groupedCustomFieldsObsSelector } from "../../recoil/territoryObservations";
 import { servicesSelector } from "../../recoil/reports";
 import { actionsCategoriesSelector } from "../../recoil/actions";
 import API from "../../services/api";
 import { OrganisationInstance } from "../../types/organisation";
+import { TeamInstance } from "../../types/team";
 import { CustomField, CustomFieldsGroup, FieldType } from "../../types/field";
 
 const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HTMLDivElement> }) => {
@@ -21,6 +22,7 @@ const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HT
   const [reloadKey, setReloadKey] = useState(0); // because input type 'file' doesn't trigger 'onChange' for uploading twice the same file
 
   const [organisation, setOrganisation] = useRecoilState(organisationState);
+  const teams = useRecoilValue(teamsState);
   const customFieldsPersons = useRecoilValue(customFieldsPersonsSelector);
 
   const groupedCustomFieldsObs = useRecoilValue(groupedCustomFieldsObsSelector);
@@ -45,7 +47,7 @@ const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HT
       const bstr = evt.target.result;
       const workbook = read(bstr, { type: "binary" });
 
-      const data = processConfigWorkbook(workbook);
+      const data = processConfigWorkbook(workbook, teams);
       setWorkbookData(data);
       scrollContainer.current.scrollTo({ top: 0 });
     };
@@ -83,7 +85,7 @@ const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HT
             tout est correct avant de valider. Si vous n'avez pas d'erreur, vous pouvez ensuite cliquer sur le bouton "Valider l'import" à l'étape
             suivante. Les champs attendus sont les suivants:
           </p>
-          <table className="table-sm table" style={{ fontSize: "14px", marginTop: "2rem" }}>
+          <table className="table-sm table !tw-text-sm tw-mt-8">
             <thead>
               <tr>
                 <th>Feuille</th>
@@ -93,11 +95,28 @@ const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HT
             </thead>
             <tbody>
               {Object.entries(workbookColumns).map(([sheetName, columns]) => {
-                return columns.map((col, i) => (
+                const withTeams =
+                  sheetName === "Infos social et médical" ||
+                  sheetName === "Dossier médical" ||
+                  sheetName === "Consultation" ||
+                  sheetName === "Observation de territoire";
+                return [...columns, withTeams ? "[Nom d'une équipe]" : ""].filter(Boolean).map((col, i) => (
                   <tr key={i}>
                     <td>{sheetName}</td>
                     <td>{col}</td>
-                    <td>{col === "Choix" ? <code className="tw-whitespace-pre">{typeOptionsLabels.join("\n")}</code> : "Texte"}</td>
+                    <td>
+                      {col === "Choix" ? (
+                        <code className="tw-whitespace-pre">{typeOptionsLabels.join("\n")}</code>
+                      ) : col === "[Nom d'une équipe]" ? (
+                        <>
+                          <code className="tw-whitespace-pre">X</code> si l'équipe doit être activée pour ce champ
+                          <br />
+                          on laisse tout vide si le champ est activé pour toutes les équipes
+                        </>
+                      ) : (
+                        "Texte"
+                      )}
+                    </td>
                   </tr>
                 ));
               })}
@@ -112,7 +131,7 @@ const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HT
                 utils.book_append_sheet(
                   workbook,
                   utils.aoa_to_sheet([
-                    ["Rubrique", "Intitulé du champ", "Type de champ", "Choix"],
+                    ["Rubrique", "Intitulé du champ", "Type de champ", "Choix", ...teams.map((t) => t.name)],
                     ...customFieldsPersons.reduce((acc, curr) => {
                       return [
                         ...acc,
@@ -121,6 +140,7 @@ const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HT
                           e.label,
                           typeOptions.find((t) => t.value === e.type)!.label,
                           (e.options || []).join(","),
+                          ...teams.map((t) => ((e.enabledTeams || []).includes(t._id) ? "X" : "")),
                         ]),
                       ];
                     }, [] as string[][]),
@@ -131,7 +151,7 @@ const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HT
                 utils.book_append_sheet(
                   workbook,
                   utils.aoa_to_sheet([
-                    ["Rubrique", "Intitulé du champ", "Type de champ", "Choix"],
+                    ["Rubrique", "Intitulé du champ", "Type de champ", "Choix", ...teams.map((t) => t.name)],
                     ...groupedCustomFieldsMedicalFile.reduce((acc, curr) => {
                       return [
                         ...acc,
@@ -140,6 +160,7 @@ const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HT
                           e.label,
                           typeOptions.find((t) => t.value === e.type)!.label,
                           (e.options || []).join(","),
+                          ...teams.map((t) => ((e.enabledTeams || []).includes(t._id) ? "X" : "")),
                         ]),
                       ];
                     }, [] as string[][]),
@@ -150,7 +171,7 @@ const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HT
                 utils.book_append_sheet(
                   workbook,
                   utils.aoa_to_sheet([
-                    ["Consultation type pour", "Intitulé du champ", "Type de champ", "Choix"],
+                    ["Consultation type pour", "Intitulé du champ", "Type de champ", "Choix", ...teams.map((t) => t.name)],
                     ...consultationFields.reduce((acc, curr) => {
                       return [
                         ...acc,
@@ -159,6 +180,7 @@ const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HT
                           e.label,
                           typeOptions.find((t) => t.value === e.type)!.label,
                           (e.options || []).join(","),
+                          ...teams.map((t) => ((e.enabledTeams || []).includes(t._id) ? "X" : "")),
                         ]),
                       ];
                     }, [] as string[][]),
@@ -169,7 +191,7 @@ const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HT
                 utils.book_append_sheet(
                   workbook,
                   utils.aoa_to_sheet([
-                    ["Rubrique", "Intitulé du champ", "Type de champ", "Choix"],
+                    ["Rubrique", "Intitulé du champ", "Type de champ", "Choix", ...teams.map((t) => t.name)],
                     ...groupedCustomFieldsObs.reduce((acc, curr) => {
                       return [
                         ...acc,
@@ -178,6 +200,7 @@ const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HT
                           e.label,
                           typeOptions.find((t) => t.value === e.type)!.label,
                           (e.options || []).join(","),
+                          ...teams.map((t) => ((e.enabledTeams || []).includes(t._id) ? "X" : "")),
                         ]),
                       ];
                     }, [] as string[][]),
@@ -232,7 +255,7 @@ const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HT
             Le fichier a été analysé. Relisez attentivement le compte rendu pour vérifier que c'est bien ce qui est attendu. Quand tout vous semble
             bon, cliquez sur le bouton "Valider l'import" en bas (pas de retour arrière possible).
           </div>
-          {Object.entries(workbookData).map(([sheetName, { data, globalErrors, errors }]) => (
+          {Object.entries(workbookData).map(([sheetName, { data, globalErrors, errors, withTeams }]) => (
             <div key={sheetName}>
               <h4 className="tw-mb-4 tw-mt-10 tw-flex tw-justify-between tw-text-lg tw-font-bold">{sheetName}</h4>
               {!globalErrors.length && !errors.length && data.length > 0 && (
@@ -262,6 +285,7 @@ const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HT
                             {col}
                           </th>
                         ))}
+                        {withTeams ? <th className="tw-bg-slate-50 tw-px-4 tw-py-2 tw-text-sm tw-font-normal">Équipes activées</th> : null}
                       </tr>
                     </thead>
                     <tbody className="tw-text-sm">
@@ -278,11 +302,17 @@ const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HT
                           {Object.values(row).map((value, j) => (
                             <td className="tw-px-4 tw-py-2" key={j}>
                               {Array.isArray(value)
-                                ? value.map((v) => (
-                                    <div key={v} className="tw-text-xs">
-                                      {v}
-                                    </div>
-                                  ))
+                                ? value.map((v) => {
+                                    if (!v) return "";
+                                    return (
+                                      <React.Fragment key={v?.name ?? v}>
+                                        <code className="tw-text-xs tw-bg-gray-50 tw-border-gray-200 border tw-px-1">
+                                          {typeof v === "object" ? v.name : v}
+                                        </code>
+                                        <br />
+                                      </React.Fragment>
+                                    );
+                                  })
                                 : value
                                   ? String(value)
                                   : ""}
@@ -368,13 +398,14 @@ const workbookColumns: Record<SheetName, string[]> = {
 type WorkbookData = Record<
   SheetName,
   {
-    data: Record<string, string | string[]>[];
+    data: Record<string, string | string[] | TeamInstance[]>[];
     globalErrors: string[];
     errors: { line: number; col: number; message: string }[];
+    withTeams?: boolean;
   }
 >;
 
-function trimAllValues<R extends Record<string, string | string[]>>(obj: R): R {
+function trimAllValues<R extends Record<string, string | string[] | TeamInstance[]>>(obj: R): R {
   if (typeof obj !== "object") return obj;
   return Object.fromEntries(
     Object.entries(obj).map(([k, v]) => [
@@ -385,11 +416,16 @@ function trimAllValues<R extends Record<string, string | string[]>>(obj: R): R {
 }
 
 // Parse le fichier Excel et retourne un objet contenant les données et les erreurs
-function processConfigWorkbook(workbook: WorkBook): WorkbookData {
+function processConfigWorkbook(workbook: WorkBook, teams: Array<TeamInstance>): WorkbookData {
   const data: WorkbookData = sheetNames.reduce((acc, sheetName) => {
-    return { ...acc, [sheetName]: { data: [], globalErrors: [], errors: [] } };
+    return { ...acc, [sheetName]: { data: [], globalErrors: [], errors: [], withTeams: false } };
   }, {} as WorkbookData);
   for (const sheetName of sheetNames) {
+    const withTeams =
+      sheetName === "Infos social et médical" ||
+      sheetName === "Dossier médical" ||
+      sheetName === "Consultation" ||
+      sheetName === "Observation de territoire";
     if (!workbook.SheetNames.includes(sheetName)) {
       data[sheetName].globalErrors.push(`La feuille ${sheetName} est manquante`);
       continue;
@@ -401,53 +437,66 @@ function processConfigWorkbook(workbook: WorkBook): WorkbookData {
     for (const col of workbookColumns[sheetName]) {
       if (!rows[0].includes(col)) data[sheetName].globalErrors.push(`La colonne ${col} est manquante`);
     }
+    if (withTeams) {
+      for (const team of teams) {
+        if (!rows[0].includes(team.name)) data[sheetName].globalErrors.push(`La colonne de l'équipe ${team.name} est manquante`);
+      }
+    }
     if (data[sheetName].globalErrors.length > 0) continue;
 
     const rowsWithoutHeader = rows.slice(1);
     for (const key in rowsWithoutHeader) {
       const row = rowsWithoutHeader[key];
       if (sheetName === "Infos social et médical") {
-        const [rubrique, intitule, type, choix] = row;
+        const [rubrique, intitule, type, choix, ...teamsCrossed] = row;
         if (!rubrique) data[sheetName].errors.push({ line: parseInt(key), col: 0, message: `La rubrique est manquante` });
         if (!intitule) data[sheetName].errors.push({ line: parseInt(key), col: 1, message: `L'intitulé du champ est manquant` });
         if (!type) data[sheetName].errors.push({ line: parseInt(key), col: 2, message: `Le type de champ est manquant` });
         if (requiresOptions(type as TypeOptionLabel) && !choix)
           data[sheetName].errors.push({ line: parseInt(key), col: 3, message: `Les choix sont manquants` });
         if (!isTypeOptionLabel(type)) data[sheetName].errors.push({ line: parseInt(key), col: 2, message: `Le type ${type} n'existe pas` });
-        data[sheetName].data.push(trimAllValues({ rubrique, intitule, type, choix: choix?.split(",") || [] }));
+        const enabledTeams: Array<TeamInstance> = teamsCrossed.map((teamCrossed, index) => (teamCrossed ? teams[index] : null)).filter(Boolean);
+        data[sheetName].data.push(trimAllValues({ rubrique, intitule, type, choix: choix?.split(",") || [], enabledTeams }));
+        data[sheetName].withTeams = true;
       }
 
       if (sheetName === "Dossier médical") {
-        const [rubrique, intitule, type, choix] = row;
+        const [rubrique, intitule, type, choix, ...teamsCrossed] = row;
         if (!rubrique) data[sheetName].errors.push({ line: parseInt(key), col: 0, message: `La rubrique est manquante` });
         if (!intitule) data[sheetName].errors.push({ line: parseInt(key), col: 1, message: `L'intitulé du champ est manquant` });
         if (!type) data[sheetName].errors.push({ line: parseInt(key), col: 2, message: `Le type de champ est manquant` });
         if (requiresOptions(type as TypeOptionLabel) && !choix)
           data[sheetName].errors.push({ line: parseInt(key), col: 3, message: `Les choix sont manquants` });
         if (!isTypeOptionLabel(type)) data[sheetName].errors.push({ line: parseInt(key), col: 2, message: `Le type ${type} n'existe pas` });
-        data[sheetName].data.push(trimAllValues({ rubrique, intitule, type, choix: choix?.split(",") || [] }));
+        const enabledTeams: Array<TeamInstance> = teamsCrossed.map((teamCrossed, index) => (teamCrossed ? teams[index] : null)).filter(Boolean);
+        data[sheetName].data.push(trimAllValues({ rubrique, intitule, type, choix: choix?.split(",") || [], enabledTeams }));
+        data[sheetName].withTeams = true;
       }
 
       if (sheetName === "Consultation") {
-        const [rubrique, intitule, type, choix] = row;
+        const [rubrique, intitule, type, choix, ...teamsCrossed] = row;
         if (!rubrique) data[sheetName].errors.push({ line: parseInt(key), col: 0, message: `La rubrique est manquante` });
         if (!intitule) data[sheetName].errors.push({ line: parseInt(key), col: 1, message: `L'intitulé du champ est manquant` });
         if (!type) data[sheetName].errors.push({ line: parseInt(key), col: 2, message: `Le type de champ est manquant` });
         if (requiresOptions(type as TypeOptionLabel) && !choix)
           data[sheetName].errors.push({ line: parseInt(key), col: 3, message: `Les choix sont manquants` });
         if (!isTypeOptionLabel(type)) data[sheetName].errors.push({ line: parseInt(key), col: 2, message: `Le type ${type} n'existe pas` });
-        data[sheetName].data.push(trimAllValues({ rubrique, intitule, type, choix: choix?.split(",") || [] }));
+        const enabledTeams: Array<TeamInstance> = teamsCrossed.map((teamCrossed, index) => (teamCrossed ? teams[index] : null)).filter(Boolean);
+        data[sheetName].data.push(trimAllValues({ rubrique, intitule, type, choix: choix?.split(",") || [], enabledTeams }));
+        data[sheetName].withTeams = true;
       }
 
       if (sheetName === "Observation de territoire") {
-        const [rubrique, intitule, type, choix] = row;
+        const [rubrique, intitule, type, choix, ...teamsCrossed] = row;
         if (!rubrique) data[sheetName].errors.push({ line: parseInt(key), col: 0, message: `La rubrique est manquante` });
         if (!intitule) data[sheetName].errors.push({ line: parseInt(key), col: 1, message: `L'intitulé du champ est manquant` });
         if (!type) data[sheetName].errors.push({ line: parseInt(key), col: 2, message: `Le type de champ est manquant` });
         if (requiresOptions(type as TypeOptionLabel) && !choix)
           data[sheetName].errors.push({ line: parseInt(key), col: 3, message: `Les choix sont manquants` });
         if (!isTypeOptionLabel(type)) data[sheetName].errors.push({ line: parseInt(key), col: 2, message: `Le type ${type} n'existe pas` });
-        data[sheetName].data.push(trimAllValues({ rubrique, intitule, type, choix: choix?.split(",") || [] }));
+        const enabledTeams: Array<TeamInstance> = teamsCrossed.map((teamCrossed, index) => (teamCrossed ? teams[index] : null)).filter(Boolean);
+        data[sheetName].data.push(trimAllValues({ rubrique, intitule, type, choix: choix?.split(",") || [], enabledTeams }));
+        data[sheetName].withTeams = true;
       }
 
       if (sheetName === "Liste des services") {
@@ -468,16 +517,17 @@ function processConfigWorkbook(workbook: WorkBook): WorkbookData {
   return data;
 }
 
-function mergerFieldWithPrevious(field: Partial<CustomField>, previousField?: CustomField): CustomField {
-  return {
+function mergeFieldWithPrevious(field: Partial<CustomField>, previousField?: CustomField): CustomField {
+  const nextField = {
     ...(newCustomField() as CustomField),
     name: `custom-${new Date().toISOString().split(".").join("-").split(":").join("-")}-${uuidv4()}`,
     ...field,
-    ...(previousField ? { enabled: previousField.enabled } : {}),
+    enabled: !field.enabledTeams?.length ? true : false, // enabled stands for "enabled for the whole organisation if no team is selected"
     ...(previousField ? { required: previousField.required } : {}),
     ...(previousField ? { showInStats: previousField.showInStats } : {}),
     ...(previousField ? { name: previousField.name } : {}),
   };
+  return nextField;
 }
 
 // Importe les données dans l'organisation
@@ -493,6 +543,7 @@ function getUpdatedOrganisationFromWorkbookData(organisation: OrganisationInstan
         const intitule = curr.intitule as string;
         const type = curr.type as TypeOptionLabel;
         const options = curr.choix as string[];
+        const enabledTeams = (curr.enabledTeams as TeamInstance[]).map((t) => t._id);
         const rubriqueIndex = acc.findIndex((e) => e.name === rubrique);
 
         const previousOrganisationField = organisation.customFieldsPersons
@@ -502,15 +553,16 @@ function getUpdatedOrganisationFromWorkbookData(organisation: OrganisationInstan
         if (rubriqueIndex === -1) {
           acc.push({
             name: rubrique,
-            fields: [mergerFieldWithPrevious({ label: intitule, type: toFieldType(type), options }, previousOrganisationField)],
+            fields: [mergeFieldWithPrevious({ label: intitule, type: toFieldType(type), options, enabledTeams }, previousOrganisationField)],
           });
         } else {
           acc[rubriqueIndex].fields.push(
-            mergerFieldWithPrevious(
+            mergeFieldWithPrevious(
               {
                 label: intitule,
                 type: toFieldType(type),
                 options,
+                enabledTeams,
               },
               previousOrganisationField
             )
@@ -527,6 +579,7 @@ function getUpdatedOrganisationFromWorkbookData(organisation: OrganisationInstan
         const intitule = curr.intitule as string;
         const type = curr.type as TypeOptionLabel;
         const options = curr.choix as string[];
+        const enabledTeams = (curr.enabledTeams as TeamInstance[]).map((t) => t._id);
         const rubriqueIndex = acc.findIndex((e) => e.name === rubrique);
 
         const previousOrganisationField = organisation.groupedCustomFieldsMedicalFile
@@ -536,15 +589,16 @@ function getUpdatedOrganisationFromWorkbookData(organisation: OrganisationInstan
         if (rubriqueIndex === -1) {
           acc.push({
             name: rubrique,
-            fields: [mergerFieldWithPrevious({ label: intitule, type: toFieldType(type), options }, previousOrganisationField)],
+            fields: [mergeFieldWithPrevious({ label: intitule, type: toFieldType(type), options, enabledTeams }, previousOrganisationField)],
           });
         } else {
           acc[rubriqueIndex].fields.push(
-            mergerFieldWithPrevious(
+            mergeFieldWithPrevious(
               {
                 label: intitule,
                 type: toFieldType(type),
                 options,
+                enabledTeams,
               },
               previousOrganisationField
             )
@@ -561,6 +615,7 @@ function getUpdatedOrganisationFromWorkbookData(organisation: OrganisationInstan
         const intitule = curr.intitule as string;
         const type = curr.type as TypeOptionLabel;
         const options = curr.choix as string[];
+        const enabledTeams = (curr.enabledTeams as TeamInstance[]).map((t) => t._id);
         const rubriqueIndex = acc.findIndex((e) => e.name === rubrique);
 
         const previousOrganisationField = organisation.consultations?.find((e) => e.name === rubrique)?.fields.find((f) => f.label === intitule);
@@ -568,15 +623,16 @@ function getUpdatedOrganisationFromWorkbookData(organisation: OrganisationInstan
         if (rubriqueIndex === -1) {
           acc.push({
             name: rubrique,
-            fields: [mergerFieldWithPrevious({ label: intitule, type: toFieldType(type), options }, previousOrganisationField)],
+            fields: [mergeFieldWithPrevious({ label: intitule, type: toFieldType(type), options, enabledTeams }, previousOrganisationField)],
           });
         } else {
           acc[rubriqueIndex].fields.push(
-            mergerFieldWithPrevious(
+            mergeFieldWithPrevious(
               {
                 label: intitule,
                 type: toFieldType(type),
                 options,
+                enabledTeams,
               },
               previousOrganisationField
             )
@@ -593,6 +649,7 @@ function getUpdatedOrganisationFromWorkbookData(organisation: OrganisationInstan
         const intitule = curr.intitule as string;
         const type = curr.type as TypeOptionLabel;
         const options = curr.choix as string[];
+        const enabledTeams = (curr.enabledTeams as TeamInstance[]).map((t) => t._id);
         const rubriqueIndex = acc.findIndex((e) => e.name === rubrique);
 
         const previousOrganisationField = organisation.groupedCustomFieldsObs
@@ -602,15 +659,16 @@ function getUpdatedOrganisationFromWorkbookData(organisation: OrganisationInstan
         if (rubriqueIndex === -1) {
           acc.push({
             name: rubrique,
-            fields: [mergerFieldWithPrevious({ label: intitule, type: toFieldType(type), options }, previousOrganisationField)],
+            fields: [mergeFieldWithPrevious({ label: intitule, type: toFieldType(type), options, enabledTeams }, previousOrganisationField)],
           });
         } else {
           acc[rubriqueIndex].fields.push(
-            mergerFieldWithPrevious(
+            mergeFieldWithPrevious(
               {
                 label: intitule,
                 type: toFieldType(type),
                 options,
+                enabledTeams,
               },
               previousOrganisationField
             )
