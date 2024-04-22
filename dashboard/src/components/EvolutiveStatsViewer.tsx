@@ -7,8 +7,7 @@ import { useMemo, useState } from "react";
 import { capture } from "../services/sentry";
 import type { Dayjs } from "dayjs";
 import type { FilterableField } from "../types/field";
-import type { EvolutiveStatsPersonFields, EvolutiveStatOption, EvolutiveStatDateYYYYMMDD } from "../types/evolutivesStats";
-import { filterData } from "./Filters";
+import type { EvolutiveStatOption } from "../types/evolutivesStats";
 import { SelectedPersonsModal } from "../scenes/stats/PersonsStats";
 
 interface EvolutiveStatsViewerProps {
@@ -305,18 +304,32 @@ function EvolutiveStatsTable({
                 <tr key={option}>
                   <td className="tw-cursor-default tw-border tw-border-zinc-400 tw-p-1">{option}</td>
                   <td
-                    onClick={() => {
-                      onLineClick(startDateConsolidated.format("DD/MM/YYYY"), option, personsAtStartByValue);
-                    }}
-                    className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center"
+                    onClick={
+                      startValue > 0
+                        ? () => {
+                            onLineClick(startDateConsolidated.format("DD/MM/YYYY"), option, personsAtStartByValue);
+                          }
+                        : undefined
+                    }
+                    className={[
+                      "tw-border tw-border-zinc-400 tw-p-1 tw-text-center",
+                      startValue > 0 ? "tw-cursor-pointer" : "tw-cursor-default",
+                    ].join(" ")}
                   >
                     {startValue}
                   </td>
                   <td
-                    onClick={() => {
-                      onLineClick(endDateConsolidated.format("DD/MM/YYYY"), option, personsAtEndByValue);
-                    }}
-                    className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center"
+                    onClick={
+                      endValue > 0
+                        ? () => {
+                            onLineClick(endDateConsolidated.format("DD/MM/YYYY"), option, personsAtEndByValue);
+                          }
+                        : undefined
+                    }
+                    className={[
+                      "tw-border  tw-border-zinc-400 tw-p-1  tw-text-center",
+                      endValue > 0 ? "tw-cursor-pointer" : "tw-cursor-default",
+                    ].join(" ")}
                   >
                     {endValue}
                   </td>
