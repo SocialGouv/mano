@@ -43,7 +43,7 @@ export default function OrganisationUsers({
 
   return (
     <ModalContainer open={open} onClose={onClose} size="full">
-      <ModalHeader title={`Utilisateurs de l'organisation ${organisation.name}`} key={organisation?._id} onClose={onClose} />
+      <ModalHeader title={`Utilisateurs de l'organisation ${organisation?.name}`} key={organisation?._id} onClose={onClose} />
       <ModalBody>
         <table className="table table-striped table-bordered tw-text-sm">
           <thead>
