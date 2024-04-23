@@ -278,6 +278,14 @@ function EvolutiveStatsTable({
     setPersonsModalOpened(true);
   };
 
+  console.log({
+    personsModalOpened,
+    sliceDate,
+    sliceField,
+    sliceValue,
+    slicedData,
+  });
+
   return (
     <>
       <div className="tw-flex tw-basis-1/3 tw-items-center tw-justify-center">
