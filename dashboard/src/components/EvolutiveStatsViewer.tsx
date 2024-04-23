@@ -315,6 +315,7 @@ function EvolutiveStatsTable({
                     onClick={
                       startValue > 0
                         ? () => {
+                            console.log({ startDateConsolidated, option, personsAtStartByValue });
                             onLineClick(startDateConsolidated.format("DD/MM/YYYY"), option, personsAtStartByValue);
                           }
                         : undefined
@@ -330,6 +331,7 @@ function EvolutiveStatsTable({
                     onClick={
                       endValue > 0
                         ? () => {
+                            console.log({ endDateConsolidated, option, personsAtEndByValue });
                             onLineClick(endDateConsolidated.format("DD/MM/YYYY"), option, personsAtEndByValue);
                           }
                         : undefined
