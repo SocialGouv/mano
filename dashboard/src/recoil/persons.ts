@@ -124,8 +124,13 @@ export const filterPersonsBaseSelector = selector({
     }
     filterPersonsBase.push({
       field: "hasAtLeastOneConsultation",
-      label: "A eu une consultation",
+      label: "A eu une consultation dans l'organisation",
       type: "boolean",
+    });
+    filterPersonsBase.push({
+      field: "numberOfConsultations",
+      label: "Nombre de consultations dans l'organisation",
+      type: "number",
     });
     return filterPersonsBase;
   },
