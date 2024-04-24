@@ -80,6 +80,8 @@ export const personFieldsIncludingCustomFieldsSelector = selector({
           name: f.name,
           type: f.type,
           label: f.label,
+          enabled: f.enabled,
+          enabledTeams: f.enabledTeams || undefined,
           encrypted: true,
           importable: true,
           options: f.options || undefined,

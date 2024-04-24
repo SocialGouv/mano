@@ -52,6 +52,7 @@ export const mockedEvolutiveStatsIndicatorsBase: Array<CustomOrPredefinedField> 
     encrypted: true,
     importable: true,
     filterable: true,
+    enabled: true,
     options: ["Aucun", "Homme", "Femme", "Homme transgenre", "Femme transgenre", "Non binaire", "Autre"],
   },
   {
@@ -61,6 +62,7 @@ export const mockedEvolutiveStatsIndicatorsBase: Array<CustomOrPredefinedField> 
     encrypted: true,
     importable: true,
     filterable: true,
+    enabled: true,
   },
   {
     name: "outOfActiveList",
@@ -70,6 +72,7 @@ export const mockedEvolutiveStatsIndicatorsBase: Array<CustomOrPredefinedField> 
     importable: true,
     options: ["Oui", "Non"],
     filterable: true,
+    enabled: true,
   },
   {
     name: "outOfActiveListReasons",
@@ -91,6 +94,7 @@ export const mockedEvolutiveStatsIndicatorsBase: Array<CustomOrPredefinedField> 
       "Exclusion définitive",
     ],
     filterable: true,
+    enabled: true,
   },
   {
     name: "custom-2024-02-01T11-51-11-380Z",
@@ -100,6 +104,7 @@ export const mockedEvolutiveStatsIndicatorsBase: Array<CustomOrPredefinedField> 
     importable: true,
     options: [],
     filterable: true,
+    enabled: true,
   },
   {
     name: "custom-2024-01-09T16-08-32-284Z",
@@ -109,6 +114,7 @@ export const mockedEvolutiveStatsIndicatorsBase: Array<CustomOrPredefinedField> 
     importable: true,
     options: ["100-200", "300_500", "600-1000"],
     filterable: true,
+    enabled: true,
   },
   {
     name: "custom-2023-12-21T14-16-15-807Z",
@@ -118,6 +124,7 @@ export const mockedEvolutiveStatsIndicatorsBase: Array<CustomOrPredefinedField> 
     importable: true,
     options: ["Oui", "Non", "NSP", "Autre"],
     filterable: true,
+    enabled: true,
   },
   {
     name: "custom-2023-12-15T09-40-16-722Z",
@@ -127,6 +134,7 @@ export const mockedEvolutiveStatsIndicatorsBase: Array<CustomOrPredefinedField> 
     importable: true,
     options: ["Isolé.e", "Couple avec enfant(s)"],
     filterable: true,
+    enabled: true,
   },
   {
     name: "custom-2023-06-16T08-50-52-737Z",
@@ -136,6 +144,7 @@ export const mockedEvolutiveStatsIndicatorsBase: Array<CustomOrPredefinedField> 
     importable: true,
     options: ["Française", "UE", "Hors UE", "Apatride", "Non communiqué"],
     filterable: true,
+    enabled: true,
   },
   {
     name: "resources",
@@ -163,6 +172,7 @@ export const mockedEvolutiveStatsIndicatorsBase: Array<CustomOrPredefinedField> 
       "Autre",
     ],
     filterable: true,
+    enabled: true,
   },
   {
     name: "custom-2023-12-20T16-33-12-516Z",
@@ -172,6 +182,7 @@ export const mockedEvolutiveStatsIndicatorsBase: Array<CustomOrPredefinedField> 
     importable: true,
     options: ["ACT", "HLM"],
     filterable: true,
+    enabled: true,
   },
   {
     name: "custom-2024-01-05T10-06-05-490Z",
@@ -181,6 +192,7 @@ export const mockedEvolutiveStatsIndicatorsBase: Array<CustomOrPredefinedField> 
     importable: true,
     options: ["Crack", "Mdma"],
     filterable: true,
+    enabled: true,
   },
   {
     name: "custom-2024-01-25T08-58-25-139Z",
@@ -190,6 +202,7 @@ export const mockedEvolutiveStatsIndicatorsBase: Array<CustomOrPredefinedField> 
     importable: true,
     options: [],
     filterable: true,
+    enabled: true,
   },
   {
     name: "custom-2023-06-16T09-12-47-771Z",
@@ -199,6 +212,7 @@ export const mockedEvolutiveStatsIndicatorsBase: Array<CustomOrPredefinedField> 
     importable: true,
     options: ["DPH", "CDD", "CDI", "CDDI", "Intérim", "Bénévolat", "Sans activité", "Étudiant", "Non déclaré", "Autre"],
     filterable: true,
+    enabled: true,
   },
   {
     name: "custom-2023-12-04T10-37-00-230Z",
@@ -208,6 +222,7 @@ export const mockedEvolutiveStatsIndicatorsBase: Array<CustomOrPredefinedField> 
     importable: true,
     options: ["Aucune", "Régime général", "PUMa", "CSS", "AME", "Avec ALD", "Sans ALD"],
     filterable: true,
+    enabled: true,
   },
   {
     name: "custom-2023-12-19T10-35-39-717Z",
@@ -217,6 +232,7 @@ export const mockedEvolutiveStatsIndicatorsBase: Array<CustomOrPredefinedField> 
     importable: true,
     options: ["Inhalation", "Injection", "Sniff"],
     filterable: true,
+    enabled: true,
   },
   {
     name: "reasons",
@@ -239,6 +255,7 @@ export const mockedEvolutiveStatsIndicatorsBase: Array<CustomOrPredefinedField> 
       "Autre",
     ],
     filterable: true,
+    enabled: true,
   },
   {
     name: "custom-2023-11-08T12-52-47-263Z",
@@ -248,6 +265,7 @@ export const mockedEvolutiveStatsIndicatorsBase: Array<CustomOrPredefinedField> 
     importable: true,
     options: ["Pathologie chronique", "Psychologique", "Injecteur", "Handicap"],
     filterable: true,
+    enabled: true,
   },
   {
     name: "custom-2023-06-16T09-14-54-982Z",
@@ -272,6 +290,7 @@ export const mockedEvolutiveStatsIndicatorsBase: Array<CustomOrPredefinedField> 
       "Autre",
     ],
     filterable: true,
+    enabled: true,
   },
   {
     name: "caseHistoryTypes",
@@ -299,6 +318,7 @@ export const mockedEvolutiveStatsIndicatorsBase: Array<CustomOrPredefinedField> 
       "Hospitalisation",
     ],
     filterable: true,
+    enabled: true,
   },
   {
     name: "custom-2024-01-05T14-03-25-969Z",
@@ -317,6 +337,7 @@ export const mockedEvolutiveStatsIndicatorsBase: Array<CustomOrPredefinedField> 
       "sans domicile",
     ],
     filterable: true,
+    enabled: true,
   },
   {
     name: "custom-2023-12-21T11-31-21-081Z",
@@ -326,6 +347,7 @@ export const mockedEvolutiveStatsIndicatorsBase: Array<CustomOrPredefinedField> 
     importable: true,
     options: ["1", "2", "3", "4", "5", "6"],
     filterable: true,
+    enabled: true,
   },
   {
     name: "custom-2023-12-21T11-31-51-780Z",
@@ -335,6 +357,7 @@ export const mockedEvolutiveStatsIndicatorsBase: Array<CustomOrPredefinedField> 
     importable: true,
     options: [],
     filterable: true,
+    enabled: true,
   },
 ];
 

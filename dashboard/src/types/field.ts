@@ -24,6 +24,8 @@ export interface PredefinedField {
   encrypted?: boolean;
   importable?: boolean;
   filterable?: boolean;
+  enabled: boolean;
+  enabledTeams?: UUIDV4[];
 }
 
 export interface CustomOrPredefinedField extends PredefinedField {}
