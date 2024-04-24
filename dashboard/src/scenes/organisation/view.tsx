@@ -1,5 +1,5 @@
 import { MouseEventHandler, useEffect, useRef, useState } from "react";
-import { FormGroup, Input, Label, Row, Col } from "reactstrap";
+import { Input, Label, Row, Col } from "reactstrap";
 import { Formik } from "formik";
 import { toast } from "react-toastify";
 import { useRecoilState, useRecoilValue } from "recoil";
@@ -146,6 +146,7 @@ const View = () => {
               receptionEnabled: organisation.receptionEnabled || false,
               groupsEnabled: organisation.groupsEnabled || false,
               passagesEnabled: organisation.passagesEnabled || false,
+              checkboxShowAllOrgaPersons: organisation.checkboxShowAllOrgaPersons || false,
               rencontresEnabled: organisation.rencontresEnabled || false,
             }}
             enableReinitialize
@@ -169,14 +170,12 @@ const View = () => {
                   return (
                     <>
                       <TabTitle>Informations générales</TabTitle>
-                      <Row>
-                        <Col md={6}>
-                          <FormGroup>
-                            <Label htmlFor="name">Nom</Label>
-                            <Input name="name" id="name" value={values.name} onChange={handleChange} />
-                          </FormGroup>
-                        </Col>
-                      </Row>
+                      <div className="tw-mb-4 tw-flex tw-gap-4 tw-flex-wrap tw-flex-row tw-basis-full">
+                        <div className="tw-flex tw-flex-col tw-basis-full tw-mb-4 tw-p-4">
+                          <label htmlFor="name">Nom</label>
+                          <input className="tailwindui" name="name" id="name" value={values.name} onChange={handleChange} />
+                        </div>
+                      </div>
                       <div className="tw-mb-10 tw-flex tw-justify-end tw-gap-4">
                         <DeleteButtonAndConfirmModal
                           title={`Voulez-vous vraiment supprimer l'organisation ${organisation.name}`}
@@ -208,6 +207,32 @@ const View = () => {
                           onClick={handleSubmit as unknown as MouseEventHandler<HTMLButtonElement>}
                         />
                       </div>
+                      <hr />
+                      <h4 className="tw-my-8">Activer la case à chocher "Afficher les personnes de toute l'organisation"</h4>
+                      <div className="tw-mb-4">
+                        <div className="tw-ml-5 tw-flex tw-w-4/5 tw-items-baseline">
+                          <input
+                            type="checkbox"
+                            name="checkboxShowAllOrgaPersons"
+                            className="tw-mr-2"
+                            id="checkboxShowAllOrgaPersons"
+                            checked={values.checkboxShowAllOrgaPersons || false}
+                            onChange={handleChange}
+                          />
+                          <label htmlFor="checkboxShowAllOrgaPersons">
+                            Cette case à cocher permet à un utilisateur qui n'est pas attribué à certaines équipes, d'avopir malgré tout accès à
+                            toutes les personnes de l'organisation. Elle est visible dans l onglet "Personnes suivies".
+                          </label>
+                        </div>
+                      </div>
+                      <div className="tw-mb-10 tw-flex tw-justify-end tw-gap-4">
+                        <ButtonCustom
+                          title={"Mettre à jour"}
+                          disabled={values.checkboxShowAllOrgaPersons === organisation.checkboxShowAllOrgaPersons}
+                          loading={isSubmitting}
+                          onClick={handleSubmit as unknown as MouseEventHandler<HTMLButtonElement>}
+                        />
+                      </div>
                     </>
                   );
                 case "encryption":
@@ -233,7 +258,7 @@ const View = () => {
                       <TabTitle>Accueil de jour</TabTitle>
                       <div className="tw-flex tw-flex-col">
                         <h4 className="tw-my-8">Activer l'accueil de jour</h4>
-                        <FormGroup>
+                        <div className="tw-mb-4">
                           <div className="tw-ml-5 tw-flex tw-w-4/5 tw-items-baseline">
                             <input
                               type="checkbox"
@@ -248,7 +273,7 @@ const View = () => {
                               apparaîtra sur la barre de navigation latérale.
                             </label>
                           </div>
-                        </FormGroup>
+                        </div>
                         <div className="tw-mb-10 tw-flex tw-justify-end tw-gap-4">
                           <ButtonCustom
                             title={"Mettre à jour"}
@@ -267,7 +292,7 @@ const View = () => {
                     <>
                       <TabTitle>Territoires</TabTitle>
                       <h4 className="tw-my-8">Activer les territoires</h4>
-                      <FormGroup>
+                      <div className="tw-mb-4">
                         <div className="tw-ml-5 tw-flex tw-w-4/5 tw-items-baseline">
                           <input
                             type="checkbox"
@@ -282,7 +307,7 @@ const View = () => {
                             apparaîtra sur la barre de navigation latérale, et sur l'application mobile.
                           </label>
                         </div>
-                      </FormGroup>
+                      </div>
                       <div className="tw-mb-10 tw-flex tw-justify-end tw-gap-4">
                         <ButtonCustom
                           title={"Mettre à jour"}
@@ -300,7 +325,7 @@ const View = () => {
                     <>
                       <TabTitle>Passages / rencontres</TabTitle>
                       <h4 className="tw-my-8">Activer les passages</h4>
-                      <FormGroup>
+                      <div className="tw-mb-4">
                         <div className="tw-ml-5 tw-flex tw-w-4/5 tw-items-baseline">
                           <input
                             type="checkbox"
@@ -314,9 +339,9 @@ const View = () => {
                             Activer les passages vous permettra de comptabiliser les personnes qui passent sur votre structure.
                           </label>
                         </div>
-                      </FormGroup>
+                      </div>
                       <h4 className="tw-my-8">Activer les rencontres</h4>
-                      <FormGroup>
+                      <div className="tw-mb-4">
                         <div className="tw-ml-5 tw-flex tw-w-4/5 tw-items-baseline">
                           <input
                             type="checkbox"
@@ -330,7 +355,7 @@ const View = () => {
                             Activer les rencontres vous permettra de comptabiliser les personnes rencontrées en rue.
                           </label>
                         </div>
-                      </FormGroup>
+                      </div>
                       <div className="tw-mb-10 tw-flex tw-justify-end tw-gap-4">
                         <ButtonCustom
                           title={"Mettre à jour"}
@@ -351,7 +376,7 @@ const View = () => {
                       {organisation.encryptionEnabled ? (
                         <>
                           <h4 className="tw-my-8">Activer la fonctionnalité Liens familiaux</h4>
-                          <FormGroup>
+                          <div className="tw-mb-4">
                             <div className="tw-ml-5 tw-flex tw-w-4/5 tw-items-baseline">
                               <input
                                 type="checkbox"
@@ -366,7 +391,7 @@ const View = () => {
                                 personnes, et vous pourrez créer des actions, des commentaires et des documents visibles pour toute la famille.
                               </label>
                             </div>
-                          </FormGroup>
+                          </div>
                           <div className="tw-mb-10 tw-flex tw-justify-end tw-gap-4">
                             <ButtonCustom
                               title={"Mettre à jour"}

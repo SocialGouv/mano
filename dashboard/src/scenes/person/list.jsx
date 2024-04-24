@@ -103,12 +103,15 @@ const List = () => {
 
   const [search, setSearch] = useSearchParamState("search", "");
   const [alertness, setFilterAlertness] = useLocalStorage("person-alertness", false);
-  const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage("person-allOrg", true);
+  const [viewAllOrganisationDataChecked, setViewAllOrganisationData] = useLocalStorage("person-allOrg", true);
   const [sortBy, setSortBy] = useLocalStorage("person-sortBy", "name");
   const [sortOrder, setSortOrder] = useLocalStorage("person-sortOrder", "ASC");
   const [filters, setFilters] = useLocalStorage("person-filters", []);
   const [page, setPage] = useSearchParamState("page", 0);
   const currentTeam = useRecoilValue(currentTeamState);
+  const organisation = useRecoilValue(organisationState);
+
+  const viewAllOrganisationData = organisation.checkboxShowAllOrgaPersons && viewAllOrganisationDataChecked;
 
   const personsFilteredBySearch = useRecoilValue(
     personsFilteredBySearchSelector({ search, viewAllOrganisationData, filters, alertness, sortBy, sortOrder })
@@ -119,7 +122,6 @@ const List = () => {
   }, [personsFilteredBySearch, page]);
   const total = useMemo(() => personsFilteredBySearch.length, [personsFilteredBySearch]);
 
-  const organisation = useRecoilValue(organisationState);
   const history = useHistory();
 
   if (!personsFilteredBySearch) return <Loading />;
@@ -169,19 +171,21 @@ const List = () => {
                   }
                 }}
               />
-              <div className="tw-flex tw-w-full tw-items-center">
-                <label htmlFor="viewAllOrganisationData">
-                  <input
-                    type="checkbox"
-                    id="viewAllOrganisationData"
-                    className="tw-mr-2.5"
-                    checked={viewAllOrganisationData}
-                    value={viewAllOrganisationData}
-                    onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
-                  />
-                  Afficher les personnes de toute l'organisation
-                </label>
-              </div>
+              {organisation.checkboxShowAllOrgaPersons && (
+                <div className="tw-flex tw-w-full tw-items-center">
+                  <label htmlFor="viewAllOrganisationData">
+                    <input
+                      type="checkbox"
+                      id="viewAllOrganisationData"
+                      className="tw-mr-2.5"
+                      checked={viewAllOrganisationData}
+                      value={viewAllOrganisationData}
+                      onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
+                    />
+                    Afficher les personnes de toute l'organisation
+                  </label>
+                </div>
+              )}
               <div className="tw-flex tw-w-full tw-items-center">
                 <label htmlFor="alertness">
                   <input

@@ -93,6 +93,7 @@ CREATE TABLE IF NOT EXISTS mano."Organisation" (
     "customFieldsMedicalFile" jsonb,
     "territoriesEnabled" boolean DEFAULT true,
     "passagesEnabled" boolean DEFAULT true,
+    "checkboxShowAllOrgaPersons" boolean DEFAULT true,
     "rencontresEnabled" boolean DEFAULT true
 );
 

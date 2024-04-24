@@ -29,6 +29,7 @@ export interface OrganisationInstance {
   groupsEnabled?: boolean;
   passagesEnabled?: boolean;
   rencontresEnabled?: boolean;
+  checkboxShowAllOrgaPersons?: boolean;
 
   groupedServices?: GroupedServices[];
   services?: string[]; // deprecated

@@ -33,6 +33,7 @@ module.exports = (sequelize, DataTypes) => {
     fieldsPersonsCustomizableOptions: DataTypes.JSONB,
     customFieldsPersons: DataTypes.JSONB,
     groupedCustomFieldsMedicalFile: DataTypes.JSONB,
+    checkboxShowAllOrgaPersons: { type: DataTypes.BOOLEAN, default: true },
     migrating: { type: DataTypes.BOOLEAN, default: false },
     migrations: DataTypes.ARRAY(DataTypes.TEXT),
     migrationLastUpdateAt: DataTypes.DATE,
