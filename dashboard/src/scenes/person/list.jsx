@@ -17,7 +17,7 @@ import {
 import TagTeam from "../../components/TagTeam";
 import Filters, { filterData } from "../../components/Filters";
 import { dayjsInstance, formatDateWithFullMonth } from "../../services/date";
-import { personsWithMedicalFileMergedSelector } from "../../recoil/selectors";
+import { personsWithMedicalFileAndConsultationsMergedSelector } from "../../recoil/selectors";
 import { currentTeamState, organisationState, userState } from "../../recoil/auth";
 import { placesState } from "../../recoil/places";
 import { filterBySearch } from "../search/utils";
@@ -27,6 +27,7 @@ import { useDataLoader } from "../../components/DataLoader";
 import ExclamationMarkButton from "../../components/tailwind/ExclamationMarkButton";
 import { customFieldsMedicalFileSelector } from "../../recoil/medicalFiles";
 import useMinimumWidth from "../../services/useMinimumWidth";
+import { flattenedCustomFieldsConsultationsSelector } from "../../recoil/consultations";
 
 const limit = 20;
 
@@ -35,9 +36,9 @@ const personsFilteredSelector = selectorFamily({
   get:
     ({ viewAllOrganisationData, filters, alertness }) =>
     ({ get }) => {
-      const personWithBirthDate = get(personsWithMedicalFileMergedSelector);
+      const personsWithBirthDate = get(personsWithMedicalFileAndConsultationsMergedSelector);
       const currentTeam = get(currentTeamState);
-      let pFiltered = personWithBirthDate;
+      let pFiltered = personsWithBirthDate;
       if (!!filters?.filter((f) => Boolean(f?.value)).length) pFiltered = filterData(pFiltered, filters);
       if (!!alertness) pFiltered = pFiltered.filter((p) => !!p.alertness);
       if (!!viewAllOrganisationData) return pFiltered;
@@ -73,6 +74,7 @@ const filterPersonsWithAllFieldsSelector = selector({
     const fieldsPersonsCustomizableOptions = get(fieldsPersonsCustomizableOptionsSelector);
     const flattenedCustomFieldsPersons = get(flattenedCustomFieldsPersonsSelector);
     const customFieldsMedicalFile = get(customFieldsMedicalFileSelector);
+    const consultationFields = get(flattenedCustomFieldsConsultationsSelector);
     const filterPersonsBase = get(filterPersonsBaseSelector);
     return [
       ...filterPersonsBase,
@@ -80,6 +82,9 @@ const filterPersonsWithAllFieldsSelector = selector({
       ...flattenedCustomFieldsPersons.filter((a) => a.enabled || a.enabledTeams?.includes(team._id)).map((a) => ({ field: a.name, ...a })),
       ...(user.healthcareProfessional
         ? customFieldsMedicalFile.filter((a) => a.enabled || a.enabledTeams?.includes(team._id)).map((a) => ({ field: a.name, ...a }))
+        : []),
+      ...(user.healthcareProfessional
+        ? consultationFields.filter((a) => a.enabled || a.enabledTeams?.includes(team._id)).map((a) => ({ field: a.name, ...a }))
         : []),
       {
         label: "Lieux fréquentés",

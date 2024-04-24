@@ -136,6 +136,22 @@ export const itemsGroupedByPersonSelector = selector({
     }
     const actions = Object.values(get(actionsWithCommentsSelector));
     const comments = get(commentsState);
+    const excludeConsultationsFieldsFromSearch = new Set([
+      "_id",
+      "encryptedEntityKey",
+      "entityKey",
+      "createdBy",
+      "documents",
+      "user", // because it is an id
+      "organisation", // because it is an id
+      // "type",
+      "person",
+      "user",
+      "teams",
+      "documents",
+      // "comments",
+      "history",
+    ]);
     const consultations = get(consultationsState);
     const treatments = get(treatmentsState);
     const medicalFiles = [...get(medicalFileState)].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -240,7 +256,22 @@ export const itemsGroupedByPersonSelector = selector({
     }
     for (const consultation of consultations) {
       if (!personsObject[consultation.person]) continue;
+
       personsObject[consultation.person].consultations = personsObject[consultation.person].consultations || [];
+      personsObject[consultation.person].flattenedConsultations = personsObject[consultation.person].consultations || {};
+      for (const key of Object.keys(consultation)) {
+        if (excludeConsultationsFieldsFromSearch.has(key)) continue;
+        if (!personsObject[consultation.person].flattenedConsultations[key]) {
+          personsObject[consultation.person].flattenedConsultations[key] = [];
+        }
+        if (Array.isArray(consultation[key])) {
+          personsObject[consultation.person].flattenedConsultations[key] = personsObject[consultation.person].flattenedConsultations[key].concat(
+            consultation[key]
+          );
+        } else {
+          personsObject[consultation.person].flattenedConsultations[key].push(consultation[key]);
+        }
+      }
       personsObject[consultation.person].consultations.push(consultation);
       personsObject[consultation.person].hasAtLeastOneConsultation = true;
       personsObject[consultation.person].interactions.push(consultation.dueAt);
@@ -432,16 +463,19 @@ export const arrayOfitemsGroupedByPersonSelector = selector({
   },
 });
 
-export const personsWithMedicalFileMergedSelector = selector({
-  key: "personsWithMedicalFileMergedSelector",
+export const personsWithMedicalFileAndConsultationsMergedSelector = selector({
+  key: "personsWithMedicalFileAndConsultationsMergedSelector",
   get: ({ get }) => {
     const user = get(userState);
     const persons = get(arrayOfitemsGroupedByPersonSelector);
     if (!user.healthcareProfessional) return persons;
-    return persons.map((p) => ({
-      ...(p.medicalFile || {}),
-      ...p,
-    }));
+    return persons.map((person) => {
+      return {
+        ...(person.medicalFile || {}),
+        ...(person.flattenedConsultations || {}),
+        ...person,
+      };
+    });
   },
 });
 
