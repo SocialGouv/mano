@@ -547,7 +547,7 @@ router.get(
 
     if ((req.user.role !== "admin" && req.user.role !== "superadmin") || req.query.minimal === "true") {
       for (let user of users) {
-        data.push({ name: user.name, _id: user._id });
+        data.push({ name: user.name, _id: user._id, lastLoginAt: user.lastLoginAt, createdAt: user.createdAt });
       }
       return res.status(200).send({ ok: true, data });
     }

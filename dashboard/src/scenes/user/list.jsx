@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useRecoilValue } from "recoil";
-import { teamsState, userState } from "../../recoil/auth";
+import { teamsState, usersState, userState } from "../../recoil/auth";
 import API from "../../services/api";
 import { formatDateWithFullMonth } from "../../services/date";
 import useTitle from "../../services/useTitle";
@@ -15,6 +15,7 @@ import Table from "../../components/table";
 import TagTeam from "../../components/TagTeam";
 import SelectRole from "../../components/SelectRole";
 import { emailRegex } from "../../utils";
+import dayjs from "dayjs";
 
 const defaultSort = (a, b, sortOrder) => (sortOrder === "ASC" ? (a.name || "").localeCompare(b.name) : (b.name || "").localeCompare(a.name));
 
@@ -44,16 +45,32 @@ const sortUsers = (sortBy, sortOrder) => (a, b) => {
 };
 
 const List = () => {
-  const [users, setUsers] = useState([]);
-  const history = useHistory();
-  const [refresh, setRefresh] = useState(true);
-  const user = useRecoilValue(userState);
   useTitle("Utilisateurs");
+
+  const [users, setUsers] = useState([]);
+  const user = useRecoilValue(userState);
+
+  const history = useHistory();
+
+  const [refresh, setRefresh] = useState(true);
 
   const [sortBy, setSortBy] = useLocalStorage("users-sortBy", "createdAt");
   const [sortOrder, setSortOrder] = useLocalStorage("users-sortOrder", "ASC");
 
-  const data = useMemo(() => users.sort(sortUsers(sortBy, sortOrder)), [users, sortBy, sortOrder]);
+  console.log("users", users);
+
+  const data = useMemo(
+    () =>
+      users
+        .map((user) => {
+          return {
+            ...user,
+            style: dayjs().diff(user.lastLoginAt ?? user.createdAt, "months") > 6 ? { color: "red", fontWeight: 800 } : {},
+          };
+        })
+        .sort(sortUsers(sortBy, sortOrder)),
+    [users, sortBy, sortOrder]
+  );
 
   useEffect(() => {
     API.get({ path: "/user" }).then((response) => {
@@ -110,8 +127,8 @@ const List = () => {
             render: (user) => {
               return (
                 <>
-                  <div>{user.role}</div>
-                  {user.healthcareProfessional ? <div>🧑‍⚕️ professionnel·le de santé</div> : ""}
+                  <span>{user.role}</span>
+                  {user.healthcareProfessional ? <span>🧑‍⚕️&nbsp;pro.&nbsp;de&nbsp;santé</span> : ""}
                 </>
               );
             },
@@ -146,7 +163,10 @@ const List = () => {
             onSortBy: setSortBy,
             sortOrder,
             sortBy,
-            render: (i) => (i.lastLoginAt ? formatDateWithFullMonth(i.lastLoginAt) : null),
+            render: (i) => {
+              if (!i.lastLoginAt) return "Jamais connecté";
+              return formatDateWithFullMonth(i.lastLoginAt);
+            },
           },
         ]}
       />

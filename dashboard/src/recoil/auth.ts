@@ -3,6 +3,7 @@ import { AppSentry } from "../services/sentry";
 import type { OrganisationInstance } from "../types/organisation";
 import type { UserInstance } from "../types/user";
 import type { TeamInstance } from "../types/team";
+import dayjs from "dayjs";
 
 export const userState = atom<UserInstance | null>({
   key: "userState",
@@ -55,6 +56,14 @@ export const teamsState = atom<TeamInstance[]>({
 export const usersState = atom<UserInstance[]>({
   key: "usersState",
   default: [],
+});
+
+export const usersLastLoginMoreThan6MonthsSelector = selector<number>({
+  key: "usersLastLoginMoreThan6MonthsSelector",
+  get: ({ get }) => {
+    const users = get(usersState);
+    return users.filter((user) => dayjs().diff(user.lastLoginAt ?? user.createdAt, "months") > 6).length;
+  },
 });
 
 export const currentTeamState = atom<TeamInstance | null>({
