@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from "reactstrap";
-import logo from "../assets/logo-green.png";
+import logo from "../assets/logo-green-creux.png";
 import SelectTeam from "./SelectTeam";
 
 import { currentTeamState, organisationState, teamsState, userState } from "../recoil/auth";
@@ -44,7 +44,7 @@ const TopBar = () => {
         </div>
         <div className="tw-hidden tw-flex-1 lg:tw-flex">
           <button
-            className="tw-mx-auto tw-my-0 tw-h-9 tw-w-14 tw-bg-cover tw-bg-center tw-bg-no-repeat disabled:tw-opacity-30"
+            className="tw-mx-auto tw-my-0 tw-h-9 tw-w-14 tw-bg-center tw-bg-no-repeat disabled:tw-opacity-30 tw-bg-contain"
             type="button"
             title="Cliquez ici pour rafraîchir les données"
             onClick={refresh}
