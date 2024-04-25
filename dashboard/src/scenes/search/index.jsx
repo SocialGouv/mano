@@ -1,6 +1,5 @@
 import React, { useMemo, Fragment } from "react";
 import { useHistory } from "react-router-dom";
-import DateBloc from "../../components/DateBloc";
 import Header from "../../components/header";
 import Table from "../../components/table";
 import dayjs from "dayjs";
@@ -8,13 +7,12 @@ import UserName from "../../components/UserName";
 import Search from "../../components/search";
 import TagTeam from "../../components/TagTeam";
 import { currentTeamState, organisationState, teamsState, userState } from "../../recoil/auth";
-import { actionsState, CANCEL, DONE, sortActionsOrConsultations } from "../../recoil/actions";
+import { actionsState } from "../../recoil/actions";
 import { personsState, sortPersons } from "../../recoil/persons";
 import { relsPersonPlaceState } from "../../recoil/relPersonPlace";
 import { sortTerritories, territoriesState } from "../../recoil/territory";
 import { selector, selectorFamily, useRecoilValue } from "recoil";
 import { itemsGroupedByPersonSelector, onlyFilledObservationsTerritories, personsObjectSelector } from "../../recoil/selectors";
-import PersonName from "../../components/PersonName";
 import { formatBirthDate, formatDateWithFullMonth, formatTime } from "../../services/date";
 import { useDataLoader } from "../../components/DataLoader";
 import { placesState } from "../../recoil/places";
@@ -22,16 +20,16 @@ import { filterBySearch } from "./utils";
 import { commentsState } from "../../recoil/comments";
 import useTitle from "../../services/useTitle";
 import ExclamationMarkButton from "../../components/tailwind/ExclamationMarkButton";
-import ConsultationButton from "../../components/ConsultationButton";
 import { useLocalStorage } from "../../services/useLocalStorage";
 import { customFieldsObsSelector, territoryObservationsState } from "../../recoil/territoryObservations";
 import TabsNav from "../../components/tailwind/TabsNav";
-import DescriptionIcon from "../../components/DescriptionIcon";
 import { consultationsState } from "../../recoil/consultations";
 import { medicalFileState } from "../../recoil/medicalFiles";
 import { treatmentsState } from "../../recoil/treatments";
-import ActionStatusSelect from "../../components/ActionStatusSelect";
 import CustomFieldDisplay from "../../components/CustomFieldDisplay";
+import ActionsSortableList from "../../components/ActionsSortableList";
+import TreatmentsSortableList from "../person/components/TreatmentsSortableList";
+import CommentsSortableList from "../../components/CommentsSortableList";
 
 const personsWithFormattedBirthDateSelector = selector({
   key: "personsWithFormattedBirthDateSelector",
@@ -82,15 +80,16 @@ const commentsPopulatedSelector = selector({
       if (comment.person) {
         commentsObject[comment._id] = {
           ...comment,
-          person: persons[comment.person],
           type: "person",
         };
         continue;
       }
       if (comment.action) {
+        const action = actions[comment.action];
         commentsObject[comment._id] = {
           ...comment,
-          action: actions[comment.action],
+          action,
+          person: action.person,
           type: "action",
         };
         continue;
@@ -245,12 +244,12 @@ const View = () => {
           activeTabIndex={initTabs.findIndex((tab) => tab === activeTab)}
         />
         <div className="[&_table]:!tw-p0 tw-w-full tw-rounded-lg tw-bg-white tw-px-8 tw-py-4 print:tw-mb-4 [&_.title]:!tw-pb-5">
-          {activeTab === "Actions" && <Actions actions={actions} />}
-          {activeTab === "Consultations" && <Consultations consultations={consultations} />}
-          {activeTab === "Traitements" && <Treatments treatments={treatments} />}
+          {activeTab === "Actions" && <ActionsSortableList data={actions} />}
+          {activeTab === "Consultations" && <ActionsSortableList data={consultations} />}
+          {activeTab === "Traitements" && <TreatmentsSortableList treatments={treatments} />}
           {activeTab === "Personnes" && <Persons persons={persons} />}
           {activeTab === "Dossiers médicaux" && <Persons persons={medicalFiles} />}
-          {activeTab === "Commentaires non médicaux" && <Comments comments={comments} />}
+          {activeTab === "Commentaires non médicaux" && <CommentsSortableList data={comments} />}
           {activeTab === "Lieux" && <Places places={places} />}
           {activeTab === "Territoires" && <Territories territories={territories} />}
           {activeTab === "Observations" && <TerritoryObservations observations={observations} />}
@@ -267,280 +266,6 @@ const View = () => {
       </div>
       {renderContent()}
     </>
-  );
-};
-
-const Actions = ({ actions }) => {
-  const history = useHistory();
-  const organisation = useRecoilValue(organisationState);
-  const [sortBy, setSortBy] = useLocalStorage("actions-consultations-sortBy", "dueAt");
-  const [sortOrder, setSortOrder] = useLocalStorage("actions-consultations-sortOrder", "ASC");
-
-  const data = useMemo(() => {
-    return [...actions].sort(sortActionsOrConsultations(sortBy, sortOrder));
-  }, [actions, sortBy, sortOrder]);
-
-  if (!actions.length) return <div />;
-
-  const moreThanOne = data.length > 1;
-
-  return (
-    <Table
-      className="Table"
-      data={data.map((a) => {
-        if (a.urgent) return { ...a, style: { backgroundColor: "#fecaca" } };
-        return a;
-      })}
-      title={`Action${moreThanOne ? "s" : ""} (${data.length})`}
-      noData="Pas d'action"
-      onRowClick={(action) => {
-        const searchParams = new URLSearchParams(history.location.search);
-        searchParams.set("actionId", action._id);
-        history.push(`?${searchParams.toString()}`);
-      }}
-      rowKey="_id"
-      columns={[
-        {
-          title: "",
-          dataKey: "urgentOrGroupOrConsultation",
-          small: true,
-          onSortOrder: setSortOrder,
-          onSortBy: setSortBy,
-          sortBy,
-          sortOrder,
-          render: (actionOrConsult) => {
-            return (
-              <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
-                {!!actionOrConsult.urgent && <ExclamationMarkButton />}
-                {!!actionOrConsult.description && <DescriptionIcon />}
-                {!!organisation.groupsEnabled && !!actionOrConsult.group && (
-                  <span className="tw-text-3xl" aria-label="Action familiale" title="Action familiale">
-                    👪
-                  </span>
-                )}
-                {!!actionOrConsult.isConsultation && <ConsultationButton />}
-              </div>
-            );
-          },
-        },
-        {
-          title: "Date",
-          dataKey: "dueAt",
-          onSortOrder: setSortOrder,
-          onSortBy: setSortBy,
-          sortBy,
-          sortOrder,
-          render: (a) => <DateBloc date={[DONE, CANCEL].includes(a.status) ? a.completedAt : a.dueAt} />,
-        },
-        {
-          title: "Heure",
-          dataKey: "time",
-          render: (action) => {
-            if (!action.dueAt || !action.withTime) return null;
-            return formatTime(action.dueAt);
-          },
-        },
-        {
-          title: "Nom",
-          dataKey: "name",
-          onSortOrder: setSortOrder,
-          onSortBy: setSortBy,
-          sortBy,
-          sortOrder,
-        },
-        {
-          title: "Personne suivie",
-          dataKey: "person",
-          onSortOrder: setSortOrder,
-          onSortBy: setSortBy,
-          sortBy,
-          sortOrder,
-          render: (action) => <PersonName item={action} />,
-        },
-        {
-          title: "Statut",
-          dataKey: "status",
-          onSortOrder: setSortOrder,
-          onSortBy: setSortBy,
-          sortBy,
-          sortOrder,
-          render: (action) => <ActionStatusSelect action={action} />,
-        },
-        {
-          title: "Équipe(s) en charge",
-          dataKey: "team",
-          render: (a) => (
-            <div className="px-2 tw-flex tw-flex-shrink-0 tw-flex-col tw-gap-px">
-              {Array.isArray(a?.teams) ? a.teams.map((e) => <TagTeam key={e} teamId={e} />) : <TagTeam teamId={a?.team} />}
-            </div>
-          ),
-        },
-      ]}
-    />
-  );
-};
-
-const Consultations = ({ consultations }) => {
-  const history = useHistory();
-  const organisation = useRecoilValue(organisationState);
-  const [sortBy, setSortBy] = useLocalStorage("actions-consultations-sortBy", "dueAt");
-  const [sortOrder, setSortOrder] = useLocalStorage("actions-consultations-sortOrder", "ASC");
-
-  const data = useMemo(() => {
-    return [...consultations].sort(sortActionsOrConsultations(sortBy, sortOrder));
-  }, [consultations, sortBy, sortOrder]);
-
-  if (!consultations.length) return <div />;
-
-  const moreThanOne = data.length > 1;
-
-  return (
-    <Table
-      className="Table"
-      data={data.map((a) => {
-        if (a.urgent) return { ...a, style: { backgroundColor: "#fecaca" } };
-        return a;
-      })}
-      title={`Consultation${moreThanOne ? "s" : ""} (${data.length})`}
-      noData="Pas de consultation"
-      onRowClick={(consultation) => {
-        const searchParams = new URLSearchParams(history.location.search);
-        searchParams.set("consultationId", consultation._id);
-        history.push(`?${searchParams.toString()}`);
-      }}
-      rowKey="_id"
-      columns={[
-        {
-          title: "",
-          dataKey: "urgentOrGroupOrConsultation",
-          small: true,
-          onSortOrder: setSortOrder,
-          onSortBy: setSortBy,
-          sortBy,
-          sortOrder,
-          render: (actionOrConsult) => {
-            return (
-              <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
-                {!!actionOrConsult.urgent && <ExclamationMarkButton />}
-                {!!actionOrConsult.description && <DescriptionIcon />}
-                {!!organisation.groupsEnabled && !!actionOrConsult.group && (
-                  <span className="tw-text-3xl" aria-label="Action familiale" title="Action familiale">
-                    👪
-                  </span>
-                )}
-                {!!actionOrConsult.isConsultation && <ConsultationButton />}
-              </div>
-            );
-          },
-        },
-        {
-          title: "Date",
-          dataKey: "dueAt",
-          onSortOrder: setSortOrder,
-          onSortBy: setSortBy,
-          sortBy,
-          sortOrder,
-          render: (consult) => <DateBloc date={[DONE, CANCEL].includes(consult.status) ? consult.completedAt : consult.dueAt} />,
-        },
-        {
-          title: "Heure",
-          dataKey: "time",
-          render: (consultation) => {
-            if (!consultation.dueAt || !consultation.withTime) return null;
-            return formatTime(consultation.dueAt);
-          },
-        },
-        {
-          title: "Nom",
-          dataKey: "name",
-          onSortOrder: setSortOrder,
-          onSortBy: setSortBy,
-          sortBy,
-          sortOrder,
-        },
-        {
-          title: "Personne suivie",
-          dataKey: "person",
-          onSortOrder: setSortOrder,
-          onSortBy: setSortBy,
-          sortBy,
-          sortOrder,
-          render: (consultation) => <PersonName item={consultation} />,
-        },
-        {
-          title: "Statut",
-          dataKey: "status",
-          onSortOrder: setSortOrder,
-          onSortBy: setSortBy,
-          sortBy,
-          sortOrder,
-          render: (consultation) => <ActionStatusSelect action={consultation} />,
-        },
-        {
-          title: "Équipe(s) en charge",
-          dataKey: "team",
-          render: (consult) => (
-            <div className="px-2 tw-flex tw-flex-shrink-0 tw-flex-col tw-gap-px">
-              {Array.isArray(consult?.teams) ? consult.teams.map((e) => <TagTeam key={e} teamId={e} />) : <TagTeam teamId={consult?.team} />}
-            </div>
-          ),
-        },
-      ]}
-    />
-  );
-};
-
-const Treatments = ({ treatments }) => {
-  const history = useHistory();
-
-  const moreThanOne = treatments.length > 1;
-
-  return (
-    <Table
-      className="Table"
-      data={treatments}
-      title={`Traitement${moreThanOne ? "s" : ""} (${treatments?.length})`}
-      noData="Pas de traitement"
-      onRowClick={(consultation) => {
-        const searchParams = new URLSearchParams(history.location.search);
-        searchParams.set("consultationId", consultation._id);
-        history.push(`?${searchParams.toString()}`);
-      }}
-      rowKey="_id"
-      columns={[
-        {
-          title: "Début",
-          dataKey: "startDate",
-          render: (treatment) => <DateBloc date={treatment.startDate} />,
-        },
-        {
-          title: "Fin",
-          dataKey: "endDate",
-          render: (treatment) => <DateBloc date={treatment.endDate} />,
-        },
-        {
-          title: "Nom",
-          dataKey: "name",
-        },
-        {
-          title: "Dosage",
-          dataKey: "dosage",
-        },
-        {
-          title: "Fréquence",
-          dataKey: "frequency",
-        },
-        {
-          title: "Indication",
-          dataKey: "indication",
-        },
-        {
-          title: "Personne suivie",
-          dataKey: "person",
-          render: (consultation) => <PersonName item={consultation} />,
-        },
-      ]}
-    />
   );
 };
 

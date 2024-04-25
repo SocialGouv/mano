@@ -17,6 +17,7 @@ import PersonFamily from "./PersonFamily";
 import { groupSelector } from "../../recoil/groups";
 import TabsNav from "../../components/tailwind/TabsNav";
 import { useDataLoader } from "../../components/DataLoader";
+import SearchInPerson from "./components/SearchInPerson";
 
 export default function View() {
   const { personId } = useParams();
@@ -45,9 +46,12 @@ export default function View() {
 
   return (
     <div>
-      <div className="tw-flex tw-w-full tw-justify-between">
+      <div className="tw-flex tw-w-full tw-justify-between tw-items-center">
         <div>
           <BackButton />
+        </div>
+        <div className="tw-w-full tw-flex tw-justify-center [&>div]:tw-max-w-96">
+          <SearchInPerson person={person} />
         </div>
         <div className="noprint">
           <UserName

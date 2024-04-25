@@ -5,7 +5,7 @@ type TabsNavProps = {
   className?: string;
   onClick: (name: Tab, index: number) => void;
   activeTabIndex?: number;
-  renderTab: (name: Tab) => React.ReactNode;
+  renderTab?: (name: Tab) => React.ReactNode;
 };
 
 export default function TabsNav({ tabs, className, onClick, activeTabIndex, renderTab = (caption) => caption }: TabsNavProps) {

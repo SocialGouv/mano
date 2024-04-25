@@ -20,7 +20,7 @@ import DescriptionIcon from "./DescriptionIcon";
 import { AgendaMutedIcon } from "../assets/icons/AgendaMutedIcon";
 import ActionStatusSelect from "./ActionStatusSelect";
 
-const ActionsSortableList = ({ data, limit }) => {
+const ActionsSortableList = ({ data, limit = 0 }) => {
   useTitle("Agenda");
   const history = useHistory();
   const user = useRecoilValue(userState);

@@ -25,6 +25,7 @@ interface DocumentsModuleProps {
   personId: UUIDV4;
   showPanel?: boolean;
   showAssociatedItem?: boolean;
+  showAddDocumentButton?: boolean;
   canToggleGroupCheck?: boolean;
   socialOrMedical: "social" | "medical";
   onDeleteDocument: (item: DocumentWithLinkedItem) => Promise<boolean>;
@@ -43,6 +44,7 @@ export function DocumentsModule({
   showPanel = false,
   canToggleGroupCheck = false,
   showAssociatedItem = true,
+  showAddDocumentButton = true,
   onDeleteDocument,
   onSubmitDocument,
   onAddDocuments,
@@ -98,7 +100,7 @@ export function DocumentsModule({
         </div>
       ) : (
         <DocumentTable
-          showAddDocumentButton
+          showAddDocumentButton={showAddDocumentButton}
           documents={onlyDocuments}
           color={color}
           onDisplayDocument={setDocumentToEdit}
@@ -328,7 +330,7 @@ interface DocumentTableProps {
   withClickableLabel?: boolean;
 }
 
-function DocumentTable({
+export function DocumentTable({
   documents,
   onDisplayDocument,
   personId,
@@ -389,10 +391,7 @@ function DocumentTable({
                 key={doc._id}
                 data-test-id={doc.downloadPath}
                 aria-label={`Document ${doc.name}`}
-                className={[
-                  `tw-w-full tw-border-t tw-border-zinc-200 tw-bg-${color}`,
-                  index % 2 ? "tw-bg-opacity-0" : "tw-bg-opacity-5",
-                ].join(" ")}
+                className={[`tw-w-full tw-border-t tw-border-zinc-200 tw-bg-${color}`, index % 2 ? "tw-bg-opacity-0" : "tw-bg-opacity-5"].join(" ")}
                 onClick={() => {
                   onDisplayDocument(doc);
                 }}

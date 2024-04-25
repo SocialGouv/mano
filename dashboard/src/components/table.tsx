@@ -2,21 +2,58 @@ import React, { useCallback, useEffect, useRef } from "react";
 import Sortable from "sortablejs";
 import useMinimumWidth from "../services/useMinimumWidth";
 
-const Table = ({
+interface HasId {
+  _id: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string;
+  organisation: string;
+}
+
+interface TableProps<T extends HasId> {
+  columns?: {
+    title: string;
+    dataKey: string;
+    sortableKey?: string;
+    onSortBy?: (key: string) => void;
+    onSortOrder?: (order: "ASC" | "DESC") => void;
+    sortBy?: string;
+    sortOrder?: "ASC" | "DESC";
+    className?: string;
+    style?: React.CSSProperties;
+    help?: React.ReactNode;
+    render?: (item: T) => React.ReactNode;
+    small?: boolean;
+  }[];
+  data?: T[];
+  rowKey: string;
+  dataTestId?: string;
+  onRowClick?: (item: T) => void;
+  rowDisabled?: (item: T) => boolean;
+  nullDisplay?: string;
+  className?: string;
+  title?: string;
+  noData?: string;
+  isSortable?: boolean;
+  onSort?: (newOrder: string[], data: T[]) => void;
+  renderCellSmallDevices?: (item: T) => React.ReactNode;
+}
+
+const Table = <T extends { [key: string]: any } & HasId>({
   columns = [],
   data = [],
-  renderCellSmallDevices,
   rowKey,
   dataTestId = null,
-  onRowClick,
+  onRowClick = null,
   rowDisabled = () => false,
   nullDisplay = "",
   className,
-  title,
+  title = "",
   noData,
-  isSortable,
-  onSort,
-}) => {
+  isSortable = false,
+  onSort = (_newOrder, _data) => null,
+  renderCellSmallDevices = null,
+}: TableProps<T>) => {
   const gridRef = useRef(null);
   const sortableJsRef = useRef(null);
 
@@ -121,10 +158,10 @@ const Table = ({
                     rowDisabled(item)
                       ? "tw-cursor-not-allowed"
                       : isSortable
-                      ? "tw-cursor-move"
-                      : Boolean(onRowClick)
-                      ? "tw-cursor-pointer"
-                      : "tw-cursor-auto",
+                        ? "tw-cursor-move"
+                        : Boolean(onRowClick)
+                          ? "tw-cursor-pointer"
+                          : "tw-cursor-auto",
                   ].join(" ")}
                   style={item.style || {}}
                 >
