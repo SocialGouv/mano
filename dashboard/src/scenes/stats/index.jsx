@@ -36,6 +36,7 @@ import dayjs from "dayjs";
 import { filterItem } from "../../components/Filters";
 import TabsNav from "../../components/tailwind/TabsNav";
 import { filterPersonByAssignedTeam } from "../../utils/filter-person";
+import { flattenedCustomFieldsConsultationsSelector } from "../../recoil/consultations";
 
 const tabs = [
   "Général",
@@ -278,6 +279,7 @@ const Stats = () => {
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
   const flattenedCustomFieldsPersons = useRecoilValue(flattenedCustomFieldsPersonsSelector);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
+  const consultationFields = useRecoilValue(flattenedCustomFieldsConsultationsSelector);
   const personFields = useRecoilValue(personFieldsSelector);
   const territories = useRecoilValue(territoriesState);
   const allCategories = useRecoilValue(flattenedActionsCategoriesSelector);
@@ -479,6 +481,9 @@ const Stats = () => {
   // Add enabled custom fields in filters.
   const filterPersonsWithAllFields = (withMedicalFiles = false) => [
     ...(withMedicalFiles ? customFieldsMedicalFile : [])
+      .filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id))
+      .map((a) => ({ field: a.name, ...a })),
+    ...(withMedicalFiles ? consultationFields : [])
       .filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id))
       .map((a) => ({ field: a.name, ...a })),
     ...filterPersonsBase.map((f) =>
@@ -713,7 +718,7 @@ const Stats = () => {
             consultations={consultationsFilteredByPersons} // filter by persons
             // filter by persons
             personsWithConsultations={personsWithConsultations}
-            filterBase={filterPersonsWithAllFields()}
+            filterBase={filterPersonsWithAllFields(true)}
             filterPersons={filterPersons}
             setFilterPersons={setFilterPersons}
           />

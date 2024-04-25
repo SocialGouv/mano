@@ -7,7 +7,7 @@ import { ageFromBirthdateAsYear, dayjsInstance, formatBirthDate, startOfToday } 
 import { customFieldsObsSelector, territoryObservationsState } from "./territoryObservations";
 import { selector } from "recoil";
 import { actionsState } from "./actions";
-import { consultationsState } from "./consultations";
+import { consultationsState, excludeConsultationsFieldsFromSearch } from "./consultations";
 import { commentsState } from "./comments";
 import { passagesState } from "./passages";
 import { medicalFileState } from "./medicalFiles";
@@ -136,22 +136,7 @@ export const itemsGroupedByPersonSelector = selector({
     }
     const actions = Object.values(get(actionsWithCommentsSelector));
     const comments = get(commentsState);
-    const excludeConsultationsFieldsFromSearch = new Set([
-      "_id",
-      "encryptedEntityKey",
-      "entityKey",
-      "createdBy",
-      "documents",
-      "user", // because it is an id
-      "organisation", // because it is an id
-      // "type",
-      "person",
-      "user",
-      "teams",
-      "documents",
-      // "comments",
-      "history",
-    ]);
+
     const consultations = get(consultationsState);
     const treatments = get(treatmentsState);
     const medicalFiles = [...get(medicalFileState)].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));

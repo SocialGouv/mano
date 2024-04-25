@@ -35,6 +35,32 @@ const encryptedFields: Array<keyof ConsultationInstance> = [
   "constantes-tension-arterielle-diastolique",
 ];
 
+export const excludeConsultationsFieldsFromSearch = new Set([
+  "_id",
+  "encryptedEntityKey",
+  "entityKey",
+  "createdBy",
+  "documents",
+  "user", // because it is an id
+  "organisation", // because it is an id
+  // "type",
+  "person",
+  "user",
+  "teams",
+  "documents",
+  // "comments",
+  "history",
+  "constantes-poids",
+  "constantes-frequence-cardiaque",
+  "constantes-taille",
+  "constantes-saturation-o2",
+  "constantes-temperature",
+  "constantes-glycemie-capillaire",
+  "constantes-frequence-respiratoire",
+  "constantes-tension-arterielle-systolique",
+  "constantes-tension-arterielle-diastolique",
+]);
+
 export const consultationFieldsSelector = selector({
   key: "consultationFieldsSelector",
   get: ({ get }) => {
