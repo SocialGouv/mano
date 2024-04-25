@@ -226,7 +226,7 @@ const View = () => {
                             suivies qui ne sont pas assignées à son équipe.
                           </label>
                         </div>
-                      </div> */}
+                      </div>
                       <div className="tw-mb-10 tw-flex tw-justify-end tw-gap-4">
                         <ButtonCustom
                           title={"Mettre à jour"}
@@ -234,7 +234,7 @@ const View = () => {
                           loading={isSubmitting}
                           onClick={handleSubmit as unknown as MouseEventHandler<HTMLButtonElement>}
                         />
-                      </div>
+                      </div> */}
                     </>
                   );
                 case "encryption":
