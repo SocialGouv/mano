@@ -171,21 +171,19 @@ const List = () => {
                   }
                 }}
               />
-              {organisation.checkboxShowAllOrgaPersons && (
-                <div className="tw-flex tw-w-full tw-items-center">
-                  <label htmlFor="viewAllOrganisationData">
-                    <input
-                      type="checkbox"
-                      id="viewAllOrganisationData"
-                      className="tw-mr-2.5"
-                      checked={viewAllOrganisationData}
-                      value={viewAllOrganisationData}
-                      onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
-                    />
-                    Afficher les personnes de toute l'organisation
-                  </label>
-                </div>
-              )}
+              <div className="tw-flex tw-w-full tw-items-center">
+                <label htmlFor="viewAllOrganisationData">
+                  <input
+                    type="checkbox"
+                    id="viewAllOrganisationData"
+                    className="tw-mr-2.5"
+                    checked={viewAllOrganisationData}
+                    value={viewAllOrganisationData}
+                    onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
+                  />
+                  Afficher les personnes de toute l'organisation
+                </label>
+              </div>
               <div className="tw-flex tw-w-full tw-items-center">
                 <label htmlFor="alertness">
                   <input

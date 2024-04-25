@@ -208,7 +208,7 @@ const View = () => {
                         />
                       </div>
                       <hr />
-                      <h4 className="tw-my-8">Activer la case à cocher "Afficher les personnes de toute l'organisation"</h4>
+                      {/* <h4 className="tw-my-8">Activer la case à cocher "Afficher les personnes de toute l'organisation"</h4>
                       <div className="tw-mb-4">
                         <div className="tw-ml-5 tw-flex tw-w-4/5 tw-items-baseline">
                           <input
@@ -226,7 +226,7 @@ const View = () => {
                             suivies qui ne sont pas assignées à son équipe.
                           </label>
                         </div>
-                      </div>
+                      </div> */}
                       <div className="tw-mb-10 tw-flex tw-justify-end tw-gap-4">
                         <ButtonCustom
                           title={"Mettre à jour"}
