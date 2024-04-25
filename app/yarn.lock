@@ -2444,12 +2444,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native-community/datetimepicker@npm:^6.7.1":
-  version: 6.7.5
-  resolution: "@react-native-community/datetimepicker@npm:6.7.5"
+"@react-native-community/datetimepicker@npm:^8.0.0":
+  version: 8.0.0
+  resolution: "@react-native-community/datetimepicker@npm:8.0.0"
   dependencies:
     invariant: "npm:^2.2.4"
-  checksum: 8540b3b033b466baa3ed1d4036c2496a9a25de01cee134f6528aa482b8b7fbaa70993471becf43d819fed3ff36365a3683255eb8f897dcec83197e3cd63644dd
+  peerDependencies:
+    react: "*"
+    react-native: ^0.73.0
+    react-native-windows: ^0.73.0
+  peerDependenciesMeta:
+    react-native-windows:
+      optional: true
+  checksum: 63a4fbee8a2f4bf14e2cdb79b9ce70df8aaac396cc0f000b84f02fbe11ae8e0c40352c91ab3073d4bf72e9e7bccc6dec34d2f8d5e82cba6f76e664842231a123
   languageName: node
   linkType: hard
 
@@ -6003,14 +6010,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graceful-fs@npm:^4.1.11, graceful-fs@npm:^4.1.2, graceful-fs@npm:^4.1.3, graceful-fs@npm:^4.1.6, graceful-fs@npm:^4.2.0, graceful-fs@npm:^4.2.4, graceful-fs@npm:^4.2.9":
-  version: 4.2.10
-  resolution: "graceful-fs@npm:4.2.10"
-  checksum: 4223a833e38e1d0d2aea630c2433cfb94ddc07dfc11d511dbd6be1d16688c5be848acc31f9a5d0d0ddbfb56d2ee5a6ae0278aceeb0ca6a13f27e06b9956fb952
-  languageName: node
-  linkType: hard
-
-"graceful-fs@npm:^4.2.6":
+"graceful-fs@npm:^4.1.11, graceful-fs@npm:^4.1.2, graceful-fs@npm:^4.1.3, graceful-fs@npm:^4.1.6, graceful-fs@npm:^4.2.0, graceful-fs@npm:^4.2.4, graceful-fs@npm:^4.2.6, graceful-fs@npm:^4.2.9":
   version: 4.2.11
   resolution: "graceful-fs@npm:4.2.11"
   checksum: 386d011a553e02bc594ac2ca0bd6d9e4c22d7fa8cfbfc448a6d148c59ea881b092db9dbe3547ae4b88e55f1b01f7c4a2ecc53b310c042793e63aa44cf6c257f2
@@ -7891,7 +7891,7 @@ __metadata:
     "@babel/runtime": "npm:^7.20.0"
     "@expo/react-native-action-sheet": "npm:^4.0.1"
     "@react-native-async-storage/async-storage": "npm:^1.17.11"
-    "@react-native-community/datetimepicker": "npm:^6.7.1"
+    "@react-native-community/datetimepicker": "npm:^8.0.0"
     "@react-native-community/netinfo": "npm:^11.0.0"
     "@react-native-masked-view/masked-view": "npm:^0.2.8"
     "@react-native-picker/picker": "npm:^2.4.8"
