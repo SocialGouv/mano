@@ -95,10 +95,7 @@ export function SummaryPrint({ person }: { person: PersonPopulated }) {
                 <div>{`${date}${time}`}</div>
                 {Boolean(action.categories) && (
                   <div>
-                    Catégories :{" "}
-                    {action.categories?.map((category: string) => (
-                      <span key={category}>{category}</span>
-                    ))}
+                    Catégories : {action.categories?.map((category: string, index: number) => <span key={category + index}>{category}</span>)}
                   </div>
                 )}
                 {action.urgent ? <div>Action prioritaire</div> : null}

@@ -3,6 +3,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import isBetween from "dayjs/plugin/isBetween";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import dayjs from "dayjs";
+import type { Dayjs } from "dayjs";
 
 dayjs.locale("fr");
 dayjs.extend(relativeTime);
@@ -10,42 +11,50 @@ dayjs.extend(isBetween);
 dayjs.extend(customParseFormat);
 
 /** FORMAT DATES **/
+type PossibleDate = string | Date | Dayjs | null;
 
-export function formatDateWithFullMonth(date) {
+export function formatDateWithFullMonth(date: PossibleDate): string {
   return `${dayjs(date).format("D MMMM YYYY")}`;
 }
 
-export function formatTime(date) {
+export function formatTime(date: PossibleDate): string {
   return dayjs(date).format("HH:mm");
 }
 
-export function formatDateWithNameOfDay(date) {
+export function formatDateWithNameOfDay(date?: PossibleDate): string {
   return dayjs(date).format("dddd D MMMM YYYY");
 }
 
-export function formatDateTimeWithNameOfDay(date) {
+export function formatDateTimeWithNameOfDay(date: PossibleDate = null): string {
   return dayjs(date).format("dddd D MMMM YYYY HH:mm");
 }
 
-export function formatBirthDate(date) {
+export function formatBirthDate(date: PossibleDate): string | null {
   if (!date) return null;
   const birthDate = dayjs(date);
   return `${birthDate.format("DD/MM/YYYY")} (${formatAge(date)})`;
 }
 
-export function formatAge(date) {
+export function formatAge(date: PossibleDate): string | null {
   if (!date) return null;
   const birthDate = dayjs(date);
-  return birthDate.fromNow(true);
+  const months = dayjs().diff(birthDate, "months");
+  if (months < 24) return months + " mois";
+  const years = dayjs().diff(birthDate, "years");
+  if (years < 7) {
+    const etDemi = months % 12 >= 6;
+    if (etDemi) return `${years} ans et demi`;
+  }
+  return `${years} ans`;
 }
 
-export function ageFromBirthdateAsYear(date) {
+export function ageFromBirthdateAsYear(date: PossibleDate): number | null {
   if (!date) return null;
   const birthDate = dayjs(date);
   return dayjsInstance(dayjsInstance()).diff(birthDate, "year");
 }
 
-export function formatCalendarDate(date) {
+export function formatCalendarDate(date: PossibleDate): string | null {
   if (dayjs(date).isSame(dayjs(), "day")) {
     return "Aujourd'hui";
   }
@@ -60,51 +69,52 @@ export function formatCalendarDate(date) {
 
 /** MANIPULATION AND COMPARISON **/
 
-export function isOnSameDay(date1, date2) {
+export function isOnSameDay(date1: PossibleDate, date2: PossibleDate): boolean {
   return dayjs(date1).isSame(dayjs(date2), "day");
 }
 
-export function isToday(date) {
+export function isToday(date: PossibleDate): boolean {
   return dayjs(date).isSame(dayjs(), "day");
 }
 
-export function addOneDay(date) {
+export function addOneDay(date: PossibleDate): Dayjs {
   return dayjs(date).add(1, "day");
 }
 
-export function subtractOneDay(date) {
+export function subtractOneDay(date: PossibleDate): Dayjs {
   return dayjs(date).subtract(1, "day");
 }
 
-export function startOfToday() {
+export function startOfToday(): Dayjs {
   return dayjs().startOf("day");
 }
 
-export function now() {
+export function now(): Dayjs {
   return dayjs();
 }
 
-export function dateForDatePicker(date) {
+export function dateForDatePicker(date: PossibleDate): Date | null {
   return date && dayjs(date).isValid() ? dayjs(date).toDate() : null;
 }
 
-export function dateForInputDate(date, withTime = false) {
+export function dateForInputDate(date: PossibleDate, withTime = false): string {
   return date && dayjs(date).isValid()
     ? dayjs(date)
         .format(withTime ? "YYYY-MM-DDTHH:mm" : "YYYY-MM-DD")
         .padStart(withTime ? 16 : 10, "0")
     : "";
 }
+
 export const LEFT_BOUNDARY_DATE = "1900-01-01";
 export const RIGHT_BOUNDARY_DATE = "2100-01-01";
-export function outOfBoundariesDate(date) {
+export function outOfBoundariesDate(date: PossibleDate): boolean {
   return dayjs(date).isBefore(dayjs(LEFT_BOUNDARY_DATE)) || dayjs(date).isAfter(dayjs(RIGHT_BOUNDARY_DATE));
 }
-export function dateFromInputDate(date) {
+export function dateFromInputDate(date: PossibleDate): Date | null {
   return date && dayjs(date).isValid() ? dayjs(date).toDate() : null;
 }
 
-export const getIsDayWithinHoursOffsetOfPeriod = (dayToTest, { referenceStartDay, referenceEndDay }, offsetHours = -12) => {
+export const getIsDayWithinHoursOffsetOfPeriod = (dayToTest: PossibleDate, { referenceStartDay, referenceEndDay }, offsetHours = -12) => {
   if (!dayToTest) return false;
 
   const startDate = dayjs(referenceStartDay).startOf("day").add(offsetHours, "hour");
@@ -121,7 +131,7 @@ export const getIsDayWithinHoursOffsetOfPeriod = (dayToTest, { referenceStartDay
   return dayjs(dayToTest).isBetween(startDate, endDate, null, "[)");
 };
 
-export function fromDateString(dateString) {
+export function fromDateString(dateString: PossibleDate): Dayjs {
   return dayjs(dateString, ["YYYY-MM-DD", "DD/MM/YYYY", "DD/MM/YY", "D/M/YYYY", "D/M/YY", "D/MM/YYYY", "D/MM/YY"], "fr", true);
 }
 

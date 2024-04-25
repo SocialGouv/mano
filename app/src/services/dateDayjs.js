@@ -39,17 +39,16 @@ export function formatBirthDate(date) {
 }
 
 export function formatAge(date) {
-  let birthDate = new Date(date);
-  let currentDate = new Date();
-
-  let years = currentDate.getFullYear() - birthDate.getFullYear();
-  let m = currentDate.getMonth() - birthDate.getMonth();
-
-  if (m < 0 || (m === 0 && currentDate.getDate() < birthDate.getDate())) {
-    years--;
+  if (!date) return null;
+  const birthDate = dayjs(date);
+  const months = dayjs().diff(birthDate, 'months');
+  if (months < 24) return months + ' mois';
+  const years = dayjs().diff(birthDate, 'years');
+  if (years < 7) {
+    const etDemi = months % 12 >= 6;
+    if (etDemi) return `${years} ans et demi`;
   }
-
-  return `${years}`;
+  return `${years} ans`;
 }
 
 export function formatBirthDateAndAge(date) {
