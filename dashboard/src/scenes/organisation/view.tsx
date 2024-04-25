@@ -208,7 +208,7 @@ const View = () => {
                         />
                       </div>
                       <hr />
-                      <h4 className="tw-my-8">Activer la case à chocher "Afficher les personnes de toute l'organisation"</h4>
+                      <h4 className="tw-my-8">Activer la case à cocher "Afficher les personnes de toute l'organisation"</h4>
                       <div className="tw-mb-4">
                         <div className="tw-ml-5 tw-flex tw-w-4/5 tw-items-baseline">
                           <input
@@ -220,8 +220,10 @@ const View = () => {
                             onChange={handleChange}
                           />
                           <label htmlFor="checkboxShowAllOrgaPersons">
-                            Cette case à cocher permet à un utilisateur qui n'est pas attribué à certaines équipes, d'avopir malgré tout accès à
-                            toutes les personnes de l'organisation. Elle est visible dans l onglet "Personnes suivies".
+                            Cette case à cocher, visible dans l'onglet "Personnes suivies", permet à un utilisateur d'avoir accès à toutes les
+                            personnes de l'organisation MÊME SI des personnes suivies ne sont pas assignées à son équipe. Si cette option est
+                            désactivée, un utilisateur ne pourra pas voir cette case à cocher lui permettant d'accéder aux dossiers des personnes
+                            suivies qui ne sont pas assignées à son équipe.
                           </label>
                         </div>
                       </div>
