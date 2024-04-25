@@ -42,3 +42,10 @@ export interface FilterableField {
   type: FieldType;
   options: string[];
 }
+
+export type Filter = {
+  field?: string;
+  value?: any;
+  type?: FieldType;
+  label?: string;
+};

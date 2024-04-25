@@ -3,14 +3,7 @@ import SelectCustom from "./SelectCustom";
 import { components } from "react-select";
 import { dayjsInstance, isOnSameDay } from "../services/date";
 import DatePicker from "./DatePicker";
-import type { FilterableField } from "../types/field";
-
-type Filter = {
-  field?: string;
-  value?: any;
-  type?: string;
-  label?: string;
-};
+import type { FilterableField, Filter } from "../types/field";
 
 export const filterItem =
   (filters: Array<Filter>, debug = false) =>

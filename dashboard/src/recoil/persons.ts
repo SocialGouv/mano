@@ -4,7 +4,7 @@ import { organisationState } from "./auth";
 import { toast } from "react-toastify";
 import { capture } from "../services/sentry";
 import type { PersonInstance } from "../types/person";
-import type { PredefinedField, CustomField, CustomOrPredefinedField } from "../types/field";
+import type { PredefinedField, CustomField, CustomOrPredefinedField, Filter } from "../types/field";
 
 const collectionName = "person";
 export const personsState = atom<PersonInstance[]>({
@@ -105,7 +105,7 @@ export const filterPersonsBaseSelector = selector({
   key: "filterPersonsBaseSelector",
   get: ({ get }) => {
     const personFields = get(personFieldsSelector) as PredefinedField[];
-    const filterPersonsBase = [];
+    const filterPersonsBase: Array<Filter> = [];
     for (const field of personFields) {
       if (!field.filterable) continue;
       filterPersonsBase.push({
@@ -118,20 +118,27 @@ export const filterPersonsBaseSelector = selector({
           field: "age",
           label: "Age",
           type: "number",
-          filterable: true,
         });
       }
     }
-    filterPersonsBase.push({
+    const hasAtLeastOneConsultationFilter: Filter = {
       field: "hasAtLeastOneConsultation",
-      label: "A eu une consultation dans l'organisation",
+      label: "A eu une consultation",
       type: "boolean",
-    });
-    filterPersonsBase.push({
+    };
+    filterPersonsBase.push(hasAtLeastOneConsultationFilter);
+    const numberOfConsultationsFilter: Filter = {
       field: "numberOfConsultations",
-      label: "Nombre de consultations dans l'organisation",
+      label: "Nombre de consultations",
       type: "number",
-    });
+    };
+    filterPersonsBase.push(numberOfConsultationsFilter);
+    const lastUpdateCheckForGDPRFilter: Filter = {
+      field: "lastUpdateCheckForGDPR",
+      label: "Date de dernière interaction",
+      type: "date",
+    };
+    filterPersonsBase.push(lastUpdateCheckForGDPRFilter);
     return filterPersonsBase;
   },
 });
