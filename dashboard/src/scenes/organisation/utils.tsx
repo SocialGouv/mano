@@ -27,7 +27,7 @@ export function getUmapGeoJSONFromOrgs(organisations: Array<OrganisationInstance
         type: "Feature",
         properties: {
           name: cityAndDepartment,
-          description: organisation.orgId,
+          description: "- " + organisation.orgId,
         },
         geometry: {
           type: "Point",
