@@ -11,7 +11,9 @@ interface GroupedServices {
 
 export interface OrganisationInstance {
   _id: string;
+  orgId: string;
   name: string;
+  city: string;
 
   collaborations?: string[];
 

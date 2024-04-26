@@ -358,6 +358,42 @@ router.put(
   })
 );
 
+router.put(
+  "/superadmin/:_id",
+  passport.authenticate("user", { session: false }),
+  validateUser(["superadmin"]),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.object({
+        params: z.object({
+          _id: z.string().regex(looseUuidRegex),
+        }),
+        body: z.object({
+          city: z.string().min(1),
+        }),
+      });
+    } catch (e) {
+      const error = new Error(`Invalid request in organisation superadmin put: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+    const { _id } = req.params;
+
+    const organisation = await Organisation.findOne({ where: { _id } });
+    if (!organisation) return res.status(404).send({ ok: false, error: "Not Found" });
+
+    const updateOrg = {};
+    if (req.body.hasOwnProperty("city")) updateOrg.city = req.body.city;
+
+    await organisation.update(updateOrg);
+
+    return res.status(200).send({
+      ok: true,
+      data: serializeOrganisation(organisation),
+    });
+  })
+);
+
 router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),

@@ -11,6 +11,7 @@ function serializeOrganisation(organisation) {
   return {
     _id: organisation._id,
     name: organisation.name,
+    city: organisation.city,
     createdAt: organisation.createdAt,
     updatedAt: organisation.updatedAt,
     encryptionEnabled: organisation.encryptionEnabled,
