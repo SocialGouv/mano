@@ -4,7 +4,6 @@ import { Formik } from "formik";
 import { toast } from "react-toastify";
 import styled from "styled-components";
 import Table from "../../components/table";
-
 import OrganisationUsers from "./OrganisationUsers";
 import Loading from "../../components/loading";
 import API from "../../services/api";
@@ -19,6 +18,7 @@ import SelectRole from "../../components/SelectRole";
 import SelectCustom from "../../components/SelectCustom";
 import OrganisationSuperadminSettings from "./OrganisationSuperadminSettings";
 import { getUmapGeoJSONFromOrgs } from "./utils";
+import CitySelect from "../../components/CitySelect";
 
 const List = () => {
   const [organisations, setOrganisations] = useState(null);
@@ -356,8 +356,15 @@ const Create = ({ onChange, open, setOpen }) => {
                   <div className="-tw-mx-4 tw-flex tw-flex-row tw-flex-wrap">
                     <div className="tw-flex tw-basis-full tw-flex-col tw-px-4 tw-py-2">
                       <div className="tw-mb-4">
-                        <label htmlFor="city">Ville</label>
-                        <input className="tailwindui" name="city" id="city" value={values.city} onChange={handleChange} />
+                        <label htmlFor="organisation-create-city">Ville</label>
+                        <CitySelect
+                          name="city"
+                          id="organisation-create-city"
+                          value={values.city}
+                          onChange={(nextCity) => {
+                            handleChange({ target: { name: "city", value: nextCity } });
+                          }}
+                        />
                         {touched.city && errors.city && <span className="tw-text-xs tw-text-red-500">{errors.city}</span>}
                       </div>
                     </div>

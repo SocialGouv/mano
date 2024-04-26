@@ -1,21 +1,9 @@
 import { useState } from "react";
 import API from "../../services/api";
-import { theme } from "../../config";
 import { OrganisationInstance } from "../../types/organisation";
 import { ModalContainer, ModalBody, ModalHeader, ModalFooter } from "../../components/tailwind/Modal";
 import { toast } from "react-toastify";
-import AsyncSelect from "react-select/async";
-
-type GeoApiResponse = {
-  codeDepartement: string;
-  centre: {
-    type: string;
-    coordinates: [number, number];
-  };
-  nom: string;
-  code: string;
-  _score: number;
-};
+import CitySelect from "../../components/CitySelect";
 
 export default function OrganisationSuperadminSettings({
   organisation,
@@ -29,10 +17,6 @@ export default function OrganisationSuperadminSettings({
   updateOrganisation: (organisation: OrganisationInstance) => void;
 }) {
   const [data, setData] = useState(organisation);
-
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setData({ ...data, [e.target.name]: e.target.value });
-  }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -49,18 +33,6 @@ export default function OrganisationSuperadminSettings({
 
   function onClose() {
     setOpen(false);
-  }
-
-  async function loadOptions(inputValue: string) {
-    const response: Array<GeoApiResponse> = await fetch(
-      `https://geo.api.gouv.fr/communes?nom=${inputValue}&fields=codeDepartement,centre&boost=population&limit=5`
-    ).then((res) => res.json());
-    console.log({ response });
-    const options = response.map((city) => {
-      const cityAndDepartment = `${city.nom} (${city.codeDepartement})`;
-      return { value: `${cityAndDepartment} - ${JSON.stringify(city.centre.coordinates)}`, label: cityAndDepartment };
-    });
-    return options;
   }
 
   return (
@@ -87,19 +59,13 @@ export default function OrganisationSuperadminSettings({
             <div className="tw-flex tw-basis-full tw-flex-col tw-px-4 tw-py-2">
               <div className="tw-mb-4">
                 <label htmlFor="city">Ville</label>
-                <AsyncSelect
-                  styles={filterStyles}
-                  placeholder="Choisir..."
-                  noOptionsMessage={() => "Aucun résultat"}
-                  theme={setTheme}
-                  instanceId="organisation-city"
-                  inputId="organisation-city"
-                  value={{ value: data.city, label: data?.city?.split?.(" - ")[0] }}
-                  onChange={(e) => {
-                    setData({ ...data, city: e?.value });
+                <CitySelect
+                  name="city"
+                  id="organisation-city"
+                  value={data.city}
+                  onChange={(nextCity) => {
+                    setData({ ...data, city: nextCity });
                   }}
-                  classNamePrefix="organisation-city"
-                  loadOptions={loadOptions}
                 />
               </div>
             </div>
@@ -116,24 +82,4 @@ export default function OrganisationSuperadminSettings({
       </ModalFooter>
     </ModalContainer>
   );
-}
-
-const filterStyles = {
-  // control: (styles) => ({ ...styles, borderWidth: 0 }),
-  indicatorSeparator: (styles: any) => ({ ...styles, borderWidth: 0, backgroundColor: "transparent" }),
-  menuPortal: (provided: any) => ({ ...provided, zIndex: 10000 }),
-  menu: (provided: any) => ({ ...provided, zIndex: 10000 }),
-};
-
-function setTheme(defaultTheme) {
-  return {
-    ...defaultTheme,
-    colors: {
-      ...defaultTheme.colors,
-      primary: theme.main,
-      primary25: theme.main25,
-      primary50: theme.main50,
-      primary75: theme.main75,
-    },
-  };
 }
