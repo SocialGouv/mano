@@ -89,7 +89,7 @@ const commentsPopulatedSelector = selector({
         commentsObject[comment._id] = {
           ...comment,
           action,
-          person: action.person,
+          person: action?.person,
           type: "action",
         };
         continue;
