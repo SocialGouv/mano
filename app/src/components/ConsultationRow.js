@@ -12,14 +12,8 @@ import DateAndTimeCalendarDisplay from './DateAndTimeCalendarDisplay';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../recoil/auth';
 import { StyleSheet } from 'react-native';
-import { disableConsultationRow } from '../recoil/consultations';
+import { consultationIsVisibleByMe, disableConsultationRow } from '../recoil/consultations';
 import { itemsGroupedByPersonSelector } from '../recoil/selectors';
-
-const isVisibleByMe = (consultation, me) => {
-  if (!me?.healthcareProfessional) return false;
-  if (!consultation?.onlyVisibleBy?.length) return true;
-  return consultation.onlyVisibleBy.includes(me._id);
-};
 
 const ConsultationRow = ({
   onConsultationPress,
@@ -40,7 +34,7 @@ const ConsultationRow = ({
   const user = consultation.user;
   const person = useMemo(() => (consultation?.person ? personsObject?.[consultation.person] : null), [personsObject, consultation.person]);
   const pseudo = useMemo(() => consultation?.personName || person?.name, [consultation, person?.name]);
-  const visibleByMe = isVisibleByMe(consultation, me);
+  const visibleByMe = consultationIsVisibleByMe(consultation, me);
 
   const dueAt = consultation?.dueAt ? new Date(consultation?.dueAt) : null;
 

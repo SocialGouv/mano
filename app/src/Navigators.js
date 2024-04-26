@@ -64,6 +64,7 @@ import { appCurrentCacheKey, clearCache } from './services/dataManagement';
 import useResetAllCachedDataRecoilStates from './recoil/reset';
 import CGUsAcceptance from './scenes/Login/CGUsAcceptance';
 import TerritoryObservationRencontre from './scenes/Territories/TerritoryObservationRencontre';
+import Consultations from './scenes/Reports/Consultations';
 
 const ActionsStack = createStackNavigator();
 const ActionsNavigator = () => {
@@ -174,6 +175,8 @@ const ReportsNavigator = () => {
       <ReportsStack.Screen name="RencontresForReport" component={RencontresForReport} />
       <ReportsStack.Screen name="PassagesForReport" component={PassagesForReport} />
       <ReportsStack.Screen name="Actions" component={Actions} />
+      <ReportsStack.Screen name="Consultations" component={Consultations} />
+      <ReportsStack.Screen name="Consultation" component={Consultation} />
       <ReportsStack.Screen name="Observations" component={Observations} />
     </ReportsStack.Navigator>
   );

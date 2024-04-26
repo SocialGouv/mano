@@ -1,8 +1,7 @@
 import { useIsFocused } from '@react-navigation/native';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, InteractionManager } from 'react-native';
+import { ActivityIndicator, Alert, InteractionManager, View } from 'react-native';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import styled from 'styled-components/native';
 import InputLabelled from '../../components/InputLabelled';
 import Label from '../../components/Label';
 import { MyText } from '../../components/MyText';
@@ -13,14 +12,14 @@ import ScrollContainer from '../../components/ScrollContainer';
 import Spacer from '../../components/Spacer';
 import Tags from '../../components/Tags';
 import { CANCEL, DONE } from '../../recoil/actions';
-import { currentTeamState, organisationState } from '../../recoil/auth';
+import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import API from '../../services/api';
 import colors from '../../utils/colors';
 import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
 import {
-  actionsCompletedOrCanceledForReport,
-  actionsCreatedForReport,
+  actionsForReport,
+  consultationsForReport,
   commentsForReport,
   currentTeamReportsSelector,
   observationsForReport,
@@ -69,15 +68,15 @@ const Report = ({ navigation, route }) => {
   const currentTeam = useRecoilValue(currentTeamState);
   const setReports = useSetRecoilState(reportsState);
   const teamsReports = useRecoilValue(currentTeamReportsSelector);
+  const user = useRecoilValue(userState);
 
   const [day] = useState(() => route.params?.day);
   const [reportDB, setReportDB] = useState(() => route?.params?.report);
   const [report, setReport] = useState(() => castToReport(reportDB));
   const reportCreatedRef = useRef(!!reportDB?._id);
 
-  const actionsCreated = useRecoilValue(actionsCreatedForReport({ date: day }));
-  const actionsCompleted = useRecoilValue(actionsCompletedOrCanceledForReport({ date: day, status: DONE }));
-  const actionsCanceled = useRecoilValue(actionsCompletedOrCanceledForReport({ date: day, status: CANCEL }));
+  const { actionsCreated, actionsCompleted, actionsCanceled } = useRecoilValue(actionsForReport({ date: day }));
+  const { consultationsCreated, consultationsCompleted, consultationsCanceled } = useRecoilValue(consultationsForReport({ date: day }));
   const comments = useRecoilValue(commentsForReport({ date: day }));
   const rencontres = useRecoilValue(rencontresForReport({ date: day }));
   const passages = useRecoilValue(passagesForReport({ date: day }));
@@ -222,7 +221,7 @@ const Report = ({ navigation, route }) => {
         testID="report"
       />
       <ScrollContainer noPadding>
-        <Summary>
+        <View className="px-8 pt-8 pb-0">
           <InputLabelled
             label="Description"
             onChangeText={(description) => setReport((r) => ({ ...r, description }))}
@@ -231,7 +230,7 @@ const Report = ({ navigation, route }) => {
             multiline
             editable={editable}
           />
-          {editable ? <Label label="Collaboration(s)" /> : <InlineLabel>Collaboration(s) :</InlineLabel>}
+          {editable ? <Label label="Collaboration(s)" /> : <MyText className="text-main mb-4 text-base">Collaboration(s) :</MyText>}
           <Tags
             data={report.collaborations}
             key={report.collaborations}
@@ -240,7 +239,7 @@ const Report = ({ navigation, route }) => {
             onAddRequest={() => navigation.navigate('Collaborations', { report: reportDB, day })}
             renderTag={(collaboration) => <MyText>{collaboration}</MyText>}
           />
-        </Summary>
+        </View>
         <Row
           withNextButton
           caption={`Actions complétées (${actionsCompleted.length})`}
@@ -260,6 +259,29 @@ const Report = ({ navigation, route }) => {
           disabled={!actionsCanceled.length}
         />
         <Spacer height={30} />
+        {user.healthcareProfessional && (
+          <>
+            <Row
+              withNextButton
+              caption={`Consultations complétées (${consultationsCompleted.length})`}
+              onPress={() => navigation.navigate('Consultations', { date: day, status: DONE })}
+              disabled={!consultationsCompleted.length}
+            />
+            <Row
+              withNextButton
+              caption={`Consultations créées (${consultationsCreated.length})`}
+              onPress={() => navigation.navigate('Consultations', { date: day, status: null })}
+              disabled={!consultationsCreated.length}
+            />
+            <Row
+              withNextButton
+              caption={`Consultations annulées (${consultationsCanceled.length})`}
+              onPress={() => navigation.navigate('Consultations', { date: day, status: CANCEL })}
+              disabled={!consultationsCanceled.length}
+            />
+            <Spacer height={30} />
+          </>
+        )}
         <Row
           withNextButton
           caption={`Commentaires (${comments.length})`}
@@ -295,15 +317,5 @@ const Report = ({ navigation, route }) => {
     </SceneContainer>
   );
 };
-
-const Summary = styled.View`
-  padding: 30px 30px 0;
-`;
-
-const InlineLabel = styled(MyText)`
-  font-size: 15px;
-  color: ${colors.app.color};
-  margin-bottom: 15px;
-`;
 
 export default ReportLoading;

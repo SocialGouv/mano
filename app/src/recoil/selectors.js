@@ -317,12 +317,15 @@ const consultationsForCurrentTeamSelector = selector({
   get: ({ get }) => {
     const consultations = get(consultationsState);
     const currentTeam = get(currentTeamState);
-    const filteredConsultations = consultations
-      .filter((consultation) => {
-        if (!consultation.teams?.length) return true;
-        return consultation.teams.includes(currentTeam._id);
-      })
-      .map((c) => ({ ...c, isConsultation: true }));
+    const filteredConsultations = [];
+    for (const consultation of consultations) {
+      if (!consultation.teams?.length || consultation.teams.includes(currentTeam._id)) {
+        filteredConsultations.push({
+          ...consultation,
+          isConsultation: true,
+        });
+      }
+    }
     return filteredConsultations;
   },
 });

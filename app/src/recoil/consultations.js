@@ -132,3 +132,9 @@ export const disableConsultationRow = (actionOrConsultation, user) => {
   if (!actionOrConsultation.onlyVisibleBy?.length) return false;
   return !actionOrConsultation.onlyVisibleBy.includes(user._id);
 };
+
+export const consultationIsVisibleByMe = (consultation, me) => {
+  if (!me?.healthcareProfessional) return false;
+  if (!consultation?.onlyVisibleBy?.length) return true;
+  return consultation.onlyVisibleBy.includes(me._id);
+};
