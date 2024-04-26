@@ -191,6 +191,8 @@ export const itemsGroupedByPersonSelector = selector({
       personPerAction[action._id] = action.person;
       personsObject[action.person].actions = personsObject[action.person].actions || [];
       personsObject[action.person].actions.push(action);
+      if (!personsObject[action.person].numberOfActions) personsObject[action.person].numberOfActions = 0;
+      personsObject[action.person].numberOfActions++;
       personsObject[action.person].interactions.push(action.dueAt);
       personsObject[action.person].interactions.push(action.createdAt);
       personsObject[action.person].interactions.push(action.completedAt);
@@ -281,6 +283,8 @@ export const itemsGroupedByPersonSelector = selector({
       if (!personsObject[treatment.person]) continue;
       personsObject[treatment.person].treatments = personsObject[treatment.person].treatments || [];
       personsObject[treatment.person].treatments.push(treatment);
+      if (!personsObject[treatment.person].numberOfTreatments) personsObject[treatment.person].numberOfTreatments = 0;
+      personsObject[treatment.person].numberOfTreatments++;
       personsObject[treatment.person].interactions.push(treatment.createdAt);
       for (const comment of treatment.comments || []) {
         personsObject[treatment.person].interactions.push(comment.date);
@@ -339,6 +343,8 @@ export const itemsGroupedByPersonSelector = selector({
         type: "Non-anonyme",
         gender: personsObject[passage.person]?.gender || "Non renseigné",
       });
+      if (!personsObject[passage.person].numberOfPassages) personsObject[passage.person].numberOfPassages = 0;
+      personsObject[passage.person].numberOfPassages++;
       personsObject[passage.person].interactions.push(passage.date || passage.createdAt);
       if (passage.comment) {
         personsObject[passage.person].comments = personsObject[passage.person].comments || [];
@@ -363,6 +369,8 @@ export const itemsGroupedByPersonSelector = selector({
     for (const rencontre of rencontres) {
       if (!personsObject[rencontre.person]) continue;
       rencontresObject[rencontre._id] = rencontre;
+      if (!personsObject[rencontre.person].numberOfRencontres) personsObject[rencontre.person].numberOfRencontres = 0;
+      personsObject[rencontre.person].numberOfRencontres++;
       if (!rencontre.observation) continue;
       if (!rencontresByObservations[rencontre.observation]) rencontresByObservations[rencontre.observation] = [];
       rencontresByObservations[rencontre.observation].push(rencontre._id);

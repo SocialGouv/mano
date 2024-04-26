@@ -133,6 +133,30 @@ export const filterPersonsBaseSelector = selector({
       type: "number",
     };
     filterPersonsBase.push(numberOfConsultationsFilter);
+    const numberOfActionsFilter: Filter = {
+      field: "numberOfActions",
+      label: "Nombre d'actions",
+      type: "number",
+    };
+    filterPersonsBase.push(numberOfActionsFilter);
+    const numberOfTreatmentsFilter: Filter = {
+      field: "numberOfTreatments",
+      label: "Nombre de traitements",
+      type: "number",
+    };
+    filterPersonsBase.push(numberOfTreatmentsFilter);
+    const numberOfPassagesFilter: Filter = {
+      field: "numberOfPassages",
+      label: "Nombre de passages",
+      type: "number",
+    };
+    filterPersonsBase.push(numberOfPassagesFilter);
+    const numberOfRencontresFilter: Filter = {
+      field: "numberOfRencontres",
+      label: "Nombre de rencontres",
+      type: "number",
+    };
+    filterPersonsBase.push(numberOfRencontresFilter);
     const lastUpdateCheckForGDPRFilter: Filter = {
       field: "lastUpdateCheckForGDPR",
       label: "Date de dernière interaction",
