@@ -6,3 +6,4 @@ client_max_body_size 350m;
 # new
 client_header_buffer_size 4k;
 large_client_header_buffers 4 16k;
+keepalive_requests 5000;
