@@ -258,6 +258,7 @@ const execute = async ({
 
     if (window?.debugApi?.length) window.debugApi.push("start get URL");
     const url = getUrl(path, query);
+    if (window?.debugApi?.length) window.debugApi.push("URL is " + url);
     if (window?.debugApi?.length) window.debugApi.push("method is " + method);
     // J'ai parfois une erreur ici.
     let response;
