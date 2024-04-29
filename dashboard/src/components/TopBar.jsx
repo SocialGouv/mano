@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from "reactstrap";
-import logo from "../assets/logo-green-creux.png";
+import logo from "../assets/logo-green-creux-plus-petit.png";
 import SelectTeam from "./SelectTeam";
 
 import { currentTeamState, organisationState, teamsState, userState } from "../recoil/auth";
