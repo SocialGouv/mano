@@ -46,9 +46,11 @@ export function getHashedOrgEncryptionKey() {
 
 export const encryptItem = async (item) => {
   if (item.decrypted) {
+    if (window?.debugApi?.length) window.debugApi.push("encryptItem");
     if (!item.entityKey) item.entityKey = await generateEntityKey();
+    if (window?.debugApi?.length) window.debugApi.push("start encrypt");
     const { encryptedContent, encryptedEntityKey } = await encrypt(JSON.stringify(item.decrypted), item.entityKey, hashedOrgEncryptionKey);
-
+    if (window?.debugApi?.length) window.debugApi.push("end encrypt");
     // why do we decryptDBItem ? without await ?
     // because we just want to make sure the encryption is working
     // if it's not working, the decryptDBItem will fail and we will capture the error
@@ -56,9 +58,12 @@ export const encryptItem = async (item) => {
     // but we don't need to wait for it to finish because it's only for debug
     // TODO: remove when debug is done
     try {
+      if (window?.debugApi?.length) window.debugApi.push("start decryptDBItem");
       decryptDBItem({ encryptedContent, encryptedEntityKey }, hashedOrgEncryptionKey);
     } catch (e) {
+      if (window?.debugApi?.length) window.debugApi.push("error in decryptDBItem");
       // TODO: remove when debug is done
+      // TODO: raph dit : on doit supprimer
       capture("error decrypting item after encrypting", { extra: { e, item: item._id } });
     }
 
@@ -204,10 +209,12 @@ const execute = async ({
   skipDecrypt = false,
   decryptDeleted = false,
 } = {}) => {
+  if (window) window.debugApi = [];
   const organisation = getRecoil(organisationState) || {};
   const tokenCached = getRecoil(authTokenState);
   const { encryptionLastUpdateAt, encryptionEnabled, encryptedVerificationKey, migrationLastUpdateAt } = organisation;
   try {
+    if (window?.debugApi && Array.isArray(window.debugApi)) window.debugApi.push("start execute");
     // Force logout when one user has been logged in multiple tabs to different organisations.
     if (
       path !== "/user/logout" &&
@@ -215,12 +222,15 @@ const execute = async ({
       window.localStorage.getItem("mano-organisationId") &&
       organisation._id !== window.localStorage.getItem("mano-organisationId")
     ) {
+      if (window?.debugApi?.length) window.debugApi.push("start force logout");
       toast.error(
         "Veuillez vous reconnecter. Il semble que des connexions à plusieurs organisations soient actives dans un même navigateur (par exemple dans un autre onglet). Cela peut poser des problèmes de cache.",
         { autoClose: 8000 }
       );
       logout();
+      if (window?.debugApi?.length) window.debugApi.push("end force logout");
     }
+    if (window?.debugApi?.length) window.debugApi.push("before options");
     if (tokenCached) headers.Authorization = `JWT ${tokenCached}`;
     const options = {
       method,
@@ -229,11 +239,15 @@ const execute = async ({
       headers: { ...headers, "Content-Type": "application/json", Accept: "application/json", platform: "dashboard", version: packageInfo.version },
     };
 
+    if (window?.debugApi?.length) window.debugApi.push("after options");
     if (body) {
+      if (window?.debugApi?.length) window.debugApi.push("with body");
       options.body = JSON.stringify(await encryptItem(body));
+      if (window?.debugApi?.length) window.debugApi.push("body built");
     }
 
     if (["PUT", "POST", "DELETE"].includes(method) && enableEncrypt) {
+      if (window?.debugApi?.length) window.debugApi.push("start put post delete");
       query = {
         encryptionLastUpdateAt,
         encryptionEnabled,
@@ -242,7 +256,9 @@ const execute = async ({
       };
     }
 
+    if (window?.debugApi?.length) window.debugApi.push("start get URL");
     const url = getUrl(path, query);
+    if (window?.debugApi?.length) window.debugApi.push("method is " + method);
     const response =
       method === "GET"
         ? await fetchWithFetchRetry(url, {
@@ -251,7 +267,7 @@ const execute = async ({
             retryDelay: 2000,
           })
         : await fetch(url, options);
-
+    if (window?.debugApi?.length) window.debugApi.push("response received");
     if (response.headers.has("x-api-deployment-commit")) {
       setRecoil(deploymentCommitState, response.headers.get("x-api-deployment-commit"));
       if (!window.localStorage.getItem("deploymentCommit")) {
@@ -265,27 +281,36 @@ const execute = async ({
       }
     }
 
+    if (window?.debugApi?.length) window.debugApi.push("header parsed");
     if (!response.ok && response.status === 401) {
       if (!["/user/logout", "/user/signin-token"].includes(path)) logout();
       return response;
     }
 
     try {
+      if (window?.debugApi?.length) window.debugApi.push("start big try");
       const res = await response.json();
+      if (window?.debugApi?.length) window.debugApi.push("JSON parsed");
       if (!response.ok) {
+        if (window?.debugApi?.length) window.debugApi.push("response not ok");
         if (res?.error?.message) {
+          if (window?.debugApi?.length) window.debugApi.push("res?.error?.message");
           toast?.error(res?.error?.message, { autoClose: import.meta.env.VITE_TEST_PLAYWRIGHT !== "true" });
         } else if (res?.error) {
+          if (window?.debugApi?.length) window.debugApi.push("res?.error");
           toast?.error(res?.error, { autoClose: import.meta.env.VITE_TEST_PLAYWRIGHT !== "true" });
         } else if (res?.code) {
+          if (window?.debugApi?.length) window.debugApi.push("res?.code");
           toast?.error(res?.code, { autoClose: import.meta.env.VITE_TEST_PLAYWRIGHT !== "true" });
         } else {
           capture("api error unhandled", { extra: { res, path, query } });
         }
       }
       if (skipDecrypt) {
+        if (window?.debugApi?.length) window.debugApi.push("skip decrypt");
         return res;
       } else if (decryptDeleted) {
+        if (window?.debugApi?.length) window.debugApi.push("decrypt deleted");
         res.decryptedData = {};
         for (const [key, value] of Object.entries(res.data)) {
           const decryptedEntries = await Promise.all(value.map((item) => decryptDBItem(item, { path, encryptedVerificationKey, decryptDeleted })));
@@ -293,28 +318,35 @@ const execute = async ({
         }
         return res;
       } else if (!!res.data && Array.isArray(res.data)) {
+        if (window?.debugApi?.length) window.debugApi.push("decrypt array");
         const decryptedData = await Promise.all(res.data.map((item) => decryptDBItem(item, { path, encryptedVerificationKey })));
+        if (window?.debugApi?.length) window.debugApi.push("end decrypt array");
         res.decryptedData = decryptedData;
         return res;
       } else if (res.data) {
+        if (window?.debugApi?.length) window.debugApi.push("decrypt single");
         res.decryptedData = await decryptDBItem(res.data, { path, encryptedVerificationKey });
         return res;
       } else {
         return res;
       }
     } catch (errorFromJson) {
-      capture(errorFromJson, { extra: { message: "error parsing response", response, path, query } });
+      capture(errorFromJson, {
+        extra: { message: "error parsing response", response, path, query, debug: window?.debugApi?.length ? window.debugApi.join(", ") : null },
+      });
       return { ok: false, error: "Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !" };
     }
   } catch (errorExecuteApi) {
+    if (window?.debugApi?.length) window.debugApi.push("errorExecuteApi");
+    if (window?.debugApi?.length) window.debugApi.push(typeof errorExecuteApi);
     capture(errorExecuteApi, {
       extra: {
         path,
         query,
         method,
         body,
-
         headers,
+        debug: window?.debugApi?.length ? window.debugApi.join(", ") : null,
       },
     });
     if (typeof errorExecuteApi === "string") {
