@@ -259,14 +259,42 @@ const execute = async ({
     if (window?.debugApi?.length) window.debugApi.push("start get URL");
     const url = getUrl(path, query);
     if (window?.debugApi?.length) window.debugApi.push("method is " + method);
-    const response =
-      method === "GET"
-        ? await fetchWithFetchRetry(url, {
-            ...options,
-            retries: 10,
-            retryDelay: 2000,
-          })
-        : await fetch(url, options);
+    // J'ai parfois une erreur ici.
+    let response;
+    try {
+      /*
+        Une promesse fetch() n'est rejetée que quand un problème de réseau est rencontré, 
+        même si en réalité cela signifie généralement qu'il y a un problème de permissions ou quelque 
+        chose de similaire. La promesse ne sera pas rejetée en cas d'erreur HTTP (404, etc.) 
+        Pour cela, un gestionnaire then() doit vérifier que la propriété Response.ok 
+        ait bien pour valeur true et/ou la valeur de la propriété Response.status (en-US).
+      */
+      response =
+        method === "GET"
+          ? await fetchWithFetchRetry(url, {
+              ...options,
+              retries: 10,
+              retryDelay: 2000,
+            })
+          : await fetch(url, options);
+    } catch (networkException) {
+      const message =
+        method === "GET"
+          ? "Impossible de charger les données. Veuillez vérifier votre connexion internet."
+          : "Impossible de transmettre les données. Veuillez vérifier votre connexion internet.";
+      capture(networkException, {
+        extra: {
+          message: "Problème réseau probable",
+          response,
+          path,
+          query,
+          debug: window?.debugApi?.length ? window.debugApi.join(", ") : null,
+        },
+      });
+      toast.error(message);
+      return { ok: false, error: message };
+    }
+
     if (window?.debugApi?.length) window.debugApi.push("response received");
     if (response.headers.has("x-api-deployment-commit")) {
       setRecoil(deploymentCommitState, response.headers.get("x-api-deployment-commit"));
@@ -289,6 +317,7 @@ const execute = async ({
 
     try {
       if (window?.debugApi?.length) window.debugApi.push("start big try");
+      // J'ai parfois une erreur ici.
       const res = await response.json();
       if (window?.debugApi?.length) window.debugApi.push("JSON parsed");
       if (!response.ok) {
@@ -306,6 +335,8 @@ const execute = async ({
           capture("api error unhandled", { extra: { res, path, query } });
         }
       }
+      if (window?.debugApi?.length) window.debugApi.push("after response.ok check");
+      if (window?.debugApi?.length) window.debugApi.push("typeof res is " + typeof res);
       if (skipDecrypt) {
         if (window?.debugApi?.length) window.debugApi.push("skip decrypt");
         return res;
@@ -332,7 +363,14 @@ const execute = async ({
       }
     } catch (errorFromJson) {
       capture(errorFromJson, {
-        extra: { message: "error parsing response", response, path, query, debug: window?.debugApi?.length ? window.debugApi.join(", ") : null },
+        extra: {
+          message: "error parsing response",
+          typeOfResponse: typeof response,
+          response,
+          path,
+          query,
+          debug: window?.debugApi?.length ? window.debugApi.join(", ") : null,
+        },
       });
       return { ok: false, error: "Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !" };
     }
