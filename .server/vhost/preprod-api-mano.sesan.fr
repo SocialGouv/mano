@@ -9,7 +9,8 @@ large_client_header_buffers 4 16k;
 keepalive_requests 5000;
 
 # test pour avoir toujours les cors
-add_header 'Access-Control-Allow-Credentials' 'true';
-add_header 'Access-Control-Allow-Headers' 'authorization,content-type,platform,version,user-agent,keep-alive';
-add_header 'Access-Control-Allow-Methods' 'GET,HEAD,PUT,PATCH,POST,DELETE';
-add_header 'Access-Control-Allow-Origin' 'https://preprod-espace-mano.sesan.fr';
+# ça ne marche pas car ils sont en double...
+# add_header 'Access-Control-Allow-Credentials' 'true';
+# add_header 'Access-Control-Allow-Headers' 'authorization,content-type,platform,version,user-agent,keep-alive';
+# add_header 'Access-Control-Allow-Methods' 'GET,HEAD,PUT,PATCH,POST,DELETE';
+# add_header 'Access-Control-Allow-Origin' 'https://preprod-espace-mano.sesan.fr';
