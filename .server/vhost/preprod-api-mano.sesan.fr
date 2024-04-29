@@ -1,4 +1,4 @@
-client_max_body_size 100m;
+client_max_body_size 1m;
 # Source: https://stackoverflow.com/a/43852895/978690
 # Obsolete
 # http2_max_field_size 64k;
