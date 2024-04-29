@@ -1,1 +1,8 @@
 client_max_body_size 100m;
+# Source: https://stackoverflow.com/a/43852895/978690
+# Obsolete
+# http2_max_field_size 64k;
+# http2_max_header_size 64k;
+# new
+client_header_buffer_size 4k;
+large_client_header_buffers 4 16k;
