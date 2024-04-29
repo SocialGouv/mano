@@ -5488,7 +5488,7 @@ __metadata:
     eslint: "npm:^8.57.0"
     eslint-plugin-react: "npm:^7.34.1"
     eslint-plugin-react-hooks: "npm:^4.6.0"
-    fetch-retry: "npm:^5.0.1"
+    fetch-retry: "npm:^5.0.6"
     fork-ts-checker-webpack-plugin: "npm:^6.5.3"
     formik: "npm:^2.2.9"
     jest: "npm:^29.7.0"
@@ -6494,10 +6494,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fetch-retry@npm:^5.0.1":
-  version: 5.0.3
-  resolution: "fetch-retry@npm:5.0.3"
-  checksum: ea577f9537c0f289b650bfda1b1d7dff1d0fea230323fc702b983990c73ed01e4e8dd690dece3053a721d1fc51d689469c814e5821fcd78bda9368d34712f379
+"fetch-retry@npm:^5.0.6":
+  version: 5.0.6
+  resolution: "fetch-retry@npm:5.0.6"
+  checksum: 349f50db631039630e915f70c763469cb696f3ac92ca6f63823109334a2bc62f63670b8c5a5c7e0195c39df517e60ef385cc5264f4c4904d0c6707d371fa8999
   languageName: node
   linkType: hard
 
