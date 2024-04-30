@@ -28,7 +28,7 @@ import { consultationsState, prepareConsultationForEncryption } from "../../reco
 import { prepareTreatmentForEncryption, treatmentsState } from "../../recoil/treatments";
 import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from "../../recoil/medicalFiles";
 import { useDataLoader } from "../../components/DataLoader";
-import { getDuration } from "../stats/utils";
+import { formatAge } from "../../services/date";
 
 const getRawValue = (field, value) => {
   try {
