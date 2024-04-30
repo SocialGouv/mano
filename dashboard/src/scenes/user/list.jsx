@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useRecoilValue } from "recoil";
-import { teamsState, usersState, userState } from "../../recoil/auth";
+import { teamsState, userState } from "../../recoil/auth";
 import API from "../../services/api";
 import { formatDateWithFullMonth } from "../../services/date";
 import useTitle from "../../services/useTitle";
@@ -56,8 +56,6 @@ const List = () => {
 
   const [sortBy, setSortBy] = useLocalStorage("users-sortBy", "createdAt");
   const [sortOrder, setSortOrder] = useLocalStorage("users-sortOrder", "ASC");
-
-  console.log("users", users);
 
   const data = useMemo(
     () =>
@@ -139,7 +137,7 @@ const List = () => {
             render: (user) => {
               return (
                 <div className="tw-flex tw-flex-col tw-gap-1">
-                  {user.teams.map((t) => (
+                  {(user.teams || []).map((t) => (
                     <TagTeam teamId={t._id} key={t._id} />
                   ))}
                 </div>
