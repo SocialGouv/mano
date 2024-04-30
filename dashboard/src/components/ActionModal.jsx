@@ -151,13 +151,17 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
         body.completedAt = null;
       }
       const response = await API.post({ path: "/action", body: prepareActionForEncryption(body) });
-      if (response.ok) setActions((actions) => [response.decryptedData, ...actions]);
-      const { createdAt } = response.decryptedData;
-      await createReportAtDateIfNotExist(createdAt);
-      if (!!completedAt) {
-        if (dayjsInstance(completedAt).format("YYYY-MM-DD") !== dayjsInstance(createdAt).format("YYYY-MM-DD")) {
-          await createReportAtDateIfNotExist(completedAt);
+      if (response.ok) {
+        setActions((actions) => [response.decryptedData, ...actions]);
+        const { createdAt } = response.decryptedData;
+        await createReportAtDateIfNotExist(createdAt);
+        if (completedAt) {
+          if (dayjsInstance(completedAt).format("YYYY-MM-DD") !== dayjsInstance(createdAt).format("YYYY-MM-DD")) {
+            await createReportAtDateIfNotExist(completedAt);
+          }
         }
+      } else {
+        toast.error("Erreur lors de la création de l'action");
       }
       return response;
     };
