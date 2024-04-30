@@ -1,4 +1,5 @@
 import { useRecoilValue, useSetRecoilState } from "recoil";
+import structuredClone from "@ungap/structured-clone";
 import { organisationAuthentifiedState, userAuthentifiedState } from "../../../recoil/auth";
 import { Consultations } from "./Consultations";
 import { InfosMain } from "./InfosMain";

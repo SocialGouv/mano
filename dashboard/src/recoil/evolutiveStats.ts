@@ -1,4 +1,5 @@
 import { selector, selectorFamily } from "recoil";
+import structuredClone from "@ungap/structured-clone";
 import { capture } from "../services/sentry";
 import type { PersonPopulated } from "../types/person";
 import type { CustomOrPredefinedField } from "../types/field";
