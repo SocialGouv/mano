@@ -217,6 +217,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
                             onChange={onSelectPerson}
                             inputId="person-select-and-create-reception"
                             classNamePrefix="person-select-and-create-reception"
+                            showLinkToPerson={false}
                           />
                         </div>
                         <div className="tw-flex tw-justify-end tw-w-32 tw-min-w-32">

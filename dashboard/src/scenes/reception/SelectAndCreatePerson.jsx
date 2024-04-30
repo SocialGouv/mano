@@ -68,7 +68,7 @@ const filterEasySearch = (search, items = []) => {
   return [...firstItems, ...secondItems];
 };
 
-const SelectAndCreatePerson = ({ value, onChange, inputId, classNamePrefix }) => {
+const SelectAndCreatePerson = ({ value, onChange, inputId, classNamePrefix, showLinkToPerson = true }) => {
   const [persons, setPersons] = useRecoilState(personsState);
   const [isDisabled, setIsDisabled] = useState(false);
   const actions = useRecoilValue(actionsState);
@@ -193,10 +193,10 @@ const SelectAndCreatePerson = ({ value, onChange, inputId, classNamePrefix }) =>
       formatOptionLabel={(person, options) => {
         if (options.context === "menu") {
           if (person.__isNew__) return <span>Créer "{person.value}"</span>;
-          return <Person person={person} />;
+          return <Person person={person} showLinkToPerson={showLinkToPerson} />;
         }
         if (person.__isNew__) return <span>Création de {person.name}...</span>;
-        return <PersonSelected person={person} />;
+        return <PersonSelected person={person} showLinkToPerson={showLinkToPerson} />;
       }}
       format
       creatable
@@ -210,7 +210,7 @@ const SelectAndCreatePerson = ({ value, onChange, inputId, classNamePrefix }) =>
   );
 };
 
-const PersonSelected = ({ person }) => {
+const PersonSelected = ({ person, showLinkToPerson }) => {
   const history = useHistory();
   const onClick = (e) => {
     e.stopPropagation();
@@ -225,20 +225,22 @@ const PersonSelected = ({ person }) => {
           {formatBirthDate(person.birthdate)}
         </small>
       ) : null}
-      <button
-        onMouseUp={onClick}
-        // onTouchEnd required to work on tablet
-        // see https://github.com/JedWatson/react-select/issues/3117#issuecomment-1286232693 for similar issue
-        onTouchEnd={onClick}
-        className="noprint tw-ml-2 tw-p-0 tw-text-sm tw-font-semibold tw-text-main hover:tw-underline"
-      >
-        Accéder au dossier
-      </button>
+      {showLinkToPerson ? (
+        <button
+          onMouseUp={onClick}
+          // onTouchEnd required to work on tablet
+          // see https://github.com/JedWatson/react-select/issues/3117#issuecomment-1286232693 for similar issue
+          onTouchEnd={onClick}
+          className="noprint tw-ml-2 tw-p-0 tw-text-sm tw-font-semibold tw-text-main hover:tw-underline"
+        >
+          Accéder au dossier
+        </button>
+      ) : null}
     </div>
   );
 };
 
-const Person = ({ person }) => {
+const Person = ({ person, showLinkToPerson }) => {
   const history = useHistory();
   const user = useRecoilValue(userState);
   return (
@@ -255,15 +257,17 @@ const Person = ({ person }) => {
             />
           )}
         </div>
-        <ButtonCustom
-          onClick={(e) => {
-            e.stopPropagation();
-            history.push(`/person/${person._id}`);
-          }}
-          color="link"
-          title="Accéder au dossier"
-          padding="0px"
-        />
+        {showLinkToPerson ? (
+          <ButtonCustom
+            onClick={(e) => {
+              e.stopPropagation();
+              history.push(`/person/${person._id}`);
+            }}
+            color="link"
+            title="Accéder au dossier"
+            padding="0px"
+          />
+        ) : null}
       </div>
       {person.outOfActiveList && (
         <div className="tw-flex tw-gap-1 tw-text-xs">

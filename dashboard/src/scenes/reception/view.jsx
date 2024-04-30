@@ -218,6 +218,7 @@ const Reception = () => {
             onChange={onSelectPerson}
             inputId="person-select-and-create-reception"
             classNamePrefix="person-select-and-create-reception"
+            showLinkToPerson={true}
           />
         </div>
         <ButtonCustom
