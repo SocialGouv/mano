@@ -288,6 +288,7 @@ const execute = async ({
           response,
           path,
           query,
+          body,
           debug: window?.debugApi?.length ? window.debugApi.join(", ") : null,
         },
       });
@@ -311,14 +312,27 @@ const execute = async ({
 
     if (window?.debugApi?.length) window.debugApi.push("header parsed");
     if (!response.ok && response.status === 401) {
-      if (!["/user/logout", "/user/signin-token"].includes(path)) logout();
+      if (!["/user/logout", "/user/signin-token"].includes(path)) {
+        if (window?.debugApi?.length) window.debugApi.push("processus de logout");
+        // On ne poste pas sur logout car le user est déjà refusé via passeport (donc session finie).
+        // Si on le fait (en appelant la fonction logout) on re-rentre dans tout le processus pour rien
+        reset();
+        window.location.reload();
+      }
       return response;
     }
 
     try {
       if (window?.debugApi?.length) window.debugApi.push("start big try");
       // J'ai parfois une erreur ici.
-      const res = await response.json();
+      let res;
+      try {
+        res = await response.json();
+      } catch (errorParsingJson) {
+        if (window?.debugApi?.length) window.debugApi.push("errorParsingJson");
+        if (window?.debugApi?.length) window.debugApi.push(errorParsingJson.toString());
+        throw errorParsingJson;
+      }
       if (window?.debugApi?.length) window.debugApi.push("JSON parsed");
       if (!response.ok) {
         if (window?.debugApi?.length) window.debugApi.push("response not ok");
