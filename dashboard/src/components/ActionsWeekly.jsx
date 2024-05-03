@@ -13,8 +13,6 @@ import useSearchParamState from "../services/useSearchParamState";
 import { disableConsultationRow } from "../recoil/consultations";
 import ActionStatusSelect from "./ActionStatusSelect";
 
-// TODO: remove inline style when UI is stabilized.
-
 export default function ActionsWeekly({ actions, isNightSession, onCreateAction }) {
   const [startOfWeek, setStartOfWeek] = useSearchParamState("startOfWeek", dayjsInstance().startOf("week").format("YYYY-MM-DD"));
 
@@ -60,7 +58,7 @@ export default function ActionsWeekly({ actions, isNightSession, onCreateAction 
             &gt;
           </Button>
         </div>
-        <div style={{ textTransform: "capitalize" }}>{dayjsInstance(startOfWeek).format("MMMM YYYY")}</div>
+        <div className="tw-capitalize">{dayjsInstance(startOfWeek).format("MMMM YYYY")}</div>
       </div>
       <div className="tw-grid tw-w-full tw-auto-rows-fr tw-grid-cols-7 tw-gap-x-2 tw-gap-y-0">
         {[...Array(7)].map((_, index) => {
