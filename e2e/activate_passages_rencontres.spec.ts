@@ -54,7 +54,7 @@ test("test", async ({ page }) => {
   /* ***** comptes rendus ***** */
 
   await page.getByRole("link", { name: "Comptes rendus" }).click();
-  await expect(page.getByText("3", { exact: true })).toBeVisible();
+  await expect(page.getByTitle("Passages", { exact: true }).getByText("3")).toBeVisible();
   await page.getByRole("button", { name: "Passer les passages en plein écran" }).click();
   await expect(page.getByRole("dialog", { name: "Passages (3)" }).getByRole("cell", { name: "Anonyme" })).toBeVisible();
   await expect(page.getByRole("dialog", { name: "Passages (3)" }).getByRole("cell", { name: "test passage", exact: true })).toBeVisible();
