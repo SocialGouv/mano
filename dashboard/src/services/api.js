@@ -44,13 +44,13 @@ export function getHashedOrgEncryptionKey() {
   return hashedOrgEncryptionKey;
 }
 
-export const encryptItem = async (item) => {
+export const encryptItem = async (item, debugApi) => {
   if (item.decrypted) {
-    if (window?.debugApi?.length) window.debugApi.push("encryptItem");
+    if (debugApi?.length) debugApi.push("encryptItem");
     if (!item.entityKey) item.entityKey = await generateEntityKey();
-    if (window?.debugApi?.length) window.debugApi.push("start encrypt");
+    if (debugApi?.length) debugApi.push("start encrypt");
     const { encryptedContent, encryptedEntityKey } = await encrypt(JSON.stringify(item.decrypted), item.entityKey, hashedOrgEncryptionKey);
-    if (window?.debugApi?.length) window.debugApi.push("end encrypt");
+    if (debugApi?.length) debugApi.push("end encrypt");
     item.encrypted = encryptedContent;
     item.encryptedEntityKey = encryptedEntityKey;
     delete item.decrypted;
@@ -193,12 +193,12 @@ const execute = async ({
   skipDecrypt = false,
   decryptDeleted = false,
 } = {}) => {
-  if (window) window.debugApi = [];
+  let debugApi = [];
   const organisation = getRecoil(organisationState) || {};
   const tokenCached = getRecoil(authTokenState);
   const { encryptionLastUpdateAt, encryptionEnabled, encryptedVerificationKey, migrationLastUpdateAt } = organisation;
   try {
-    if (window?.debugApi && Array.isArray(window.debugApi)) window.debugApi.push("start execute");
+    if (debugApi?.length) debugApi.push("start execute");
     // Force logout when one user has been logged in multiple tabs to different organisations.
     if (
       path !== "/user/logout" &&
@@ -206,15 +206,15 @@ const execute = async ({
       window.localStorage.getItem("mano-organisationId") &&
       organisation._id !== window.localStorage.getItem("mano-organisationId")
     ) {
-      if (window?.debugApi?.length) window.debugApi.push("start force logout");
+      if (debugApi?.length) debugApi.push("start force logout");
       toast.error(
         "Veuillez vous reconnecter. Il semble que des connexions à plusieurs organisations soient actives dans un même navigateur (par exemple dans un autre onglet). Cela peut poser des problèmes de cache.",
         { autoClose: 8000 }
       );
       logout();
-      if (window?.debugApi?.length) window.debugApi.push("end force logout");
+      if (debugApi?.length) debugApi.push("end force logout");
     }
-    if (window?.debugApi?.length) window.debugApi.push("before options");
+    if (debugApi?.length) debugApi.push("before options");
     if (tokenCached) headers.Authorization = `JWT ${tokenCached}`;
     const options = {
       method,
@@ -223,15 +223,15 @@ const execute = async ({
       headers: { ...headers, "Content-Type": "application/json", Accept: "application/json", platform: "dashboard", version: packageInfo.version },
     };
 
-    if (window?.debugApi?.length) window.debugApi.push("after options");
+    if (debugApi?.length) debugApi.push("after options");
     if (body) {
-      if (window?.debugApi?.length) window.debugApi.push("with body");
-      options.body = JSON.stringify(await encryptItem(body));
-      if (window?.debugApi?.length) window.debugApi.push("body built");
+      if (debugApi?.length) debugApi.push("with body");
+      options.body = JSON.stringify(await encryptItem(body, debugApi));
+      if (debugApi?.length) debugApi.push("body built");
     }
 
     if (["PUT", "POST", "DELETE"].includes(method) && enableEncrypt) {
-      if (window?.debugApi?.length) window.debugApi.push("start put post delete");
+      if (debugApi?.length) debugApi.push("start put post delete");
       query = {
         encryptionLastUpdateAt,
         encryptionEnabled,
@@ -240,17 +240,17 @@ const execute = async ({
       };
     }
 
-    if (window?.debugApi?.length) window.debugApi.push("start get URL");
+    if (debugApi?.length) debugApi.push("start get URL");
     const url = getUrl(path, query);
-    if (window?.debugApi?.length) window.debugApi.push("method is " + method);
+    if (debugApi?.length) debugApi.push("method is " + method);
     // J'ai parfois une erreur ici.
     let response;
     try {
       /*
-        Une promesse fetch() n'est rejetée que quand un problème de réseau est rencontré, 
-        même si en réalité cela signifie généralement qu'il y a un problème de permissions ou quelque 
-        chose de similaire. La promesse ne sera pas rejetée en cas d'erreur HTTP (404, etc.) 
-        Pour cela, un gestionnaire then() doit vérifier que la propriété Response.ok 
+        Une promesse fetch() n'est rejetée que quand un problème de réseau est rencontré,
+        même si en réalité cela signifie généralement qu'il y a un problème de permissions ou quelque
+        chose de similaire. La promesse ne sera pas rejetée en cas d'erreur HTTP (404, etc.)
+        Pour cela, un gestionnaire then() doit vérifier que la propriété Response.ok
         ait bien pour valeur true et/ou la valeur de la propriété Response.status (en-US).
       */
       response =
@@ -273,14 +273,19 @@ const execute = async ({
           path,
           query,
           body,
-          debug: window?.debugApi?.length ? window.debugApi.join(", ") : null,
+          debug: debugApi?.length ? debugApi.join(", ") : null,
+        },
+        tags: {
+          path,
+          message: "Problème réseau probable",
+          debug: debugApi?.length ? debugApi.join(", ") : null,
         },
       });
       toast.error(message);
       return { ok: false, error: message };
     }
 
-    if (window?.debugApi?.length) window.debugApi.push("response received");
+    if (debugApi?.length) debugApi.push("response received");
     if (response.headers.has("x-api-deployment-commit")) {
       setRecoil(deploymentCommitState, response.headers.get("x-api-deployment-commit"));
       if (!window.localStorage.getItem("deploymentCommit")) {
@@ -294,10 +299,10 @@ const execute = async ({
       }
     }
 
-    if (window?.debugApi?.length) window.debugApi.push("header parsed");
+    if (debugApi?.length) debugApi.push("header parsed");
     if (!response.ok && response.status === 401) {
       if (!["/user/logout", "/user/signin-token"].includes(path)) {
-        if (window?.debugApi?.length) window.debugApi.push("processus de logout");
+        if (debugApi?.length) debugApi.push("processus de logout");
         // On ne poste pas sur logout car le user est déjà refusé via passeport (donc session finie).
         // Si on le fait (en appelant la fonction logout) on re-rentre dans tout le processus pour rien
         reset();
@@ -307,39 +312,50 @@ const execute = async ({
     }
 
     try {
-      if (window?.debugApi?.length) window.debugApi.push("start big try");
+      if (debugApi?.length) debugApi.push("start big try");
       // J'ai parfois une erreur ici.
       let res;
       try {
         res = await response.json();
       } catch (errorParsingJson) {
-        if (window?.debugApi?.length) window.debugApi.push("errorParsingJson");
-        if (window?.debugApi?.length) window.debugApi.push(errorParsingJson.toString());
+        if (debugApi?.length) debugApi.push("errorParsingJson");
+        if (debugApi?.length) debugApi.push(errorParsingJson.toString());
         throw errorParsingJson;
       }
-      if (window?.debugApi?.length) window.debugApi.push("JSON parsed");
+      if (debugApi?.length) debugApi.push("JSON parsed");
       if (!response.ok) {
-        if (window?.debugApi?.length) window.debugApi.push("response not ok");
+        if (debugApi?.length) debugApi.push("response not ok");
         if (res?.error?.message) {
-          if (window?.debugApi?.length) window.debugApi.push("res?.error?.message");
+          if (debugApi?.length) debugApi.push("res?.error?.message");
           toast?.error(res?.error?.message, { autoClose: import.meta.env.VITE_TEST_PLAYWRIGHT !== "true" });
         } else if (res?.error) {
-          if (window?.debugApi?.length) window.debugApi.push("res?.error");
+          if (debugApi?.length) debugApi.push("res?.error");
           toast?.error(res?.error, { autoClose: import.meta.env.VITE_TEST_PLAYWRIGHT !== "true" });
         } else if (res?.code) {
-          if (window?.debugApi?.length) window.debugApi.push("res?.code");
+          if (debugApi?.length) debugApi.push("res?.code");
           toast?.error(res?.code, { autoClose: import.meta.env.VITE_TEST_PLAYWRIGHT !== "true" });
         } else {
-          capture("api error unhandled", { extra: { res, path, query } });
+          capture("api error unhandled", {
+            extra: {
+              res,
+              path,
+              query,
+            },
+            tags: {
+              path,
+              message: "api error unhandled",
+              debug: debugApi?.length ? debugApi.join(", ") : null,
+            },
+          });
         }
       }
-      if (window?.debugApi?.length) window.debugApi.push("after response.ok check");
-      if (window?.debugApi?.length) window.debugApi.push("typeof res is " + typeof res);
+      if (debugApi?.length) debugApi.push("after response.ok check");
+      if (debugApi?.length) debugApi.push("typeof res is " + typeof res);
       if (skipDecrypt) {
-        if (window?.debugApi?.length) window.debugApi.push("skip decrypt");
+        if (debugApi?.length) debugApi.push("skip decrypt");
         return res;
       } else if (decryptDeleted) {
-        if (window?.debugApi?.length) window.debugApi.push("decrypt deleted");
+        if (debugApi?.length) debugApi.push("decrypt deleted");
         res.decryptedData = {};
         for (const [key, value] of Object.entries(res.data)) {
           const decryptedEntries = await Promise.all(value.map((item) => decryptDBItem(item, { path, encryptedVerificationKey, decryptDeleted })));
@@ -347,13 +363,13 @@ const execute = async ({
         }
         return res;
       } else if (!!res.data && Array.isArray(res.data)) {
-        if (window?.debugApi?.length) window.debugApi.push("decrypt array");
+        if (debugApi?.length) debugApi.push("decrypt array");
         const decryptedData = await Promise.all(res.data.map((item) => decryptDBItem(item, { path, encryptedVerificationKey })));
-        if (window?.debugApi?.length) window.debugApi.push("end decrypt array");
+        if (debugApi?.length) debugApi.push("end decrypt array");
         res.decryptedData = decryptedData;
         return res;
       } else if (res.data) {
-        if (window?.debugApi?.length) window.debugApi.push("decrypt single");
+        if (debugApi?.length) debugApi.push("decrypt single");
         res.decryptedData = await decryptDBItem(res.data, { path, encryptedVerificationKey });
         return res;
       } else {
@@ -367,22 +383,33 @@ const execute = async ({
           response,
           path,
           query,
-          debug: window?.debugApi?.length ? window.debugApi.join(", ") : null,
+          debug: debugApi?.length ? debugApi.join(", ") : null,
+        },
+        tags: {
+          path,
+          message: "error parsing response",
+          debug: debugApi?.length ? debugApi.join(", ") : null,
         },
       });
       return { ok: false, error: "Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !" };
     }
   } catch (errorExecuteApi) {
-    if (window?.debugApi?.length) window.debugApi.push("errorExecuteApi");
-    if (window?.debugApi?.length) window.debugApi.push(typeof errorExecuteApi);
+    if (debugApi?.length) debugApi.push("errorExecuteApi");
+    if (debugApi?.length) debugApi.push(typeof errorExecuteApi);
     capture(errorExecuteApi, {
       extra: {
+        message: "error execute api",
         path,
         query,
         method,
         body,
         headers,
-        debug: window?.debugApi?.length ? window.debugApi.join(", ") : null,
+        debug: debugApi?.length ? debugApi.join(", ") : null,
+      },
+      tags: {
+        path,
+        message: "error execute api",
+        debug: debugApi?.length ? debugApi.join(", ") : null,
       },
     });
     if (typeof errorExecuteApi === "string") {
