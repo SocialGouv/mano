@@ -411,6 +411,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
         rencontre?.persons ? (
           <Rencontre
             rencontre={rencontre}
+            disableAccessToPerson
             onFinished={() => {
               setRencontre(undefined);
               setSelectedPersons([]);
@@ -425,6 +426,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
         ) : (
           <Rencontre
             rencontre={rencontre}
+            disableAccessToPerson
             onFinished={() => {
               setRencontre(undefined);
             }}

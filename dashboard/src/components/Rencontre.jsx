@@ -15,7 +15,7 @@ import DatePicker from "./DatePicker";
 import { outOfBoundariesDate } from "../services/date";
 import AutoResizeTextarea from "./AutoresizeTextArea";
 
-const Rencontre = ({ rencontre, personId, onFinished, onSave }) => {
+const Rencontre = ({ rencontre, personId, onFinished, onSave, disableAccessToPerson = false }) => {
   const user = useRecoilValue(userState);
   const teams = useRecoilValue(teamsState);
   const [open, setOpen] = useState(false);
@@ -145,9 +145,16 @@ const Rencontre = ({ rencontre, personId, onFinished, onSave }) => {
                     <Col md={6}>
                       <FormGroup>
                         {showMultiSelect ? (
-                          <SelectPerson value={values.persons} onChange={handleChange} isClearable isMulti name="persons" />
+                          <SelectPerson
+                            disableAccessToPerson={disableAccessToPerson}
+                            value={values.persons}
+                            onChange={handleChange}
+                            isClearable
+                            isMulti
+                            name="persons"
+                          />
                         ) : (
-                          <SelectPerson value={values.person} onChange={handleChange} />
+                          <SelectPerson disableAccessToPerson={disableAccessToPerson} value={values.person} onChange={handleChange} />
                         )}
                       </FormGroup>
                     </Col>
