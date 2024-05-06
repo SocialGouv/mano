@@ -29,8 +29,9 @@ router.get("/version", async (req, res) => {
       `La nouvelle version ${MOBILE_APP_VERSION} de Mano est disponible !`,
       `Vous avez la version ${req.headers.version} actuellement sur votre téléphone.
 Cette nouvelle version :
-- Corrige l'affichage des rencontres dans les comptes-rendus
-- Corrige le tri des commentaires lorsqu'un nouveau commentaire est ajouté
+- Affiche les passages et les consultations dans les comptes rendus
+- Corrige le tri des consultations dans le dossier des personnes suivies
+- Corrige l'affichage des anniversaires (en mois jusqu'à 2 ans, puis avec la mention "et demi" pour les enfants de moins de 7 ans)
 `,
       [
         { text: "Télécharger", link: `https://mano.sesan.fr/download?ts=${Date.now()}` },
