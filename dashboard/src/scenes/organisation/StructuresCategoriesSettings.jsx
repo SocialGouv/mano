@@ -181,7 +181,6 @@ const Category = ({ item: category, groupTitle }) => {
     <>
       <div
         key={category}
-        data-category={category}
         onMouseDown={() => setIsSelected(true)}
         onMouseUp={() => setIsSelected(false)}
         className={[

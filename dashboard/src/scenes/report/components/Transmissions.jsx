@@ -1,42 +1,42 @@
 import React, { useState, useMemo } from "react";
 import { toast } from "react-toastify";
-import dayjs from "dayjs";
-import { prepareReportForEncryption } from "../../../recoil/reports";
+import { prepareReportForEncryption, reportsState } from "../../../recoil/reports";
 import API from "../../../services/api";
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "../../../components/tailwind/Modal";
-import { useDataLoader } from "../../../components/DataLoader";
 import SelectAndCreateCollaboration from "../SelectAndCreateCollaboration";
+import { dayjsInstance } from "../../../services/date";
+import { useSetRecoilState } from "recoil";
 
 export default function Transmissions({ period, selectedTeamsObject, reports }) {
   const days = useMemo(() => {
-    const days = [];
-    const endDate = dayjs(period.endDate).startOf("day").add(1, "day").toISOString();
-    let i = 0;
-    while (true) {
-      const day = dayjs(period.startDate).add(i, "day").format("YYYY-MM-DD");
-      if (day < endDate) {
-        days.push(day);
-        i++;
-      } else {
-        break;
-      }
-    }
+    const numberOfDays = Math.abs(dayjsInstance(period.startDate).diff(period.endDate, "day")) + 1;
+    const days = Array.from({ length: numberOfDays }, (_, index) => dayjsInstance(period.startDate).add(index, "day").format("YYYY-MM-DD"));
     return days;
   }, [period]);
 
   return (
     <>
-      <section className="noprint">
+      <section>
         <h3 className="tw-w-full tw-px-3 tw-py-2 tw-text-base tw-font-medium tw-text-black">👋&nbsp;Comment s'est passée la&nbsp;journée&nbsp;?</h3>
         {days.map((day) => {
           return (
             <details open={days.length === 1} className="tw-my-2 tw-p-2" key={day}>
               <summary>
-                <h4 className="tw-inline-block tw-text-base tw-capitalize">{dayjs(day).format("dddd D MMM")}</h4>
+                <h4 className="tw-inline-block tw-text-base tw-capitalize">{dayjsInstance(day).format("dddd D MMM")}</h4>
               </summary>
-              {Object.keys(selectedTeamsObject).map((teamId) => {
+              {Object.entries(selectedTeamsObject).map(([teamId, team]) => {
                 const report = reports.find((report) => report.team === teamId && report.date === day);
-                return <Transmission day={day} teamId={teamId} report={report} team={selectedTeamsObject[teamId]} key={teamId + report?._id} />;
+                const key = team.name.replace(/[^a-zA-Z0-9]/g, "-") + day;
+                return (
+                  <Transmission
+                    day={day}
+                    teamId={teamId}
+                    report={report}
+                    team={selectedTeamsObject[teamId]}
+                    key={key}
+                    reactSelectInputId={`report-select-collaboration-${key}`}
+                  />
+                );
               })}
             </details>
           );
@@ -50,10 +50,11 @@ export default function Transmissions({ period, selectedTeamsObject, reports }) 
         {days.map((day) => {
           return (
             <div className="tw-border-t tw-border-zinc-200" key={day}>
-              <h4 className="tw-inline-block tw-p-4 tw-text-base tw-capitalize">{dayjs(day).format("dddd D MMM")}</h4>
-              {Object.keys(selectedTeamsObject).map((teamId) => {
+              <h4 className="tw-inline-block tw-p-4 tw-text-base tw-capitalize">{dayjsInstance(day).format("dddd D MMM")}</h4>
+              {Object.entries(selectedTeamsObject).map(([teamId, team]) => {
                 const report = reports.find((report) => report.team === teamId && report.date === day);
-                return <Transmission day={day} teamId={teamId} report={report} team={selectedTeamsObject[teamId]} key={teamId + report?._id} />;
+                const key = team.name.replace(/[^a-zA-Z0-9]/g, "-") + day;
+                return <TransmissionPrint report={report} team={selectedTeamsObject[teamId]} key={key} />;
               })}
             </div>
           );
@@ -63,10 +64,52 @@ export default function Transmissions({ period, selectedTeamsObject, reports }) 
   );
 }
 
-function Transmission({ report, team, day, teamId }) {
+function TransmissionPrint({ report, team }) {
+  const collaborations = report?.collaborations ?? [];
+
+  return (
+    <>
+      <div className="p-2 tw-mb-4 tw-flex tw-flex-col tw-rounded-2xl tw-bg-gray-100 tw-mx-4 tw-bg-transparent">
+        <p className="tw-font-medium">
+          {team?.nightSession ? "🌒" : "☀️ "} {team?.name || ""}
+        </p>
+        <div className="tw-ml-4 tw-border-l-2 tw-border-zinc-300 tw-pl-8">
+          {!report?.description ? (
+            <>
+              <h5 className="tw-text-base tw-font-medium">Aucune transmission pour cette journée</h5>
+            </>
+          ) : (
+            <>
+              {report?.description?.length > 0 && <h5 className="tw-text-base tw-font-medium">Transmission :</h5>}
+              <p className="tw-border-l tw-border-zinc-200 tw-pl-4">
+                {report?.description?.split("\n").map((sentence, index) => (
+                  <React.Fragment key={index}>
+                    {sentence}
+                    <br />
+                  </React.Fragment>
+                ))}
+              </p>
+            </>
+          )}
+          <hr />
+          <div className="tw-my-2">
+            {!!collaborations.length && (
+              <>
+                <p className="tw-mb-2">Co-interventions avec&nbsp;:</p>
+                <p className="tw-border-l tw-border-zinc-200 tw-pl-4">{collaborations.join(", ")}</p>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function Transmission({ report, team, day, teamId, reactSelectInputId }) {
   const [isEditingTransmission, setIsEditingTransmission] = useState(false);
   const [collaborations, setCollaborations] = useState(report?.collaborations ?? []);
-  const { refresh } = useDataLoader();
+  const setReports = useSetRecoilState(reportsState);
 
   async function onEditTransmission(event) {
     event.preventDefault();
@@ -89,31 +132,27 @@ function Transmission({ report, team, day, teamId }) {
       toast.error(response.errorMessage);
       return;
     }
-    refresh();
+    setReports((reports) => [response.decryptedData, ...reports.filter((_report) => _report._id !== response.decryptedData._id)]);
     setIsEditingTransmission(false);
   };
 
   return (
     <>
-      <div className="p-2 tw-mb-4 tw-flex tw-flex-col tw-rounded-2xl tw-bg-gray-100 print:tw-mx-4 print:tw-bg-transparent">
+      <div className="p-2 tw-mb-4 tw-flex tw-flex-col tw-rounded-2xl tw-bg-gray-100">
         <p className="tw-font-medium">
           {team?.nightSession ? "🌒" : "☀️ "} {team?.name || ""}
         </p>
-        <div className="print:tw-ml-4 print:tw-border-l-2 print:tw-border-zinc-300 print:tw-pl-8">
+        <div>
           {!report?.description ? (
             <>
-              <h5 className="printonly tw-text-base tw-font-medium">Aucune transmission pour cette journée</h5>
-              <button
-                onClick={() => setIsEditingTransmission(true)}
-                className="noprint tw-mx-auto tw-rounded-lg tw-border tw-border-main tw-px-3 tw-py-1"
-              >
+              <button onClick={() => setIsEditingTransmission(true)} className="tw-mx-auto tw-rounded-lg tw-border tw-border-main tw-px-3 tw-py-1">
                 Ajouter une transmission
               </button>
             </>
           ) : (
             <>
-              {report?.description?.length > 0 && <h5 className="printonly tw-text-base tw-font-medium">Transmission :</h5>}
-              <p className="print:tw-border-l print:tw-border-zinc-200 print:tw-pl-4">
+              {report?.description?.length > 0 && <h5 className="tw-text-base tw-font-medium">Transmission :</h5>}
+              <p>
                 {report?.description?.split("\n").map((sentence, index) => (
                   <React.Fragment key={index}>
                     {sentence}
@@ -121,10 +160,7 @@ function Transmission({ report, team, day, teamId }) {
                   </React.Fragment>
                 ))}
               </p>
-              <button
-                onClick={() => setIsEditingTransmission(true)}
-                className="noprint tw-mx-auto tw-rounded-lg tw-border tw-border-main tw-px-3 tw-py-1"
-              >
+              <button onClick={() => setIsEditingTransmission(true)} className="tw-mx-auto tw-rounded-lg tw-border tw-border-main tw-px-3 tw-py-1">
                 Modifier la transmission
               </button>
             </>
@@ -134,12 +170,10 @@ function Transmission({ report, team, day, teamId }) {
             {!!collaborations.length && (
               <>
                 <p className="tw-mb-2">Co-interventions avec&nbsp;:</p>
-                <p className="print:tw-border-l print:tw-border-zinc-200 print:tw-pl-4">{collaborations.join(", ")}</p>
               </>
             )}
             <SelectAndCreateCollaboration
               values={collaborations}
-              className="noprint"
               onChange={(e) => {
                 const nextCollabs = e.currentTarget.value;
                 setCollaborations(nextCollabs);
@@ -150,12 +184,15 @@ function Transmission({ report, team, day, teamId }) {
                   date: day,
                 });
               }}
+              inputId={reactSelectInputId}
             />
           </div>
         </div>
       </div>
       <ModalContainer open={isEditingTransmission} size="3xl">
-        <ModalHeader title={`Transmission du ${dayjs(day).format("dddd D MMM")} - ${team?.nightSession ? "🌒" : "☀️ "} ${team?.name || ""}`} />
+        <ModalHeader
+          title={`Transmission du ${dayjsInstance(day).format("dddd D MMM")} - ${team?.nightSession ? "🌒" : "☀️ "} ${team?.name || ""}`}
+        />
         <ModalBody className="tw-py-4">
           <form id={`edit-transmission-${day}-${teamId}`} className="tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8" onSubmit={onEditTransmission}>
             <div>

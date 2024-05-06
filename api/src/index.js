@@ -107,6 +107,7 @@ app.use("/organisation", require("./controllers/organisation"));
 app.use("/public", require("./controllers/public"));
 app.use("/encrypt", require("./controllers/encrypt"));
 app.use("/category", require("./controllers/category"));
+app.use("/collaboration", require("./controllers/collaboration"));
 app.use("/service", require("./controllers/service"));
 app.use("/custom-field", require("./controllers/custom-field"));
 app.use("/migration", require("./controllers/migration"));

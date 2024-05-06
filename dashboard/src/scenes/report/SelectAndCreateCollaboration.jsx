@@ -11,7 +11,7 @@ const NoOptionsMessage = () => (
   </span>
 );
 
-const SelectAndCreateCollaboration = ({ values, onChange, className = "" }) => {
+const SelectAndCreateCollaboration = ({ values, onChange, className = "", inputId }) => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
 
   const onChangeRequest = (newCollabs) => {
@@ -24,7 +24,7 @@ const SelectAndCreateCollaboration = ({ values, onChange, className = "" }) => {
     const response = await API.put({
       path: `/organisation/${organisation._id}`,
       body: {
-        collaborations: [...(organisation.collaborations || []), collab].filter((e) => Boolean(e.trim())).sort((c1, c2) => c1.localeCompare(c2)),
+        collaborations: [...(organisation.collaborations || []), collab].filter((e) => Boolean(e.trim())),
       },
     });
     if (response.ok) {
@@ -55,8 +55,8 @@ const SelectAndCreateCollaboration = ({ values, onChange, className = "" }) => {
         if (__isNew__) return <span>Créer "{collab}"</span>;
         return <span>{collab}</span>;
       }}
-      inputId="report-select-collaboration"
-      classNamePrefix="report-select-collaboration"
+      inputId={inputId}
+      classNamePrefix={inputId}
     />
   );
 };

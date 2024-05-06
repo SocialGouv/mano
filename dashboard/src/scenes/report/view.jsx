@@ -1,9 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
-import { addOneDay, dateForDatePicker, formatDateWithNameOfDay } from "../../services/date";
+import { addOneDay, dateForDatePicker, formatDateWithNameOfDay, dayjsInstance } from "../../services/date";
 import { HeaderStyled, Title as HeaderTitle } from "../../components/header";
-
-import dayjs from "dayjs";
 import { TODO } from "../../recoil/actions";
 import ButtonCustom from "../../components/ButtonCustom";
 import { currentTeamState, organisationState, teamsState, userState } from "../../recoil/auth";
@@ -61,8 +59,8 @@ const itemsForReportsSelector = selectorFamily({
       const allReports = get(reportsState);
 
       const defaultIsoDates = {
-        isoStartDate: dayjs(period.startDate).startOf("day").toISOString(),
-        isoEndDate: dayjs(period.endDate).startOf("day").add(1, "day").toISOString(),
+        isoStartDate: dayjsInstance(period.startDate).toISOString(),
+        isoEndDate: dayjsInstance(period.endDate).toISOString(),
       };
 
       const personsCreated = {};
@@ -188,12 +186,14 @@ const itemsForReportsSelector = selectorFamily({
         observations[observation._id] = observation;
       }
 
+      // Attention à ne pas comparer des isoDates avec des dates yyyy-mm-dd
+      const startDateForReports = dayjsInstance(defaultIsoDates.isoStartDate).format("YYYY-MM-DD");
+      const endDateForReports = dayjsInstance(defaultIsoDates.isoEndDate).format("YYYY-MM-DD");
       for (const report of allReports) {
         if (!filterItemByTeam(report, "team")) continue;
         const date = report.date;
-        const { isoStartDate, isoEndDate } = defaultIsoDates;
-        if (date < isoStartDate) continue;
-        if (date >= isoEndDate) continue;
+        if (date < startDateForReports) continue;
+        if (date > endDateForReports) continue;
         reports[report._id] = report;
       }
 
@@ -227,8 +227,8 @@ const View = () => {
 
   const [preset, setPreset, removePreset] = useLocalStorage("reports-date-preset", null);
   let [period, setPeriod] = useLocalStorage("reports-period", {
-    startDate: dateForDatePicker(defaultPreset.period.startDate),
-    endDate: dateForDatePicker(defaultPreset.period.endDate),
+    startDate: defaultPreset.period.startDate,
+    endDate: defaultPreset.period.endDate,
   });
 
   const selectedTeams = useMemo(
@@ -246,8 +246,8 @@ const View = () => {
     const teamsIdsObject = {};
     for (const team of selectedTeams) {
       const offsetHours = team.nightSession ? 12 : 0;
-      const isoStartDate = dayjs(period.startDate).startOf("day").add(offsetHours, "hour").toISOString();
-      const isoEndDate = dayjs(period.endDate).startOf("day").add(1, "day").add(offsetHours, "hour").toISOString();
+      const isoStartDate = dayjsInstance(period.startDate).startOf("day").add(offsetHours, "hour").toISOString();
+      const isoEndDate = dayjsInstance(period.endDate).startOf("day").add(1, "day").add(offsetHours, "hour").toISOString();
       teamsIdsObject[team._id] = {
         isoStartDate,
         isoEndDate,
@@ -276,11 +276,11 @@ const View = () => {
     })
   );
 
-  useTitle(`${dayjs(dateString).format("DD-MM-YYYY")} - Compte rendu`);
+  useTitle(`${dayjsInstance(dateString).format("DD-MM-YYYY")} - Compte rendu`);
 
   useEffect(() => {
     // for print use only
-    document.title = `Compte rendu Mano - Organisation ${organisation.name} - ${dayjs(dateString).format("DD-MM-YYYY")} - imprimé par ${user.name}`;
+    document.title = `Compte rendu Mano - Organisation ${organisation.name} - ${dayjsInstance(dateString).format("DD-MM-YYYY")} - imprimé par ${user.name}`;
     return () => {
       document.title = "Mano - Admin";
     };
@@ -336,7 +336,10 @@ const View = () => {
         <div className="tw-min-w-[15rem] tw-shrink-0 tw-p-0">
           <DateRangePickerWithPresets
             presets={reportsPresets}
-            period={period}
+            period={{
+              startDate: dateForDatePicker(period.startDate),
+              endDate: dateForDatePicker(period.endDate),
+            }}
             setPeriod={setPeriod}
             preset={preset}
             setPreset={setPreset}

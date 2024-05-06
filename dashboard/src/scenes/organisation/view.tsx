@@ -32,6 +32,7 @@ import MedicalFileSettings from "./MedicalFileSettings";
 import PersonCustomFieldsSettings from "./PersonCustomFieldsSettings";
 import StructuresCategoriesSettings from "./StructuresCategoriesSettings";
 import Poubelle from "./Poubelle";
+import CollaborationsSettings from "./CollaborationsSettings";
 
 const getSettingTitle = (tabId) => {
   if (tabId === "infos") return "Informations";
@@ -122,6 +123,7 @@ const View = () => {
             <MenuButton selected={tab === "territories"} text="Territoires" onClick={() => setTab("territories")} />
             <MenuButton selected={tab === "rencontres-passages"} text="Passages/rencontres" onClick={() => setTab("rencontres-passages")} />
             <MenuButton selected={tab === "consultations"} text="Consultations" onClick={() => setTab("consultations")} />
+            <MenuButton selected={tab === "collaborations"} text="Co-interventions" onClick={() => setTab("collaborations")} />
           </div>
           <div className="tw-text-white tw-font-bold tw-text-sm mt-3">Personnes suivies</div>
           <div className="rounded tw-mx-auto tw-w-full tw-p-2 my-2 tw-flex tw-bg-main25 tw-flex-col tw-gap-2 tw-items-start tw">
@@ -248,6 +250,8 @@ const View = () => {
                   );
                 case "consultations":
                   return <ConsultationsSettings />;
+                case "collaborations":
+                  return <CollaborationsSettings />;
                 case "medicalFile":
                   return <MedicalFileSettings />;
                 case "actions":
