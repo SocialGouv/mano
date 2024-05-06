@@ -31,7 +31,6 @@ import { itemsGroupedByConsultationSelector } from "../recoil/selectors";
 import { DocumentsModule } from "./DocumentsGeneric";
 import TabsNav from "./tailwind/TabsNav";
 import { useDataLoader } from "./DataLoader";
-import { DISABLED_FEATURES } from "../config";
 
 export default function ConsultationModal() {
   const consultationsObjects = useRecoilValue(itemsGroupedByConsultationSelector);
@@ -271,7 +270,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
             }}
             tabs={[
               "Informations",
-              ...(DISABLED_FEATURES["constantes-dans-les-consultations"] ? [] : ["Constantes"]),
+              "Constantes",
               `Documents ${data?.documents?.length ? `(${data.documents.length})` : ""}`,
               `Commentaires ${data?.comments?.length ? `(${data.comments.length})` : ""}`,
               "Historique",
@@ -284,13 +283,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
               if (tab.includes("Historique")) setActiveTab("Historique");
               refresh();
             }}
-            activeTabIndex={[
-              "Informations",
-              ...(DISABLED_FEATURES["constantes-dans-les-consultations"] ? [] : ["Constantes"]),
-              "Documents",
-              "Commentaires",
-              "Historique",
-            ].findIndex((tab) => tab === activeTab)}
+            activeTabIndex={["Informations", "Constantes", "Documents", "Commentaires", "Historique"].findIndex((tab) => tab === activeTab)}
           />
           <form
             id="add-consultation-form"

@@ -54,7 +54,7 @@ const DEFAULT_ORGANISATION_KEY =
   process.env.NODE_ENV === "development" && import.meta.env.VITE_TEST !== "true" ? import.meta.env.VITE_DEFAULT_ORGANISATION_KEY : "";
 
 const DISABLED_FEATURES = {
-  "constantes-dans-les-consultations": false, // TODO: delete this line
+  // "feature-key": true,
 };
 
 export { theme, HOST, SCHEME, ENV, VERSION, DEFAULT_ORGANISATION_KEY, DISABLED_FEATURES };
