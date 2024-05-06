@@ -31,7 +31,6 @@ db.Territory = require("../models/territory")(sequelize, Sequelize);
 db.TerritoryObservation = require("../models/territoryObservation")(sequelize, Sequelize);
 db.Treatment = require("../models/treatment")(sequelize, Sequelize);
 db.User = require("../models/user")(sequelize, Sequelize);
-db.PersonBackup = require("../models/personBackup")(sequelize, Sequelize);
 db.UserLog = require("../models/userLog")(sequelize, Sequelize);
 
 Object.keys(db).forEach((modelName) => {

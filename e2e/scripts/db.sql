@@ -523,18 +523,6 @@ create index if not exists user_updatedat_idx on mano."User" ("updatedAt");
 create index if not exists user_organisation_idx on mano."User" (organisation);
 create index if not exists idx_service_date_team on mano."Service" ("date", team);
 
--- This table is required for a temporary fix. Remove it in 2024.
-CREATE TABLE mano."PersonBackup" (
-  "_id" uuid NOT NULL,
-  organisation uuid NULL,
-  "createdAt" timestamptz NOT NULL,
-  "updatedAt" timestamptz NOT NULL,
-  "encrypted" text NULL,
-  "encryptedEntityKey" text NULL,
-  "deletedAt" timestamptz NULL,
-  CONSTRAINT "PersonBackup_pkey" PRIMARY KEY (_id)
-);
-
 --
 -- PostgreSQL database dump complete
 --
