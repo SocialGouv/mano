@@ -13,7 +13,14 @@ async function getManoCacheStorage() {
       try {
         const currentCacheKey = window.localStorage.getItem("mano-currentCacheKey");
         if (currentCacheKey !== dashboardCurrentCacheKey) {
-          localforage.dropInstance({ name: "mano-dashboard" });
+          try {
+            localforage.dropInstance({ name: "mano-dashboard" });
+          } catch (_e) {
+            // On peut ignorer cette erreur car elle n'est pas bloquante, et est liée à un bug de localforage.
+            // Elle pollue sentry: https://mano-20.sentry.io/issues/5096568584/
+            // see: https://www.notion.so/mano-sesan/Analyse-des-bugs-28847fb41fa549808ce5f82e9b5a4518?pvs=4
+            // A terme, il faut se débarasser de localforage tout court car il est abandonné.
+          }
         }
         window.localStorage.setItem("mano-currentCacheKey", dashboardCurrentCacheKey);
       } catch (e) {
