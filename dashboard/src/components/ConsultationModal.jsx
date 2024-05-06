@@ -487,8 +487,10 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                       value={data["constantes-poids"]}
                       onChange={handleChange}
                       type="number"
+                      step="0.001"
                       min="1"
                       max="400"
+                      onInvalid={() => setActiveTab("Constantes")}
                       name="constantes-poids"
                       placeholder="100"
                     />
@@ -510,6 +512,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                       type="number"
                       min="20"
                       max="280"
+                      onInvalid={() => setActiveTab("Constantes")}
                       name="constantes-taille"
                       placeholder="160"
                     />
@@ -531,6 +534,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                       type="number"
                       min="20"
                       max="240"
+                      onInvalid={() => setActiveTab("Constantes")}
                       name="constantes-frequence-cardiaque"
                       placeholder="60"
                     />
@@ -552,6 +556,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                       type="number"
                       min="1"
                       max="90"
+                      onInvalid={() => setActiveTab("Constantes")}
                       name="constantes-frequence-respiratoire"
                       placeholder="15"
                     />
@@ -573,6 +578,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                       type="number"
                       min="50"
                       max="150"
+                      onInvalid={() => setActiveTab("Constantes")}
                       name="constantes-saturation-o2"
                       placeholder="95"
                     />
@@ -595,6 +601,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                       min="0"
                       max="4"
                       step="0.1"
+                      onInvalid={() => setActiveTab("Constantes")}
                       name="constantes-glycemie-capillaire"
                       placeholder="1"
                     />
@@ -618,6 +625,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                       min="35"
                       max="43"
                       step="0.1"
+                      onInvalid={() => setActiveTab("Constantes")}
                       name="constantes-temperature"
                       placeholder="38"
                     />
@@ -646,6 +654,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                         type="number"
                         min="10"
                         max="200"
+                        onInvalid={() => setActiveTab("Constantes")}
                         name="constantes-tension-arterielle-systolique"
                         placeholder="Systolique"
                       />
@@ -665,6 +674,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                         type="number"
                         min="10"
                         max="200"
+                        onInvalid={() => setActiveTab("Constantes")}
                         name="constantes-tension-arterielle-diastolique"
                         placeholder="Diastolique"
                       />
