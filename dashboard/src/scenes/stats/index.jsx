@@ -699,6 +699,7 @@ const Stats = () => {
         {activeTab === "Observations" && (
           <ObservationsStats
             territories={territories}
+            personsWithRencontres={personsWithRencontres}
             selectedTerritories={selectedTerritories}
             setSelectedTerritories={setSelectedTerritories}
             observations={observations}

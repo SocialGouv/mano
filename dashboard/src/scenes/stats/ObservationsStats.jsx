@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { utils, writeFile } from "@e965/xlsx";
 import SelectCustom from "../../components/SelectCustom";
@@ -13,8 +13,17 @@ import CreateObservation from "../../components/CreateObservation";
 import { filterData } from "../../components/Filters";
 import DateBloc, { TimeBlock } from "../../components/DateBloc";
 import CustomFieldDisplay from "../../components/CustomFieldDisplay";
+import { CustomResponsivePie } from "./charts";
 
-const ObservationsStats = ({ territories, selectedTerritories, setSelectedTerritories, observations, customFieldsObs, allFilters }) => {
+const ObservationsStats = ({
+  territories,
+  selectedTerritories,
+  setSelectedTerritories,
+  observations,
+  customFieldsObs,
+  allFilters,
+  personsWithRencontres,
+}) => {
   const [obsModalOpened, setObsModalOpened] = useState(false);
   const [sliceField, setSliceField] = useState(null);
   const [sliceValue, setSliceValue] = useState(null);
@@ -35,6 +44,28 @@ const ObservationsStats = ({ territories, selectedTerritories, setSelectedTerrit
     setSlicedData(slicedData);
     setObsModalOpened(true);
   };
+
+  const rencontresByTerritories = useMemo(() => {
+    const t = {};
+    for (const p of personsWithRencontres) {
+      for (const r of p.rencontres) {
+        if (r.territoryObject?.name) {
+          if (!t[r.territoryObject.name]) t[r.territoryObject.name] = {};
+          if (!t[r.territoryObject.name][p._id]) t[r.territoryObject.name][p._id] = true;
+        }
+      }
+    }
+    return t;
+  }, [personsWithRencontres]);
+
+  const filteredRencontresByTerritories = useMemo(() => {
+    return Object.entries(rencontresByTerritories).reduce((acc, [territory, persons]) => {
+      if (selectedTerritories.length && !selectedTerritories.find((t) => t.name === territory)) return acc;
+      acc[territory] = persons;
+      return acc;
+    }, {});
+  }, [rencontresByTerritories, selectedTerritories]);
+
   return (
     <>
       <h3 className="tw-my-5 tw-text-xl">Statistiques des observations de territoire</h3>
@@ -74,6 +105,15 @@ const ObservationsStats = ({ territories, selectedTerritories, setSelectedTerrit
           `${label.capitalize()} des observations des territoires sélectionnés, dans la période définie.\n\nLa moyenne de cette données est basée sur le nombre d'observations faites.`
         }
         totalTitleForMultiChoice={<span className="tw-font-bold">Nombre d'observations concernées</span>}
+      />
+      <CustomResponsivePie
+        title="Nombre de personnes suivies rencontrées par territoire"
+        help={`Répartition par territoire du nombre de personnes suivies ayant été rencontrées lors de la saisie d'une observation dans la période définie. Si une personne est rencontrée plusieurs fois sur un même territoire, elle n'est comptabilisée qu'une seule fois. Si elle est rencontrée sur deux territoires différents, elle sera comptée indépendamment sur chaque territoire.\n\nSi aucune période n'est définie, on considère l'ensemble des observations.`}
+        data={Object.entries(filteredRencontresByTerritories).map(([territory, persons]) => ({
+          id: territory,
+          label: territory,
+          value: Object.keys(persons).length,
+        }))}
       />
       <SelectedObsModal
         open={obsModalOpened}
