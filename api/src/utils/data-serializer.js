@@ -20,6 +20,7 @@ function serializeOrganisation(organisation) {
     territoriesEnabled: organisation.territoriesEnabled,
     passagesEnabled: organisation.passagesEnabled,
     checkboxShowAllOrgaPersons: organisation.checkboxShowAllOrgaPersons,
+    lockedForEncryption: organisation.lockedForEncryption,
     rencontresEnabled: organisation.rencontresEnabled,
     encryptedVerificationKey: organisation.encryptedVerificationKey,
     migrations: organisation.migrations,

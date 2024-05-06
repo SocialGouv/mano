@@ -54,6 +54,15 @@ const EncryptionKey = ({ isMain }) => {
       const hashedOrgEncryptionKey = await setOrgEncryptionKey(values.encryptionKey.trim());
       setEncryptingStatus("Chiffrement des données...");
       const encryptedVerificationKey = await encryptVerificationKey(hashedOrgEncryptionKey);
+      const lockedForEncryptionResponse = await API.put({
+        path: `/organisation/${organisation._id}`,
+        body: {
+          lockedForEncryption: true,
+        },
+      });
+      if (!lockedForEncryptionResponse?.ok) {
+        return toast.error("Désolé une erreur est survenue, veuillez réessayer ou contacter l'équipe de support");
+      }
 
       // eslint-disable-next-line no-inner-declarations
       async function recrypt(path, callback = null) {
@@ -180,6 +189,12 @@ const EncryptionKey = ({ isMain }) => {
       setEncryptionDone(false);
       await setOrgEncryptionKey(previousKey.current, { needDerivation: false });
       setEncryptingStatus("Erreur lors du chiffrement, veuillez contacter l'administrateur");
+      API.put({
+        path: `/organisation/${organisation._id}`,
+        body: {
+          lockedForEncryption: false,
+        },
+      });
     }
   };
 

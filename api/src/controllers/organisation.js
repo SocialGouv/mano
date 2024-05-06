@@ -284,6 +284,7 @@ router.put(
         rencontresEnabled: z.optional(z.boolean()),
         passagesEnabled: z.optional(z.boolean()),
         checkboxShowAllOrgaPersons: z.optional(z.boolean()),
+        lockedForEncryption: z.optional(z.boolean()),
         services: z.optional(z.array(z.string().min(1))),
       };
       if (req.body.encryptionLastUpdateAt) {
@@ -347,6 +348,7 @@ router.put(
     if (req.body.hasOwnProperty("rencontresEnabled")) updateOrg.rencontresEnabled = req.body.rencontresEnabled;
     if (req.body.hasOwnProperty("passagesEnabled")) updateOrg.passagesEnabled = req.body.passagesEnabled;
     if (req.body.hasOwnProperty("checkboxShowAllOrgaPersons")) updateOrg.checkboxShowAllOrgaPersons = req.body.checkboxShowAllOrgaPersons;
+    if (req.body.hasOwnProperty("lockedForEncryption")) updateOrg.lockedForEncryption = req.body.lockedForEncryption;
     if (req.body.hasOwnProperty("services")) updateOrg.services = req.body.services;
 
     await organisation.update(updateOrg);

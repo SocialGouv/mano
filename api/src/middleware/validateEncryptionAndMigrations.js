@@ -12,7 +12,7 @@ async function validateEncryptionAndMigrations(req, res, next) {
     return res.status(400).send({ ok: false, status: 400, error: "encryptionLastUpdateAt is required" });
   }
 
-  if (organisation.encrypting === true) {
+  if (organisation.encrypting === true || organisation.lockedForEncryption === true) {
     return res.status(403).send({
       ok: false,
       status: 403,
