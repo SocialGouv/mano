@@ -45,23 +45,33 @@ const ObservationsStats = ({
     setObsModalOpened(true);
   };
 
-  const rencontresByTerritories = useMemo(() => {
-    const t = {};
+  const [personsRencontresByTerritories, rencontresByTerritories] = useMemo(() => {
+    const personsRencontresByTerritories = {};
+    const rencontresByTerritories = {};
     for (const p of personsWithRencontres) {
       for (const r of p.rencontres) {
         if (r.territoryObject?.name) {
-          if (!t[r.territoryObject.name]) t[r.territoryObject.name] = {};
-          if (!t[r.territoryObject.name][p._id]) t[r.territoryObject.name][p._id] = true;
+          if (!personsRencontresByTerritories[r.territoryObject.name]) personsRencontresByTerritories[r.territoryObject.name] = {};
+          if (!personsRencontresByTerritories[r.territoryObject.name][p._id]) personsRencontresByTerritories[r.territoryObject.name][p._id] = true;
+          rencontresByTerritories[r.territoryObject.name] = (rencontresByTerritories[r.territoryObject.name] || 0) + 1;
         }
       }
     }
-    return t;
+    return [personsRencontresByTerritories, rencontresByTerritories];
   }, [personsWithRencontres]);
 
-  const filteredRencontresByTerritories = useMemo(() => {
-    return Object.entries(rencontresByTerritories).reduce((acc, [territory, persons]) => {
+  const filteredPersonsRencontresByTerritories = useMemo(() => {
+    return Object.entries(personsRencontresByTerritories).reduce((acc, [territory, persons]) => {
       if (selectedTerritories.length && !selectedTerritories.find((t) => t.name === territory)) return acc;
       acc[territory] = persons;
+      return acc;
+    }, {});
+  }, [personsRencontresByTerritories, selectedTerritories]);
+
+  const filteredRencontresByTerritories = useMemo(() => {
+    return Object.entries(rencontresByTerritories).reduce((acc, [territory, rencontres]) => {
+      if (selectedTerritories.length && !selectedTerritories.find((t) => t.name === territory)) return acc;
+      acc[territory] = rencontres;
       return acc;
     }, {});
   }, [rencontresByTerritories, selectedTerritories]);
@@ -109,10 +119,19 @@ const ObservationsStats = ({
       <CustomResponsivePie
         title="Nombre de personnes suivies rencontrées par territoire"
         help={`Répartition par territoire du nombre de personnes suivies ayant été rencontrées lors de la saisie d'une observation dans la période définie. Si une personne est rencontrée plusieurs fois sur un même territoire, elle n'est comptabilisée qu'une seule fois. Si elle est rencontrée sur deux territoires différents, elle sera comptée indépendamment sur chaque territoire.\n\nSi aucune période n'est définie, on considère l'ensemble des observations.`}
-        data={Object.entries(filteredRencontresByTerritories).map(([territory, persons]) => ({
+        data={Object.entries(filteredPersonsRencontresByTerritories).map(([territory, persons]) => ({
           id: territory,
           label: territory,
           value: Object.keys(persons).length,
+        }))}
+      />
+      <CustomResponsivePie
+        title="Nombre de rencontres par territoire"
+        help={`Répartition par territoire du nombre de rencontres lors de la saisie d'une observation dans la période définie. Chaque rencontre est comptabilisée, même si plusieurs rencontres avec une même personne ont eu lieu sur un même territoire.\n\nSi aucune période n'est définie, on considère l'ensemble des observations.`}
+        data={Object.entries(filteredRencontresByTerritories).map(([territory, rencontres]) => ({
+          id: territory,
+          label: territory,
+          value: rencontres || 0,
         }))}
       />
       <SelectedObsModal
