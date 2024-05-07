@@ -1,5 +1,7 @@
 /* eslint-disable no-prototype-builtins */
 const express = require("express");
+const fs = require("fs");
+const path = require("path");
 const router = express.Router();
 const passport = require("passport");
 const { Op, fn } = require("sequelize");
@@ -33,6 +35,7 @@ const { looseUuidRegex, customFieldSchema, positiveIntegerRegex, customFieldGrou
 const { serializeOrganisation } = require("../utils/data-serializer");
 const { defaultSocialCustomFields, defaultMedicalCustomFields } = require("../utils/custom-fields/person");
 const { mailBienvenueHtml } = require("../utils/mail-bienvenue");
+const { STORAGE_DIRECTORY } = require("../config");
 
 router.get(
   "/stats",
@@ -743,6 +746,283 @@ router.delete(
         );
       }
     });
+
+    res.status(200).send({ ok: true });
+  })
+);
+
+router.post(
+  "/merge",
+  passport.authenticate("user", { session: false }),
+  validateUser(["superadmin"]),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.object({
+        mainId: z.string().regex(looseUuidRegex),
+        secondaryId: z.string().regex(looseUuidRegex),
+      }).parse(req.body);
+    } catch (e) {
+      const error = new Error(`Invalid request in organisation merge`);
+      error.status = 400;
+      return next(error);
+    }
+
+    const { mainId, secondaryId } = req.body;
+    await sequelize.transaction(async (t) => {
+      await sequelize.query(`UPDATE "mano"."Action" SET "organisation" = :mainId WHERE "organisation" = :secondaryId;`, {
+        replacements: { mainId, secondaryId },
+        transaction: t,
+      });
+      await sequelize.query(`UPDATE "mano"."Comment" SET "organisation" = :mainId WHERE "organisation" = :secondaryId;`, {
+        replacements: { mainId, secondaryId },
+        transaction: t,
+      });
+
+      await sequelize.query(`UPDATE "mano"."Consultation" SET "organisation" = :mainId WHERE "organisation" = :secondaryId;`, {
+        replacements: { mainId, secondaryId },
+        transaction: t,
+      });
+      await sequelize.query(`UPDATE "mano"."Group" SET "organisation" = :mainId WHERE "organisation" = :secondaryId;`, {
+        replacements: { mainId, secondaryId },
+        transaction: t,
+      });
+      await sequelize.query(`UPDATE "mano"."MedicalFile" SET "organisation" = :mainId WHERE "organisation" = :secondaryId;`, {
+        replacements: { mainId, secondaryId },
+        transaction: t,
+      });
+      await sequelize.query(`UPDATE "mano"."Passage" SET "organisation" = :mainId WHERE "organisation" = :secondaryId;`, {
+        replacements: { mainId, secondaryId },
+        transaction: t,
+      });
+      await sequelize.query(`UPDATE "mano"."Person" SET "organisation" = :mainId WHERE "organisation" = :secondaryId;`, {
+        replacements: { mainId, secondaryId },
+        transaction: t,
+      });
+      await sequelize.query(`UPDATE "mano"."Place" SET "organisation" = :mainId WHERE "organisation" = :secondaryId;`, {
+        replacements: { mainId, secondaryId },
+        transaction: t,
+      });
+      await sequelize.query(`UPDATE "mano"."RelPersonPlace" SET "organisation" = :mainId WHERE "organisation" = :secondaryId;`, {
+        replacements: { mainId, secondaryId },
+        transaction: t,
+      });
+      await sequelize.query(`UPDATE "mano"."RelUserTeam" SET "organisation" = :mainId WHERE "organisation" = :secondaryId;`, {
+        replacements: { mainId, secondaryId },
+        transaction: t,
+      });
+      await sequelize.query(`UPDATE "mano"."Rencontre" SET "organisation" = :mainId WHERE "organisation" = :secondaryId;`, {
+        replacements: { mainId, secondaryId },
+        transaction: t,
+      });
+      await sequelize.query(`UPDATE "mano"."Report" SET "organisation" = :mainId WHERE "organisation" = :secondaryId;`, {
+        replacements: { mainId, secondaryId },
+        transaction: t,
+      });
+      await sequelize.query(`UPDATE "mano"."Service" SET "organisation" = :mainId WHERE "organisation" = :secondaryId;`, {
+        replacements: { mainId, secondaryId },
+        transaction: t,
+      });
+      await sequelize.query(`UPDATE "mano"."Structure" SET "organisation" = :mainId WHERE "organisation" = :secondaryId;`, {
+        replacements: { mainId, secondaryId },
+        transaction: t,
+      });
+      await sequelize.query(`UPDATE "mano"."Team" SET "organisation" = :mainId WHERE "organisation" = :secondaryId;`, {
+        replacements: { mainId, secondaryId },
+        transaction: t,
+      });
+      await sequelize.query(`UPDATE "mano"."Territory" SET "organisation" = :mainId WHERE "organisation" = :secondaryId;`, {
+        replacements: { mainId, secondaryId },
+        transaction: t,
+      });
+      await sequelize.query(`UPDATE "mano"."TerritoryObservation" SET "organisation" = :mainId WHERE "organisation" = :secondaryId;`, {
+        replacements: { mainId, secondaryId },
+        transaction: t,
+      });
+      await sequelize.query(`UPDATE "mano"."Treatment" SET "organisation" = :mainId WHERE "organisation" = :secondaryId;`, {
+        replacements: { mainId, secondaryId },
+        transaction: t,
+      });
+      await sequelize.query(`UPDATE "mano"."User" SET "organisation" = :mainId WHERE "organisation" = :secondaryId;`, {
+        replacements: { mainId, secondaryId },
+        transaction: t,
+      });
+      await sequelize.query(`UPDATE "mano"."UserLog" SET "organisation" = :mainId WHERE "organisation" = :secondaryId;`, {
+        replacements: { mainId, secondaryId },
+        transaction: t,
+      });
+
+      // Start merging organisation configuration
+
+      // Merge organisation configuration
+      const mainOrg = await Organisation.findOne({ where: { _id: mainId }, transaction: t });
+      const secondaryOrg = await Organisation.findOne({ where: { _id: secondaryId }, transaction: t });
+
+      // actionsGroupedCategories
+      const mainActionsGroupedCategories = structuredClone(mainOrg.actionsGroupedCategories) || [];
+      const secondaryActionsGroupedCategories = structuredClone(secondaryOrg.actionsGroupedCategories) || [];
+      for (const mainGroup of mainActionsGroupedCategories) {
+        const secondaryGroup = secondaryActionsGroupedCategories.find((g) => g.groupTitle === mainGroup.groupTitle);
+        if (!secondaryGroup) continue;
+        mainGroup.categories = Array.from(new Set([...mainGroup.categories, ...secondaryGroup.categories]));
+      }
+      // merge remaining secondary groups
+      for (const secondaryGroup of secondaryActionsGroupedCategories) {
+        const mainGroup = mainActionsGroupedCategories.find((g) => g.groupTitle === secondaryGroup.groupTitle);
+        if (!mainGroup) mainActionsGroupedCategories.push(secondaryGroup);
+      }
+
+      // structuresGroupedCategories
+      const mainStructuresGroupedCategories = structuredClone(mainOrg.structuresGroupedCategories) || [];
+      const secondaryStructuresGroupedCategories = structuredClone(secondaryOrg.structuresGroupedCategories) || [];
+      for (const mainGroup of mainStructuresGroupedCategories) {
+        const secondaryGroup = secondaryStructuresGroupedCategories.find((g) => g.groupTitle === mainGroup.groupTitle);
+        if (!secondaryGroup) continue;
+        mainGroup.categories = Array.from(new Set([...mainGroup.categories, ...secondaryGroup.categories]));
+      }
+      // merge remaining secondary groups
+      for (const secondaryGroup of secondaryStructuresGroupedCategories) {
+        const mainGroup = mainStructuresGroupedCategories.find((g) => g.groupTitle === secondaryGroup.groupTitle);
+        if (!mainGroup) mainStructuresGroupedCategories.push(secondaryGroup);
+      }
+
+      // groupedServices
+      const mainGroupedServices = structuredClone(mainOrg.groupedServices) || [];
+      const secondaryGroupedServices = structuredClone(secondaryOrg.groupedServices) || [];
+      for (const mainGroup of mainGroupedServices) {
+        const secondaryGroup = secondaryGroupedServices.find((g) => g.groupTitle === mainGroup.groupTitle);
+        if (!secondaryGroup) continue;
+        mainGroup.services = Array.from(new Set([...mainGroup.services, ...secondaryGroup.services]));
+      }
+      // merge remaining secondary groups
+      for (const secondaryGroup of secondaryGroupedServices) {
+        const mainGroup = mainGroupedServices.find((g) => g.groupTitle === secondaryGroup.groupTitle);
+        if (!mainGroup) mainGroupedServices.push(secondaryGroup);
+      }
+
+      // consultations
+      const mainConsultations = structuredClone(mainOrg.consultations) || [];
+      const secondaryConsultations = structuredClone(secondaryOrg.consultations) || [];
+      for (const mainConsultation of mainConsultations) {
+        const secondaryConsultation = secondaryConsultations.find((c) => c.name === mainConsultation.name);
+        if (!secondaryConsultation) continue;
+        for (const field of secondaryConsultation.fields) {
+          if (!mainConsultation.fields.find((f) => f.name === field.name))
+            mainConsultation.fields.push({
+              ...field,
+              label: `${field.label} (fusion ${secondaryOrg.name})`,
+            });
+          // Si deux champs on le même nom, on va considérer qu'on ne fait rien, on garde celui du "main"
+          // (ce sont surement des champs par défaut, sinon ils s'appellent custom-date-xyz)
+        }
+      }
+      // merge remaining secondary consultations
+      for (const secondaryConsultation of secondaryConsultations) {
+        if (!mainConsultations.find((c) => c.name === secondaryConsultation.name)) mainConsultations.push(secondaryConsultation);
+      }
+
+      // customFieldsPersons
+      const mainCustomFieldsPersons = structuredClone(mainOrg.customFieldsPersons) || [];
+      const secondaryCustomFieldsPersons = structuredClone(secondaryOrg.customFieldsPersons) || [];
+      for (const mainCustomField of mainCustomFieldsPersons) {
+        const secondaryCustomField = secondaryCustomFieldsPersons.find((c) => c.name === mainCustomField.name);
+        if (!secondaryCustomField) continue;
+        for (const field of secondaryCustomField.fields) {
+          if (!mainCustomField.fields.find((f) => f.name === field.name))
+            mainCustomField.fields.push({
+              ...field,
+              label: `${field.label} (fusion ${secondaryOrg.name})`,
+            });
+          // Si deux champs on le même nom, on va considérer qu'on ne fait rien, on garde celui du "main"
+          // (ce sont surement des champs par défaut, sinon ils s'appellent custom-date-xyz)
+        }
+      }
+      // merge remaining secondary customFieldsPersons
+      for (const secondaryCustomField of secondaryCustomFieldsPersons) {
+        if (!mainCustomFieldsPersons.find((c) => c.name === secondaryCustomField.name)) mainCustomFieldsPersons.push(secondaryCustomField);
+      }
+
+      // groupedCustomFieldsObs
+      const mainGroupedCustomFieldsObs = structuredClone(mainOrg.groupedCustomFieldsObs) || [];
+      const secondaryGroupedCustomFieldsObs = structuredClone(secondaryOrg.groupedCustomFieldsObs) || [];
+      for (const mainGroup of mainGroupedCustomFieldsObs) {
+        const secondaryGroup = secondaryGroupedCustomFieldsObs.find((g) => g.name === mainGroup.name);
+        if (!secondaryGroup) continue;
+        for (const field of secondaryGroup.fields) {
+          if (!mainGroup.fields.find((f) => f.name === field.name))
+            mainGroup.fields.push({
+              ...field,
+              label: `${field.label} (fusion ${secondaryOrg.name})`,
+            });
+          // Si deux champs on le même nom, on va considérer qu'on ne fait rien, on garde celui du "main"
+          // (ce sont surement des champs par défaut, sinon ils s'appellent custom-date-xyz)
+        }
+      }
+      // merge remaining secondary groupedCustomFieldsObs
+      for (const secondaryGroup of secondaryGroupedCustomFieldsObs) {
+        if (!mainGroupedCustomFieldsObs.find((g) => g.name === secondaryGroup.name)) mainGroupedCustomFieldsObs.push(secondaryGroup);
+      }
+
+      // groupedCustomFieldsMedicalFile
+      const mainGroupedCustomFieldsMedicalFile = structuredClone(mainOrg.groupedCustomFieldsMedicalFile) || [];
+      const secondaryGroupedCustomFieldsMedicalFile = structuredClone(secondaryOrg.groupedCustomFieldsMedicalFile) || [];
+      for (const mainGroup of mainGroupedCustomFieldsMedicalFile) {
+        const secondaryGroup = secondaryGroupedCustomFieldsMedicalFile.find((g) => g.name === mainGroup.name);
+        if (!secondaryGroup) continue;
+        for (const field of secondaryGroup.fields) {
+          if (!mainGroup.fields.find((f) => f.name === field.name))
+            mainGroup.fields.push({
+              ...field,
+              label: `${field.label} (fusion ${secondaryOrg.name})`,
+            });
+          // Si deux champs on le même nom, on va considérer qu'on ne fait rien, on garde celui du "main"
+          // (ce sont surement des champs par défaut, sinon ils s'appellent custom-date-xyz)
+        }
+      }
+      // merge remaining secondary groupedCustomFieldsMedicalFile
+      for (const secondaryGroup of secondaryGroupedCustomFieldsMedicalFile) {
+        if (!mainGroupedCustomFieldsMedicalFile.find((g) => g.name === secondaryGroup.name)) mainGroupedCustomFieldsMedicalFile.push(secondaryGroup);
+      }
+
+      // collaborations
+      const mainCollaborations = structuredClone(mainOrg.collaborations) || [];
+      const secondaryCollaborations = structuredClone(secondaryOrg.collaborations) || [];
+      mainOrg.collaborations = Array.from(new Set([...mainCollaborations, ...secondaryCollaborations]));
+
+      await mainOrg.update(
+        {
+          actionsGroupedCategories: mainActionsGroupedCategories,
+          structuresGroupedCategories: mainStructuresGroupedCategories,
+          groupedServices: mainGroupedServices,
+          consultations: mainConsultations,
+          customFieldsPersons: mainCustomFieldsPersons,
+          groupedCustomFieldsObs: mainGroupedCustomFieldsObs,
+          groupedCustomFieldsMedicalFile: mainGroupedCustomFieldsMedicalFile,
+          collaborations: mainCollaborations,
+        },
+        { transaction: t }
+      );
+      // End merging organisation configuration
+
+      // Last step: delete secondary organisation
+      await sequelize.query(`DELETE FROM "mano"."Organisation" WHERE "_id" = :secondaryId;`, {
+        replacements: { mainId, secondaryId },
+        transaction: t,
+      });
+    });
+
+    const basedir = STORAGE_DIRECTORY ? path.join(STORAGE_DIRECTORY, "uploads") : path.join(__dirname, "../../uploads");
+    const mainDir = path.join(basedir, mainId, "persons");
+    const secondaryDir = path.join(basedir, secondaryId, "persons");
+    await fs.promises
+      .readdir(secondaryDir)
+      .then((files) => {
+        for (const file of files) {
+          fs.promises.rename(path.join(secondaryDir, file), path.join(mainDir, file));
+        }
+      })
+      .catch(() => {
+        console.log("No secondary directory");
+      });
 
     res.status(200).send({ ok: true });
   })

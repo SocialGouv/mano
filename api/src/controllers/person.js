@@ -30,7 +30,6 @@ const { capture } = require("../sentry");
 // Return the basedir to store persons' documents.
 function personDocumentBasedir(userOrganisation, personId) {
   const basedir = STORAGE_DIRECTORY ? path.join(STORAGE_DIRECTORY, "uploads") : path.join(__dirname, "../../uploads");
-  console.log("basedir", basedir);
   console.log(path.join(basedir, `${userOrganisation}`, "persons", `${personId}`));
   return path.join(basedir, `${userOrganisation}`, "persons", `${personId}`);
 }

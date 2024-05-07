@@ -19,6 +19,7 @@ import SelectCustom from "../../components/SelectCustom";
 import OrganisationSuperadminSettings from "./OrganisationSuperadminSettings";
 import { getUmapGeoJSONFromOrgs } from "./utils";
 import CitySelect from "../../components/CitySelect";
+import { checkEncryptedVerificationKey, derivedMasterKey } from "../../services/encryption";
 
 const List = () => {
   const [organisations, setOrganisations] = useState(null);
@@ -28,6 +29,7 @@ const List = () => {
   const [sortOrder, setSortOrder] = useState("DESC");
   const [refresh, setRefresh] = useState(true);
   const [openCreateModal, setOpenCreateModal] = useState(false);
+  const [openMergeModal, setOpenMergeModal] = useState(false);
   const [openOrgSettingsModal, setOpenOrgSettingsModal] = useState(false);
   const [openCreateUserModal, setOpenCreateUserModal] = useState(false);
   const [openUserListModal, setOpenUserListModal] = useState(false);
@@ -59,6 +61,7 @@ const List = () => {
   return (
     <>
       <Create onChange={() => setRefresh(true)} open={openCreateModal} setOpen={setOpenCreateModal} />
+      <MergeOrganisations onChange={() => setRefresh(true)} open={openMergeModal} setOpen={setOpenMergeModal} organisations={organisations} />
       <OrganisationUsers
         open={openUserListModal}
         organisation={selectedOrganisation}
@@ -85,7 +88,7 @@ const List = () => {
       />
       <CreateUser onChange={() => setRefresh(true)} open={openCreateUserModal} setOpen={setOpenCreateUserModal} organisation={selectedOrganisation} />
       <div className="tw-mb-10 tw-mt-4 tw-flex tw-w-full tw-justify-between">
-        <h2 className="tw-text-2xl">Organisations utilisant Mano ({total})</h2>
+        <h2 className="tw-text-2xl">Organisations ({total})</h2>
         <div>
           <button
             className="button-classic"
@@ -98,6 +101,15 @@ const List = () => {
             }}
           >
             Exporter les villes vers umap
+          </button>
+          <button
+            className="button-destructive"
+            type="button"
+            onClick={() => {
+              setOpenMergeModal(true);
+            }}
+          >
+            Fusionner deux orgas
           </button>
           <button className="button-submit" type="button" onClick={() => setOpenCreateModal(true)}>
             Créer une nouvelle organisation
@@ -400,6 +412,128 @@ const Create = ({ onChange, open, setOpen }) => {
         </Formik>
       </ModalContainer>
     </>
+  );
+};
+
+const MergeOrganisations = ({ open, setOpen, organisations, onChange }) => {
+  const [selectedOrganisationMain, setSelectedOrganisationMain] = useState(null);
+  const [selectedOrganisationSecondary, setSelectedOrganisationSecondary] = useState(null);
+  const [secretKey, setSecretKey] = useState("");
+  const [loading, setLoading] = useState(false);
+  return (
+    <ModalContainer open={open} onClose={() => setOpen(false)} size="3xl" blurryBackground>
+      <ModalHeader title="Fusion" />
+      <ModalBody className="tw-px-4 tw-py-2 tw-pb-20">
+        <div className="tw-py-4">
+          Organisation <b>principale</b> (celle qui reste)
+          <SelectCustom
+            name="name"
+            options={organisations}
+            onChange={(org) => {
+              setSelectedOrganisationMain(org);
+            }}
+            value={selectedOrganisationMain}
+            getOptionValue={(org) => org._id}
+            getOptionLabel={(i) => i?.name}
+            formatOptionLabel={(org) => (
+              <>
+                {org.name} <span className="tw-text-sm tw-text-gray-600">{"(Id: " + org.orgId + ")"}</span>
+              </>
+            )}
+          />
+        </div>
+        <div className="tw-py-4">
+          Organisation <b>secondaire</b> (celle qui sera supprimée)
+          <SelectCustom
+            name="name"
+            options={organisations}
+            onChange={(org) => {
+              setSelectedOrganisationSecondary(org);
+            }}
+            value={selectedOrganisationSecondary}
+            getOptionValue={(org) => org._id}
+            getOptionLabel={(i) => i?.name}
+            formatOptionLabel={(org) => (
+              <>
+                {org.name} <span className="tw-text-sm tw-text-gray-600">{"(Id: " + org.orgId + ")"}</span>
+              </>
+            )}
+          />
+        </div>
+        <div className="tw-py-4">
+          Clé de l’orga (les deux clés doivent être identiques)
+          <input
+            className="tailwindui"
+            type="text"
+            value={secretKey}
+            onChange={(e) => {
+              setSecretKey(e.target.value);
+            }}
+          />
+        </div>
+        <div className="tw-mx-auto tw-flex tw-justify-center tw-py-4">
+          <img src="/fusion.gif" />
+        </div>
+      </ModalBody>
+      <ModalFooter>
+        <button type="button" name="cancel" disabled={loading} className="button-cancel" onClick={() => setOpen(false)}>
+          Annuler
+        </button>
+        <button
+          className="button-submit"
+          disabled={loading}
+          onClick={async () => {
+            if (!confirm("AUCUN RETOUR EN ARRIERE POSSIBLE ! Voulez-vous vraiment fusionner ces deux organisations ?")) return;
+            setLoading(true);
+
+            if (!selectedOrganisationMain || !selectedOrganisationSecondary) {
+              setLoading(false);
+              return toast.error("Veuillez sélectionner les 2 organisations à fusionner");
+            }
+
+            if (!secretKey) {
+              setLoading(false);
+              return toast.error("La clé de l'organisation est obligatoire");
+            }
+
+            if (selectedOrganisationMain._id === selectedOrganisationSecondary._id) {
+              setLoading(false);
+              return toast.error("Les deux organisations ne peuvent pas être les mêmes");
+            }
+
+            const derived = await derivedMasterKey(secretKey);
+            const encryptionKeyIsValid = await checkEncryptedVerificationKey(selectedOrganisationMain.encryptedVerificationKey, derived);
+            if (!encryptionKeyIsValid) {
+              setLoading(false);
+              return toast.error("La clé de l'organisation principale n'est pas valide");
+            }
+
+            const encryptionKeyIsValid2 = await checkEncryptedVerificationKey(selectedOrganisationSecondary.encryptedVerificationKey, derived);
+            if (!encryptionKeyIsValid2) {
+              setLoading(false);
+              return toast.error("La clé de l'organisation secondaire n'est pas valide");
+            }
+
+            const res = await API.post({
+              path: `/organisation/merge`,
+              body: { mainId: selectedOrganisationMain._id, secondaryId: selectedOrganisationSecondary._id },
+            });
+            setSelectedOrganisationMain(null);
+            setSelectedOrganisationSecondary(null);
+            setLoading(false);
+            setOpen(false);
+            if (res.ok) {
+              toast.success("Fusion réussie, vérifiez quand même que tout est ok");
+              onChange();
+            } else {
+              toast.error("Catastrophe, la fusion d'organisation a échoué, appelez les devs");
+            }
+          }}
+        >
+          Valider
+        </button>
+      </ModalFooter>
+    </ModalContainer>
   );
 };
 
