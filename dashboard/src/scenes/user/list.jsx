@@ -106,6 +106,9 @@ const List = () => {
             onSortBy: setSortBy,
             sortOrder,
             sortBy,
+            render: (user) => {
+              return <div className="tw-hyphens-auto tw-max-w-52">{user.email}</div>;
+            },
           },
           {
             title: "Téléphone",
