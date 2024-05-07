@@ -592,8 +592,8 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                       className="tailwindui"
                       type="number"
                       min="0"
-                      max="4"
-                      step="0.1"
+                      max="10"
+                      step="0.01"
                       onInvalid={() => setActiveTab("Constantes")}
                       name="constantes-glycemie-capillaire"
                       placeholder="1"
