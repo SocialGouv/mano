@@ -67,8 +67,10 @@ const actionsByTeamAndStatusSelector = selectorFamily({
 const consultationsByStatusSelector = selectorFamily({
   key: "consultationsByStatusSelector",
   get:
-    ({ statuses, teamIds, viewAllOrganisationData, viewNoTeamData }) =>
+    ({ statuses, teamIds, viewAllOrganisationData, viewNoTeamData, actionsWithNoCategory }) =>
     ({ get }) => {
+      // On retourne seulement les actions si "Actions sans catégorie" est coché
+      if (actionsWithNoCategory) return [];
       const consultations = get(arrayOfitemsGroupedByConsultationSelector);
       const consultationsByStatus = consultations.filter((consultation) => {
         if (!viewAllOrganisationData) {
@@ -99,7 +101,7 @@ const dataFilteredBySearchSelector = selectorFamily({
       // When we filter by category, we don't want to see all consultations.
       const consultations = categories?.length
         ? []
-        : get(consultationsByStatusSelector({ statuses, teamIds, viewNoTeamData, viewAllOrganisationData }));
+        : get(consultationsByStatusSelector({ statuses, teamIds, viewNoTeamData, viewAllOrganisationData, actionsWithNoCategory }));
 
       if (!search) {
         return [...actions, ...consultations];
