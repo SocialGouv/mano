@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { selectorFamily, useRecoilValue } from "recoil";
 import { useHistory } from "react-router-dom";
 import { SmallHeader } from "../../components/header";
@@ -125,7 +125,6 @@ const List = () => {
   const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage("action-allOrg", false);
   const [viewNoTeamData, setViewNoTeamData] = useLocalStorage("action-noTeam", false);
   const [actionsWithNoCategory, setActionsWithNoCategory] = useLocalStorage("action-noCategory", false);
-  const [mobileBottomSheetOpened, setMobileBottomSheetOpened] = useState(false);
 
   const [showAs, setShowAs] = useLocalStorage("action-showAs", showAsOptions[0]); // calendar, list
   const dataConsolidated = useRecoilValue(
