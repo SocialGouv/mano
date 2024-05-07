@@ -345,18 +345,18 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
     <>
       <ModalHeader
         title={
-          <>
-            {isNewAction && "Ajouter une action"}
-            {!isNewAction && !isEditing && `Action: ${action?.name}`}
-            {!isNewAction && isEditing && `Modifier l'action: ${action?.name}`}
+          <div className="tw-flex tw-mr-12 tw-gap-2">
+            <div className="tw-grow">
+              {isNewAction && "Ajouter une action"}
+              {!isNewAction && !isEditing && `Action: ${action?.name}`}
+              {!isNewAction && isEditing && `Modifier l'action: ${action?.name}`}
+            </div>
             {!isNewAction && action?.user && (
-              <UserName
-                className="tw-block tw-text-right tw-text-base tw-font-normal tw-italic"
-                id={action.user}
-                wrapper={(name) => ` (créée par ${name})`}
-              />
+              <div>
+                <UserName className="tw-text-base tw-font-normal tw-italic" id={action.user} wrapper={(name) => ` (créée par ${name})`} />
+              </div>
             )}
-          </>
+          </div>
         }
         onClose={onClose}
       />

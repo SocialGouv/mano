@@ -220,18 +220,18 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
     <>
       <ModalHeader
         title={
-          <>
-            {isNewConsultation && "Ajouter une consultation"}
-            {!isNewConsultation && !isEditing && "Consultation"}
-            {!isNewConsultation && isEditing && "Modifier la consultation"}
+          <div className="tw-flex tw-mr-12 tw-gap-2">
+            <div className="tw-grow">
+              {isNewConsultation && "Ajouter une consultation"}
+              {!isNewConsultation && !isEditing && "Consultation"}
+              {!isNewConsultation && isEditing && "Modifier la consultation"}
+            </div>
             {!isNewConsultation && consultation?.user && (
-              <UserName
-                className="tw-block tw-text-right tw-text-base tw-font-normal tw-italic"
-                id={consultation.user}
-                wrapper={(name) => ` (créée par ${name})`}
-              />
+              <div>
+                <UserName className="tw-text-base tw-font-normal tw-italic" id={consultation.user} wrapper={(name) => ` (créée par ${name})`} />
+              </div>
             )}
-          </>
+          </div>
         }
         onClose={() => {
           if (JSON.stringify(data) === JSON.stringify(initialState)) return onClose();
