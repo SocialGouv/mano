@@ -34,7 +34,7 @@ export const organisationState = atom<OrganisationInstance | null>({
   effects: [
     ({ onSet }) =>
       onSet((organisation) => {
-        AppSentry.setTag("organisationId", organisation?._id);
+        AppSentry.setTag("organisationId", organisation?._id ?? "unauthenticated");
       }),
   ],
 });

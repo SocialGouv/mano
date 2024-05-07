@@ -273,12 +273,12 @@ const execute = async ({
           path,
           query,
           body,
-          debug: debugApi?.length ? debugApi.join(", ") : null,
+          debug: JSON.stringify(debugApi),
         },
         tags: {
           path,
           message: "Problème réseau probable",
-          debug: debugApi?.length ? debugApi.join(", ") : null,
+          debug: JSON.stringify(debugApi),
         },
       });
       toast.error(message);
@@ -344,7 +344,7 @@ const execute = async ({
             tags: {
               path,
               message: "api error unhandled",
-              debug: debugApi?.length ? debugApi.join(", ") : null,
+              debug: JSON.stringify(debugApi),
             },
           });
         }
@@ -383,12 +383,12 @@ const execute = async ({
           response,
           path,
           query,
-          debug: debugApi?.length ? debugApi.join(", ") : null,
+          debug: JSON.stringify(debugApi),
         },
         tags: {
           path,
           message: "error parsing response",
-          debug: debugApi?.length ? debugApi.join(", ") : null,
+          debug: JSON.stringify(debugApi),
         },
       });
       return { ok: false, error: "Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !" };
@@ -404,12 +404,12 @@ const execute = async ({
         method,
         body,
         headers,
-        debug: debugApi?.length ? debugApi.join(", ") : null,
+        debug: JSON.stringify(debugApi),
       },
       tags: {
         path,
         message: "error execute api",
-        debug: debugApi?.length ? debugApi.join(", ") : null,
+        debug: JSON.stringify(debugApi),
       },
     });
     if (typeof errorExecuteApi === "string") {
