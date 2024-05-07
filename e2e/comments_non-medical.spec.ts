@@ -29,7 +29,7 @@ test("test", async ({ page }) => {
   await page.getByLabel("Nom de l'action").fill(actionName);
   await page.getByLabel("Commentaire (optionnel)").click();
   await page.getByLabel("Commentaire (optionnel)").fill("Commentaire intégré");
-  await page.getByLabel("Commentaire prioritaire Ce commentaire sera mise en avant par rapport aux autres").check();
+  await page.getByLabel("Commentaire prioritaire Ce commentaire sera mis en avant par rapport aux autres").check();
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
   await page.getByText("Commentaire intégré").click();

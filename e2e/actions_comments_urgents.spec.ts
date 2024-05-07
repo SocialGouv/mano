@@ -52,7 +52,7 @@ test("Create action with comments", async ({ page }) => {
   await changeReactSelectValue(page, "create-action-person-select", person1Name);
   await page.getByLabel("Description").fill("Une seule personne");
   await page.getByLabel("Commentaire (optionnel)").fill("Une personne avec un commentaire prioritaire");
-  await page.getByText("Commentaire prioritaire Ce commentaire sera mise en avant par rapport aux autres").click();
+  await page.getByText("Commentaire prioritaire Ce commentaire sera mis en avant par rapport aux autres").click();
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
 

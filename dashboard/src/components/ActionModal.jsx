@@ -517,7 +517,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                             }}
                           />
                           Commentaire prioritaire <br />
-                          <small className="text-muted">Ce commentaire sera mise en avant par rapport aux autres</small>
+                          <small className="text-muted">Ce commentaire sera mis en avant par rapport aux autres</small>
                         </label>
                       </div>
                     </>
