@@ -81,13 +81,14 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
             const historyEntry = {
               date: new Date(),
               user: user._id,
+              userName: user.name,
               data: {},
             };
             for (const key in body) {
               if (!allowedFieldsInHistory.includes(key)) continue;
               if (body[key] !== person[key]) historyEntry.data[key] = { oldValue: person[key], newValue: body[key] };
             }
-            if (!!Object.keys(historyEntry.data).length) body.history = [...cleanHistory(person.history || []), historyEntry];
+            if (Object.keys(historyEntry.data).length) body.history = [...cleanHistory(person.history || []), historyEntry];
             const response = await API.put({
               path: `/person/${person._id}`,
               body: preparePersonForEncryption(body),
@@ -108,7 +109,7 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
             }
           }}
         >
-          {({ values, handleChange, handleSubmit, isSubmitting, setFieldValue }) => {
+          {({ values, handleChange, handleSubmit, isSubmitting }) => {
             return (
               <>
                 <div className="tw-text-sm">

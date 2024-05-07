@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import { useRecoilValue } from "recoil";
-import UserName from "../../../components/UserName";
-import { teamsState, userState } from "../../../recoil/auth";
+import { teamsState, userState, usersState } from "../../../recoil/auth";
 import { personFieldsIncludingCustomFieldsSelector } from "../../../recoil/persons";
 import { formatDateWithFullMonth, dayjsInstance } from "../../../services/date";
 import { customFieldsMedicalFileSelector } from "../../../recoil/medicalFiles";
@@ -20,6 +19,14 @@ export const cleanHistory = (history = []) => {
     return true;
   });
 };
+
+function UserName({ id, name }) {
+  const users = useRecoilValue(usersState);
+  const user = users.find((u) => u._id === id);
+  if (user) return user.name || "Utilisateur sans nom";
+  else if (name) return name + " (utilisateur supprimé)";
+  else return "Utilisateur supprimé";
+}
 
 export default function PersonHistory({ person }) {
   const teams = useRecoilValue(teamsState);
@@ -56,7 +63,7 @@ export default function PersonHistory({ person }) {
               <tr key={h.date} className="tw-cursor-default">
                 <td>{dayjsInstance(h.date).format("DD/MM/YYYY HH:mm")}</td>
                 <td>
-                  <UserName id={h.user} />
+                  <UserName id={h.user} name={h.userName} />
                 </td>
                 <td className="tw-max-w-prose">
                   {Object.entries(h.data).map(([key, value]) => {
