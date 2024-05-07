@@ -238,15 +238,17 @@ async function createUsersAndOrgas() {
         "user",
         "team",
         "createdAt",
-        "updatedAt"
+        "updatedAt",
+        "organisation"
       ) VALUES (
         $1,
         $2,
         $3,
         $4,
-        $4
+        $4,
+        $5
       );`,
-      [uuidv4(), adminId, teamId, date]
+      [uuidv4(), adminId, teamId, date, orgId]
     );
 
     await client.query(
@@ -255,15 +257,17 @@ async function createUsersAndOrgas() {
         "user",
         "team",
         "createdAt",
-        "updatedAt"
+        "updatedAt",
+        "organisation"
       ) VALUES (
         $1,
         $2,
         $3,
         $4,
-        $4
+        $4,
+        $5
       );`,
-      [uuidv4(), healthProfessionalId, teamId, date]
+      [uuidv4(), healthProfessionalId, teamId, date, orgId]
     );
 
     await client.query(
@@ -272,15 +276,17 @@ async function createUsersAndOrgas() {
         "user",
         "team",
         "createdAt",
-        "updatedAt"
+        "updatedAt",
+        "organisation"
       ) VALUES (
         $1,
         $2,
         $3,
         $4,
-        $4
+        $4,
+        $5
       );`,
-      [uuidv4(), normalUserId, teamId, date]
+      [uuidv4(), normalUserId, teamId, date, orgId]
     );
 
     await client.query(
@@ -289,15 +295,17 @@ async function createUsersAndOrgas() {
         "user",
         "team",
         "createdAt",
-        "updatedAt"
+        "updatedAt",
+        "organisation"
       ) VALUES (
         $1,
         $2,
         $3,
         $4,
-        $4
+        $4,
+        $5
       );`,
-      [uuidv4(), restrictedUserId, teamId, date]
+      [uuidv4(), restrictedUserId, teamId, date, orgId]
     );
   }
   await client.end();

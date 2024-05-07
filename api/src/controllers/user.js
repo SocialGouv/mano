@@ -399,7 +399,7 @@ router.post(
     const teams = await Team.findAll({ where: { organisation: organisationId, _id: { [Op.in]: team } } });
     const tx = await User.sequelize.transaction();
     await RelUserTeam.bulkCreate(
-      teams.map((t) => ({ user: data._id, team: t._id })),
+      teams.map((t) => ({ user: data._id, team: t._id, organisation: organisationId })),
       { transaction: tx }
     );
     await tx.commit();
@@ -619,7 +619,7 @@ router.put(
     if (team && Array.isArray(team)) {
       await RelUserTeam.destroy({ where: { user: _id }, transaction: tx });
       await RelUserTeam.bulkCreate(
-        team.map((teamId) => ({ user: _id, team: teamId })),
+        team.map((teamId) => ({ user: _id, team: teamId, organisation: user.organisation })),
         { transaction: tx }
       );
     }
@@ -690,7 +690,7 @@ router.put(
     if (team && Array.isArray(team)) {
       await RelUserTeam.destroy({ where: { user: _id }, transaction: tx });
       await RelUserTeam.bulkCreate(
-        team.map((teamId) => ({ user: _id, team: teamId })),
+        team.map((teamId) => ({ user: _id, team: teamId, organisation: req.user.organisation })),
         { transaction: tx }
       );
     }
