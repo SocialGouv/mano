@@ -193,7 +193,7 @@ const execute = async ({
   skipDecrypt = false,
   decryptDeleted = false,
 } = {}) => {
-  let debugApi = [];
+  let debugApi = ["init"];
   const organisation = getRecoil(organisationState) || {};
   const tokenCached = getRecoil(authTokenState);
   const { encryptionLastUpdateAt, encryptionEnabled, encryptedVerificationKey, migrationLastUpdateAt } = organisation;
