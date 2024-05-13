@@ -222,19 +222,20 @@ export default function NewIndex() {
                 <iframe
                   width="100%"
                   height="300px"
-                  frameBorder="0"
-                  allowFullScreen
+                  frameborder="0"
+                  allowfullscreen
                   allow="geolocation"
-                  src="//umap.openstreetmap.fr/fr/map/structures-utilisatrices-de-mano_929555?scaleControl=false&miniMap=false&scrollWheelZoom=false&zoomControl=true&editMode=disabled&moreControl=false&searchControl=false&tilelayersControl=false&embedControl=false&datalayersControl=false&onLoadPanel=none&captionBar=false&captionMenus=false&locateControl=false&measureControl=false&editinosmControl=false&starControl=false#6/46.845/2.120"
+                  src="//umap.openstreetmap.fr/fr/map/villes-utilisatrices-de-mano_1053916?scaleControl=false&miniMap=false&scrollWheelZoom=false&zoomControl=true&editMode=disabled&moreControl=false&searchControl=false&tilelayersControl=false&embedControl=false&datalayersControl=false&onLoadPanel=none&captionBar=false&captionMenus=false&locateControl=false&measureControl=false&editinosmControl=false&starControl=false#6/46.845/2.120"
                 ></iframe>
                 <a
                   target="_blank"
                   className="ml-2 -mt-10 self-start bg-white rounded px-4 py-2 text-sm text-mano shadow hover:bg-mano cursor-pointer hover:text-white"
-                  href="//umap.openstreetmap.fr/fr/map/structures-utilisatrices-de-mano_929555?scaleControl=false&miniMap=false&scrollWheelZoom=false&zoomControl=true&editMode=disabled&moreControl=false&searchControl=false&tilelayersControl=false&embedControl=false&datalayersControl=false&onLoadPanel=none&captionBar=false&captionMenus=false&locateControl=false&measureControl=false&editinosmControl=false&starControl=false#6/46.845/2.120"
+                  href="//umap.openstreetmap.fr/fr/map/villes-utilisatrices-de-mano_1053916?scaleControl=false&miniMap=false&scrollWheelZoom=false&zoomControl=true&editMode=disabled&moreControl=false&searchControl=false&tilelayersControl=false&embedControl=false&datalayersControl=false&onLoadPanel=none&captionBar=false&captionMenus=false&locateControl=false&measureControl=false&editinosmControl=false&starControl=false#6/46.845/2.120"
                 >
                   Voir en plein écran
                 </a>
               </div>
+
               <div className="flex flex-col items-center justify-center border">
                 <div className="py-3 text-lg">Plus de 130 associations utilisatrices</div>
                 <img src="/assos.png" alt="Screenshot" className="md:h-[300px] rounded shadow" />
