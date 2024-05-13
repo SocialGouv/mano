@@ -1,4 +1,5 @@
 import React, { useMemo, useRef, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import { read } from "@e965/xlsx";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { toast } from "react-toastify";
@@ -10,33 +11,44 @@ import { isNullOrUndefined } from "../../utils";
 import API, { encryptItem } from "../../services/api";
 import { formatDateWithFullMonth, now } from "../../services/date";
 import { sanitizeFieldValueFromExcel } from "./importSanitizer";
+import { customFieldsMedicalFileSelector, prepareMedicalFileForEncryption } from "../../recoil/medicalFiles";
+import { useDataLoader } from "../../components/DataLoader";
 
 const ImportData = () => {
   const user = useRecoilValue(userState);
   const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
+  const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
   const fileDialogRef = useRef(null);
-  const setAllPersons = useSetRecoilState(personsState);
+  const { refresh } = useDataLoader();
   const teams = useRecoilValue(teamsState);
 
   const preparePersonForEncryption = usePreparePersonForEncryption();
 
-  const [showImportSummary, setShowImpotSummary] = useState(false);
-  const [dataToImport, setDataToImport] = useState([]);
+  const [showImportSummary, setShowImportSummary] = useState(false);
+  const [personsToImport, setPersonsToImport] = useState([]);
+  const [medicalFilesToImport, setMedicalFilesToImport] = useState([]);
   const [importedFields, setImportedFields] = useState([]);
   const [ignoredFields, setIgnoredFields] = useState([]);
   const [reloadKey, setReloadKey] = useState(0); // because input type 'file' doesn't trigger 'onChange' for uploading twice the same file
 
   const importableFields = useMemo(
     () =>
-      personFieldsIncludingCustomFields
-        .filter((field) => field.importable)
-        .map((field) => ({
-          ...field,
-          options: field.name === "assignedTeams" ? teams.map((team) => team.name) : field.options,
-        })),
+      [...personFieldsIncludingCustomFields.filter((field) => field.importable), ...customFieldsMedicalFile].map((field) => ({
+        ...field,
+        options: field.name === "assignedTeams" ? teams.map((team) => team.name) : field.options,
+      })),
     [personFieldsIncludingCustomFields, teams]
   );
   const importableLabels = useMemo(() => importableFields.map((f) => f.label), [importableFields]);
+
+  const medicalFieldsObjectByName = customFieldsMedicalFile.reduce((acc, field) => {
+    acc[field.name] = field;
+    return acc;
+  }, {});
+  const personFieldsObjectByName = personFieldsIncludingCustomFields.reduce((acc, field) => {
+    acc[field.name] = field;
+    return acc;
+  }, {});
 
   const onParseData = async (event) => {
     try {
@@ -92,17 +104,23 @@ const ImportData = () => {
       }
 
       const persons = [];
+      const medicalFiles = [];
       for (let i = 2; i <= lastRow; i++) {
         const person = {};
+        const medicalFile = {};
         for (const [column, field] of headerColumnsAndField) {
           if (!personsSheet[`${column}${i}`]) continue;
           const value = sanitizeFieldValueFromExcel(field, personsSheet[`${column}${i}`]);
           if (!isNullOrUndefined(value)) {
-            person[field.name] = value;
+            if (personFieldsObjectByName[field.name]) person[field.name] = value;
+            if (medicalFieldsObjectByName[field.name]) medicalFile[field.name] = value;
             if (field.name === "assignedTeams" && value.length > 0) {
               person[field.name] = value.map((teamName) => teams.find((team) => team.name === teamName)?._id).filter((a) => a);
             }
           }
+        }
+        if (Object.keys(person).length || Object.keys(medicalFile).length) {
+          person._id = uuidv4();
         }
         if (Object.keys(person).length) {
           person.description = `Données importées le ${formatDateWithFullMonth(now())}\n${person.description || ""}`;
@@ -113,11 +131,16 @@ const ImportData = () => {
           }
           persons.push(person);
         }
+        if (Object.keys(medicalFile).length) {
+          medicalFiles.push({ ...medicalFile, person: person._id });
+        }
       }
 
       const encryptedPersons = await Promise.all(persons.map(preparePersonForEncryption).map(encryptItem));
-      setDataToImport(encryptedPersons);
-      setShowImpotSummary(true);
+      setPersonsToImport(encryptedPersons);
+      const encryptedMedicalFiles = await Promise.all(medicalFiles.map(prepareMedicalFileForEncryption(customFieldsMedicalFile)).map(encryptItem));
+      setMedicalFilesToImport(encryptedMedicalFiles);
+      setShowImportSummary(true);
     } catch (e) {
       console.log(e);
       toast.error("Désolé, nous n'avons pas pu lire votre fichier. Mais vous pouvez réssayer !");
@@ -126,11 +149,11 @@ const ImportData = () => {
   };
 
   const onImportData = async () => {
-    if (window.confirm(`Voulez-vous vraiment importer ${dataToImport.length} personnes dans Mano ? Cette opération est irréversible.`)) {
-      const response = await API.post({ path: "/person/import", body: dataToImport });
+    if (window.confirm(`Voulez-vous vraiment importer ${personsToImport.length} personnes dans Mano ? Cette opération est irréversible.`)) {
+      const response = await API.post({ path: "/person/import", body: { personsToImport, medicalFilesToImport } });
       if (response.ok) toast.success("Importation réussie !");
-      setAllPersons((oldPersons) => [...oldPersons, ...response.decryptedData].sort((p1, p2) => (p1.name || "").localeCompare(p2.name || "")));
-      setShowImpotSummary(false);
+      refresh();
+      setShowImportSummary(false);
     }
   };
 
@@ -148,11 +171,11 @@ const ImportData = () => {
         style={{ display: "none" }}
         onChange={onParseData}
       />
-      <Modal isOpen={showImportSummary} toggle={() => setShowImpotSummary(false)} size="lg" backdrop="static">
-        <ModalHeader toggle={() => setShowImpotSummary(false)}>Résumé de l'import de personnes</ModalHeader>
+      <Modal isOpen={showImportSummary} toggle={() => setShowImportSummary(false)} size="lg" backdrop="static">
+        <ModalHeader toggle={() => setShowImportSummary(false)}>Résumé de l'import de personnes</ModalHeader>
         <ModalBody>
           <p>
-            Nombre de personnes à importer&nbsp;: <strong>{dataToImport.length}</strong>
+            Nombre de personnes à importer&nbsp;: <strong>{personsToImport.length}</strong>
           </p>
           <Alert color="warning">
             Vérifiez bien la liste des champs ci-dessous. S'il manque un champ (par exemple parce qu'une colonne ne contient pas le nom exact indiqué
@@ -173,8 +196,8 @@ const ImportData = () => {
           )}
 
           <ul>
-            {ignoredFields.map((label) => (
-              <li key={label}>
+            {ignoredFields.map((label, index) => (
+              <li key={label + index}>
                 <code>{label}</code>
               </li>
             ))}
@@ -183,8 +206,8 @@ const ImportData = () => {
           <p>
             Les colonnes suivantes seront <strong>importées</strong> ({importedFields.length}) :
             <ul>
-              {importedFields.map((label) => (
-                <li key={label}>
+              {importedFields.map((label, index) => (
+                <li key={label + index}>
                   <code style={{ color: "black" }}>{label}</code>
                 </li>
               ))}

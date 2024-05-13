@@ -145,39 +145,53 @@ router.post(
   validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
     try {
-      z.array(
-        z.object({
-          encrypted: z.string(),
-          encryptedEntityKey: z.string(),
-        })
-      ).parse(req.body);
+      z.object({
+        personsToImport: z.array(
+          z.object({
+            _id: z.optional(z.string().regex(looseUuidRegex)),
+            encrypted: z.string(),
+            encryptedEntityKey: z.string(),
+          })
+        ),
+        medicalFilesToImport: z.array(
+          z.object({
+            encrypted: z.string(),
+            encryptedEntityKey: z.string(),
+          })
+        ),
+      }).parse(req.body);
     } catch (e) {
       const error = new Error(`Invalid request in person import: ${e}`);
       error.status = 400;
       return next(error);
     }
 
-    const persons = req.body.map((p) => {
-      const person = {
-        encrypted: p.encrypted,
-        encryptedEntityKey: p.encryptedEntityKey,
-        organisation: req.user.organisation,
-        user: req.user._id,
-      };
-      return person;
+    await sequelize.transaction(async (tx) => {
+      const persons = req.body.personsToImport.map((p) => {
+        const person = {
+          _id: p._id,
+          encrypted: p.encrypted,
+          encryptedEntityKey: p.encryptedEntityKey,
+          organisation: req.user.organisation,
+          user: req.user._id,
+        };
+        return person;
+      });
+      await Person.bulkCreate(persons, { transaction: tx });
+      const medicalFiles = req.body.medicalFilesToImport.map((p) => {
+        const medicalFile = {
+          encrypted: p.encrypted,
+          encryptedEntityKey: p.encryptedEntityKey,
+          organisation: req.user.organisation,
+          user: req.user._id,
+        };
+        return medicalFile;
+      });
+      await MedicalFile.bulkCreate(medicalFiles, { transaction: tx });
     });
-    const data = await Person.bulkCreate(persons, { returning: true });
+
     return res.status(200).send({
       ok: true,
-      data: data.map((p) => ({
-        _id: p._id,
-        encrypted: p.encrypted,
-        encryptedEntityKey: p.encryptedEntityKey,
-        organisation: p.organisation,
-        createdAt: p.createdAt,
-        updatedAt: p.updatedAt,
-        deletedAt: p.deletedAt,
-      })),
     });
   })
 );

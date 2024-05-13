@@ -33,6 +33,7 @@ import PersonCustomFieldsSettings from "./PersonCustomFieldsSettings";
 import StructuresCategoriesSettings from "./StructuresCategoriesSettings";
 import Poubelle from "./Poubelle";
 import CollaborationsSettings from "./CollaborationsSettings";
+import { customFieldsMedicalFileSelector } from "../../recoil/medicalFiles";
 
 const getSettingTitle = (tabId) => {
   if (tabId === "infos") return "Informations";
@@ -66,6 +67,7 @@ const View = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const user = useRecoilValue(userState);
   const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
+  const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
 
   const persons = useRecoilValue(personsState);
@@ -506,6 +508,16 @@ const View = () => {
                                         </tr>
                                       );
                                     })}
+                                  {customFieldsMedicalFile.map((f) => {
+                                    return (
+                                      <tr key={f.label}>
+                                        <td>{f.label}</td>
+                                        <td>
+                                          <ImportFieldDetails field={f} />
+                                        </td>
+                                      </tr>
+                                    );
+                                  })}
                                 </tbody>
                               </table>
                             </li>
