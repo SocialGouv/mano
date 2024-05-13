@@ -9,19 +9,19 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import isBetween from 'dayjs/plugin/isBetween';
 import dayjs from 'dayjs';
 import 'dayjs/locale/fr';
+import * as Sentry from '@sentry/react-native';
 
 dayjs.locale('fr');
 dayjs.locale('fr');
 dayjs.extend(relativeTime);
 dayjs.extend(isBetween);
 
-import * as Sentry from '@sentry/react-native';
-
 Sentry.init({
   dsn: 'https://1bab2dc91a5ed9ddde3e4273fe5438a5@o4506615228596224.ingest.sentry.io/4506829687554048',
   environment: 'app',
-  // tracesSampleRate: 1.0,
-  // release: version,
+  enabled: !__DEV__,
+  tracesSampleRate: 0.05,
+  release: version,
   // ignoreErrors: [
   //   'Network request failed',
   //   'Failed to fetch',
