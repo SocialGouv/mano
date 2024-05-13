@@ -343,7 +343,7 @@ const TerritoryObservation = ({ route, navigation }) => {
                 const person = personsObject[rencontre.person];
                 return (
                   <View key={rencontre._id + rencontre.person} className="bg-gray-100 rounded p-4 my-2 flex flex-row">
-                    <View className="grow">
+                    <View className="grow shrink">
                       <PersonName person={person} />
                     </View>
                     {!rencontre._id ? (
