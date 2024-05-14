@@ -4,6 +4,7 @@ import { Text, Alert } from 'react-native';
 import API from '../services/api';
 import FileViewer from 'react-native-file-viewer';
 import { useActionSheet } from '@expo/react-native-action-sheet';
+import { capture } from '../services/sentry';
 
 const Document = ({ personId, document, onDelete }) => {
   const [isDownloading, setIsDownloading] = useState(false);
@@ -29,6 +30,10 @@ const Document = ({ personId, document, onDelete }) => {
               text: 'Supprimer',
               style: 'destructive',
               onPress: async () => {
+                if (!document?.file?.filename) {
+                  capture(new Error('Document not found for deleting'), { personId, document });
+                  return;
+                }
                 setIsDeleting(true);
                 await API.delete({ path: document.downloadPath ?? `/person/${document.person ?? personId}/document/${document.file.filename}` });
                 onDelete(document);
@@ -45,6 +50,11 @@ const Document = ({ personId, document, onDelete }) => {
     <DocumentContainer
       onLongPress={onMorePress}
       onPress={() => {
+        if (!document?.file?.filename) {
+          Alert.alert('Erreur', 'Le document est introuvable');
+          capture(new Error('Document not found for downloading'), { personId, document });
+          return;
+        }
         if (isDownloading) return;
         setIsDownloading(true);
         API.download({

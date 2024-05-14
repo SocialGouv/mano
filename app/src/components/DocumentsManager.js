@@ -98,6 +98,11 @@ const DocumentsManager = ({ personDB, documents = [], onAddDocument, onDelete })
 
   const sendToDB = async () => {
     setLoading('sending');
+    if (!asset) {
+      Alert.alert('Désolé, une erreur est survenue', "Veuillez réessayer d'enregistrer votre document");
+      reset();
+      return;
+    }
     const extension = asset.fileName.split('.').reverse()[0];
     const { data: file, encryptedEntityKey } = await API.upload({
       file: {
@@ -108,6 +113,11 @@ const DocumentsManager = ({ personDB, documents = [], onAddDocument, onDelete })
       },
       path: `/person/${personDB._id}/document`,
     });
+    if (!file) {
+      Alert.alert('Désolé, une erreur est survenue', "Veuillez réessayer d'enregistrer votre document");
+      reset();
+      return;
+    }
     await onAddDocument({
       _id: file.filename,
       name: file.originalname,
