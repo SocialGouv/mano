@@ -14,7 +14,6 @@ import {
 } from "../recoil/consultations";
 import API from "../services/api";
 import { dayjsInstance } from "../services/date";
-import useCreateReportAtDateIfNotExist from "../services/useCreateReportAtDateIfNotExist";
 import CustomFieldInput from "./CustomFieldInput";
 import { modalConfirmState } from "./ModalConfirm";
 import SelectAsInput from "./SelectAsInput";
@@ -107,7 +106,6 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
   const user = useRecoilValue(userState);
   const setModalConfirmState = useSetRecoilState(modalConfirmState);
   const setAllConsultations = useSetRecoilState(consultationsState);
-  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
   const consultationsFieldsIncludingCustomFields = useRecoilValue(consultationsFieldsIncludingCustomFieldsSelector);
   const { refresh } = useDataLoader();
 
@@ -186,13 +184,6 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
           })
           .sort((a, b) => new Date(b.dueAt) - new Date(a.dueAt))
       );
-    }
-    const { createdAt, completedAt } = consultationResponse.decryptedData;
-    await createReportAtDateIfNotExist(createdAt);
-    if (!!completedAt) {
-      if (dayjsInstance(completedAt).format("YYYY-MM-DD") !== dayjsInstance(createdAt).format("YYYY-MM-DD")) {
-        await createReportAtDateIfNotExist(completedAt);
-      }
     }
     if (closeOnSubmit) onClose();
     refresh();

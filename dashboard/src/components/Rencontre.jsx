@@ -10,7 +10,6 @@ import API from "../services/api";
 import { rencontresState, prepareRencontreForEncryption } from "../recoil/rencontres";
 import SelectTeam from "./SelectTeam";
 import SelectPerson from "./SelectPerson";
-import useCreateReportAtDateIfNotExist from "../services/useCreateReportAtDateIfNotExist";
 import DatePicker from "./DatePicker";
 import { outOfBoundariesDate } from "../services/date";
 import AutoResizeTextarea from "./AutoresizeTextArea";
@@ -20,8 +19,6 @@ const Rencontre = ({ rencontre, personId, onFinished, onSave, disableAccessToPer
   const teams = useRecoilValue(teamsState);
   const [open, setOpen] = useState(false);
   const currentTeam = useRecoilValue(currentTeamState);
-
-  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const setRencontres = useSetRecoilState(rencontresState);
 
@@ -109,7 +106,6 @@ const Rencontre = ({ rencontre, personId, onFinished, onSave, disableAccessToPer
                 onFinished();
                 toast.success(body.person.length > 1 ? "Rencontre enregistrée" : "Rencontres enregistrées");
                 actions.setSubmitting(false);
-                await createReportAtDateIfNotExist(newRencontre.date);
                 return;
               }
               const response = await API.put({
@@ -123,7 +119,6 @@ const Rencontre = ({ rencontre, personId, onFinished, onSave, disableAccessToPer
                   return p;
                 })
               );
-              await createReportAtDateIfNotExist(rencontre.date);
               setOpen(false);
               onFinished();
               toast.success("Rencontre mise à jour");

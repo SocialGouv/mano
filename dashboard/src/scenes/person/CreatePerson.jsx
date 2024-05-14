@@ -11,7 +11,6 @@ import { personsState, usePreparePersonForEncryption } from "../../recoil/person
 import { useRecoilState, useRecoilValue } from "recoil";
 import API from "../../services/api";
 import SelectTeamMultiple from "../../components/SelectTeamMultiple";
-import useCreateReportAtDateIfNotExist from "../../services/useCreateReportAtDateIfNotExist";
 import dayjs from "dayjs";
 
 const CreatePerson = ({ refreshable }) => {
@@ -21,8 +20,6 @@ const CreatePerson = ({ refreshable }) => {
   const history = useHistory();
   const [persons, setPersons] = useRecoilState(personsState);
   const preparePersonForEncryption = usePreparePersonForEncryption();
-
-  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   return (
     <>
@@ -56,7 +53,6 @@ const CreatePerson = ({ refreshable }) => {
                 setOpen(false);
                 actions.setSubmitting(false);
                 history.push(`/person/${response.decryptedData._id}`);
-                await createReportAtDateIfNotExist(dayjs());
               }
             }}
           >

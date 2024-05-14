@@ -13,23 +13,25 @@ import Spacer from '../../components/Spacer';
 import { currentTeamState, organisationState } from '../../recoil/auth';
 import { getPeriodTitle } from './utils';
 import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
-import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
+import { currentTeamReportsSelector } from './selectors';
+import { refreshTriggerState } from '../../components/Loader';
 
 const Collaborations = ({ route, navigation }) => {
   const [collaboration, setCollaboration] = useState('');
   const [posting, setPosting] = useState(false);
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const currentTeam = useRecoilValue(currentTeamState);
-  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
+  const teamsReports = useRecoilValue(currentTeamReportsSelector);
+
+  const day = route.params?.day;
+  const reportDB = useMemo(() => teamsReports.find((r) => r.date === day), [teamsReports, day]);
 
   const [organisation, setOrganisation] = useRecoilState(organisationState);
-  const setReports = useSetRecoilState(reportsState);
   const collaborations = useMemo(() => organisation.collaborations, [organisation]);
   const data = useMemo(() => {
     if (!collaboration) return collaborations;
     return collaborations.filter((c) => c.toLocaleLowerCase().includes(collaboration.toLocaleLowerCase()));
   }, [collaboration, collaborations]);
-
-  const { day } = route.params;
 
   const backRequestHandledRef = useRef(null);
   const handleBeforeRemove = (e) => {
@@ -62,21 +64,20 @@ const Collaborations = ({ route, navigation }) => {
   }, [collaboration, collaborations, organisation._id, setOrganisation]);
 
   const onSubmit = async (newCollaboration) => {
-    const reportToUpdate = await createReportAtDateIfNotExist(day); // to make sure we have the last one
     setPosting(true);
-    const reportUpdate = {
-      ...reportToUpdate,
-      collaborations: [...new Set([...(reportToUpdate.collaborations || []), newCollaboration])],
-    };
-    const res = await API.put({ path: `/report/${reportToUpdate._id}`, body: prepareReportForEncryption(reportUpdate) });
-    if (res.error) return Alert.alert(res.error);
-    if (res.ok) {
-      setReports((reports) =>
-        reports.map((a) => {
-          if (a._id === reportToUpdate._id) return res.decryptedData;
-          return a;
+    const collaborations = [...new Set([...(reportDB?.collaborations || []), newCollaboration])];
+    const response = reportDB?._id
+      ? await API.put({
+          path: `/report/${reportDB?._id}`,
+          body: prepareReportForEncryption({ ...reportDB, collaborations }),
         })
-      );
+      : await API.post({
+          path: '/report',
+          body: prepareReportForEncryption({ team: currentTeam._id, date: day, collaborations }),
+        });
+    if (response.error) return Alert.alert(response.error);
+    if (response.ok) {
+      setRefreshTrigger({ status: true, options: { showFullScreen: false, initialLoad: false } });
       onBack();
     }
   };

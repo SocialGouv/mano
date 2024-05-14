@@ -16,7 +16,6 @@ import { currentTeamState, organisationState, userState } from '../../recoil/aut
 import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import API from '../../services/api';
 import colors from '../../utils/colors';
-import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
 import {
   actionsForReport,
   consultationsForReport,
@@ -27,6 +26,7 @@ import {
   rencontresForReport,
 } from './selectors';
 import { getPeriodTitle } from './utils';
+import { refreshTriggerState } from '../../components/Loader';
 
 const castToReport = (report = {}) => ({
   description: report.description?.trim() || '',
@@ -36,7 +36,7 @@ const castToReport = (report = {}) => ({
 const ReportLoading = ({ navigation, route }) => {
   const currentTeam = useRecoilValue(currentTeamState);
 
-  const [day] = useState(() => route.params?.day);
+  const day = route.params?.day;
   const [isLoading, setIsLoading] = useState(true);
 
   const title = useMemo(
@@ -70,10 +70,9 @@ const Report = ({ navigation, route }) => {
   const teamsReports = useRecoilValue(currentTeamReportsSelector);
   const user = useRecoilValue(userState);
 
-  const [day] = useState(() => route.params?.day);
-  const [reportDB, setReportDB] = useState(() => route?.params?.report);
+  const day = route.params?.day;
+  const reportDB = useMemo(() => teamsReports.find((r) => r.date === day), [teamsReports, day]);
   const [report, setReport] = useState(() => castToReport(reportDB));
-  const reportCreatedRef = useRef(!!reportDB?._id);
 
   const { actionsCreated, actionsCompleted, actionsCanceled } = useRecoilValue(actionsForReport({ date: day }));
   const { consultationsCreated, consultationsCompleted, consultationsCanceled } = useRecoilValue(consultationsForReport({ date: day }));
@@ -82,47 +81,15 @@ const Report = ({ navigation, route }) => {
   const passages = useRecoilValue(passagesForReport({ date: day }));
   const observations = useRecoilValue(observationsForReport({ date: day }));
   const organisation = useRecoilValue(organisationState);
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
 
   const isFocused = useIsFocused();
-  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
+  // to update collaborations
   useEffect(() => {
     if (!isFocused) return;
-    if (!reportDB?._id) {
-      // to update collaborations
-      const reportFoundByDate = teamsReports.find((r) => r.date === day);
-      if (reportFoundByDate) {
-        setReportDB(reportFoundByDate);
-        setReport(castToReport(reportFoundByDate));
-        return;
-      }
-      // to update regarding actions etc.
-      if (actionsCreated.length || actionsCompleted.length || actionsCanceled.length || comments.length || observations.length) {
-        if (!!reportCreatedRef.current) return;
-        (async () => {
-          const newReport = await createReportAtDateIfNotExist(day);
-          setReportDB(newReport);
-          setReport(castToReport(newReport));
-        })();
-        return;
-      }
-    }
-    // to update collaborations
-    const freshReport = teamsReports.find((r) => r._id === reportDB?._id);
-    setReportDB(freshReport);
-    setReport(castToReport(freshReport));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    isFocused,
-    reportDB?._id,
-    teamsReports,
-    actionsCreated.length,
-    actionsCompleted.length,
-    actionsCanceled.length,
-    comments.length,
-    observations.length,
-    day,
-  ]);
+    setReport(castToReport(reportDB));
+  }, [isFocused, reportDB]);
 
   const [updating, setUpdating] = useState(false);
   const [editable, setEditable] = useState(route?.params?.editable || false);
@@ -148,25 +115,23 @@ const Report = ({ navigation, route }) => {
   const onEdit = () => setEditable((e) => !e);
 
   const onUpdateReport = async () => {
-    const reportToUpdate = await createReportAtDateIfNotExist(day); // to make sure we have the last one
     setUpdating(true);
-    const response = await API.put({
-      path: `/report/${reportToUpdate?._id}`,
-      body: prepareReportForEncryption({ ...reportToUpdate, description: report.description }),
-    });
+    const response = reportDB?._id
+      ? await API.put({
+          path: `/report/${reportDB?._id}`,
+          body: prepareReportForEncryption({ ...reportDB, ...report }),
+        })
+      : await API.post({
+          path: '/report',
+          body: prepareReportForEncryption({ ...report, team: currentTeam._id, date: day }),
+        });
     if (response.error) {
       setUpdating(false);
       Alert.alert(response.error);
       return false;
     }
     if (response.ok) {
-      setReports((reports) =>
-        reports.map((a) => {
-          if (a._id === reportToUpdate?._id) return response.decryptedData;
-          return a;
-        })
-      );
-      setReportDB(response.decryptedData);
+      setRefreshTrigger({ status: true, options: { showFullScreen: false, initialLoad: false } });
       setReport(castToReport(response.decryptedData));
       Alert.alert('Compte-rendu mis à jour !');
       setUpdating(false);

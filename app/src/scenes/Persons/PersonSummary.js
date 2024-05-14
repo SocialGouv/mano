@@ -27,7 +27,6 @@ import RencontreRow from './RencontreRow';
 import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
 import { formatDateWithFullMonth, getRelativeTimeFrench } from '../../services/dateDayjs';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
-import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
 import { groupsState } from '../../recoil/groups';
 import API from '../../services/api';
 
@@ -53,7 +52,6 @@ const PersonSummary = ({
   const organisation = useRecoilValue(organisationState);
   const setComments = useSetRecoilState(commentsState);
   const groups = useRecoilValue(groupsState);
-  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const scrollViewRef = useRef(null);
   const descriptionRef = useRef(null);
@@ -332,7 +330,6 @@ const PersonSummary = ({
               return;
             }
             setComments((comments) => [response.decryptedData, ...comments]);
-            await createReportAtDateIfNotExist(response.decryptedData.date);
           }}
         />
       </SubList>

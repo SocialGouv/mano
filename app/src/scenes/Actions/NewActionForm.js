@@ -18,8 +18,6 @@ import { currentTeamState, organisationState, userState } from '../../recoil/aut
 import API from '../../services/api';
 import ActionCategoriesModalSelect from '../../components/ActionCategoriesModalSelect';
 import CheckboxLabelled from '../../components/CheckboxLabelled';
-import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
-import { dayjsInstance } from '../../services/dateDayjs';
 import { groupsState } from '../../recoil/groups';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -39,7 +37,6 @@ const NewActionForm = ({ route, navigation }) => {
   const forCurrentPerson = useRef(!!route.params?.person).current;
   const [posting, setPosting] = useState(false);
   const [status, setStatus] = useState(TODO);
-  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const backRequestHandledRef = useRef(null);
   useEffect(() => {
@@ -94,12 +91,6 @@ const NewActionForm = ({ route, navigation }) => {
       if (!newAction) newAction = response.decryptedData;
       setActions((actions) => [response.decryptedData, ...actions]);
       actions.push(response.decryptedData);
-    }
-    await createReportAtDateIfNotExist(newAction.createdAt);
-    if (!!newAction.completedAt) {
-      if (dayjsInstance(newAction.completedAt).format('YYYY-MM-DD') !== dayjsInstance(newAction.createdAt).format('YYYY-MM-DD')) {
-        await createReportAtDateIfNotExist(newAction.completedAt);
-      }
     }
     // because when we go back from Action to ActionsList, we don't want the Back popup to be triggered
     backRequestHandledRef.current = true;

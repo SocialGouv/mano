@@ -24,7 +24,6 @@ import PersonName from "../../components/PersonName";
 import Table from "../../components/table";
 import Passage from "../../components/Passage";
 import UserName from "../../components/UserName";
-import useCreateReportAtDateIfNotExist from "../../services/useCreateReportAtDateIfNotExist";
 import ReceptionService from "../../components/ReceptionService";
 
 const actionsForCurrentTeamSelector = selector({
@@ -107,7 +106,6 @@ const Reception = () => {
   const consultationsByStatus = useRecoilValue(consultationsByStatusSelector({ status }));
   const [services, setServices] = useState(null);
   const [todaysPassagesOpen, setTodaysPassagesOpen] = useState(false);
-  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const dataConsolidated = useMemo(
     () => [...actionsByStatus, ...consultationsByStatus].sort((a, b) => new Date(b.completedAt || b.dueAt) - new Date(a.completedAt || a.dueAt)),
@@ -163,7 +161,6 @@ const Reception = () => {
       setPassages((passages) => [response.decryptedData, ...passages.filter((p) => p.optimisticId !== optimisticId)]);
       if (!reportCreatedRef.current) {
         reportCreatedRef.current = true;
-        await createReportAtDateIfNotExist(response.decryptedData.date);
       }
     }
   };
@@ -190,7 +187,6 @@ const Reception = () => {
           setPassages((passages) => [response.decryptedData, ...passages.filter((p) => p.optimisticId !== index)]);
           if (!reportCreatedRef.current) {
             reportCreatedRef.current = true;
-            await createReportAtDateIfNotExist(response.decryptedData.date);
           }
         }
       }

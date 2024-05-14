@@ -19,7 +19,6 @@ import { territoriesState } from "../recoil/territory";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { dayjsInstance, outOfBoundariesDate } from "../services/date";
 import API from "../services/api";
-import useCreateReportAtDateIfNotExist from "../services/useCreateReportAtDateIfNotExist";
 import DatePicker from "./DatePicker";
 import { ModalBody, ModalContainer, ModalHeader, ModalFooter } from "./tailwind/Modal";
 import SelectAndCreatePerson from "../scenes/reception/SelectAndCreatePerson";
@@ -60,15 +59,12 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
     if (forceOpen > 0) setOpen(true);
   }, [forceOpen]);
 
-  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
-
   const addTerritoryObs = async (obs) => {
     const res = await API.post({ path: "/territory-observation", body: prepareObsForEncryption(customFieldsObs)(obs) });
     if (res.ok) {
       setTerritoryObservations((territoryObservations) =>
         [res.decryptedData, ...territoryObservations].sort((a, b) => new Date(b.observedAt || b.createdAt) - new Date(a.observedAt || a.createdAt))
       );
-      await createReportAtDateIfNotExist(res.decryptedData.observedAt);
     }
     return res;
   };
@@ -84,7 +80,6 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
           })
           .sort((a, b) => new Date(b.observedAt || b.createdAt) - new Date(a.observedAt || a.createdAt))
       );
-      await createReportAtDateIfNotExist(res.decryptedData.observedAt);
     }
     return res;
   };

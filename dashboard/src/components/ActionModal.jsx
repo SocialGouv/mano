@@ -8,7 +8,6 @@ import { dayjsInstance, now, outOfBoundariesDate } from "../services/date";
 import API from "../services/api";
 import SelectPerson from "./SelectPerson";
 import SelectStatus from "./SelectStatus";
-import useCreateReportAtDateIfNotExist from "../services/useCreateReportAtDateIfNotExist";
 import { commentsState, prepareCommentForEncryption } from "../recoil/comments";
 import ActionsCategorySelect from "./tailwind/ActionsCategorySelect";
 import { groupsState } from "../recoil/groups";
@@ -110,7 +109,6 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
   const setComments = useSetRecoilState(commentsState);
   const history = useHistory();
   const location = useLocation();
-  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { refresh } = useDataLoader();
 
@@ -153,13 +151,6 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
       const response = await API.post({ path: "/action", body: prepareActionForEncryption(body) });
       if (response.ok) {
         setActions((actions) => [response.decryptedData, ...actions]);
-        const { createdAt } = response.decryptedData;
-        await createReportAtDateIfNotExist(createdAt);
-        if (completedAt) {
-          if (dayjsInstance(completedAt).format("YYYY-MM-DD") !== dayjsInstance(createdAt).format("YYYY-MM-DD")) {
-            await createReportAtDateIfNotExist(completedAt);
-          }
-        }
       } else {
         toast.error("Erreur lors de la création de l'action");
       }
@@ -316,12 +307,6 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
         return a;
       })
     );
-    await createReportAtDateIfNotExist(newAction.createdAt);
-    if (!!newAction.completedAt) {
-      if (dayjsInstance(newAction.completedAt).format("YYYY-MM-DD") !== dayjsInstance(newAction.createdAt).format("YYYY-MM-DD")) {
-        await createReportAtDateIfNotExist(newAction.completedAt);
-      }
-    }
     toast.success("Mise à jour !");
     if (location.pathname !== "/stats") refresh(); // if we refresh when we're on stats page, it will remove the view we're on
     const actionCancelled = action.status !== CANCEL && body.status === CANCEL;
@@ -645,7 +630,6 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                     if (!response.ok) return;
                     setComments((comments) => [response.decryptedData, ...comments]);
                     toast.success("Commentaire ajouté !");
-                    await createReportAtDateIfNotExist(response.decryptedData.date);
                   } else {
                     const response = await API.put({
                       path: `/comment/${comment._id}`,
@@ -658,7 +642,6 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                           return c;
                         })
                       );
-                      await createReportAtDateIfNotExist(response.decryptedData.date || response.decryptedData.createdAt);
                     }
                     if (!response.ok) return;
                     toast.success("Commentaire mis à jour");

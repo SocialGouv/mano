@@ -17,7 +17,6 @@ import {
 } from '../../recoil/territoryObservations';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import API from '../../services/api';
-import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
 import DateAndTimeInput from '../../components/DateAndTimeInput';
 import { prepareRencontreForEncryption, rencontresState } from '../../recoil/rencontres';
 import { useFocusEffect } from '@react-navigation/native';
@@ -38,7 +37,6 @@ const TerritoryObservation = ({ route, navigation }) => {
   const fieldsGroupNames = groupedCustomFieldsObs.map((f) => f.name).filter((f) => f);
   const [allTerritoryOservations, setTerritoryObservations] = useRecoilState(territoryObservationsState);
   const [obsDB, setObsDB] = useState(() => allTerritoryOservations.find((obs) => obs._id === route.params?.obs?._id) || {});
-  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
   const [rencontresInProgress, setRencontresInProgress] = useState([]);
   const setRencontres = useSetRecoilState(rencontresState);
   const rencontres = useRecoilValue(rencontresState);
@@ -145,7 +143,6 @@ const TerritoryObservation = ({ route, navigation }) => {
 
     setObs(castToTerritoryObservation(response.decryptedData));
     setTerritoryObservations((territoryObservations) => [response.decryptedData, ...territoryObservations]);
-    await createReportAtDateIfNotExist(response.decryptedData.observedAt);
     setObsDB(response.decryptedData);
     await saveRencontres(response.decryptedData._id);
     Alert.alert('Nouvelle observation créée !');
@@ -180,7 +177,6 @@ const TerritoryObservation = ({ route, navigation }) => {
         return a;
       })
     );
-    await createReportAtDateIfNotExist(response.decryptedData.observedAt);
     setObsDB(response.decryptedData);
     Alert.alert('Observation mise à jour !');
     await saveRencontres(response.decryptedData._id);

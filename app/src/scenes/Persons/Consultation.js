@@ -27,8 +27,6 @@ import { CANCEL, DONE, TODO } from '../../recoil/actions';
 import CheckboxLabelled from '../../components/CheckboxLabelled';
 import ButtonsContainer from '../../components/ButtonsContainer';
 import ButtonDelete from '../../components/ButtonDelete';
-import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
-import { dayjsInstance } from '../../services/dateDayjs';
 import InputFromSearchList from '../../components/InputFromSearchList';
 import CommentRow from '../Comments/CommentRow';
 import SubList from '../../components/SubList';
@@ -58,7 +56,6 @@ const Consultation = ({ navigation, route }) => {
   }, [allConsultations, route?.params?.consultationDB?._id, user._id]);
 
   const isNew = !consultationDB?._id;
-  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
   const [writingComment, setWritingComment] = useState('');
 
   const castToConsultation = useCallback(
@@ -180,13 +177,6 @@ const Consultation = ({ navigation, route }) => {
             })
             .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
         );
-      }
-      const { createdAt, completedAt } = consultationResponse.decryptedData;
-      await createReportAtDateIfNotExist(createdAt);
-      if (!!completedAt) {
-        if (dayjsInstance(completedAt).format('YYYY-MM-DD') !== dayjsInstance(createdAt).format('YYYY-MM-DD')) {
-          await createReportAtDateIfNotExist(completedAt);
-        }
       }
       if (goBackOnSave) {
         onBack();

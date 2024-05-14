@@ -28,7 +28,6 @@ import API from '../../services/api';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { capture } from '../../services/sentry';
 import CheckboxLabelled from '../../components/CheckboxLabelled';
-import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
 import { groupsState } from '../../recoil/groups';
 import { useFocusEffect } from '@react-navigation/native';
 import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
@@ -62,7 +61,6 @@ const Action = ({ navigation, route }) => {
   const groups = useRecoilValue(groupsState);
   const [comments, setComments] = useRecoilState(commentsState);
   const currentTeam = useRecoilValue(currentTeamState);
-  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const [actionDB, setActionDB] = useState(() => {
     const existingAction = actions.find((a) => a._id === route.params?.action?._id);
@@ -229,7 +227,6 @@ const Action = ({ navigation, route }) => {
           return a;
         })
       );
-      if (!!newAction.completedAt) await createReportAtDateIfNotExist(newAction.completedAt);
       return response;
     } catch (error) {
       capture(error, { extra: { message: 'error in updating action' } });
@@ -312,7 +309,6 @@ const Action = ({ navigation, route }) => {
       return;
     }
     setActions((actions) => [response.decryptedData, ...actions]);
-    await createReportAtDateIfNotExist(response.decryptedData.createdAt);
 
     for (let c of comments.filter((c) => c.action === actionDB._id)) {
       const body = {
@@ -564,7 +560,6 @@ const Action = ({ navigation, route }) => {
                 }
 
                 setComments((comments) => [response.decryptedData, ...comments]);
-                await createReportAtDateIfNotExist(response.decryptedData.date);
               }}
             />
           )}

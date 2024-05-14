@@ -13,7 +13,6 @@ import ButtonCustom from "../../components/ButtonCustom";
 import { currentTeamState, organisationState, userState } from "../../recoil/auth";
 import ExclamationMarkButton from "../../components/tailwind/ExclamationMarkButton";
 import { theme } from "../../config";
-import useCreateReportAtDateIfNotExist from "../../services/useCreateReportAtDateIfNotExist";
 import dayjs from "dayjs";
 
 function removeDiatricsAndAccents(str) {
@@ -79,7 +78,6 @@ const SelectAndCreatePerson = ({ value, onChange, inputId, classNamePrefix, show
   const rencontres = useRecoilValue(rencontresState);
 
   const optionsExist = useRef(null);
-  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
   const preparePersonForEncryption = usePreparePersonForEncryption();
 
   const searchablePersons = useRecoilValue(searchablePersonsSelector);
@@ -186,7 +184,6 @@ const SelectAndCreatePerson = ({ value, onChange, inputId, classNamePrefix, show
           setPersons((persons) => [personResponse.decryptedData, ...persons].sort((p1, p2) => (p1?.name || "").localeCompare(p2?.name || "")));
           toast.success("Nouvelle personne ajoutée !");
           onChange([...currentValue, personResponse.decryptedData]);
-          await createReportAtDateIfNotExist(dayjs());
         }
       }}
       value={value}

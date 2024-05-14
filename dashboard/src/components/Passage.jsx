@@ -10,7 +10,6 @@ import API from "../services/api";
 import { passagesState, preparePassageForEncryption } from "../recoil/passages";
 import SelectTeam from "./SelectTeam";
 import SelectPerson from "./SelectPerson";
-import useCreateReportAtDateIfNotExist from "../services/useCreateReportAtDateIfNotExist";
 import DatePicker from "./DatePicker";
 import { outOfBoundariesDate } from "../services/date";
 import AutoResizeTextarea from "./AutoresizeTextArea";
@@ -19,8 +18,6 @@ const Passage = ({ passage, personId, onFinished }) => {
   const user = useRecoilValue(userState);
   const teams = useRecoilValue(teamsState);
   const [open, setOpen] = useState(false);
-
-  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const setPassages = useSetRecoilState(passagesState);
 
@@ -85,7 +82,6 @@ const Passage = ({ passage, personId, onFinished }) => {
                       setPassages((passages) => [response.decryptedData, ...passages]);
                     }
                   }
-                  await createReportAtDateIfNotExist(newPassage.date);
                 } else if (showMultiSelect) {
                   for (const person of body.persons) {
                     const response = await API.post({
@@ -96,7 +92,6 @@ const Passage = ({ passage, personId, onFinished }) => {
                       setPassages((passages) => [response.decryptedData, ...passages]);
                     }
                   }
-                  await createReportAtDateIfNotExist(body.date);
                 } else {
                   const response = await API.post({
                     path: "/passage",
@@ -104,7 +99,6 @@ const Passage = ({ passage, personId, onFinished }) => {
                   });
                   if (response.ok) {
                     setPassages((passages) => [response.decryptedData, ...passages]);
-                    await createReportAtDateIfNotExist(response.decryptedData.date);
                   }
                 }
 
@@ -125,7 +119,6 @@ const Passage = ({ passage, personId, onFinished }) => {
                     return p;
                   })
                 );
-                await createReportAtDateIfNotExist(response.decryptedData.date);
               }
               if (!response.ok) return;
               setOpen(false);
