@@ -45,8 +45,12 @@ test("Create action with comments", async ({ page }) => {
   await page.getByText("Action prioritaire Cette action sera mise en avant par rapport aux autres").click();
   await changeReactSelectValue(page, "create-action-person-select", person1Name);
   await page.getByLabel("Description").fill("Une seule personne");
-  await page.getByLabel("Commentaire (optionnel)").fill("Une personne avec un commentaire prioritaire");
+
+  await page.getByRole("button", { name: "Commentaires", exact: true }).click();
+  await page.getByRole("dialog", { name: "Ajouter une action" }).getByRole("button", { name: "＋ Ajouter un commentaire" }).click();
+  await page.getByLabel("Commentaire", { exact: true }).fill("Une personne avec un commentaire prioritaire");
   await page.getByText("Commentaire prioritaire Ce commentaire sera mis en avant par rapport aux autres").click();
+  await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
 
@@ -73,7 +77,10 @@ test("Create action with comments", async ({ page }) => {
   await page.getByLabel("Nom de l'action").fill(actionFor2PersonName);
   await changeReactSelectValue(page, "create-action-person-select", person1Name);
   await changeReactSelectValue(page, "create-action-person-select", person2Name);
-  await page.getByLabel("Commentaire (optionnel)").fill("Un commentaire pour tout le monde");
+  await page.getByRole("button", { name: "Commentaires", exact: true }).click();
+  await page.getByRole("dialog", { name: "Ajouter une action" }).getByRole("button", { name: "＋ Ajouter un commentaire" }).click();
+  await page.getByLabel("Commentaire", { exact: true }).fill("Un commentaire pour tout le monde");
+  await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
 

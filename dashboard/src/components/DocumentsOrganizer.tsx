@@ -99,8 +99,6 @@ export default function DocumentsOrganizer({
 
   if (!items.length) return null;
 
-  console.log({ documentsTree });
-
   return (
     <div id={`${htmlId}-documents`}>
       <div className="tw-flex tw-w-full tw-border tw-border-gray-100 tw-py-1 tw-text-xs tw-text-gray-400">
@@ -177,7 +175,14 @@ function Branch({
 }: BranchProps) {
   const open = initShowOpen || openedFolderIds.includes(folder._id);
   if (!folder.children.length && !openedFolderIds.includes(folder._id)) {
-    setOpenedFolderIds([...openedFolderIds, folder._id]);
+    // On doit décaler setOpenedFolderIds pour éviter le bug React qui embête le monde entier sauf Dan Abramov:
+    // "Cannot update a component from inside the function body of a different component".
+    // https://github.com/facebook/react/issues/18178#issuecomment-59584631
+    // Si on veut ne pas passer par le setTimeout, il faut passer par un useEffect, en tout cas le set ne peut
+    // pas être directement dans le corps de la fonction.
+    setTimeout(() => {
+      setOpenedFolderIds([...openedFolderIds, folder._id]);
+    }, 0);
   }
   const parentIsOpen = openedFolderIds.includes(parentId);
   const gridRef = useRef<HTMLDivElement>(null);

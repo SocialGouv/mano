@@ -45,8 +45,10 @@ test("test", async ({ page }) => {
   await page.getByText("Commentaire enregistré").click();
   await page.getByRole("button", { name: "Ajouter une action" }).click();
   await page.getByLabel("Nom de l'action").fill(monAction);
-  await page.getByLabel("Commentaire (optionnel)").click();
-  await page.getByLabel("Commentaire (optionnel)").fill("Avec un commentaire");
+  await page.getByRole("button", { name: "Commentaires", exact: true }).click();
+  await page.getByRole("dialog", { name: "Ajouter une action" }).getByRole("button", { name: "＋ Ajouter un commentaire" }).click();
+  await page.getByLabel("Commentaire", { exact: true }).fill("Avec un commentaire");
+  await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
   await page.getByRole("button", { name: "Éditer les informations sociales" }).click();

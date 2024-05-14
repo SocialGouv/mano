@@ -63,7 +63,7 @@ test("Actions", async ({ page }) => {
     await page.getByRole("cell", { name: action2Name }).click();
     await page.getByRole("button", { name: "Modifier" }).click();
     page.once("dialog", (dialog) => {
-      expect(dialog.message()).toBe(`Êtes-vous sûr ?`);
+      expect(dialog.message()).toBe(`Voulez-vous supprimer cette action ?`);
       dialog.accept();
     });
     await page.getByRole("button", { name: "Supprimer" }).click();

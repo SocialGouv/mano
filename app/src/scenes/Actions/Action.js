@@ -51,6 +51,7 @@ const castToAction = (action) => {
     teams: action.teams || (action.team ? [action.team] : undefined),
     structure: action.structure || null,
     history: action.history || [],
+    documents: action.documents || [],
   };
 };
 

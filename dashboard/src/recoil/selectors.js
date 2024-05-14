@@ -206,7 +206,44 @@ export const itemsGroupedByPersonSelector = selector({
           personsObject[person].actions.push(action);
         }
       }
+      if (action.documents) {
+        for (const document of action.documents) {
+          if (!document) continue;
+          personsObject[action.person].documentsForModule = personsObject[action.person].documentsForModule || [];
+          personsObject[action.person].documentsForModule.push({
+            ...document,
+            type: "document",
+            linkedItem: {
+              _id: action._id,
+              type: "action",
+            },
+            parentId: document.parentId ?? "actions",
+          });
+          // Cas très particulier des documents liés à des actions de groupe
+          // (on doit retrouver les documents dans toutes les fiches des personnes)
+          // Ça fait beaucoup de complexité pour ce cas particulier.
+          if (action.group) {
+            const group = personsObject[action.person].group;
+            if (!group) continue;
+            for (const person of group.persons) {
+              if (!personsObject[person]) continue;
+              if (person === action.person) continue;
+              personsObject[person].documentsForModule = personsObject[person].documentsForModule || [];
+              personsObject[person].documentsForModule.push({
+                ...document,
+                type: "document",
+                linkedItem: {
+                  _id: action._id,
+                  type: "action",
+                },
+                parentId: document.parentId ?? "actions",
+              });
+            }
+          }
+        }
+      }
     }
+
     for (const comment of comments) {
       if (comment.action) {
         const person = personPerAction[comment.action];

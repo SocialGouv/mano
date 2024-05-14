@@ -33,8 +33,6 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
 
   const allMedicalDocuments = useMemo(() => {
     if (!medicalFile) return [];
-    // ordonnaces is an object of DocumentWithLinkedItem
-    // define ordannace typed
     const treatmentsDocs: Array<DocumentWithLinkedItem | FolderWithLinkedItem> = [
       {
         _id: "treatment",
@@ -127,6 +125,8 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
       title={`Documents médicaux de ${person.name} (${allMedicalDocuments.length})`}
       personId={person._id}
       onDeleteDocument={async (documentOrFolder) => {
+        // FIXME Il semblerait que ce soit toujours un document et non un documentOrFolder.
+        // Il y a une fonction onDeleteFolder qui est utilisée dans PersonDocuments.tsx
         if (documentOrFolder.type === "document") {
           const document = documentOrFolder as DocumentWithLinkedItem;
           await API.delete({ path: document.downloadPath ?? `/person/${person._id}/document/${document.file.filename}` });
@@ -306,7 +306,6 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
       }}
       onSaveNewOrder={async (nextDocuments) => {
         try {
-          await new Promise((resolve) => setTimeout(resolve, 100)); // if not, the UX is jumpy and shit - no idea why
           const groupedById: any = {
             treatment: {},
             consultation: {},

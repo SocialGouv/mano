@@ -42,6 +42,7 @@ const encryptedFields = [
   'user',
   'urgent',
   'history',
+  'documents',
 ];
 
 export const allowedActionFieldsInHistory = [

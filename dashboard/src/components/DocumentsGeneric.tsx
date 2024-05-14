@@ -422,6 +422,7 @@ export function DocumentTable({
                         <div className={`tw-rounded tw-border tw-border-${color} tw-bg-${color} tw-bg-opacity-10 tw-px-1`}>
                           {doc.linkedItem.type === "treatment" && "Traitement"}
                           {doc.linkedItem.type === "consultation" && "Consultation"}
+                          {doc.linkedItem.type === "action" && "Action"}
                         </div>
                       </div>
                     )}
@@ -453,9 +454,16 @@ function AddDocumentInput({ personId, onAddDocuments }: AddDocumentInputProps) {
       name="file"
       className="tw-hidden"
       onClick={(e) => {
-        if (!personId) {
+        if (!personId || (Array.isArray(personId) && personId.length === 0)) {
           e.preventDefault();
           toast.error("Veuillez sélectionner une personne auparavant");
+          return;
+        }
+        if (Array.isArray(personId) && personId.length > 1) {
+          e.preventDefault();
+          toast.error(
+            "Ajouter un document pour une action concernant plusieurs personnes n'est pas possible. Veuillez sélectionner uniquement une personne."
+          );
           return;
         }
       }}
@@ -488,7 +496,7 @@ function AddDocumentInput({ personId, onAddDocuments }: AddDocumentInputProps) {
             downloadPath: `/person/${personId}/document/${fileUploaded.filename}`,
             file: fileUploaded,
             group: false,
-            parentId: undefined, // it will be 'treatment', 'consultation' or 'root'
+            parentId: undefined, // it will be 'treatment', 'consultation', 'action' or 'root'
             position: undefined,
             type: "document",
           };
@@ -581,33 +589,37 @@ function DocumentModal({ document, onClose, personId, onDelete, onSubmit, showAs
               </button>
             </div>
           )}
-          {!!canToggleGroupCheck && (
-            <div>
-              <label htmlFor="document-for-group">
-                <input
-                  type="checkbox"
-                  className="tw-mr-2"
-                  id="document-for-group"
-                  name="group"
-                  defaultChecked={document.group}
-                  value={document?.group ? "true" : "false"}
-                  onChange={async () => {
-                    await onSubmit({ ...document, group: !document.group });
-                    setIsUpdating(false);
-                    setIsEditing(false);
-                  }}
-                />
-                Document familial
-                <br />
-                <small className="tw-block tw-text-gray-500">Ce document sera visible pour toute la famille</small>
-              </label>
-              {!!document.group && personId !== document.linkedItem._id && (
-                <small className="tw-block tw-text-gray-500">
-                  Note: Ce document est lié à <PersonName item={{ person: document.linkedItem._id }} />
-                </small>
-              )}
-            </div>
-          )}
+          {
+            // On ne propose pas de changer l'état du document pour les documents liés à des actions
+            // car ils sont ou non partagés avec la famille via l'action liée (pour ne pas créer d'absurdité).
+            !!canToggleGroupCheck && document.linkedItem.type !== "action" && (
+              <div>
+                <label htmlFor="document-for-group">
+                  <input
+                    type="checkbox"
+                    className="tw-mr-2"
+                    id="document-for-group"
+                    name="group"
+                    defaultChecked={document.group}
+                    value={document?.group ? "true" : "false"}
+                    onChange={async () => {
+                      await onSubmit({ ...document, group: !document.group });
+                      setIsUpdating(false);
+                      setIsEditing(false);
+                    }}
+                  />
+                  Document familial
+                  <br />
+                  <small className="tw-block tw-text-gray-500">Ce document sera visible pour toute la famille</small>
+                </label>
+                {!!document.group && personId !== document.linkedItem._id && (
+                  <small className="tw-block tw-text-gray-500">
+                    Note: Ce document est lié à <PersonName item={{ person: document.linkedItem._id }} />
+                  </small>
+                )}
+              </div>
+            )
+          }
           <small className="tw-pt-4 tw-opacity-60">
             Créé par <UserName id={document.createdBy} /> le {formatDateTimeWithNameOfDay(document.createdAt)}
           </small>
@@ -622,6 +634,19 @@ function DocumentModal({ document, onClose, personId, onDelete, onSubmit, showAs
               className="button-classic"
             >
               Voir le traitement associé
+            </button>
+          )}
+          {!!showAssociatedItem && document?.linkedItem?.type === "action" && (
+            <button
+              onClick={() => {
+                const searchParams = new URLSearchParams(history.location.search);
+                searchParams.set("actionId", document.linkedItem._id);
+                history.push(`?${searchParams.toString()}`);
+                onClose();
+              }}
+              className="button-classic"
+            >
+              Voir l’action associée
             </button>
           )}
           {!!showAssociatedItem && document?.linkedItem?.type === "consultation" && (

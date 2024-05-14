@@ -26,10 +26,10 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Ajouter une action" }).click();
   await page.getByLabel("Description").fill("descriptionanepasvoir");
   await page.getByLabel("Nom de l'action").fill("Action2");
-  await page.getByLabel("Commentaire (optionnel)").fill("commentaireanepasvoir");
-  await page.getByLabel("Commentaire (optionnel)").click();
-  await page.getByLabel("Commentaire (optionnel)").fill("commentaireanepasvoir ");
-  await page.getByLabel("Commentaire (optionnel)").click();
+  await page.getByRole("button", { name: "Commentaires", exact: true }).click();
+  await page.getByRole("dialog", { name: "Ajouter une action" }).getByRole("button", { name: "＋ Ajouter un commentaire" }).click();
+  await page.getByLabel("Commentaire", { exact: true }).fill("commentaireanepasvoir");
+  await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
   await page.getByRole("button", { name: "Ajouter un commentaire" }).first().click();
