@@ -128,6 +128,11 @@ export const getIsDayWithinHoursOffsetOfDay = (dayToTest, referenceDay, offsetHo
   return getIsDayWithinHoursOffsetOfPeriod(dayToTest, { referenceStartDay: referenceDay, referenceEndDay: referenceDay }, offsetHours);
 };
 
+export const getDayWithOffset = (day, offsetHours = -12) => {
+  if (!day) return null;
+  return dayjs(day).add(offsetHours, 'hour').format('YYYY-MM-DD');
+};
+
 export const getIsDayWithinHoursOffsetOfPeriod = (dayToTest, { referenceStartDay, referenceEndDay }, offsetHours = -12) => {
   if (!dayToTest) return false;
 

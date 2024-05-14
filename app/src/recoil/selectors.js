@@ -28,7 +28,7 @@ export const actionsObjectSelector = selector({
   },
 });
 
-const actionsWithCommentsSelector = selector({
+export const actionsWithCommentsSelector = selector({
   key: 'actionsWithCommentsSelector',
   get: ({ get }) => {
     const actions = get(actionsState);
@@ -312,7 +312,7 @@ Actions and Consultations
 
 */
 
-const consultationsForCurrentTeamSelector = selector({
+export const consultationsForCurrentTeamSelector = selector({
   key: 'consultationsForCurrentTeamSelector',
   get: ({ get }) => {
     const consultations = get(consultationsState);

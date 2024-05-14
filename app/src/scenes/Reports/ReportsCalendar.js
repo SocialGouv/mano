@@ -9,7 +9,7 @@ import ScrollContainer from '../../components/ScrollContainer';
 import { currentTeamState } from '../../recoil/auth';
 import colors from '../../utils/colors';
 import { refreshTriggerState } from '../../components/Loader';
-import { currentTeamReportsSelector } from './selectors';
+import { currentTeamReportsSelector, itemsGroupedDateSelector } from './selectors';
 
 LocaleConfig.locales.fr = {
   monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
@@ -23,7 +23,7 @@ LocaleConfig.defaultLocale = 'fr';
 export const mappedReportsToCalendarDaysSelector = selector({
   key: 'mappedReportsToCalendarDaysSelector',
   get: ({ get }) => {
-    const reports = get(currentTeamReportsSelector);
+    const itemsGroupedDate = get(itemsGroupedDateSelector);
     const today = dayjs().format('YYYY-MM-DD');
     const dates = {
       [today]: {
@@ -34,16 +34,16 @@ export const mappedReportsToCalendarDaysSelector = selector({
         dotColor: '#000000',
       },
     };
-    for (const report of reports) {
-      if (report.date === today) {
-        dates[report.date].marked = true;
+    for (const date of Object.keys(itemsGroupedDate)) {
+      if (date === today) {
+        dates[date].marked = true;
       } else {
-        dates[report.date] = {
+        dates[date] = {
           marked: true,
           dotColor: '#000000',
         };
       }
-      dates[report.date].report = report;
+      dates[date].report = itemsGroupedDate[date].report;
     }
     return dates;
   },
