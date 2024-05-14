@@ -22,7 +22,7 @@ import Label from '../../components/Label';
 import Tags from '../../components/Tags';
 import { MyText } from '../../components/MyText';
 import { actionsState, DONE, CANCEL, TODO, prepareActionForEncryption, allowedActionFieldsInHistory } from '../../recoil/actions';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import API from '../../services/api';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
@@ -31,6 +31,7 @@ import CheckboxLabelled from '../../components/CheckboxLabelled';
 import { groupsState } from '../../recoil/groups';
 import { useFocusEffect } from '@react-navigation/native';
 import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
+import { refreshTriggerState } from '../../components/Loader';
 
 const castToAction = (action) => {
   if (!action) action = {};
@@ -54,7 +55,8 @@ const castToAction = (action) => {
 };
 
 const Action = ({ navigation, route }) => {
-  const [actions, setActions] = useRecoilState(actionsState);
+  const actions = useRecoilValue(actionsState);
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
   const allPersonsObject = useRecoilValue(itemsGroupedByPersonSelector);
@@ -62,13 +64,18 @@ const Action = ({ navigation, route }) => {
   const [comments, setComments] = useRecoilState(commentsState);
   const currentTeam = useRecoilValue(currentTeamState);
 
-  const [actionDB, setActionDB] = useState(() => {
-    const existingAction = actions.find((a) => a._id === route.params?.action?._id);
-    if (!existingAction) return {};
+  const actionDB = useMemo(() => {
+    let existingAction = actions.find((a) => a._id === route.params?.action?._id);
+    if (!existingAction) existingAction = route.params?.action;
     return Object.assign({}, castToAction(existingAction), { _id: existingAction._id });
-  });
+  }, [actions, route.params?.action?._id]);
 
   const [action, setAction] = useState(() => castToAction(actionDB));
+
+  useEffect(() => {
+    setAction(castToAction(actionDB));
+  }, [actionDB?.updatedAt]);
+
   const [multipleActions] = useState(() => route?.params?.actions);
   const isMultipleActions = multipleActions?.length > 1;
   const canComment = !isMultipleActions;
@@ -181,6 +188,10 @@ const Action = ({ navigation, route }) => {
     }, [route?.params?.person])
   );
 
+  const onRefresh = async () => {
+    setRefreshTrigger({ status: true, options: { showFullScreen: false, initialLoad: false } });
+  };
+
   const updateAction = async (action) => {
     if (!action.name.trim()) {
       Alert.alert("Vous devez rentrer un nom d'action");
@@ -220,13 +231,7 @@ const Action = ({ navigation, route }) => {
         body: prepareActionForEncryption(action),
       });
       if (!response?.ok) return response;
-      const newAction = response.decryptedData;
-      setActions((actions) =>
-        actions.map((a) => {
-          if (a._id === newAction._id) return newAction;
-          return a;
-        })
-      );
+      onRefresh();
       return response;
     } catch (error) {
       capture(error, { extra: { message: 'error in updating action' } });
@@ -268,7 +273,7 @@ const Action = ({ navigation, route }) => {
       }
       return;
     }
-    setActionDB(response.decryptedData);
+    onRefresh();
     if (actionCancelled) {
       Alert.alert('Cette action est annulée, voulez-vous la dupliquer ?', 'Avec une date ultérieure par exemple', [
         { text: 'OK', onPress: onDuplicate },
@@ -308,7 +313,7 @@ const Action = ({ navigation, route }) => {
       Alert.alert('Impossible de dupliquer !');
       return;
     }
-    setActions((actions) => [response.decryptedData, ...actions]);
+    onRefresh();
 
     for (let c of comments.filter((c) => c.action === actionDB._id)) {
       const body = {
@@ -356,7 +361,7 @@ const Action = ({ navigation, route }) => {
           setComments((comments) => comments.filter((p) => p._id !== comment._id));
         }
       }
-      setActions((actions) => actions.filter((a) => a._id !== id));
+      onRefresh();
     }
     return res;
   };

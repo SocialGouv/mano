@@ -13,16 +13,17 @@ import ActionStatusSelect from '../../components/Selects/ActionStatusSelect';
 import Label from '../../components/Label';
 import Tags from '../../components/Tags';
 import { MyText } from '../../components/MyText';
-import { actionsState, prepareActionForEncryption, TODO } from '../../recoil/actions';
+import { prepareActionForEncryption, TODO } from '../../recoil/actions';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import API from '../../services/api';
 import ActionCategoriesModalSelect from '../../components/ActionCategoriesModalSelect';
 import CheckboxLabelled from '../../components/CheckboxLabelled';
 import { groupsState } from '../../recoil/groups';
 import { useFocusEffect } from '@react-navigation/native';
+import { refreshTriggerState } from '../../components/Loader';
 
 const NewActionForm = ({ route, navigation }) => {
-  const setActions = useSetRecoilState(actionsState);
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const currentTeam = useRecoilValue(currentTeamState);
   const organisation = useRecoilValue(organisationState);
   const groups = useRecoilValue(groupsState);
@@ -64,40 +65,44 @@ const NewActionForm = ({ route, navigation }) => {
 
   const onCreateAction = async () => {
     setPosting(true);
-    let newAction = null;
-    const actions = [];
-    for (const person of actionPersons) {
-      const response = await API.post({
-        path: '/action',
-        body: prepareActionForEncryption({
-          name,
-          person: person._id,
-          teams: [currentTeam._id],
-          dueAt,
-          withTime,
-          urgent,
-          group,
-          status,
-          categories,
-          user: user._id,
-          completedAt: status !== TODO ? new Date().toISOString() : null,
-        }),
-      });
-      if (!response.ok) {
-        setPosting(false);
-        if (response.status !== 401) Alert.alert(response.error || response.code);
-        return;
-      }
-      if (!newAction) newAction = response.decryptedData;
-      setActions((actions) => [response.decryptedData, ...actions]);
-      actions.push(response.decryptedData);
+
+    const response = await API.post({
+      path: '/action/multiple',
+      body: await Promise.all(
+        actionPersons
+          .map((person) =>
+            prepareActionForEncryption({
+              name,
+              person: person._id,
+              teams: [currentTeam._id],
+              dueAt,
+              withTime,
+              urgent,
+              group,
+              status,
+              categories,
+              user: user._id,
+              completedAt: status !== TODO ? new Date().toISOString() : null,
+            })
+          )
+          .map(API.encryptItem)
+      ),
+    });
+
+    setRefreshTrigger({ status: true, options: { showFullScreen: false, initialLoad: false } });
+    setPosting(false);
+    if (!response.ok) {
+      if (response.status !== 401) Alert.alert(response.error || response.code);
+      return;
     }
+    const actionToRedirect = response.decryptedData[0];
+
     // because when we go back from Action to ActionsList, we don't want the Back popup to be triggered
     backRequestHandledRef.current = true;
-    Sentry.setContext('action', { _id: newAction._id });
+    Sentry.setContext('action', { _id: actionToRedirect._id });
     navigation.replace('Action', {
-      actions,
-      action: newAction,
+      actions: response.decryptedData,
+      action: actionToRedirect,
       editable: true,
     });
     setTimeout(() => setPosting(false), 250);

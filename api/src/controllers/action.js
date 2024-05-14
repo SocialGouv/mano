@@ -6,13 +6,14 @@ const { Op } = require("sequelize");
 const { catchErrors } = require("../errors");
 const validateUser = require("../middleware/validateUser");
 const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
-const { Action } = require("../db/sequelize");
+const { Action, sequelize } = require("../db/sequelize");
 const { looseUuidRegex, positiveIntegerRegex } = require("../utils");
 
 const TODO = "A FAIRE";
 const DONE = "FAIT";
 const CANCEL = "ANNULEE";
 const STATUS = [TODO, DONE, CANCEL];
+
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
@@ -59,6 +60,61 @@ router.post(
         completedAt: data.completedAt,
       },
     });
+  })
+);
+
+router.post(
+  "/multiple",
+  passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal", "restricted-access"]),
+  validateEncryptionAndMigrations,
+  catchErrors(async (req, res, next) => {
+    try {
+      z.array(
+        z.object({
+          status: z.enum(STATUS),
+          dueAt: z.preprocess((input) => new Date(input), z.date()),
+          ...([DONE, CANCEL].includes(req.body.status) ? { completedAt: z.preprocess((input) => new Date(input), z.date()) } : {}),
+          encrypted: z.string(),
+          encryptedEntityKey: z.string(),
+        })
+      ).parse(req.body);
+    } catch (e) {
+      const error = new Error(`Invalid request in action creation: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+
+    const data = await sequelize.transaction(async (transaction) => {
+      const actions = [];
+      for (const action of req.body) {
+        const { status, dueAt, completedAt, encrypted, encryptedEntityKey } = action;
+        const actionToCreate = {
+          organisation: req.user.organisation,
+          status,
+          dueAt,
+          completedAt: completedAt || null,
+          encrypted,
+          encryptedEntityKey,
+        };
+        await Action.create(actionToCreate, { transaction, returning: true }).then((data) => {
+          actions.push({
+            _id: data._id,
+            encrypted: data.encrypted,
+            encryptedEntityKey: data.encryptedEntityKey,
+            organisation: data.organisation,
+            createdAt: data.createdAt,
+            updatedAt: data.updatedAt,
+            deletedAt: data.deletedAt,
+            status: data.status,
+            dueAt: data.dueAt,
+            completedAt: data.completedAt,
+          });
+        });
+      }
+      return actions;
+    });
+    return res.status(200).send({ ok: true, data });
   })
 );
 
