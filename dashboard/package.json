@@ -25,9 +25,9 @@
     "detect-browser": "^5.3.0",
     "fetch-retry": "^5.0.6",
     "formik": "^2.2.9",
+    "idb-keyval": "^6.2.1",
     "libsodium": "^0.7.9",
     "libsodium-wrappers": "^0.7.9",
-    "localforage": "^1.10.0",
     "page-lifecycle": "^0.1.2",
     "react": "^18.2.0",
     "react-datepicker": "^4.0.0",
@@ -75,6 +75,7 @@
     "eslint": "^8.57.0",
     "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "fake-indexeddb": "^5.0.2",
     "fork-ts-checker-webpack-plugin": "^6.5.3",
     "jest": "^29.7.0",
     "postcss": "^8.4.35",
@@ -107,6 +108,9 @@
     },
     "testMatch": [
       "**/__tests__/**/*?(*.)+(spec|test).ts"
+    ],
+    "setupFiles": [
+      "fake-indexeddb/auto"
     ]
   },
   "browserslist": {
