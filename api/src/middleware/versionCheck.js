@@ -1,7 +1,7 @@
 const { QueryTypes } = require("sequelize");
 const { sequelize } = require("../db/sequelize");
 
-const MINIMUM_MOBILE_APP_VERSION = [3, 3, 0];
+const MINIMUM_MOBILE_APP_VERSION = [3, 5, 0];
 
 let deploymentCommit = null;
 let deploymentDate = null;
@@ -45,9 +45,7 @@ module.exports = async ({ headers: { version, platform } }, res, next) => {
         message: "Veuillez mettre à jour votre application!",
         inAppMessage: [
           `Veuillez mettre à jour votre application\u00A0!`,
-          `Les fonctionnalités de cette nouvelle version sont\u00A0:
-- Rencontres dans les observations de territoire
-- Constantes dans les consultations médicales`,
+          `Cette mise à jour est nécessaire pour continuer à utiliser l'application.`,
           [{ text: "Télécharger la dernière version", link: `https://mano.sesan.fr/download?ts=${Date.now()}` }],
         ],
       });

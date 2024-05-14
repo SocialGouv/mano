@@ -2,8 +2,8 @@
   "name": "mano",
   "displayName": "Mano",
   "version": {
-    "buildNumber": 31,
-    "buildName": "3.4.0"
+    "buildNumber": 32,
+    "buildName": "3.5.0"
   },
   "bundle": {
     "android": "com.sesan.mano",
