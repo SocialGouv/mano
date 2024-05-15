@@ -7,7 +7,7 @@ import { useLocation, useHistory } from "react-router-dom";
 import { CANCEL, DONE, TODO } from "../recoil/actions";
 import { currentTeamState, organisationState, teamsState, userState } from "../recoil/auth";
 import { allowedActionFieldsInHistory, prepareActionForEncryption } from "../recoil/actions";
-import API from "../services/api";
+import API, { encryptItem } from "../services/api";
 import { dayjsInstance, outOfBoundariesDate } from "../services/date";
 import { modalConfirmState } from "./ModalConfirm";
 import SelectStatus from "./SelectStatus";
@@ -235,20 +235,27 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
 
       toast.success("Mise à jour !");
     } else {
-      const actionsId = [];
+      let actionsId = [];
       if (Array.isArray(body.person)) {
-        for (const person of body.person) {
-          const actionResponse = await API.post({
-            path: "/action",
-            body: prepareActionForEncryption({ ...body, person }),
-          });
-          if (!actionResponse.ok) {
-            toast.error("Erreur lors de la création de l'action, les données n'ont pas été sauvegardées.");
-            capture("error creating action", { extra: { personId: JSON.stringify(person) } });
-            return false;
-          }
-          actionsId.push(actionResponse.decryptedData._id);
+        const actionResponse = await API.post({
+          path: "/action/multiple",
+          body: await Promise.all(
+            body.person
+              .map((personId) =>
+                prepareActionForEncryption({
+                  ...body,
+                  person: personId,
+                })
+              )
+              .map(encryptItem)
+          ),
+        });
+        if (!actionResponse.ok) {
+          toast.error("Erreur lors de la création des action, les données n'ont pas été sauvegardées.");
+          capture("error creating multiple actions", { extra: { actionResponse, body } });
+          return false;
         }
+        actionsId = actionResponse.decryptedData.map((a) => a._id);
       } else {
         const actionResponse = await API.post({
           path: "/action",
@@ -256,7 +263,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
         });
         if (!actionResponse.ok) {
           toast.error("Erreur lors de la création de l'action, les données n'ont pas été sauvegardées.");
-          capture("error creating action", { extra: { personId: JSON.stringify(body.person) } });
+          capture("error creating single action", { extra: { actionResponse, body } });
           return false;
         }
         actionsId.push(actionResponse.decryptedData._id);
