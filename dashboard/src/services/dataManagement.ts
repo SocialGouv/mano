@@ -10,6 +10,7 @@ customStore = createStore(manoDB, dashboardCurrentCacheKey);
 
 export async function clearCache() {
   if (customStore) clear(customStore);
+  customStore = createStore(manoDB, dashboardCurrentCacheKey);
   window.localStorage?.clear();
   window.sessionStorage?.clear();
 }
