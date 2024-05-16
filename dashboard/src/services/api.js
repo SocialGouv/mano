@@ -75,7 +75,7 @@ export async function decryptAndEncryptItem(item, oldHashedOrgEncryptionKey, new
   return item;
 }
 
-const decryptDBItem = async (item, { path, encryptedVerificationKey = null, decryptDeleted = false } = {}) => {
+const decryptDBItem = async (item, { path, decryptDeleted = false } = {}) => {
   if (!enableEncrypt) return item;
   if (!item.encrypted) return item;
   if (item.deletedAt && !decryptDeleted) return item;
@@ -106,12 +106,9 @@ const decryptDBItem = async (item, { path, encryptedVerificationKey = null, decr
         path,
       },
     });
-    if (encryptedVerificationKey) {
-      toast.error(
-        "Désolé, un élément n'a pas pu être déchiffré. L'équipe technique a été prévenue, nous reviendrons vers vous dans les meilleurs délais."
-      );
-      return item;
-    }
+    toast.error(
+      "Désolé, un élément n'a pas pu être déchiffré. L'équipe technique a été prévenue, nous reviendrons vers vous dans les meilleurs délais."
+    );
   }
   return item;
 };
@@ -196,7 +193,7 @@ const execute = async ({
   let debugApi = ["init"];
   const organisation = getRecoil(organisationState) || {};
   const tokenCached = getRecoil(authTokenState);
-  const { encryptionLastUpdateAt, encryptionEnabled, encryptedVerificationKey, migrationLastUpdateAt } = organisation;
+  const { encryptionLastUpdateAt, encryptionEnabled, migrationLastUpdateAt } = organisation;
   try {
     if (debugApi?.length) debugApi.push("start execute");
     // Force logout when one user has been logged in multiple tabs to different organisations.
@@ -358,19 +355,19 @@ const execute = async ({
         if (debugApi?.length) debugApi.push("decrypt deleted");
         res.decryptedData = {};
         for (const [key, value] of Object.entries(res.data)) {
-          const decryptedEntries = await Promise.all(value.map((item) => decryptDBItem(item, { path, encryptedVerificationKey, decryptDeleted })));
+          const decryptedEntries = await Promise.all(value.map((item) => decryptDBItem(item, { path, decryptDeleted })));
           res.decryptedData[key] = decryptedEntries;
         }
         return res;
       } else if (!!res.data && Array.isArray(res.data)) {
         if (debugApi?.length) debugApi.push("decrypt array");
-        const decryptedData = await Promise.all(res.data.map((item) => decryptDBItem(item, { path, encryptedVerificationKey })));
+        const decryptedData = await Promise.all(res.data.map((item) => decryptDBItem(item, { path })));
         if (debugApi?.length) debugApi.push("end decrypt array");
         res.decryptedData = decryptedData;
         return res;
       } else if (res.data) {
         if (debugApi?.length) debugApi.push("decrypt single");
-        res.decryptedData = await decryptDBItem(res.data, { path, encryptedVerificationKey });
+        res.decryptedData = await decryptDBItem(res.data, { path });
         return res;
       } else {
         return res;
