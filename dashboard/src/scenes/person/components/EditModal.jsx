@@ -65,16 +65,32 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
           enableReinitialize
           initialValues={person}
           onSubmit={async (body) => {
-            if (!body.name?.trim()?.length) return toast.error("Une personne doit avoir un nom");
+            if (!body.name?.trim()?.length) {
+              setOpenPanels(["main"]);
+              return toast.error("Une personne doit avoir un nom");
+            }
             const existingPerson = persons.find((p) => p.name === body.name && p._id !== person._id);
-            if (existingPerson) return toast.error("Une personne existe déjà à ce nom");
+            if (existingPerson) {
+              setOpenPanels(["main"]);
+              return toast.error("Une personne existe déjà à ce nom");
+            }
             if (!body.followedSince) body.followedSince = person.createdAt;
-            if (!body.assignedTeams?.length) return toast.error("Une personne doit être suivie par au moins une équipe");
-            if (outOfBoundariesDate(body.followedSince)) return toast.error("La date de suivi est hors limites (entre 1900 et 2100)");
-            if (body.birthdate && outOfBoundariesDate(body.birthdate))
+            if (!body.assignedTeams?.length) {
+              setOpenPanels(["main"]);
+              return toast.error("Une personne doit être suivie par au moins une équipe");
+            }
+            if (outOfBoundariesDate(body.followedSince)) {
+              setOpenPanels(["main"]);
+              return toast.error("La date de suivi est hors limites (entre 1900 et 2100)");
+            }
+            if (body.birthdate && outOfBoundariesDate(body.birthdate)) {
+              setOpenPanels(["main"]);
               return toast.error("La date de naissance est hors limites (entre 1900 et 2100)");
-            if (body.wanderingAt && outOfBoundariesDate(body.wanderingAt))
+            }
+            if (body.wanderingAt && outOfBoundariesDate(body.wanderingAt)) {
+              setOpenPanels(["main"]);
               return toast.error("La date temps passé en rue est hors limites (entre 1900 et 2100)");
+            }
 
             body.entityKey = person.entityKey;
 

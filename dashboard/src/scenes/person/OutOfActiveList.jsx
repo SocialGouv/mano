@@ -80,6 +80,7 @@ const OutOfActiveList = ({ person }) => {
       );
       toast.success(person.name + " est hors de la file active");
     }
+    setOpen(false);
   };
 
   return (
@@ -95,13 +96,7 @@ const OutOfActiveList = ({ person }) => {
           Sortie de file active de {person.name}
         </ModalHeader>
         <ModalBody>
-          <Formik
-            initialValues={{ ...person, outOfActiveListDate: Date.now(), outOfActiveListReasons: [] }}
-            onSubmit={async (body) => {
-              await setOutOfActiveList(body);
-              setOpen(false);
-            }}
-          >
+          <Formik initialValues={{ ...person, outOfActiveListDate: Date.now(), outOfActiveListReasons: [] }} onSubmit={setOutOfActiveList}>
             {({ values, handleChange, handleSubmit, isSubmitting }) => (
               <React.Fragment>
                 <Row>

@@ -150,7 +150,12 @@ test("test", async ({ page }) => {
   await page.getByLabel("Date de fin").fill("2000-11-11");
   await page.getByLabel("Date de début").fill("2009-11-11");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
-  await page.getByText("Le nom est obligatoire").first().click();
+  const validationMessage = await page.getByPlaceholder("Amoxicilline").evaluate((element) => {
+    const input = element as HTMLInputElement;
+    return input.validationMessage;
+  });
+  expect(validationMessage).toContain("Please fill out this field.");
+
   await page.getByPlaceholder("Amoxicilline").click();
   await page.getByPlaceholder("Amoxicilline").fill("hdeyygdeygde");
   await page.getByRole("button", { name: "Sauvegarder" }).click();

@@ -136,6 +136,7 @@ function TreatmentContent({ onClose, treatment, personId }) {
   async function handleSubmit({ newData = {}, closeOnSubmit = false } = {}) {
     const body = { ...data, ...newData };
     if (!body.name) {
+      setActiveTab("Informations");
       toast.error("Le nom est obligatoire");
       return false;
     }
@@ -144,10 +145,12 @@ function TreatmentContent({ onClose, treatment, personId }) {
       return false;
     }
     if (outOfBoundariesDate(body.startDate)) {
+      setActiveTab("Informations");
       toast.error("La date de début de traitement est hors limites (entre 1900 et 2100)");
       return false;
     }
     if (body.endDate && outOfBoundariesDate(body.endDate)) {
+      setActiveTab("Informations");
       toast.error("La date de fin de traitement est hors limites (entre 1900 et 2100)");
       return false;
     }
@@ -273,7 +276,16 @@ function TreatmentContent({ onClose, treatment, personId }) {
                   Nom
                 </label>
                 {isEditing ? (
-                  <input className="tailwindui" placeholder="Amoxicilline" name="name" id="medicine-name" value={data.name} onChange={handleChange} />
+                  <input
+                    className="tailwindui"
+                    required
+                    onInvalid={() => setActiveTab("Informations")}
+                    placeholder="Amoxicilline"
+                    name="name"
+                    id="medicine-name"
+                    value={data.name}
+                    onChange={handleChange}
+                  />
                 ) : (
                   <CustomFieldDisplay value={data.name} type="text" />
                 )}
@@ -327,7 +339,14 @@ function TreatmentContent({ onClose, treatment, personId }) {
                   Date de début
                 </label>
                 {isEditing ? (
-                  <DatePicker id="startDate" name="startDate" defaultValue={data.startDate} onChange={handleChange} />
+                  <DatePicker
+                    id="startDate"
+                    name="startDate"
+                    defaultValue={data.startDate}
+                    onChange={handleChange}
+                    required
+                    onInvalid={() => setActiveTab("Informations")}
+                  />
                 ) : (
                   <CustomFieldDisplay value={data.startDate} type="date" />
                 )}
@@ -337,7 +356,13 @@ function TreatmentContent({ onClose, treatment, personId }) {
                   Date de fin
                 </label>
                 {isEditing ? (
-                  <DatePicker id="endDate" name="endDate" defaultValue={data.endDate} onChange={handleChange} />
+                  <DatePicker
+                    id="endDate"
+                    name="endDate"
+                    defaultValue={data.endDate}
+                    onChange={handleChange}
+                    onInvalid={() => setActiveTab("Informations")}
+                  />
                 ) : (
                   <CustomFieldDisplay value={data.endDate} type="date" />
                 )}

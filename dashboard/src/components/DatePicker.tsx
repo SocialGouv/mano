@@ -1,3 +1,4 @@
+import type { FormEvent } from "react";
 import { dateForInputDate, dateFromInputDate, LEFT_BOUNDARY_DATE, RIGHT_BOUNDARY_DATE } from "../services/date";
 
 interface DatePickerProps {
@@ -6,9 +7,19 @@ interface DatePickerProps {
   id: string;
   withTime?: boolean;
   name?: string;
+  required?: boolean;
+  onInvalid?: (e: FormEvent<HTMLInputElement>) => void;
 }
 
-export default function DatePicker({ onChange, defaultValue, id, withTime = false, name = "" }: DatePickerProps): JSX.Element {
+export default function DatePicker({
+  onChange,
+  defaultValue,
+  id,
+  withTime = false,
+  name = "",
+  required = false,
+  onInvalid = () => null,
+}: DatePickerProps): JSX.Element {
   return (
     <input
       id={id}
@@ -20,6 +31,8 @@ export default function DatePicker({ onChange, defaultValue, id, withTime = fals
       onChange={(e) => {
         onChange({ target: { name: e.target.name, value: dateFromInputDate(e.target.value) } });
       }}
+      required={required}
+      onInvalid={onInvalid}
       min={dateForInputDate(LEFT_BOUNDARY_DATE, withTime)}
       max={dateForInputDate(RIGHT_BOUNDARY_DATE, withTime)}
     />

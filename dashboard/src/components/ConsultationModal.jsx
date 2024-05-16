@@ -419,6 +419,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                       name="dueAt"
                       defaultValue={data.dueAt ?? new Date()}
                       onChange={handleChange}
+                      onInvalid={() => setActiveTab("Informations")}
                     />
                   ) : (
                     <CustomFieldDisplay type="date-with-time" value={data.dueAt} />
@@ -439,6 +440,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                       name="completedAt"
                       defaultValue={data.completedAt ?? new Date()}
                       onChange={handleChange}
+                      onInvalid={() => setActiveTab("Informations")}
                     />
                   ) : (
                     <CustomFieldDisplay type="date-with-time" value={data.completedAt} />

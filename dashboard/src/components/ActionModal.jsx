@@ -491,6 +491,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                           name="dueAt"
                           defaultValue={data.dueAt ?? new Date()}
                           onChange={handleChange}
+                          onInvalid={() => setActiveTab("Informations")}
                         />
                         <div>
                           <input
@@ -573,6 +574,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                         name="completedAt"
                         defaultValue={data.completedAt ?? new Date()}
                         onChange={handleChange}
+                        onInvalid={() => setActiveTab("Informations")}
                       />
                     </div>
                   </div>
