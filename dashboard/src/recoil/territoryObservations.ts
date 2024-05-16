@@ -1,12 +1,15 @@
 import { organisationState } from "./auth";
 import { atom, selector } from "recoil";
+import type { RecoilValueReadOnly } from "recoil";
 import { getCacheItemDefaultValue, setCacheItem } from "../services/dataManagement";
 import { looseUuidRegex } from "../utils";
 import { toast } from "react-toastify";
 import { capture } from "../services/sentry";
+import type { TerritoryObservationInstance, ReadyToEncryptTerritoryObservationInstance } from "../types/territoryObs";
+import type { CustomField, CustomFieldsGroup } from "../types/field";
 
 const collectionName = "territory-observation";
-export const territoryObservationsState = atom({
+export const territoryObservationsState = atom<Array<TerritoryObservationInstance>>({
   key: collectionName,
   default: selector({
     key: "territory-observation/default",
@@ -18,7 +21,7 @@ export const territoryObservationsState = atom({
   effects: [({ onSet }) => onSet(async (newValue) => setCacheItem(collectionName, newValue))],
 });
 
-export const customFieldsObsSelector = selector({
+export const customFieldsObsSelector: RecoilValueReadOnly<Array<CustomField>> = selector({
   key: "customFieldsObsSelector",
   get: ({ get }) => {
     const organisation = get(organisationState);
@@ -27,7 +30,7 @@ export const customFieldsObsSelector = selector({
   },
 });
 
-export const groupedCustomFieldsObsSelector = selector({
+export const groupedCustomFieldsObsSelector: RecoilValueReadOnly<Array<CustomFieldsGroup>> = selector({
   key: "groupedCustomFieldsObsSelector",
   get: ({ get }) => {
     const organisation = get(organisationState);
@@ -36,7 +39,7 @@ export const groupedCustomFieldsObsSelector = selector({
   },
 });
 
-export const defaultCustomFields = [
+export const defaultCustomFields: Array<CustomField> = [
   {
     name: "personsMale",
     label: "Nombre de personnes non connues hommes rencontrées",
@@ -99,8 +102,8 @@ export const defaultCustomFields = [
 const compulsoryEncryptedFields = ["territory", "user", "team", "observedAt"];
 
 export const prepareObsForEncryption =
-  (customFields) =>
-  (obs, { checkRequiredFields = true } = {}) => {
+  (customFields: Array<CustomField>) =>
+  (obs: TerritoryObservationInstance, { checkRequiredFields = true } = {}): ReadyToEncryptTerritoryObservationInstance => {
     if (checkRequiredFields) {
       try {
         if (!looseUuidRegex.test(obs.territory)) {

@@ -120,7 +120,7 @@ const nullFunction = () => null;
 
 interface ModalHeaderProps {
   children?: React.ReactNode;
-  title?: string;
+  title?: string | React.ReactNode;
   onClose?: null | (() => void);
 }
 

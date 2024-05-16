@@ -285,9 +285,9 @@ const Stats = () => {
   const allCategories = useRecoilValue(flattenedActionsCategoriesSelector);
   const groupsCategories = useRecoilValue(actionsCategoriesSelector);
 
-  const [selectedTerritories, setSelectedTerritories] = useLocalStorage("stats-territories", []);
   const [activeTab, setActiveTab] = useLocalStorage("stats-tabCaption", "Général");
   const [filterPersons, setFilterPersons] = useLocalStorage("stats-filterPersons-defaultEverybody", initFilters);
+  const [filterObs, setFilterObs] = useLocalStorage("stats-filterObs-defaultEverybody", []);
   const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage("stats-viewAllOrganisationData", teams.length === 1);
   const [period, setPeriod] = useLocalStorage("period", { startDate: null, endDate: null });
   const [preset, setPreset, removePreset] = useLocalStorage("stats-date-preset", null);
@@ -446,13 +446,21 @@ const Stats = () => {
 
   const observations = useMemo(() => {
     const observationsFiltered = [];
+    const territoriesById = {};
+    for (const territory of territories) {
+      territoriesById[territory._id] = territory;
+    }
+    const activeFilters = filterObs.filter((f) => f.value);
+    const territoryFilter = activeFilters.find((f) => f.field === "territory");
+    const otherFilters = activeFilters.filter((f) => f.field !== "territory");
     for (const observation of allObservations) {
       if (!viewAllOrganisationData) {
         if (!selectedTeamsObjectWithOwnPeriod[observation.team]) continue;
       }
-      if (selectedTerritories.length) {
-        if (!selectedTerritories.some((t) => t._id === observation.territory)) continue;
+      if (territoryFilter) {
+        if (!territoryFilter.value.includes(territoriesById[observation.territory]?.name)) continue;
       }
+      if (!filterItem(otherFilters)(observation)) continue;
       const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[observation.team] ?? defaultIsoDates;
       const date = observation.observedAt ?? observation.createdAt;
       if (date < isoStartDate) continue;
@@ -460,7 +468,7 @@ const Stats = () => {
       observationsFiltered.push(observation);
     }
     return observationsFiltered;
-  }, [allObservations, selectedTerritories, defaultIsoDates, selectedTeamsObjectWithOwnPeriod, viewAllOrganisationData]);
+  }, [allObservations, filterObs, territories, defaultIsoDates, selectedTeamsObjectWithOwnPeriod, viewAllOrganisationData]);
 
   const reports = useMemo(() => {
     const reportsFiltered = [];
@@ -700,17 +708,12 @@ const Stats = () => {
           <ObservationsStats
             territories={territories}
             personsWithRencontres={personsWithRencontres}
-            selectedTerritories={selectedTerritories}
-            setSelectedTerritories={setSelectedTerritories}
+            filterObs={filterObs}
+            setFilterObs={setFilterObs}
             observations={observations}
             customFieldsObs={customFieldsObs}
-            // `allFilters` is for debug purpose only
-            // TODO: remove when debugged
-            allFilters={{
-              selectedTerritories,
-              period,
-              selectedTeams,
-            }}
+            period={period}
+            selectedTeams={selectedTeams}
           />
         )}
         {activeTab === "Comptes-rendus" && <ReportsStats reports={reports} />}

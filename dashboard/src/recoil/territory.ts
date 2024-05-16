@@ -3,9 +3,10 @@ import { atom, selector } from "recoil";
 import { looseUuidRegex } from "../utils";
 import { toast } from "react-toastify";
 import { capture } from "../services/sentry";
+import type { TerritoryInstance, ReadyToEncryptTerritoryInstance } from "../types/territory";
 
 const collectionName = "territory";
-export const territoriesState = atom({
+export const territoriesState = atom<Array<TerritoryInstance>>({
   key: collectionName,
   default: selector({
     key: "territory/default",
@@ -19,7 +20,7 @@ export const territoriesState = atom({
 
 const encryptedFields = ["name", "perimeter", "description", "types", "user"];
 
-export const prepareTerritoryForEncryption = (territory, { checkRequiredFields = true } = {}) => {
+export const prepareTerritoryForEncryption = (territory: TerritoryInstance, { checkRequiredFields = true } = {}): ReadyToEncryptTerritoryInstance => {
   if (checkRequiredFields) {
     try {
       if (!territory.name) {
@@ -66,9 +67,14 @@ export const territoryTypes = [
   "Historique",
 ];
 
-const defaultSort = (a, b, sortOrder) => (sortOrder === "ASC" ? (a.name || "").localeCompare(b.name) : (b.name || "").localeCompare(a.name));
+type SortOrder = "ASC" | "DESC";
 
-export const sortTerritories = (sortBy, sortOrder) => (a, b) => {
+type SortBy = "name" | "createdAt" | "types" | "perimeter";
+
+const defaultSort = (a: TerritoryInstance, b: TerritoryInstance, sortOrder: SortOrder) =>
+  sortOrder === "ASC" ? (a.name || "").localeCompare(b.name) : (b.name || "").localeCompare(a.name);
+
+export const sortTerritories = (sortBy: SortBy, sortOrder: SortOrder) => (a: TerritoryInstance, b: TerritoryInstance) => {
   if (sortBy === "types") {
     if (!a.types?.length && !b.types?.length) return defaultSort(a, b, sortOrder);
     if (!a.types?.length) return sortOrder === "ASC" ? 1 : -1;

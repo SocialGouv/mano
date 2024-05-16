@@ -3,7 +3,7 @@ import { ResponsivePie } from "@nivo/pie";
 import { ResponsiveBar } from "@nivo/bar";
 import HelpButtonAndModal from "../../components/HelpButtonAndModal";
 
-export const CustomResponsivePie = ({ data = [], title, onItemClick, help }) => {
+export const CustomResponsivePie = ({ data = [], title, onItemClick = null, help }) => {
   const total = data.reduce((sum, item) => sum + item.value, 0);
 
   const onClick = ({ id }) => {

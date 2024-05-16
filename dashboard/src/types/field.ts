@@ -36,8 +36,8 @@ export interface CustomFieldsGroup {
 }
 
 export interface FilterableField {
-  field: string;
-  name: string;
+  field: string; // same as name
+  name: string; // same as field
   label: string;
   type: FieldType;
   options: string[];

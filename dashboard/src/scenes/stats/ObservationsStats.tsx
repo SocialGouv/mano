@@ -10,37 +10,77 @@ import Table from "../../components/table";
 import { dayjsInstance } from "../../services/date";
 import { customFieldsObsSelector } from "../../recoil/territoryObservations";
 import CreateObservation from "../../components/CreateObservation";
-import { filterData } from "../../components/Filters";
+import Filters, { filterData } from "../../components/Filters";
 import DateBloc, { TimeBlock } from "../../components/DateBloc";
 import CustomFieldDisplay from "../../components/CustomFieldDisplay";
 import { CustomResponsivePie } from "./charts";
+import type { TerritoryInstance } from "../../types/territory";
+import type { Filter, FilterableField } from "../../types/field";
+import type { TerritoryObservationInstance } from "../../types/territoryObs";
+import type { CustomField } from "../../types/field";
+import type { Period } from "../../types/date";
+import type { TeamInstance } from "../../types/team";
+import type { PersonPopulated } from "../../types/person";
+
+interface ObservationsStatsProps {
+  territories: Array<TerritoryInstance>;
+  filterObs: Array<Filter>;
+  setFilterObs: (filters: Array<Filter>) => void;
+  observations: Array<TerritoryObservationInstance>;
+  customFieldsObs: Array<CustomField>;
+  period: Period;
+  selectedTeams: Array<TeamInstance>;
+  personsWithRencontres: Array<PersonPopulated>;
+}
 
 const ObservationsStats = ({
   territories,
-  selectedTerritories,
-  setSelectedTerritories,
+  filterObs,
+  setFilterObs,
   observations,
   customFieldsObs,
-  allFilters,
+  period,
+  selectedTeams,
   personsWithRencontres,
-}) => {
+}: ObservationsStatsProps) => {
+  const currentTeam = useRecoilValue(currentTeamState);
+  const selectedTerritories = useMemo(() => {
+    return territories.filter((t) => filterObs.find((f) => f.field === "territory")?.value?.includes(t.name));
+  }, [territories, filterObs]);
+
+  const filterBase: Array<FilterableField> = useMemo(() => {
+    return [
+      {
+        field: "territory",
+        name: "territory",
+        label: "Territoire",
+        type: "multi-choice",
+        options: territories.map((t) => t.name),
+      },
+      ...customFieldsObs
+        .filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id))
+        .map((field) => ({
+          field: field.name,
+          name: field.name,
+          label: field.label,
+          type: field.type,
+          options: field.options,
+        })),
+    ];
+  }, [territories, customFieldsObs]);
   const [obsModalOpened, setObsModalOpened] = useState(false);
   const [sliceField, setSliceField] = useState(null);
   const [sliceValue, setSliceValue] = useState(null);
   const [slicedData, setSlicedData] = useState([]);
 
-  const onSliceClick = (newSlice, fieldName, observationsConcerned = observations) => {
+  const onSliceClick = (newSlice: string, fieldName: FilterableField["field"], observationsConcerned = observations) => {
     const newSlicefield = customFieldsObs.find((f) => f.name === fieldName);
     setSliceField(newSlicefield);
     setSliceValue(newSlice);
     const slicedData =
       newSlicefield.type === "boolean"
-        ? observationsConcerned.filter((p) => (newSlice === "Non" ? !p[newSlicefield.field] : !!p[newSlicefield.field]))
-        : filterData(
-            observationsConcerned,
-            [{ ...newSlicefield, value: newSlice, type: newSlicefield.field === "outOfActiveList" ? "boolean" : newSlicefield.field }],
-            true
-          );
+        ? observationsConcerned.filter((p) => (newSlice === "Non" ? !p[newSlicefield.name] : !!p[newSlicefield.name]))
+        : filterData(observationsConcerned, [{ ...newSlicefield, value: newSlice, type: newSlicefield.type }]);
     setSlicedData(slicedData);
     setObsModalOpened(true);
   };
@@ -79,23 +119,7 @@ const ObservationsStats = ({
   return (
     <>
       <h3 className="tw-my-5 tw-text-xl">Statistiques des observations de territoire</h3>
-      <div className="tw-mx-5 tw-mb-8">
-        <label htmlFor="filter-territory">Filter par territoire</label>
-        <SelectCustom
-          isMulti
-          options={territories}
-          name="place"
-          placeholder="Tous les territoires"
-          value={selectedTerritories?.map((t) => ({ _id: t._id, name: t.name })) || []}
-          onChange={(t) => {
-            setSelectedTerritories(t);
-          }}
-          isClearable={true}
-          inputId="filter-territory"
-          getOptionValue={(i) => i._id}
-          getOptionLabel={(i) => i.name}
-        />
-      </div>
+      <Filters base={filterBase} filters={filterObs} onChange={setFilterObs} />
       <CustomFieldsStats
         data={observations}
         customFields={customFieldsObs}
@@ -140,7 +164,6 @@ const ObservationsStats = ({
           setObsModalOpened(false);
         }}
         observations={slicedData}
-        sliceField={sliceField}
         onAfterLeave={() => {
           setSliceField(null);
           setSliceValue(null);
@@ -148,13 +171,14 @@ const ObservationsStats = ({
         }}
         title={`${sliceField?.label ?? "Observations de territoire"}${sliceValue ? ` : ${sliceValue}` : ""} (${slicedData.length})`}
         territories={territories}
-        allFilters={allFilters}
+        selectedTeams={selectedTeams}
+        period={period}
       />
     </>
   );
 };
 
-const SelectedObsModal = ({ open, onClose, observations, territories, title, onAfterLeave, allFilters }) => {
+const SelectedObsModal = ({ open, onClose, observations, territories, title, onAfterLeave, selectedTeams, period }) => {
   const [observationToEdit, setObservationToEdit] = useState({});
   const [openObservationModaleKey, setOpenObservationModaleKey] = useState(0);
   const teams = useRecoilValue(teamsState);
@@ -192,20 +216,17 @@ const SelectedObsModal = ({ open, onClose, observations, territories, title, onA
 
     utils.book_append_sheet(wb, utils.json_to_sheet(observations), "Observations (données brutes)");
     utils.book_append_sheet(wb, utils.json_to_sheet(territories), "Territoires (données brutes)");
-    utils.book_append_sheet(wb, utils.json_to_sheet(allFilters.selectedTerritories), "Filtres (territoires)");
-    utils.book_append_sheet(wb, utils.json_to_sheet(allFilters.selectedTeams), "Filtres (équipes)");
+    utils.book_append_sheet(wb, utils.json_to_sheet(selectedTeams), "Filtres (équipes)");
     const otherFilters = [
       {
-        "Période - début": allFilters.period.startDate,
-        "Période - fin": allFilters.period.endDate,
+        "Période - début": period.startDate,
+        "Période - fin": period.endDate,
       },
     ];
     utils.book_append_sheet(wb, utils.json_to_sheet(otherFilters), "Filtres (autres)");
     writeFile(
       wb,
-      `Statistiques (${dayjsInstance(allFilters.period.startDate).format("YYYY-MM-DD")} - ${dayjsInstance(allFilters.period.endDate).format(
-        "YYYY-MM-DD"
-      )}) - ${title}.xlsx`
+      `Statistiques (${dayjsInstance(period.startDate).format("YYYY-MM-DD")} - ${dayjsInstance(period.endDate).format("YYYY-MM-DD")}) - ${title}.xlsx`
     );
   };
 
@@ -272,7 +293,6 @@ const SelectedObsModal = ({ open, onClose, observations, territories, title, onA
                         })}
                     </div>
                   ),
-                  left: true,
                 },
                 {
                   title: "Équipe en charge",
@@ -296,7 +316,7 @@ const SelectedObsModal = ({ open, onClose, observations, territories, title, onA
           </button>
         </ModalFooter>
       </ModalContainer>
-      <CreateObservation observation={observationToEdit} forceOpen={!!openObservationModaleKey} />
+      <CreateObservation observation={observationToEdit} forceOpen={openObservationModaleKey} />
     </>
   );
 };
