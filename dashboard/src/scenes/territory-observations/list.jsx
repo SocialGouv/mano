@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import styled from "styled-components";
 
 import ButtonCustom from "../../components/ButtonCustom";
 import CreateObservation from "../../components/CreateObservation";
@@ -36,7 +35,7 @@ const List = ({ territory = {} }) => {
     <>
       <div className="tw-flex tw-items-center tw-mt-12 tw-mb-6">
         <div className="tw-flex-1 tw-mt-2">
-          <Title>Observations</Title>
+          <h1 className="tw-text-xl tw-font-bold">Observations</h1>
         </div>
         <div>
           <ButtonCustom
@@ -115,10 +114,5 @@ const List = ({ territory = {} }) => {
     </>
   );
 };
-
-const Title = styled.h1`
-  font-size: 20px;
-  font-weight: 800;
-`;
 
 export default List;

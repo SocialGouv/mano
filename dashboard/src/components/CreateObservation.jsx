@@ -103,9 +103,8 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
   };
 
   const currentRencontres = [...rencontresInProgress, ...rencontresForObs];
-
   return (
-    <CreateStyle>
+    <div className="tw-w-full tw-flex tw-justify-end">
       <Formik
         key={open}
         initialValues={observation}
@@ -428,14 +427,8 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
           />
         )
       }
-    </CreateStyle>
+    </div>
   );
 };
-
-const CreateStyle = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: flex-end;
-`;
 
 export default CreateObservation;
