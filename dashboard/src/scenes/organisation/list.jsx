@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { ModalBody, ModalHeader, ModalFooter, ModalContainer } from "../../components/tailwind/Modal";
 import { Formik } from "formik";
 import { toast } from "react-toastify";
-import styled from "styled-components";
 import Table from "../../components/table";
 import OrganisationUsers from "./OrganisationUsers";
 import Loading from "../../components/loading";
@@ -179,31 +178,37 @@ const List = () => {
               sortBy,
               render: (o) => {
                 return (
-                  <StyledCounters total={o.countersTotal}>
-                    <span>Personnes: {o.counters.persons || 0}</span>
-                    <br />
-                    <span>Familles: {o.counters.groups || 0}</span>
-                    <br />
-                    <span>Actions: {o.counters.actions || 0}</span>
-                    <br />
-                    <span>Passages: {o.counters.passages || 0}</span>
-                    <br />
-                    <span>Rencontres: {o.counters.rencontres || 0}</span>
-                    <br />
-                    <span>Territoires: {o.counters.territories || 0}</span>
-                    <br />
-                    <span>Observations: {o.counters.observations || 0}</span>
-                    <br />
-                    <span>Comptes-rendus: {o.counters.reports || 0}</span>
-                    <br />
-                    <span>Collaborations: {o.counters.collaborations || 0}</span>
-                    <br />
-                    <span>Commentaires: {o.counters.comments || 0}</span>
-                    <br />
-                    <span>Consultations: {o.counters.consultations || 0}</span>
-                    <br />
-                    <span>Traitements: {o.counters.treatments || 0}</span>
-                  </StyledCounters>
+                  <div
+                    className={
+                      // yolo
+                      o.countersTotal === 0
+                        ? "tw-opacity-10"
+                        : o.countersTotal < 10
+                          ? "tw-opacity-50"
+                          : o.countersTotal > 10000
+                            ? "tw-font-extrabold"
+                            : o.countersTotal > 5000
+                              ? "tw-font-bold"
+                              : o.countersTotal > 2000
+                                ? "tw-font-semibold"
+                                : o.countersTotal > 200
+                                  ? "tw-font-medium"
+                                  : ""
+                    }
+                  >
+                    <div>Personnes: {o.counters.persons || 0}</div>
+                    <div>Familles: {o.counters.groups || 0}</div>
+                    <div>Actions: {o.counters.actions || 0}</div>
+                    <div>Passages: {o.counters.passages || 0}</div>
+                    <div>Rencontres: {o.counters.rencontres || 0}</div>
+                    <div>Territoires: {o.counters.territories || 0}</div>
+                    <div>Observations: {o.counters.observations || 0}</div>
+                    <div>Comptes-rendus: {o.counters.reports || 0}</div>
+                    <div>Collaborations: {o.counters.collaborations || 0}</div>
+                    <div>Commentaires: {o.counters.comments || 0}</div>
+                    <div>Consultations: {o.counters.consultations || 0}</div>
+                    <div>Traitements: {o.counters.treatments || 0}</div>
+                  </div>
                 );
               },
             },
@@ -302,15 +307,6 @@ const List = () => {
     </>
   );
 };
-
-const StyledCounters = styled.p`
-  ${(p) => p.total < 10 && "opacity: 0.5;"}
-  ${(p) => p.total === 0 && "opacity: 0.1;"}
-  ${(p) => p.total > 200 && "font-weight: 500;"}
-  ${(p) => p.total > 2000 && "font-weight: 600;"}
-  ${(p) => p.total > 5000 && "font-weight: 700;"}
-  ${(p) => p.total > 10000 && "font-weight: 800;"}
-`;
 
 const Create = ({ onChange, open, setOpen }) => {
   return (
