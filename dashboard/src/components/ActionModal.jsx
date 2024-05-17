@@ -252,7 +252,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
         });
         if (!actionResponse.ok) {
           toast.error("Erreur lors de la création des action, les données n'ont pas été sauvegardées.");
-          capture("error creating multiple actions", { extra: { actionResponse, body } });
+          capture("error creating multiple actions", { extra: { actionResponse } });
           return false;
         }
         actionsId = actionResponse.decryptedData.map((a) => a._id);
@@ -263,7 +263,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
         });
         if (!actionResponse.ok) {
           toast.error("Erreur lors de la création de l'action, les données n'ont pas été sauvegardées.");
-          capture("error creating single action", { extra: { actionResponse, body } });
+          capture("error creating single action", { extra: { actionResponse } });
           return false;
         }
         actionsId.push(actionResponse.decryptedData._id);
