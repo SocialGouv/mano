@@ -24,19 +24,21 @@ export const currentTeamReportsSelector = selector({
   },
 });
 
-const emptyItemsForReport = {
-  actionsCreated: [],
-  actionsCompleted: [],
-  actionsCanceled: [],
-  consultationsCreated: [],
-  consultationsCompleted: [],
-  consultationsCanceled: [],
-  comments: [],
-  observations: [],
-  passages: [],
-  rencontres: [],
-  report: null,
-};
+function emptyItemsForReport() {
+  return {
+    actionsCreated: [],
+    actionsCompleted: [],
+    actionsCanceled: [],
+    consultationsCreated: [],
+    consultationsCompleted: [],
+    consultationsCanceled: [],
+    comments: [],
+    observations: [],
+    passages: [],
+    rencontres: [],
+    report: null,
+  };
+}
 
 export const itemsGroupedDateSelector = selector({
   key: 'itemsGroupedDateSelector',
@@ -60,7 +62,7 @@ export const itemsGroupedDateSelector = selector({
       const date = getDayWithOffset(report.date, currentTeam.nightSession ? 12 : 0);
       if (!date) continue;
       if (!itemsGroupedByDate[date]) {
-        itemsGroupedByDate[date] = { ...emptyItemsForReport };
+        itemsGroupedByDate[date] = emptyItemsForReport();
       }
       itemsGroupedByDate[date].report = report;
     }
@@ -72,12 +74,12 @@ export const itemsGroupedDateSelector = selector({
         const created = getDayWithOffset(action.createdAt, currentTeam.nightSession ? 12 : 0);
         const completed = getDayWithOffset(action.completedAt, currentTeam.nightSession ? 12 : 0);
         if (!itemsGroupedByDate[created]) {
-          itemsGroupedByDate[created] = { ...emptyItemsForReport };
+          itemsGroupedByDate[created] = emptyItemsForReport();
         }
         itemsGroupedByDate[created].actionsCreated.push(action);
         if (completed) {
           if (!itemsGroupedByDate[completed]) {
-            itemsGroupedByDate[completed] = { ...emptyItemsForReport };
+            itemsGroupedByDate[completed] = emptyItemsForReport();
           }
           if (action.status === CANCEL) itemsGroupedByDate[completed].actionsCanceled.push(action);
           if (action.status === DONE) itemsGroupedByDate[completed].actionsCompleted.push(action);
@@ -95,12 +97,12 @@ export const itemsGroupedDateSelector = selector({
         const completed = getDayWithOffset(consultation.completedAt, currentTeam.nightSession ? 12 : 0);
         if (!itemsGroupedByDate) continue;
         if (!itemsGroupedByDate[created]) {
-          itemsGroupedByDate[created] = { ...emptyItemsForReport };
+          itemsGroupedByDate[created] = emptyItemsForReport();
         }
         itemsGroupedByDate[created].consultationsCreated.push(consultation);
         if (completed) {
           if (!itemsGroupedByDate[completed]) {
-            itemsGroupedByDate[completed] = { ...emptyItemsForReport };
+            itemsGroupedByDate[completed] = emptyItemsForReport();
           }
           if (consultation.status === CANCEL) itemsGroupedByDate[completed].consultationsCompleted.push(consultation);
           if (consultation.status === DONE) itemsGroupedByDate[completed].consultationsCanceled.push(consultation);
@@ -113,7 +115,7 @@ export const itemsGroupedDateSelector = selector({
       const date = getDayWithOffset(comment.date || comment.createdAt, currentTeam.nightSession ? 12 : 0);
       if (!date) continue;
       if (!itemsGroupedByDate[date]) {
-        itemsGroupedByDate[date] = { ...emptyItemsForReport };
+        itemsGroupedByDate[date] = emptyItemsForReport();
       }
       if (comment.person) {
         itemsGroupedByDate[date].comments.push({
@@ -139,7 +141,7 @@ export const itemsGroupedDateSelector = selector({
       const date = getDayWithOffset(passage.date || passage.createdAt, currentTeam.nightSession ? 12 : 0);
       if (!date) continue;
       if (!itemsGroupedByDate[date]) {
-        itemsGroupedByDate[date] = { ...emptyItemsForReport };
+        itemsGroupedByDate[date] = emptyItemsForReport();
       }
       itemsGroupedByDate[date].passages.push(passage);
     }
@@ -150,7 +152,7 @@ export const itemsGroupedDateSelector = selector({
       const date = getDayWithOffset(rencontre.date || rencontre.createdAt, currentTeam.nightSession ? 12 : 0);
       if (!date) continue;
       if (!itemsGroupedByDate[date]) {
-        itemsGroupedByDate[date] = { ...emptyItemsForReport };
+        itemsGroupedByDate[date] = emptyItemsForReport();
       }
       itemsGroupedByDate[date].passages.push(rencontre);
     }
@@ -160,7 +162,7 @@ export const itemsGroupedDateSelector = selector({
       const date = getDayWithOffset(observation.observedAt || observation.createdAt, currentTeam.nightSession ? 12 : 0);
       if (!date) continue;
       if (!itemsGroupedByDate[date]) {
-        itemsGroupedByDate[date] = { ...emptyItemsForReport };
+        itemsGroupedByDate[date] = emptyItemsForReport();
       }
       itemsGroupedByDate[date].observations.push(observation);
     }
