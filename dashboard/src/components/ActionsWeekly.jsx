@@ -1,7 +1,8 @@
-import React, { useMemo } from "react";
+import React, { forwardRef, useMemo } from "react";
 import { useHistory } from "react-router-dom";
 import { Button } from "reactstrap";
 import { useRecoilValue } from "recoil";
+import DatePicker from "react-datepicker";
 import { CANCEL, DONE } from "../recoil/actions";
 import { dayjsInstance, formatTime } from "../services/date";
 import ActionOrConsultationName from "./ActionOrConsultationName";
@@ -26,6 +27,16 @@ export default function ActionsWeekly({ actions, isNightSession, onCreateAction 
       )
     );
   }, [actions, startOfWeek]);
+
+  // Source de cette approche étrange : https://reactdatepicker.com/#example-custom-input
+  // Du coup, pas besoin de clickoutside comme dans DateRangePickerWithPresets
+  const CustomInputRef = forwardRef(function CustomInput({ onClick }, ref) {
+    return (
+      <div ref={ref} onClick={onClick} className="tw-capitalize hover:tw-underline">
+        {dayjsInstance(startOfWeek).format("MMMM YYYY")}
+      </div>
+    );
+  });
 
   return (
     <div>
@@ -58,7 +69,14 @@ export default function ActionsWeekly({ actions, isNightSession, onCreateAction 
             &gt;
           </Button>
         </div>
-        <div className="tw-capitalize">{dayjsInstance(startOfWeek).format("MMMM YYYY")}</div>
+        <div className="tw-cursor-pointer">
+          <DatePicker
+            selected={dayjsInstance(startOfWeek).toDate()}
+            locale="fr"
+            onChange={(date) => setStartOfWeek(dayjsInstance(date).startOf("week").format("YYYY-MM-DD"))}
+            customInput={<CustomInputRef />}
+          />
+        </div>
       </div>
       <div className="tw-grid tw-w-full tw-auto-rows-fr tw-grid-cols-7 tw-gap-x-2 tw-gap-y-0">
         {[...Array(7)].map((_, index) => {
