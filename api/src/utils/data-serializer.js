@@ -42,6 +42,7 @@ function serializeOrganisation(organisation) {
         categories: [],
       },
     ],
+    defaultPersonsFolders: organisation.defaultPersonsFolders || [],
 
     /* services settings */
     groupedServices: organisation.groupedServices,

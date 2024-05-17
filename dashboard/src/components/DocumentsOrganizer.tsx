@@ -21,10 +21,10 @@ interface RootForTree extends Folder {
 type FolderChildren = Array<FolderForTree | DocumentForTree | RootForTree>;
 
 interface DocumentsOrganizerProps {
-  items: Item[];
+  items: Item[] | Folder[];
   onSave: (newOrder: Array<Item>) => Promise<boolean>;
   onFolderClick: (folder: FolderForTree) => void;
-  onDocumentClick: (document: DocumentForTree) => void;
+  onDocumentClick?: (document: DocumentForTree) => void;
   color: "main" | "blue-900";
   htmlId: "social" | "family" | "medical";
   rootFolderName?: "Dossier Racine" | "👪 Documents familiaux";
@@ -152,7 +152,7 @@ interface BranchProps {
   initShowOpen: boolean;
   onListChange: (save: boolean) => void;
   onFolderClick: (folder: FolderForTree) => void;
-  onDocumentClick: (document: DocumentForTree) => void;
+  onDocumentClick?: (document: DocumentForTree) => void;
   setOpenedFolderIds: (ids: DocumentOrFolderId[]) => void;
   openedFolderIds: DocumentOrFolderId[];
   color: "main" | "blue-900";
@@ -341,7 +341,7 @@ function DocumentRow({ document, level, parentIsOpen, position, parentId, color,
       <div className="tw-flex tw-w-full tw-justify-between tw-overflow-hidden">
         <button
           type="button"
-          onClick={() => onDocumentClick(document)}
+          onClick={() => onDocumentClick?.(document)}
           className="tw-inline-flex tw-flex-1 tw-overflow-hidden tw-py-2 tw-pr-5 tw-text-left"
         >
           {!!organisation.groupsEnabled && !!document.group && (
@@ -377,7 +377,7 @@ function Informations({ item }: { item: Item | FolderForTree | RootForTree }) {
   );
 }
 
-const buildFolderTree = (items: Item[], rootFolderName: "Dossier Racine" | "👪 Documents familiaux") => {
+const buildFolderTree = (items: Item[] | Folder[], rootFolderName: "Dossier Racine" | "👪 Documents familiaux") => {
   const rootFolderItem: Omit<Item, "linkedItem"> = {
     _id: "root",
     name: rootFolderName,
@@ -389,7 +389,7 @@ const buildFolderTree = (items: Item[], rootFolderName: "Dossier Racine" | "👪
     movable: false,
   } as Item;
 
-  const findChildren = (folder: Item): FolderChildren => {
+  const findChildren = (folder: Item | Folder): FolderChildren => {
     const children = items
       .filter((item: Item) => item.parentId === folder._id)
       .sort((a, b) => {

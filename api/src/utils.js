@@ -63,6 +63,17 @@ function sanitizeAll(text) {
   return sanitizeHtml(text || "", { allowedTags: [], allowedAttributes: {} });
 }
 
+const folderSchema = z.object({
+  _id: z.string().min(1),
+  name: z.string().min(1),
+  createdAt: z.string(),
+  createdBy: z.string(),
+  parentId: z.string().optional(),
+  position: z.number().optional(),
+  movable: z.boolean().optional(),
+  type: z.literal("folder"),
+});
+
 module.exports = {
   validatePassword,
   comparePassword,
@@ -77,4 +88,5 @@ module.exports = {
   customFieldSchema,
   customFieldGroupSchema,
   sanitizeAll,
+  folderSchema,
 };

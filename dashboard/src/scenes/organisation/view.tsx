@@ -34,6 +34,8 @@ import StructuresCategoriesSettings from "./StructuresCategoriesSettings";
 import Poubelle from "./Poubelle";
 import CollaborationsSettings from "./CollaborationsSettings";
 import { customFieldsMedicalFileSelector } from "../../recoil/medicalFiles";
+import DocumentsOrganizer from "../../components/DocumentsOrganizer";
+import DefaultPersonFolders from "./DefaultPersonFolders";
 
 const getSettingTitle = (tabId) => {
   if (tabId === "infos") return "Informations";
@@ -420,6 +422,9 @@ const View = () => {
                           />
                           <hr />
                           <PersonCustomFieldsSettings />
+                          <hr />
+                          <h4 className="tw-my-8">Dossiers par défaut</h4>
+                          <DefaultPersonFolders />
                         </>
                       ) : (
                         <>

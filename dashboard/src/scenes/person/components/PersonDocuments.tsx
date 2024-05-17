@@ -46,7 +46,27 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
     createdBy: "admin",
   };
 
-  const documents = [...(person.documentsForModule || []), needsActionsFolder ? actionsFolder : undefined, ...(person.groupDocuments || [])]
+  let defaultDocuments: Array<FolderWithLinkedItem> = [];
+  if ((person.documentsForModule || []).length === 0 && (person.groupDocuments || []).length === 0) {
+    defaultDocuments = organisation.defaultPersonsFolders.map((folder) => ({
+      ...folder,
+      linkedItem: {
+        _id: person._id,
+        type: "person",
+      },
+    }));
+  }
+
+  const documents = [
+    // Le dossier "Actions" est ajouté si nécessaire, il s'affichera toujours en premier
+    needsActionsFolder ? actionsFolder : undefined,
+    // Les documents et dossiers de la personne
+    ...(person.documentsForModule || []),
+    // Les documents et dossier du groupe (famille)
+    ...(person.groupDocuments || []),
+    // Les dossiers par défaut configurés par l'organisation
+    ...defaultDocuments,
+  ]
     .filter((e) => e)
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
@@ -128,7 +148,9 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
           path: `/person/${_person._id}`,
           body: preparePersonForEncryption({
             ..._person,
-            documents: (_person.documents || [])
+            // If there are no document yet and default documents are present,
+            // we save the default documents since they are modified by the user.
+            documents: (_person.documents || [...defaultDocuments])
               .filter((f) => f._id !== folder._id)
               .map((item) => {
                 if (item.parentId === folder._id) return { ...item, parentId: "" };
@@ -201,7 +223,9 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
             path: `/person/${_person._id}`,
             body: preparePersonForEncryption({
               ..._person,
-              documents: _person.documents?.filter((d) => d._id !== document._id),
+              // If there are no document yet and default documents are present,
+              // we save the default documents since they are modified by the user.
+              documents: (_person.documents || [...defaultDocuments])?.filter((d) => d._id !== document._id),
             }),
           });
           if (!personResponse.ok) {
@@ -246,7 +270,9 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
             path: `/person/${_person._id}`,
             body: preparePersonForEncryption({
               ..._person,
-              documents: _person.documents?.map((d) => {
+              // If there are no document yet and default documents are present,
+              // we save the default documents since they are modified by the user.
+              documents: (_person.documents || [...defaultDocuments])?.map((d) => {
                 if (d._id === documentOrFolder._id) return documentOrFolder;
                 return d;
               }),
@@ -266,7 +292,9 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
           path: `/person/${person._id}`,
           body: preparePersonForEncryption({
             ...person,
-            documents: [...(person.documents || []), ...newDocuments],
+            // If there are no document yet and default documents are present,
+            // we save the default documents since they are modified by the user.
+            documents: [...(person.documents || [...defaultDocuments]), ...newDocuments],
           }),
         });
         if (!personResponse.ok) {

@@ -713,15 +713,15 @@ function DocumentModal({ document, onClose, personId, onDelete, onSubmit, showAs
 }
 
 interface FolderModalProps {
-  folder?: FolderWithLinkedItem | null;
+  folder?: FolderWithLinkedItem | Folder | null;
   onClose: () => void;
-  onDelete: (folder: FolderWithLinkedItem) => Promise<boolean>;
-  onSubmit: (folder: FolderWithLinkedItem) => Promise<void>;
+  onDelete: (folder: FolderWithLinkedItem | Folder) => Promise<boolean>;
+  onSubmit: (folder: FolderWithLinkedItem | Folder) => Promise<void>;
   onAddFolder: (items: Folder) => Promise<void>;
   color?: "main" | "blue-900";
 }
 
-function FolderModal({ folder, onClose, onDelete, onSubmit, onAddFolder, color }: FolderModalProps) {
+export function FolderModal({ folder, onClose, onDelete, onSubmit, onAddFolder, color }: FolderModalProps) {
   const isNewFolder = !folder?._id;
   const user = useRecoilValue(userAuthentifiedState);
 

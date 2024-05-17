@@ -1,3 +1,4 @@
+import { Folder } from "./document";
 import { CustomField, PredefinedField, CustomFieldsGroup } from "./field";
 
 interface GroupedCategories {
@@ -47,4 +48,6 @@ export interface OrganisationInstance {
 
   actionsGroupedCategories?: GroupedCategories[];
   structuresGroupedCategories?: GroupedCategories[];
+
+  defaultPersonsFolders?: Folder[];
 }

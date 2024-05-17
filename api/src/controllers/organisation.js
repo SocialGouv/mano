@@ -31,7 +31,7 @@ const {
 } = require("../db/sequelize");
 const mailservice = require("../utils/mailservice");
 const validateUser = require("../middleware/validateUser");
-const { looseUuidRegex, customFieldSchema, positiveIntegerRegex, customFieldGroupSchema } = require("../utils");
+const { looseUuidRegex, customFieldSchema, positiveIntegerRegex, customFieldGroupSchema, folderSchema } = require("../utils");
 const { serializeOrganisation } = require("../utils/data-serializer");
 const { defaultSocialCustomFields, defaultMedicalCustomFields } = require("../utils/custom-fields/person");
 const { mailBienvenueHtml } = require("../utils/mail-bienvenue");
@@ -258,6 +258,7 @@ router.put(
         categories: z.optional(z.array(z.string().min(1))),
         actionsGroupedCategories: z.optional(z.array(z.object({ groupTitle: z.string(), categories: z.array(z.string().min(1)) }))),
         structuresGroupedCategories: z.optional(z.array(z.object({ groupTitle: z.string(), categories: z.array(z.string().min(1)) }))),
+        defaultPersonsFolders: z.optional(z.array(folderSchema)),
         groupedServices: z.optional(z.array(z.object({ groupedServices: z.string(), services: z.array(z.string().min(1)) }))),
         collaborations: z.optional(z.array(z.string().min(1))),
         groupedCustomFieldsObs: z.optional(z.array(customFieldGroupSchema)),
@@ -322,6 +323,7 @@ router.put(
     if (req.body.hasOwnProperty("categories")) updateOrg.categories = req.body.categories;
     if (req.body.hasOwnProperty("actionsGroupedCategories")) updateOrg.actionsGroupedCategories = req.body.actionsGroupedCategories;
     if (req.body.hasOwnProperty("structuresGroupedCategories")) updateOrg.structuresGroupedCategories = req.body.structuresGroupedCategories;
+    if (req.body.hasOwnProperty("defaultPersonsFolders")) updateOrg.defaultPersonsFolders = req.body.defaultPersonsFolders;
     if (req.body.hasOwnProperty("groupedServices")) updateOrg.groupedServices = req.body.groupedServices;
     if (req.body.hasOwnProperty("collaborations")) updateOrg.collaborations = req.body.collaborations;
     if (req.body.hasOwnProperty("groupedCustomFieldsObs"))
@@ -884,6 +886,10 @@ router.post(
         const mainGroup = mainStructuresGroupedCategories.find((g) => g.groupTitle === secondaryGroup.groupTitle);
         if (!mainGroup) mainStructuresGroupedCategories.push(secondaryGroup);
       }
+
+      // ...
+      // We do not merge defaultPersonsFolders, we keep the main ones.
+      // ...
 
       // groupedServices
       const mainGroupedServices = structuredClone(mainOrg.groupedServices) || [];
