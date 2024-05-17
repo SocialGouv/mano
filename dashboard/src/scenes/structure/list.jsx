@@ -85,22 +85,31 @@ const List = () => {
             dataKey: "name",
             render: (structure) => {
               return (
-                <div className="[overflow-wrap:anywhere]">
+                <div className="[overflow-wrap:anywhere] tw-min-w-32">
                   <b>{structure.name}</b>
                 </div>
               );
             },
+          },
+          {
+            title: "Description",
+            dataKey: "description",
+            render: (structure) => <div className="[overflow-wrap:anywhere] tw-text-xs">{structure.description}</div>,
           },
           { title: "Téléphone", dataKey: "phone" },
           {
             title: "Adresse",
             dataKey: "adresse",
             render: (structure) => {
-              return <div className="[overflow-wrap:anywhere]">{structure.adresse}</div>;
+              return (
+                <>
+                  <div className="[overflow-wrap:anywhere]">{structure.adresse}</div>
+                  {structure.postcode ? <div>{structure.postcode}</div> : null}
+                  {structure.city ? <div>{structure.city}</div> : null}
+                </>
+              );
             },
           },
-          { title: "Code postal", dataKey: "postcode" },
-          { title: "Ville", dataKey: "city" },
           {
             title: "Catégories",
             dataKey: "categories",
