@@ -119,10 +119,6 @@ const Reception = () => {
 
   const history = useHistory();
   const location = useLocation();
-  const reportCreatedRef = useRef(!!todaysReport?._id);
-  useEffect(() => {
-    reportCreatedRef.current = !!todaysReport?._id;
-  }, [todaysReport?._id]);
 
   const [selectedPersons, setSelectedPersons] = useState(() => {
     const params = new URLSearchParams(location.search)?.get("persons")?.split(",");
@@ -159,9 +155,6 @@ const Reception = () => {
     const response = await API.post({ path: "/passage", body: preparePassageForEncryption(newPassage) });
     if (response.ok) {
       setPassages((passages) => [response.decryptedData, ...passages.filter((p) => p.optimisticId !== optimisticId)]);
-      if (!reportCreatedRef.current) {
-        reportCreatedRef.current = true;
-      }
     }
   };
 
@@ -185,9 +178,6 @@ const Reception = () => {
         const response = await API.post({ path: "/passage", body: preparePassageForEncryption(passage) });
         if (response.ok) {
           setPassages((passages) => [response.decryptedData, ...passages.filter((p) => p.optimisticId !== index)]);
-          if (!reportCreatedRef.current) {
-            reportCreatedRef.current = true;
-          }
         }
       }
       setAddingPassage(false);
@@ -288,7 +278,7 @@ const Reception = () => {
                 {passages.length} passage{passages.length > 1 ? "s" : ""}
               </h5>
               <ButtonCustom onClick={onAddAnonymousPassage} color="primary" icon={plusIcon} title="Passage anonyme" id="add-anonymous-passage" />
-              {!!passages.length && reportCreatedRef.current && (
+              {!!passages.length && (
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                   <ButtonCustom onClick={() => setTodaysPassagesOpen(true)} color="link" title="Voir les passages d'aujourd'hui" padding="0px" />
                 </div>
