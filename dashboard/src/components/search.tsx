@@ -1,5 +1,4 @@
 import React, { useRef, useState, useEffect } from "react";
-import { Input, InputGroup } from "reactstrap";
 
 type SearchProps = {
   value?: string;
