@@ -141,7 +141,7 @@ const ObservationsStats = ({
         totalTitleForMultiChoice={<span className="tw-font-bold">Nombre d'observations concernées</span>}
       />
       <CustomResponsivePie
-        title="Nombre de personnes suivies rencontrées par territoire"
+        title="Nombre de personnes suivies différentes rencontrées (sur les territoires)"
         help={`Répartition par territoire du nombre de personnes suivies ayant été rencontrées lors de la saisie d'une observation dans la période définie. Si une personne est rencontrée plusieurs fois sur un même territoire, elle n'est comptabilisée qu'une seule fois. Si elle est rencontrée sur deux territoires différents, elle sera comptée indépendamment sur chaque territoire.\n\nSi aucune période n'est définie, on considère l'ensemble des observations.`}
         data={Object.entries(filteredPersonsRencontresByTerritories).map(([territory, persons]) => ({
           id: territory,
@@ -150,7 +150,7 @@ const ObservationsStats = ({
         }))}
       />
       <CustomResponsivePie
-        title="Nombre de rencontres par territoire"
+        title="Nombre de rencontres de personnes suivies (dans les territoires)"
         help={`Répartition par territoire du nombre de rencontres lors de la saisie d'une observation dans la période définie. Chaque rencontre est comptabilisée, même si plusieurs rencontres avec une même personne ont eu lieu sur un même territoire.\n\nSi aucune période n'est définie, on considère l'ensemble des observations.`}
         data={Object.entries(filteredRencontresByTerritories).map(([territory, rencontres]) => ({
           id: territory,
