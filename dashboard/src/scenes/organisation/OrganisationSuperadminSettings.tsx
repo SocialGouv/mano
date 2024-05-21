@@ -4,6 +4,7 @@ import { OrganisationInstance } from "../../types/organisation";
 import { ModalContainer, ModalBody, ModalHeader, ModalFooter } from "../../components/tailwind/Modal";
 import { toast } from "react-toastify";
 import CitySelect from "../../components/CitySelect";
+import SelectCustom from "../../components/SelectCustom";
 
 export default function OrganisationSuperadminSettings({
   organisation,
@@ -34,6 +35,13 @@ export default function OrganisationSuperadminSettings({
   function onClose() {
     setOpen(false);
   }
+
+  const options = [
+    { value: "Guillaume", label: "Guillaume" },
+    { value: "Melissa", label: "Melissa" },
+    { value: "Yoann", label: "Yoann" },
+    { value: undefined, label: "Non renseigné" },
+  ];
 
   return (
     <ModalContainer open={open} onClose={onClose} size="3xl">
@@ -66,6 +74,20 @@ export default function OrganisationSuperadminSettings({
                   onChange={(nextCity) => {
                     setData({ ...data, city: nextCity });
                   }}
+                />
+              </div>
+            </div>
+            <div className="tw-flex tw-basis-full tw-flex-col tw-px-4 tw-py-2">
+              <div className="tw-mb-4">
+                <label htmlFor="city">Responsable / Chargé de déploiement</label>
+                <SelectCustom
+                  name="responsible"
+                  id="organisation-responsible"
+                  value={options.find((option) => option.value === data.responsible)}
+                  onChange={(nextResponsible) => {
+                    setData({ ...data, responsible: nextResponsible.value });
+                  }}
+                  options={options}
                 />
               </div>
             </div>

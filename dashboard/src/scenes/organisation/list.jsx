@@ -138,6 +138,8 @@ const List = () => {
                   <small className="tw-text-gray-500">ID: {o.orgId}</small>
                   <br />
                   <small className="tw-text-gray-500">Ville: {o.city?.split?.(" - ")?.[0]}</small>
+                  <br />
+                  <small className="tw-text-gray-500">Responsable: {o.responsible}</small>
                 </div>
               ),
             },
@@ -308,13 +310,21 @@ const List = () => {
   );
 };
 
+
+const options = [
+  { value: "Guillaume", label: "Guillaume" },
+  { value: "Melissa", label: "Melissa" },
+  { value: "Yoann", label: "Yoann" },
+  { value: undefined, label: "Non renseigné" },
+];
+
 const Create = ({ onChange, open, setOpen }) => {
   return (
     <>
       <ModalContainer open={open} onClose={() => setOpen(false)} size="3xl" blurryBackground>
         <ModalHeader title="Créer une nouvelle organisation et un administrateur" />
         <Formik
-          initialValues={{ orgName: "", name: "", email: "", orgId: "", city: "" }}
+          initialValues={{ orgName: "", name: "", email: "", orgId: "", city: "", responsible: "" }}
           validate={(values) => {
             const errors = {};
             if (!values.name) errors.name = "Le nom est obligatoire";
@@ -375,6 +385,21 @@ const Create = ({ onChange, open, setOpen }) => {
                         />
                         {touched.city && errors.city && <span className="tw-text-xs tw-text-red-500">{errors.city}</span>}
                       </div>
+                    </div>
+                  </div>
+                  <div className="tw-flex tw-basis-full tw-flex-col tw-py-2">
+                    <div className="tw-mb-4">
+                      <label htmlFor="city">Responsable / Chargé de déploiement</label>
+                      <SelectCustom
+                        name="responsible"
+                        id="organisation-responsible"
+                        value={options.find((o) => o.value === values.responsible)}
+                        onChange={(nextResponsible) => {
+                          handleChange({ target: { name: "responsible", value: nextResponsible.value } });
+                        }}
+                        options={options}
+                      />
+                      {touched.responsible && errors.responsible && <span className="tw-text-xs tw-text-red-500">{errors.responsible}</span>}
                     </div>
                   </div>
                   <div className="-tw-mx-4 tw-flex tw-flex-row tw-flex-wrap">

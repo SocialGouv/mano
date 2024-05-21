@@ -6,6 +6,7 @@ module.exports = (sequelize, DataTypes) => {
     name: DataTypes.TEXT,
     orgId: DataTypes.TEXT, // for superadmin
     city: { type: DataTypes.TEXT, default: "" }, // for superadmin
+    responsible: DataTypes.TEXT,
     categories: DataTypes.ARRAY(DataTypes.TEXT),
     actionsGroupedCategories: {
       type: DataTypes.JSONB, // example: [{"groupTitle": "médical", categories: ["seringue", "pansement"]}, { "groupTitle": "local", "categories": ["entretien", "lavage"]}]

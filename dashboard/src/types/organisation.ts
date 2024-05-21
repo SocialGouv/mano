@@ -50,4 +50,6 @@ export interface OrganisationInstance {
   structuresGroupedCategories?: GroupedCategories[];
 
   defaultPersonsFolders?: Folder[];
+
+  responsible?: string;
 }

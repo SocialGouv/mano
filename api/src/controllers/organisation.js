@@ -117,6 +117,7 @@ router.post(
         orgName: z.string().min(1),
         orgId: z.string().min(1),
         city: z.string().min(1),
+        responsible: z.optional(z.string()),
         name: z.string().min(1),
         email: z.string().email(),
       }).parse(req.body);
@@ -125,7 +126,7 @@ router.post(
       error.status = 400;
       return next(error);
     }
-    const { orgName, name, email, orgId, city } = req.body;
+    const { orgName, name, email, orgId, city, responsible } = req.body;
     const user = await User.findOne({ where: { email } });
     if (user) return res.status(400).send({ ok: false, error: "Cet email existe déjà dans une autre organisation" });
 
@@ -134,6 +135,7 @@ router.post(
         name: orgName,
         orgId: orgId,
         city: city,
+        responsible: responsible || null,
         // We have to add default custom fields on creation
         // (search for "custom-fields-persons-setup" or "custom-fields-persons-refacto-regroup" in code).
         customFieldsPersons: [
@@ -376,9 +378,10 @@ router.put(
           _id: z.string().regex(looseUuidRegex),
         }),
         body: z.object({
-          city: z.string().min(1),
+          city: z.optional(z.string().min(1)),
+          responsible: z.optional(z.string()),
         }),
-      });
+      }).parse(req);
     } catch (e) {
       const error = new Error(`Invalid request in organisation superadmin put: ${e}`);
       error.status = 400;
@@ -391,6 +394,7 @@ router.put(
 
     const updateOrg = {};
     if (req.body.hasOwnProperty("city")) updateOrg.city = req.body.city;
+    if (req.body.hasOwnProperty("responsible")) updateOrg.responsible = req.body.responsible || null;
 
     await organisation.update(updateOrg);
 
