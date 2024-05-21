@@ -64,7 +64,8 @@ const SignIn = () => {
       if (ok && token && user) {
         setAuthViaCookie(true);
         const { organisation } = user;
-        if (organisation._id !== window.localStorage.getItem("mano-organisationId")) {
+        const storedOrganisationId = window.localStorage.getItem("mano-organisationId");
+        if (storedOrganisationId && storedOrganisationId !== organisation._id) {
           await resetCache();
         }
         window.localStorage.setItem("mano-organisationId", organisation._id);
@@ -107,7 +108,8 @@ const SignIn = () => {
       const { user, token, ok } = authViaCookie ? await API.get({ path: "/user/signin-token" }) : await API.post({ path: "/user/signin", body });
       if (!ok) return setIsSubmitting(false);
       const { organisation } = user;
-      if (organisation._id !== window.localStorage.getItem("mano-organisationId")) {
+      const storedOrganisationId = window.localStorage.getItem("mano-organisationId");
+      if (storedOrganisationId && organisation._id !== storedOrganisationId) {
         await resetCache();
       }
       setOrganisation(organisation);
