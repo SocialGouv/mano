@@ -282,7 +282,7 @@ export const itemsGroupedByPersonSelector = selector({
       if (!personsObject[consultation.person]) continue;
 
       personsObject[consultation.person].consultations = personsObject[consultation.person].consultations || [];
-      personsObject[consultation.person].flattenedConsultations = personsObject[consultation.person].consultations || {};
+      personsObject[consultation.person].flattenedConsultations = personsObject[consultation.person].flattenedConsultations || {};
       for (const key of Object.keys(consultation)) {
         if (excludeConsultationsFieldsFromSearch.has(key)) continue;
         if (!personsObject[consultation.person].flattenedConsultations[key]) {
@@ -517,6 +517,7 @@ export const personsForStatsSelector = selector({
     const persons = get(arrayOfitemsGroupedByPersonSelector);
     return persons.map((p) => ({
       ...(p.medicalFile || {}),
+      ...(p.flattenedConsultations || {}),
       ...p,
     }));
   },

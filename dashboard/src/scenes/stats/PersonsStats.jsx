@@ -547,13 +547,6 @@ export const SelectedPersonsModal = ({ open, onClose, persons, title, onAfterLea
     return [...persons].sort(sortPersons(sortBy, sortOrder));
   }, [persons, sortBy, sortOrder]);
 
-  console.log({
-    open,
-    persons,
-    title,
-    sliceField,
-  });
-
   if (!sliceField) return null;
 
   const exportXlsx = () => {

@@ -76,22 +76,24 @@ const filterPersonsWithAllFieldsSelector = selector({
     const customFieldsMedicalFile = get(customFieldsMedicalFileSelector);
     const consultationFields = get(flattenedCustomFieldsConsultationsSelector);
     const filterPersonsBase = get(filterPersonsBaseSelector);
-    return [
+
+    const filterBase = [
       ...filterPersonsBase,
       ...fieldsPersonsCustomizableOptions.filter((a) => a.enabled || a.enabledTeams?.includes(team._id)).map((a) => ({ field: a.name, ...a })),
       ...flattenedCustomFieldsPersons.filter((a) => a.enabled || a.enabledTeams?.includes(team._id)).map((a) => ({ field: a.name, ...a })),
-      ...(user.healthcareProfessional
-        ? customFieldsMedicalFile.filter((a) => a.enabled || a.enabledTeams?.includes(team._id)).map((a) => ({ field: a.name, ...a }))
-        : []),
-      ...(user.healthcareProfessional
-        ? consultationFields.filter((a) => a.enabled || a.enabledTeams?.includes(team._id)).map((a) => ({ field: a.name, ...a }))
-        : []),
       {
         label: "Lieux fréquentés",
         field: "places",
         options: [...new Set(places.map((place) => place.name))],
       },
     ];
+    if (user.healthcareProfessional) {
+      filterBase.push(
+        ...customFieldsMedicalFile.filter((a) => a.enabled || a.enabledTeams?.includes(team._id)).map((a) => ({ field: a.name, ...a }))
+      );
+      filterBase.push(...consultationFields.filter((a) => a.enabled || a.enabledTeams?.includes(team._id)).map((a) => ({ field: a.name, ...a })));
+    }
+    return filterBase;
   },
 });
 

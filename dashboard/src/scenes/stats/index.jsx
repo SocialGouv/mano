@@ -8,7 +8,7 @@ import {
   flattenedCustomFieldsPersonsSelector,
 } from "../../recoil/persons";
 import { customFieldsObsSelector, territoryObservationsState } from "../../recoil/territoryObservations";
-import { currentTeamState, organisationState, teamsState } from "../../recoil/auth";
+import { currentTeamState, organisationState, teamsState, userState } from "../../recoil/auth";
 import { actionsCategoriesSelector, DONE, flattenedActionsCategoriesSelector } from "../../recoil/actions";
 import { reportsState } from "../../recoil/reports";
 import { territoriesState } from "../../recoil/territory";
@@ -271,6 +271,7 @@ const Stats = () => {
   const organisation = useRecoilValue(organisationState);
   const currentTeam = useRecoilValue(currentTeamState);
   const teams = useRecoilValue(teamsState);
+  const user = useRecoilValue(userState);
 
   const allreports = useRecoilValue(reportsState);
   const allObservations = useRecoilValue(territoryObservationsState);
@@ -487,25 +488,30 @@ const Stats = () => {
 
   const filterPersonsBase = useRecoilValue(filterPersonsBaseSelector);
   // Add enabled custom fields in filters.
-  const filterPersonsWithAllFields = (withMedicalFiles = false) => [
-    ...(withMedicalFiles ? customFieldsMedicalFile : [])
-      .filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id))
-      .map((a) => ({ field: a.name, ...a })),
-    ...(withMedicalFiles ? consultationFields : [])
-      .filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id))
-      .map((a) => ({ field: a.name, ...a })),
-    ...filterPersonsBase.map((f) =>
-      f.field !== "outOfActiveList"
-        ? f
-        : {
-            ...f,
-            options: ["Oui", "Non", "Oui et non (c'est-à-dire tout le monde)"],
-            type: "multi-choice",
-          }
-    ),
-    ...fieldsPersonsCustomizableOptions.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
-    ...flattenedCustomFieldsPersons.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
-  ];
+  const filterPersonsWithAllFields = useMemo(() => {
+    const filterBase = [
+      ...filterPersonsBase.map((f) =>
+        f.field !== "outOfActiveList"
+          ? f
+          : {
+              ...f,
+              options: ["Oui", "Non", "Oui et non (c'est-à-dire tout le monde)"],
+              type: "multi-choice",
+            }
+      ),
+      ...fieldsPersonsCustomizableOptions.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
+      ...flattenedCustomFieldsPersons.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
+    ];
+    if (user.healthcareProfessional) {
+      filterBase.push(
+        ...customFieldsMedicalFile.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a }))
+      );
+      filterBase.push(
+        ...consultationFields.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a }))
+      );
+    }
+    return filterBase;
+  });
 
   const availableTabs = tabs.filter((tabCaption) => {
     if (["Observations"].includes(tabCaption)) {
@@ -619,7 +625,7 @@ const Stats = () => {
             // numberOfActionsPerPersonConcernedByActions={numberOfActionsPerPersonConcernedByActions}
             personsUpdatedWithActions={personsUpdatedWithActions}
             // filter by persons
-            filterBase={filterPersonsWithAllFields()}
+            filterBase={filterPersonsWithAllFields}
             filterPersons={filterPersons}
             setFilterPersons={setFilterPersons}
           />
@@ -642,7 +648,7 @@ const Stats = () => {
             filterableActionsCategories={filterableActionsCategories}
             // filter by persons
             personsUpdatedWithActions={personsUpdatedWithActions}
-            filterBase={filterPersonsWithAllFields()}
+            filterBase={filterPersonsWithAllFields}
             filterPersons={filterPersons}
             setFilterPersons={setFilterPersons}
           />
@@ -651,7 +657,7 @@ const Stats = () => {
           <PersonStats
             title="personnes créées"
             firstBlockHelp={`Nombre de personnes dont la date 'Suivi(e) depuis le / Créé(e) le' se situe dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
-            filterBase={filterPersonsWithAllFields()}
+            filterBase={filterPersonsWithAllFields}
             filterPersons={filterPersons}
             setFilterPersons={setFilterPersons}
             personsForStats={personsCreated}
@@ -671,7 +677,7 @@ const Stats = () => {
             personFields={personFields}
             flattenedCustomFieldsPersons={flattenedCustomFieldsPersons}
             // filter by persons
-            filterBase={filterPersonsWithAllFields()}
+            filterBase={filterPersonsWithAllFields}
             filterPersons={filterPersons}
             setFilterPersons={setFilterPersons}
             evolutivesStatsActivated={evolutivesStatsActivated}
@@ -687,7 +693,7 @@ const Stats = () => {
             personsInPassagesBeforePeriod={personsInPassagesBeforePeriod}
             // filter by persons
             personsWithPassages={personsWithPassages}
-            filterBase={filterPersonsWithAllFields()}
+            filterBase={filterPersonsWithAllFields}
             filterPersons={filterPersons}
             setFilterPersons={setFilterPersons}
           />
@@ -699,7 +705,7 @@ const Stats = () => {
             personsInRencontresBeforePeriod={personsInRencontresBeforePeriod}
             // filter by persons
             personsWithRencontres={personsWithRencontres}
-            filterBase={filterPersonsWithAllFields()}
+            filterBase={filterPersonsWithAllFields}
             filterPersons={filterPersons}
             setFilterPersons={setFilterPersons}
           />
@@ -722,14 +728,14 @@ const Stats = () => {
             consultations={consultationsFilteredByPersons} // filter by persons
             // filter by persons
             personsWithConsultations={personsWithConsultations}
-            filterBase={filterPersonsWithAllFields(true)}
+            filterBase={filterPersonsWithAllFields}
             filterPersons={filterPersons}
             setFilterPersons={setFilterPersons}
           />
         )}
         {activeTab === "Dossiers médicaux des personnes créées" && (
           <MedicalFilesStats
-            filterBase={filterPersonsWithAllFields(true)}
+            filterBase={filterPersonsWithAllFields}
             title="personnes créées"
             filterPersons={filterPersons}
             setFilterPersons={setFilterPersons}
@@ -745,7 +751,7 @@ const Stats = () => {
             customFieldsMedicalFile={customFieldsMedicalFile}
             personFields={personFields}
             // filter by persons
-            filterBase={filterPersonsWithAllFields(true)}
+            filterBase={filterPersonsWithAllFields}
             filterPersons={filterPersons}
             setFilterPersons={setFilterPersons}
           />
