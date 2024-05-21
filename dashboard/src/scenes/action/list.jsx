@@ -22,6 +22,7 @@ import { dayjsInstance } from "../../services/date";
 import useMinimumWidth from "../../services/useMinimumWidth";
 
 const showAsOptions = ["Calendrier", "Liste", "Hebdomadaire"];
+const showTypeOptions = ["Actions et consultations", "Actions", "Consultations"];
 
 const actionsByTeamAndStatusSelector = selectorFamily({
   key: "actionsByTeamAndStatusSelector",
@@ -93,15 +94,17 @@ const consultationsByStatusSelector = selectorFamily({
 const dataFilteredBySearchSelector = selectorFamily({
   key: "dataFilteredBySearchSelector",
   get:
-    ({ search, statuses, categories, teamIds, viewAllOrganisationData, viewNoTeamData, actionsWithNoCategory }) =>
+    ({ search, statuses, categories, teamIds, viewAllOrganisationData, viewNoTeamData, actionsWithNoCategory, showType }) =>
     ({ get }) => {
-      const actions = get(
-        actionsByTeamAndStatusSelector({ statuses, categories, teamIds, viewNoTeamData, viewAllOrganisationData, actionsWithNoCategory })
-      );
+      const actions =
+        showType === "Actions" || showType === "Actions et consultations"
+          ? get(actionsByTeamAndStatusSelector({ statuses, categories, teamIds, viewNoTeamData, viewAllOrganisationData, actionsWithNoCategory }))
+          : [];
       // When we filter by category, we don't want to see all consultations.
-      const consultations = categories?.length
-        ? []
-        : get(consultationsByStatusSelector({ statuses, teamIds, viewNoTeamData, viewAllOrganisationData, actionsWithNoCategory }));
+      const consultations =
+        !categories?.length && (showType === "Consultations" || showType === "Actions et consultations")
+          ? get(consultationsByStatusSelector({ statuses, teamIds, viewNoTeamData, viewAllOrganisationData, actionsWithNoCategory }))
+          : [];
 
       if (!search) {
         return [...actions, ...consultations];
@@ -129,11 +132,14 @@ const List = () => {
   const [actionsWithNoCategory, setActionsWithNoCategory] = useLocalStorage("action-noCategory", false);
 
   const [showAs, setShowAs] = useLocalStorage("action-showAs", showAsOptions[0]); // calendar, list
+  const [showType, setShowType] = useLocalStorage("action-showType", "Actions et consultations"); // actions, consultations, both
+
   const dataConsolidated = useRecoilValue(
     dataFilteredBySearchSelector({
       search,
       statuses,
       categories,
+      showType,
       teamIds: selectedTeamIds,
       viewAllOrganisationData,
       viewNoTeamData,
@@ -211,26 +217,45 @@ const List = () => {
       </div>
 
       {isDesktop && (
-        <div className="tw-mb-10 tw-flex tw-flex-wrap tw-border-b tw-border-gray-200">
-          <div className="tw-mb-5 tw-flex tw-w-full tw-items-center tw-px-2">
-            <label htmlFor="actions-show-as" className="tw-mr-5 tw-w-40 tw-shrink-0">
-              Afficher par&nbsp;:
-            </label>
-            <div className="tw-basis-1/3">
-              <SelectCustom
-                onChange={({ value }) => setShowAs(value)}
-                value={{ value: showAs, label: showAs }}
-                options={showAsOptions.map((_option) => ({ value: _option, label: _option }))}
-                isClearable={false}
-                isMulti={false}
-                inputId="actions-show-as"
-                getOptionValue={(o) => o.value}
-                getOptionLabel={(o) => o.label}
-              />
+        <div className="tw-mb-10 tw-mt-4 tw-flex tw-flex-wrap tw-border-b tw-border-gray-200">
+          <div className="tw-mb-5 tw-grid tw-grid-cols-2 tw-w-full tw-items-center tw-px-2 tw-gap-8">
+            <div className="tw-flex tw-items-center">
+              <label htmlFor="actions-show-as" className="tw-w-36 tw-shrink-0 tw-m-0">
+                Afficher par&nbsp;:
+              </label>
+              <div className="tw-grow">
+                <SelectCustom
+                  onChange={({ value }) => setShowAs(value)}
+                  value={{ value: showAs, label: showAs }}
+                  options={showAsOptions.map((_option) => ({ value: _option, label: _option }))}
+                  isClearable={false}
+                  isMulti={false}
+                  inputId="actions-show-as"
+                  getOptionValue={(o) => o.value}
+                  getOptionLabel={(o) => o.label}
+                />
+              </div>
+            </div>
+            <div className="tw-flex tw-items-center">
+              <label htmlFor="actions-show-as" className="tw-w-36 tw-shrink-0 tw-m-0">
+                Éléments affichés&nbsp;:
+              </label>
+              <div className="tw-grow">
+                <SelectCustom
+                  onChange={({ value }) => setShowType(value)}
+                  value={{ value: showType, label: showType }}
+                  options={showTypeOptions.map((_option) => ({ value: _option, label: _option }))}
+                  isClearable={false}
+                  isMulti={false}
+                  inputId="actions-show-type"
+                  getOptionValue={(o) => o.value}
+                  getOptionLabel={(o) => o.label}
+                />
+              </div>
             </div>
           </div>
           <div className="tw-mb-5 tw-flex tw-w-full tw-items-center tw-px-2">
-            <label htmlFor="search" className="tw-mr-5 tw-w-40 tw-shrink-0">
+            <label htmlFor="search" className="tw-w-36 tw-shrink-0 tw-m-0">
               Recherche&nbsp;:
             </label>
             <Search placeholder="Par mot clé, présent dans le nom, la catégorie, un commentaire, ..." value={search} onChange={setSearch} />
@@ -266,7 +291,7 @@ const List = () => {
                 isDisabled={viewAllOrganisationData || viewNoTeamData}
               />
               {teams.length > 1 && (
-                <label htmlFor="viewAllOrganisationData" className="tw-flex tw-items-center tw-text-sm">
+                <label htmlFor="viewAllOrganisationData" className="tw-flex tw-items-center tw-text-sm tw-m-0">
                   <input
                     id="viewAllOrganisationData"
                     type="checkbox"
