@@ -1,3 +1,4 @@
+/* eslint-disable no-inner-declarations */
 import { useEffect } from "react";
 import { atom, selector, useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { toast } from "react-toastify";
