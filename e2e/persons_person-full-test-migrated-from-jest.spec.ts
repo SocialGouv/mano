@@ -154,7 +154,11 @@ test("test", async ({ page }) => {
     const input = element as HTMLInputElement;
     return input.validationMessage;
   });
-  expect(validationMessage).toContain("Please fill out this field.");
+  if (validationMessage?.includes("Veuillez renseigner ce champ.")) {
+    expect(validationMessage).toContain("Veuillez renseigner ce champ.");
+  } else {
+    expect(validationMessage).toContain("Please fill out this field.");
+  }
 
   await page.getByPlaceholder("Amoxicilline").click();
   await page.getByPlaceholder("Amoxicilline").fill("hdeyygdeygde");
