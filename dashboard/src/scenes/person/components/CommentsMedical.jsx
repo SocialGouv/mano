@@ -23,6 +23,7 @@ const CommentsMedical = ({ person }) => {
         comments={commentsMedical}
         typeForNewComment="medical-file"
         color="blue-900"
+        canToggleShareComment
         showPanel
         onDeleteComment={async (comment) => {
           const newMedicalFile = {

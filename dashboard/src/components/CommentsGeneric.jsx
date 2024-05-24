@@ -15,6 +15,7 @@ import { outOfBoundariesDate } from "../services/date";
 import AutoResizeTextarea from "./AutoresizeTextArea";
 import UserName from "./UserName";
 import CustomFieldDisplay from "./CustomFieldDisplay";
+import ConsultationButton from "./ConsultationButton";
 
 /*
 3 components:
@@ -36,6 +37,7 @@ import CustomFieldDisplay from "./CustomFieldDisplay";
  * @param {Boolean} props.showPanel
  * @param {Boolean} props.canToggleGroupCheck
  * @param {Boolean} props.canToggleUrgentCheck
+ * @param {Function} props.canToggleShareComment
  * @param {Function} props.onDeleteComment
  * @param {Function} props.onSubmitComment
  * @param {String} props.color (main|blue-900)
@@ -50,6 +52,7 @@ export function CommentsModule({
   showPanel = false,
   canToggleGroupCheck = false,
   canToggleUrgentCheck = false,
+  canToggleShareComment = false,
   onDeleteComment,
   onSubmitComment,
   color = "main", // main|blue-900
@@ -114,6 +117,7 @@ export function CommentsModule({
           onSubmit={onSubmitComment}
           typeForNewComment={typeForNewComment}
           canToggleGroupCheck={canToggleGroupCheck}
+          canToggleShareComment={canToggleShareComment}
           canToggleUrgentCheck={canToggleUrgentCheck}
           personId={personId}
           actionId={actionId}
@@ -129,6 +133,7 @@ export function CommentsModule({
           onSubmit={onSubmitComment}
           typeForNewComment={typeForNewComment}
           canToggleGroupCheck={canToggleGroupCheck}
+          canToggleShareComment={canToggleShareComment}
           canToggleUrgentCheck={canToggleUrgentCheck}
           personId={personId}
           actionId={actionId}
@@ -144,6 +149,7 @@ export function CommentsModule({
             setCommentToEdit(commentToDisplay);
           }}
           canToggleGroupCheck={canToggleGroupCheck}
+          canToggleShareComment={canToggleShareComment}
           canToggleUrgentCheck={canToggleUrgentCheck}
           color={color}
         />
@@ -231,17 +237,25 @@ function CommentsTable({ comments, onDisplayComment, onEditComment, onAddComment
         <tbody className="small">
           {(comments || []).map((comment, i) => {
             if (!comment.type) throw new Error("type is required");
-            const isNotEditable = (!!searchParams.get("consultationId") || !!searchParams.get("treatmentId")) && comment.user !== user._id;
+            const isNotEditable =
+              comment.isMedicalCommentShared ||
+              ((!!searchParams.get("consultationId") || !!searchParams.get("treatmentId")) && comment.user !== user._id);
             return (
               <tr
                 key={comment._id}
                 title={isNotEditable ? "Ce commentaire peut seulement être modifié par l'utilisateur qui l'a créé" : ""}
-                className={[`tw-bg-${color} tw-w-full`, i % 2 ? "tw-bg-opacity-0" : "tw-bg-opacity-5", isNotEditable && "!tw-cursor-not-allowed"]
+                className={[
+                  "tw-w-full",
+                  comment.isMedicalCommentShared ? "tw-bg-blue-900" : `tw-bg-${color}`,
+                  i % 2 && !comment.isMedicalCommentShared ? "tw-bg-opacity-0" : "tw-bg-opacity-5",
+                  isNotEditable && "!tw-cursor-not-allowed",
+                ]
                   .filter(Boolean)
                   .join(" ")}
               >
                 <td
                   onClick={() => {
+                    if (comment.isMedicalCommentShared) return;
                     switch (comment.type) {
                       case "action":
                       case "person":
@@ -286,7 +300,12 @@ function CommentsTable({ comments, onDisplayComment, onEditComment, onAddComment
                   <div className="tw-mx-auto tw-flex tw-w-full tw-max-w-prose tw-flex-col tw-gap-2 tw-overflow-hidden">
                     <div className="tw-mb-4 tw-flex tw-items-center tw-align-middle">
                       {!!comment.urgent && <ExclamationMarkButton className="tw-mr-4" />}
-                      <div className="tw-text-xs tw-opacity-50">{formatDateTimeWithNameOfDay(comment.date || comment.createdAt)}</div>
+                      <div className="tw-text-xs tw-opacity-50 tw-grow">{formatDateTimeWithNameOfDay(comment.date || comment.createdAt)}</div>
+                      {comment.isMedicalCommentShared ? (
+                        <div>
+                          <ConsultationButton />
+                        </div>
+                      ) : null}
                     </div>
                     <div className="tw-flex tw-w-full tw-flex-shrink tw-items-start">
                       {!!organisation.groupsEnabled && !!comment.group && (
@@ -301,13 +320,15 @@ function CommentsTable({ comments, onDisplayComment, onEditComment, onAddComment
                           </p>
                         ))}
                       </div>
+
                       {!!withClickableLabel && ["treatment", "consultation", "action", "passage", "rencontre"].includes(comment.type) && (
                         <button
                           type="button"
-                          className="tw-ml-auto tw-block"
+                          className={`tw-ml-auto tw-block ${comment.isMedicalCommentShared ? "!tw-cursor-not-allowed" : ""}`}
                           onClick={(e) => {
                             e.stopPropagation();
                             const searchParams = new URLSearchParams(location.search);
+                            if (comment.isMedicalCommentShared) return;
                             switch (comment.type) {
                               case "action":
                                 searchParams.set("actionId", comment.action);
@@ -365,7 +386,7 @@ function CommentsTable({ comments, onDisplayComment, onEditComment, onAddComment
   );
 }
 
-function CommentDisplay({ comment, onClose, onEditComment, canToggleUrgentCheck, canToggleGroupCheck, color = "main" }) {
+function CommentDisplay({ comment, onClose, onEditComment, canToggleUrgentCheck, canToggleGroupCheck, canToggleShareComment, color = "main" }) {
   const user = useRecoilValue(userState);
 
   const isEditable = useMemo(() => {
@@ -399,17 +420,17 @@ function CommentDisplay({ comment, onClose, onEditComment, canToggleUrgentCheck,
                 </div>
               </div>
             </div>
-            {(!!canToggleUrgentCheck || !!canToggleGroupCheck) && (
+            {canToggleUrgentCheck || canToggleGroupCheck || canToggleShareComment ? (
               <div className="tw-flex tw-gap-8">
-                {!!canToggleUrgentCheck && !!comment.urgent && (
+                {canToggleUrgentCheck && comment.urgent ? (
                   <div className="tw-flex tw-flex-1 tw-flex-col">
                     <label htmlFor="create-comment-urgent">
                       Commentaire prioritaire <br />
                       <small className="text-muted">Ce commentaire sera mis en avant par rapport aux autres</small>
                     </label>
                   </div>
-                )}
-                {!!canToggleGroupCheck && (
+                ) : null}
+                {canToggleGroupCheck ? (
                   <div className="tw-flex tw-flex-1 tw-flex-col">
                     <label htmlFor="create-comment-for-group">
                       <input type="checkbox" className="tw-mr-2" id="create-comment-for-group" name="group" checked={comment.group} disabled />
@@ -417,9 +438,17 @@ function CommentDisplay({ comment, onClose, onEditComment, canToggleUrgentCheck,
                       <small className="text-muted">Ce commentaire sera valable pour chaque membre de la famille</small>
                     </label>
                   </div>
-                )}
+                ) : null}
+                {canToggleShareComment ? (
+                  <div className="tw-flex tw-flex-1 tw-flex-col">
+                    <label htmlFor="create-comment-for-share">
+                      <input type="checkbox" className="tw-mr-2" id="create-comment-for-share" name="share" checked={comment.share} disabled />
+                      Partager ce commentaire médical avec les professionnels non-médicaux
+                    </label>
+                  </div>
+                ) : null}
               </div>
-            )}
+            ) : null}
           </div>
         </ModalBody>
         <ModalFooter>
@@ -450,6 +479,7 @@ function CommentModal({
   onSubmit,
   canToggleGroupCheck,
   canToggleUrgentCheck,
+  canToggleShareComment,
   typeForNewComment,
   actionId,
   personId,
@@ -477,7 +507,13 @@ function CommentModal({
       >
         <ModalHeader toggle={onClose} title={isNewComment ? "Créer un commentaire" : "Éditer le commentaire"} />
         <Formik
-          initialValues={{ urgent: false, group: false, ...comment, comment: comment.comment || window.sessionStorage.getItem("currentComment") }}
+          initialValues={{
+            urgent: false,
+            group: false,
+            share: false,
+            ...comment,
+            comment: comment.comment || window.sessionStorage.getItem("currentComment"),
+          }}
           onSubmit={async (body, actions) => {
             if (!body.date && !isNewComment) return toast.error("La date est obligatoire");
             if (!body.comment) return toast.error("Le commentaire est obligatoire");
@@ -488,6 +524,7 @@ function CommentModal({
               comment: body.comment,
               urgent: body.urgent || false,
               group: body.group || false,
+              share: body.share || false,
               user: user._id,
               date: body.date || new Date(),
               team: body.team || currentTeam._id,
@@ -552,9 +589,9 @@ function CommentModal({
                       />
                     </div>
                   </div>
-                  {(!!canToggleUrgentCheck || !!canToggleGroupCheck) && (
+                  {canToggleUrgentCheck || canToggleGroupCheck || canToggleShareComment ? (
                     <div className="tw-flex tw-gap-8">
-                      {!!canToggleUrgentCheck && (
+                      {canToggleUrgentCheck ? (
                         <div className="tw-flex tw-flex-1 tw-flex-col">
                           <label htmlFor="create-comment-urgent">
                             <input
@@ -569,8 +606,8 @@ function CommentModal({
                             <small className="text-muted">Ce commentaire sera mis en avant par rapport aux autres</small>
                           </label>
                         </div>
-                      )}
-                      {!!canToggleGroupCheck && (
+                      ) : null}
+                      {canToggleGroupCheck ? (
                         <div className="tw-flex tw-flex-1 tw-flex-col">
                           <label htmlFor="create-comment-for-group">
                             <input
@@ -585,9 +622,24 @@ function CommentModal({
                             <small className="text-muted">Ce commentaire sera valable pour chaque membre de la famille</small>
                           </label>
                         </div>
-                      )}
+                      ) : null}
+                      {canToggleShareComment ? (
+                        <div className="tw-flex tw-flex-1 tw-flex-col">
+                          <label htmlFor="create-comment-for-share">
+                            <input
+                              type="checkbox"
+                              className="tw-mr-2"
+                              id="create-comment-for-share"
+                              name="share"
+                              checked={values.share}
+                              onChange={handleChange}
+                            />
+                            Partager ce commentaire médical avec les professionnels non-médicaux
+                          </label>
+                        </div>
+                      ) : null}
                     </div>
-                  )}
+                  ) : null}
                 </div>
               </ModalBody>
               <ModalFooter>

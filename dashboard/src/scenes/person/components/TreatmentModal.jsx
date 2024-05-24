@@ -414,6 +414,7 @@ function TreatmentContent({ onClose, treatment, personId }) {
               comments={data.comments.map((c) => ({ ...c, type: "treatment", treatment }))}
               color="blue-900"
               typeForNewComment="treatment"
+              canToggleShareComment
               onDeleteComment={async (comment) => {
                 const newData = { ...data, comments: data.comments.filter((c) => c._id !== comment._id) };
                 setData(newData);
