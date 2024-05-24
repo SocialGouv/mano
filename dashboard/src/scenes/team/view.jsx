@@ -5,7 +5,6 @@ import { useParams, useHistory } from "react-router-dom";
 import { Formik } from "formik";
 import { toast } from "react-toastify";
 
-import { SmallHeaderWithBackButton } from "../../components/header";
 import Loading from "../../components/loading";
 import ButtonCustom from "../../components/ButtonCustom";
 import NightSessionModale from "../../components/NightSessionModale";
@@ -21,6 +20,7 @@ import { territoryObservationsState } from "../../recoil/territoryObservations";
 import { personsState } from "../../recoil/persons";
 import { passagesState } from "../../recoil/passages";
 import { rencontresState } from "../../recoil/rencontres";
+import BackButton from "../../components/backButton";
 
 const View = () => {
   const [team, setTeam] = useState(null);
@@ -72,7 +72,9 @@ const View = () => {
 
   return (
     <>
-      <SmallHeaderWithBackButton />
+      <div className="tw-my-8">
+        <BackButton />
+      </div>
       <Formik
         initialValues={team}
         enableReinitialize

@@ -30,7 +30,7 @@ const CreatePerson = () => {
         disabled={!currentTeam}
         onClick={() => setOpen(true)}
         color="primary"
-        title="Créer une nouvelle personne"
+        title="Créer une personne"
         padding="12px 24px"
       />
       <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">

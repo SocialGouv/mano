@@ -17,13 +17,13 @@ test("test", async ({ page }) => {
   await loginWith(page, "admin1@example.org");
   await page.getByRole("link", { name: "Organisation" }).click();
   await page.getByRole("link", { name: "Équipes" }).click();
-  await page.getByRole("button", { name: "Créer une nouvelle équipe" }).click();
+  await page.getByRole("button", { name: "Créer une équipe" }).click();
   await page.getByLabel("Nom").click();
   await page.getByLabel("Nom").fill("Équipe 2");
   await page.getByRole("dialog").getByRole("button", { name: "Créer" }).click();
   await page.getByText("Création réussie !").click();
   await page.getByRole("link", { name: "Personnes suivies" }).click();
-  await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
+  await page.getByRole("button", { name: "Créer une personne" }).click();
   await page.getByLabel("Nom").click();
   await page.getByLabel("Nom").fill("Manu Chao");
   await page.getByRole("button", { name: "Sauvegarder" }).click();

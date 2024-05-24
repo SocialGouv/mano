@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import { selectorFamily, useRecoilValue } from "recoil";
 import { useHistory } from "react-router-dom";
-import { SmallHeader } from "../../components/header";
 import Search from "../../components/search";
 import ActionsCalendar from "../../components/ActionsCalendar";
 import ActionsWeekly from "../../components/ActionsWeekly";
@@ -162,29 +161,24 @@ const List = () => {
 
   return (
     <>
-      <SmallHeader
-        title={
-          <span>
-            Agenda{" "}
-            {viewAllOrganisationData ? (
-              <>de toute l'organisation</>
-            ) : (
-              <>
-                {selectedTeamIds.length > 1 ? "des équipes" : "de l'équipe"}{" "}
-                <b>
-                  {teams
-                    .filter((t) => selectedTeamIds.includes(t._id))
-                    .map((e) => e?.name)
-                    .join(", ")}
-                </b>
-              </>
-            )}
-          </span>
-        }
-      />
-
-      <div className="tw-mb-5 tw-flex tw-flex-row tw-justify-center">
-        <div className="noprint tw-flex tw-w-full tw-justify-end tw-gap-3">
+      <div className="tw-flex tw-w-full tw-items-center tw-mt-8 tw-mb-12">
+        <div className="tw-grow tw-text-xl">
+          Agenda{" "}
+          {viewAllOrganisationData ? (
+            <>de toute l'organisation</>
+          ) : (
+            <>
+              {selectedTeamIds.length > 1 ? "des équipes" : "de l'équipe"}{" "}
+              <b>
+                {teams
+                  .filter((t) => selectedTeamIds.includes(t._id))
+                  .map((e) => e?.name)
+                  .join(", ")}
+              </b>
+            </>
+          )}
+        </div>
+        <div className="noprint tw-flex  tw-gap-3">
           <ButtonCustom
             icon={agendaIcon}
             disabled={!currentTeam}
@@ -195,7 +189,7 @@ const List = () => {
               history.push(`?${searchParams.toString()}`);
             }}
             color="primary"
-            title="Créer une nouvelle action"
+            title="Créer une action"
             padding={"12px 24px"}
           />
           {Boolean(user.healthcareProfessional) && (
@@ -209,13 +203,12 @@ const List = () => {
                 history.push(`?${searchParams.toString()}`);
               }}
               color="primary"
-              title="Créer une nouvelle consultation"
+              title="Créer une consultation"
               padding={"12px 24px"}
             />
           )}
         </div>
       </div>
-
       {isDesktop && (
         <div className="tw-mb-10 tw-mt-4 tw-flex tw-flex-wrap tw-border-b tw-border-gray-200">
           <div className="tw-mb-5 tw-grid tw-grid-cols-2 tw-w-full tw-items-center tw-px-2 tw-gap-8">

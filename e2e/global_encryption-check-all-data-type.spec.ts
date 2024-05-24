@@ -17,13 +17,13 @@ test("test", async ({ page }) => {
 
   await loginWith(page, "admin1@example.org", "secret", "plouf");
   await page.getByRole("link", { name: "Personnes suivies" }).click();
-  await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
+  await page.getByRole("button", { name: "Créer une personne" }).click();
   await page.getByLabel("Nom").click();
   await page.getByLabel("Nom").fill(premier);
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
   await page.getByRole("link", { name: "Personnes suivies" }).click();
-  await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
+  await page.getByRole("button", { name: "Créer une personne" }).click();
   await page.getByLabel("Nom").click();
   await page.getByLabel("Nom").fill(deuxieme);
   await page.getByRole("button", { name: "Sauvegarder" }).click();
@@ -106,7 +106,7 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Le lien familial a été ajouté").click();
   await page.getByRole("link", { name: "Territoires" }).click();
-  await page.getByRole("button", { name: "Créer un nouveau territoire" }).click();
+  await page.getByRole("button", { name: "Créer un territoire" }).click();
   await page.getByLabel("Nom").click();
   await page.getByLabel("Nom").fill(testTerritoire);
   await page.getByRole("button", { name: "Sauvegarder" }).click();
@@ -116,7 +116,7 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
   await page.getByRole("link", { name: "Structures" }).click();
-  await page.getByRole("button", { name: "Créer une nouvelle structure" }).click();
+  await page.getByRole("button", { name: "Créer une structure" }).click();
   await page.getByLabel("Nom").fill("Une structure");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Structure créée !").click();

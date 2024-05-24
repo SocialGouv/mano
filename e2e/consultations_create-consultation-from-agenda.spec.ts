@@ -16,13 +16,13 @@ test("test", async ({ page }) => {
   await page.getByLabel("Clé de chiffrement d'organisation").fill("plouf");
   await page.getByRole("button", { name: "Se connecter" }).click();
   await page.getByRole("link", { name: "Personnes suivies" }).click();
-  await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
+  await page.getByRole("button", { name: "Créer une personne" }).click();
   await page.getByLabel("Nom").click();
   await page.getByLabel("Nom").fill("test");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
   await page.getByRole("link", { name: "Agenda" }).click();
-  await page.getByRole("button", { name: "Créer une nouvelle consultation" }).click();
+  await page.getByRole("button", { name: "Créer une consultation" }).click();
   await changeReactSelectValue(page, "create-consultation-person-select", "test");
   await changeReactSelectValue(page, "consultation-modal-type", "Médicale");
 

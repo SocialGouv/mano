@@ -1,7 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { addOneDay, dateForDatePicker, formatDateWithNameOfDay, dayjsInstance } from "../../services/date";
-import { HeaderStyled, Title as HeaderTitle } from "../../components/header";
 import { TODO } from "../../recoil/actions";
 import ButtonCustom from "../../components/ButtonCustom";
 import { currentTeamState, organisationState, teamsState, userState } from "../../recoil/auth";
@@ -288,8 +287,8 @@ const View = () => {
   const canSeeComments = ["admin", "normal"].includes(user.role);
   return (
     <>
-      <HeaderStyled className=" !tw-py-4 tw-px-0">
-        <div className="printonly tw-px-8 tw-py-4 tw-text-2xl tw-font-bold" aria-hidden>
+      <div>
+        <div className="printonly tw-py-8 tw-px-8 tw-text-2xl tw-font-bold" aria-hidden>
           Compte-rendu{" "}
           {viewAllOrganisationData ? (
             <>global</>
@@ -300,13 +299,11 @@ const View = () => {
           )}{" "}
           - {formatPeriod({ period, preset })}
         </div>
-        <div className="noprint tw-flex tw-grow">
-          <HeaderTitle className="tw-w-96 tw-font-normal">
-            <span>
-              Comptes rendus {viewAllOrganisationData ? <>de toutes les équipes</> : <>{selectedTeams.length > 1 ? "des équipes" : "de l'équipe"}</>}
-            </span>
-          </HeaderTitle>
-          <div className="tw-ml-4">
+        <div className="noprint tw-flex tw-justify-start tw-items-start tw-mt-10 tw-mb-8">
+          <h1 className="tw-block tw-text-xl tw-min-w-96 tw-full tw-font-normal">
+            Comptes rendus {viewAllOrganisationData ? <>de toutes les équipes</> : <>{selectedTeams.length > 1 ? "des équipes" : "de l'équipe"}</>}
+          </h1>
+          <div className="tw-ml-4 tw-min-w-96">
             <SelectTeamMultiple
               onChange={(teamIds) => {
                 setSelectedTeamIds(teamIds);
@@ -331,7 +328,7 @@ const View = () => {
             {!selectedTeams.length && <p className="tw-mx-auto tw-w-full tw-text-center">Sélectionnez une équipe 👆</p>}
           </div>
         </div>
-      </HeaderStyled>
+      </div>
       <div className="noprint date-picker-container tw-mb-5 tw-flex tw-flex-wrap tw-items-center">
         <div className="tw-min-w-[15rem] tw-shrink-0 tw-p-0">
           <DateRangePickerWithPresets

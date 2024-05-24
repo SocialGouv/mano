@@ -30,7 +30,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("link", { name: "Équipes" }).click();
   await expect(page).toHaveURL("http://localhost:8090/team");
 
-  await page.getByRole("button", { name: "Créer une nouvelle équipe" }).click();
+  await page.getByRole("button", { name: "Créer une équipe" }).click();
   await page.getByRole("dialog").getByLabel("Nom").fill(teamExcludeCustomFieldName);
 
   await page.getByLabel("Non").check();
@@ -93,7 +93,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await expect(page).toHaveURL("http://localhost:8090/person");
 
-  await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
+  await page.getByRole("button", { name: "Créer une personne" }).click();
   await page.getByRole("dialog").getByLabel("Nom").fill(personName);
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.locator(".Toastify__close-button").last().click();
@@ -119,7 +119,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
 
   await page.getByRole("link", { name: "Territoires" }).click();
   await expect(page).toHaveURL("http://localhost:8090/territory");
-  await page.getByRole("button", { name: "Créer un nouveau territoire" }).click();
+  await page.getByRole("button", { name: "Créer un territoire" }).click();
   await page.getByRole("dialog").getByLabel("Nom").fill(territoryName);
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.locator(".Toastify__close-button").last().click();

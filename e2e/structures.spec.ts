@@ -27,7 +27,7 @@ test("Structures", async ({ page }) => {
   await page.getByText("Catégorie ajoutée. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard").click();
 
   await page.getByRole("link", { name: "Structures" }).click();
-  await page.getByRole("button", { name: "Créer une nouvelle structure" }).click();
+  await page.getByRole("button", { name: "Créer une structure" }).click();
   await page.getByLabel("Nom").fill("Structure 1");
   await page.getByLabel("Téléphone").fill("1123456789");
   await page.getByLabel("Adresse (numéro et rue)").fill("1 rue du chemin");
@@ -45,7 +45,7 @@ test("Structures", async ({ page }) => {
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await page.getByRole("link", { name: "Structures" }).click();
   await expect(page).toHaveURL("http://localhost:8090/structure");
-  await page.getByRole("button", { name: "Créer une nouvelle structure" }).click();
+  await page.getByRole("button", { name: "Créer une structure" }).click();
   await page.getByLabel("Nom").fill("Structure 1");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Une structure avec le même nom existe déjà").click();

@@ -1,6 +1,5 @@
 import React, { useMemo, Fragment } from "react";
 import { useHistory } from "react-router-dom";
-import Header from "../../components/header";
 import Table from "../../components/table";
 import dayjs from "dayjs";
 import UserName from "../../components/UserName";
@@ -260,7 +259,7 @@ const View = () => {
 
   return (
     <>
-      <Header title="Rechercher" />
+      <h1 className="tw-text-xl tw-my-8 tw-font-normal">Rechercher</h1>
       <div className="tw-mb-10 tw-flex tw-items-center tw-border-b tw-border-zinc-200 tw-pb-5">
         <Search placeholder="Par mot clé" value={search} onChange={setSearch} />
       </div>

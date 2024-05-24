@@ -23,7 +23,7 @@ test("Person creation", async ({ page }) => {
   await test.step("Create person through Personnes Suivies page", async () => {
     await page.getByRole("link", { name: "Personnes suivies" }).click();
 
-    await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
+    await page.getByRole("button", { name: "Créer une personne" }).click();
 
     await page.getByLabel("Nom").click();
 

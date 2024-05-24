@@ -35,7 +35,7 @@ export async function createAction(
   } = { categories: [], group: false }
 ) {
   await page.getByRole("link", { name: "Agenda" }).click();
-  await page.getByRole("button", { name: "Créer une nouvelle action" }).click();
+  await page.getByRole("button", { name: "Créer une action" }).click();
   await page.getByLabel("Nom de l'action").fill(actionName);
   await clickOnEmptyReactSelect(page, "create-action-person-select", personName);
   const { categories = [], group = false } = options;
@@ -57,7 +57,7 @@ export async function createAction(
 export async function createPerson(page: Page, name: string) {
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await expect(page).toHaveURL("http://localhost:8090/person");
-  await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
+  await page.getByRole("button", { name: "Créer une personne" }).click();
   await page.getByLabel("Nom").click();
   await page.getByLabel("Nom").fill(name);
   await page.getByRole("button", { name: "Sauvegarder" }).click();

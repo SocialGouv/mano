@@ -23,7 +23,7 @@ test("Create action with comments", async ({ page }) => {
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await expect(page).toHaveURL("http://localhost:8090/person");
 
-  await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
+  await page.getByRole("button", { name: "Créer une personne" }).click();
   await page.getByLabel("Nom").click();
   await page.getByLabel("Nom").fill(person1Name);
   await page.getByRole("button", { name: "Sauvegarder" }).click();
@@ -37,7 +37,7 @@ test("Create action with comments", async ({ page }) => {
 
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await expect(page).toHaveURL("http://localhost:8090/person");
-  await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
+  await page.getByRole("button", { name: "Créer une personne" }).click();
   await page.getByLabel("Nom").click();
   await page.getByLabel("Nom").fill(person2Name);
   await page.getByRole("button", { name: "Sauvegarder" }).click();
@@ -46,7 +46,7 @@ test("Create action with comments", async ({ page }) => {
 
   await page.getByRole("link", { name: "Agenda" }).click();
   await expect(page).toHaveURL("http://localhost:8090/action?calendarTab=2");
-  await page.getByRole("button", { name: "Créer une nouvelle action" }).click();
+  await page.getByRole("button", { name: "Créer une action" }).click();
   await page.getByLabel("Nom de l'action").fill("action avec commentaire");
   await page.getByText("Action prioritaire Cette action sera mise en avant par rapport aux autres").click();
   await changeReactSelectValue(page, "create-action-person-select", person1Name);
@@ -78,7 +78,7 @@ test("Create action with comments", async ({ page }) => {
 
   await page.getByRole("link", { name: "Agenda" }).click();
   await expect(page).toHaveURL("http://localhost:8090/action?calendarTab=2");
-  await page.getByRole("button", { name: "Créer une nouvelle action" }).click();
+  await page.getByRole("button", { name: "Créer une action" }).click();
   await page.getByLabel("Nom de l'action").click();
   await page.getByLabel("Nom de l'action").fill(actionFor2PersonName);
   await changeReactSelectValue(page, "create-action-person-select", person1Name);

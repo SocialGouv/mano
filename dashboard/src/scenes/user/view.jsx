@@ -6,7 +6,6 @@ import { Formik } from "formik";
 import { toast } from "react-toastify";
 import { useRecoilState, useRecoilValue } from "recoil";
 
-import { SmallHeaderWithBackButton } from "../../components/header";
 import Loading from "../../components/loading";
 import ButtonCustom from "../../components/ButtonCustom";
 import SelectTeamMultiple from "../../components/SelectTeamMultiple";
@@ -17,6 +16,7 @@ import useTitle from "../../services/useTitle";
 import DeleteButtonAndConfirmModal from "../../components/DeleteButtonAndConfirmModal";
 import { emailRegex } from "../../utils";
 import { capture } from "../../services/sentry";
+import BackButton from "../../components/backButton";
 
 const View = () => {
   const [localUser, setLocalUser] = useState(null);
@@ -41,7 +41,9 @@ const View = () => {
 
   return (
     <>
-      <SmallHeaderWithBackButton />
+      <div className="tw-my-8">
+        <BackButton />
+      </div>
       <button
         type="button"
         className="tw-absolute tw-bottom-0 tw-right-0 tw-m-4 tw-rounded tw-bg-white tw-p-2 tw-text-sm tw-text-white tw-opacity-0"

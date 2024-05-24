@@ -2,7 +2,6 @@ import React, { useMemo, useState, useRef, useEffect } from "react";
 import { Modal, ModalBody, ModalHeader } from "reactstrap";
 import { useHistory, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
-import { SmallHeader } from "../../components/header";
 import { formatDateWithNameOfDay, getIsDayWithinHoursOffsetOfPeriod, isToday, now, startOfToday } from "../../services/date";
 import { currentTeamReportsSelector } from "../../recoil/selectors";
 import SelectAndCreatePerson from "./SelectAndCreatePerson";
@@ -184,14 +183,13 @@ const Reception = () => {
 
   return (
     <>
-      <SmallHeader
-        title={
-          <span data-test-id="reception-title">
-            Accueil du <b>{formatDateWithNameOfDay(now())}</b> de l'équipe {currentTeam.nightSession ? "de nuit " : ""}
-            <b>{currentTeam.name || ""}</b>
-          </span>
-        }
-      />
+      <div className="tw-flex tw-w-full tw-items-center tw-mt-8 tw-mb-12">
+        <div className="tw-grow tw-text-xl tw-leading-[45px]">
+          Accueil du <b>{formatDateWithNameOfDay(now())}</b> de l'équipe {currentTeam.nightSession ? "de nuit " : ""}
+          <b>{currentTeam.name || ""}</b>
+        </div>
+      </div>
+
       <div className="tw-mb-10 tw-mt-8 tw-flex tw-gap-4">
         <div className="tw-grow">
           <SelectAndCreatePerson

@@ -10,13 +10,13 @@ test.beforeAll(async () => {
 test("search in reception and user list using different order and accent", async ({ page }) => {
   await loginWith(page, "admin1@example.org");
   await page.getByRole("link", { name: "Personnes suivies" }).click();
-  await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
+  await page.getByRole("button", { name: "Créer une personne" }).click();
   await page.getByLabel("Nom").click();
   await page.getByLabel("Nom").fill("azertyé qsdfghç");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
   await page.getByRole("link", { name: "Personnes suivies" }).click();
-  await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
+  await page.getByRole("button", { name: "Créer une personne" }).click();
   await page.getByLabel("Nom").click();
   await page.getByLabel("Nom").fill("azertyé wxcvbn");
   await page.getByRole("button", { name: "Sauvegarder" }).click();

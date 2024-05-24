@@ -15,7 +15,7 @@ test("test", async ({ page }) => {
   // Admin : creation personne/action/passage/rencontre/commentaire
 
   await page.getByRole("link", { name: "Personnes suivies" }).click();
-  await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
+  await page.getByRole("button", { name: "Créer une personne" }).click();
   await page.getByLabel("Nom").fill("testrestrict");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
@@ -78,7 +78,7 @@ test("test", async ({ page }) => {
   // création des territoires
   await page.getByRole("link", { name: "Accueil" }).click();
   await page.getByRole("link", { name: "Territoires" }).click();
-  await page.getByRole("button", { name: "Créer un nouveau territoire" }).click();
+  await page.getByRole("button", { name: "Créer un territoire" }).click();
   await page.getByLabel("Nom").fill("nouveauterritoire");
   await page.getByLabel("Périmètre").click();
   await clickOnEmptyReactSelect(page, "territory-select-types", "Lieu de deal");

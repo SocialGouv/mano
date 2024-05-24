@@ -3,8 +3,6 @@ import { FormGroup, Input, Label, Row, Col, Modal, ModalHeader, ModalBody } from
 import { Formik } from "formik";
 import { toast } from "react-toastify";
 import { useRecoilState } from "recoil";
-
-import Header from "../components/header";
 import Loading from "../components/loading";
 import ButtonCustom from "../components/ButtonCustom";
 import ChangePassword from "../components/ChangePassword";
@@ -18,7 +16,7 @@ const Account = () => {
 
   return (
     <>
-      <Header title={user.name} />
+      <h1 className="tw-text-xl tw-my-8 tw-font-normal">{user.name}</h1>
       <Formik
         initialValues={user}
         onSubmit={async (body) => {

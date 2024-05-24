@@ -5,7 +5,6 @@ import { Formik } from "formik";
 import { toast } from "react-toastify";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 
-import { SmallHeader } from "../../components/header";
 import ButtonCustom from "../../components/ButtonCustom";
 import Table from "../../components/table";
 import NightSessionModale from "../../components/NightSessionModale";
@@ -44,8 +43,12 @@ const List = () => {
 
   return (
     <>
-      <SmallHeader title="Équipes" />
-      <Create />
+      <div className="tw-flex tw-w-full tw-items-center tw-mt-8 tw-mb-12">
+        <div className="tw-grow tw-text-xl">Équipes</div>
+        <div>
+          <Create />
+        </div>
+      </div>
       <Table
         data={data}
         onRowClick={(i) => history.push(`/team/${i._id}`)}
@@ -98,11 +101,11 @@ const Create = () => {
   const onboardingForTeams = !teams.length;
 
   return (
-    <div className="tw-mb-10 tw-flex tw-w-full tw-justify-end">
-      <ButtonCustom color="primary" onClick={() => setOpen(true)} title="Créer une nouvelle équipe" padding="12px 24px" />
+    <div className="tw-flex tw-w-full tw-justify-end">
+      <ButtonCustom color="primary" onClick={() => setOpen(true)} title="Créer une équipe" padding="12px 24px" />
       <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
         <ModalHeader close={onboardingForTeams ? <></> : null} toggle={() => setOpen(false)}>
-          {onboardingForTeams ? "Dernière étape !" : "Créer une nouvelle équipe"}
+          {onboardingForTeams ? "Dernière étape !" : "Créer une équipe"}
         </ModalHeader>
         <ModalBody>
           {Boolean(onboardingForTeams) && (

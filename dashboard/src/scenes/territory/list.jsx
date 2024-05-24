@@ -5,7 +5,6 @@ import { toast } from "react-toastify";
 import { Formik } from "formik";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { useLocalStorage } from "../../services/useLocalStorage";
-import { SmallHeader } from "../../components/header";
 import Page from "../../components/pagination";
 import Loading from "../../components/loading";
 import Table from "../../components/table";
@@ -56,18 +55,14 @@ const List = () => {
 
   return (
     <>
-      <SmallHeader
-        title={
-          <>
-            Territoires de l'organisation <b>{organisation.name}</b>
-          </>
-        }
-      />
-      <Row style={{ marginBottom: 40 }}>
-        <Col>
+      <div className="tw-flex tw-w-full tw-items-center tw-mt-8 tw-mb-12">
+        <div className="tw-grow tw-text-xl">
+          Territoires de l'organisation <b>{organisation.name}</b>
+        </div>
+        <div>
           <CreateTerritory />
-        </Col>
-      </Row>
+        </div>
+      </div>
       <Row style={{ marginBottom: 40, borderBottom: "1px solid #ddd" }}>
         <Col md={12} style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
           <label htmlFor="search" style={{ marginRight: 20, width: 250, flexShrink: 0 }}>
@@ -137,13 +132,7 @@ export const CreateTerritory = () => {
   return (
     <div className="tw-flex tw-w-full tw-justify-end">
       {!["restricted-access"].includes(user.role) && (
-        <ButtonCustom
-          disabled={!currentTeam?._id}
-          onClick={() => setOpen(true)}
-          color="primary"
-          title="Créer un nouveau territoire"
-          padding="12px 24px"
-        />
+        <ButtonCustom disabled={!currentTeam?._id} onClick={() => setOpen(true)} color="primary" title="Créer un territoire" padding="12px 24px" />
       )}
       <TerritoryModal open={open} setOpen={setOpen} />
     </div>
@@ -159,7 +148,7 @@ export function TerritoryModal({ open, setOpen, territory = {} }) {
 
   return (
     <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
-      <ModalHeader toggle={() => setOpen(false)}>Créer un nouveau territoire</ModalHeader>
+      <ModalHeader toggle={() => setOpen(false)}>Créer un territoire</ModalHeader>
       <ModalBody>
         <Formik
           initialValues={initialValues}

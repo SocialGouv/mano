@@ -26,7 +26,7 @@ test("test restricted accesses", async ({ page }) => {
     await page.getByRole("link", { name: "Personnes suivies" }).click();
     await expect(page).toHaveURL("http://localhost:8090/person");
 
-    await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
+    await page.getByRole("button", { name: "Créer une personne" }).click();
     await page.getByLabel("Nom").fill(person1Name);
     await page.getByRole("button", { name: "Sauvegarder" }).click();
     await page.getByText("Création réussie !").click();
@@ -315,7 +315,7 @@ test("test restricted accesses", async ({ page }) => {
 
   await test.step("Merge persons", async () => {
     await page.getByRole("link", { name: "Personnes suivies" }).click();
-    await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
+    await page.getByRole("button", { name: "Créer une personne" }).click();
     await page.getByLabel("Nom").click();
     await page.getByLabel("Nom").fill(person2Name);
     await page.getByRole("button", { name: "Sauvegarder" }).click();

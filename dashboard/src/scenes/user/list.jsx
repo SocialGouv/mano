@@ -8,7 +8,6 @@ import { formatDateWithFullMonth } from "../../services/date";
 import useTitle from "../../services/useTitle";
 import { useLocalStorage } from "../../services/useLocalStorage";
 import { ModalBody, ModalContainer, ModalHeader, ModalFooter } from "../../components/tailwind/Modal";
-import { SmallHeader } from "../../components/header";
 import SelectTeamMultiple from "../../components/SelectTeamMultiple";
 import Loading from "../../components/loading";
 import Table from "../../components/table";
@@ -84,8 +83,10 @@ const List = () => {
   if (!users.length) return <Loading />;
   return (
     <>
-      <SmallHeader title="Utilisateurs" />
-      {["admin"].includes(user.role) && <Create users={users} onChange={() => setRefresh(true)} />}
+      <div className="tw-flex tw-w-full tw-items-center tw-mt-8 tw-mb-12">
+        <div className="tw-grow tw-text-xl">Utilisateurs</div>
+        <div>{["admin"].includes(user.role) && <Create users={users} onChange={() => setRefresh(true)} />}</div>
+      </div>
       <Table
         data={data}
         rowKey={"_id"}
@@ -238,9 +239,9 @@ const Create = ({ onChange, users }) => {
   };
 
   return (
-    <div className="tw-mb-10 tw-flex tw-w-full tw-justify-end">
+    <div className="tw-flex tw-w-full tw-justify-end">
       <button type="button" className="button-submit" onClick={() => setOpen(true)}>
-        Créer un nouvel utilisateur
+        Créer un utilisateur
       </button>
       <ModalContainer open={open} onClose={() => setOpen(false)} size="full">
         <ModalHeader onClose={() => setOpen(false)} title="Créer de nouveaux utilisateurs" />

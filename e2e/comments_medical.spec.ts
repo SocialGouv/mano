@@ -18,7 +18,7 @@ test("test", async ({ page }) => {
 
   await loginWith(page, "admin1@example.org");
   await page.getByRole("link", { name: "Personnes suivies" }).click();
-  await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
+  await page.getByRole("button", { name: "Créer une personne" }).click();
   await page.getByLabel("Nom").click();
   await page.getByLabel("Nom").fill(personName);
   await page.getByRole("button", { name: "Sauvegarder" }).click();

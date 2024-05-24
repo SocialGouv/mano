@@ -13,7 +13,7 @@ test("test territories", async ({ page }) => {
 
   await page.getByRole("link", { name: "Territoires" }).click();
   await expect(page).toHaveURL("http://localhost:8090/territory");
-  await page.getByRole("button", { name: "Créer un nouveau territoire" }).click();
+  await page.getByRole("button", { name: "Créer un territoire" }).click();
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Le nom est obligatoire").click();
   await page.getByRole("dialog").getByLabel("Nom").fill("test de territoire new");

@@ -17,7 +17,7 @@ test("Lieux fréquentés", async ({ page }) => {
 
   await page.getByRole("link", { name: "Personnes suivies" }).click();
 
-  await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
+  await page.getByRole("button", { name: "Créer une personne" }).click();
   await page.getByLabel("Nom").fill("personne 1");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
@@ -49,7 +49,7 @@ test("Lieux fréquentés", async ({ page }) => {
   await expect(page.locator("data-test-id=parking")).not.toBeVisible();
 
   await page.getByRole("link", { name: "Personnes suivies" }).click();
-  await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
+  await page.getByRole("button", { name: "Créer une personne" }).click();
   await page.getByLabel("Nom").fill("personne 2");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();

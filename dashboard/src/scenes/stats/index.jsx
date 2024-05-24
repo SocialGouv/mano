@@ -17,7 +17,6 @@ import { personsForStatsSelector, populatedPassagesSelector } from "../../recoil
 import useTitle from "../../services/useTitle";
 import DateRangePickerWithPresets, { formatPeriod, statsPresets } from "../../components/DateRangePickerWithPresets";
 import { useDataLoader } from "../../components/DataLoader";
-import { HeaderStyled, Title as HeaderTitle } from "../../components/header";
 import Loading from "../../components/loading";
 import SelectTeamMultiple from "../../components/SelectTeamMultiple";
 import ExportFormattedData from "../data-import-export/ExportFormattedData";
@@ -531,7 +530,7 @@ const Stats = () => {
 
   return (
     <>
-      <HeaderStyled className=" !tw-py-4 tw-px-0">
+      <div>
         <div className="printonly tw-px-8 tw-py-4 tw-text-2xl tw-font-bold" aria-hidden>
           Statistiques{" "}
           {viewAllOrganisationData ? (
@@ -543,11 +542,11 @@ const Stats = () => {
           )}{" "}
           - {formatPeriod({ period, preset })}
         </div>
-        <div className="noprint tw-flex tw-grow">
-          <HeaderTitle className="tw-w-64 tw-font-normal">
+        <div className="noprint tw-flex tw-justify-start tw-items-start tw-mt-10 tw-mb-8">
+          <h1 className="tw-block tw-text-xl tw-min-w-64 tw-full tw-font-normal">
             <span>Statistiques {viewAllOrganisationData ? <>globales</> : <>{selectedTeams.length > 1 ? "des équipes" : "de l'équipe"}</>}</span>
-          </HeaderTitle>
-          <div className="tw-ml-4">
+          </h1>
+          <div className="tw-ml-4 tw-min-w-96">
             <SelectTeamMultiple
               onChange={(teamsId) => {
                 setSelectedTeams(teams.filter((t) => teamsId.includes(t._id)));
@@ -571,7 +570,7 @@ const Stats = () => {
             )}
           </div>
         </div>
-      </HeaderStyled>
+      </div>
       <div className="noprint date-picker-container tw-mb-5 tw-flex tw-flex-wrap tw-items-center">
         <div className="tw-min-w-[15rem] tw-shrink-0 tw-basis-1/3 tw-p-0">
           <DateRangePickerWithPresets

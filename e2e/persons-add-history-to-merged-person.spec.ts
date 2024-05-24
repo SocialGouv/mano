@@ -25,7 +25,7 @@ test("Add history to merged person", async ({ page }) => {
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await expect(page).toHaveURL("http://localhost:8090/person");
 
-  await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
+  await page.getByRole("button", { name: "Créer une personne" }).click();
 
   await page.getByLabel("Nom").click();
 
@@ -42,7 +42,7 @@ test("Add history to merged person", async ({ page }) => {
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await expect(page).toHaveURL("http://localhost:8090/person");
 
-  await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
+  await page.getByRole("button", { name: "Créer une personne" }).click();
 
   await page.getByLabel("Nom").click();
 

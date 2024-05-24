@@ -25,7 +25,7 @@ test("Merge persons", async ({ page }) => {
 
   await test.step("Create persons and upload files", async () => {
     await page.getByRole("link", { name: "Personnes suivies" }).click();
-    await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
+    await page.getByRole("button", { name: "Créer une personne" }).click();
     await page.getByLabel("Nom").click();
     await page.getByLabel("Nom").fill(person1Name);
     await page.getByRole("button", { name: "Sauvegarder" }).click();
@@ -35,7 +35,7 @@ test("Merge persons", async ({ page }) => {
     person1DocumentLink = await page.locator("tr[aria-label='Document image-1.jpg']").getAttribute("data-test-id");
 
     await page.getByRole("link", { name: "Personnes suivies" }).click();
-    await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
+    await page.getByRole("button", { name: "Créer une personne" }).click();
     await page.getByLabel("Nom").click();
     await page.getByLabel("Nom").fill(person2Name);
     await page.getByRole("button", { name: "Sauvegarder" }).click();

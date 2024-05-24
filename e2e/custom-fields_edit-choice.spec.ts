@@ -56,7 +56,7 @@ test("test", async ({ page }) => {
     await page.getByRole("link", { name: "Personnes suivies" }).click();
     await expect(page).toHaveURL("http://localhost:8090/person");
 
-    await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
+    await page.getByRole("button", { name: "Créer une personne" }).click();
     await page.getByRole("dialog").getByLabel("Nom").fill("personne1");
     await page.getByRole("button", { name: "Sauvegarder" }).click();
     await page.getByText("Création réussie !").click();
@@ -114,7 +114,7 @@ test("test", async ({ page }) => {
   await test.step("create observation", async () => {
     await page.getByRole("link", { name: "Territoires" }).click();
     await expect(page).toHaveURL("http://localhost:8090/territory");
-    await page.getByRole("button", { name: "Créer un nouveau territoire" }).click();
+    await page.getByRole("button", { name: "Créer un territoire" }).click();
     await page.getByRole("dialog").getByLabel("Nom").fill("territoire1");
     await page.getByRole("button", { name: "Sauvegarder" }).click();
     await page.getByText("Création réussie !").click();

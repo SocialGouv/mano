@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { SmallHeader } from "../../components/header";
 import Loading from "../../components/loading";
 import Table from "../../components/table";
 import { toast } from "react-toastify";
@@ -45,9 +44,9 @@ const List = () => {
 
   return (
     <>
-      <SmallHeader title={`Structures (${filteredStructures?.length})`} />
-      <div className="tw-mb-5 tw-flex tw-flex-row tw-justify-center">
-        <div className="noprint tw-flex tw-w-full tw-justify-end tw-gap-3">
+      <div className="tw-flex tw-w-full tw-items-center tw-mt-8 tw-mb-12">
+        <div className="tw-grow tw-text-xl">{`Structures (${filteredStructures?.length})`}</div>
+        <div>
           <Structure
             key={currentStructure}
             onSuccess={() => {
@@ -183,7 +182,7 @@ const Structure = ({ structure: initStructure, onSuccess, open, onClose, onOpen 
 
   return (
     <div className="tw-flex tw-w-full tw-justify-end">
-      <ButtonCustom onClick={onOpen} color="primary" title="Créer une nouvelle structure" padding="12px 24px" />
+      <ButtonCustom onClick={onOpen} color="primary" title="Créer une structure" padding="12px 24px" />
       <ModalContainer open={open} onClose={onResetAndClose} size="full">
         <ModalHeader title={!initStructure?._id ? "Créer une structure" : "Modifier une structure"} />
         <ModalBody className="tw-pb-4">
