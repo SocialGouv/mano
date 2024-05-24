@@ -12,13 +12,15 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import API from "../../services/api";
 import SelectTeamMultiple from "../../components/SelectTeamMultiple";
 import dayjs from "dayjs";
+import { useDataLoader } from "../../components/DataLoader";
 
-const CreatePerson = ({ refreshable }) => {
+const CreatePerson = () => {
+  const { refresh } = useDataLoader();
   const [open, setOpen] = useState(false);
   const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
   const history = useHistory();
-  const [persons, setPersons] = useRecoilState(personsState);
+  const [persons] = useRecoilState(personsState);
   const preparePersonForEncryption = usePreparePersonForEncryption();
 
   return (
@@ -48,11 +50,11 @@ const CreatePerson = ({ refreshable }) => {
                 body: preparePersonForEncryption(body),
               });
               if (response.ok) {
-                setPersons((persons) => [response.decryptedData, ...persons].sort((p1, p2) => (p1.name || "").localeCompare(p2.name || "")));
+                await refresh();
                 toast.success("Création réussie !");
                 setOpen(false);
                 actions.setSubmitting(false);
-                history.push(`/person/${response.decryptedData._id}`);
+                history.push(`/person/${response.data._id}`);
               }
             }}
           >

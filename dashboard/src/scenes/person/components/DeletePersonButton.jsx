@@ -114,7 +114,7 @@ const DeletePersonButton = ({ person }) => {
         const personRes = await API.delete({ path: `/person/${person._id}`, body });
         if (personRes?.ok) {
           toast.success("Suppression réussie");
-          refresh();
+          await refresh();
           history.goBack();
         }
       }}

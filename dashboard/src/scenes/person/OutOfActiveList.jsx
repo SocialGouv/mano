@@ -2,24 +2,25 @@ import React, { useState } from "react";
 import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader, Label } from "reactstrap";
 import { Formik } from "formik";
 import { toast } from "react-toastify";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 import { userState } from "../../recoil/auth";
 import ButtonCustom from "../../components/ButtonCustom";
-import { fieldsPersonsCustomizableOptionsSelector, personsState, usePreparePersonForEncryption } from "../../recoil/persons";
+import { fieldsPersonsCustomizableOptionsSelector, usePreparePersonForEncryption } from "../../recoil/persons";
 import API from "../../services/api";
 import { outOfBoundariesDate } from "../../services/date";
 import SelectCustom from "../../components/SelectCustom";
 import { cleanHistory } from "./components/PersonHistory";
 import DatePicker from "../../components/DatePicker";
+import { useDataLoader } from "../../components/DataLoader";
 
 const OutOfActiveList = ({ person }) => {
   const [open, setOpen] = useState(false);
+  const { refresh } = useDataLoader();
 
   const preparePersonForEncryption = usePreparePersonForEncryption();
   const user = useRecoilValue(userState);
 
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
-  const setPersons = useSetRecoilState(personsState);
 
   const reintegerInActiveList = async () => {
     const historyEntry = {
@@ -38,13 +39,7 @@ const OutOfActiveList = ({ person }) => {
       body: preparePersonForEncryption({ ...person, outOfActiveList: false, outOfActiveListReasons: [], outOfActiveListDate: null, history }),
     });
     if (response.ok) {
-      const newPerson = response.decryptedData;
-      setPersons((persons) =>
-        persons.map((p) => {
-          if (p._id === person._id) return newPerson;
-          return p;
-        })
-      );
+      await refresh();
       toast.success(person.name + " est réintégré dans la file active");
     }
   };
@@ -71,13 +66,7 @@ const OutOfActiveList = ({ person }) => {
       body: preparePersonForEncryption(updatedPerson),
     });
     if (response.ok) {
-      const newPerson = response.decryptedData;
-      setPersons((persons) =>
-        persons.map((p) => {
-          if (p._id === person._id) return newPerson;
-          return p;
-        })
-      );
+      await refresh();
       toast.success(person.name + " est hors de la file active");
     }
     setOpen(false);

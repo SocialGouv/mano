@@ -142,13 +142,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
             }),
           });
           if (treatmentResponse.ok) {
-            const newTreatment = treatmentResponse.decryptedData;
-            setAllTreatments((allTreatments) =>
-              allTreatments.map((t) => {
-                if (t._id === treatment._id) return newTreatment;
-                return t;
-              })
-            );
+            await refresh();
             toast.success("Document supprimé");
             return true;
           } else {
@@ -167,13 +161,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
             }),
           });
           if (consultationResponse.ok) {
-            const newConsultation = consultationResponse.decryptedData;
-            setAllConsultations((allConsultations) =>
-              allConsultations.map((c) => {
-                if (c._id === consultation._id) return newConsultation;
-                return c;
-              })
-            );
+            await refresh();
             toast.success("Document supprimé");
             return true;
           } else {
@@ -191,13 +179,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
             }),
           });
           if (medicalFileResponse.ok) {
-            const newMedicalFile = medicalFileResponse.decryptedData;
-            setAllMedicalFiles((allMedicalFiles) =>
-              allMedicalFiles.map((m) => {
-                if (m._id === medicalFile._id) return newMedicalFile;
-                return m;
-              })
-            );
+            await refresh();
             toast.success("Document supprimé");
             return true;
           } else {
@@ -227,13 +209,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
             }),
           });
           if (treatmentResponse.ok) {
-            const newTreatment = treatmentResponse.decryptedData;
-            setAllTreatments((allTreatments) =>
-              allTreatments.map((t) => {
-                if (t._id === treatment._id) return newTreatment;
-                return t;
-              })
-            );
+            await refresh();
             toast.success("Document mis à jour");
           } else {
             toast.error("Erreur lors de la mise à jour du document, vous pouvez contactez le support");
@@ -259,13 +235,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
             }),
           });
           if (consultationResponse.ok) {
-            const newConsultation = consultationResponse.decryptedData;
-            setAllConsultations((allConsultations) =>
-              allConsultations.map((c) => {
-                if (c._id === consultation._id) return newConsultation;
-                return c;
-              })
-            );
+            await refresh();
             toast.success("Document mis à jour");
           } else {
             toast.error("Erreur lors de la mise à jour du document, vous pouvez contactez le support");
@@ -290,13 +260,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
             }),
           });
           if (medicalFileResponse.ok) {
-            const newMedicalFile = medicalFileResponse.decryptedData;
-            setAllMedicalFiles((allMedicalFiles) =>
-              allMedicalFiles.map((m) => {
-                if (m._id === medicalFile._id) return newMedicalFile;
-                return m;
-              })
-            );
+            await refresh();
             toast.success("Document mis à jour");
           } else {
             toast.error("Erreur lors de la mise à jour du document, vous pouvez contactez le support");
@@ -360,7 +324,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
           });
           if (medicalDocumentsResponse.ok) {
             toast.success("Documents mis à jour");
-            refresh();
+            await refresh();
             return true;
           } else {
             toast.error("Erreur lors de la mise à jour des documents, vous pouvez contactez le support");
@@ -385,12 +349,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
         if (medicalFileResponse.ok) {
           if (nextDocuments.filter((d) => d.type === "document").length > 1) toast.success("Documents enregistrés !");
           if (nextDocuments.filter((d) => d.type === "folder").length > 0) toast.success("Dossier créé !");
-          setAllMedicalFiles((allMedicalFiles) =>
-            allMedicalFiles.map((m) => {
-              if (m._id === medicalFile._id) return medicalFileResponse.decryptedData;
-              return m;
-            })
-          );
+          await refresh();
         }
       }}
     />

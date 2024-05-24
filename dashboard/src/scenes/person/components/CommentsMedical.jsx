@@ -1,14 +1,15 @@
-import React, { useMemo } from "react";
-import { useSetRecoilState, useRecoilValue } from "recoil";
+import { useMemo } from "react";
+import { useRecoilValue } from "recoil";
 import { v4 as uuidv4 } from "uuid";
-import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from "../../../recoil/medicalFiles";
+import { customFieldsMedicalFileSelector, prepareMedicalFileForEncryption } from "../../../recoil/medicalFiles";
 import { CommentsModule } from "../../../components/CommentsGeneric";
 import API from "../../../services/api";
 import { toast } from "react-toastify";
+import { useDataLoader } from "../../../components/DataLoader";
 
 const CommentsMedical = ({ person }) => {
+  const { refresh } = useDataLoader();
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
-  const setAllMedicalFiles = useSetRecoilState(medicalFileState);
 
   const medicalFile = person.medicalFile;
   const commentsMedical = useMemo(
@@ -28,25 +29,13 @@ const CommentsMedical = ({ person }) => {
             ...medicalFile,
             comments: medicalFile.comments.filter((c) => c._id !== comment._id),
           };
-          // optimistic UI
-          setAllMedicalFiles((medicalFiles) => {
-            return medicalFiles.map((_medicalFile) => {
-              if (_medicalFile._id !== medicalFile._id) return _medicalFile;
-              return newMedicalFile;
-            });
-          });
           const response = await API.put({
             path: `/medical-file/${medicalFile._id}`,
             body: prepareMedicalFileForEncryption(customFieldsMedicalFile)(newMedicalFile),
           });
           if (!response.ok) return;
           toast.success("Commentaire supprimé");
-          setAllMedicalFiles((medicalFiles) => {
-            return medicalFiles.map((_medicalFile) => {
-              if (_medicalFile._id !== medicalFile._id) return _medicalFile;
-              return response.decryptedData;
-            });
-          });
+          await refresh();
         }}
         onSubmitComment={async (comment, isNewComment) => {
           const newMedicalFile = {
@@ -60,25 +49,13 @@ const CommentsMedical = ({ person }) => {
                   return c;
                 }),
           };
-          // optimistic UI
-          setAllMedicalFiles((medicalFiles) => {
-            return medicalFiles.map((_medicalFile) => {
-              if (_medicalFile._id !== medicalFile._id) return _medicalFile;
-              return newMedicalFile;
-            });
-          });
           const response = await API.put({
             path: `/medical-file/${medicalFile._id}`,
             body: prepareMedicalFileForEncryption(customFieldsMedicalFile)(newMedicalFile),
           });
           if (!response.ok) return;
           toast.success("Commentaire enregistré");
-          setAllMedicalFiles((medicalFiles) => {
-            return medicalFiles.map((_medicalFile) => {
-              if (_medicalFile._id !== medicalFile._id) return _medicalFile;
-              return response.decryptedData;
-            });
-          });
+          await refresh();
         }}
       />
     </div>

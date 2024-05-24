@@ -14,6 +14,7 @@ import { currentTeamState, organisationState, userState } from "../../recoil/aut
 import ExclamationMarkButton from "../../components/tailwind/ExclamationMarkButton";
 import { theme } from "../../config";
 import dayjs from "dayjs";
+import { useDataLoader } from "../../components/DataLoader";
 
 function removeDiatricsAndAccents(str) {
   return (str || "")
@@ -68,7 +69,8 @@ const filterEasySearch = (search, items = []) => {
 };
 
 const SelectAndCreatePerson = ({ value, onChange, inputId, classNamePrefix, showLinkToPerson = true }) => {
-  const [persons, setPersons] = useRecoilState(personsState);
+  const { refresh } = useDataLoader();
+  const [persons] = useRecoilState(personsState);
   const [isDisabled, setIsDisabled] = useState(false);
   const actions = useRecoilValue(actionsState);
   const currentTeam = useRecoilValue(currentTeamState);
@@ -181,7 +183,7 @@ const SelectAndCreatePerson = ({ value, onChange, inputId, classNamePrefix, show
         });
         setIsDisabled(false);
         if (personResponse.ok) {
-          setPersons((persons) => [personResponse.decryptedData, ...persons].sort((p1, p2) => (p1?.name || "").localeCompare(p2?.name || "")));
+          await refresh();
           toast.success("Nouvelle personne ajoutée !");
           onChange([...currentValue, personResponse.decryptedData]);
         }

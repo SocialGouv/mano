@@ -16,7 +16,7 @@ import { ModalContainer, ModalHeader, ModalBody, ModalFooter } from "../../compo
 import { itemsGroupedByPersonSelector } from "../../recoil/selectors";
 
 const PersonFamily = ({ person }) => {
-  const [groups, setGroups] = useRecoilState(groupsState);
+  const [groups] = useRecoilState(groupsState);
   const user = useRecoilValue(userState);
   const personGroup = useRecoilValue(groupSelector({ personId: person?._id }));
   const itemsGroupedByPerson = useRecoilValue(itemsGroupedByPersonSelector);
@@ -78,9 +78,7 @@ const PersonFamily = ({ person }) => {
       ? await API.post({ path: "/group", body: prepareGroupForEncryption(nextGroup) })
       : await API.put({ path: `/group/${groupToEdit._id}`, body: prepareGroupForEncryption(nextGroup) });
     if (response.ok) {
-      setGroups((groups) =>
-        isNew ? [...groups, response.decryptedData] : groups.map((group) => (group._id === groupToEdit._id ? response.decryptedData : group))
-      );
+      await refresh();
       setNewRelationModalOpen(false);
       toast.success("Le lien familial a été ajouté");
     }
@@ -97,7 +95,7 @@ const PersonFamily = ({ person }) => {
     };
     const response = await API.put({ path: `/group/${personGroup._id}`, body: prepareGroupForEncryption(nextGroup) });
     if (response.ok) {
-      setGroups((groups) => groups.map((group) => (group._id === personGroup._id ? response.decryptedData : group)));
+      await refresh();
       setRelationToEdit(null);
       toast.success("Le lien familial a été modifié");
     }
@@ -119,7 +117,7 @@ const PersonFamily = ({ person }) => {
     if (!nextRelations.length) {
       const deleteResponse = await API.delete({ path: `/group/${personGroup._id}` });
       if (deleteResponse.ok) {
-        setGroups((groups) => groups.filter((group) => group._id !== personGroup._id));
+        await refresh();
         setRelationToEdit(null);
         toast.success("Le lien familial a été supprimé");
         return;
@@ -131,7 +129,7 @@ const PersonFamily = ({ person }) => {
     };
     const response = await API.put({ path: `/group/${personGroup._id}`, body: prepareGroupForEncryption(nextGroup) });
     if (response.ok) {
-      setGroups((groups) => groups.map((group) => (group._id === personGroup._id ? response.decryptedData : group)));
+      await refresh();
       setRelationToEdit(null);
       toast.success("Le lien familial a été supprimé");
     }

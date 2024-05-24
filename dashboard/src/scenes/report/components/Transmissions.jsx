@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from "react";
 import { toast } from "react-toastify";
-import { prepareReportForEncryption, reportsState } from "../../../recoil/reports";
+import { prepareReportForEncryption } from "../../../recoil/reports";
 import API from "../../../services/api";
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "../../../components/tailwind/Modal";
 import SelectAndCreateCollaboration from "../SelectAndCreateCollaboration";
 import { dayjsInstance } from "../../../services/date";
-import { useSetRecoilState } from "recoil";
+import { useDataLoader } from "../../../components/DataLoader";
 
 export default function Transmissions({ period, selectedTeamsObject, reports }) {
   const days = useMemo(() => {
@@ -109,7 +109,7 @@ function TransmissionPrint({ report, team }) {
 function Transmission({ report, team, day, teamId, reactSelectInputId }) {
   const [isEditingTransmission, setIsEditingTransmission] = useState(false);
   const [collaborations, setCollaborations] = useState(report?.collaborations ?? []);
-  const setReports = useSetRecoilState(reportsState);
+  const { refresh } = useDataLoader();
 
   async function onEditTransmission(event) {
     event.preventDefault();
@@ -132,7 +132,7 @@ function Transmission({ report, team, day, teamId, reactSelectInputId }) {
       toast.error(response.errorMessage);
       return;
     }
-    setReports((reports) => [response.decryptedData, ...reports.filter((_report) => _report._id !== response.decryptedData._id)]);
+    await refresh();
     setIsEditingTransmission(false);
   };
 

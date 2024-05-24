@@ -17,7 +17,6 @@ import QuestionMarkButton from "../../components/QuestionMarkButton";
 const PersonPlaces = ({ person }) => {
   const user = useRecoilValue(userState);
   const places = useRecoilValue(placesState);
-  const setRelsPersonPlace = useSetRecoilState(relsPersonPlaceState);
 
   const [relPersonPlaceModal, setRelPersonPlaceModal] = useState(null);
   const [placeToEdit, setPlaceToEdit] = useState(null);
@@ -31,7 +30,7 @@ const PersonPlaces = ({ person }) => {
     const response = await API.delete({ path: `/relPersonPlace/${relPersonPlace?._id}` });
     setDeleting(false);
     if (!response.ok) return toast.error(response.error);
-    setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersonPlace?._id));
+    await refresh();
   };
 
   const sameMultiplePlaces = useMemo(() => {
@@ -143,11 +142,10 @@ const PersonPlaces = ({ person }) => {
 
 const RelPersonPlaceModal = ({ open, setOpen, person, relPersonPlaceModal, setPlaceToEdit }) => {
   const [places, setPlaces] = useRecoilState(placesState);
-  const setRelsPersonPlace = useSetRecoilState(relsPersonPlaceState);
   const me = useRecoilValue(userState);
   const [placeId, setPlaceId] = useState(relPersonPlaceModal?.place);
   const [userId, setUserId] = useState(relPersonPlaceModal?.user ?? me._id);
-  const [posting, setUpdating] = useState(false);
+  const [updating, setUpdating] = useState(false);
 
   const { refresh } = useDataLoader();
 
@@ -169,12 +167,16 @@ const RelPersonPlaceModal = ({ open, setOpen, person, relPersonPlaceModal, setPl
       toast.error(response.error);
       return;
     }
+    // On doit mettre à jour les places à la main pour être sûr qu'elles sont prêtes directement
+    // Ce problème est visible dans les tests unitaires, qui peuvent parfois rater si on ne fait pas ça.
+    // Il existe peut-être une meilleure solution.
     setPlaces((places) =>
       [response.decryptedData, ...places].sort((p1, p2) =>
         p1?.name?.toLocaleLowerCase().localeCompare(p2.name?.toLocaleLowerCase(), "fr", { ignorPunctuation: true, sensitivity: "base" })
       )
     );
-    setPlaceId(response.decryptedData._id);
+    setPlaceId(response.data._id);
+    await refresh();
   };
 
   const onEditPlace = async (e) => {
@@ -206,12 +208,7 @@ const RelPersonPlaceModal = ({ open, setOpen, person, relPersonPlaceModal, setPl
       return;
     }
     toast.success(`Le lieu a été ${isNew ? "ajouté" : "modifié"}`);
-    if (isNew) {
-      setRelsPersonPlace((relsPersonPlace) => [response.decryptedData, ...relsPersonPlace]);
-    } else {
-      setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.map((r) => (r._id === relPersonPlaceModal._id ? response.decryptedData : r)));
-    }
-    refresh();
+    await refresh();
     setOpen(null);
   };
 
@@ -233,7 +230,7 @@ const RelPersonPlaceModal = ({ open, setOpen, person, relPersonPlaceModal, setPl
               name="place"
               onChange={(place) => setPlaceId(place._id)}
               isClearable={false}
-              isDisabled={posting}
+              isDisabled={updating}
               value={places.find((p) => p._id === placeId)}
               creatable
               required
@@ -289,8 +286,8 @@ const RelPersonPlaceModal = ({ open, setOpen, person, relPersonPlaceModal, setPl
 };
 
 const EditRelPersonPlaceModal = ({ open, setOpen, placeToEdit }) => {
-  const [places, setPlaces] = useRecoilState(placesState);
-  const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
+  const [places] = useRecoilState(placesState);
+  const [relsPersonPlace] = useRecoilState(relsPersonPlaceState);
   const user = useRecoilValue(userState);
 
   const [updating, setUpdating] = useState(false);
@@ -320,8 +317,7 @@ const EditRelPersonPlaceModal = ({ open, setOpen, placeToEdit }) => {
       return;
     }
     toast.success(`Le nom du lieu a été modifié`);
-    setPlaces((places) => places.map((p) => (p._id === placeToEdit._id ? response.decryptedData : p)));
-    refresh();
+    await refresh();
     setOpen(null);
   };
 
@@ -340,11 +336,10 @@ const EditRelPersonPlaceModal = ({ open, setOpen, placeToEdit }) => {
       toast.error(response.error);
       return;
     }
-    setPlaces((places) => places.filter((p) => p._id !== placeToEdit._id));
     for (let relPersonPlace of relsPersonPlace.filter((rel) => rel.place === placeToEdit._id)) {
       await API.delete({ path: `/relPersonPlace/${relPersonPlace._id}` });
     }
-    setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel.place !== placeToEdit._id));
+    await refresh();
     toast.success("Lieu supprimé !");
     refresh();
     setOpen(null);

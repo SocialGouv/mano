@@ -149,7 +149,7 @@ const List = () => {
       <div className="tw-hidden tw-flex-wrap sm:tw-flex">
         <div className="tw-relative tw-w-full tw-max-w-full tw-grow tw-basis-0">
           <div className="tw-mb-8 tw-flex tw-w-full tw-justify-end">
-            <CreatePerson refreshable />
+            <CreatePerson />
           </div>
         </div>
       </div>

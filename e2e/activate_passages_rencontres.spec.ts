@@ -75,7 +75,9 @@ test("test", async ({ page }) => {
 
   await page.getByRole("link", { name: "Statistiques" }).click();
   await page.getByRole("button", { name: "Passages" }).click();
-  await expect(page.getByText("Nombre de passages ?Non-anonyme375%Anonyme125%Total4100%AnonymeNon-anonyme1 (25%")).toBeVisible();
+  await expect(page.getByText("Non-anonyme375%")).toBeVisible();
+  await expect(page.getByText("Anonyme125%")).toBeVisible();
+  await expect(page.getByText("Total4100%")).toBeVisible();
 
   await expect(page.getByRole("button", { name: "Rencontres", exact: true })).not.toBeVisible();
 

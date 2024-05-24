@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import { organisationState, userState } from "../../../recoil/auth";
 import { dayjsInstance, outOfBoundariesDate } from "../../../services/date";
 import API from "../../../services/api";
-import { allowedTreatmentFieldsInHistory, prepareTreatmentForEncryption, treatmentsState } from "../../../recoil/treatments";
+import { allowedTreatmentFieldsInHistory, prepareTreatmentForEncryption } from "../../../recoil/treatments";
 import DatePicker from "../../../components/DatePicker";
 import { CommentsModule } from "../../../components/CommentsGeneric";
 import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from "../../../components/tailwind/Modal";
@@ -95,7 +95,6 @@ const newTreatmentInitialState = (user, personId, organisation) => ({
 });
 
 function TreatmentContent({ onClose, treatment, personId }) {
-  const setAllTreatments = useSetRecoilState(treatmentsState);
   const setModalConfirmState = useSetRecoilState(modalConfirmState);
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
@@ -104,7 +103,7 @@ function TreatmentContent({ onClose, treatment, personId }) {
   const newTreatmentInitialStateRef = useRef(newTreatmentInitialState(user, personId, organisation));
 
   const initialState = useMemo(() => {
-    if (!!treatment) {
+    if (treatment) {
       return {
         documents: [],
         comments: [],
@@ -165,7 +164,7 @@ function TreatmentContent({ onClose, treatment, personId }) {
         if (!allowedTreatmentFieldsInHistory.map((field) => field.name).includes(key)) continue;
         if (body[key] !== treatment[key]) historyEntry.data[key] = { oldValue: treatment[key], newValue: body[key] };
       }
-      if (!!Object.keys(historyEntry.data).length) {
+      if (Object.keys(historyEntry.data).length) {
         const prevHistory = Array.isArray(treatment.history) ? treatment.history : [];
         body.history = [...prevHistory, historyEntry];
       }
@@ -185,18 +184,8 @@ function TreatmentContent({ onClose, treatment, personId }) {
       return false;
     }
     setData(treatmentResponse.decryptedData);
-    if (isNewTreatment) {
-      setAllTreatments((all) => [...all, treatmentResponse.decryptedData]);
-    } else {
-      setAllTreatments((all) =>
-        all.map((c) => {
-          if (c._id === data._id) return treatmentResponse.decryptedData;
-          return c;
-        })
-      );
-    }
+    await refresh();
     if (closeOnSubmit) onClose();
-    refresh();
     return true;
   }
 
@@ -466,7 +455,7 @@ function TreatmentContent({ onClose, treatment, personId }) {
               if (!window.confirm("Voulez-vous supprimer ce traitement ?")) return;
               const response = await API.delete({ path: `/treatment/${treatment._id}` });
               if (!response.ok) return;
-              setAllTreatments((all) => all.filter((t) => t._id !== treatment._id));
+              await refresh();
               toast.success("Traitement supprimé !");
               onClose();
             }}

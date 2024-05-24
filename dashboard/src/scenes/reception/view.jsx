@@ -25,6 +25,7 @@ import Table from "../../components/table";
 import Passage from "../../components/Passage";
 import UserName from "../../components/UserName";
 import ReceptionService from "../../components/ReceptionService";
+import { useDataLoader } from "../../components/DataLoader";
 
 const actionsForCurrentTeamSelector = selector({
   key: "actionsForCurrentTeamSelector",
@@ -96,7 +97,7 @@ const todaysPassagesSelector = selector({
 
 const Reception = () => {
   useTitle("Accueil");
-
+  const { refresh } = useDataLoader();
   const currentTeam = useRecoilValue(currentTeamState);
   const organisation = useRecoilValue(organisationState);
   const setPassages = useSetRecoilState(passagesState);
@@ -150,11 +151,9 @@ const Reception = () => {
       date: new Date(),
       optimisticId,
     };
-    // optimistic UI
-    setPassages((passages) => [newPassage, ...passages]);
     const response = await API.post({ path: "/passage", body: preparePassageForEncryption(newPassage) });
     if (response.ok) {
-      setPassages((passages) => [response.decryptedData, ...passages.filter((p) => p.optimisticId !== optimisticId)]);
+      await refresh();
     }
   };
 
@@ -172,14 +171,10 @@ const Reception = () => {
           optimisticId: index,
         });
       }
-      // optimistic UI
-      setPassages((passages) => [...newPassages, ...passages]);
-      for (const [index, passage] of Object.entries(newPassages)) {
-        const response = await API.post({ path: "/passage", body: preparePassageForEncryption(passage) });
-        if (response.ok) {
-          setPassages((passages) => [response.decryptedData, ...passages.filter((p) => p.optimisticId !== index)]);
-        }
+      for (const [, passage] of Object.entries(newPassages)) {
+        await API.post({ path: "/passage", body: preparePassageForEncryption(passage) });
       }
+      await refresh();
       setAddingPassage(false);
     } catch (e) {
       capture(e, { extra: { selectedPersons: selectedPersons.map((p) => p._id), currentTeam }, user });

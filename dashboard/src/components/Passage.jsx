@@ -5,21 +5,21 @@ import { Formik } from "formik";
 import ButtonCustom from "./ButtonCustom";
 import SelectUser from "./SelectUser";
 import { teamsState, userState } from "../recoil/auth";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 import API from "../services/api";
-import { passagesState, preparePassageForEncryption } from "../recoil/passages";
+import { preparePassageForEncryption } from "../recoil/passages";
 import SelectTeam from "./SelectTeam";
 import SelectPerson from "./SelectPerson";
 import DatePicker from "./DatePicker";
 import { outOfBoundariesDate } from "../services/date";
 import AutoResizeTextarea from "./AutoresizeTextArea";
+import { useDataLoader } from "./DataLoader";
 
 const Passage = ({ passage, personId, onFinished }) => {
   const user = useRecoilValue(userState);
   const teams = useRecoilValue(teamsState);
   const [open, setOpen] = useState(false);
-
-  const setPassages = useSetRecoilState(passagesState);
+  const { refresh } = useDataLoader();
 
   useEffect(() => {
     setOpen(!!passage);
@@ -35,10 +35,10 @@ const Passage = ({ passage, personId, onFinished }) => {
     if (confirm) {
       const passageRes = await API.delete({ path: `/passage/${passage._id}` });
       if (passageRes.ok) {
+        await refresh();
         toast.success("Suppression réussie");
         setOpen(false);
         onFinished();
-        setPassages((passages) => passages.filter((p) => p._id !== passage._id));
       }
     }
   };
@@ -74,34 +74,26 @@ const Passage = ({ passage, personId, onFinished }) => {
 
                 if (body.anonymous) {
                   for (let i = 0; i < body.anonymousNumberOfPassages; i++) {
-                    const response = await API.post({
+                    await API.post({
                       path: "/passage",
                       body: preparePassageForEncryption(newPassage),
                     });
-                    if (response.ok) {
-                      setPassages((passages) => [response.decryptedData, ...passages]);
-                    }
                   }
                 } else if (showMultiSelect) {
                   for (const person of body.persons) {
-                    const response = await API.post({
+                    await API.post({
                       path: "/passage",
                       body: preparePassageForEncryption({ ...newPassage, person }),
                     });
-                    if (response.ok) {
-                      setPassages((passages) => [response.decryptedData, ...passages]);
-                    }
                   }
                 } else {
-                  const response = await API.post({
+                  await API.post({
                     path: "/passage",
                     body: preparePassageForEncryption({ ...newPassage, person: body.person }),
                   });
-                  if (response.ok) {
-                    setPassages((passages) => [response.decryptedData, ...passages]);
-                  }
                 }
 
+                await refresh();
                 setOpen(false);
                 onFinished();
                 toast.success(body.person?.length > 1 ? "Passage enregistré !" : "Passages enregistrés !");
@@ -112,15 +104,8 @@ const Passage = ({ passage, personId, onFinished }) => {
                 path: `/passage/${passage._id}`,
                 body: preparePassageForEncryption(body),
               });
-              if (response.ok) {
-                setPassages((passages) =>
-                  passages.map((p) => {
-                    if (p._id === passage._id) return response.decryptedData;
-                    return p;
-                  })
-                );
-              }
               if (!response.ok) return;
+              await refresh();
               setOpen(false);
               onFinished();
               toast.success("Passage mis à jour");

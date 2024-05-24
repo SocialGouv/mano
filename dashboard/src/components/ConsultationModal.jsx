@@ -6,12 +6,7 @@ import { toast } from "react-toastify";
 import { useLocation, useHistory } from "react-router-dom";
 import { CANCEL, DONE, TODO } from "../recoil/actions";
 import { currentTeamState, organisationState, teamsState, userState } from "../recoil/auth";
-import {
-  consultationsFieldsIncludingCustomFieldsSelector,
-  consultationsState,
-  defaultConsultationFields,
-  prepareConsultationForEncryption,
-} from "../recoil/consultations";
+import { consultationsFieldsIncludingCustomFieldsSelector, prepareConsultationForEncryption } from "../recoil/consultations";
 import API from "../services/api";
 import { dayjsInstance } from "../services/date";
 import CustomFieldInput from "./CustomFieldInput";
@@ -105,7 +100,6 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
   const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
   const setModalConfirmState = useSetRecoilState(modalConfirmState);
-  const setAllConsultations = useSetRecoilState(consultationsState);
   const consultationsFieldsIncludingCustomFields = useRecoilValue(consultationsFieldsIncludingCustomFieldsSelector);
   const { refresh } = useDataLoader();
 
@@ -158,7 +152,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
         if (!consultationsFieldsIncludingCustomFields.map((field) => field.name).includes(key)) continue;
         if (body[key] !== consultation[key]) historyEntry.data[key] = { oldValue: consultation[key], newValue: body[key] };
       }
-      if (!!Object.keys(historyEntry.data).length) body.history = [...(consultation.history || []), historyEntry];
+      if (Object.keys(historyEntry.data).length) body.history = [...(consultation.history || []), historyEntry];
     }
 
     const consultationResponse = isNewConsultation
@@ -172,21 +166,9 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
         });
     if (!consultationResponse.ok) return false;
     setData(consultationResponse.decryptedData);
-    const consult = { ...consultationResponse.decryptedData, ...defaultConsultationFields };
-    if (isNewConsultation) {
-      setAllConsultations((all) => [...all, consult].sort((a, b) => new Date(b.dueAt) - new Date(a.dueAt)));
-    } else {
-      setAllConsultations((all) =>
-        all
-          .map((c) => {
-            if (c._id === body._id) return consult;
-            return c;
-          })
-          .sort((a, b) => new Date(b.dueAt) - new Date(a.dueAt))
-      );
-    }
+    await refresh();
     if (closeOnSubmit) onClose();
-    refresh();
+
     return true;
   }
 
@@ -769,7 +751,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
               if (!window.confirm("Voulez-vous supprimer cette consultation ?")) return;
               const response = await API.delete({ path: `/consultation/${consultation._id}` });
               if (!response.ok) return;
-              setAllConsultations((all) => all.filter((t) => t._id !== consultation._id));
+              await refresh();
               toast.success("Consultation supprimée !");
               onClose();
             }}

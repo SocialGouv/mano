@@ -1,22 +1,22 @@
-import { useRecoilValue, useSetRecoilState } from "recoil";
-import { DONE, TODO, CANCEL, prepareActionForEncryption, actionsState } from "../recoil/actions";
+import { useRecoilValue } from "recoil";
+import { DONE, TODO, CANCEL, prepareActionForEncryption } from "../recoil/actions";
 import API from "../services/api";
 import { now } from "../services/date";
 import { toast } from "react-toastify";
 import { organisationState, userState } from "../recoil/auth";
-import { consultationsState, defaultConsultationFields, prepareConsultationForEncryption } from "../recoil/consultations";
+import { prepareConsultationForEncryption } from "../recoil/consultations";
 import { ConsultationInstance } from "../types/consultation";
 import { ActionInstance } from "../types/action";
+import { useDataLoader } from "./DataLoader";
 
 function isConsultation(action: ActionInstance | ConsultationInstance): action is ConsultationInstance {
   return action.isConsultation !== undefined && action.isConsultation;
 }
 
 export default function ActionStatusSelect({ action }: { action: ActionInstance | ConsultationInstance }) {
-  const setActions = useSetRecoilState<ActionInstance[]>(actionsState);
-  const setConsultations = useSetRecoilState<ConsultationInstance[]>(consultationsState);
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
+  const { refresh } = useDataLoader();
 
   if (!organisation || !user) return null;
 
@@ -62,15 +62,7 @@ export default function ActionStatusSelect({ action }: { action: ActionInstance 
             toast.error("Erreur lors de la mise à jour de la consultation");
             return;
           }
-          const newConsultation = { ...consultationResponse.decryptedData, ...defaultConsultationFields };
-          setConsultations((consultations) =>
-            consultations
-              .map((a) => {
-                if (a._id === newConsultation._id) return newConsultation;
-                return a;
-              })
-              .sort((a, b) => new Date(b.dueAt).getTime() - new Date(a.dueAt).getTime())
-          );
+          await refresh();
           toast.success("Le statut de la consultation a été mis à jour");
           return;
         } else {
@@ -88,13 +80,7 @@ export default function ActionStatusSelect({ action }: { action: ActionInstance 
             toast.error("Erreur lors de la mise à jour de l'action");
             return;
           }
-          const newAction = actionResponse.decryptedData;
-          setActions((actions) =>
-            actions.map((a) => {
-              if (a._id === newAction._id) return newAction;
-              return a;
-            })
-          );
+          await refresh();
           toast.success("Le statut de l'action a été mis à jour");
         }
       }}

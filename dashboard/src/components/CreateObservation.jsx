@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Col, FormGroup, Row, Label } from "reactstrap";
-import styled from "styled-components";
 import { Formik } from "formik";
 import { toast } from "react-toastify";
 
@@ -30,6 +29,7 @@ import PersonName from "./PersonName";
 import UserName from "./UserName";
 import TagTeam from "./TagTeam";
 import Table from "./table";
+import { useDataLoader } from "./DataLoader";
 
 const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
   const [selectedPersons, setSelectedPersons] = useState([]);
@@ -47,6 +47,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
   const [rencontresInProgress, setRencontresInProgress] = useState([]);
   const setRencontres = useSetRecoilState(rencontresState);
   const rencontres = useRecoilValue(rencontresState);
+  const { refresh } = useDataLoader();
 
   const [sortBy, setSortBy] = useLocalStorage("in-observation-rencontre-sortBy", "dueAt");
   const [sortOrder, setSortOrder] = useLocalStorage("in-observation-rencontre-sortOrder", "ASC");
@@ -62,9 +63,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
   const addTerritoryObs = async (obs) => {
     const res = await API.post({ path: "/territory-observation", body: prepareObsForEncryption(customFieldsObs)(obs) });
     if (res.ok) {
-      setTerritoryObservations((territoryObservations) =>
-        [res.decryptedData, ...territoryObservations].sort((a, b) => new Date(b.observedAt || b.createdAt) - new Date(a.observedAt || a.createdAt))
-      );
+      await refresh();
     }
     return res;
   };
@@ -72,14 +71,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
   const updateTerritoryObs = async (obs) => {
     const res = await API.put({ path: `/territory-observation/${obs._id}`, body: prepareObsForEncryption(customFieldsObs)(obs) });
     if (res.ok) {
-      setTerritoryObservations((territoryObservations) =>
-        territoryObservations
-          .map((a) => {
-            if (a._id === obs._id) return res.decryptedData;
-            return a;
-          })
-          .sort((a, b) => new Date(b.observedAt || b.createdAt) - new Date(a.observedAt || a.createdAt))
-      );
+      await refresh();
     }
     return res;
   };
@@ -89,7 +81,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
     if (confirm) {
       const res = await API.delete({ path: `/territory-observation/${id}` });
       if (res.ok) {
-        setTerritoryObservations((territoryObservations) => territoryObservations.filter((p) => p._id !== id));
+        await refresh();
       }
       if (!res.ok) return;
       toast.success("Suppression réussie");
@@ -135,14 +127,13 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
                   path: "/rencontre",
                   body: prepareRencontreForEncryption({ ...rencontre, observation: res.data._id }),
                 });
-                if (response.ok) {
-                  setRencontres((rencontres) => [response.decryptedData, ...rencontres]);
-                } else {
+                if (!response.ok) {
                   rencontreSuccess = false;
                 }
               }
               if (rencontreSuccess) toast.success("Les rencontres ont également été sauvegardées");
               else toast.error("Une ou plusieurs rencontres n'ont pas pu être sauvegardées");
+              await refresh();
             }
             setRencontresInProgress([]);
           }

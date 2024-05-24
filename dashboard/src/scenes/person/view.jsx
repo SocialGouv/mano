@@ -1,6 +1,6 @@
 import { useHistory, useLocation, useParams } from "react-router-dom";
 import { Alert } from "reactstrap";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 import Places from "./Places";
 import { itemsGroupedByPersonSelector } from "../../recoil/selectors";
 import API from "../../services/api";
@@ -10,7 +10,7 @@ import MedicalFile from "./components/MedicalFile";
 import Summary from "./components/Summary";
 import BackButton from "../../components/backButton";
 import UserName from "../../components/UserName";
-import { personsState, usePreparePersonForEncryption } from "../../recoil/persons";
+import { usePreparePersonForEncryption } from "../../recoil/persons";
 import { toast } from "react-toastify";
 import { organisationState, userState } from "../../recoil/auth";
 import PersonFamily from "./PersonFamily";
@@ -28,7 +28,6 @@ export default function View() {
   const organisation = useRecoilValue(organisationState);
   const person = useRecoilValue(itemsGroupedByPersonSelector)[personId];
   const personGroup = useRecoilValue(groupSelector({ personId }));
-  const setPersons = useSetRecoilState(personsState);
   const user = useRecoilValue(userState);
   const searchParams = new URLSearchParams(location.search);
   const currentTab = searchParams.get("tab") || "Résumé";
@@ -65,13 +64,7 @@ export default function View() {
               });
               if (response.ok) {
                 toast.success("Personne mise à jour (créée par)");
-                const newPerson = response.decryptedData;
-                setPersons((persons) =>
-                  persons.map((p) => {
-                    if (p._id === person._id) return newPerson;
-                    return p;
-                  })
-                );
+                await refresh();
               } else {
                 toast.error("Impossible de mettre à jour la personne");
               }
@@ -91,7 +84,7 @@ export default function View() {
                 "Historique",
                 Boolean(organisation.groupsEnabled) && `Liens familiaux (${personGroup.relations.length})`,
               ].filter(Boolean)}
-              onClick={(tab, index) => {
+              onClick={(tab) => {
                 if (tab.includes("Résumé")) setCurrentTab("Résumé");
                 if (tab.includes("Dossier Médical")) setCurrentTab("Dossier Médical");
                 if (tab.includes("Lieux fréquentés")) setCurrentTab("Lieux fréquentés");

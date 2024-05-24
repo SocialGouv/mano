@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import React, { useMemo, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 import { useLocalStorage } from "../services/useLocalStorage";
 import { actionsState, CANCEL, DONE, prepareActionForEncryption, sortActionsOrConsultations, TODO } from "../recoil/actions";
 import { currentTeamState, userState } from "../recoil/auth";
@@ -16,6 +16,7 @@ import API from "../services/api";
 import { ModalContainer, ModalBody, ModalFooter } from "./tailwind/Modal";
 import PersonName from "./PersonName";
 import BellIconWithNotifications from "../assets/icons/BellIconWithNotifications";
+import { useDataLoader } from "./DataLoader";
 
 export default function Notification() {
   const [showModal, setShowModal] = useState(false);
@@ -100,8 +101,7 @@ export default function Notification() {
 const Actions = ({ setShowModal, actions, setSortOrder, setSortBy, sortBy, sortOrder }) => {
   const history = useHistory();
   const user = useRecoilValue(userState);
-  const setActions = useSetRecoilState(actionsState);
-
+  const { refresh } = useDataLoader();
   if (!actions.length) return null;
   return (
     <div role="dialog" title="Actions urgentes et vigilance" name="Actions urgentes et vigilance">
@@ -173,13 +173,7 @@ const Actions = ({ setShowModal, actions, setSortOrder, setSortBy, sortBy, sortO
                       body: prepareActionForEncryption({ ...action, urgent: false, user: action.user || user._id }),
                     });
                     if (actionResponse.ok) {
-                      const newAction = actionResponse.decryptedData;
-                      setActions((actions) =>
-                        actions.map((a) => {
-                          if (a._id === newAction._id) return newAction;
-                          return a;
-                        })
-                      );
+                      await refresh();
                     }
                   }}
                 >
@@ -196,9 +190,9 @@ const Actions = ({ setShowModal, actions, setSortOrder, setSortBy, sortBy, sortO
 
 const Comments = ({ setShowModal, comments }) => {
   const history = useHistory();
-  const setComments = useSetRecoilState(commentsState);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
+  const { refresh } = useDataLoader();
 
   if (!comments.length) return null;
   return (
@@ -312,13 +306,7 @@ const Comments = ({ setShowModal, comments }) => {
                       }),
                     });
                     if (commentResponse.ok) {
-                      const newComment = commentResponse.decryptedData;
-                      setComments((comments) =>
-                        comments.map((a) => {
-                          if (a._id === newComment._id) return newComment;
-                          return a;
-                        })
-                      );
+                      await refresh();
                     }
                   }}
                 >

@@ -12,7 +12,7 @@ import {
 import { outOfBoundariesDate } from "../../../services/date";
 import SelectTeamMultiple from "../../../components/SelectTeamMultiple";
 import { currentTeamState, userState } from "../../../recoil/auth";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import CustomFieldInput from "../../../components/CustomFieldInput";
 import { useMemo, useState } from "react";
 import ButtonCustom from "../../../components/ButtonCustom";
@@ -24,21 +24,21 @@ import DatePicker from "../../../components/DatePicker";
 import {
   customFieldsMedicalFileSelector,
   groupedCustomFieldsMedicalFileSelector,
-  medicalFileState,
   prepareMedicalFileForEncryption,
 } from "../../../recoil/medicalFiles";
+import { useDataLoader } from "../../../components/DataLoader";
 
 export default function EditModal({ person, selectedPanel, onClose, isMedicalFile = false }) {
+  const { refresh } = useDataLoader();
   const [openPanels, setOpenPanels] = useState([selectedPanel]);
   const user = useRecoilValue(userState);
   const customFieldsPersons = useRecoilValue(customFieldsPersonsSelector);
   const flattenedCustomFieldsPersons = useRecoilValue(flattenedCustomFieldsPersonsSelector);
   const allowedFieldsInHistory = useRecoilValue(allowedPersonFieldsInHistorySelector);
   const team = useRecoilValue(currentTeamState);
-  const [persons, setPersons] = useRecoilState(personsState);
+  const [persons] = useRecoilState(personsState);
   const flatCustomFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
   const groupedCustomFieldsMedicalFile = useRecoilValue(groupedCustomFieldsMedicalFileSelector);
-  const setAllMedicalFiles = useSetRecoilState(medicalFileState);
   const medicalFile = person.medicalFile;
 
   const groupedCustomFieldsMedicalFileWithLegacyFields = useMemo(() => {
@@ -110,14 +110,7 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
               body: preparePersonForEncryption(body),
             });
             if (response.ok) {
-              const newPerson = response.decryptedData;
-              setPersons((persons) =>
-                persons.map((p) => {
-                  if (p._id === person._id) return newPerson;
-                  return p;
-                })
-              );
-
+              await refresh();
               toast.success("Mis à jour !");
               onClose();
             } else {
@@ -357,12 +350,7 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
               });
               let success = mfResponse.ok;
               if (success) {
-                setAllMedicalFiles((medicalFiles) =>
-                  medicalFiles.map((m) => {
-                    if (m._id === medicalFile._id) return mfResponse.decryptedData;
-                    return m;
-                  })
-                );
+                await refresh();
               }
 
               // We have to save legacy fields in person
@@ -392,13 +380,7 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                   body: preparePersonForEncryption(bodySocial),
                 });
                 if (personResponse.ok) {
-                  const newPerson = personResponse.decryptedData;
-                  setPersons((persons) =>
-                    persons.map((p) => {
-                      if (p._id === person._id) return newPerson;
-                      return p;
-                    })
-                  );
+                  await refresh();
                 } else {
                   success = false;
                 }

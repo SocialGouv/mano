@@ -1,4 +1,4 @@
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 import structuredClone from "@ungap/structured-clone";
 import { organisationAuthentifiedState, userAuthentifiedState } from "../../../recoil/auth";
 import { Consultations } from "./Consultations";
@@ -11,7 +11,6 @@ import { flattenedCustomFieldsPersonsSelector } from "../../../recoil/persons";
 import {
   customFieldsMedicalFileSelector,
   groupedCustomFieldsMedicalFileSelector,
-  medicalFileState,
   prepareMedicalFileForEncryption,
 } from "../../../recoil/medicalFiles";
 import { Treatments } from "./Treatments";
@@ -21,15 +20,16 @@ import { MedicalFilePrint } from "./MedicalFilePrint";
 import API from "../../../services/api";
 import CommentsMedical from "./CommentsMedical";
 import type { PersonPopulated } from "../../../types/person";
-import type { MedicalFileInstance } from "../../../types/medicalFile";
 import type { CustomField, CustomFieldsGroup } from "../../../types/field";
 import Constantes from "./Constantes";
+import { useDataLoader } from "../../../components/DataLoader";
 
 interface MedicalFileProps {
   person: PersonPopulated;
 }
 
 export default function MedicalFile({ person }: MedicalFileProps) {
+  const { refresh } = useDataLoader();
   const user = useRecoilValue(userAuthentifiedState);
   const flatCustomFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
   const groupedCustomFieldsMedicalFile = useRecoilValue(groupedCustomFieldsMedicalFileSelector);
@@ -63,8 +63,6 @@ export default function MedicalFile({ person }: MedicalFileProps) {
     }
     return c;
   }, [groupedCustomFieldsMedicalFile, flattenedCustomFieldsPersons]);
-
-  const setAllMedicalFiles = useSetRecoilState(medicalFileState);
   const medicalFile = person.medicalFile;
 
   useEffect(() => {
@@ -78,8 +76,7 @@ export default function MedicalFile({ person }: MedicalFileProps) {
         }),
       }).then((response) => {
         if (!response.ok) return;
-        const newMedicalFile = response.decryptedData as MedicalFileInstance;
-        setAllMedicalFiles((medicalFiles: MedicalFileInstance[]) => [...medicalFiles, newMedicalFile]);
+        refresh();
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

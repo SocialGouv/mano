@@ -2,27 +2,26 @@ import React from "react";
 import { useParams, useHistory } from "react-router-dom";
 import { toast } from "react-toastify";
 import Loading from "../../components/loading";
-import ButtonCustom from "../../components/ButtonCustom";
 import Observations from "../territory-observations/list";
 import { territoriesState } from "../../recoil/territory";
 import { useRecoilState, useRecoilValue } from "recoil";
 import API from "../../services/api";
-import { territoryObservationsState } from "../../recoil/territoryObservations";
 import useTitle from "../../services/useTitle";
 import DeleteButtonAndConfirmModal from "../../components/DeleteButtonAndConfirmModal";
 import { userState } from "../../recoil/auth";
 import BackButton from "../../components/backButton";
 import { TerritoryModal } from "./list";
 import { useLocalStorage } from "../../services/useLocalStorage";
+import { useDataLoader } from "../../components/DataLoader";
 
 const View = () => {
+  const { refresh } = useDataLoader();
   const { id } = useParams();
   const history = useHistory();
   const [, setActiveTab] = useLocalStorage("stats-tabCaption");
   const [, setSelectedTerritories] = useLocalStorage("stats-territories");
   const user = useRecoilValue(userState);
-  const [territories, setTerritories] = useRecoilState(territoriesState);
-  const [territoryObservations, setTerritoryObservations] = useRecoilState(territoryObservationsState);
+  const [territories] = useRecoilState(territoriesState);
   const [modalOpen, setModalOpen] = React.useState(false);
   const territory = territories.find((t) => t._id === id);
 
@@ -76,13 +75,7 @@ const View = () => {
                 onConfirm={async () => {
                   const res = await API.delete({ path: `/territory/${id}` });
                   if (res.ok) {
-                    setTerritories((territories) => territories.filter((t) => t._id !== id));
-                    for (let obs of territoryObservations.filter((o) => o.territory === id)) {
-                      const res = await API.delete({ path: `/territory-observation/${obs._id}` });
-                      if (res.ok) {
-                        setTerritoryObservations((territoryObservations) => territoryObservations.filter((p) => p._id !== obs._id));
-                      }
-                    }
+                    await refresh();
                     toast.success("Suppression réussie");
                     history.goBack();
                   }
