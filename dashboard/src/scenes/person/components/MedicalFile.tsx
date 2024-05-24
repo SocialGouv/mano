@@ -112,10 +112,10 @@ export default function MedicalFile({ person }: MedicalFileProps) {
               })}
             </div>
             <div className="tw-col-span-6 tw-flex tw-min-h-full tw-flex-col tw-gap-4">
-              <div className="tw-min-h-[200px] tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+              <div className="tw-h-[400px] tw-max-h-[50%] tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
                 <Treatments person={person} />
               </div>
-              <div className="tw-min-h-[200px] tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+              <div className="tw-h-[400px] tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
                 <PersonDocumentsMedical person={person} />
               </div>
             </div>
