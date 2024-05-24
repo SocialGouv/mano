@@ -319,7 +319,9 @@ router.post(
       body: { token, password, name },
     } = req;
 
-    if (!validatePassword(password)) return res.status(400).send({ ok: false, error: passwordCheckError, code: PASSWORD_NOT_VALIDATED });
+    if (!validatePassword(password)) {
+      return res.status(400).send({ ok: false, error: passwordCheckError, code: PASSWORD_NOT_VALIDATED });
+    }
     const user = await User.findOne({ where: { forgotPasswordResetToken: token, forgotPasswordResetExpires: { [Op.gte]: new Date() } } });
 
     if (!user) {

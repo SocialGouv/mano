@@ -73,19 +73,13 @@ const ChangePassword = ({ onSubmit, onFinished, withCurrentPassword, centerButto
       if (changePasswordForm.newPassword.trim() !== changePasswordForm.verifyPassword.trim()) {
         return toast.error("Les mots de passe ne sont pas identiques !");
       }
-      onFinished({
-        body: {
-          newPassword: changePasswordForm.newPassword.trim(),
-          verifyPassword: changePasswordForm.verifyPassword.trim(),
-          password: changePasswordForm.password.trim(),
-        },
-      });
       const res = await onSubmit(changePasswordForm);
       setIsSubmitting(false);
       if (res.ok) {
         toast.success("Mot de passe mis à jour!");
-        onFinished(true);
+        return onFinished(true);
       }
+      onFinished(false);
     } catch (errorUpdatePassword) {
       console.log("error in updating password", errorUpdatePassword);
       toast.error(errorUpdatePassword);
