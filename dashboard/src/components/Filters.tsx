@@ -180,7 +180,7 @@ const Filters = ({
   return (
     <>
       <div className="printonly tw-flex tw-gap-2">
-        <p>{title}</p>
+        {title ? <p>{title}</p> : null}
         <ul>
           {filters.map((filter: Filter, index: number) => {
             if (!filter?.field) return null;
@@ -196,7 +196,7 @@ const Filters = ({
           })}
         </ul>
       </div>
-      <div className="border-b noprint tw-z-10 tw-mb-8 tw-flex tw-w-full tw-flex-col tw-justify-center tw-gap-2 tw-self-center tw-border-gray-300 tw-pb-4">
+      <div className="border-b noprint tw-z-10 tw-mb-4 tw-flex tw-w-full tw-flex-col tw-justify-center tw-gap-2 tw-self-center tw-border-gray-300">
         <div className="tw-flex tw-flex-wrap">
           <div className="tw-basis-5/6">
             <p className="tw-m-0">{title}</p>
@@ -263,7 +263,7 @@ const Filters = ({
           <div className="tw-basis-1/12" />
           <button
             type="button"
-            className="tw-h-full tw-rounded tw-text-main disabled:tw-opacity-20"
+            className="tw-h-full tw-rounded tw-text-main disabled:tw-opacity-20 hover:tw-underline tw-text-sm"
             onClick={onAddFilter}
             disabled={!!filters.find((f) => !f.field)}
           >

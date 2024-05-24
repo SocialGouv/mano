@@ -153,14 +153,17 @@ const List = () => {
           </div>
         </div>
       </div>
-      <details open={isDesktop} className="[&_summary]:open:tw-opacity-10">
-        <summary className="tw-mx-4 tw-my-2">Recherche et filtres...</summary>
-        <div className="tw-mb-5 tw-flex tw-flex-wrap ">
-          <div className="tw-mb-5 tw-flex tw-w-full tw-items-start tw-justify-start">
-            <label htmlFor="search" className="tw-mr-5 tw-shrink-0 tw-basis-40">
-              Recherche :{" "}
+      <details open={isDesktop} className="-tw-mx-4 tw-px-4 tw-mb-4 tw-py-2 tw-rounded-lg tw-border tw-border-zinc-100  tw-shadow">
+        <summary className="tw-text-main">
+          <span className="tw-ml-2">Recherche et filtres...</span>
+        </summary>
+        <hr className="tw-m-0 tw-mt-2" />
+        <div className="tw-mb-4 tw-flex tw-flex-wrap tw-mt-8">
+          <div className="tw-flex tw-w-full tw-items-start tw-justify-start">
+            <label htmlFor="search" className="tw-shrink-0 tw-w-[100px] tw-m-0 tw-mt-2.5">
+              Recherche
             </label>
-            <div className="tw-flex-grow-1 tw-flex-col tw-items-stretch tw-gap-2">
+            <div className="tw-flex-grow-1 tw-flex-col tw-items-stretch tw-gap-2 tw-w-full">
               <Search
                 placeholder="Par mot clé, présent dans le nom, la description, un commentaire, une action, ..."
                 value={search}
@@ -174,20 +177,7 @@ const List = () => {
                 }}
               />
               <div className="tw-flex tw-w-full tw-items-center">
-                <label htmlFor="viewAllOrganisationData">
-                  <input
-                    type="checkbox"
-                    id="viewAllOrganisationData"
-                    className="tw-mr-2.5"
-                    checked={viewAllOrganisationData}
-                    value={viewAllOrganisationData}
-                    onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
-                  />
-                  Afficher les personnes de toute l'organisation
-                </label>
-              </div>
-              <div className="tw-flex tw-w-full tw-items-center">
-                <label htmlFor="alertness">
+                <label htmlFor="alertness" className="tw-m-0 tw-text-sm tw-mt-0.5">
                   <input
                     type="checkbox"
                     className="tw-mr-2.5"
@@ -199,10 +189,23 @@ const List = () => {
                   N'afficher que les personnes vulnérables où ayant besoin d'une attention particulière
                 </label>
               </div>
+              <div className="tw-flex tw-w-full tw-items-center">
+                <label htmlFor="viewAllOrganisationData" className="tw-m-0 tw-text-sm">
+                  <input
+                    type="checkbox"
+                    id="viewAllOrganisationData"
+                    className="tw-mr-2.5"
+                    checked={viewAllOrganisationData}
+                    value={viewAllOrganisationData}
+                    onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
+                  />
+                  Afficher les personnes de toute l'organisation
+                </label>
+              </div>
             </div>
           </div>
         </div>
-        <Filters base={filterPersonsWithAllFields} filters={filters} onChange={setFilters} title="Autres filtres : " saveInURLParams />
+        <Filters base={filterPersonsWithAllFields} title="" filters={filters} onChange={setFilters} saveInURLParams />
       </details>
       <Table
         data={data}
@@ -230,7 +233,7 @@ const List = () => {
                         {p.name}
                         {p.otherNames ? <small className="tw-inline tw-text-main"> - {p.otherNames}</small> : null}
                       </div>
-                      <div>Sortie de file active : {p.outOfActiveListReasons?.join(", ")}</div>
+                      <div>Sortie de file active&nbsp;: {p.outOfActiveListReasons?.join(", ")}</div>
                     </div>
                   ) : (
                     <div className="tw-max-w-md tw-items-center tw-gap-1 tw-font-bold [overflow-wrap:anywhere]">
@@ -284,7 +287,7 @@ const List = () => {
                       {p.name}
                       {p.otherNames ? <small className="tw-inline tw-text-main"> - {p.otherNames}</small> : null}
                     </p>
-                    <div>Sortie de file active : {p.outOfActiveListReasons?.join(", ")}</div>
+                    <div>Sortie de file active&nbsp;: {p.outOfActiveListReasons?.join(", ")}</div>
                   </div>
                 );
               return (
