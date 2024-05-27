@@ -257,7 +257,6 @@ router.put(
     try {
       const bodyToParse = {
         name: z.optional(z.string().min(1)),
-        categories: z.optional(z.array(z.string().min(1))),
         actionsGroupedCategories: z.optional(z.array(z.object({ groupTitle: z.string(), categories: z.array(z.string().min(1)) }))),
         structuresGroupedCategories: z.optional(z.array(z.object({ groupTitle: z.string(), categories: z.array(z.string().min(1)) }))),
         defaultPersonsFolders: z.optional(z.array(folderSchema)),
@@ -322,7 +321,6 @@ router.put(
 
     const updateOrg = {};
     if (req.body.hasOwnProperty("name")) updateOrg.name = req.body.name;
-    if (req.body.hasOwnProperty("categories")) updateOrg.categories = req.body.categories;
     if (req.body.hasOwnProperty("actionsGroupedCategories")) updateOrg.actionsGroupedCategories = req.body.actionsGroupedCategories;
     if (req.body.hasOwnProperty("structuresGroupedCategories")) updateOrg.structuresGroupedCategories = req.body.structuresGroupedCategories;
     if (req.body.hasOwnProperty("defaultPersonsFolders")) updateOrg.defaultPersonsFolders = req.body.defaultPersonsFolders;

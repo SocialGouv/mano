@@ -30,12 +30,12 @@ function serializeOrganisation(organisation) {
     /* for family/groups */
     groupsEnabled: organisation.groupsEnabled,
 
-    /* actions settings */
-    // eslint-disable-next-line no-extra-boolean-cast
-    categories: !!organisation.actionsGroupedCategories
-      ? organisation.actionsGroupedCategories.reduce((flattenedCategories, group) => [...flattenedCategories, ...group.categories], [])
-      : organisation.categories,
-
+    // Cela peut rester dans le doute pour le front, mais c'est l'ancienne facçon d'appeler les
+    // actionsGroupedCategories. La colonne n'exite plus dans la base de données.
+    categories: (organisation.actionsGroupedCategories || []).reduce(
+      (flattenedCategories, group) => [...flattenedCategories, ...group.categories],
+      []
+    ),
     actionsGroupedCategories: organisation.actionsGroupedCategories,
     structuresGroupedCategories: organisation.structuresGroupedCategories || [
       {
