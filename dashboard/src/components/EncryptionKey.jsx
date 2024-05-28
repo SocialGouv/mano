@@ -1,18 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader, Input, Label } from "reactstrap";
-import styled from "styled-components";
 import { Formik } from "formik";
 import { toast } from "react-toastify";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useHistory } from "react-router-dom";
 
-import ButtonCustom from "./ButtonCustom";
-import { theme } from "../config";
 import { organisationState, teamsState, userState } from "../recoil/auth";
 import { encryptVerificationKey } from "../services/encryption";
 import { capture } from "../services/sentry";
 import API, { setOrgEncryptionKey, getHashedOrgEncryptionKey, decryptAndEncryptItem } from "../services/api";
 import { useDataLoader } from "./DataLoader";
+import { ModalContainer, ModalBody, ModalHeader } from "./tailwind/Modal";
 
 const EncryptionKey = ({ isMain }) => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
@@ -48,6 +45,9 @@ const EncryptionKey = ({ isMain }) => {
       await new Promise((resolve) => setTimeout(resolve, 100));
       if (!values.encryptionKey) return toast.error("La clé est obligatoire");
       if (!values.encryptionKeyConfirm) return toast.error("La validation de la clé est obligatoire");
+      if (!import.meta.env.VITE_TEST_PLAYWRIGHT) {
+        if (values.encryptionKey.length < 8) return toast.error("La clé doit faire au moins 8 caractères");
+      }
       if (values.encryptionKey !== values.encryptionKeyConfirm) return toast.error("Les clés ne sont pas identiques");
       previousKey.current = getHashedOrgEncryptionKey();
       setEncryptionKey(values.encryptionKey.trim());
@@ -199,39 +199,22 @@ const EncryptionKey = ({ isMain }) => {
   };
 
   const renderEncrypting = () => (
-    <ModalBody>
-      <span style={{ marginBottom: 30, display: "block", width: "100%", textAlign: "center" }}>
-        Ne fermez pas cette page pendant le chiffrement des données...
-      </span>
-      <span style={{ marginBottom: 30, display: "block", width: "100%", textAlign: "center" }}>
-        N'oubliez pas votre nouvelle clé, sinon toutes vos données seront perdues
-      </span>
-      <span style={{ marginBottom: 30, display: "block", width: "100%", textAlign: "center", color: theme.redDark }}>
+    <>
+      <p className="tw-mb-7 tw-block tw-w-full tw-text-center">Ne fermez pas cette page pendant le chiffrement des données...</p>
+      <p className="tw-mb-7 tw-block tw-w-full tw-text-center">N'oubliez pas votre nouvelle clé, sinon toutes vos données seront perdues</p>
+      <p className="tw-mb-7 tw-block tw-w-full tw-text-red-500 tw-text-center">
         <b>{encryptionKey}</b>
-      </span>
-      <span style={{ marginBottom: 30, display: "block", width: "100%", textAlign: "center" }}>
+      </p>
+      <p className="tw-mb-7 tw-block tw-w-full tw-text-center">
         Si vous perdez cette clé, vos données seront perdues définitivement. Notez-la bien quelque part !
-      </span>
-      <div style={{ display: "flex", alignItems: "center", flexDirection: "column", width: "60%", margin: "0 auto" }}>
-        <span>{encryptingStatus}</span>
-        <div
-          style={{
-            marginTop: 10,
-            marginBottom: 30,
-            display: "block",
-            width: "100%",
-            textAlign: "center",
-            height: 10,
-            borderRadius: 10,
-            border: "1px solid black",
-            overflow: "hidden",
-          }}
-        >
+      </p>
+      <div className="tw-flex tw-items-center tw-flex-col tw-w-2/3 tw-mx-auto">
+        <p>{encryptingStatus}</p>
+        <div className="tw-mt-2.5 tw-mb-7 tw-block tw-w-full tw-text-center tw-h-2.5 tw-rounded-full tw-border tw-border-black tw-overflow-hidden">
           <div
+            className="tw-bg-main tw-rounded-full tw-transition-all tw-duration-300 tw-h-full"
             style={{
-              backgroundColor: theme.main,
               width: `${(encryptingProgress / totalDurationOnServer.current) * 100}%`,
-              height: "100%",
             }}
           />
         </div>
@@ -239,21 +222,17 @@ const EncryptionKey = ({ isMain }) => {
       {!onboardingForTeams && encryptionDone && (
         <div className="tw-flex tw-flex-col tw-items-center">
           <div className="tw-mb-4 tw-text-red-600">Notez la clé avant de vous reconnecter</div>
-          <ButtonCustom
-            color="secondary"
-            onClick={async () => {
-              return API.logout();
-            }}
-            title={"Se déconnecter"}
-          />
+          <button className="button-submit !tw-bg-black" onClick={API.logout} type="button">
+            Se déconnecter
+          </button>
         </div>
       )}
-    </ModalBody>
+    </>
   );
 
   const renderForm = () => (
-    <ModalBody>
-      <span style={{ marginBottom: 30, display: "block", width: "100%", textAlign: "center" }}>
+    <>
+      <p className="tw-mb-7 tw-block tw-w-full tw-text-left">
         {organisation.encryptionEnabled ? (
           "Cette opération entrainera la modification définitive de toutes les données chiffrées liées à l'organisation : personnes suivies, actions, territoires, commentaires et observations, rapports... "
         ) : (
@@ -266,51 +245,63 @@ const EncryptionKey = ({ isMain }) => {
             <b>chiffrées avec une clé que seule votre organisation connait</b>.
           </>
         )}
-      </span>
-      <span style={{ marginBottom: 30, display: "block", width: "100%", textAlign: "center" }}>
+      </p>
+      <p className="tw-mb-7 tw-block tw-w-full tw-text-left">
         Si vous perdez cette clé, vos données seront perdues définitivement. <br />
         Notez-la bien quelque part !
-      </span>
+      </p>
       <Formik initialValues={{ encryptionKey: "", encryptionKeyConfirm: "" }} onSubmit={onEncrypt}>
         {({ values, handleChange, handleSubmit, isSubmitting }) => (
           <React.Fragment>
-            <Row style={{ justifyContent: "center" }}>
-              <Col md={3} />
-              <Col md={6}>
-                <FormGroup>
-                  <Label htmlFor="encryptionKey">Clé de chiffrement</Label>
-                  <Input id="encryptionKey" name="encryptionKey" value={values.encryptionKey} onChange={handleChange} />
-                </FormGroup>
-              </Col>
-              <Col md={3} />
-              <Col md={3} />
-              <Col md={6}>
-                <FormGroup>
-                  <Label htmlFor="encryptionKeyConfirm">Confirmez la clé de chiffrement</Label>
-                  <Input id="encryptionKeyConfirm" name="encryptionKeyConfirm" value={values.encryptionKeyConfirm} onChange={handleChange} />
-                </FormGroup>
-              </Col>
-              <Col md={3} />
-            </Row>
+            <div className="tw-flex tw-flex-col tw-items-center tw-mx-auto tw-max-w-xl tw-w-full">
+              <div className="tw-flex tw-basis-full tw-w-full tw-flex-col tw-px-4 tw-py-2">
+                <label className="tailwindui" htmlFor="encryptionKey">
+                  Clé de chiffrement
+                </label>
+                <input
+                  type="text"
+                  minLength={8}
+                  required
+                  className="tailwindui"
+                  id="encryptionKey"
+                  name="encryptionKey"
+                  value={values.encryptionKey}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="tw-flex tw-basis-full tw-w-full tw-flex-col tw-px-4 tw-py-2">
+                <label className="tailwindui" htmlFor="encryptionKeyConfirm">
+                  Confirmez la clé de chiffrement
+                </label>
+                <input
+                  className="tailwindui"
+                  minLength={8}
+                  required
+                  id="encryptionKeyConfirm"
+                  name="encryptionKeyConfirm"
+                  value={values.encryptionKeyConfirm}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
             <br />
-            <Row style={{ justifyContent: "center" }}>
-              <ButtonCustom
-                color="secondary"
-                id="encrypt"
+            <div className="tw-border-t tw-border-t-gray-50 tw-flex tw-justify-center">
+              <button
                 disabled={isLoading || isSubmitting}
-                loading={isLoading || isSubmitting}
-                type="submit"
+                className="button-submit !tw-bg-black disabled:tw-opacity-50"
                 onClick={() => {
                   if (isSubmitting) return;
                   handleSubmit();
                 }}
-                title={organisation.encryptionEnabled ? "Changer la clé de chiffrement" : "Activer le chiffrement"}
-              />
-            </Row>
+                type="submit"
+              >
+                {isLoading ? "Chiffrement en cours..." : organisation.encryptionEnabled ? "Changer la clé de chiffrement" : "Activer le chiffrement"}
+              </button>
+            </div>
           </React.Fragment>
         )}
       </Formik>
-    </ModalBody>
+    </>
   );
 
   if (organisation.encryptionEnabled && !user.healthcareProfessional)
@@ -323,33 +314,26 @@ const EncryptionKey = ({ isMain }) => {
 
   return (
     <>
-      <ButtonCustom
-        title={organisation.encryptionEnabled ? "Changer la clé de chiffrement" : "Activer le chiffrement"}
-        type="button"
-        color="secondary"
-        style={{ marginRight: 20 }}
-        onClick={() => setOpen(true)}
-      />
-      <StyledModal
-        backdrop="static"
-        isOpen={open}
-        toggle={() => setOpen(false)}
-        onClosed={() => {
+      <button className="button-submit !tw-bg-black" onClick={() => setOpen(true)} type="button">
+        {organisation.encryptionEnabled ? "Changer la clé de chiffrement" : "Activer le chiffrement"}
+      </button>
+      <ModalContainer
+        open={open}
+        onClose={() => setOpen(false)}
+        onAfterLeave={() => {
           setEncryptionKey("");
           setEncryptingProgress(0);
           setEncryptingStatus("");
         }}
-        size="lg"
-        data-test-id="encryption-modal"
-        centered
+        size="3xl"
+        dataTestId="encryption-modal"
       >
-        <ModalHeader close={onboardingForEncryption ? <></> : null} toggle={() => setOpen(false)} color="danger">
-          <span style={{ color: theme.black, textAlign: "center", display: "block" }}>
-            {organisation.encryptionEnabled ? "Changer la clé de chiffrement" : "Activer le chiffrement"}
-          </span>
-        </ModalHeader>
-        {!encryptionKey ? renderForm() : renderEncrypting()}
-      </StyledModal>
+        <ModalHeader
+          title={organisation.encryptionEnabled ? "Changer la clé de chiffrement" : "Activer le chiffrement"}
+          onClose={() => setOpen(false)}
+        />
+        <ModalBody className="tw-p-4">{!encryptionKey ? renderForm() : renderEncrypting()}</ModalBody>
+      </ModalContainer>
     </>
   );
 };
@@ -402,14 +386,5 @@ const recryptPersonRelatedDocuments = async (item, id, oldKey, newKey) => {
   }
   return { ...item, documents: updatedDocuments };
 };
-
-const StyledModal = styled(Modal)`
-  align-items: center;
-  .modal-title {
-    width: 100%;
-    flex-grow: 1;
-    padding: auto;
-  }
-`;
 
 export default EncryptionKey;

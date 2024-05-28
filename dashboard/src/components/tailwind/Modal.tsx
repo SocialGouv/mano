@@ -25,6 +25,7 @@ interface ModalContainerProps {
   onBeforeLeave?: () => void;
   size?: "lg" | "xl" | "3xl" | "full" | "prose";
   blurryBackground?: boolean; // if true, the background will be blurred
+  dataTestId?: string;
 }
 
 const ModalContainer = ({
@@ -38,6 +39,7 @@ const ModalContainer = ({
   onBeforeLeave = () => null,
   size = "lg", // lg, xl, 3xl, full, prose
   blurryBackground = false,
+  dataTestId = "modal",
 }: ModalContainerProps) => {
   const backgroundRef = useRef<HTMLDivElement | null>(null);
 
@@ -63,7 +65,10 @@ const ModalContainer = ({
           </Transition.Child>
 
           <div className="tw-fixed tw-inset-0 tw-z-[101] tw-overflow-y-auto" ref={backgroundRef}>
-            <div className="tw-flex tw-min-h-full tw-items-end tw-justify-center tw-p-4 tw-text-center sm:tw-items-center sm:tw-p-0">
+            <div
+              className="tw-flex tw-min-h-full tw-items-end tw-justify-center tw-p-4 tw-text-center sm:tw-items-center sm:tw-p-0"
+              data-test-id={dataTestId}
+            >
               <Transition.Child
                 as={Fragment}
                 enter="tw-ease-out tw-duration-300"
@@ -96,6 +101,8 @@ const ModalContainer = ({
                       aria-label="Fermer"
                       className="tw-absolute tw-right-0 tw-top-4 tw-text-gray-900 sm:tw-px-6"
                       onClick={onClose}
+                      title="Close"
+                      name="Close"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="tw-h-6 tw-w-6">
                         <path

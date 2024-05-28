@@ -13,18 +13,18 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Chiffrement" }).click();
   await page.getByRole("button", { name: "Changer la clé de chiffrement" }).click();
   await page.getByRole("textbox", { name: "Clé de chiffrement", exact: true }).click();
-  await page.getByRole("textbox", { name: "Clé de chiffrement", exact: true }).fill("erreur");
+  await page.getByRole("textbox", { name: "Clé de chiffrement", exact: true }).fill("erreur erreur");
   await page.getByLabel("Confirmez la clé de chiffrement").click();
-  await page.getByLabel("Confirmez la clé de chiffrement").fill("raté");
+  await page.getByLabel("Confirmez la clé de chiffrement").fill("raté raté");
   await page.locator("data-test-id=encryption-modal").getByRole("button", { name: "Changer la clé de chiffrement" }).click();
   await page.getByText("Les clés ne sont pas identiques").click();
   await page.getByRole("textbox", { name: "Clé de chiffrement", exact: true }).click();
-  await page.getByRole("textbox", { name: "Clé de chiffrement", exact: true }).fill("nouvelle");
+  await page.getByRole("textbox", { name: "Clé de chiffrement", exact: true }).fill("nouvelle assez longue");
   await page.getByLabel("Confirmez la clé de chiffrement").click();
-  await page.getByLabel("Confirmez la clé de chiffrement").fill("nouvelle");
+  await page.getByLabel("Confirmez la clé de chiffrement").fill("nouvelle assez longue");
   await page.locator("data-test-id=encryption-modal").getByRole("button", { name: "Changer la clé de chiffrement" }).click();
   await page.getByText("Données chiffrées ! Veuillez noter la clé puis vous reconnecter").click();
-  await page.locator("data-test-id=encryption-modal").getByRole("button", { name: "Close" }).click();
+  await page.locator("data-test-id=encryption-modal").getByLabel("Fermer").first().click();
 
   await page.getByRole("button", { name: "User Admin Test - 8" }).click();
   await page.getByRole("menuitem", { name: "Se déconnecter", exact: true }).click();
@@ -44,7 +44,7 @@ test("test", async ({ page }) => {
     )
     .click();
   await page.getByLabel("Clé de chiffrement d'organisation").click();
-  await page.getByLabel("Clé de chiffrement d'organisation").fill("nouvelle");
+  await page.getByLabel("Clé de chiffrement d'organisation").fill("nouvelle assez longue");
   await page.getByRole("button", { name: "Se connecter" }).click();
   await page.getByRole("link", { name: "Organisation" }).click();
   await page.getByRole("button", { name: "Chiffrement" }).click();
