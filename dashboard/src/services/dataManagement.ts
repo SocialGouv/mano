@@ -24,11 +24,10 @@ async function deleteDB() {
       capture(event); // just to monitor, rejecting would block the process, maybe we can remove this capture
       resolve(false);
     };
-    DBDeleteRequest.onblocked = (event) => {
-      capture(event); // just to monitor, rejecting would block the process, maybe we can remove this capture
+    DBDeleteRequest.onblocked = () => {
       resolve(false);
     };
-    DBDeleteRequest.onsuccess = (event) => {
+    DBDeleteRequest.onsuccess = () => {
       resolve(true);
     };
   });
