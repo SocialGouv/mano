@@ -20,6 +20,8 @@ module.exports = (sequelize, DataTypes) => {
     debugApp: DataTypes.JSONB,
     debugDashboard: DataTypes.JSONB,
     gaveFeedbackEarly2023: DataTypes.BOOLEAN,
+    loginAttempts: { type: DataTypes.INTEGER, defaultValue: 0 },
+    nextLoginAttemptAt: DataTypes.DATE,
   };
 
   class User extends Model {

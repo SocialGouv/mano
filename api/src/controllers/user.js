@@ -183,19 +183,53 @@ router.post(
       error.status = 400;
       return next(error);
     }
-
+    const now = new Date();
     let { password, email } = req.body;
     if (!password || !email) return res.status(400).send({ ok: false, error: "Missing password" });
     email = (email || "").trim().toLowerCase();
 
     const user = await User.findOne({ where: { email } });
     if (!user) return res.status(403).send({ ok: false, error: "E-mail ou mot de passe incorrect", code: EMAIL_OR_PASSWORD_INVALID });
+    if (user.loginAttempts > 12) {
+      return res.status(403).send({ ok: false, error: "Trop de tentatives de connexions infructueuses, le compte n'est plus accessible" });
+    }
 
+    if (user.nextLoginAttemptAt && user.nextLoginAttemptAt > now) {
+      const displayTime = new Date(user.nextLoginAttemptAt);
+      displayTime.setMinutes(displayTime.getMinutes() + 1);
+
+      return res.status(403).send({
+        ok: false,
+        code:
+          "Trop de tentatives de connexions infructueuses, vous pourrez vous reconnecter à partir de " +
+          displayTime.toLocaleTimeString("fr-FR", { timeZone: "Europe/Paris", timeStyle: "short" }),
+      });
+    }
     const { password: expectedPassword } = await User.scope("withPassword").findOne({ where: { email }, attributes: ["password"] });
 
     const match = await comparePassword(password, expectedPassword);
-    if (!match) return res.status(403).send({ ok: false, error: "E-mail ou mot de passe incorrect", code: EMAIL_OR_PASSWORD_INVALID });
+    if (!match) {
+      const loginAttempts = (user.loginAttempts || 0) + 1;
+
+      let date = now;
+      // Au quatrième essai, on est bloqué pour 1 minute
+      if (loginAttempts > 3) {
+        date = new Date(now.getTime() + 60 * 1000); // 1 minute
+      }
+      // Au septième essai, on est bloqué pour 1 heure
+      if (loginAttempts > 6) {
+        date = new Date(now.getTime() + 60 * 60 * 1000); // 1 hour
+      }
+
+      user.loginAttempts = loginAttempts;
+      user.nextLoginAttemptAt = date;
+      await user.save();
+      return res.status(403).send({ ok: false, error: "E-mail ou mot de passe incorrect", code: EMAIL_OR_PASSWORD_INVALID });
+    }
+
     user.lastLoginAt = new Date();
+    user.nextLoginAttemptAt = null;
+    user.loginAttempts = 0;
 
     createUserLog(req, user);
 
