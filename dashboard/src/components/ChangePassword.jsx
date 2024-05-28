@@ -51,7 +51,7 @@ const codesToHints = {
   NO_SPECIAL: "au moins un caractère spécial",
 };
 
-const ChangePassword = ({ onSubmit, onFinished, withCurrentPassword, centerButton }) => {
+const ChangePassword = ({ onSubmit, onFinished, withCurrentPassword, centerButton = false }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [changePasswordForm, setChangePasswordForm] = useState({
     password: "",

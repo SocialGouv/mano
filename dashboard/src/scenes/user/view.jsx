@@ -148,7 +148,7 @@ const View = () => {
                 </Col>
               )}
             </Row>
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: "1rem" }}>
+            <div className="tw-flex tw-justify-end tw-gap-4">
               {id !== user._id && (
                 <DeleteButtonAndConfirmModal
                   title={`Voulez-vous vraiment supprimer l'utilisateur ${values.name}`}

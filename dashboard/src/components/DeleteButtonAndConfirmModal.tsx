@@ -4,6 +4,19 @@ import { toast } from "react-toastify";
 import { useRecoilValue } from "recoil";
 import { userState } from "../recoil/auth";
 import { ModalBody, ModalContainer, ModalHeader, ModalFooter } from "./tailwind/Modal";
+import type { UserInstance } from "../types/user";
+
+interface DeleteButtonAndConfirmModalProps {
+  title: string;
+  children: React.ReactNode;
+  textToConfirm: string;
+  onConfirm: () => void;
+  buttonWidth?: string;
+  roles?: Array<UserInstance["role"]>;
+  roleErrorMessage?: string;
+  disabled?: boolean;
+  disabledTitle?: string;
+}
 
 const DeleteButtonAndConfirmModal = ({
   title,
@@ -15,7 +28,7 @@ const DeleteButtonAndConfirmModal = ({
   roleErrorMessage = "Désolé, seul un admin peut supprimer ce type d'élément",
   disabled = false,
   disabledTitle = "Vous n'avez pas le droit de supprimer cet élément",
-}) => {
+}: DeleteButtonAndConfirmModalProps) => {
   const user = useRecoilValue(userState);
   const [open, setOpen] = useState(false);
   return (
@@ -34,7 +47,7 @@ const DeleteButtonAndConfirmModal = ({
       >
         Supprimer
       </button>
-      <ModalContainer open={open} toggle={() => setOpen(false)} size="3xl">
+      <ModalContainer open={open} onClose={() => setOpen(false)} size="3xl">
         <ModalHeader>
           <div className="tw-px-4">
             <p className="tw-block tw-text-center tw-text-xl tw-text-red-500">{title}</p>
@@ -55,7 +68,7 @@ const DeleteButtonAndConfirmModal = ({
             id={`delete-${textToConfirm}`}
             onSubmit={async (e) => {
               e.preventDefault();
-              const _textToConfirm = Object.fromEntries(new FormData(e.target))?.textToConfirm;
+              let _textToConfirm = Object.fromEntries(new FormData(e.currentTarget))?.textToConfirm as string;
               if (!_textToConfirm) return toast.error("Veuillez rentrer le texte demandé");
               if (_textToConfirm.trim().toLocaleLowerCase() !== textToConfirm.trim().toLocaleLowerCase()) {
                 return toast.error("Le texte renseigné est incorrect");

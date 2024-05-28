@@ -821,6 +821,32 @@ router.put(
 );
 
 router.delete(
+  "/me",
+  passport.authenticate("user", { session: false }),
+  catchErrors(async (req, res, next) => {
+    const userId = req.user._id;
+
+    UserLog.create({
+      organisation: req.user.organisation,
+      user: req.user._id,
+      platform: req.headers.platform === "android" ? "app" : req.headers.platform === "dashboard" ? "dashboard" : "unknown",
+      action: `delete-me`,
+    });
+
+    const query = { where: { _id: userId, organisation: req.user.organisation } };
+
+    let user = await User.findOne(query);
+    if (!user) return res.status(404).send({ ok: false, error: "Not Found" });
+
+    let tx = await User.sequelize.transaction();
+    await Promise.all([User.destroy({ ...query, transaction: tx }), RelUserTeam.destroy({ where: { user: userId }, transaction: tx })]);
+    await user.destroy({ transaction: tx });
+    await tx.commit();
+    res.status(200).send({ ok: true });
+  })
+);
+
+router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "superadmin"]),
