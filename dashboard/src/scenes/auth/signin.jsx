@@ -124,7 +124,12 @@ const SignIn = () => {
       window.localStorage.setItem("mano-organisationId", organisation._id);
       if (!["superadmin"].includes(user.role) && !!signinForm.orgEncryptionKey) {
         const encryptionIsValid = await setOrgEncryptionKey(signinForm.orgEncryptionKey.trim(), organisation);
-        if (!encryptionIsValid) return setIsSubmitting(false);
+        if (!encryptionIsValid) {
+          await API.post({ path: "/user/decrypt-attempt-failure" });
+          return setIsSubmitting(false);
+        } else {
+          API.post({ path: "/user/decrypt-attempt-success" });
+        }
       }
       // now login !
       // superadmin

@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { atom, useRecoilState, useRecoilValue } from "recoil";
-import { organisationState, teamsState, usersLastLoginMoreThan6MonthsSelector, userState } from "../recoil/auth";
+import { organisationState, teamsState, usersLastLoginMoreThan6MonthsSelector, userState, usersTooManyDecryptAttempsSelector } from "../recoil/auth";
 import OpenNewWindowIcon from "./OpenNewWindowIcon";
 import SessionCountDownLimiter from "./SessionCountDownLimiter";
 import useMinimumWidth from "../services/useMinimumWidth";
@@ -14,6 +14,7 @@ export const showDrawerState = atom({
 const Drawer = () => {
   const user = useRecoilValue(userState);
   const usersLastLoginMoreThan6Months = useRecoilValue(usersLastLoginMoreThan6MonthsSelector);
+  const usersTooManyDecryptAttemps = useRecoilValue(usersTooManyDecryptAttempsSelector);
   const organisation = useRecoilValue(organisationState);
   const teams = useRecoilValue(teamsState);
   const deploymentCommit = useRecoilValue(deploymentShortCommitSHAState);
@@ -135,16 +136,20 @@ const Drawer = () => {
               <li>
                 <NavLink to="/user" activeClassName="active">
                   Utilisateurs
-                  {usersLastLoginMoreThan6Months > 1 && (
+                  {usersLastLoginMoreThan6Months >= 1 && (
                     <>
                       <br />
-                      <small className="tw-text-red-500">⚠️ {usersLastLoginMoreThan6Months} utilisateurs inactifs</small>
+                      <small className="tw-text-red-500">
+                        ⚠️ {usersLastLoginMoreThan6Months} {usersLastLoginMoreThan6Months === 1 ? "utilisateur inactif" : "utilisateurs inactifs"}
+                      </small>
                     </>
                   )}
-                  {usersLastLoginMoreThan6Months === 1 && (
+                  {usersTooManyDecryptAttemps >= 1 && (
                     <>
                       <br />
-                      <small className="tw-text-red-500">⚠️ {usersLastLoginMoreThan6Months} utilisateur inactif</small>
+                      <small className="tw-text-red-500 tw-font-bold">
+                        ⚠️ {usersTooManyDecryptAttemps} {usersTooManyDecryptAttemps === 1 ? "utilisateur suspicieux" : "utilisateurs suspicieux"}
+                      </small>
                     </>
                   )}
                 </NavLink>

@@ -60,9 +60,20 @@ const List = () => {
     () =>
       users
         .map((user) => {
+          const style = {};
+          if (dayjs().diff(user.lastLoginAt ?? user.createdAt, "months") > 6) {
+            style.color = "red";
+            style.fontWeight = 800;
+          }
+          if (user.decryptAttempts > 12) {
+            style.backgroundColor = "red";
+            style.color = "white";
+            style.fontWeight = 800;
+          }
+
           return {
             ...user,
-            style: dayjs().diff(user.lastLoginAt ?? user.createdAt, "months") > 6 ? { color: "red", fontWeight: 800 } : {},
+            style,
           };
         })
         .sort(sortUsers(sortBy, sortOrder)),

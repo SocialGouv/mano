@@ -66,6 +66,14 @@ export const usersLastLoginMoreThan6MonthsSelector = selector<number>({
   },
 });
 
+export const usersTooManyDecryptAttempsSelector = selector<number>({
+  key: "usersTooManyDecryptAttempsSelector",
+  get: ({ get }) => {
+    const users = get(usersState);
+    return users.filter((user) => user?.decryptAttempts > 12).length;
+  },
+});
+
 export const currentTeamState = atom<TeamInstance | null>({
   key: "currentTeamState",
   default: null,

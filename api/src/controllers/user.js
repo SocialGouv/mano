@@ -190,7 +190,7 @@ router.post(
 
     const user = await User.findOne({ where: { email } });
     if (!user) return res.status(403).send({ ok: false, error: "E-mail ou mot de passe incorrect", code: EMAIL_OR_PASSWORD_INVALID });
-    if (user.loginAttempts > 12) {
+    if (user.loginAttempts > 12 || user.decryptAttempts > 12) {
       return res.status(403).send({ ok: false, error: "Trop de tentatives de connexions infructueuses, le compte n'est plus accessible" });
     }
 
@@ -276,6 +276,22 @@ router.get(
     const token = platform === "dashboard" ? req.cookies.jwt : platform === "android" ? ExtractJwt.fromAuthHeaderWithScheme("JWT")(req) : null;
     if (!token) return res.status(400).send({ ok: false });
     const user = await User.findOne({ where: { _id: req.user._id } });
+
+    if (user.loginAttempts > 12 || user.decryptAttempts > 12) {
+      return res.status(403).send({ ok: false, error: "Trop de tentatives de connexions infructueuses, le compte n'est plus accessible" });
+    }
+
+    if (user.nextLoginAttemptAt && user.nextLoginAttemptAt > now) {
+      const displayTime = new Date(user.nextLoginAttemptAt);
+      displayTime.setMinutes(displayTime.getMinutes() + 1);
+
+      return res.status(403).send({
+        ok: false,
+        code:
+          "Trop de tentatives de connexions infructueuses, vous pourrez vous reconnecter à partir de " +
+          displayTime.toLocaleTimeString("fr-FR", { timeZone: "Europe/Paris", timeStyle: "short" }),
+      });
+    }
 
     const organisation = await user.getOrganisation();
     const orgTeams = await Team.findAll({ where: { organisation: organisation._id } });
@@ -521,6 +537,49 @@ router.post(
   })
 );
 
+router.post(
+  "/decrypt-attempt-failure",
+  passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal", "superadmin", "restricted-access", "stats-only"]),
+  catchErrors(async (req, res, next) => {
+    const now = new Date();
+
+    const _id = req.user._id;
+    const user = await User.findOne({ where: { _id } });
+
+    const decryptAttempts = (user.decryptAttempts || 0) + 1;
+
+    user.decryptAttempts = decryptAttempts;
+    await user.save();
+    UserLog.create({
+      user: user._id,
+      organisation: user.organisation,
+      platform: "unknown",
+      action: "decrypt-attempt-failure",
+    });
+    return res.status(200).send({ ok: false, error: "" });
+  })
+);
+
+router.post(
+  "/decrypt-attempt-success",
+  passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal", "superadmin", "restricted-access", "stats-only"]),
+  catchErrors(async (req, res, next) => {
+    const _id = req.user._id;
+    const user = await User.findOne({ where: { _id } });
+    user.decryptAttempts = 0;
+    await user.save();
+    UserLog.create({
+      user: user._id,
+      organisation: user.organisation,
+      platform: "unknown",
+      action: "decrypt-attempt-success",
+    });
+    return res.status(200).send({ ok: true });
+  })
+);
+
 router.get(
   "/:_id",
   passport.authenticate("user", { session: false }),
@@ -583,7 +642,13 @@ router.get(
 
     if ((req.user.role !== "admin" && req.user.role !== "superadmin") || req.query.minimal === "true") {
       for (let user of users) {
-        data.push({ name: user.name, _id: user._id, lastLoginAt: user.lastLoginAt, createdAt: user.createdAt });
+        data.push({
+          name: user.name,
+          _id: user._id,
+          lastLoginAt: user.lastLoginAt,
+          createdAt: user.createdAt,
+          decryptAttempts: user.decryptAttempts,
+        });
       }
       return res.status(200).send({ ok: true, data });
     }
@@ -604,6 +669,7 @@ router.get(
         cgusAccepted: user.cgusAccepted,
         gaveFeedbackEarly2023: user.gaveFeedbackEarly2023,
         lastLoginAt: user.lastLoginAt,
+        decryptAttempts: user.decryptAttempts,
         teams: teams.map(serializeTeam),
       });
     }

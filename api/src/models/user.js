@@ -22,6 +22,10 @@ module.exports = (sequelize, DataTypes) => {
     gaveFeedbackEarly2023: DataTypes.BOOLEAN,
     loginAttempts: { type: DataTypes.INTEGER, defaultValue: 0 },
     nextLoginAttemptAt: DataTypes.DATE,
+    decryptAttempts: { type: DataTypes.INTEGER, defaultValue: 0 },
+    // we don't have `nextDecryptAttemptAt` because
+    // 1. the flow is different than signin (the encryption key is checked in the frontend) and
+    // 2. we create a userLog at every decrypt attempt (failure or success) so we can track the number of attempts
   };
 
   class User extends Model {

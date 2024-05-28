@@ -15,4 +15,5 @@ export type UserInstance = {
   team?: UUIDV4[];
   teams?: UUIDV4[];
   createdAt?: Date;
+  decryptAttempts?: number;
 };
