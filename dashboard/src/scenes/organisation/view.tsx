@@ -13,7 +13,7 @@ import {
   usePreparePersonForEncryption,
 } from "../../recoil/persons";
 import TableCustomFields from "../../components/TableCustomFields";
-import { organisationState, userState } from "../../recoil/auth";
+import { organisationState, userState, encryptionKeyLengthState, MINIMUM_ENCRYPTION_KEY_LENGTH } from "../../recoil/auth";
 import API, { encryptItem } from "../../services/api";
 import ExportData from "../data-import-export/ExportData";
 import ImportData from "../data-import-export/ImportData";
@@ -71,6 +71,7 @@ const View = () => {
   const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
+  const encryptionKeyLength = useRecoilValue(encryptionKeyLengthState);
 
   const persons = useRecoilValue(personsState);
   const preparePersonForEncryption = usePreparePersonForEncryption();
@@ -111,7 +112,17 @@ const View = () => {
     };
 
   return (
-    <div className="tw--m-12 tw--mt-4 tw-flex tw-h-[calc(100%+4rem)] tw-flex-col">
+    <div className="relative tw--m-12 tw--mt-4 tw-flex tw-h-[calc(100%+4rem)] tw-flex-col">
+      {encryptionKeyLength < MINIMUM_ENCRYPTION_KEY_LENGTH && (
+        <div className="tw-z-[200] tw-rounded tw-border tw-border-orange-50 tw-bg-amber-100 tw-px-5 tw-py-3 tw-text-orange-900">
+          Votre clé de chiffrement est trop courte. Pour des raisons de sécurité, nous vous recommandons de la changer.
+          <br />
+          <button type="button" onClick={() => setTab("encryption")} className="tw-font-bold tw-text-stone-800 tw-underline">
+            Cliquez ici
+          </button>{" "}
+          ou sur le bouton "Chiffrement" pour la modifier.
+        </div>
+      )}
       <div className="tw-flex tw-flex-1 tw-overflow-hidden">
         <div className="tw-flex tw-h-full tw-w-58 tw-shrink-0 tw-flex-col tw-items-start tw-bg-main tw-px-2 tw-pt-2 tw-overflow-auto">
           <div className="tw-text-white tw-font-bold tw-text-sm mt-4">Général</div>

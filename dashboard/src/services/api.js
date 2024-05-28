@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import fetchRetry from "fetch-retry";
 import packageInfo from "../../package.json";
 import { HOST, SCHEME } from "../config";
-import { organisationState } from "../recoil/auth";
+import { encryptionKeyLengthState, organisationState } from "../recoil/auth";
 import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey, encryptFile, decryptFile } from "./encryption";
 import { AppSentry, capture } from "./sentry";
 import { deploymentCommitState, deploymentDateState } from "../recoil/version";
@@ -37,6 +37,7 @@ export const setOrgEncryptionKey = async (orgEncryptionKey, { encryptedVerificat
   }
   hashedOrgEncryptionKey = newHashedOrgEncryptionKey;
   enableEncrypt = true;
+  setRecoil(encryptionKeyLengthState, orgEncryptionKey.length);
   return newHashedOrgEncryptionKey;
 };
 

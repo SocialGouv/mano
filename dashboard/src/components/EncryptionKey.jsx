@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useHistory } from "react-router-dom";
 
-import { organisationState, teamsState, userState } from "../recoil/auth";
+import { MINIMUM_ENCRYPTION_KEY_LENGTH, organisationState, teamsState, userState } from "../recoil/auth";
 import { encryptVerificationKey } from "../services/encryption";
 import { capture } from "../services/sentry";
 import API, { setOrgEncryptionKey, getHashedOrgEncryptionKey, decryptAndEncryptItem } from "../services/api";
@@ -46,7 +46,8 @@ const EncryptionKey = ({ isMain }) => {
       if (!values.encryptionKey) return toast.error("La clé est obligatoire");
       if (!values.encryptionKeyConfirm) return toast.error("La validation de la clé est obligatoire");
       if (!import.meta.env.VITE_TEST_PLAYWRIGHT) {
-        if (values.encryptionKey.length < 8) return toast.error("La clé doit faire au moins 8 caractères");
+        if (values.encryptionKey.length < MINIMUM_ENCRYPTION_KEY_LENGTH)
+          return toast.error(`La clé doit faire au moins ${MINIMUM_ENCRYPTION_KEY_LENGTH} caractères`);
       }
       if (values.encryptionKey !== values.encryptionKeyConfirm) return toast.error("Les clés ne sont pas identiques");
       previousKey.current = getHashedOrgEncryptionKey();
@@ -260,7 +261,7 @@ const EncryptionKey = ({ isMain }) => {
                 </label>
                 <input
                   type="text"
-                  minLength={8}
+                  minLength={MINIMUM_ENCRYPTION_KEY_LENGTH}
                   required
                   className="tailwindui"
                   id="encryptionKey"
@@ -275,7 +276,7 @@ const EncryptionKey = ({ isMain }) => {
                 </label>
                 <input
                   className="tailwindui"
-                  minLength={8}
+                  minLength={MINIMUM_ENCRYPTION_KEY_LENGTH}
                   required
                   id="encryptionKeyConfirm"
                   name="encryptionKeyConfirm"

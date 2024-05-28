@@ -93,3 +93,10 @@ export const sessionInitialDateTimestamp = atom({
   key: "sessionInitialDateTimestamp",
   default: null,
 });
+
+export const encryptionKeyLengthState = atom({
+  key: "encryptionKeyLengthState",
+  default: null,
+});
+
+export const MINIMUM_ENCRYPTION_KEY_LENGTH = 8;
