@@ -30,7 +30,7 @@ interface DocumentsModuleProps {
   socialOrMedical: "social" | "medical";
   onDeleteDocument: (item: DocumentWithLinkedItem) => Promise<boolean>;
   onSubmitDocument: (item: ItemWithLink) => Promise<void>;
-  onAddDocuments: (items: Item[]) => Promise<void>;
+  onAddDocuments?: (items: Item[]) => Promise<void>;
   onSaveNewOrder?: (items: ItemWithLink[]) => Promise<boolean>;
   onDeleteFolder?: (item: FolderWithLinkedItem) => Promise<boolean>;
   color?: "main" | "blue-900";
@@ -69,7 +69,13 @@ export function DocumentsModule({
   return (
     <>
       {showPanel ? (
-        <DocumentsDropZone personId={personId} onAddDocuments={onAddDocuments} className="tw-h-full" color={color}>
+        <DocumentsDropZone
+          showAddDocumentButton={showAddDocumentButton}
+          personId={personId}
+          onAddDocuments={onAddDocuments}
+          className="tw-h-full"
+          color={color}
+        >
           <div className="tw-sticky tw-top-0 tw-z-10 tw-flex tw-items-center tw-bg-white tw-p-3">
             <h4 className="tw-flex-1 tw-text-xl">Documents {onlyDocuments.length ? `(${onlyDocuments.length})` : ""}</h4>
             <div className="tw-flex tw-items-center tw-gap-2">
@@ -95,18 +101,27 @@ export function DocumentsModule({
             color={color}
             onDisplayDocument={setDocumentToEdit}
             onAddDocuments={onAddDocuments}
+            showAddDocumentButton={showAddDocumentButton}
             personId={personId}
           />
         </DocumentsDropZone>
       ) : (
-        <DocumentTable
+        <DocumentsDropZone
           showAddDocumentButton={showAddDocumentButton}
-          documents={onlyDocuments}
-          color={color}
-          onDisplayDocument={setDocumentToEdit}
-          onAddDocuments={onAddDocuments}
           personId={personId}
-        />
+          onAddDocuments={onAddDocuments}
+          className="tw-h-full"
+          color={color}
+        >
+          <DocumentTable
+            documents={onlyDocuments}
+            color={color}
+            onDisplayDocument={setDocumentToEdit}
+            onAddDocuments={onAddDocuments}
+            showAddDocumentButton={showAddDocumentButton}
+            personId={personId}
+          />
+        </DocumentsDropZone>
       )}
       {!!documentToEdit && (
         <DocumentModal
@@ -189,7 +204,7 @@ function DocumentsFullScreen({
     <ModalContainer open={open} size={withDocumentOrganizer ? "full" : "prose"} onClose={onClose}>
       <ModalHeader title={title} />
       <ModalBody>
-        <DocumentsDropZone personId={personId} onAddDocuments={onAddDocuments} color={color}>
+        <DocumentsDropZone showAddDocumentButton personId={personId} onAddDocuments={onAddDocuments} color={color}>
           {!documents.length && (
             <div className="tw-flex tw-flex-col tw-items-center tw-gap-6 tw-pb-6">
               <div className="tw-mb-2 tw-mt-8 tw-w-full tw-text-center tw-text-gray-300">
@@ -367,10 +382,12 @@ export function DocumentTable({
           </svg>
           Aucun document pour le moment
         </div>
-        <label aria-label="Ajouter des documents" className={`button-submit mb-0 !tw-bg-${color}`}>
-          ＋ Ajouter des documents
-          <AddDocumentInput onAddDocuments={onAddDocuments} personId={personId} />
-        </label>
+        {showAddDocumentButton && (
+          <label aria-label="Ajouter des documents" className={`button-submit mb-0 !tw-bg-${color}`}>
+            ＋ Ajouter des documents
+            <AddDocumentInput onAddDocuments={onAddDocuments} personId={personId} />
+          </label>
+        )}
       </div>
     );
   }
@@ -482,7 +499,7 @@ function AddDocumentInput({ personId, onAddDocuments }: AddDocumentInputProps) {
   );
 }
 
-function DocumentsDropZone({ children, personId, onAddDocuments, color, className = "" }) {
+function DocumentsDropZone({ children, personId, onAddDocuments, color, className = "", showAddDocumentButton = false }) {
   // insipirations:
   // https://stackoverflow.com/a/35428657/5225096
   // https://stackoverflow.com/a/16403756/5225096
@@ -490,6 +507,10 @@ function DocumentsDropZone({ children, personId, onAddDocuments, color, classNam
 
   const user = useRecoilValue(userState);
   const [isInDropzone, setIsInDropzone] = useState(false);
+
+  if (!showAddDocumentButton) {
+    return <div className={className}>{children}</div>;
+  }
 
   return (
     <div

@@ -50,7 +50,7 @@ export default function SearchInPerson({ person }: { person: PersonPopulated }) 
 function SearchResults({ person, search }: { person: PersonPopulated; search: string }) {
   const user = useRecoilValue(userState);
   const initTabs = useMemo(() => {
-    const defaultTabs = ["Actions", "Commentaires non médicaux", "Lieux"];
+    const defaultTabs = ["Actions", "Commentaires non médicaux", "Lieux", "Documents non médicaux"];
     if (!user.healthcareProfessional) return defaultTabs;
     return [...defaultTabs, "Consultations", "Traitements", "Dossiers médicaux"];
   }, [user.healthcareProfessional]);
@@ -145,7 +145,6 @@ function SearchResults({ person, search }: { person: PersonPopulated; search: st
               personId={person._id}
               color="main"
               showAddDocumentButton={false}
-              onAddDocuments={() => null}
               onDeleteDocument={() => null}
               onSubmitDocument={() => null}
               socialOrMedical="social"
