@@ -314,12 +314,11 @@ const BlockGroup = ({ title, groups }) => {
           title={title}
           count={groups.length}
           help={`Une personne ne peut appartenir qu'à une famille. On comptabilise donc le nombre de familles dans lesquelles se trouvent les personnes concernées.\n\nSi plusieurs personnes appartiennent à la même famille, on comptabilisera seulement une seule famille.`}
-          children={
-            <span className="font-weight-normal">
-              Taille moyenne des familles: <strong>{avg}</strong>
-            </span>
-          }
-        />
+        >
+          <span className="font-weight-normal">
+            Taille moyenne des familles: <strong>{avg}</strong>
+          </span>
+        </Card>
       </div>
     );
   } catch (errorBlockTotal) {
