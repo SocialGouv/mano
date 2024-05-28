@@ -36,6 +36,7 @@ import CollaborationsSettings from "./CollaborationsSettings";
 import { customFieldsMedicalFileSelector } from "../../recoil/medicalFiles";
 import DocumentsOrganizer from "../../components/DocumentsOrganizer";
 import DefaultPersonFolders from "./DefaultPersonFolders";
+import { dayjsInstance, now } from "../../services/date";
 
 const getSettingTitle = (tabId) => {
   if (tabId === "infos") return "Informations";
@@ -120,7 +121,17 @@ const View = () => {
           <button type="button" onClick={() => setTab("encryption")} className="tw-font-bold tw-text-stone-800 tw-underline">
             Cliquez ici
           </button>{" "}
-          ou sur le bouton "Chiffrement" pour la modifier.
+          ou sur le bouton «&nbsp;Chiffrement&nbsp;» pour la modifier.
+        </div>
+      )}
+      {now().diff(dayjsInstance(organisation.encryptionLastUpdateAt), "year") > 1 && (
+        <div className="tw-z-[200] tw-rounded tw-border tw-border-orange-50 tw-bg-amber-100 tw-px-5 tw-py-3 tw-text-orange-900">
+          Votre clé de chiffrement n'a pas été modifiée depuis plus d'un an. Pour des raisons de sécurité, nous vous recommandons de la mettre à jour.
+          <br />
+          <button type="button" onClick={() => setTab("encryption")} className="tw-font-bold tw-text-stone-800 tw-underline">
+            Cliquez ici
+          </button>{" "}
+          ou sur le bouton «&nbsp;Chiffrement&nbsp;» pour la modifier.
         </div>
       )}
       <div className="tw-flex tw-flex-1 tw-overflow-hidden">
