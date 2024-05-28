@@ -67,7 +67,7 @@ const ObservationsStats = ({
           options: field.options,
         })),
     ];
-  }, [territories, customFieldsObs]);
+  }, [territories, customFieldsObs, currentTeam._id]);
   const [obsModalOpened, setObsModalOpened] = useState(false);
   const [sliceField, setSliceField] = useState(null);
   const [sliceValue, setSliceValue] = useState(null);
