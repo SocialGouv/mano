@@ -39,12 +39,13 @@ const SignIn = () => {
 
   useEffect(() => {
     if (isLoading !== true) return;
+    if (["stats-only"].includes(user.role)) return history.push("/stats");
     if (isDesktop && !!organisation?.receptionEnabled) {
       history.push("/reception");
     } else {
       history.push("/action");
     }
-  }, [history, organisation, isLoading, isDesktop]);
+  }, [history, organisation, isLoading, isDesktop, user]);
 
   const onSigninValidated = () => startInitialLoad();
 

@@ -65,10 +65,10 @@ test("Add history to merged person", async ({ page }) => {
 
   await clickOnEmptyReactSelect(page, "person-to-merge-with-select", mergePersonName);
 
-  await page.locator('[data-test-id="name"]').getByRole("cell", { name: originPersonName }).click();
-  await page.locator('[data-test-id="name"]').getByRole("cell", { name: mergePersonName }).click();
-  await page.locator('[data-test-id="otherNames"]').getByRole("cell", { name: originPersonOtherName }).click();
-  await page.locator('[data-test-id="otherNames"]').getByRole("cell", { name: mergePersonOtherName }).click();
+  await page.locator('[data-test-id="name"]').getByText(originPersonName).click();
+  await page.locator('[data-test-id="name"]').getByText(mergePersonName).click();
+  await page.locator('[data-test-id="otherNames"]').getByText(originPersonOtherName).click();
+  await page.locator('[data-test-id="otherNames"]').getByText(mergePersonOtherName).click();
 
   await page.locator('[data-test-id="otherNames"] input[name="otherNames"]').fill(mergedPersonOtherName);
 

@@ -41,5 +41,5 @@ test("test", async ({ page }) => {
   await changeReactSelectValue(page, "create-consultation-team-select", "Équipe 2");
   const createdAt = dayjs().format("dddd D MMMM YYYY HH:mm");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
-  await page.getByRole("cell", { name: `${createdAt} Une consultation - Médicale Team Test - 1 Équipe 2 Créée par User Admin Test - 1` }).click();
+  await page.getByText(`${createdAt}À faireFaitAnnuléUne consultation- MédicaleTeam Test - 1`).click();
 });

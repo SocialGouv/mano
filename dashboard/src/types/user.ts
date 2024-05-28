@@ -11,7 +11,7 @@ export type UserInstance = {
   cgusAccepted: Date | null;
   phone: string | null;
   healthcareProfessional: boolean | null;
-  role: "normal" | "admin"; // Add other roles if available.
+  role: "normal" | "admin" | "superadmin" | "restricted-access" | "stats-only";
   team?: UUIDV4[];
   teams?: UUIDV4[];
   createdAt?: Date;

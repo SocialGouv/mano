@@ -40,7 +40,7 @@ const { STORAGE_DIRECTORY } = require("../config");
 router.get(
   "/stats",
   passport.authenticate("user", { session: false }),
-  validateUser(["superadmin", "admin", "normal", "restricted-access"]),
+  validateUser(["superadmin", "admin", "normal", "restricted-access", "stats-only"]),
   catchErrors(async (req, res, next) => {
     try {
       z.object({

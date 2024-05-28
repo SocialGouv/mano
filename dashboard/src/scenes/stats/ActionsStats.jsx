@@ -6,6 +6,8 @@ import { getMultichoiceBarData } from "./utils";
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "../../components/tailwind/Modal";
 import ActionsSortableList from "../../components/ActionsSortableList";
 import Filters from "../../components/Filters";
+import { useRecoilValue } from "recoil";
+import { userState } from "../../recoil/auth";
 
 const ActionsStats = ({
   // data
@@ -30,6 +32,7 @@ const ActionsStats = ({
   const [actionsModalOpened, setActionsModalOpened] = useState(false);
   const [groupSlice, setGroupSlice] = useState(null);
   const [categorySlice, setCategorySlice] = useState(null);
+  const user = useRecoilValue(userState);
 
   const filteredActionsBySlice = useMemo(() => {
     if (groupSlice) {
@@ -130,10 +133,14 @@ const ActionsStats = ({
       <CustomResponsiveBar
         title="Répartition des actions par groupe"
         help={`Si une action a plusieurs catégories appartenant à plusieurs groupes, elle est comptabilisée dans chaque groupe.\n\nSi une action a plusieurs catégories appartenant au même groupe, elle est comptabilisée autant de fois dans ce groupe.\n\nAinsi, le total affiché peut être supérieur au nombre total d'actions.`}
-        onItemClick={(newGroupSlice) => {
-          setActionsModalOpened(true);
-          setGroupSlice(newGroupSlice);
-        }}
+        onItemClick={
+          user.role === "stats-only"
+            ? undefined
+            : (newGroupSlice) => {
+                setActionsModalOpened(true);
+                setGroupSlice(newGroupSlice);
+              }
+        }
         isMultiChoice
         axisTitleY="Actions"
         axisTitleX="Groupe"
@@ -149,10 +156,14 @@ const ActionsStats = ({
       <CustomResponsiveBar
         title="Répartition des actions par catégorie"
         help={`Si une action a plusieurs catégories, elle est comptabilisée dans chaque catégorie.\n\nAinsi, le total affiché peut être supérieur au nombre total d'actions.`}
-        onItemClick={(newCategorySlice) => {
-          setActionsModalOpened(true);
-          setCategorySlice(newCategorySlice);
-        }}
+        onItemClick={
+          user.role === "stats-only"
+            ? undefined
+            : (newCategorySlice) => {
+                setActionsModalOpened(true);
+                setCategorySlice(newCategorySlice);
+              }
+        }
         isMultiChoice
         axisTitleY="Actions"
         axisTitleX="Catégorie"

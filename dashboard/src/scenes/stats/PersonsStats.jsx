@@ -11,7 +11,7 @@ import { capture } from "../../services/sentry";
 import { Block } from "./Blocks";
 import CustomFieldsStats from "./CustomFieldsStats";
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "../../components/tailwind/Modal";
-import { organisationState, teamsState } from "../../recoil/auth";
+import { organisationState, teamsState, userState } from "../../recoil/auth";
 import { customFieldsPersonsSelector, personFieldsIncludingCustomFieldsSelector, sortPersons } from "../../recoil/persons";
 import TagTeam from "../../components/TagTeam";
 import Table from "../../components/table";
@@ -36,6 +36,7 @@ export default function PersonStats({
 }) {
   const allGroups = useRecoilValue(groupsState);
   const customFieldsPersons = useRecoilValue(customFieldsPersonsSelector);
+  const user = useRecoilValue(userState);
 
   const [personsModalOpened, setPersonsModalOpened] = useState(false);
   const [sliceField, setSliceField] = useState(null);
@@ -53,6 +54,7 @@ export default function PersonStats({
   }, [personsForStats, allGroups]);
 
   const onSliceClick = (newSlice, fieldName, personConcerned = personsForStats) => {
+    if (["stats-only"].includes(user.role)) return;
     const newSlicefield = filterBase.find((f) => f.field === fieldName);
     if (!newSlicefield) {
       capture("newSlicefield not found", { fieldName, filterBase });
@@ -114,67 +116,95 @@ export default function PersonStats({
             <CustomResponsivePie
               title="Genre"
               field="gender"
-              onItemClick={(newSlice) => {
-                onSliceClick(newSlice, "gender");
-              }}
+              onItemClick={
+                user.role === "stats-only"
+                  ? undefined
+                  : (newSlice) => {
+                      onSliceClick(newSlice, "gender");
+                    }
+              }
               data={getPieData(personsForStats, "gender", { options: personFields.find((f) => f.name === "gender").options })}
               help={`Genre des ${title} dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
             />
             <AgeRangeBar
               persons={personsForStats}
-              onItemClick={(newSlice, data) => {
-                setSliceField(personFields.find((f) => f.name === "birthdate"));
-                setSliceValue(newSlice);
-                setSlicedData(data);
-                setPersonsModalOpened(true);
-              }}
+              onItemClick={
+                user.role === "stats-only"
+                  ? undefined
+                  : (newSlice, data) => {
+                      setSliceField(personFields.find((f) => f.name === "birthdate"));
+                      setSliceValue(newSlice);
+                      setSlicedData(data);
+                      setPersonsModalOpened(true);
+                    }
+              }
             />
             <StatsCreatedAtRangeBar
               persons={personsForStats}
-              onItemClick={(newSlice, data) => {
-                setSliceField(personFields.find((f) => f.name === "followedSince"));
-                setSliceValue(newSlice);
-                setSlicedData(data);
-                setPersonsModalOpened(true);
-              }}
+              onItemClick={
+                user.role === "stats-only"
+                  ? undefined
+                  : (newSlice, data) => {
+                      setSliceField(personFields.find((f) => f.name === "followedSince"));
+                      setSliceValue(newSlice);
+                      setSlicedData(data);
+                      setPersonsModalOpened(true);
+                    }
+              }
             />
             <StatsWanderingAtRangeBar
               persons={personsForStats}
-              onItemClick={(newSlice, data) => {
-                setSliceField(personFields.find((f) => f.name === "wanderingAt"));
-                setSliceValue(newSlice);
-                setSlicedData(data);
-                setPersonsModalOpened(true);
-              }}
+              onItemClick={
+                user.role === "stats-only"
+                  ? undefined
+                  : (newSlice, data) => {
+                      setSliceField(personFields.find((f) => f.name === "wanderingAt"));
+                      setSliceValue(newSlice);
+                      setSlicedData(data);
+                      setPersonsModalOpened(true);
+                    }
+              }
             />
             <CustomResponsivePie
               title="Personnes très vulnérables"
               field="alertness"
-              onItemClick={(newSlice) => {
-                onSliceClick(newSlice, "alertness");
-              }}
+              onItemClick={
+                user.role === "stats-only"
+                  ? undefined
+                  : (newSlice) => {
+                      onSliceClick(newSlice, "alertness");
+                    }
+              }
               data={getPieData(personsForStats, "alertness", { isBoolean: true })}
               help={`${title.capitalize()} vulnérables dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
             />
             <CustomResponsivePie
               title="Sortie de file active"
               field="outOfActiveList"
-              onItemClick={(newSlice) => {
-                onSliceClick(newSlice, "outOfActiveList");
-              }}
+              onItemClick={
+                user.role === "stats-only"
+                  ? undefined
+                  : (newSlice) => {
+                      onSliceClick(newSlice, "outOfActiveList");
+                    }
+              }
               data={getPieData(personsForStats, "outOfActiveList", { isBoolean: true })}
               help={`${title} dans la période définie, sorties de la file active. La date de sortie de la file active n'est pas nécessairement dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
             />
             <CustomResponsiveBar
               title="Raison de sortie de file active"
               help={`Raisons de sortie de file active des ${title} dans la période définie, sorties de la file active. La date de sortie de la file active n'est pas nécessairement dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
-              onItemClick={(newSlice) => {
-                onSliceClick(
-                  newSlice,
-                  "outOfActiveListReasons",
-                  personsForStats.filter((p) => !!p.outOfActiveList)
-                );
-              }}
+              onItemClick={
+                user.role === "stats-only"
+                  ? undefined
+                  : (newSlice) => {
+                      onSliceClick(
+                        newSlice,
+                        "outOfActiveListReasons",
+                        personsForStats.filter((p) => !!p.outOfActiveList)
+                      );
+                    }
+              }
               axisTitleY="File active"
               axisTitleX="Raison de sortie de file active"
               isMultiChoice
@@ -209,7 +239,7 @@ export default function PersonStats({
                 <CustomFieldsStats
                   data={personsForStats}
                   customFields={section.fields}
-                  onSliceClick={onSliceClick}
+                  onSliceClick={user.role === "stats-only" ? undefined : onSliceClick}
                   help={(label) =>
                     `${label.capitalize()} des ${title} dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`
                   }

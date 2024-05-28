@@ -29,6 +29,7 @@ async function createUsersAndOrgas() {
     const healthProfessionalId = uuidv4();
     const normalUserId = uuidv4();
     const restrictedUserId = uuidv4();
+    const statsOnlyUserId = uuidv4();
     const teamId = uuidv4();
     const passwordSecret = bcrypt.hashSync("secret", 10);
 
@@ -214,6 +215,43 @@ async function createUsersAndOrgas() {
     );
 
     await client.query(
+      `INSERT INTO mano."User" (
+        _id,
+        name,
+        email,
+        password,
+        organisation,
+        "lastLoginAt",
+        "createdAt",
+        "updatedAt",
+        role,
+        "lastChangePasswordAt",
+        "forgotPasswordResetExpires",
+        "forgotPasswordResetToken",
+        "termsAccepted",
+        "cgusAccepted",
+        "healthcareProfessional"
+      ) VALUES (
+        $1,
+        $6,
+        $7,
+        $2,
+        $3,
+        $4,
+        $4,
+        $4,
+        'stats-only',
+        $5::date,
+        null,
+        null,
+        $4,
+        $4,
+        false
+      );`,
+      [statsOnlyUserId, passwordSecret, orgId, date, date, `User Stats Only Test - ${i}`, `stats-only${i}@example.org`]
+    );
+
+    await client.query(
       `INSERT INTO mano."Team" (
         _id,
         name,
@@ -304,6 +342,25 @@ async function createUsersAndOrgas() {
         $5
       );`,
       [uuidv4(), restrictedUserId, teamId, date, orgId]
+    );
+
+    await client.query(
+      `INSERT INTO mano."RelUserTeam" (
+        _id,
+        "user",
+        "team",
+        "createdAt",
+        "updatedAt",
+        "organisation"
+      ) VALUES (
+        $1,
+        $2,
+        $3,
+        $4,
+        $4,
+        $5
+      );`,
+      [uuidv4(), statsOnlyUserId, teamId, date, orgId]
     );
   }
   await client.end();

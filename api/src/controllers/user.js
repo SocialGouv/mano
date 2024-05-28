@@ -142,7 +142,7 @@ function createUserLog(req, user) {
 router.get(
   "/me",
   passport.authenticate("user", { session: false }),
-  validateUser(["admin", "normal", "superadmin", "restricted-access"]),
+  validateUser(["admin", "normal", "superadmin", "restricted-access", "stats-only"]),
   catchErrors(async (req, res) => {
     const user = await User.findOne({ where: { _id: req.user._id } });
     const teams = await user.getTeams();
@@ -157,7 +157,7 @@ router.get(
 router.post(
   "/logout",
   passport.authenticate("user", { session: false }),
-  validateUser(["admin", "normal", "superadmin", "restricted-access"]),
+  validateUser(["admin", "normal", "superadmin", "restricted-access", "stats-only"]),
   catchErrors(async (req, res) => {
     UserLog.create({
       organisation: req.user.organisation,
@@ -234,8 +234,8 @@ router.post(
     createUserLog(req, user);
 
     await user.save();
-    // restricted-access users cannot acces the app
-    if (req.headers.platform === "android" && user.role === "restricted-access") {
+
+    if (req.headers.platform === "android" && ["stats-only", "restricted-access"].includes(user.role)) {
       return res.status(403).send({ ok: false, error: "Accès interdit au personnel non habilité" });
     }
 
@@ -254,7 +254,7 @@ router.post(
 router.get(
   "/signin-token",
   passport.authenticate("user", { session: false }),
-  validateUser(["admin", "normal", "superadmin", "restricted-access"]),
+  validateUser(["admin", "normal", "superadmin", "restricted-access", "stats-only"]),
   catchErrors(async (req, res, next) => {
     try {
       z.object({
@@ -395,7 +395,7 @@ router.post(
         email: z.preprocess((email) => email.trim().toLowerCase(), z.string().email().optional().or(z.literal(""))),
         healthcareProfessional: z.boolean(),
         team: z.array(z.string().regex(looseUuidRegex)),
-        role: z.enum(["admin", "normal", "restricted-access"]),
+        role: z.enum(["admin", "normal", "restricted-access", "stats-only"]),
         ...(req.user.role === "superadmin" ? { organisation: z.string().regex(looseUuidRegex) } : {}),
       }).parse(req.body);
     } catch (e) {
@@ -411,7 +411,7 @@ router.post(
       name: sanitizeAll(name),
       phone: sanitizeAll(phone) || null,
       role,
-      healthcareProfessional: role === "restricted-access" ? false : healthcareProfessional,
+      healthcareProfessional: ["stats-only", "restricted-access"].includes(role) ? false : healthcareProfessional,
       email: sanitizeAll(email.trim().toLowerCase()),
       password: crypto.randomBytes(60).toString("hex"), // A useless password.
       organisation: organisationId,
@@ -464,7 +464,7 @@ router.post(
 router.post(
   "/reset_password",
   passport.authenticate("user", { session: false }),
-  validateUser(["admin", "normal", "superadmin", "restricted-access"]),
+  validateUser(["admin", "normal", "superadmin", "restricted-access", "stats-only"]),
   catchErrors(async (req, res, next) => {
     try {
       z.string().min(1).parse(req.body.password);
@@ -564,7 +564,7 @@ router.get(
 router.get(
   "/",
   passport.authenticate("user", { session: false }),
-  validateUser(["admin", "normal", "superadmin", "restricted-access"]),
+  validateUser(["admin", "normal", "superadmin", "restricted-access", "stats-only"]),
   catchErrors(async (req, res, next) => {
     try {
       z.object({
@@ -614,7 +614,7 @@ router.get(
 router.put(
   "/",
   passport.authenticate("user", { session: false }),
-  validateUser(["admin", "normal", "superadmin", "restricted-access"]),
+  validateUser(["admin", "normal", "superadmin", "restricted-access", "stats-only"]),
   catchErrors(async (req, res, next) => {
     try {
       z.object({
@@ -719,7 +719,7 @@ router.put(
 
     if (healthcareProfessional !== undefined) user.set({ healthcareProfessional });
     if (role) user.set({ role });
-    if (role === "restricted-access") {
+    if (["stats-only", "restricted-access"].includes(user.role)) {
       user.set({ healthcareProfessional: false });
     }
     const tx = await User.sequelize.transaction();

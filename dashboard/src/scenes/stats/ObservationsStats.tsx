@@ -4,7 +4,7 @@ import { utils, writeFile } from "@e965/xlsx";
 import SelectCustom from "../../components/SelectCustom";
 import CustomFieldsStats from "./CustomFieldsStats";
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "../../components/tailwind/Modal";
-import { currentTeamState, teamsState, usersState } from "../../recoil/auth";
+import { currentTeamState, teamsState, usersState, userState } from "../../recoil/auth";
 import TagTeam from "../../components/TagTeam";
 import Table from "../../components/table";
 import { dayjsInstance } from "../../services/date";
@@ -72,8 +72,10 @@ const ObservationsStats = ({
   const [sliceField, setSliceField] = useState(null);
   const [sliceValue, setSliceValue] = useState(null);
   const [slicedData, setSlicedData] = useState([]);
+  const user = useRecoilValue(userState);
 
   const onSliceClick = (newSlice: string, fieldName: FilterableField["field"], observationsConcerned = observations) => {
+    if (["stats-only"].includes(user.role)) return;
     const newSlicefield = customFieldsObs.find((f) => f.name === fieldName);
     setSliceField(newSlicefield);
     setSliceValue(newSlice);
@@ -123,16 +125,19 @@ const ObservationsStats = ({
       <CustomFieldsStats
         data={observations}
         customFields={customFieldsObs}
-        onSliceClick={onSliceClick}
+        onSliceClick={user.role === "stats-only" ? undefined : onSliceClick}
         dataTestId="number-observations"
         additionalCols={[
           {
             title: "Nombre d'observations de territoire",
             value: observations.length,
-            onBlockClick: () => {
-              setSlicedData(observations);
-              setObsModalOpened(true);
-            },
+            onBlockClick:
+              user.role === "stats-only"
+                ? undefined
+                : () => {
+                    setSlicedData(observations);
+                    setObsModalOpened(true);
+                  },
           },
         ]}
         help={(label) =>

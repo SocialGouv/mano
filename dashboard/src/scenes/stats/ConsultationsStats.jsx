@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { CustomResponsivePie } from "./charts";
 import { getPieData } from "./utils";
-import { organisationState } from "../../recoil/auth";
+import { organisationState, userState } from "../../recoil/auth";
 import { useRecoilValue } from "recoil";
 import { Block } from "./Blocks";
 import CustomFieldsStats from "./CustomFieldsStats";
@@ -13,6 +13,7 @@ export default function ConsultationsStats({ consultations, personsWithConsultat
   const organisation = useRecoilValue(organisationState);
   const [actionsModalOpened, setActionsModalOpened] = useState(false);
   const [slicedData, setSlicedData] = useState([]);
+  const user = useRecoilValue(userState);
 
   const filterTitle = useMemo(() => {
     if (!filterPersons.length) return `Filtrer par personnes suivies :`;
@@ -68,19 +69,27 @@ export default function ConsultationsStats({ consultations, personsWithConsultat
         <CustomResponsivePie
           title="Consultations par type"
           data={getPieData(consultations, "type")}
-          onItemClick={(newSlice) => {
-            setActionsModalOpened(true);
-            setSlicedData(consultationsByType[newSlice].data);
-          }}
+          onItemClick={
+            user.role === "stats-only"
+              ? undefined
+              : (newSlice) => {
+                  setActionsModalOpened(true);
+                  setSlicedData(consultationsByType[newSlice].data);
+                }
+          }
           help={`Répartition par type des consultations réalisées dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des consultations.`}
         />
         <CustomResponsivePie
           title="Consultations par statut"
           data={getPieData(consultations, "status")}
-          onItemClick={(newSlice) => {
-            setActionsModalOpened(true);
-            setSlicedData(consultations.filter((c) => c.status === newSlice));
-          }}
+          onItemClick={
+            user.role === "stats-only"
+              ? undefined
+              : (newSlice) => {
+                  setActionsModalOpened(true);
+                  setSlicedData(consultations.filter((c) => c.status === newSlice));
+                }
+          }
           help={`Répartition par statut des consultations réalisées dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des consultations.`}
         />
       </details>
@@ -117,14 +126,18 @@ export default function ConsultationsStats({ consultations, personsWithConsultat
             <CustomFieldsStats
               data={consultationsByType[c.name].data}
               customFields={c.fields}
-              onSliceClick={(newSlice, field) => {
-                setActionsModalOpened(true);
-                if (newSlice === "Non renseigné") {
-                  setSlicedData(consultationsByType[c.name].data.filter((c) => !c[field]));
-                } else {
-                  setSlicedData(consultationsByType[c.name].data.filter((c) => c[field] === newSlice));
-                }
-              }}
+              onSliceClick={
+                user.role === "stats-only"
+                  ? undefined
+                  : (newSlice, field) => {
+                      setActionsModalOpened(true);
+                      if (newSlice === "Non renseigné") {
+                        setSlicedData(consultationsByType[c.name].data.filter((c) => !c[field]));
+                      } else {
+                        setSlicedData(consultationsByType[c.name].data.filter((c) => c[field] === newSlice));
+                      }
+                    }
+              }
               help={(label) => `${label.capitalize()} des consultations réalisées dans la période définie.`}
               totalTitleForMultiChoice={<span className="tw-font-bold">Nombre de consultations concernées</span>}
             />

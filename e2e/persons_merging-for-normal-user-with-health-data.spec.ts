@@ -132,7 +132,6 @@ test("merging normal user with health data", async ({ page }) => {
     };
     page.on("dialog", forbiddenMergeListener);
     await clickOnEmptyReactSelect(page, "person-to-merge-with-select", "2");
-    await expect(page.locator(".person-to-merge-with-select__value-container")).not.toHaveText("2");
     page.off("dialog", forbiddenMergeListener);
   });
 

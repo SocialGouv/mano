@@ -14,7 +14,7 @@ router.put(
   "/:migrationName",
   passport.authenticate("user", { session: false }),
   validateEncryptionAndMigrations,
-  validateUser(["admin", "normal", "restricted-access"]),
+  validateUser(["admin", "normal", "restricted-access", "stats-only"]),
   catchErrors(async (req, res, next) => {
     try {
       z.object({

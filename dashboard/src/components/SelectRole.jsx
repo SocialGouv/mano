@@ -5,6 +5,7 @@ const roles = [
   { value: "normal", label: "Normal" },
   { value: "admin", label: "Admin" },
   { value: "restricted-access", label: "Accès restreint" },
+  { value: "stats-only", label: "Statistiques seulement" },
 ];
 
 const SelectRole = ({ value, handleChange }) => (

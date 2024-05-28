@@ -20,7 +20,7 @@ const versionCheck = require("./middleware/versionCheck");
 
 // Put together a schema
 const app = express();
-if (process.env.NODE_ENV === "development") {
+if (["development", "test"].includes(process.env.NODE_ENV)) {
   app.use(logger("dev"));
 }
 
