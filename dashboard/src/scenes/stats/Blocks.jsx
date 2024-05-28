@@ -30,16 +30,10 @@ export const BlockTotal = ({ title, unit, data, field, help }) => {
   const total = dataWithOnlyNumbers.reduce((total, item) => total + Number(item[field]), 0);
   const avg = total / dataWithOnlyNumbers.length;
   return (
-    <Card
-      title={title}
-      unit={unit}
-      count={twoDecimals(total)}
-      help={help}
-      children={
-        <span className="font-weight-normal">
-          Moyenne: <strong>{isNaN(avg) ? "-" : twoDecimals(avg)}</strong>
-        </span>
-      }
-    />
+    <Card title={title} unit={unit} count={twoDecimals(total)} help={help}>
+      <span className="font-weight-normal">
+        Moyenne: <strong>{isNaN(avg) ? "-" : twoDecimals(avg)}</strong>
+      </span>
+    </Card>
   );
 };
