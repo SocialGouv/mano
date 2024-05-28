@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { useHistory } from "react-router-dom";
 import { v4 as uuid } from "uuid";
@@ -69,7 +69,7 @@ export function DocumentsModule({
   return (
     <>
       {showPanel ? (
-        <div className="tw-relative">
+        <DocumentsDropZone personId={personId} onAddDocuments={onAddDocuments} className="tw-h-full" color={color}>
           <div className="tw-sticky tw-top-0 tw-z-10 tw-flex tw-items-center tw-bg-white tw-p-3">
             <h4 className="tw-flex-1 tw-text-xl">Documents {onlyDocuments.length ? `(${onlyDocuments.length})` : ""}</h4>
             <div className="tw-flex tw-items-center tw-gap-2">
@@ -97,7 +97,7 @@ export function DocumentsModule({
             onAddDocuments={onAddDocuments}
             personId={personId}
           />
-        </div>
+        </DocumentsDropZone>
       ) : (
         <DocumentTable
           showAddDocumentButton={showAddDocumentButton}
@@ -189,118 +189,120 @@ function DocumentsFullScreen({
     <ModalContainer open={open} size={withDocumentOrganizer ? "full" : "prose"} onClose={onClose}>
       <ModalHeader title={title} />
       <ModalBody>
-        {!documents.length && (
-          <div className="tw-flex tw-flex-col tw-items-center tw-gap-6 tw-pb-6">
-            <div className="tw-mb-2 tw-mt-8 tw-w-full tw-text-center tw-text-gray-300">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="tw-mx-auto tw-h-16 tw-w-16 tw-text-gray-200"
-                width={24}
-                height={24}
-                viewBox="0 0 24 24"
-                strokeWidth="2"
-                stroke="currentColor"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path
+        <DocumentsDropZone personId={personId} onAddDocuments={onAddDocuments} color={color}>
+          {!documents.length && (
+            <div className="tw-flex tw-flex-col tw-items-center tw-gap-6 tw-pb-6">
+              <div className="tw-mb-2 tw-mt-8 tw-w-full tw-text-center tw-text-gray-300">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="tw-mx-auto tw-h-16 tw-w-16 tw-text-gray-200"
+                  width={24}
+                  height={24}
+                  viewBox="0 0 24 24"
+                  strokeWidth="2"
+                  stroke="currentColor"
+                  fill="none"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
-                />
-              </svg>
-              Aucun document pour le moment
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
+                  />
+                </svg>
+                Aucun document pour le moment
+              </div>
+              <label aria-label="Ajouter des documents" className={`button-submit mb-0 !tw-bg-${color}`}>
+                ＋ Ajouter des documents
+                <AddDocumentInput onAddDocuments={onAddDocuments} personId={personId} />
+              </label>
             </div>
-            <label aria-label="Ajouter des documents" className={`button-submit mb-0 !tw-bg-${color}`}>
-              ＋ Ajouter des documents
-              <AddDocumentInput onAddDocuments={onAddDocuments} personId={personId} />
-            </label>
-          </div>
-        )}
-        {withDocumentOrganizer ? (
-          <div className="tw-min-h-1/2 ">
-            {socialOrMedical === "social" && (
-              <>
-                <DocumentsOrganizer
-                  items={documents
-                    .filter((doc) => {
-                      if (doc.type === "document") {
-                        const document = doc as DocumentWithLinkedItem;
-                        if (document.group) return false;
-                      }
-                      return true;
-                    })
-                    .map((doc) => {
-                      if (doc.parentId) return doc;
-                      return {
-                        ...doc,
-                        parentId: "root",
-                      };
-                    })}
-                  onSave={(newOrder) => {
-                    const ok = onSaveNewOrder(newOrder);
-                    if (!ok) onClose();
-                    return ok;
-                  }}
-                  htmlId="social"
-                  onFolderClick={onEditFolderRequest}
-                  onDocumentClick={onDisplayDocument}
-                  color={color}
-                />
-                {!!organisation.groupsEnabled && (
+          )}
+          {withDocumentOrganizer ? (
+            <div className="tw-min-h-1/2 ">
+              {socialOrMedical === "social" && (
+                <>
                   <DocumentsOrganizer
                     items={documents
-                      .filter((item) => {
-                        if (item.type !== "document") return false;
-                        const doc = item as DocumentWithLinkedItem;
-                        return !!doc.group;
+                      .filter((doc) => {
+                        if (doc.type === "document") {
+                          const document = doc as DocumentWithLinkedItem;
+                          if (document.group) return false;
+                        }
+                        return true;
                       })
                       .map((doc) => {
+                        if (doc.parentId) return doc;
                         return {
                           ...doc,
                           parentId: "root",
                         };
                       })}
-                    htmlId="family"
-                    rootFolderName="👪 Documents familiaux"
                     onSave={(newOrder) => {
                       const ok = onSaveNewOrder(newOrder);
                       if (!ok) onClose();
                       return ok;
                     }}
+                    htmlId="social"
                     onFolderClick={onEditFolderRequest}
                     onDocumentClick={onDisplayDocument}
                     color={color}
                   />
-                )}
-              </>
-            )}
-            {socialOrMedical === "medical" && (
-              <DocumentsOrganizer
-                htmlId="medical"
-                items={documents}
-                onSave={(newOrder) => {
-                  const ok = onSaveNewOrder(newOrder);
-                  if (!ok) onClose();
-                  return ok;
-                }}
-                onFolderClick={onEditFolderRequest}
-                onDocumentClick={onDisplayDocument}
-                color={color}
-              />
-            )}
-          </div>
-        ) : (
-          <DocumentTable
-            documents={documents as DocumentWithLinkedItem[]}
-            onDisplayDocument={onDisplayDocument}
-            onAddDocuments={onAddDocuments}
-            withClickableLabel
-            color={color}
-            personId={personId}
-          />
-        )}
+                  {!!organisation.groupsEnabled && (
+                    <DocumentsOrganizer
+                      items={documents
+                        .filter((item) => {
+                          if (item.type !== "document") return false;
+                          const doc = item as DocumentWithLinkedItem;
+                          return !!doc.group;
+                        })
+                        .map((doc) => {
+                          return {
+                            ...doc,
+                            parentId: "root",
+                          };
+                        })}
+                      htmlId="family"
+                      rootFolderName="👪 Documents familiaux"
+                      onSave={(newOrder) => {
+                        const ok = onSaveNewOrder(newOrder);
+                        if (!ok) onClose();
+                        return ok;
+                      }}
+                      onFolderClick={onEditFolderRequest}
+                      onDocumentClick={onDisplayDocument}
+                      color={color}
+                    />
+                  )}
+                </>
+              )}
+              {socialOrMedical === "medical" && (
+                <DocumentsOrganizer
+                  htmlId="medical"
+                  items={documents}
+                  onSave={(newOrder) => {
+                    const ok = onSaveNewOrder(newOrder);
+                    if (!ok) onClose();
+                    return ok;
+                  }}
+                  onFolderClick={onEditFolderRequest}
+                  onDocumentClick={onDisplayDocument}
+                  color={color}
+                />
+              )}
+            </div>
+          ) : (
+            <DocumentTable
+              documents={documents as DocumentWithLinkedItem[]}
+              onDisplayDocument={onDisplayDocument}
+              onAddDocuments={onAddDocuments}
+              withClickableLabel
+              color={color}
+              personId={personId}
+            />
+          )}
+        </DocumentsDropZone>
       </ModalBody>
       <ModalFooter>
         <button type="button" name="cancel" className="button-cancel" onClick={onClose}>
@@ -468,45 +470,121 @@ function AddDocumentInput({ personId, onAddDocuments }: AddDocumentInputProps) {
         }
       }}
       onChange={async (e) => {
-        if (!e.target.files?.length) return;
-        if (!personId) {
-          toast.error("Veuillez sélectionner une personne auparavant");
-          return;
-        }
-        const docsResponses = [];
-        for (let i = 0; i < e.target.files.length; i++) {
-          const fileToUpload = e.target.files[i] as any;
-          const docResponse = await API.upload({
-            path: `/person/${personId}/document`,
-            file: fileToUpload,
-          });
-          if (!docResponse.ok || !docResponse.data) {
-            capture("Error uploading document", { extra: { docResponseError: docResponse.error } });
-            toast.error(`Une erreur est survenue lors de l'envoi du document ${fileToUpload?.filename}`);
-            return;
-          }
-          const fileUploaded = docResponse.data as FileMetadata;
-          toast.success(`Document ${fileUploaded.originalname} ajouté !`);
-          const document: Document = {
-            _id: fileUploaded.filename,
-            name: fileUploaded.originalname,
-            encryptedEntityKey: docResponse.encryptedEntityKey,
-            createdAt: new Date(),
-            createdBy: user?._id ?? "",
-            downloadPath: `/person/${personId}/document/${fileUploaded.filename}`,
-            file: fileUploaded,
-            group: false,
-            parentId: undefined, // it will be 'treatment', 'consultation', 'action' or 'root'
-            position: undefined,
-            type: "document",
-          };
-          docsResponses.push(document);
-        }
+        const docsResponses = await handleFilesUpload({
+          files: e.target.files,
+          personId,
+          user,
+        });
         onAddDocuments(docsResponses);
         setResetFileInputKey((k) => k + 1);
       }}
     />
   );
+}
+
+function DocumentsDropZone({ children, personId, onAddDocuments, color, className = "" }) {
+  // insipirations:
+  // https://stackoverflow.com/a/35428657/5225096
+  // https://stackoverflow.com/a/16403756/5225096
+  // https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/File_drag_and_drop
+
+  const user = useRecoilValue(userState);
+  const [isInDropzone, setIsInDropzone] = useState(false);
+
+  return (
+    <div
+      className={["tw-relative", className].filter(Boolean).join(" ")}
+      onDragEnter={(e) => {
+        e.preventDefault(); // Prevent default behavior (Prevent file from being opened)
+        if (!isInDropzone) setIsInDropzone(true);
+      }}
+      onDragOver={(e) => {
+        e.preventDefault(); // Prevent default behavior (Prevent file from being opened)
+      }}
+    >
+      {children}
+      {isInDropzone && (
+        <div
+          className={[
+            "tw-absolute tw-inset-0 tw-bg-white tw-flex tw-items-center tw-justify-center tw-border-dashed tw-border-4 tw-z-50",
+            `tw-border-${color} tw-text-${color}`,
+          ].join(" ")}
+          onDragOver={(e) => {
+            e.preventDefault(); // Prevent default behavior (Prevent file from being opened)
+          }}
+          onDragLeave={(e) => {
+            if (isInDropzone) setIsInDropzone(false);
+          }}
+          onDrop={async (e) => {
+            e.preventDefault(); // Prevent default behavior (Prevent file from being opened)
+            setIsInDropzone(false);
+            const documentsResponse = await handleFilesUpload({ files: e.dataTransfer.files, personId, user });
+            onAddDocuments(documentsResponse);
+          }}
+        >
+          <div className="tw-mb-2 tw-mt-8 tw-w-full tw-text-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="tw-mx-auto tw-h-16 tw-w-16"
+              width={24}
+              height={24}
+              viewBox="0 0 24 24"
+              strokeWidth="2"
+              stroke="currentColor"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
+              />
+            </svg>
+            Déposer vos fichiers ici
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+async function handleFilesUpload({ files, personId, user }) {
+  if (!files?.length) return;
+  if (!personId) {
+    toast.error("Veuillez sélectionner une personne auparavant");
+    return;
+  }
+  const docsResponses = [];
+  for (let i = 0; i < files.length; i++) {
+    const fileToUpload = files[i] as any;
+    const docResponse = await API.upload({
+      path: `/person/${personId}/document`,
+      file: fileToUpload,
+    });
+    if (!docResponse.ok || !docResponse.data) {
+      capture("Error uploading document", { extra: { docResponseError: docResponse.error } });
+      toast.error(`Une erreur est survenue lors de l'envoi du document ${fileToUpload?.filename}`);
+      return;
+    }
+    const fileUploaded = docResponse.data as FileMetadata;
+    toast.success(`Document ${fileUploaded.originalname} ajouté !`);
+    const document: Document = {
+      _id: fileUploaded.filename,
+      name: fileUploaded.originalname,
+      encryptedEntityKey: docResponse.encryptedEntityKey,
+      createdAt: new Date(),
+      createdBy: user?._id ?? "",
+      downloadPath: `/person/${personId}/document/${fileUploaded.filename}`,
+      file: fileUploaded,
+      group: false,
+      parentId: undefined, // it will be 'treatment', 'consultation', 'action' or 'root'
+      position: undefined,
+      type: "document",
+    };
+    docsResponses.push(document);
+  }
+  return docsResponses;
 }
 
 type DocumentModalProps = {
