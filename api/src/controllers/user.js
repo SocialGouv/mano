@@ -823,7 +823,7 @@ router.put(
 router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
-  validateUser("admin"),
+  validateUser(["admin", "superadmin"]),
   catchErrors(async (req, res, next) => {
     try {
       z.object({
@@ -844,7 +844,8 @@ router.delete(
       action: `delete-user-${userId}`,
     });
 
-    const query = { where: { _id: userId, organisation: req.user.organisation } };
+    const query = { where: { _id: userId } };
+    if (req.user.role !== "superadmin") query.where.organisation = req.user.organisation;
 
     let user = await User.findOne(query);
     if (!user) return res.status(404).send({ ok: false, error: "Not Found" });

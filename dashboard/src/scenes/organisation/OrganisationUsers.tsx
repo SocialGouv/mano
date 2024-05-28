@@ -5,6 +5,8 @@ import { TeamInstance } from "../../types/team";
 import { OrganisationInstance } from "../../types/organisation";
 import { formatDateWithFullMonth } from "../../services/date";
 import { ModalContainer, ModalBody, ModalHeader, ModalFooter } from "../../components/tailwind/Modal";
+import DeleteButtonAndConfirmModal from "../../components/DeleteButtonAndConfirmModal";
+import { toast } from "react-toastify";
 
 export default function OrganisationUsers({
   organisation,
@@ -52,6 +54,7 @@ export default function OrganisationUsers({
               <th>Email</th>
               <th>Rôle</th>
               <th>Équipes</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -112,6 +115,22 @@ export default function OrganisationUsers({
                         {team.name}
                       </div>
                     ))}
+                  </div>
+                </td>
+                <td>
+                  <div className="tw-grid tw-gap-1">
+                    <DeleteButtonAndConfirmModal
+                      title={`Voulez-vous vraiment supprimer l'utilisateur ${user.name}`}
+                      textToConfirm={user.email}
+                      onConfirm={async () => {
+                        const res = await API.delete({ path: `/user/${user._id}` });
+                        if (!res.ok) return;
+                        toast.success("Suppression réussie");
+                        setUsers(users.filter((u) => u._id !== user._id));
+                      }}
+                    >
+                      <span className="tw-mb-7 tw-block tw-w-full tw-text-center">Cette opération est irréversible</span>
+                    </DeleteButtonAndConfirmModal>
                   </div>
                 </td>
               </tr>
