@@ -1,4 +1,4 @@
-import { type UseStore, set, get, createStore } from "idb-keyval";
+import { type UseStore, set, get, createStore, keys, delMany } from "idb-keyval";
 import { capture } from "./sentry";
 
 export const dashboardCurrentCacheKey = "mano_last_refresh_2022_01_11";
@@ -18,19 +18,10 @@ function setupDB() {
 }
 
 async function deleteDB() {
-  return new Promise((resolve) => {
-    const DBDeleteRequest = window.indexedDB.deleteDatabase(manoDB);
-    DBDeleteRequest.onerror = (event) => {
-      capture(event); // just to monitor, rejecting would block the process, maybe we can remove this capture
-      resolve(false);
-    };
-    DBDeleteRequest.onblocked = () => {
-      resolve(false);
-    };
-    DBDeleteRequest.onsuccess = () => {
-      resolve(true);
-    };
-  });
+  // On n'arrive pas à supprimer la base de données, on va donc supprimer les données une par une
+  if (!customStore) return;
+  const ks = await keys(customStore);
+  return await delMany(ks, customStore);
 }
 
 export async function clearCache() {

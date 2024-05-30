@@ -449,7 +449,6 @@ export function useDataLoader(options = { refreshOnMount: false }) {
 
   async function resetCache() {
     setLastLoad(0);
-    await clearCache();
     setPersons([]);
     setGroups([]);
     setReports([]);
@@ -464,6 +463,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     setConsultations([]);
     setTreatments([]);
     setMedicalFiles([]);
+    await clearCache();
   }
 
   return {
