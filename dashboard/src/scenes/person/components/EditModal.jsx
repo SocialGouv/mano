@@ -19,7 +19,6 @@ import ButtonCustom from "../../../components/ButtonCustom";
 import { Formik } from "formik";
 import { toast } from "react-toastify";
 import API from "../../../services/api";
-import { cleanHistory } from "./PersonHistory";
 import DatePicker from "../../../components/DatePicker";
 import {
   customFieldsMedicalFileSelector,
@@ -27,6 +26,7 @@ import {
   prepareMedicalFileForEncryption,
 } from "../../../recoil/medicalFiles";
 import { useDataLoader } from "../../../components/DataLoader";
+import { cleanHistory } from "../../../utils/person-history";
 
 export default function EditModal({ person, selectedPanel, onClose, isMedicalFile = false }) {
   const { refresh } = useDataLoader();

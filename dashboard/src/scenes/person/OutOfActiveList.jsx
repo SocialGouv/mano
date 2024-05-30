@@ -9,9 +9,9 @@ import { fieldsPersonsCustomizableOptionsSelector, usePreparePersonForEncryption
 import API from "../../services/api";
 import { outOfBoundariesDate } from "../../services/date";
 import SelectCustom from "../../components/SelectCustom";
-import { cleanHistory } from "./components/PersonHistory";
 import DatePicker from "../../components/DatePicker";
 import { useDataLoader } from "../../components/DataLoader";
+import { cleanHistory } from "../../utils/person-history";
 
 const OutOfActiveList = ({ person }) => {
   const [open, setOpen] = useState(false);
