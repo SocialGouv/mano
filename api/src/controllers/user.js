@@ -281,6 +281,7 @@ router.get(
       return res.status(403).send({ ok: false, error: "Trop de tentatives de connexions infructueuses, le compte n'est plus accessible" });
     }
 
+    const now = new Date();
     if (user.nextLoginAttemptAt && user.nextLoginAttemptAt > now) {
       const displayTime = new Date(user.nextLoginAttemptAt);
       displayTime.setMinutes(displayTime.getMinutes() + 1);
