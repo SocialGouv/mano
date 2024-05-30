@@ -6,7 +6,8 @@ const MINIMUM_MOBILE_APP_VERSION = [3, 5, 0];
 let deploymentCommit = null;
 let deploymentDate = null;
 
-module.exports = async ({ headers: { version, platform } }, res, next) => {
+module.exports = async ({ path, headers: { version, platform } }, res, next) => {
+  if (path.startsWith("/public")) return next();
   if (platform === "website") return next();
   if (platform === "dashboard") {
     if (deploymentCommit === null) {
