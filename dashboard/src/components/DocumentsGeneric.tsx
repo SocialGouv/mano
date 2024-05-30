@@ -540,7 +540,9 @@ function DocumentsDropZone({ children, personId, onAddDocuments, color, classNam
             e.preventDefault(); // Prevent default behavior (Prevent file from being opened)
             setIsInDropzone(false);
             const documentsResponse = await handleFilesUpload({ files: e.dataTransfer.files, personId, user });
-            onAddDocuments(documentsResponse);
+            if (documentsResponse) {
+              onAddDocuments(documentsResponse);
+            }
           }}
         >
           <div className="tw-mb-2 tw-mt-8 tw-w-full tw-text-center">
