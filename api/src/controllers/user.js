@@ -542,9 +542,7 @@ router.post(
   "/decrypt-attempt-failure",
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal", "superadmin", "restricted-access", "stats-only"]),
-  catchErrors(async (req, res, next) => {
-    const now = new Date();
-
+  catchErrors(async (req, res) => {
     const _id = req.user._id;
     const user = await User.findOne({ where: { _id } });
 
@@ -566,7 +564,7 @@ router.post(
   "/decrypt-attempt-success",
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal", "superadmin", "restricted-access", "stats-only"]),
-  catchErrors(async (req, res, next) => {
+  catchErrors(async (req, res) => {
     const _id = req.user._id;
     const user = await User.findOne({ where: { _id } });
     user.decryptAttempts = 0;
@@ -824,7 +822,7 @@ router.put(
 router.delete(
   "/me",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res, next) => {
+  catchErrors(async (req, res) => {
     const userId = req.user._id;
 
     UserLog.create({
