@@ -100,6 +100,7 @@ export const itemsGroupedByPersonSelector = selector({
       personsObject[person._id] = {
         ...person,
         followedSince: person.followedSince || person.createdAt,
+        followSinceMonths: dayjsInstance().diff(person.followedSince || person.createdAt, "months"),
         userPopulated: usersObject[person.user],
         formattedBirthDate: formatBirthDate(person.birthdate),
         age: ageFromBirthdateAsYear(person.birthdate),

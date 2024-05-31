@@ -58,6 +58,7 @@ export interface PersonPopulated extends PersonInstance {
   userPopulated: UserInstance;
   formattedBirthDate: string;
   age: number;
+  followSinceMonths: number;
   formattedPhoneNumber: string;
   interactions: Date[];
   lastUpdateCheckForGDPR: Date;

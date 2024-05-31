@@ -38,6 +38,7 @@ export const personPopulated: PersonPopulated = {
   userPopulated: userBase,
   formattedBirthDate: "01/01/1990",
   age: 32,
+  followSinceMonths: 3,
   formattedPhoneNumber: "01 23 45 67 89",
   interactions: [dayjs("2023-01-01").toDate()],
   lastUpdateCheckForGDPR: new Date(),

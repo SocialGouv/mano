@@ -116,11 +116,17 @@ export const filterPersonsBaseSelector = selector({
       if (field.name === "birthdate") {
         filterPersonsBase.push({
           field: "age",
-          label: "Age",
+          label: "Age (en années)",
           type: "number",
         });
       }
     }
+    const followUpFilter: Filter = {
+      field: "followSinceMonths",
+      label: "Suivi depuis (en mois)",
+      type: "number",
+    };
+    filterPersonsBase.push(followUpFilter);
     const hasAtLeastOneConsultationFilter: Filter = {
       field: "hasAtLeastOneConsultation",
       label: "A eu une consultation",
