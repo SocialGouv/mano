@@ -1,8 +1,11 @@
-import { type UseStore, set, get, createStore, keys, delMany } from "idb-keyval";
+import { type UseStore, set, get, createStore, keys, delMany, clear } from "idb-keyval";
 import { capture } from "./sentry";
 
 export const dashboardCurrentCacheKey = "mano_last_refresh_2022_01_11";
-export const manoDB = "mano-dashboard";
+const legacyStoreName = "mano_last_refresh_2022_01_11";
+const legacyManoDB = "mano-dashboard";
+const manoDB = "mano";
+const storeName = "store";
 
 let customStore: UseStore | null = null;
 const savedCacheKey = window.localStorage.getItem("mano-currentCacheKey");
@@ -13,8 +16,13 @@ if (savedCacheKey !== dashboardCurrentCacheKey) {
 }
 
 function setupDB() {
+  // Vidage du store historique qui ne sert plus à rien, mais qui peut-être encore présent
+  const legacyStore = createStore(legacyManoDB, legacyStoreName);
+  clear(legacyStore).catch(capture);
+  // Pour plus tard, quand on sera sûr qu'elle n'est plus utilisée, on devrait même pouvoir la supprimer !
+  // Fin du legacy
   window.localStorage.setItem("mano-currentCacheKey", dashboardCurrentCacheKey);
-  customStore = createStore(manoDB, dashboardCurrentCacheKey);
+  customStore = createStore(manoDB, storeName);
 }
 
 async function deleteDB() {
