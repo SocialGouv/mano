@@ -28,14 +28,13 @@ const EncryptionKey = ({ isMain }) => {
   const [encryptingStatus, setEncryptingStatus] = useState("");
   const [encryptingProgress, setEncryptingProgress] = useState(0);
   const [encryptionDone, setEncryptionDone] = useState(false);
-  const { isLoading, refresh } = useDataLoader();
+  const { isLoading } = useDataLoader();
 
   useEffect(() => {
     if (open) {
-      refresh();
+      // do seomething on the next PR
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, encryptionKey]);
+  }, [open]);
 
   if (!["admin"].includes(user.role)) return null;
 
