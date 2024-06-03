@@ -620,8 +620,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                         onChange={handleChange}
                         className="tailwindui"
                         type="number"
-                        min="10"
-                        max="200"
+                        min="0"
                         onInvalid={() => setActiveTab("Constantes")}
                         name="constantes-tension-arterielle-systolique"
                         placeholder="Systolique"
@@ -640,8 +639,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                         onChange={handleChange}
                         className="tailwindui"
                         type="number"
-                        min="10"
-                        max="200"
+                        min="0"
                         onInvalid={() => setActiveTab("Constantes")}
                         name="constantes-tension-arterielle-diastolique"
                         placeholder="Diastolique"
