@@ -206,14 +206,14 @@ const ImportData = () => {
 
           <p>
             Les colonnes suivantes seront <strong>importées</strong> ({importedFields.length}) :
-            <ul>
-              {importedFields.map((label, index) => (
-                <li key={label + index}>
-                  <code style={{ color: "black" }}>{label}</code>
-                </li>
-              ))}
-            </ul>
           </p>
+          <ul>
+            {importedFields.map((label, index) => (
+              <li key={label + index}>
+                <code style={{ color: "black" }}>{label}</code>
+              </li>
+            ))}
+          </ul>
 
           <ButtonCustom onClick={onImportData} color="primary" title="Importer" padding="12px 24px" />
         </ModalBody>
