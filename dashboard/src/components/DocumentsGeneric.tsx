@@ -200,12 +200,13 @@ function DocumentsFullScreen({
 }: DocumentsFullScreenProps) {
   const withDocumentOrganizer = !!onSaveNewOrder;
   const organisation = useRecoilValue(organisationAuthentifiedState);
+  const [enableDropZone, setEnableDropZone] = useState(true);
 
   return (
     <ModalContainer open={open} size={withDocumentOrganizer ? "full" : "prose"} onClose={onClose}>
       <ModalHeader title={title} />
       <ModalBody>
-        <DocumentsDropZone showAddDocumentButton personId={personId} onAddDocuments={onAddDocuments} color={color}>
+        <DocumentsDropZone enabled={enableDropZone} showAddDocumentButton personId={personId} onAddDocuments={onAddDocuments} color={color}>
           {!documents.length && (
             <div className="tw-flex tw-flex-col tw-items-center tw-gap-6 tw-pb-6">
               <div className="tw-mb-2 tw-mt-8 tw-w-full tw-text-center tw-text-gray-300">
@@ -240,6 +241,8 @@ function DocumentsFullScreen({
               {socialOrMedical === "social" && (
                 <>
                   <DocumentsOrganizer
+                    onDragStart={() => setEnableDropZone(false)}
+                    onDragEnd={() => setEnableDropZone(true)}
                     items={documents
                       .filter((doc) => {
                         if (doc.type === "document") {
@@ -267,6 +270,8 @@ function DocumentsFullScreen({
                   />
                   {!!organisation.groupsEnabled && (
                     <DocumentsOrganizer
+                      onDragStart={() => setEnableDropZone(false)}
+                      onDragEnd={() => setEnableDropZone(true)}
                       items={documents
                         .filter((item) => {
                           if (item.type !== "document") return false;
@@ -295,6 +300,8 @@ function DocumentsFullScreen({
               )}
               {socialOrMedical === "medical" && (
                 <DocumentsOrganizer
+                  onDragStart={() => setEnableDropZone(false)}
+                  onDragEnd={() => setEnableDropZone(true)}
                   htmlId="medical"
                   items={documents}
                   onSave={(newOrder) => {
@@ -500,7 +507,7 @@ function AddDocumentInput({ personId, onAddDocuments }: AddDocumentInputProps) {
   );
 }
 
-function DocumentsDropZone({ children, personId, onAddDocuments, color, className = "", showAddDocumentButton = false }) {
+function DocumentsDropZone({ children, personId, onAddDocuments, color, className = "", showAddDocumentButton = false, enabled = true }) {
   // insipirations:
   // https://stackoverflow.com/a/35428657/5225096
   // https://stackoverflow.com/a/16403756/5225096
@@ -518,6 +525,7 @@ function DocumentsDropZone({ children, personId, onAddDocuments, color, classNam
       className={["tw-relative", className].filter(Boolean).join(" ")}
       onDragEnter={(e) => {
         e.preventDefault(); // Prevent default behavior (Prevent file from being opened)
+        if (!enabled) return;
         if (!isInDropzone) setIsInDropzone(true);
       }}
       onDragOver={(e) => {
@@ -540,6 +548,7 @@ function DocumentsDropZone({ children, personId, onAddDocuments, color, classNam
           onDrop={async (e) => {
             e.preventDefault(); // Prevent default behavior (Prevent file from being opened)
             setIsInDropzone(false);
+            if (!enabled) return;
             const documentsResponse = await handleFilesUpload({ files: e.dataTransfer.files, personId, user });
             if (documentsResponse) {
               onAddDocuments(documentsResponse);

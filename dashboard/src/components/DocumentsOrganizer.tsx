@@ -23,6 +23,8 @@ type FolderChildren = Array<FolderForTree | DocumentForTree | RootForTree>;
 interface DocumentsOrganizerProps {
   items: Item[] | Folder[];
   onSave: (newOrder: Array<Item>) => Promise<boolean>;
+  onDragStart?: () => void;
+  onDragEnd?: () => void;
   onFolderClick: (folder: FolderForTree) => void;
   onDocumentClick?: (document: DocumentForTree) => void;
   color: "main" | "blue-900";
@@ -39,6 +41,8 @@ export default function DocumentsOrganizer({
   htmlId,
   rootFolderName = "Dossier Racine",
   onSave,
+  onDragStart = () => {},
+  onDragEnd = () => {},
   onFolderClick,
   onDocumentClick,
   color,
@@ -76,6 +80,7 @@ export default function DocumentsOrganizer({
 
   const onListChange = useCallback(
     async (save: boolean) => {
+      onDragEnd();
       if (!rootRef.current) return;
       if (htmlId === "family") return;
       setIsSaving(true);
@@ -126,6 +131,7 @@ export default function DocumentsOrganizer({
           htmlId={htmlId}
           initShowOpen
           onListChange={onListChange}
+          onDragStart={onDragStart}
           onFolderClick={onFolderClick}
           onDocumentClick={onDocumentClick}
           openedFolderIds={openedFolderIds}
@@ -151,6 +157,7 @@ interface BranchProps {
   parentId: DocumentOrFolderId;
   initShowOpen: boolean;
   onListChange: (save: boolean) => void;
+  onDragStart: () => void;
   onFolderClick: (folder: FolderForTree) => void;
   onDocumentClick?: (document: DocumentForTree) => void;
   setOpenedFolderIds: (ids: DocumentOrFolderId[]) => void;
@@ -166,6 +173,7 @@ function Branch({
   parentId,
   htmlId,
   onListChange,
+  onDragStart,
   onFolderClick,
   onDocumentClick,
   setOpenedFolderIds,
@@ -197,8 +205,9 @@ function Branch({
       // swapThreshold: 0.5,
       filter: ".unmovable", // 'unmovable' class is not draggable
       onEnd: () => onListChange(true),
+      onStart: onDragStart,
     });
-  }, [onListChange, htmlId]);
+  }, [onListChange, onDragStart, htmlId]);
 
   return (
     <div
@@ -284,6 +293,7 @@ function Branch({
                 level={level + 1}
                 initShowOpen={false}
                 onListChange={onListChange}
+                onDragStart={onDragStart}
                 onDocumentClick={onDocumentClick}
                 onFolderClick={onFolderClick}
                 openedFolderIds={openedFolderIds}
