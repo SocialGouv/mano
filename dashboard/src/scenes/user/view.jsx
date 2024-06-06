@@ -163,7 +163,7 @@ const View = () => {
               {id !== user._id && (
                 <DeleteButtonAndConfirmModal
                   title={`Voulez-vous vraiment supprimer l'utilisateur ${values.name}`}
-                  textToConfirm={values.name}
+                  textToConfirm={values.email}
                   onConfirm={async () => {
                     const [error] = await tryFetchExpectOk(() => API.delete({ path: `/user/${id}` }));
                     if (error) {
