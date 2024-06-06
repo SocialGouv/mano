@@ -123,7 +123,7 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
           const [actionError] = await tryFetchExpectOk(async () => {
             return API.put({
               path: `/action/${actionId}`,
-              body: await encryptPerson({
+              body: await encryptAction({
                 ...action,
                 documents: actionNextDocuments.filter((d) => d.linkedItem._id === actionId),
               }),
