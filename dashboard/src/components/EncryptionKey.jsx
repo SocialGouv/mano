@@ -349,9 +349,11 @@ const EncryptionKey = ({ isMain }) => {
 
   return (
     <>
-      {/* <button className="button-submit !tw-bg-black" onClick={() => setOpen(true)} type="button">
-        {organisation.encryptionEnabled ? "Changer la clé de chiffrement" : "Activer le chiffrement"}
-  </button> */}
+      {import.meta.env.VITE_TEST_PLAYWRIGHT === "true" ? (
+        <button className="button-submit !tw-bg-black" onClick={() => setOpen(true)} type="button">
+          {organisation.encryptionEnabled ? "Changer la clé de chiffrement" : "Activer le chiffrement"}
+        </button>
+      ) : null}
       <ModalContainer
         open={open}
         onClose={() => setOpen(false)}
