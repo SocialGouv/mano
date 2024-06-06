@@ -113,6 +113,7 @@ const ChangePassword = ({ onSubmit, onFinished, withCurrentPassword, centerButto
             onChange={handleChange}
             showPassword={showPassword}
             setShowPassword={setShowPassword}
+            autoComplete="new-password"
           />
           {Object.keys(codesToHints).map((check, index, array) => {
             let caption = codesToHints[check];
@@ -140,6 +141,7 @@ const ChangePassword = ({ onSubmit, onFinished, withCurrentPassword, centerButto
             onChange={handleChange}
             showPassword={showPassword}
             setShowPassword={setShowPassword}
+            autoComplete="new-password"
           />
         </div>
         <ButtonCustom
