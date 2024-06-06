@@ -349,9 +349,9 @@ const EncryptionKey = ({ isMain }) => {
 
   return (
     <>
-      <button className="button-submit !tw-bg-black" onClick={() => setOpen(true)} type="button">
+      {/* <button className="button-submit !tw-bg-black" onClick={() => setOpen(true)} type="button">
         {organisation.encryptionEnabled ? "Changer la clé de chiffrement" : "Activer le chiffrement"}
-      </button>
+  </button> */}
       <ModalContainer
         open={open}
         onClose={() => setOpen(false)}
