@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { FormGroup, Input, Label, Row, Col } from "reactstrap";
 
 import { useParams, useHistory } from "react-router-dom";
 import { Formik } from "formik";
@@ -71,6 +70,7 @@ const View = () => {
         onSubmit={async (body, actions) => {
           try {
             if (!body.team?.length) return toast.error("Au moins une équipe est obligatoire");
+            if (!body.email) return toast.error("L'email est obligatoire");
             if (body.email && !emailRegex.test(body.email)) return toast.error("Email invalide");
             if (!body.name) return toast.error("Le nom doit faire au moins un caractère");
             body.organisation = organisation._id;
@@ -97,29 +97,29 @@ const View = () => {
       >
         {({ values, handleChange, handleSubmit, isSubmitting }) => (
           <React.Fragment>
-            <Row>
-              <Col md={6}>
-                <FormGroup>
-                  <Label htmlFor="name">Nom</Label>
-                  <Input name="name" id="name" value={values.name} onChange={handleChange} />
-                </FormGroup>
-              </Col>
+            <div className="-tw-mx-4 tw-flex tw-flex-row tw-flex-wrap">
+              <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
+                <div className="tw-mb-4">
+                  <label htmlFor="name">Nom</label>
+                  <input className="tailwindui" name="name" id="name" value={values.name} onChange={handleChange} />
+                </div>
+              </div>
 
-              <Col md={6}>
-                <FormGroup>
-                  <Label htmlFor="email">Email</Label>
-                  <Input name="email" id="email" value={values.email} onChange={handleChange} />
-                </FormGroup>
-              </Col>
-              <Col md={6}>
-                <FormGroup>
-                  <Label htmlFor="phone">Téléphone</Label>
-                  <Input name="phone" id="phone" value={values.phone} onChange={handleChange} />
-                </FormGroup>
-              </Col>
-              <Col md={6}>
-                <FormGroup>
-                  <Label htmlFor="team">Équipes</Label>
+              <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
+                <div className="tw-mb-4">
+                  <label htmlFor="email">Email</label>
+                  <input className="tailwindui" name="email" id="email" value={values.email} onChange={handleChange} required />
+                </div>
+              </div>
+              <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
+                <div className="tw-mb-4">
+                  <label htmlFor="phone">Téléphone</label>
+                  <input className="tailwindui" name="phone" id="phone" value={values.phone} onChange={handleChange} />
+                </div>
+              </div>
+              <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
+                <div className="tw-mb-4">
+                  <label htmlFor="team">Équipes</label>
                   <div>
                     <SelectTeamMultiple
                       onChange={(teamIds) => handleChange({ target: { value: teamIds, name: "team" } })}
@@ -130,17 +130,17 @@ const View = () => {
                       inputId="team"
                     />
                   </div>
-                </FormGroup>
-              </Col>
-              <Col md={6}>
-                <FormGroup>
-                  <Label htmlFor="role">Role</Label>
+                </div>
+              </div>
+              <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
+                <div className="tw-mb-4">
+                  <label htmlFor="role">Role</label>
                   <SelectRole handleChange={handleChange} value={values.role} />
-                </FormGroup>
-              </Col>
+                </div>
+              </div>
               {values.role !== "restricted-access" && (
-                <Col md={12}>
-                  <Label htmlFor="healthcareProfessional" style={{ marginBottom: 0 }}>
+                <div className="tw-flex tw-basis-full tw-flex-col tw-px-4 tw-py-2">
+                  <label htmlFor="healthcareProfessional" style={{ marginBottom: 0 }}>
                     <input
                       type="checkbox"
                       id="healthcareProfessional"
@@ -152,13 +152,13 @@ const View = () => {
                       }}
                     />
                     Professionnel·le de santé
-                  </Label>
+                  </label>
                   <div>
                     <small className="text-muted">Un·e professionnel·le de santé a accès au dossier médical complet des personnes.</small>
                   </div>
-                </Col>
+                </div>
               )}
-            </Row>
+            </div>
             <div className="tw-flex tw-justify-end tw-gap-4">
               {id !== user._id && (
                 <DeleteButtonAndConfirmModal
