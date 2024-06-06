@@ -706,7 +706,12 @@ router.put(
 
     if (name) user.set({ name: sanitizeAll(name) });
     if (phone) user.set({ phone: sanitizeAll(phone) });
-    if (email) user.set({ email: sanitizeAll(email.trim().toLowerCase()) });
+    if (email) {
+      const newEmail = email.trim().toLowerCase();
+      const existingUser = await User.findOne({ where: { email: newEmail, _id: { [Op.ne]: _id } } });
+      if (existingUser) return res.status(400).send({ ok: false, error: "Un utilisateur existe déjà avec cet email" });
+      user.set({ email: newEmail });
+    }
     if (termsAccepted) user.set({ termsAccepted: termsAccepted });
     if (cgusAccepted) user.set({ cgusAccepted: cgusAccepted });
     if (password) {
@@ -780,7 +785,12 @@ router.put(
 
     if (name) user.name = sanitizeAll(name);
     if (phone) user.phone = sanitizeAll(phone);
-    if (email) user.email = sanitizeAll(email.trim().toLowerCase());
+    if (email) {
+      const newEmail = email.trim().toLowerCase();
+      const existingUser = await User.findOne({ where: { email: newEmail, _id: { [Op.ne]: _id } } });
+      if (existingUser) return res.status(400).send({ ok: false, error: "Un utilisateur existe déjà avec cet email" });
+      user.email = sanitizeAll(email.trim().toLowerCase());
+    }
 
     if (healthcareProfessional !== undefined) user.set({ healthcareProfessional });
     if (role) user.set({ role });

@@ -5,7 +5,7 @@ import { useRecoilState } from "recoil";
 import Loading from "../components/loading";
 import ChangePassword from "../components/ChangePassword";
 import { userState } from "../recoil/auth";
-import API, { tryFetch } from "../services/api";
+import API, { tryFetch, tryFetchExpectOk } from "../services/api";
 import { ModalBody, ModalContainer, ModalHeader } from "../components/tailwind/Modal";
 import DeleteButtonAndConfirmModal from "../components/DeleteButtonAndConfirmModal";
 import { errorMessage } from "../utils";
@@ -24,14 +24,14 @@ const Account = () => {
           const [error] = await tryFetch(async () => API.put({ path: "/user", body }));
           if (!error) {
             toast.success("Mis à jour !");
-            const [error, response] = await tryFetch(async () => API.get({ path: "/user/me" }));
+            const [error, response] = await tryFetchExpectOk(async () => API.get({ path: "/user/me" }));
             if (error) {
-              toast.error("Erreur lors de la mise à jour");
+              toast.error(errorMessage(error));
               return;
             }
             setUser(response.user);
           } else {
-            toast.error("Erreur lors de la mise à jour");
+            toast.error(errorMessage(error));
           }
         }}
       >
