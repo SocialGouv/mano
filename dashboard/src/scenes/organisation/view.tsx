@@ -118,7 +118,7 @@ const View = () => {
 
   return (
     <div className="relative tw--m-12 tw--mt-4 tw-flex tw-h-[calc(100%+4rem)] tw-flex-col">
-      {encryptionKeyLength < MINIMUM_ENCRYPTION_KEY_LENGTH && (
+      {organisation.encryptionEnabled && encryptionKeyLength < MINIMUM_ENCRYPTION_KEY_LENGTH && (
         <div className="tw-rounded tw-border tw-border-orange-50 tw-bg-amber-100 tw-px-5 tw-py-3 tw-text-orange-900">
           Votre clé de chiffrement est trop courte. Pour des raisons de sécurité, nous vous recommandons de la changer.
           <br />
