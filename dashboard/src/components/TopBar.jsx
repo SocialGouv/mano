@@ -12,8 +12,10 @@ import { useDataLoader } from "./DataLoader";
 import OpenNewWindowIcon from "./OpenNewWindowIcon";
 import ColorHeaderBand from "./ColorHeaderBand";
 import UnBugButton from "./UnBugButton";
+import ModalCacheResetLoader from "./ModalCacheResetLoader";
 
 const TopBar = () => {
+  const [modalCacheOpen, setModalCacheOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
@@ -21,6 +23,18 @@ const TopBar = () => {
   const [currentTeam, setCurrentTeam] = useRecoilState(currentTeamState);
 
   const { resetCache, refresh, isLoading } = useDataLoader();
+
+  function resetCacheAndLogout() {
+    // On affiche une fenêtre pendant notre vidage du cache pour éviter toute manipulation de la part des utilisateurs.
+    setModalCacheOpen(true);
+    resetCache().then(() => {
+      tryFetchExpectOk(() => API.post({ path: "/user/logout" })).then(() => {
+        // On met un timeout pour laisser le temps aux personnes de lire si jamais ça va trop vite.
+        // Il n'a donc aucune utilité d'un point de vue code.
+        setTimeout(() => API.reset({ redirect: true }), 1500);
+      });
+    });
+  }
 
   return (
     <div className="tw-hidden tw-w-full sm:tw-block">
@@ -56,7 +70,7 @@ const TopBar = () => {
         </div>
         <div className="tw-flex tw-flex-1 tw-justify-end tw-gap-x-4 [&_.dropdown-menu.show]:tw-z-20">
           {!["stats-only"].includes(user.role) ? <Notification /> : null}
-          <UnBugButton />
+          <UnBugButton onResetCacheAndLogout={resetCacheAndLogout} />
           <ButtonDropdown direction="down" isOpen={dropdownOpen} toggle={() => setDropdownOpen(!dropdownOpen)}>
             <DropdownToggle className="tw-ml-2.5 !tw-inline-flex tw-flex-1 tw-items-center tw-justify-between tw-gap-x-2.5 !tw-rounded-full tw-border-main tw-bg-main !tw-px-4 tw-py-1 tw-text-xs">
               <span>{user?.name}</span>
@@ -108,17 +122,7 @@ const TopBar = () => {
               >
                 Se déconnecter
               </DropdownItem>
-              <DropdownItem
-                onClick={() => {
-                  resetCache().then(() => {
-                    tryFetchExpectOk(() => API.post({ path: "/user/logout" })).then(() => {
-                      API.reset({ redirect: true });
-                    });
-                  });
-                }}
-              >
-                Se déconnecter et vider le cache
-              </DropdownItem>
+              <DropdownItem onClick={resetCacheAndLogout}>Se déconnecter et vider le cache</DropdownItem>
             </DropdownMenu>
           </ButtonDropdown>
         </div>
@@ -126,6 +130,7 @@ const TopBar = () => {
       <div className="tw-w-full">
         <ColorHeaderBand teamId={currentTeam?._id} />
       </div>
+      {modalCacheOpen ? <ModalCacheResetLoader /> : null}
     </div>
   );
 };

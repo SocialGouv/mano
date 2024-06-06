@@ -1,11 +1,8 @@
 import React from "react";
-import { useDataLoader } from "./DataLoader";
-import API from "../services/api";
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "./tailwind/Modal";
 
-export default function UnBugButton() {
+export default function UnBugButton({ onResetCacheAndLogout }) {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const { resetCache } = useDataLoader();
   return (
     <>
       <button
@@ -28,14 +25,7 @@ export default function UnBugButton() {
             <ul className="tw-list-disc tw-space-y-2">
               <li>
                 Cliquez{" "}
-                <button
-                  className={"tw-text-blue-500 tw-underline"}
-                  onClick={() => {
-                    resetCache().then(() => {
-                      return API.reset({ redirect: true });
-                    });
-                  }}
-                >
+                <button className={"tw-text-blue-500 tw-underline"} onClick={onResetCacheAndLogout}>
                   sur ce lien
                 </button>{" "}
                 pour réinitialiser le cache et vérifiez si le problème persiste
