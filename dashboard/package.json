@@ -90,7 +90,7 @@
   },
   "scripts": {
     "dev": "vite --port 8083",
-    "dev-test": "vite --port 8090",
+    "dev-test": "npx vite --port 8090",
     "test": "jest",
     "start": "serve -s build -l 8083",
     "build": "tsc && vite build",
