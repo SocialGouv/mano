@@ -148,7 +148,7 @@ const Drawer = () => {
                     <>
                       <br />
                       <small className="tw-text-red-500 tw-font-bold">
-                        ⚠️ {usersTooManyDecryptAttemps} {usersTooManyDecryptAttemps === 1 ? "utilisateur suspect" : "utilisateurs suspects"}
+                        ⚠️ {usersTooManyDecryptAttemps} {usersTooManyDecryptAttemps === 1 ? "utilisateur bloqué" : "utilisateurs bloqués"}
                       </small>
                     </>
                   )}
