@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useDataLoader } from "../../components/DataLoader";
 import { organisationState } from "../../recoil/auth";
-import API from "../../services/api";
+import API, { tryFetchExpectOk } from "../../services/api";
 import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from "../../components/tailwind/Modal";
 import { toast } from "react-toastify";
 import DragAndDropSettings from "./DragAndDropSettings";
@@ -23,11 +23,13 @@ const StructuresCategoriesSettings = () => {
   const onDragAndDrop = useCallback(
     async (newGroups) => {
       newGroups = newGroups.map((group) => ({ groupTitle: group.groupTitle, categories: group.items }));
-      const res = await API.put({
-        path: `/organisation/${organisation._id}`,
-        body: { structuresGroupedCategories: newGroups },
-      });
-      if (res.ok) {
+      const [error, res] = await tryFetchExpectOk(async () =>
+        API.put({
+          path: `/organisation/${organisation._id}`,
+          body: { structuresGroupedCategories: newGroups },
+        })
+      );
+      if (!error) {
         setOrganisation(res.data);
         refresh();
       }
@@ -71,13 +73,15 @@ const AddCategory = ({ groupTitle }) => {
 
     const oldOrganisation = organisation;
     setOrganisation({ ...organisation, structuresGroupedCategories: newStructuresGroupedCategories }); // optimistic UI
-    const response = await API.put({
-      path: `/organisation/${organisation._id}`,
-      body: {
-        structuresGroupedCategories: newStructuresGroupedCategories,
-      },
-    });
-    if (response.ok) {
+    const [error, response] = await tryFetchExpectOk(async () =>
+      API.put({
+        path: `/organisation/${organisation._id}`,
+        body: {
+          structuresGroupedCategories: newStructuresGroupedCategories,
+        },
+      })
+    );
+    if (!error) {
       setOrganisation(response.data);
       toast.success("Catégorie ajoutée. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
     } else {
@@ -131,15 +135,17 @@ const Category = ({ item: category, groupTitle }) => {
     const oldOrganisation = organisation;
     setOrganisation({ ...organisation, structuresGroupedCategories: newStructuresGroupedCategories }); // optimistic UI
 
-    const response = await API.put({
-      path: `/structure/category`,
-      body: {
-        structuresGroupedCategories: newStructuresGroupedCategories,
-        newCategory,
-        oldCategory,
-      },
-    });
-    if (response.ok) {
+    const [error, response] = await tryFetchExpectOk(async () =>
+      API.put({
+        path: `/structure/category`,
+        body: {
+          structuresGroupedCategories: newStructuresGroupedCategories,
+          newCategory,
+          oldCategory,
+        },
+      })
+    );
+    if (!error) {
       refresh();
       setOrganisation(response.data);
       setIsEditingCategory(false);
@@ -161,13 +167,16 @@ const Category = ({ item: category, groupTitle }) => {
     const oldOrganisation = organisation;
     setOrganisation({ ...organisation, structuresGroupedCategories: newStructuresGroupedCategories }); // optimistic UI
 
-    const response = await API.put({
-      path: `/organisation/${organisation._id}`,
-      body: {
-        structuresGroupedCategories: newStructuresGroupedCategories,
-      },
-    });
-    if (response.ok) {
+    const [error, response] = await tryFetchExpectOk(async () =>
+      API.put({
+        path: `/organisation/${organisation._id}`,
+        body: {
+          structuresGroupedCategories: newStructuresGroupedCategories,
+        },
+      })
+    );
+
+    if (!error) {
       refresh();
       setIsEditingCategory(false);
       setOrganisation(response.data);

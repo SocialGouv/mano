@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { useRecoilState } from "recoil";
 import { organisationState } from "../recoil/auth";
-import API from "../services/api";
+import API, { tryFetchExpectOk } from "../services/api";
 import ButtonCustom from "./ButtonCustom";
 import SelectCustom from "./SelectCustom";
 import Table from "./table";
@@ -10,7 +10,7 @@ import DeleteButtonAndConfirmModal from "./DeleteButtonAndConfirmModal";
 import TableCustomFieldteamSelector from "./TableCustomFieldTeamSelector";
 import SelectDraggableAndEditable from "./SelectDraggableAndEditable";
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "./tailwind/Modal";
-import { newCustomField, typeOptions } from "../utils";
+import { errorMessage, newCustomField, typeOptions } from "../utils";
 import SelectTeamMultiple from "./SelectTeamMultiple";
 
 const getValueFromType = (type) => typeOptions.find((opt) => opt.value === type);
@@ -71,41 +71,40 @@ const TableCustomFields = ({
     if (!newData) newData = mutableData.filter((field) => !!field.label.length);
     newData = newData.map(sanitizeFields);
     setIsSubmitting(true);
-    try {
-      const response = await API.put({
+
+    const [error, response] = await tryFetchExpectOk(async () =>
+      API.put({
         path: `/organisation/${organisation._id}`,
         body: { [customFields]: mergeData ? mergeData(newData) : newData },
-      });
-      if (response.ok) {
-        toast.success("Mise à jour !");
-        setMutableData(extractData ? extractData(response.data[customFields]) : response.data[customFields]);
-        setOrganisation(response.data);
-        setTableKey((k) => k + 1);
-      }
-    } catch (orgUpdateError) {
-      console.log("error in updating organisation", orgUpdateError);
-      toast.error(orgUpdateError.message);
+      })
+    );
+    if (error) {
+      toast.error(errorMessage(error));
+    } else {
+      toast.success("Mise à jour !");
+      setMutableData(extractData ? extractData(response.data[customFields]) : response.data[customFields]);
+      setOrganisation(response.data);
+      setTableKey((k) => k + 1);
     }
     setIsSubmitting(false);
   };
 
   const handleSort = async (keys, oldData) => {
     setIsSubmitting(true);
-    try {
-      const dataForApi = keys.map((key) => mutableData.find((field) => field.name === key));
-      const response = await API.put({
+    const dataForApi = keys.map((key) => mutableData.find((field) => field.name === key));
+    const [error, response] = await tryFetchExpectOk(async () =>
+      API.put({
         path: `/organisation/${organisation._id}`,
         body: { [customFields]: mergeData ? mergeData(dataForApi) : dataForApi },
-      });
-      if (response.ok) {
-        toast.success("Mise à jour !");
-        setMutableData(extractData ? extractData(response.data[customFields]) : response.data[customFields]);
-        setOrganisation(response.data);
-        setTableKey((k) => k + 1);
-      }
-    } catch (orgUpdateError) {
-      console.log("error in updating organisation", orgUpdateError);
-      toast.error(orgUpdateError.message);
+      })
+    );
+    if (!error) {
+      toast.success("Mise à jour !");
+      setMutableData(extractData ? extractData(response.data[customFields]) : response.data[customFields]);
+      setOrganisation(response.data);
+      setTableKey((k) => k + 1);
+    } else {
+      toast.error(errorMessage(error));
     }
     setIsSubmitting(false);
   };

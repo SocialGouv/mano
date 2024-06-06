@@ -26,7 +26,7 @@ import Reception from "./scenes/reception";
 import ActionModal from "./components/ActionModal";
 import Charte from "./scenes/auth/charte";
 import { userState } from "./recoil/auth";
-import API, { recoilResetKeyState, authTokenState } from "./services/api";
+import API, { recoilResetKeyState, tryFetch } from "./services/api";
 import ScrollToTop from "./components/ScrollToTop";
 import TopBar from "./components/TopBar";
 import VersionOutdatedAlert from "./components/VersionOutdatedAlert";
@@ -87,13 +87,12 @@ if (ENV === "production") {
 }
 
 const App = ({ resetRecoil }) => {
-  const authToken = useRecoilValue(authTokenState);
   const user = useRecoilValue(userState);
   const initialLoadIsDone = useRecoilValue(initialLoadIsDoneState);
 
   const recoilResetKey = useRecoilValue(recoilResetKeyState);
   useEffect(() => {
-    if (!!recoilResetKey) {
+    if (recoilResetKey) {
       resetRecoil();
     }
   }, [recoilResetKey, resetRecoil]);
@@ -102,24 +101,20 @@ const App = ({ resetRecoil }) => {
 
   useEffect(() => {
     const onWindowFocus = (e) => {
-      if (authToken && e.newState === "active") {
-        API.get({ path: "/check-auth" }) // will force logout if session is expired
-          .then(() => {
-            if (initialLoadIsDone) {
-              // if the app is already loaded
-              // will refresh data if session is still valid
-              refresh();
-            } else {
-              console.log("initial load not done");
-            }
-          });
+      if (API.getToken() && e.newState === "active") {
+        // will force logout if session is expired
+        tryFetch(() => API.get({ path: "/check-auth" })).then(() => {
+          if (initialLoadIsDone) {
+            refresh();
+          }
+        });
       }
     };
     lifecycle.addEventListener("statechange", onWindowFocus);
     return () => {
       lifecycle.removeEventListener("statechange", onWindowFocus);
     };
-  }, [authToken, refresh, initialLoadIsDone]);
+  }, [refresh, initialLoadIsDone]);
 
   return (
     <div className="main-container">

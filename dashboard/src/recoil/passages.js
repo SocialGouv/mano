@@ -3,6 +3,7 @@ import { atom, selector } from "recoil";
 import { looseUuidRegex } from "../utils";
 import { toast } from "react-toastify";
 import { capture } from "../services/sentry";
+import { encryptItem } from "../services/encryption";
 
 const collectionName = "passage";
 export const passagesState = atom({
@@ -55,6 +56,10 @@ export const preparePassageForEncryption = (passage, { checkRequiredFields = tru
     entityKey: passage.entityKey,
   };
 };
+
+export async function encryptPassage(passage, { checkRequiredFields = true } = {}) {
+  return encryptItem(preparePassageForEncryption(passage, { checkRequiredFields }));
+}
 
 export const sortPassages =
   (sortBy = "dueAt", sortOrder = "ASC") =>

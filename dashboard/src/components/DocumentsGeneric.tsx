@@ -8,13 +8,14 @@ import { formatDateTimeWithNameOfDay } from "../services/date";
 import { FullScreenIcon } from "../assets/icons/FullScreenIcon";
 import UserName from "./UserName";
 import type { DocumentWithLinkedItem, Document, FileMetadata, FolderWithLinkedItem, Folder } from "../types/document";
-import API from "../services/api";
-import { download, viewBlobInNewWindow } from "../utils";
+import API, { tryFetch, tryFetchBlob } from "../services/api";
+import { download, errorMessage, viewBlobInNewWindow } from "../utils";
 import type { UUIDV4 } from "../types/uuid";
 import PersonName from "./PersonName";
 import { capture } from "../services/sentry";
 import { toast } from "react-toastify";
 import DocumentsOrganizer from "./DocumentsOrganizer";
+import { decryptFile, encryptFile, getHashedOrgEncryptionKey } from "../services/encryption";
 
 type ItemWithLink = DocumentWithLinkedItem | FolderWithLinkedItem;
 type Item = Document | Folder;
@@ -581,12 +582,11 @@ async function handleFilesUpload({ files, personId, user }) {
   const docsResponses = [];
   for (let i = 0; i < files.length; i++) {
     const fileToUpload = files[i] as any;
-    const docResponse = await API.upload({
-      path: `/person/${personId}/document`,
-      file: fileToUpload,
+    const { encryptedEntityKey, encryptedFile } = await encryptFile(fileToUpload, getHashedOrgEncryptionKey());
+    const [docResponseError, docResponse] = await tryFetch(() => {
+      return API.upload({ path: `/person/${personId}/document`, encryptedFile });
     });
-    if (!docResponse.ok || !docResponse.data) {
-      capture("Error uploading document", { extra: { docResponseError: docResponse.error } });
+    if (docResponseError || !docResponse.ok || !docResponse.data) {
       toast.error(`Une erreur est survenue lors de l'envoi du document ${fileToUpload?.filename}`);
       return;
     }
@@ -595,7 +595,7 @@ async function handleFilesUpload({ files, personId, user }) {
     const document: Document = {
       _id: fileUploaded.filename,
       name: fileUploaded.originalname,
-      encryptedEntityKey: docResponse.encryptedEntityKey,
+      encryptedEntityKey: encryptedEntityKey,
       createdAt: new Date(),
       createdBy: user?._id ?? "",
       downloadPath: `/person/${personId}/document/${fileUploaded.filename}`,
@@ -657,10 +657,13 @@ function DocumentModal({ document, onClose, personId, onDelete, onSubmit, showAs
                 type="button"
                 className={`button-submit !tw-bg-${color}`}
                 onClick={async () => {
-                  const file = await API.download({
-                    path: document.downloadPath ?? `/person/${personId}/document/${document.file.filename}`,
-                    encryptedEntityKey: document.encryptedEntityKey,
+                  const [error, blob] = await tryFetchBlob(() => {
+                    return API.download({ path: document.downloadPath ?? `/person/${personId}/document/${document.file.filename}` });
                   });
+                  if (error) {
+                    toast.error(errorMessage(error) || "Une erreur est survenue lors du téléchargement du document");
+                  }
+                  const file = await decryptFile(blob, document.encryptedEntityKey, getHashedOrgEncryptionKey());
                   download(file, name);
                   onClose();
                 }}
@@ -671,10 +674,13 @@ function DocumentModal({ document, onClose, personId, onDelete, onSubmit, showAs
                 type="button"
                 className={`button-submit tw-inline-flex tw-flex-col tw-items-center !tw-bg-${color}`}
                 onClick={async () => {
-                  const file = await API.download({
-                    path: document.downloadPath ?? `/person/${personId}/document/${document.file.filename}`,
-                    encryptedEntityKey: document.encryptedEntityKey,
+                  const [error, blob] = await tryFetchBlob(() => {
+                    return API.download({ path: document.downloadPath ?? `/person/${personId}/document/${document.file.filename}` });
                   });
+                  if (error) {
+                    toast.error(errorMessage(error) || "Une erreur est survenue lors du téléchargement du document");
+                  }
+                  const file = await decryptFile(blob, document.encryptedEntityKey, getHashedOrgEncryptionKey());
                   const url = URL.createObjectURL(file);
 
                   try {

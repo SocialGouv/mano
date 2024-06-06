@@ -4,6 +4,7 @@ import { organisationState } from "./auth";
 import { looseUuidRegex } from "../utils";
 import { toast } from "react-toastify";
 import { capture } from "../services/sentry";
+import { encryptItem } from "../services/encryption";
 
 const collectionName = "action";
 export const actionsState = atom({
@@ -107,6 +108,10 @@ export const prepareActionForEncryption = (action, { checkRequiredFields = true 
     entityKey: action.entityKey,
   };
 };
+
+export async function encryptAction(action, { checkRequiredFields = true } = {}) {
+  return encryptItem(prepareActionForEncryption(action, { checkRequiredFields }));
+}
 
 export const TODO = "A FAIRE";
 export const DONE = "FAIT";

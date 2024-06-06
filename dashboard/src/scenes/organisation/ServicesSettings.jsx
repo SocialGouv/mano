@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useDataLoader } from "../../components/DataLoader";
 import { organisationState } from "../../recoil/auth";
-import API from "../../services/api";
+import API, { tryFetchExpectOk } from "../../services/api";
 import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from "../../components/tailwind/Modal";
 import { toast } from "react-toastify";
 import { servicesSelector, flattenedServicesSelector } from "../../recoil/reports";
@@ -24,13 +24,15 @@ const ServicesSettings = () => {
     const oldOrganisation = organisation;
     setOrganisation({ ...organisation, groupedServices: [...groupedServices, { groupTitle, services: [] }] }); // optimistic UI
 
-    const response = await API.put({
-      path: `/service/update-configuration`,
-      body: {
-        groupedServices: [...groupedServices, { groupTitle, services: [] }],
-      },
-    });
-    if (response.ok) {
+    const [error, response] = await tryFetchExpectOk(async () =>
+      API.put({
+        path: `/service/update-configuration`,
+        body: {
+          groupedServices: [...groupedServices, { groupTitle, services: [] }],
+        },
+      })
+    );
+    if (!error) {
       refresh();
       setOrganisation(response.data);
       toast.success("Groupe créé. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
@@ -51,13 +53,15 @@ const ServicesSettings = () => {
     const oldOrganisation = organisation;
     setOrganisation({ ...organisation, groupedServices: newGroupedServices }); // optimistic UI
 
-    const response = await API.put({
-      path: `/service/update-configuration`,
-      body: {
-        groupedServices: newGroupedServices,
-      },
-    });
-    if (response.ok) {
+    const [error, response] = await tryFetchExpectOk(async () =>
+      API.put({
+        path: `/service/update-configuration`,
+        body: {
+          groupedServices: newGroupedServices,
+        },
+      })
+    );
+    if (!error) {
       refresh();
       setOrganisation(response.data);
       toast.success("Groupe mis à jour. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
@@ -73,13 +77,15 @@ const ServicesSettings = () => {
     setOrganisation({ ...organisation, groupedServices: newGroupedServices }); // optimistic UI
 
     // We don't delete the actual services to avoid user mistakes
-    const response = await API.put({
-      path: `/service/update-configuration`,
-      body: {
-        groupedServices: newGroupedServices,
-      },
-    });
-    if (response.ok) {
+    const [error, response] = await tryFetchExpectOk(async () =>
+      API.put({
+        path: `/service/update-configuration`,
+        body: {
+          groupedServices: newGroupedServices,
+        },
+      })
+    );
+    if (!error) {
       refresh();
       setOrganisation(response.data);
       toast.success("Service supprimé. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
@@ -94,13 +100,15 @@ const ServicesSettings = () => {
       const oldOrganisation = organisation;
       setOrganisation({ ...organisation, groupedServices: newGroups }); // optimistic UI
 
-      const response = await API.put({
-        path: `/service/update-configuration`,
-        body: {
-          groupedServices: newGroups,
-        },
-      });
-      if (response.ok) {
+      const [error, response] = await tryFetchExpectOk(async () =>
+        API.put({
+          path: `/service/update-configuration`,
+          body: {
+            groupedServices: newGroups,
+          },
+        })
+      );
+      if (!error) {
         refresh();
         setOrganisation(response.data);
         toast.success("Le groupe a été déplacé.");
@@ -153,13 +161,15 @@ const AddService = ({ groupTitle, services, onDragAndDrop }) => {
 
     const oldOrganisation = organisation;
     setOrganisation({ ...organisation, groupedServices: newGroupedServices }); // optimistic UI
-    const response = await API.put({
-      path: `/service/update-configuration`,
-      body: {
-        groupedServices: newGroupedServices,
-      },
-    });
-    if (response.ok) {
+    const [error, response] = await tryFetchExpectOk(async () =>
+      API.put({
+        path: `/service/update-configuration`,
+        body: {
+          groupedServices: newGroupedServices,
+        },
+      })
+    );
+    if (!error) {
       setOrganisation(response.data);
       toast.success("Service ajouté. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
     } else {
@@ -212,19 +222,23 @@ const Service = ({ item: service, groupTitle }) => {
     const oldOrganisation = organisation;
     setOrganisation({ ...organisation, groupedServices: newGroupedServices }); // optimistic UI
 
-    const response = await API.put({
-      path: `/service/update-configuration`,
-      body: {
-        groupedServices: newGroupedServices,
-      },
-    });
-    if (response.ok) {
-      const renamedServicesResponse = await API.put({
-        path: `/service/update-service-name`,
-        body: { oldService, newService },
-      });
+    const [error, response] = await tryFetchExpectOk(async () =>
+      API.put({
+        path: `/service/update-configuration`,
+        body: {
+          groupedServices: newGroupedServices,
+        },
+      })
+    );
+    if (!error) {
+      const [error] = await tryFetchExpectOk(async () =>
+        API.put({
+          path: `/service/update-service-name`,
+          body: { oldService, newService },
+        })
+      );
 
-      if (!renamedServicesResponse.ok) {
+      if (error) {
         toast.error("Erreur lors de la mise à jour du nom du service sur les anciens services");
       }
 
@@ -251,18 +265,21 @@ const Service = ({ item: service, groupTitle }) => {
     setOrganisation({ ...organisation, groupedServices: newGroupedServices }); // optimistic UI
 
     // We don't delete the actual services to avoid user mistakes
-    const response = await API.put({
-      path: `/service/update-configuration`,
-      body: {
-        groupedServices: newGroupedServices,
-      },
-    });
-    if (response.ok) {
+    const [error, response] = await tryFetchExpectOk(async () =>
+      API.put({
+        path: `/service/update-configuration`,
+        body: {
+          groupedServices: newGroupedServices,
+        },
+      })
+    );
+    if (!error) {
       refresh();
       setIsEditingService(false);
       setOrganisation(response.data);
       toast.success("Service supprimé. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
     } else {
+      toast.error("Erreur lors de la suppression du service");
       setOrganisation(oldOrganisation);
     }
   };

@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { looseUuidRegex } from "../utils";
 import type { MedicalFileInstance, NewMedicalFileInstance } from "../types/medicalFile";
 import type { CustomField } from "../types/field";
+import { encryptItem } from "../services/encryption";
 
 const collectionName = "medical-file";
 export const medicalFileState = atom<MedicalFileInstance[]>({
@@ -64,6 +65,12 @@ export const prepareMedicalFileForEncryption =
       decrypted,
       entityKey: medicalFile.entityKey,
     };
+  };
+
+export const encryptMedicalFile =
+  (customFieldsMedicalFile: CustomField[]) =>
+  (medicalFile: MedicalFileInstance | NewMedicalFileInstance, { checkRequiredFields = true } = {}) => {
+    return encryptItem(prepareMedicalFileForEncryption(customFieldsMedicalFile)(medicalFile, { checkRequiredFields }));
   };
 
 const defaultMedicalFileCustomFields: CustomField[] = [

@@ -2,11 +2,12 @@ import { useMemo } from "react";
 import { useRecoilValue } from "recoil";
 import { toast } from "react-toastify";
 import { CommentsModule } from "../../../components/CommentsGeneric";
-import { prepareCommentForEncryption } from "../../../recoil/comments";
-import API from "../../../services/api";
+import { prepareCommentForEncryption, encryptComment } from "../../../recoil/comments";
+import API, { tryFetchExpectOk } from "../../../services/api";
 import { organisationState, userState } from "../../../recoil/auth";
 import { groupsState } from "../../../recoil/groups";
 import { useDataLoader } from "../../../components/DataLoader";
+import { errorMessage } from "../../../utils";
 
 export default function Comments({ person }) {
   const organisation = useRecoilValue(organisationState);
@@ -43,32 +44,40 @@ export default function Comments({ person }) {
         showPanel
         onDeleteComment={async (comment) => {
           window.sessionStorage.removeItem("currentComment");
-          await API.delete({ path: `/comment/${comment._id}` });
+          const [error] = await tryFetchExpectOk(async () => API.delete({ path: `/comment/${comment._id}` }));
+          if (error) {
+            toast.error(errorMessage(error));
+            return;
+          }
           await refresh();
           toast.success("Commentaire supprimé !");
         }}
         onSubmitComment={async (comment, isNewComment) => {
           if (isNewComment) {
-            const response = await API.post({
-              path: "/comment",
-              body: prepareCommentForEncryption(comment),
-            });
-            if (response.ok) {
+            const [error] = await tryFetchExpectOk(async () =>
+              API.post({
+                path: "/comment",
+                body: await encryptComment(comment),
+              })
+            );
+            if (!error) {
               toast.success("Commentaire enregistré");
               await refresh();
             } else {
-              toast.error(response.error);
+              toast.error(errorMessage(error));
             }
           } else {
-            const response = await API.put({
-              path: `/comment/${comment._id}`,
-              body: prepareCommentForEncryption(comment),
-            });
-            if (response.ok) {
+            const [error] = await tryFetchExpectOk(async () =>
+              API.put({
+                path: `/comment/${comment._id}`,
+                body: await encryptComment(comment),
+              })
+            );
+            if (!error) {
               toast.success("Commentaire enregistré");
               await refresh();
             } else {
-              toast.error(response.error);
+              toast.error(errorMessage(error));
             }
           }
         }}

@@ -4,15 +4,17 @@ import ButtonCustom from "../../components/ButtonCustom";
 import UserName from "../../components/UserName";
 import { userState } from "../../recoil/auth";
 import { dayjsInstance } from "../../services/date";
-import API from "../../services/api";
+import API, { tryFetchExpectOk } from "../../services/api";
 import { useDataLoader } from "../../components/DataLoader";
 import { ModalContainer, ModalHeader, ModalBody, ModalFooter } from "../../components/tailwind/Modal";
 import SelectCustom from "../../components/SelectCustom";
-import { placesState, preparePlaceForEncryption } from "../../recoil/places";
+import { placesState, preparePlaceForEncryption, encryptPlace } from "../../recoil/places";
 import SelectUser from "../../components/SelectUser";
 import { toast } from "react-toastify";
-import { prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from "../../recoil/relPersonPlace";
+import { encryptRelPersonPlace, prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from "../../recoil/relPersonPlace";
 import QuestionMarkButton from "../../components/QuestionMarkButton";
+import { errorMessage } from "../../utils";
+import { decryptItem } from "../../services/encryption";
 
 const PersonPlaces = ({ person }) => {
   const user = useRecoilValue(userState);
@@ -27,9 +29,9 @@ const PersonPlaces = ({ person }) => {
   const onDeleteRelPersonPlace = async (relPersonPlace) => {
     if (!window.confirm("Voulez-vous vraiment supprimer ce lieu fréquenté ?")) return;
     setDeleting(true);
-    const response = await API.delete({ path: `/relPersonPlace/${relPersonPlace?._id}` });
+    const [error] = await tryFetchExpectOk(async () => API.delete({ path: `/relPersonPlace/${relPersonPlace?._id}` }));
     setDeleting(false);
-    if (!response.ok) return toast.error(response.error);
+    if (error) return toast.error(errorMessage(error));
     await refresh();
   };
 
@@ -161,17 +163,20 @@ const RelPersonPlaceModal = ({ open, setOpen, person, relPersonPlaceModal, setPl
       return;
     }
     setUpdating(true);
-    const response = await API.post({ path: "/place", body: preparePlaceForEncryption({ name, user: me._id }) });
+    const [error, response] = await tryFetchExpectOk(
+      async () => await API.post({ path: "/place", body: await encryptPlace({ name, user: me._id }) })
+    );
     setUpdating(false);
-    if (response.error) {
-      toast.error(response.error);
+    if (error) {
+      toast.error(errorMessage(error));
       return;
     }
+    const decryptedData = await decryptItem(response.data);
     // On doit mettre à jour les places à la main pour être sûr qu'elles sont prêtes directement
     // Ce problème est visible dans les tests unitaires, qui peuvent parfois rater si on ne fait pas ça.
     // Il existe peut-être une meilleure solution.
     setPlaces((places) =>
-      [response.decryptedData, ...places].sort((p1, p2) =>
+      [decryptedData, ...places].sort((p1, p2) =>
         p1?.name?.toLocaleLowerCase().localeCompare(p2.name?.toLocaleLowerCase(), "fr", { ignorPunctuation: true, sensitivity: "base" })
       )
     );
@@ -192,20 +197,21 @@ const RelPersonPlaceModal = ({ open, setOpen, person, relPersonPlaceModal, setPl
     }
     setUpdating(true);
     const isNew = !relPersonPlaceModal?._id;
-    const response = isNew
-      ? await API.post({
-          path: "/relPersonPlace",
-          body: prepareRelPersonPlaceForEncryption({ place: placeId, person: person._id, user: userId }),
-        })
-      : await API.put({
-          path: `/relPersonPlace/${relPersonPlaceModal._id}`,
-          body: prepareRelPersonPlaceForEncryption({ place: placeId, person: person._id, user: userId }),
-        });
+    const [error] = await tryFetchExpectOk(async () =>
+      isNew
+        ? API.post({
+            path: "/relPersonPlace",
+            body: await encryptRelPersonPlace({ place: placeId, person: person._id, user: userId }),
+          })
+        : API.put({
+            path: `/relPersonPlace/${relPersonPlaceModal._id}`,
+            body: await encryptRelPersonPlace({ place: placeId, person: person._id, user: userId }),
+          })
+    );
 
     setUpdating(false);
-    if (response.error) {
-      toast.error(response.error);
-      return;
+    if (error) {
+      return toast.error(errorMessage(error));
     }
     toast.success(`Le lieu a été ${isNew ? "ajouté" : "modifié"}`);
     await refresh();
@@ -303,18 +309,18 @@ const EditRelPersonPlaceModal = ({ open, setOpen, placeToEdit }) => {
     e.preventDefault();
     if (!name?.length) return toast.error("Le nom du lieu est obligatoire");
     if (places.filter((p) => p._id !== placeToEdit._id).find((p) => p.name?.toLocaleLowerCase() === name?.toLocaleLowerCase())) {
-      toast.error("Ce lieu existe déjà");
-      return;
+      return toast.error("Ce lieu existe déjà");
     }
     setUpdating(true);
-    const response = await API.put({
-      path: `/place/${placeToEdit._id}`,
-      body: preparePlaceForEncryption({ ...placeToEdit, user: placeToEdit.user || user._id, name }),
-    });
+    const [error] = await tryFetchExpectOk(async () =>
+      API.put({
+        path: `/place/${placeToEdit._id}`,
+        body: await encryptPlace({ ...placeToEdit, user: placeToEdit.user || user._id, name }),
+      })
+    );
     setUpdating(false);
-    if (response.error) {
-      toast.error(response.error);
-      return;
+    if (error) {
+      return toast.error(errorMessage(error));
     }
     toast.success(`Le nom du lieu a été modifié`);
     await refresh();
@@ -330,14 +336,17 @@ const EditRelPersonPlaceModal = ({ open, setOpen, placeToEdit }) => {
       return;
     }
     setUpdating(true);
-    const response = await API.delete({ path: `/place/${placeToEdit._id}` });
+    const [error] = await tryFetchExpectOk(async () => API.delete({ path: `/place/${placeToEdit._id}` }));
     setUpdating(false);
-    if (response.error) {
-      toast.error(response.error);
+    if (error) {
+      toast.error(errorMessage(error));
       return;
     }
     for (let relPersonPlace of relsPersonPlace.filter((rel) => rel.place === placeToEdit._id)) {
-      await API.delete({ path: `/relPersonPlace/${relPersonPlace._id}` });
+      const [error] = await tryFetchExpectOk(async () => API.delete({ path: `/relPersonPlace/${relPersonPlace._id}` }));
+      if (error) {
+        toast.error(errorMessage(error));
+      }
     }
     await refresh();
     toast.success("Lieu supprimé !");

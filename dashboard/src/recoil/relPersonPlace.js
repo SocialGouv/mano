@@ -3,6 +3,7 @@ import { atom, selector } from "recoil";
 import { looseUuidRegex } from "../utils";
 import { toast } from "react-toastify";
 import { capture } from "../services/sentry";
+import { encryptItem } from "../services/encryption";
 
 const collectionName = "relPersonPlace";
 export const relsPersonPlaceState = atom({
@@ -54,3 +55,7 @@ export const prepareRelPersonPlaceForEncryption = (relPersonPlace, { checkRequir
     entityKey: relPersonPlace.entityKey,
   };
 };
+
+export async function encryptRelPersonPlace(relPersonPlace, { checkRequiredFields = true } = {}) {
+  return encryptItem(prepareRelPersonPlaceForEncryption(relPersonPlace, { checkRequiredFields }));
+}

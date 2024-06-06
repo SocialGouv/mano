@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import validator from "validator";
 import { toast } from "react-toastify";
 import ButtonCustom from "../../components/ButtonCustom";
-import API from "../../services/api";
+import API, { tryFetch } from "../../services/api";
 import { useRecoilValue } from "recoil";
 import { deploymentShortCommitSHAState } from "../../recoil/version";
+import { errorMessage } from "../../utils";
 
 const View = () => {
   const [done, setDone] = useState(false);
@@ -20,24 +21,23 @@ const View = () => {
   });
 
   const handleSubmit = async (e) => {
-    try {
-      e.preventDefault();
-      const emailError = !validator.isEmail(resetForm.email) ? "Adresse email invalide" : "";
-      if (emailError) {
-        setShowErrors(true);
-        setResetFormErrors({ email: emailError });
-        return;
-      }
-      setIsSubmitting(true);
-      const response = await API.post({
+    e.preventDefault();
+    const emailError = !validator.isEmail(resetForm.email) ? "Adresse email invalide" : "";
+    if (emailError) {
+      setShowErrors(true);
+      setResetFormErrors({ email: emailError });
+      return;
+    }
+    setIsSubmitting(true);
+    const [error, response] = await tryFetch(async () =>
+      API.post({
         path: "/user/forgot_password",
         body: resetForm,
-      });
-      setIsSubmitting(false);
-      if (response.ok) setDone(true);
-    } catch (errorPasswordReset) {
-      toast.error(errorPasswordReset);
-    }
+      })
+    );
+    setIsSubmitting(false);
+    if (error || !response.ok) toast.error(errorMessage(error || response?.error));
+    if (!error) setDone(true);
   };
 
   const handleChange = (e) => {

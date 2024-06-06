@@ -1,6 +1,7 @@
 import { getCacheItemDefaultValue, setCacheItem } from "../services/dataManagement";
 import { atom, selector } from "recoil";
 import { looseUuidRegex } from "../utils";
+import { encryptItem } from "../services/encryption";
 import { toast } from "react-toastify";
 import { capture } from "../services/sentry";
 import type { TerritoryInstance, ReadyToEncryptTerritoryInstance } from "../types/territory";
@@ -38,7 +39,7 @@ export const prepareTerritoryForEncryption = (territory: TerritoryInstance, { ch
     }
   }
   const decrypted = {};
-  for (let field of encryptedFields) {
+  for (const field of encryptedFields) {
     decrypted[field] = territory[field];
   }
   return {
@@ -52,6 +53,10 @@ export const prepareTerritoryForEncryption = (territory: TerritoryInstance, { ch
     entityKey: territory.entityKey,
   };
 };
+
+export async function encryptTerritory(territory: TerritoryInstance, { checkRequiredFields = true } = {}) {
+  return encryptItem(prepareTerritoryForEncryption(territory, { checkRequiredFields }));
+}
 
 export const territoryTypes = [
   "Lieu de conso",

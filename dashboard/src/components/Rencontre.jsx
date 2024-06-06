@@ -6,8 +6,8 @@ import ButtonCustom from "./ButtonCustom";
 import SelectUser from "./SelectUser";
 import { currentTeamState, teamsState, userState } from "../recoil/auth";
 import { useRecoilValue } from "recoil";
-import API from "../services/api";
-import { prepareRencontreForEncryption } from "../recoil/rencontres";
+import API, { tryFetchExpectOk } from "../services/api";
+import { prepareRencontreForEncryption, encryptRencontre } from "../recoil/rencontres";
 import SelectTeam from "./SelectTeam";
 import SelectPerson from "./SelectPerson";
 import DatePicker from "./DatePicker";
@@ -34,8 +34,8 @@ const Rencontre = ({ rencontre, personId, onFinished, onSave, disableAccessToPer
   const onDeleteRencontre = async () => {
     const confirm = window.confirm("Êtes-vous sûr ?");
     if (confirm) {
-      const rencontreRes = await API.delete({ path: `/rencontre/${rencontre._id}` });
-      if (rencontreRes.ok) {
+      const [error] = await tryFetchExpectOk(async () => API.delete({ path: `/rencontre/${rencontre._id}` }));
+      if (!error) {
         await refresh();
         toast.success("Suppression réussie");
         setOpen(false);
@@ -83,16 +83,26 @@ const Rencontre = ({ rencontre, personId, onFinished, onSave, disableAccessToPer
                 } else {
                   if (showMultiSelect) {
                     for (const person of body.persons) {
-                      await API.post({
-                        path: "/rencontre",
-                        body: prepareRencontreForEncryption({ ...newRencontre, person }),
-                      });
+                      const [rencontreError] = await tryFetchExpectOk(async () =>
+                        API.post({
+                          path: "/rencontre",
+                          body: await encryptRencontre({ ...newRencontre, person }),
+                        })
+                      );
+                      if (rencontreError) {
+                        toast.error("Erreur lors de l'enregistrement de la rencontre");
+                      }
                     }
                   } else {
-                    await API.post({
-                      path: "/rencontre",
-                      body: prepareRencontreForEncryption({ ...newRencontre, person: body.person }),
-                    });
+                    const [rencontreError] = await tryFetchExpectOk(async () =>
+                      API.post({
+                        path: "/rencontre",
+                        body: await encryptRencontre({ ...newRencontre, person: body.person }),
+                      })
+                    );
+                    if (rencontreError) {
+                      toast.error("Erreur lors de l'enregistrement de la rencontre");
+                    }
                   }
                 }
                 await refresh();
@@ -102,11 +112,17 @@ const Rencontre = ({ rencontre, personId, onFinished, onSave, disableAccessToPer
                 actions.setSubmitting(false);
                 return;
               }
-              const response = await API.put({
-                path: `/rencontre/${rencontre._id}`,
-                body: prepareRencontreForEncryption(body),
-              });
-              if (!response.ok) return;
+              const [error] = await tryFetchExpectOk(async () =>
+                API.put({
+                  path: `/rencontre/${rencontre._id}`,
+                  body: await encryptRencontre(body),
+                })
+              );
+              if (error) {
+                toast.error("Erreur lors de la mise à jour de la rencontre");
+                actions.setSubmitting(false);
+                return;
+              }
               await refresh();
               setOpen(false);
               onFinished();

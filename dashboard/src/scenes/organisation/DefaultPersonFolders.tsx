@@ -4,7 +4,7 @@ import { Folder } from "../../types/document";
 import { FolderModal } from "../../components/DocumentsGeneric";
 import { useRecoilValue } from "recoil";
 import { organisationAuthentifiedState } from "../../recoil/auth";
-import API from "../../services/api";
+import API, { tryFetchExpectOk } from "../../services/api";
 import { capture } from "../../services/sentry";
 import { toast } from "react-toastify";
 
@@ -16,9 +16,9 @@ export default function DefaultPersonFolders() {
   useEffect(() => {
     // FIXME: trouver une meilleure méthode de comparaison
     if (JSON.stringify(organisation.defaultPersonsFolders) !== JSON.stringify(items)) {
-      API.put({ path: `/organisation/${organisation._id}`, body: { defaultPersonsFolders: items } })
-        .then((res) => {
-          if (!res.ok) {
+      tryFetchExpectOk(() => API.put({ path: `/organisation/${organisation._id}`, body: { defaultPersonsFolders: items } }))
+        .then(([error]) => {
+          if (error) {
             toast.error("Erreur lors de la mise à jour des dossiers par défaut des personnes");
           }
         })

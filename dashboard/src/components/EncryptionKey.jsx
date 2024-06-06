@@ -1,20 +1,29 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Formik } from "formik";
 import { toast } from "react-toastify";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { useHistory } from "react-router-dom";
 
-import { MINIMUM_ENCRYPTION_KEY_LENGTH, organisationState, teamsState, userState } from "../recoil/auth";
-import { encryptVerificationKey } from "../services/encryption";
+import { MINIMUM_ENCRYPTION_KEY_LENGTH, encryptionKeyLengthState, organisationState, teamsState, userState } from "../recoil/auth";
+import {
+  encryptVerificationKey,
+  setOrgEncryptionKey,
+  getHashedOrgEncryptionKey,
+  decryptAndEncryptItem,
+  decryptFile,
+  encryptFile,
+} from "../services/encryption";
 import { capture } from "../services/sentry";
-import API, { setOrgEncryptionKey, getHashedOrgEncryptionKey, decryptAndEncryptItem } from "../services/api";
+import API, { tryFetch, tryFetchBlob, tryFetchExpectOk } from "../services/api";
 import { useDataLoader } from "./DataLoader";
 import { ModalContainer, ModalBody, ModalHeader } from "./tailwind/Modal";
+import { errorMessage } from "../utils";
 
 const EncryptionKey = ({ isMain }) => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const teams = useRecoilValue(teamsState);
   const user = useRecoilValue(userState);
+  const setEncryptionKeyLength = useSetRecoilState(encryptionKeyLengthState);
   const totalDurationOnServer = useRef(1);
   const previousKey = useRef(null);
 
@@ -52,32 +61,38 @@ const EncryptionKey = ({ isMain }) => {
       previousKey.current = getHashedOrgEncryptionKey();
       setEncryptionKey(values.encryptionKey.trim());
       const hashedOrgEncryptionKey = await setOrgEncryptionKey(values.encryptionKey.trim());
+      setEncryptionKeyLength(values.encryptionKey.trim().length);
       setEncryptingStatus("Chiffrement des données...");
       const encryptedVerificationKey = await encryptVerificationKey(hashedOrgEncryptionKey);
-      const lockedForEncryptionResponse = await API.put({
-        path: `/organisation/${organisation._id}`,
-        body: {
-          lockedForEncryption: true,
-        },
-      });
-      if (!lockedForEncryptionResponse?.ok) {
+      const [error] = await tryFetchExpectOk(async () =>
+        API.put({
+          path: `/organisation/${organisation._id}`,
+          body: {
+            lockedForEncryption: true,
+          },
+        })
+      );
+      if (error) {
         return toast.error("Désolé une erreur est survenue, veuillez réessayer ou contacter l'équipe de support");
       }
 
       // eslint-disable-next-line no-inner-declarations
       async function recrypt(path, callback = null) {
         setEncryptingStatus(`Chiffrement des données : (${path.replace("/", "")}s)`);
-        const cryptedItems = await API.get({
-          skipDecrypt: true,
-          path,
-          query: {
-            organisation: organisation._id,
-            limit: String(Number.MAX_SAFE_INTEGER),
-            page: String(0),
-            after: String(0),
-            withDeleted: true,
-          },
-        });
+        const [error, cryptedItems] = await tryFetchExpectOk(async () =>
+          API.get({
+            skipDecrypt: true,
+            path,
+            query: {
+              organisation: organisation._id,
+              limit: String(Number.MAX_SAFE_INTEGER),
+              page: String(0),
+              after: String(0),
+              withDeleted: true,
+            },
+          })
+        );
+        if (error) throw new Error(`Impossible de récupérer les données de ${path}`);
         const encryptedItems = [];
         for (const item of cryptedItems.data) {
           try {
@@ -142,34 +157,36 @@ const EncryptionKey = ({ isMain }) => {
         setEncryptingProgress((p) => p + updateStatusBarInterval);
       }, updateStatusBarInterval * 1000);
       setOrganisation({ ...organisation, encryptionEnabled: true });
-      const res = await API.post({
-        path: "/encrypt",
-        body: {
-          persons: encryptedPersons,
-          groups: encryptedGroups,
-          actions: encryptedActions,
-          consultations: encryptedConsultations,
-          treatments: encryptedTreatments,
-          medicalFiles: encryptedMedicalFiles,
-          comments: encryptedComments,
-          passages: encryptedPassages,
-          rencontres: encryptedRencontres,
-          territories: encryptedTerritories,
-          observations: encryptedTerritoryObservations,
-          places: encryptedPlaces,
-          relsPersonPlace: encryptedRelsPersonPlace,
-          reports: encryptedReports,
-          encryptedVerificationKey,
-        },
-        query: {
-          encryptionLastUpdateAt: organisation.encryptionLastUpdateAt,
-          encryptionEnabled: true,
-          changeMasterKey: true,
-        },
-      });
+      const [encryptError, res] = await tryFetchExpectOk(async () =>
+        API.post({
+          path: "/encrypt",
+          body: {
+            persons: encryptedPersons,
+            groups: encryptedGroups,
+            actions: encryptedActions,
+            consultations: encryptedConsultations,
+            treatments: encryptedTreatments,
+            medicalFiles: encryptedMedicalFiles,
+            comments: encryptedComments,
+            passages: encryptedPassages,
+            rencontres: encryptedRencontres,
+            territories: encryptedTerritories,
+            observations: encryptedTerritoryObservations,
+            places: encryptedPlaces,
+            relsPersonPlace: encryptedRelsPersonPlace,
+            reports: encryptedReports,
+            encryptedVerificationKey,
+          },
+          query: {
+            encryptionLastUpdateAt: organisation.encryptionLastUpdateAt,
+            encryptionEnabled: true,
+            changeMasterKey: true,
+          },
+        })
+      );
 
       clearInterval(elpasedBarInterval);
-      if (res.ok) {
+      if (!encryptError) {
         // TODO: clean unused person documents
         setEncryptingProgress(totalDurationOnServer.current);
         setEncryptingStatus("Données chiffrées !");
@@ -180,6 +197,8 @@ const EncryptionKey = ({ isMain }) => {
         } else {
           toast.success("Données chiffrées ! Veuillez noter la clé puis vous reconnecter");
         }
+      } else {
+        throw new Error("Erreur lors du chiffrement, veuillez contacter l'administrateur");
       }
     } catch (orgEncryptionError) {
       capture("erreur in organisation encryption", orgEncryptionError);
@@ -188,13 +207,19 @@ const EncryptionKey = ({ isMain }) => {
       setEncryptionKey("");
       setEncryptionDone(false);
       await setOrgEncryptionKey(previousKey.current, { needDerivation: false });
+      setEncryptionKeyLength(previousKey.current.length);
       setEncryptingStatus("Erreur lors du chiffrement, veuillez contacter l'administrateur");
-      API.put({
-        path: `/organisation/${organisation._id}`,
-        body: {
-          lockedForEncryption: false,
-        },
-      });
+      const [error] = await tryFetchExpectOk(async () =>
+        API.put({
+          path: `/organisation/${organisation._id}`,
+          body: {
+            lockedForEncryption: false,
+          },
+        })
+      );
+      if (error) {
+        toast.error(errorMessage(error));
+      }
     }
   };
 
@@ -222,7 +247,15 @@ const EncryptionKey = ({ isMain }) => {
       {!onboardingForTeams && encryptionDone && (
         <div className="tw-flex tw-flex-col tw-items-center">
           <div className="tw-mb-4 tw-text-red-600">Notez la clé avant de vous reconnecter</div>
-          <button className="button-submit !tw-bg-black" onClick={API.logout} type="button">
+          <button
+            className="button-submit !tw-bg-black"
+            onClick={() => {
+              tryFetchExpectOk(() => API.post({ path: "/user/logout" })).then(() => {
+                API.reset({ redirect: true });
+              });
+            }}
+            type="button"
+          >
             Se déconnecter
           </button>
         </div>
@@ -341,21 +374,35 @@ const EncryptionKey = ({ isMain }) => {
 };
 
 const recryptDocument = async (doc, personId, { fromKey, toKey }) => {
-  const content = await API.download(
-    {
-      path: doc.downloadPath ?? `/person/${personId}/document/${doc.file.filename}`,
-      encryptedEntityKey: doc.encryptedEntityKey,
-    },
-    fromKey
+  const [error, blob] = await tryFetchBlob(() =>
+    API.download(
+      {
+        path: doc.downloadPath ?? `/person/${personId}/document/${doc.file.filename}`,
+        encryptedEntityKey: doc.encryptedEntityKey,
+      },
+      fromKey
+    )
   );
-  const docResult = await API.upload(
-    {
-      path: `/person/${personId}/document`,
-      file: new File([content], doc.file.originalname, { type: doc.file.mimetype }),
-    },
-    toKey
+  if (error) {
+    toast.error(errorMessage(error));
+    throw new Error(error);
+  }
+  const content = await decryptFile(blob, doc.encryptedEntityKey, fromKey);
+  const { encryptedEntityKey, encryptedFile } = await encryptFile(new File([content], doc.file.originalname, { type: doc.file.mimetype }), toKey);
+  const [docResponseError, docResponse] = await tryFetch(() =>
+    API.upload(
+      {
+        path: `/person/${personId}/document`,
+        encryptedFile,
+      },
+      toKey
+    )
   );
-  const { data: file, encryptedEntityKey } = docResult;
+  if (docResponseError || !docResponse.ok || !docResponse.data) {
+    toast.error(errorMessage(docResponseError || docResponse.error));
+    return;
+  }
+  const { data: file } = docResponse;
   return {
     _id: file.filename,
     name: doc.file.originalname,

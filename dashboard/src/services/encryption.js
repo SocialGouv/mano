@@ -1,5 +1,31 @@
 import libsodium from "libsodium-wrappers";
 import { Buffer } from "buffer";
+import { toast } from "react-toastify";
+import { capture } from "./sentry";
+
+let hashedOrgEncryptionKey = null;
+let enableEncrypt = false;
+
+export function getHashedOrgEncryptionKey() {
+  return hashedOrgEncryptionKey;
+}
+export const setOrgEncryptionKey = async (orgEncryptionKey, { needDerivation = true } = {}) => {
+  const newHashedOrgEncryptionKey = needDerivation ? await derivedMasterKey(orgEncryptionKey) : orgEncryptionKey;
+  hashedOrgEncryptionKey = newHashedOrgEncryptionKey;
+  enableEncrypt = true;
+  return newHashedOrgEncryptionKey;
+};
+
+export const resetOrgEncryptionKey = () => {
+  hashedOrgEncryptionKey = null;
+};
+
+export function getEnableEncrypt() {
+  return enableEncrypt;
+}
+export function setEnableEncrypt(value) {
+  enableEncrypt = value;
+}
 
 // TODO: consolidate the base 64 in both dashboard / app: it looks inconsistent right now
 
@@ -20,7 +46,7 @@ Master key
 
 */
 
-const derivedMasterKey = async (password) => {
+export const derivedMasterKey = async (password) => {
   await libsodium.ready;
   const sodium = libsodium;
 
@@ -38,7 +64,7 @@ Decrypt
 
 */
 
-const _decrypt_after_extracting_nonce = async (nonce_and_ciphertext_b64, key_uint8array) => {
+export const _decrypt_after_extracting_nonce = async (nonce_and_ciphertext_b64, key_uint8array) => {
   await libsodium.ready;
   const sodium = libsodium;
 
@@ -53,7 +79,7 @@ const _decrypt_after_extracting_nonce = async (nonce_and_ciphertext_b64, key_uin
   return sodium.crypto_secretbox_open_easy(ciphertext_uint8array, nonce_uint8array, key_uint8array);
 };
 
-const _decrypt_after_extracting_nonce_uint8array = async (nonce_and_cypher_uint8array, key_uint8array) => {
+export const _decrypt_after_extracting_nonce_uint8array = async (nonce_and_cypher_uint8array, key_uint8array) => {
   await libsodium.ready;
   const sodium = libsodium;
 
@@ -66,7 +92,7 @@ const _decrypt_after_extracting_nonce_uint8array = async (nonce_and_cypher_uint8
   return sodium.crypto_secretbox_open_easy(ciphertext_uint8array, nonce_uint8array, key_uint8array);
 };
 
-const decrypt = async (encryptedContent, encryptedEntityKey, masterKey) => {
+export const decrypt = async (encryptedContent, encryptedEntityKey, masterKey) => {
   const entityKey_bytes_array = await _decrypt_after_extracting_nonce(encryptedEntityKey, masterKey);
   const content_uint8array = await _decrypt_after_extracting_nonce(encryptedContent, entityKey_bytes_array);
   const content = window.atob(new TextDecoder().decode(content_uint8array));
@@ -82,13 +108,13 @@ const decrypt = async (encryptedContent, encryptedEntityKey, masterKey) => {
 Encrypt
 
 */
-const generateEntityKey = async () => {
+export const generateEntityKey = async () => {
   await libsodium.ready;
   const sodium = libsodium;
   return sodium.randombytes_buf(sodium.crypto_secretbox_KEYBYTES);
 };
 
-const _encrypt_and_prepend_nonce = async (message_string_or_uint8array, key_uint8array) => {
+export const _encrypt_and_prepend_nonce = async (message_string_or_uint8array, key_uint8array) => {
   await libsodium.ready;
   const sodium = libsodium;
 
@@ -98,7 +124,7 @@ const _encrypt_and_prepend_nonce = async (message_string_or_uint8array, key_uint
   return sodium.to_base64(arrayBites, sodium.base64_variants.ORIGINAL);
 };
 
-const _encrypt_and_prepend_nonce_uint8array = async (message_string_or_uint8array, key_uint8array) => {
+export const _encrypt_and_prepend_nonce_uint8array = async (message_string_or_uint8array, key_uint8array) => {
   await libsodium.ready;
   const sodium = libsodium;
 
@@ -108,7 +134,7 @@ const _encrypt_and_prepend_nonce_uint8array = async (message_string_or_uint8arra
   return arrayBites;
 };
 
-const encodeContent = (content) => {
+export const encodeContent = (content) => {
   try {
     const purifiedContent = content
       // https://stackoverflow.com/a/31652607/5225096
@@ -122,7 +148,7 @@ const encodeContent = (content) => {
   }
 };
 
-const encrypt = async (content, entityKey, masterKey) => {
+export const encrypt = async (content, entityKey, masterKey) => {
   const encryptedContent = await _encrypt_and_prepend_nonce(encodeContent(content), entityKey);
   const encryptedEntityKey = await _encrypt_and_prepend_nonce(entityKey, masterKey);
 
@@ -134,7 +160,7 @@ const encrypt = async (content, entityKey, masterKey) => {
 
 // Encrypt a file with the master key + entity key, and return the encrypted file and the entity key
 // (file: File, masterKey: Uint8Array) => Promise<{encryptedFile: File, encryptedEntityKey: Uint8Array}>
-const encryptFile = async (file, masterKey) => {
+export const encryptFile = async (file, masterKey) => {
   const fileContent = new Uint8Array(await file.arrayBuffer());
   const entityKey = await generateEntityKey();
   const encryptedContent = await _encrypt_and_prepend_nonce_uint8array(fileContent, entityKey);
@@ -148,7 +174,7 @@ const encryptFile = async (file, masterKey) => {
 
 // Decrypt a file with the master key + entity key, and return the decrypted file
 // (file: File, masterKey: Uint8Array, entityKey: Uint8Array) => Promise<File>
-const decryptFile = async (file, encryptedEntityKey, masterKey) => {
+export const decryptFile = async (file, encryptedEntityKey, masterKey) => {
   const fileContent = new Uint8Array(await file.arrayBuffer());
   const entityKey_bytes_array = await _decrypt_after_extracting_nonce(encryptedEntityKey, masterKey);
   const content_uint8array = await _decrypt_after_extracting_nonce_uint8array(fileContent, entityKey_bytes_array);
@@ -157,13 +183,13 @@ const decryptFile = async (file, encryptedEntityKey, masterKey) => {
 };
 
 const verificationPassphrase = "Surprise !";
-const encryptVerificationKey = async (masterKey) => {
+export const encryptVerificationKey = async (masterKey) => {
   const encryptedVerificationKey = await _encrypt_and_prepend_nonce(encodeContent(verificationPassphrase), masterKey);
 
   return encryptedVerificationKey;
 };
 
-const checkEncryptedVerificationKey = async (encryptedVerificationKey, masterKey) => {
+export const checkEncryptedVerificationKey = async (encryptedVerificationKey, masterKey) => {
   try {
     const decryptedVerificationKey_uint8array = await _decrypt_after_extracting_nonce(encryptedVerificationKey, masterKey);
     const decryptedVerificationKey = window.atob(new TextDecoder().decode(decryptedVerificationKey_uint8array));
@@ -175,4 +201,65 @@ const checkEncryptedVerificationKey = async (encryptedVerificationKey, masterKey
   return false;
 };
 
-export { encryptFile, decryptFile, derivedMasterKey, generateEntityKey, encrypt, decrypt, encryptVerificationKey, checkEncryptedVerificationKey };
+export const encryptItem = async (item) => {
+  if (item.decrypted) {
+    if (!item.entityKey) item.entityKey = await generateEntityKey();
+    const { encryptedContent, encryptedEntityKey } = await encrypt(JSON.stringify(item.decrypted), item.entityKey, hashedOrgEncryptionKey);
+    item.encrypted = encryptedContent;
+    item.encryptedEntityKey = encryptedEntityKey;
+    delete item.decrypted;
+    delete item.entityKey;
+  }
+  return item;
+};
+
+export const decryptItem = async (item, { decryptDeleted = false } = {}) => {
+  if (!getEnableEncrypt()) return item;
+  if (!item.encrypted) return item;
+  if (item.deletedAt && !decryptDeleted) return item;
+  if (!item.encryptedEntityKey) return item;
+
+  let decryptedItem = {};
+  try {
+    decryptedItem = await decrypt(item.encrypted, item.encryptedEntityKey, getHashedOrgEncryptionKey());
+  } catch (errorDecrypt) {
+    toast.error("Un élément n'a pas pu être déchiffré. L'équipe technique a été prévenue, nous reviendrons vers vous dans les meilleurs délais.");
+    capture(`ERROR DECRYPTING ITEM : ${errorDecrypt}`, {
+      extra: { message: "ERROR DECRYPTING ITEM", item },
+    });
+    return item;
+  }
+
+  const { content, entityKey } = decryptedItem;
+  delete item.encrypted;
+  let decryptedContent = {};
+
+  try {
+    decryptedContent = JSON.parse(content);
+  } catch (errorDecryptParsing) {
+    toast.error("Une erreur est survenue lors de la récupération des données déchiffrées: " + errorDecryptParsing);
+    capture("ERROR PARSING CONTENT", { extra: { errorDecryptParsing, content } });
+    return item;
+  }
+  return {
+    ...item,
+    ...decryptedContent,
+    entityKey,
+  };
+};
+
+export async function decryptAndEncryptItem(item, oldHashedOrgEncryptionKey, newHashedOrgEncryptionKey, updateContentCallback = null) {
+  // Some old (mostly deleted) items don't have encrypted content. We ignore them forever to avoid crash.
+  if (!item.encrypted) return null;
+  // Decrypt items
+  let { content, entityKey } = await decrypt(item.encrypted, item.encryptedEntityKey, oldHashedOrgEncryptionKey);
+  // If we need to alterate the content, we do it here.
+  if (updateContentCallback) {
+    // No try/catch here: if something is not decryptable, it should crash and stop the process.
+    content = JSON.stringify(await updateContentCallback(JSON.parse(content), item));
+  }
+  const { encryptedContent, encryptedEntityKey } = await encrypt(content, entityKey, newHashedOrgEncryptionKey);
+  item.encrypted = encryptedContent;
+  item.encryptedEntityKey = encryptedEntityKey;
+  return item;
+}

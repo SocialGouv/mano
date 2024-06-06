@@ -9,11 +9,12 @@ import ButtonCustom from "../../components/ButtonCustom";
 import Table from "../../components/table";
 import NightSessionModale from "../../components/NightSessionModale";
 import { currentTeamState, organisationState, teamsState, userState } from "../../recoil/auth";
-import API from "../../services/api";
+import API, { tryFetchExpectOk } from "../../services/api";
 import OnboardingEndModal from "../../components/OnboardingEndModal";
 import { formatDateWithFullMonth } from "../../services/date";
 import useTitle from "../../services/useTitle";
 import { useLocalStorage } from "../../services/useLocalStorage";
+import { errorMessage } from "../../utils";
 
 const defaultSort = (a, b, sortOrder) => (sortOrder === "ASC" ? (a.name || "").localeCompare(b.name) : (b.name || "").localeCompare(a.name));
 
@@ -122,19 +123,33 @@ const Create = () => {
                 actions.setSubmitting(false);
                 return;
               }
-              const newTeamRes = await API.post({
-                path: "/team",
-                body: { name: values.name, organisation: organisation._id, nightSession: values.nightSession === "true" },
-              });
-              if (!newTeamRes.ok) return actions.setSubmitting(false);
-              const userPutRes = await API.put({
-                path: `/user/${user._id}`,
-                body: {
-                  team: [...(user.teams || []).map((team) => team._id), newTeamRes.data._id],
-                },
-              });
-              if (!userPutRes.ok) return actions.setSubmitting(false);
-              const meResponse = await API.get({ path: "/user/me" });
+              const [newTeamError, newTeamRes] = await tryFetchExpectOk(async () =>
+                API.post({
+                  path: "/team",
+                  body: { name: values.name, organisation: organisation._id, nightSession: values.nightSession === "true" },
+                })
+              );
+              if (newTeamError) {
+                toast.error(errorMessage(newTeamError));
+                return actions.setSubmitting(false);
+              }
+              const [userPutError] = await tryFetchExpectOk(async () =>
+                API.put({
+                  path: `/user/${user._id}`,
+                  body: {
+                    team: [...(user.teams || []).map((team) => team._id), newTeamRes.data._id],
+                  },
+                })
+              );
+              if (userPutError) {
+                toast.error(errorMessage(meError));
+                return actions.setSubmitting(false);
+              }
+              const [meError, meResponse] = await tryFetchExpectOk(async () => API.get({ path: "/user/me" }));
+              if (meError) {
+                toast.error(errorMessage(meError));
+                return actions.setSubmitting(false);
+              }
               setUser(meResponse.user);
               setCurrentTeam(meResponse.user.teams[0]);
               if (onboardingForTeams) {
@@ -144,8 +159,11 @@ const Create = () => {
                 toast.success("Création réussie !");
               }
               actions.setSubmitting(false);
-              const { data: teams } = await API.get({ path: "/team" });
-              setTeams(teams);
+              const [error, response] = await tryFetchExpectOk(async () => await API.get({ path: "/team" }));
+              if (error) {
+                return toast.error(errorMessage(error));
+              }
+              setTeams(response.data);
               setOpen(false);
             }}
           >

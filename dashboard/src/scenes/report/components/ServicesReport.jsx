@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { organisationState } from "../../../recoil/auth";
 import { useRecoilValue } from "recoil";
 import IncrementorSmall from "../../../components/IncrementorSmall";
-import API from "../../../services/api";
+import API, { tryFetchExpectOk } from "../../../services/api";
 import { formatPeriod } from "../../../components/DateRangePickerWithPresets";
 import { servicesSelector } from "../../../recoil/reports";
 import dayjs from "dayjs";
@@ -51,15 +51,17 @@ export default function ServicesReport({ period, selectedTeamsObject }) {
     // `services` value contains an object with `team` as key, and an object with `service` as key and `count` as value.
     // { `team-id-xxx`: { `service-name`: 1, ... }, ... }
     function initServices() {
-      API.get({
-        path: `/service/for-reports`,
-        query: {
-          teamIds: Object.keys(selectedTeamsObject).join(","),
-          startDate: dayjs(period.startDate).format("YYYY-MM-DD"),
-          endDate: dayjs(period.endDate).format("YYYY-MM-DD"),
-        },
-      }).then((res) => {
-        if (!res.ok) return toast.error(<ErrorOnGetServices />);
+      tryFetchExpectOk(async () =>
+        API.get({
+          path: `/service/for-reports`,
+          query: {
+            teamIds: Object.keys(selectedTeamsObject).join(","),
+            startDate: dayjs(period.startDate).format("YYYY-MM-DD"),
+            endDate: dayjs(period.endDate).format("YYYY-MM-DD"),
+          },
+        })
+      ).then(([error, res]) => {
+        if (error) return toast.error(<ErrorOnGetServices />);
         setServices(res.data);
       });
     },

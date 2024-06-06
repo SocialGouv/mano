@@ -3,7 +3,7 @@ import { Alert } from "reactstrap";
 import { useRecoilValue } from "recoil";
 import Places from "./Places";
 import { itemsGroupedByPersonSelector } from "../../recoil/selectors";
-import API from "../../services/api";
+import API, { tryFetchExpectOk } from "../../services/api";
 import { formatDateWithFullMonth } from "../../services/date";
 import History from "./components/PersonHistory";
 import MedicalFile from "./components/MedicalFile";
@@ -18,6 +18,7 @@ import { groupSelector } from "../../recoil/groups";
 import TabsNav from "../../components/tailwind/TabsNav";
 import { useDataLoader } from "../../components/DataLoader";
 import SearchInPerson from "./components/SearchInPerson";
+import { errorMessage } from "../../utils";
 
 export default function View() {
   const { personId } = useParams();
@@ -36,7 +37,7 @@ export default function View() {
     history.push(`?${searchParams.toString()}`);
   };
 
-  const preparePersonForEncryption = usePreparePersonForEncryption();
+  const { encryptPerson } = usePreparePersonForEncryption();
 
   if (!person) {
     history.push("/person");
@@ -58,15 +59,17 @@ export default function View() {
             wrapper={() => "Créée par "}
             canAddUser
             handleChange={async (newUser) => {
-              const response = await API.put({
-                path: `/person/${person._id}`,
-                body: preparePersonForEncryption({ ...person, user: newUser }),
-              });
-              if (response.ok) {
+              const [error] = await tryFetchExpectOk(async () =>
+                API.put({
+                  path: `/person/${person._id}`,
+                  body: await encryptPerson({ ...person, user: newUser }),
+                })
+              );
+              if (!error) {
                 toast.success("Personne mise à jour (créée par)");
                 await refresh();
               } else {
-                toast.error("Impossible de mettre à jour la personne");
+                toast.error(errorMessage(error));
               }
             }}
           />

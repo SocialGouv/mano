@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import { useRecoilState } from "recoil";
 import SelectCustom from "../../components/SelectCustom";
 import { organisationState } from "../../recoil/auth";
-import API from "../../services/api";
+import API, { tryFetchExpectOk } from "../../services/api";
 
 const NoOptionsMessage = () => (
   <span style={{ fontSize: 14, textAlign: "center", color: "#808080", width: "100%", display: "block" }}>
@@ -21,13 +21,15 @@ const SelectAndCreateCollaboration = ({ values, onChange, className = "", inputI
   const onCreateOption = async (collab) => {
     toast.info("Création de la nouvelle collaboration...");
     onChangeRequest([...(values || []), collab]);
-    const response = await API.put({
-      path: `/organisation/${organisation._id}`,
-      body: {
-        collaborations: [...(organisation.collaborations || []), collab].filter((e) => Boolean(e.trim())),
-      },
-    });
-    if (response.ok) {
+    const [error, response] = await tryFetchExpectOk(async () =>
+      API.put({
+        path: `/organisation/${organisation._id}`,
+        body: {
+          collaborations: [...(organisation.collaborations || []), collab].filter((e) => Boolean(e.trim())),
+        },
+      })
+    );
+    if (!error) {
       toast.dismiss();
       toast.success("Collaboration créée !");
       setOrganisation(response.data);

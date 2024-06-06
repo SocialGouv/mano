@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import { capture } from "../services/sentry";
 import type { TerritoryObservationInstance, ReadyToEncryptTerritoryObservationInstance } from "../types/territoryObs";
 import type { CustomField, CustomFieldsGroup } from "../types/field";
+import { encryptItem } from "../services/encryption";
 
 const collectionName = "territory-observation";
 export const territoryObservationsState = atom<Array<TerritoryObservationInstance>>({
@@ -128,7 +129,7 @@ export const prepareObsForEncryption =
     }
     const encryptedFields = [...customFields.map((f) => f.name), ...compulsoryEncryptedFields];
     const decrypted = {};
-    for (let field of encryptedFields) {
+    for (const field of encryptedFields) {
       decrypted[field] = obs[field];
     }
     return {
@@ -141,4 +142,10 @@ export const prepareObsForEncryption =
       decrypted,
       entityKey: obs.entityKey,
     };
+  };
+
+export const encryptObs =
+  (customFields: Array<CustomField>) =>
+  (obs: TerritoryObservationInstance, { checkRequiredFields = true } = {}) => {
+    return encryptItem(prepareObsForEncryption(customFields)(obs, { checkRequiredFields }));
   };

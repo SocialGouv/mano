@@ -7,7 +7,8 @@ import PasswordInput from "./PasswordInput";
 import validator from "validator";
 import { useRecoilValue } from "recoil";
 import { organisationState, sessionInitialDateTimestamp } from "../recoil/auth";
-import API, { setOrgEncryptionKey } from "../services/api";
+import API, { tryFetchExpectOk } from "../services/api";
+import { setOrgEncryptionKey } from "../services/encryption";
 
 dayjs.extend(utc);
 dayjs.extend(duration);
@@ -46,7 +47,9 @@ const SessionCountDownLimiter = () => {
   const remainingTimeBeforeDeconnection = maxCookieAge - cookieSession;
 
   if (remainingTimeBeforeDeconnection < 1) {
-    API.logout();
+    tryFetchExpectOk(() => API.post({ path: "/user/logout" })).then(() => {
+      API.reset({ redirect: true });
+    });
   }
 
   return (

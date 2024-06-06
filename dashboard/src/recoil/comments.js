@@ -3,6 +3,7 @@ import { atom, selector } from "recoil";
 import { looseUuidRegex } from "../utils";
 import { toast } from "react-toastify";
 import { capture } from "../services/sentry";
+import { encryptItem } from "../services/encryption";
 
 const collectionName = "comment";
 export const commentsState = atom({
@@ -54,6 +55,10 @@ export const prepareCommentForEncryption = (comment, { checkRequiredFields = tru
     entityKey: comment.entityKey,
   };
 };
+
+export async function encryptComment(comment, { checkRequiredFields = true } = {}) {
+  return encryptItem(prepareCommentForEncryption(comment, { checkRequiredFields }));
+}
 
 export const sortComments = (_sortBy, sortOrder) => (a, b) => {
   // sortBy is always `date` for now

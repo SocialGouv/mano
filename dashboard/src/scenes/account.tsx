@@ -5,9 +5,10 @@ import { useRecoilState } from "recoil";
 import Loading from "../components/loading";
 import ChangePassword from "../components/ChangePassword";
 import { userState } from "../recoil/auth";
-import API from "../services/api";
+import API, { tryFetch } from "../services/api";
 import { ModalBody, ModalContainer, ModalHeader } from "../components/tailwind/Modal";
 import DeleteButtonAndConfirmModal from "../components/DeleteButtonAndConfirmModal";
+import { errorMessage } from "../utils";
 
 const Account = () => {
   const [user, setUser] = useRecoilState(userState);
@@ -19,17 +20,18 @@ const Account = () => {
       <h1 className="tw-text-xl tw-my-8 tw-font-normal">{user.name}</h1>
       <Formik
         initialValues={user}
-        onSubmit={async (body: any) => {
-          try {
-            const response = await API.put({ path: "/user", body });
-            if (response.ok) {
-              toast.success("Mis à jour !");
-              const { user } = await API.get({ path: "/user/me" });
-              setUser(user);
+        onSubmit={async (body) => {
+          const [error] = await tryFetch(async () => API.put({ path: "/user", body }));
+          if (!error) {
+            toast.success("Mis à jour !");
+            const [error, response] = await tryFetch(async () => API.get({ path: "/user/me" }));
+            if (error) {
+              toast.error("Erreur lors de la mise à jour");
+              return;
             }
-          } catch (userUpdateError) {
-            console.log("error in user update", userUpdateError);
-            toast.error(userUpdateError.message);
+            setUser(response.user);
+          } else {
+            toast.error("Erreur lors de la mise à jour");
           }
         }}
       >
@@ -57,8 +59,8 @@ const Account = () => {
                 textToConfirm={values.email}
                 roles={["admin", "superadmin", "normal", "restricted-access", "stats-only"]}
                 onConfirm={async () => {
-                  const res = await API.delete({ path: `/user/me` });
-                  if (!res.ok) return;
+                  const [error] = await tryFetch(async () => API.delete({ path: "/user/me" }));
+                  if (error) return;
                   toast.success("Suppression réussie");
                   window.location.reload();
                 }}
@@ -89,7 +91,13 @@ const LinkToChangePassword = () => {
         <ModalHeader title="Modifier son mot de passe" onClose={() => setOpen(false)} />
         <ModalBody className="tw-px-4 tw-py-2">
           <ChangePassword
-            onSubmit={(body: any) => API.post({ path: `/user/reset_password`, body })}
+            onSubmit={async (body: any) => {
+              const [error, response] = await tryFetch(async () => API.post({ path: `/user/reset_password`, body }));
+              if (error) {
+                toast.error(errorMessage(error));
+              }
+              return response;
+            }}
             onFinished={() => setOpen(false)}
             withCurrentPassword
           />

@@ -7,11 +7,21 @@ import { detect } from "detect-browser";
 import ButtonCustom from "../../components/ButtonCustom";
 import { DEFAULT_ORGANISATION_KEY } from "../../config";
 import PasswordInput from "../../components/PasswordInput";
-import { currentTeamState, organisationState, sessionInitialDateTimestamp, teamsState, usersState, userState } from "../../recoil/auth";
-import API, { setOrgEncryptionKey, authTokenState } from "../../services/api";
+import {
+  currentTeamState,
+  encryptionKeyLengthState,
+  organisationState,
+  sessionInitialDateTimestamp,
+  teamsState,
+  usersState,
+  userState,
+} from "../../recoil/auth";
+import API, { tryFetch, tryFetchExpectOk } from "../../services/api";
 import { useDataLoader } from "../../components/DataLoader";
 import useMinimumWidth from "../../services/useMinimumWidth";
 import { deploymentShortCommitSHAState } from "../../recoil/version";
+import { checkEncryptedVerificationKey, setOrgEncryptionKey } from "../../services/encryption";
+import { errorMessage } from "../../utils";
 
 const SignIn = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
@@ -29,8 +39,9 @@ const SignIn = () => {
   const [loading, setLoading] = useState(true);
   const [authViaCookie, setAuthViaCookie] = useState(false);
   const { startInitialLoad, isLoading, resetCache } = useDataLoader();
-  const setToken = useSetRecoilState(authTokenState);
+
   const deploymentCommit = useRecoilValue(deploymentShortCommitSHAState);
+  const setEncryptionKeyLength = useSetRecoilState(encryptionKeyLengthState);
 
   const [signinForm, setSigninForm] = useState({ email: "", password: "", orgEncryptionKey: DEFAULT_ORGANISATION_KEY || "" });
   const [signinFormErrors, setSigninFormErrors] = useState({ email: "", password: "", orgEncryptionKey: "" });
@@ -50,18 +61,25 @@ const SignIn = () => {
   const onSigninValidated = () => startInitialLoad();
 
   const onLogout = async () => {
-    await API.logout();
     setShowErrors(false);
     setUserName("");
     setShowSelectTeam(false);
     setShowEncryption(false);
     setShowPassword(false);
     setAuthViaCookie(false);
+    tryFetchExpectOk(() => API.post({ path: "/user/logout" })).then(() => {
+      API.reset();
+    });
   };
 
   useEffect(() => {
     (async () => {
-      const { token, ok, user } = await API.get({ path: "/user/signin-token" });
+      const [error, response] = await tryFetch(() => API.getSigninToken());
+      if (error) {
+        toast.error(errorMessage(error));
+        return setLoading(false);
+      }
+      const { token, user, ok } = response;
       if (ok && token && user) {
         setAuthViaCookie(true);
         const { organisation } = user;
@@ -75,95 +93,119 @@ const SignIn = () => {
         setUser(user);
         if (!!organisation.encryptionEnabled && !["superadmin"].includes(user.role)) setShowEncryption(true);
       }
-
       return setLoading(false);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSubmit = async (e) => {
-    try {
-      e.preventDefault();
-      const emailError = !authViaCookie && !validator.isEmail(signinForm.email) ? "Adresse email invalide" : "";
-      const passwordError = !authViaCookie && validator.isEmpty(signinForm.password) ? "Ce champ est obligatoire" : "";
-      const orgEncryptionKeyError = !!showEncryption && validator.isEmpty(signinForm.orgEncryptionKey) ? "Ce champ est obligatoire" : "";
-      if (emailError || passwordError || orgEncryptionKeyError) {
-        setShowErrors(true);
-        setSigninFormErrors({ email: emailError, password: passwordError, orgEncryptionKey: orgEncryptionKeyError });
-        return;
-      }
-      setShowErrors(false);
-      setIsSubmitting(true);
-      const body = {
-        email: signinForm.email,
-        password: signinForm.password,
-      };
-      const browser = detect();
-      if (browser) {
-        body.browsertype = browser.type;
-        body.browsername = browser.name;
-        body.browserversion = browser.version;
-        body.browseros = browser.os;
-      }
+    e.preventDefault();
+    const emailError = !authViaCookie && !validator.isEmail(signinForm.email) ? "Adresse email invalide" : "";
+    const passwordError = !authViaCookie && validator.isEmpty(signinForm.password) ? "Ce champ est obligatoire" : "";
+    const orgEncryptionKeyError = !!showEncryption && validator.isEmpty(signinForm.orgEncryptionKey) ? "Ce champ est obligatoire" : "";
+    if (emailError || passwordError || orgEncryptionKeyError) {
+      setShowErrors(true);
+      setSigninFormErrors({ email: emailError, password: passwordError, orgEncryptionKey: orgEncryptionKeyError });
+      return;
+    }
+    setShowErrors(false);
+    setIsSubmitting(true);
+    const body = {
+      email: signinForm.email,
+      password: signinForm.password,
+    };
+    const browser = detect();
+    if (browser) {
+      body.browsertype = browser.type;
+      body.browsername = browser.name;
+      body.browserversion = browser.version;
+      body.browseros = browser.os;
+    }
 
-      const { user, token, ok } = authViaCookie ? await API.get({ path: "/user/signin-token" }) : await API.post({ path: "/user/signin", body });
-      if (!ok) return setIsSubmitting(false);
-      const { organisation } = user;
-      const storedOrganisationId = window.localStorage.getItem("mano-organisationId");
-      if (storedOrganisationId && organisation._id !== storedOrganisationId) {
-        await resetCache();
-      }
-      setOrganisation(organisation);
-      setUser(user);
-      if (!!organisation.encryptionEnabled && !showEncryption && !["superadmin"].includes(user.role)) {
-        setShowEncryption(true);
+    let response;
+    if (authViaCookie) {
+      const [signinTokenError, signinTokenResponse] = await tryFetch(() => API.getSigninToken());
+      if (signinTokenError || !signinTokenResponse.ok) {
+        toast.error(errorMessage(signinTokenError || signinTokenResponse?.error));
         return setIsSubmitting(false);
       }
-      if (token) setToken(token);
-      setSessionInitialTimestamp(Date.now());
-      window.localStorage.setItem("mano-organisationId", organisation._id);
-      if (!["superadmin"].includes(user.role) && !!signinForm.orgEncryptionKey) {
-        const encryptionIsValid = await setOrgEncryptionKey(signinForm.orgEncryptionKey.trim(), organisation);
-        if (!encryptionIsValid) {
-          await API.post({ path: "/user/decrypt-attempt-failure" });
-          return setIsSubmitting(false);
-        } else {
-          API.post({ path: "/user/decrypt-attempt-success" });
-        }
+      response = signinTokenResponse;
+    } else {
+      const [signinError, signinResponse] = await tryFetch(() => API.post({ path: "/user/signin", body }));
+      if (signinError || !signinResponse.ok) {
+        toast.error(errorMessage(signinError || signinResponse?.error));
+        return setIsSubmitting(false);
       }
-      // now login !
-      // superadmin
-      if (["superadmin"].includes(user.role)) {
-        setIsSubmitting(false);
-        history.push("/organisation");
-        return;
-      }
-      const teamResponse = await API.get({ path: "/team" });
-      const teams = teamResponse.data;
-      const usersResponse = await API.get({ path: "/user", query: { minimal: true } });
-      const users = usersResponse.data;
-      setTeams(teams);
-      setUsers(users);
-      // onboarding
-      if (!organisation.encryptionEnabled && ["admin"].includes(user.role)) {
-        history.push(`/organisation/${organisation._id}`);
-        return;
-      }
-      if (!teams.length) {
-        history.push("/team");
-        return;
-      }
-      // basic login
-      if (user.teams.length === 1 || (process.env.NODE_ENV === "development" && import.meta.env.SKIP_TEAMS === "true")) {
-        setCurrentTeam(user.teams[0]);
-        onSigninValidated();
-        return;
-      }
-      setShowSelectTeam(true);
-    } catch (signinError) {
-      console.log("error signin", signinError);
-      toast.error("Mauvais identifiants");
+      response = signinResponse;
     }
+
+    const { user, token, ok } = response;
+    if (!ok) return setIsSubmitting(false);
+    const { organisation } = user;
+    const storedOrganisationId = window.localStorage.getItem("mano-organisationId");
+    if (storedOrganisationId && organisation._id !== storedOrganisationId) {
+      await resetCache();
+    }
+    setOrganisation(organisation);
+    setUser(user);
+    if (!!organisation.encryptionEnabled && !showEncryption && !["superadmin"].includes(user.role)) {
+      setShowEncryption(true);
+      return setIsSubmitting(false);
+    }
+    if (token) API.setToken(token);
+    setSessionInitialTimestamp(Date.now());
+    window.localStorage.setItem("mano-organisationId", organisation._id);
+    if (!["superadmin"].includes(user.role) && !!signinForm.orgEncryptionKey && organisation.encryptionEnabled) {
+      const organisationKey = await setOrgEncryptionKey(signinForm.orgEncryptionKey.trim(), { needDerivation: true });
+      const encryptionIsValid = await checkEncryptedVerificationKey(organisation.encryptedVerificationKey, organisationKey);
+      if (!encryptionIsValid) {
+        toast.error(
+          "La clé de chiffrement ne semble pas être correcte, veuillez réessayer ou demander à un membre de votre organisation de vous aider (les équipes ne mano ne la connaissent pas)"
+        );
+        await tryFetch(() => API.post({ path: "/user/decrypt-attempt-failure" }));
+        return setIsSubmitting(false);
+      } else {
+        setEncryptionKeyLength(signinForm.orgEncryptionKey.length);
+        await tryFetch(() => API.post({ path: "/user/decrypt-attempt-success" }));
+      }
+    }
+    // now login !
+    // superadmin
+    if (["superadmin"].includes(user.role)) {
+      setIsSubmitting(false);
+      history.push("/organisation");
+      return;
+    }
+    const [error, teamResponse] = await tryFetchExpectOk(async () => API.get({ path: "/team" }));
+    if (error) {
+      toast.error(errorMessage(error));
+      return;
+    }
+    const teams = teamResponse.data;
+    const [errorUsers, usersResponse] = await tryFetchExpectOk(async () => API.get({ path: "/user", query: { minimal: true } }));
+    if (errorUsers) {
+      toast.error(errorMessage(errorUsers));
+      return;
+    }
+    const users = usersResponse.data;
+    setTeams(teams);
+    setUsers(users);
+    // onboarding
+    if (!organisation.encryptionEnabled && ["admin"].includes(user.role)) {
+      history.push(`/organisation/${organisation._id}`);
+      return;
+    }
+    if (!teams.length) {
+      history.push("/team");
+      return;
+    }
+    // basic login
+    if (user.teams.length === 1 || (process.env.NODE_ENV === "development" && import.meta.env.SKIP_TEAMS === "true")) {
+      setCurrentTeam(user.teams[0]);
+      onSigninValidated();
+      return;
+    }
+    setShowSelectTeam(true);
   };
   const handleChangeRequest = (e) => {
     setShowErrors(false);

@@ -2,9 +2,9 @@ import React from "react";
 import { useHistory } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useRecoilValue } from "recoil";
-import { actionsState, prepareActionForEncryption } from "../../../recoil/actions";
-import API, { encryptItem } from "../../../services/api";
-import { commentsState, prepareCommentForEncryption } from "../../../recoil/comments";
+import { actionsState, prepareActionForEncryption, encryptAction } from "../../../recoil/actions";
+import API, { tryFetchExpectOk } from "../../../services/api";
+import { commentsState, prepareCommentForEncryption, encryptComment } from "../../../recoil/comments";
 import { passagesState } from "../../../recoil/passages";
 import { rencontresState } from "../../../recoil/rencontres";
 import DeleteButtonAndConfirmModal from "../../../components/DeleteButtonAndConfirmModal";
@@ -14,7 +14,8 @@ import { consultationsState } from "../../../recoil/consultations";
 import { treatmentsState } from "../../../recoil/treatments";
 import { userState } from "../../../recoil/auth";
 import { useDataLoader } from "../../../components/DataLoader";
-import { prepareGroupForEncryption } from "../../../recoil/groups";
+import { prepareGroupForEncryption, encryptGroup } from "../../../recoil/groups";
+import { encryptItem } from "../../../services/encryption";
 
 const DeletePersonButton = ({ person }) => {
   const actions = useRecoilValue(actionsState);
@@ -81,15 +82,13 @@ const DeletePersonButton = ({ person }) => {
             body.actionsToTransfer = await Promise.all(
               actions
                 .filter((a) => a.person === person._id && a.group === true)
-                .map((action) => prepareActionForEncryption({ ...action, person: personTransferId, user: action.user || user._id }))
-                .map(encryptItem)
+                .map((action) => encryptAction({ ...action, person: personTransferId, user: action.user || user._id }))
             );
 
             body.commentsToTransfer = await Promise.all(
               comments
                 .filter((c) => c.person === person._id && c.group === true)
-                .map((comment) => prepareCommentForEncryption({ ...comment, person: personTransferId }))
-                .map(encryptItem)
+                .map((comment) => encryptComment({ ...comment, person: personTransferId }))
             );
           }
         }
@@ -111,8 +110,8 @@ const DeletePersonButton = ({ person }) => {
         body.treatmentIdsToDelete = treatments.filter((c) => c.person === person._id).map((c) => c._id);
         body.medicalFileIdsToDelete = medicalFiles.filter((c) => c.person === person._id).map((c) => c._id);
 
-        const personRes = await API.delete({ path: `/person/${person._id}`, body });
-        if (personRes?.ok) {
+        const [error] = await tryFetchExpectOk(async () => API.delete({ path: `/person/${person._id}`, body }));
+        if (!error) {
           toast.success("Suppression réussie");
           await refresh();
           history.goBack();

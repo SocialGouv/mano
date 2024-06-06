@@ -3,6 +3,7 @@ import { atom, selector } from "recoil";
 import { looseUuidRegex } from "../utils";
 import { toast } from "react-toastify";
 import { capture } from "../services/sentry";
+import { encryptItem } from "../services/encryption";
 
 const collectionName = "rencontre";
 export const rencontresState = atom({
@@ -57,6 +58,10 @@ export const prepareRencontreForEncryption = (rencontre, { checkRequiredFields =
     entityKey: rencontre.entityKey,
   };
 };
+
+export async function encryptRencontre(rencontre, { checkRequiredFields = true } = {}) {
+  return encryptItem(prepareRencontreForEncryption(rencontre, { checkRequiredFields }));
+}
 
 export const sortRencontres =
   (sortBy = "date", sortOrder = "ASC") =>

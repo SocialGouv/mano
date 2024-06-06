@@ -1,11 +1,12 @@
 import React, { useState, useMemo } from "react";
 import { toast } from "react-toastify";
-import { prepareReportForEncryption } from "../../../recoil/reports";
-import API from "../../../services/api";
+import { prepareReportForEncryption, encryptReport } from "../../../recoil/reports";
+import API, { tryFetchExpectOk } from "../../../services/api";
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "../../../components/tailwind/Modal";
 import SelectAndCreateCollaboration from "../SelectAndCreateCollaboration";
 import { dayjsInstance } from "../../../services/date";
 import { useDataLoader } from "../../../components/DataLoader";
+import { errorMessage } from "../../../utils";
 
 export default function Transmissions({ period, selectedTeamsObject, reports }) {
   const days = useMemo(() => {
@@ -125,11 +126,13 @@ function Transmission({ report, team, day, teamId, reactSelectInputId }) {
   }
 
   const onSaveReport = async (body) => {
-    const response = report?._id
-      ? await API.put({ path: `report/${report._id}`, body: prepareReportForEncryption(body) })
-      : await API.post({ path: "report", body: prepareReportForEncryption(body) });
-    if (!response.ok) {
-      toast.error(response.errorMessage);
+    const [error] = await tryFetchExpectOk(async () =>
+      report?._id
+        ? API.put({ path: `report/${report._id}`, body: await encryptReport(body) })
+        : API.post({ path: "report", body: await encryptReport(body) })
+    );
+    if (error) {
+      toast.error(errorMessage(error));
       return;
     }
     await refresh();

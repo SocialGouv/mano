@@ -5,14 +5,15 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 import { toast } from "react-toastify";
 import { Modal, ModalBody, ModalHeader, Alert } from "reactstrap";
 import ButtonCustom from "../../components/ButtonCustom";
-import { personFieldsIncludingCustomFieldsSelector, personsState, usePreparePersonForEncryption } from "../../recoil/persons";
+import { personFieldsIncludingCustomFieldsSelector, usePreparePersonForEncryption } from "../../recoil/persons";
 import { teamsState, userState } from "../../recoil/auth";
 import { isNullOrUndefined } from "../../utils";
-import API, { encryptItem } from "../../services/api";
+import API, { tryFetchExpectOk } from "../../services/api";
 import { formatDateWithFullMonth, now } from "../../services/date";
 import { sanitizeFieldValueFromExcel } from "./importSanitizer";
-import { customFieldsMedicalFileSelector, prepareMedicalFileForEncryption } from "../../recoil/medicalFiles";
+import { customFieldsMedicalFileSelector, prepareMedicalFileForEncryption, encryptMedicalFile } from "../../recoil/medicalFiles";
 import { useDataLoader } from "../../components/DataLoader";
+import { encryptItem } from "../../services/encryption";
 
 const ImportData = () => {
   const user = useRecoilValue(userState);
@@ -22,7 +23,7 @@ const ImportData = () => {
   const { refresh } = useDataLoader();
   const teams = useRecoilValue(teamsState);
 
-  const preparePersonForEncryption = usePreparePersonForEncryption();
+  const { encryptPerson } = usePreparePersonForEncryption();
 
   const [showImportSummary, setShowImportSummary] = useState(false);
   const [personsToImport, setPersonsToImport] = useState([]);
@@ -136,7 +137,7 @@ const ImportData = () => {
         }
       }
 
-      const encryptedPersons = await Promise.all(persons.map(preparePersonForEncryption).map(encryptItem));
+      const encryptedPersons = await Promise.all(persons.map(encryptPerson));
       setPersonsToImport(encryptedPersons);
       const encryptedMedicalFiles = await Promise.all(medicalFiles.map(prepareMedicalFileForEncryption(customFieldsMedicalFile)).map(encryptItem));
       setMedicalFilesToImport(encryptedMedicalFiles);
@@ -150,8 +151,8 @@ const ImportData = () => {
 
   const onImportData = async () => {
     if (window.confirm(`Voulez-vous vraiment importer ${personsToImport.length} personnes dans Mano ? Cette opération est irréversible.`)) {
-      const response = await API.post({ path: "/person/import", body: { personsToImport, medicalFilesToImport } });
-      if (response.ok) toast.success("Importation réussie !");
+      const [error] = await tryFetchExpectOk(async () => API.post({ path: "/person/import", body: { personsToImport, medicalFilesToImport } }));
+      if (!error) toast.success("Importation réussie !");
       refresh();
       setShowImportSummary(false);
     }

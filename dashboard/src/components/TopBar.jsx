@@ -5,7 +5,7 @@ import logo from "../assets/logo-green-creux-plus-petit.png";
 import SelectTeam from "./SelectTeam";
 
 import { currentTeamState, organisationState, teamsState, userState } from "../recoil/auth";
-import API from "../services/api";
+import API, { tryFetchExpectOk } from "../services/api";
 import { useRecoilState, useRecoilValue } from "recoil";
 import Notification from "./Notification";
 import { useDataLoader } from "./DataLoader";
@@ -101,7 +101,9 @@ const TopBar = () => {
               </DropdownItem>
               <DropdownItem
                 onClick={() => {
-                  API.logout();
+                  tryFetchExpectOk(() => API.post({ path: "/user/logout" })).then(() => {
+                    API.reset({ redirect: true });
+                  });
                 }}
               >
                 Se déconnecter
@@ -109,7 +111,9 @@ const TopBar = () => {
               <DropdownItem
                 onClick={() => {
                   resetCache().then(() => {
-                    return API.logout();
+                    tryFetchExpectOk(() => API.post({ path: "/user/logout" })).then(() => {
+                      API.reset({ redirect: true });
+                    });
                   });
                 }}
               >

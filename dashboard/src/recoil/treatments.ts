@@ -3,6 +3,7 @@ import { looseUuidRegex } from "../utils";
 import { toast } from "react-toastify";
 import { capture } from "../services/sentry";
 import type { TreatmentInstance } from "../types/treatment";
+import { encryptItem } from "../services/encryption";
 
 const collectionName = "treatment";
 export const treatmentsState = atom<TreatmentInstance[]>({
@@ -66,3 +67,7 @@ export const prepareTreatmentForEncryption = (treatment: TreatmentInstance, { ch
     entityKey: treatment.entityKey,
   };
 };
+
+export async function encryptTreatment(treatment: TreatmentInstance, { checkRequiredFields = true } = {}) {
+  return encryptItem(prepareTreatmentForEncryption(treatment, { checkRequiredFields }));
+}

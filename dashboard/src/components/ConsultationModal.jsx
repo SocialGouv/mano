@@ -6,8 +6,8 @@ import { toast } from "react-toastify";
 import { useLocation, useHistory } from "react-router-dom";
 import { CANCEL, DONE, TODO } from "../recoil/actions";
 import { currentTeamState, organisationState, teamsState, userState } from "../recoil/auth";
-import { consultationsFieldsIncludingCustomFieldsSelector, prepareConsultationForEncryption } from "../recoil/consultations";
-import API from "../services/api";
+import { consultationsFieldsIncludingCustomFieldsSelector, prepareConsultationForEncryption, encryptConsultation } from "../recoil/consultations";
+import API, { tryFetchExpectOk } from "../services/api";
 import { dayjsInstance } from "../services/date";
 import CustomFieldInput from "./CustomFieldInput";
 import { modalConfirmState } from "./ModalConfirm";
@@ -25,6 +25,7 @@ import { itemsGroupedByConsultationSelector } from "../recoil/selectors";
 import { DocumentsModule } from "./DocumentsGeneric";
 import TabsNav from "./tailwind/TabsNav";
 import { useDataLoader } from "./DataLoader";
+import { decryptItem } from "../services/encryption";
 
 export default function ConsultationModal() {
   const consultationsObjects = useRecoilValue(itemsGroupedByConsultationSelector);
@@ -155,17 +156,20 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
       if (Object.keys(historyEntry.data).length) body.history = [...(consultation.history || []), historyEntry];
     }
 
-    const consultationResponse = isNewConsultation
-      ? await API.post({
-          path: "/consultation",
-          body: prepareConsultationForEncryption(organisation.consultations)(body),
-        })
-      : await API.put({
-          path: `/consultation/${data._id}`,
-          body: prepareConsultationForEncryption(organisation.consultations)(body),
-        });
-    if (!consultationResponse.ok) return false;
-    setData(consultationResponse.decryptedData);
+    const [error, response] = await tryFetchExpectOk(async () =>
+      isNewConsultation
+        ? API.post({
+            path: "/consultation",
+            body: await encryptConsultation(organisation.consultations)(body),
+          })
+        : API.put({
+            path: `/consultation/${data._id}`,
+            body: await encryptConsultation(organisation.consultations)(body),
+          })
+    );
+    if (error) return false;
+    const decryptedData = await decryptItem(response.data, data);
+    setData(decryptedData);
     await refresh();
     if (closeOnSubmit) onClose();
 
@@ -748,8 +752,8 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
             onClick={async (e) => {
               e.stopPropagation();
               if (!window.confirm("Voulez-vous supprimer cette consultation ?")) return;
-              const response = await API.delete({ path: `/consultation/${consultation._id}` });
-              if (!response.ok) return;
+              const [error] = await tryFetchExpectOk(async () => API.delete({ path: `/consultation/${consultation._id}` }));
+              if (error) return;
               await refresh();
               toast.success("Consultation supprimée !");
               onClose();

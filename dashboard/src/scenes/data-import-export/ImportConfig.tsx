@@ -11,7 +11,7 @@ import { organisationState, teamsState } from "../../recoil/auth";
 import { groupedCustomFieldsObsSelector } from "../../recoil/territoryObservations";
 import { servicesSelector } from "../../recoil/reports";
 import { actionsCategoriesSelector } from "../../recoil/actions";
-import API from "../../services/api";
+import API, { tryFetchExpectOk } from "../../services/api";
 import { OrganisationInstance } from "../../types/organisation";
 import { TeamInstance } from "../../types/team";
 import { CustomField, CustomFieldsGroup, FieldType } from "../../types/field";
@@ -59,16 +59,12 @@ const ExcelParser = ({ scrollContainer }: { scrollContainer: MutableRefObject<HT
     if (!workbookData || !organisation) return;
     // Update organisation
     const updatedOrganisation = getUpdatedOrganisationFromWorkbookData(organisation, workbookData);
-    try {
-      const response = await API.put({ path: `/organisation/${organisation._id}`, body: updatedOrganisation });
-      if (response.ok) {
-        toast.success("L'organisation a été mise à jour !");
-        setWorkbookData(null);
-        setOrganisation(response.data);
-      }
-    } catch (orgUpdateError) {
-      console.log("error in updating organisation", orgUpdateError);
-      toast.error((orgUpdateError as any)?.message || "Erreur lors de l'import");
+
+    const [error, response] = await tryFetchExpectOk(async () => API.put({ path: `/organisation/${organisation._id}`, body: updatedOrganisation }));
+    if (!error) {
+      toast.success("L'organisation a été mise à jour !");
+      setWorkbookData(null);
+      setOrganisation(response.data);
     }
   }
 

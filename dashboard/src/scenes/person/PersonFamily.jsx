@@ -7,8 +7,8 @@ import ButtonCustom from "../../components/ButtonCustom";
 import UserName from "../../components/UserName";
 import { userState } from "../../recoil/auth";
 import { dayjsInstance } from "../../services/date";
-import API from "../../services/api";
-import { groupSelector, groupsState, prepareGroupForEncryption } from "../../recoil/groups";
+import API, { tryFetchExpectOk } from "../../services/api";
+import { groupSelector, groupsState, prepareGroupForEncryption, encryptGroup } from "../../recoil/groups";
 import SelectPerson from "../../components/SelectPerson";
 import { useDataLoader } from "../../components/DataLoader";
 import PersonName from "../../components/PersonName";
@@ -74,10 +74,12 @@ const PersonFamily = ({ person }) => {
       relations: [...groupToEdit.relations, ...nextRelations],
     };
     const isNew = !groupToEdit?._id;
-    const response = isNew
-      ? await API.post({ path: "/group", body: prepareGroupForEncryption(nextGroup) })
-      : await API.put({ path: `/group/${groupToEdit._id}`, body: prepareGroupForEncryption(nextGroup) });
-    if (response.ok) {
+    const [error] = await tryFetchExpectOk(async () =>
+      isNew
+        ? API.post({ path: "/group", body: await encryptGroup(nextGroup) })
+        : API.put({ path: `/group/${groupToEdit._id}`, body: await encryptGroup(nextGroup) })
+    );
+    if (!error) {
       await refresh();
       setNewRelationModalOpen(false);
       toast.success("Le lien familial a été ajouté");
@@ -93,8 +95,8 @@ const PersonFamily = ({ person }) => {
         relation._id === _id ? { ...relation, description, updatedAt: dayjs(), user: user._id } : relation
       ),
     };
-    const response = await API.put({ path: `/group/${personGroup._id}`, body: prepareGroupForEncryption(nextGroup) });
-    if (response.ok) {
+    const [error] = await tryFetchExpectOk(async () => API.put({ path: `/group/${personGroup._id}`, body: await encryptGroup(nextGroup) }));
+    if (!error) {
       await refresh();
       setRelationToEdit(null);
       toast.success("Le lien familial a été modifié");
@@ -115,8 +117,8 @@ const PersonFamily = ({ person }) => {
     }
     const nextRelations = personGroup.relations.filter((_relation) => _relation._id !== relation._id);
     if (!nextRelations.length) {
-      const deleteResponse = await API.delete({ path: `/group/${personGroup._id}` });
-      if (deleteResponse.ok) {
+      const [error] = await tryFetchExpectOk(async () => API.delete({ path: `/group/${personGroup._id}` }));
+      if (!error) {
         await refresh();
         setRelationToEdit(null);
         toast.success("Le lien familial a été supprimé");
@@ -127,8 +129,8 @@ const PersonFamily = ({ person }) => {
       persons: [...new Set(nextRelations.reduce((_personIds, relation) => [..._personIds, ...relation.persons], []))],
       relations: nextRelations,
     };
-    const response = await API.put({ path: `/group/${personGroup._id}`, body: prepareGroupForEncryption(nextGroup) });
-    if (response.ok) {
+    const [error] = await tryFetchExpectOk(async () => API.put({ path: `/group/${personGroup._id}`, body: await encryptGroup(nextGroup) }));
+    if (!error) {
       await refresh();
       setRelationToEdit(null);
       toast.success("Le lien familial a été supprimé");

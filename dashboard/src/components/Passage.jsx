@@ -6,8 +6,8 @@ import ButtonCustom from "./ButtonCustom";
 import SelectUser from "./SelectUser";
 import { teamsState, userState } from "../recoil/auth";
 import { useRecoilValue } from "recoil";
-import API from "../services/api";
-import { preparePassageForEncryption } from "../recoil/passages";
+import API, { tryFetchExpectOk } from "../services/api";
+import { preparePassageForEncryption, encryptPassage } from "../recoil/passages";
 import SelectTeam from "./SelectTeam";
 import SelectPerson from "./SelectPerson";
 import DatePicker from "./DatePicker";
@@ -33,8 +33,8 @@ const Passage = ({ passage, personId, onFinished }) => {
   const onDeletePassage = async () => {
     const confirm = window.confirm("Êtes-vous sûr ?");
     if (confirm) {
-      const passageRes = await API.delete({ path: `/passage/${passage._id}` });
-      if (passageRes.ok) {
+      const [error] = await tryFetchExpectOk(async () => API.delete({ path: `/passage/${passage._id}` }));
+      if (!error) {
         await refresh();
         toast.success("Suppression réussie");
         setOpen(false);
@@ -72,25 +72,36 @@ const Passage = ({ passage, personId, onFinished }) => {
                   comment: body.comment,
                 };
 
+                // TODO: traiter les erreurs dans tous ces cas
                 if (body.anonymous) {
                   for (let i = 0; i < body.anonymousNumberOfPassages; i++) {
                     await API.post({
                       path: "/passage",
-                      body: preparePassageForEncryption(newPassage),
+                      body: await encryptPassage(newPassage),
                     });
                   }
                 } else if (showMultiSelect) {
                   for (const person of body.persons) {
-                    await API.post({
-                      path: "/passage",
-                      body: preparePassageForEncryption({ ...newPassage, person }),
-                    });
+                    const [passageError] = await tryFetchExpectOk(async () =>
+                      API.post({
+                        path: "/passage",
+                        body: await encryptPassage({ ...newPassage, person }),
+                      })
+                    );
+                    if (passageError) {
+                      toast.error("Erreur lors de l'enregistrement du passage");
+                    }
                   }
                 } else {
-                  await API.post({
-                    path: "/passage",
-                    body: preparePassageForEncryption({ ...newPassage, person: body.person }),
-                  });
+                  const [passageError] = await tryFetchExpectOk(async () =>
+                    API.post({
+                      path: "/passage",
+                      body: await encryptPassage({ ...newPassage, person: body.person }),
+                    })
+                  );
+                  if (passageError) {
+                    toast.error("Erreur lors de l'enregistrement du passage");
+                  }
                 }
 
                 await refresh();
@@ -100,11 +111,17 @@ const Passage = ({ passage, personId, onFinished }) => {
                 actions.setSubmitting(false);
                 return;
               }
-              const response = await API.put({
-                path: `/passage/${passage._id}`,
-                body: preparePassageForEncryption(body),
-              });
-              if (!response.ok) return;
+              const [error] = await tryFetchExpectOk(async () =>
+                API.put({
+                  path: `/passage/${passage._id}`,
+                  body: await encryptPassage(body),
+                })
+              );
+              if (error) {
+                toast.error("Erreur lors de la mise à jour du passage");
+                actions.setSubmitting(false);
+                return;
+              }
               await refresh();
               setOpen(false);
               onFinished();

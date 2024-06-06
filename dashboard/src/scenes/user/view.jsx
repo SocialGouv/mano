@@ -11,10 +11,10 @@ import ButtonCustom from "../../components/ButtonCustom";
 import SelectTeamMultiple from "../../components/SelectTeamMultiple";
 import SelectRole from "../../components/SelectRole";
 import { organisationState, userState } from "../../recoil/auth";
-import API from "../../services/api";
+import API, { tryFetch, tryFetchExpectOk } from "../../services/api";
 import useTitle from "../../services/useTitle";
 import DeleteButtonAndConfirmModal from "../../components/DeleteButtonAndConfirmModal";
-import { emailRegex } from "../../utils";
+import { emailRegex, errorMessage } from "../../utils";
 import { capture } from "../../services/sentry";
 import BackButton from "../../components/backButton";
 
@@ -28,8 +28,12 @@ const View = () => {
   useTitle(`Utilisateur ${user?.name}`);
 
   const getUserData = useCallback(async () => {
-    const { data } = await API.get({ path: `/user/${id}` });
-    setLocalUser(data);
+    const [error, response] = await tryFetch(() => API.get({ path: `/user/${id}` }));
+    if (error) {
+      toast.error(errorMessage(error));
+      return;
+    }
+    setLocalUser(response.data);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
@@ -70,11 +74,18 @@ const View = () => {
             if (body.email && !emailRegex.test(body.email)) return toast.error("Email invalide");
             if (!body.name) return toast.error("Le nom doit faire au moins un caractère");
             body.organisation = organisation._id;
-            const res = await API.put({ path: `/user/${id}`, body });
-            if (!res.ok) return actions.setSubmitting(false);
+            const [error] = await tryFetch(() => API.put({ path: `/user/${id}`, body }));
+            if (error) {
+              actions.setSubmitting(false);
+              return toast.error(errorMessage(error));
+            }
             if (user._id === id) {
-              const { data } = await API.get({ path: `/user/${id}` });
-              setUser(data);
+              const [error, response] = await tryFetchExpectOk(() => API.get({ path: `/user/${id}` }));
+              if (error) {
+                actions.setSubmitting(false);
+                return toast.error(errorMessage(error));
+              }
+              setUser(response.data);
             }
             actions.setSubmitting(false);
             toast.success("Mis à jour !");
@@ -154,8 +165,10 @@ const View = () => {
                   title={`Voulez-vous vraiment supprimer l'utilisateur ${values.name}`}
                   textToConfirm={values.name}
                   onConfirm={async () => {
-                    const res = await API.delete({ path: `/user/${id}` });
-                    if (!res.ok) return;
+                    const [error] = await tryFetchExpectOk(() => API.delete({ path: `/user/${id}` }));
+                    if (error) {
+                      return toast.error(errorMessage(error));
+                    }
                     toast.success("Suppression réussie");
                     history.goBack();
                   }}

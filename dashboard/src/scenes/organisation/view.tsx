@@ -1,5 +1,5 @@
 import { MouseEventHandler, useEffect, useRef, useState } from "react";
-import { Input, Label, Row, Col } from "reactstrap";
+import { Row, Col } from "reactstrap";
 import { Formik } from "formik";
 import { toast } from "react-toastify";
 import { useRecoilState, useRecoilValue } from "recoil";
@@ -14,7 +14,7 @@ import {
 } from "../../recoil/persons";
 import TableCustomFields from "../../components/TableCustomFields";
 import { organisationState, userState, encryptionKeyLengthState, MINIMUM_ENCRYPTION_KEY_LENGTH } from "../../recoil/auth";
-import API, { encryptItem } from "../../services/api";
+import API, { tryFetch, tryFetchExpectOk } from "../../services/api";
 import ExportData from "../data-import-export/ExportData";
 import ImportData from "../data-import-export/ImportData";
 import ImportConfig from "../data-import-export/ImportConfig";
@@ -37,6 +37,8 @@ import { customFieldsMedicalFileSelector } from "../../recoil/medicalFiles";
 import DocumentsOrganizer from "../../components/DocumentsOrganizer";
 import DefaultPersonFolders from "./DefaultPersonFolders";
 import { dayjsInstance, now } from "../../services/date";
+import { encryptItem } from "../../services/encryption";
+import { errorMessage } from "../../utils";
 
 const getSettingTitle = (tabId) => {
   if (tabId === "infos") return "Informations";
@@ -75,7 +77,7 @@ const View = () => {
   const encryptionKeyLength = useRecoilValue(encryptionKeyLengthState);
 
   const persons = useRecoilValue(personsState);
-  const preparePersonForEncryption = usePreparePersonForEncryption();
+  const { preparePersonForEncryption } = usePreparePersonForEncryption();
   const [refreshErrorKey, setRefreshErrorKey] = useState(0);
   const { refresh } = useDataLoader();
 
@@ -94,16 +96,18 @@ const View = () => {
     async ({ oldChoice, newChoice, field, fields }) => {
       const updatedPersons = replaceOldChoiceByNewChoice(persons, oldChoice, newChoice, field);
 
-      const response = await API.post({
-        path: "/custom-field",
-        body: {
-          customFields: {
-            [customFieldsRow]: fields,
+      const [error, response] = await tryFetchExpectOk(async () =>
+        API.post({
+          path: "/custom-field",
+          body: {
+            customFields: {
+              [customFieldsRow]: fields,
+            },
+            persons: await Promise.all(updatedPersons.map(preparePersonForEncryption).map(encryptItem)),
           },
-          persons: await Promise.all(updatedPersons.map(preparePersonForEncryption).map(encryptItem)),
-        },
-      });
-      if (response.ok) {
+        })
+      );
+      if (!error) {
         toast.success("Choix mis à jour !");
         setOrganisation(response.data);
       } else {
@@ -179,15 +183,12 @@ const View = () => {
             }}
             enableReinitialize
             onSubmit={async (body) => {
-              try {
-                const response = await API.put({ path: `/organisation/${organisation._id}`, body });
-                if (response.ok) {
-                  toast.success("Mise à jour !");
-                  setOrganisation(response.data);
-                }
-              } catch (orgUpdateError) {
-                console.log("error in updating organisation", orgUpdateError);
-                toast.error(orgUpdateError.message);
+              const [error, response] = await tryFetchExpectOk(async () => await API.put({ path: `/organisation/${organisation._id}`, body }));
+              if (!error) {
+                toast.success("Mise à jour !");
+                setOrganisation(response.data);
+              } else {
+                toast.error(errorMessage(error));
               }
             }}
           >
@@ -209,15 +210,14 @@ const View = () => {
                           title={`Voulez-vous vraiment supprimer l'organisation ${organisation.name}`}
                           textToConfirm={organisation.name}
                           onConfirm={async () => {
-                            try {
-                              const res = await API.delete({ path: `/organisation/${organisation._id}` });
-                              if (res.ok) {
-                                toast.success("Organisation supprimée");
-                                API.logout();
-                              }
-                            } catch (organisationDeleteError) {
-                              capture(organisationDeleteError, { extra: { organisation }, user });
-                              toast.error(organisationDeleteError.message);
+                            const [error] = await tryFetchExpectOk(async () => API.delete({ path: `/organisation/${organisation._id}` }));
+                            if (!error) {
+                              toast.success("Organisation supprimée");
+                              tryFetchExpectOk(() => API.post({ path: "/user/logout" })).then(() => {
+                                API.reset({ redirect: true });
+                              });
+                            } else {
+                              toast.error(errorMessage(error));
                             }
                           }}
                         >

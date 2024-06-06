@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import { personsState, usePreparePersonForEncryption } from "../../recoil/persons";
 import { selector, useRecoilState, useRecoilValue } from "recoil";
 import AsyncSelect from "react-select/async-creatable";
-import API from "../../services/api";
+import API, { tryFetchExpectOk } from "../../services/api";
 import { formatBirthDate, formatCalendarDate, isToday } from "../../services/date";
 import { TODO, actionsState } from "../../recoil/actions";
 import { passagesState } from "../../recoil/passages";
@@ -15,6 +15,7 @@ import ExclamationMarkButton from "../../components/tailwind/ExclamationMarkButt
 import { theme } from "../../config";
 import dayjs from "dayjs";
 import { useDataLoader } from "../../components/DataLoader";
+import { decryptItem } from "../../services/encryption";
 
 function removeDiatricsAndAccents(str) {
   return (str || "")
@@ -80,7 +81,7 @@ const SelectAndCreatePerson = ({ value, onChange, inputId, classNamePrefix, show
   const rencontres = useRecoilValue(rencontresState);
 
   const optionsExist = useRef(null);
-  const preparePersonForEncryption = usePreparePersonForEncryption();
+  const { encryptPerson } = usePreparePersonForEncryption();
 
   const searchablePersons = useRecoilValue(searchablePersonsSelector);
 
@@ -177,15 +178,20 @@ const SelectAndCreatePerson = ({ value, onChange, inputId, classNamePrefix, show
         const newPerson = { name, assignedTeams: [currentTeam._id], followedSince: dayjs(), user: user._id };
         const currentValue = value || [];
         onChange([...currentValue, { ...newPerson, __isNew__: true }]);
-        const personResponse = await API.post({
-          path: "/person",
-          body: preparePersonForEncryption(newPerson),
-        });
+        const [error, response] = await tryFetchExpectOk(async () =>
+          API.post({
+            path: "/person",
+            body: await encryptPerson(newPerson),
+          })
+        );
         setIsDisabled(false);
-        if (personResponse.ok) {
+        const decryptedData = await decryptItem(response.data);
+        if (!error) {
           await refresh();
           toast.success("Nouvelle personne ajoutée !");
-          onChange([...currentValue, personResponse.decryptedData]);
+          onChange([...currentValue, decryptedData]);
+        } else {
+          toast.error("Erreur lors de la création de la personne");
         }
       }}
       value={value}

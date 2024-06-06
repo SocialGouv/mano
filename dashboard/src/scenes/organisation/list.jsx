@@ -5,14 +5,14 @@ import { toast } from "react-toastify";
 import Table from "../../components/table";
 import OrganisationUsers from "./OrganisationUsers";
 import Loading from "../../components/loading";
-import API from "../../services/api";
+import API, { tryFetch, tryFetchExpectOk } from "../../services/api";
 import { formatAge, formatDateWithFullMonth } from "../../services/date";
 import useTitle from "../../services/useTitle";
 import DeleteButtonAndConfirmModal from "../../components/DeleteButtonAndConfirmModal";
 import { capture } from "../../services/sentry";
 import { useRecoilValue } from "recoil";
 import { userState } from "../../recoil/auth";
-import { download, emailRegex } from "../../utils";
+import { download, emailRegex, errorMessage } from "../../utils";
 import SelectRole from "../../components/SelectRole";
 import SelectCustom from "../../components/SelectCustom";
 import OrganisationSuperadminSettings from "./OrganisationSuperadminSettings";
@@ -39,8 +39,12 @@ const List = () => {
   useEffect(() => {
     (async () => {
       if (!refresh) return;
-      const { data } = await API.get({ path: "/organisation", query: { withCounters: true } });
-      const sortedDataAscendant = data?.sort((org1, org2) => (org1[sortBy] > org2[sortBy] ? 1 : -1));
+      const [error, response] = await tryFetchExpectOk(async () => API.get({ path: "/organisation", query: { withCounters: true } }));
+      if (error) {
+        toast.error(errorMessage(error));
+        return;
+      }
+      const sortedDataAscendant = response.data?.sort((org1, org2) => (org1[sortBy] > org2[sortBy] ? 1 : -1));
       setOrganisations(sortOrder === "ASC" ? sortedDataAscendant : [...(sortedDataAscendant || [])].reverse());
       setUpdateKey((k) => k + 1);
       setRefresh(false);
@@ -276,15 +280,12 @@ const List = () => {
                         title={`Voulez-vous vraiment supprimer l'organisation ${organisation.name}`}
                         textToConfirm={organisation.name}
                         onConfirm={async () => {
-                          try {
-                            const res = await API.delete({ path: `/organisation/${organisation._id}` });
-                            if (res.ok) {
-                              toast.success("Organisation supprimée");
-                              setRefresh(true);
-                            }
-                          } catch (organisationDeleteError) {
-                            capture(organisationDeleteError, { extra: { organisation }, user });
-                            toast.error(organisationDeleteError.message);
+                          const [error] = await tryFetchExpectOk(async () => API.delete({ path: `/organisation/${organisation._id}` }));
+                          if (!error) {
+                            toast.success("Organisation supprimée");
+                            setRefresh(true);
+                          } else {
+                            toast.error(errorMessage(error));
                           }
                         }}
                       >
@@ -309,7 +310,6 @@ const List = () => {
     </>
   );
 };
-
 
 const options = [
   { value: "Guillaume", label: "Guillaume" },
@@ -336,17 +336,14 @@ const Create = ({ onChange, open, setOpen }) => {
             return errors;
           }}
           onSubmit={async (body, actions) => {
-            try {
-              const orgRes = await API.post({ path: "/organisation", body });
-              actions.setSubmitting(false);
-              if (!orgRes.ok) return;
-              toast.success("Création réussie !");
-              onChange();
-              setOpen(false);
-            } catch (orgCreationError) {
-              console.log("error in creating organisation", orgCreationError);
-              toast.error(orgCreationError.message);
+            const [error, response] = await tryFetch(async () => API.post({ path: "/organisation", body }));
+            actions.setSubmitting(false);
+            if (error) {
+              return toast.error(errorMessage(error));
             }
+            toast.success("Création réussie !");
+            onChange();
+            setOpen(false);
           }}
         >
           {({ values, handleChange, handleSubmit, isSubmitting, touched, errors }) => (
@@ -535,18 +532,21 @@ const MergeOrganisations = ({ open, setOpen, organisations, onChange }) => {
               return toast.error("La clé de l'organisation secondaire n'est pas valide");
             }
 
-            const res = await API.post({
-              path: `/organisation/merge`,
-              body: { mainId: selectedOrganisationMain._id, secondaryId: selectedOrganisationSecondary._id },
-            });
+            const [error] = await tryFetchExpectOk(async () =>
+              API.post({
+                path: `/organisation/merge`,
+                body: { mainId: selectedOrganisationMain._id, secondaryId: selectedOrganisationSecondary._id },
+              })
+            );
             setSelectedOrganisationMain(null);
             setSelectedOrganisationSecondary(null);
             setLoading(false);
             setOpen(false);
-            if (res.ok) {
+            if (!error) {
               toast.success("Fusion réussie, vérifiez quand même que tout est ok");
               onChange();
             } else {
+              toast.error(errorMessage(error));
               toast.error("Catastrophe, la fusion d'organisation a échoué, appelez les devs");
             }
           }}
@@ -563,8 +563,9 @@ const CreateUser = ({ onChange, open, setOpen, organisation }) => {
   useEffect(() => {
     if (!organisation?._id) return;
     (async () => {
-      const { data } = await API.get({ path: `organisation/${organisation._id}/teams` });
-      setTeam(data);
+      const [error, response] = await tryFetchExpectOk(async () => API.get({ path: `organisation/${organisation._id}/teams` }));
+      if (error) return toast.error(errorMessage(error));
+      setTeam(response.data);
     })();
   }, [organisation?._id]);
 
@@ -582,8 +583,8 @@ const CreateUser = ({ onChange, open, setOpen, organisation }) => {
               if (!body.role) return toast.error("Le rôle est obligatoire");
 
               body.organisation = organisation._id;
-              const { ok } = await API.post({ path: "/user", body });
-              if (!ok) {
+              const [error] = await tryFetch(async () => API.post({ path: "/user", body }));
+              if (error) {
                 return false;
               }
               toast.success("Création réussie !");

@@ -2,7 +2,7 @@ import React, { useState, useCallback } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useDataLoader } from "../../components/DataLoader";
 import { organisationState } from "../../recoil/auth";
-import API, { encryptItem } from "../../services/api";
+import API, { tryFetchExpectOk } from "../../services/api";
 import { toast } from "react-toastify";
 import DragAndDropSettings from "./DragAndDropSettings";
 import {
@@ -13,6 +13,8 @@ import {
 } from "../../recoil/medicalFiles";
 import CustomFieldSetting from "../../components/CustomFieldSetting";
 import { EditCustomField } from "../../components/TableCustomFields";
+import { encryptItem } from "../../services/encryption";
+import { errorMessage } from "../../utils";
 
 const sanitizeFields = (field) => {
   const sanitizedField = {};
@@ -34,13 +36,15 @@ const MedicalFileSettings = () => {
   const { refresh } = useDataLoader();
 
   const onAddGroup = async (name) => {
-    const res = await API.put({
-      path: `/organisation/${organisation._id}`,
-      body: { groupedCustomFieldsMedicalFile: [...groupedCustomFieldsMedicalFile, { name, fields: [] }] },
-    });
-    if (res.ok) {
+    const [error, response] = await tryFetchExpectOk(async () =>
+      API.put({
+        path: `/organisation/${organisation._id}`,
+        body: { groupedCustomFieldsMedicalFile: [...groupedCustomFieldsMedicalFile, { name, fields: [] }] },
+      })
+    );
+    if (!error) {
       toast.success("Groupe ajouté", { autoclose: 2000 });
-      setOrganisation(res.data);
+      setOrganisation(response.data);
     }
     refresh();
   };
@@ -59,11 +63,13 @@ const MedicalFileSettings = () => {
     });
 
     const oldOrganisation = organisation;
-    const response = await API.put({
-      path: `/organisation/${organisation._id}`,
-      body: { groupedCustomFieldsMedicalFile: newCustomFieldsMedicalFile },
-    });
-    if (response.ok) {
+    const [error, response] = await tryFetchExpectOk(async () =>
+      API.put({
+        path: `/organisation/${organisation._id}`,
+        body: { groupedCustomFieldsMedicalFile: newCustomFieldsMedicalFile },
+      })
+    );
+    if (!error) {
       refresh();
       setOrganisation(response.data);
       toast.success("Groupe mise à jour. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
@@ -78,11 +84,13 @@ const MedicalFileSettings = () => {
 
     const oldOrganisation = organisation;
 
-    const response = await API.put({
-      path: `/organisation/${organisation._id}`,
-      body: { groupedCustomFieldsMedicalFile: newCustomFieldsMedicalFile },
-    });
-    if (response.ok) {
+    const [error, response] = await tryFetchExpectOk(async () =>
+      API.put({
+        path: `/organisation/${organisation._id}`,
+        body: { groupedCustomFieldsMedicalFile: newCustomFieldsMedicalFile },
+      })
+    );
+    if (!error) {
       toast.success("Groupe de champs de dossier médical supprimé", { autoclose: 2000 });
       setOrganisation(response.data);
       refresh();
@@ -97,12 +105,14 @@ const MedicalFileSettings = () => {
         name: group.groupTitle,
         fields: group.items.map((customFieldName) => flatCustomFieldsMedicalFile.find((f) => f.name === customFieldName)),
       }));
-      const res = await API.put({
-        path: `/organisation/${organisation._id}`,
-        body: { groupedCustomFieldsMedicalFile: newCustomFieldsMedicalFile },
-      });
-      if (res.ok) {
-        setOrganisation(res.data);
+      const [error, response] = await tryFetchExpectOk(async () =>
+        API.put({
+          path: `/organisation/${organisation._id}`,
+          body: { groupedCustomFieldsMedicalFile: newCustomFieldsMedicalFile },
+        })
+      );
+      if (!error) {
+        setOrganisation(response.data);
         refresh();
       }
     },
@@ -133,30 +143,29 @@ const AddField = ({ groupTitle: typeName }) => {
   const { refresh } = useDataLoader();
 
   const onAddField = async (newField) => {
-    try {
-      if (flatCustomFieldsMedicalFile.map((e) => e.label).includes(newField.label)) {
-        return toast.error(`Ce nom de champ existe déjà dans un autre groupe`);
-      }
+    if (flatCustomFieldsMedicalFile.map((e) => e.label).includes(newField.label)) {
+      return toast.error(`Ce nom de champ existe déjà dans un autre groupe`);
+    }
 
-      const newCustomFieldsMedicalFile = groupedCustomFieldsMedicalFile.map((type) => {
-        if (type.name !== typeName) return type;
-        return {
-          ...type,
-          fields: [...type.fields, newField].map(sanitizeFields),
-        };
-      });
-      const response = await API.put({
+    const newCustomFieldsMedicalFile = groupedCustomFieldsMedicalFile.map((type) => {
+      if (type.name !== typeName) return type;
+      return {
+        ...type,
+        fields: [...type.fields, newField].map(sanitizeFields),
+      };
+    });
+    const [error, response] = await tryFetchExpectOk(async () =>
+      API.put({
         path: `/organisation/${organisation._id}`,
         body: { groupedCustomFieldsMedicalFile: newCustomFieldsMedicalFile },
-      });
-      if (response.ok) {
-        toast.success("Mise à jour !");
-        setOrganisation(response.data);
-        refresh();
-      }
-    } catch (orgUpdateError) {
-      console.log("error in updating organisation", orgUpdateError);
-      toast.error(orgUpdateError.message);
+      })
+    );
+    if (!error) {
+      toast.success("Mise à jour !");
+      setOrganisation(response.data);
+      refresh();
+    } else {
+      toast.error(errorMessage(error));
     }
     setIsAddingField(false);
   };
@@ -215,26 +224,25 @@ const MedicalFileCustomField = ({ item: customField, groupTitle: typeName }) => 
   const { refresh } = useDataLoader();
 
   const onSaveField = async (editedField) => {
-    try {
-      const newCustomFieldsMedicalFile = groupedCustomFieldsMedicalFile.map((type) => {
-        if (type.name !== typeName) return type;
-        return {
-          ...type,
-          fields: type.fields.map((field) => (field.name !== editedField.name ? field : editedField)).map(sanitizeFields),
-        };
-      });
-      const response = await API.put({
+    const newCustomFieldsMedicalFile = groupedCustomFieldsMedicalFile.map((type) => {
+      if (type.name !== typeName) return type;
+      return {
+        ...type,
+        fields: type.fields.map((field) => (field.name !== editedField.name ? field : editedField)).map(sanitizeFields),
+      };
+    });
+    const [error, response] = await tryFetchExpectOk(async () =>
+      API.put({
         path: `/organisation/${organisation._id}`,
         body: { groupedCustomFieldsMedicalFile: newCustomFieldsMedicalFile },
-      });
-      if (response.ok) {
-        toast.success("Mise à jour !");
-        setOrganisation(response.data);
-        refresh();
-      }
-    } catch (orgUpdateError) {
-      console.log("error in updating organisation", orgUpdateError);
-      toast.error(orgUpdateError.message);
+      })
+    );
+    if (!error) {
+      toast.success("Mise à jour !");
+      setOrganisation(response.data);
+      refresh();
+    } else {
+      toast.error(errorMessage(error));
     }
     setIsEditingField(false);
   };
@@ -259,16 +267,18 @@ const MedicalFileCustomField = ({ item: customField, groupTitle: typeName }) => 
 
     const newCustomFieldsMedicalFileFlat = newCustomFieldsMedicalFile.reduce((acc, type) => [...acc, ...type.fields], []);
 
-    const response = await API.post({
-      path: "/custom-field",
-      body: {
-        customFields: {
-          groupedCustomFieldsMedicalFile: newCustomFieldsMedicalFile,
+    const [error, response] = await tryFetchExpectOk(async () =>
+      API.post({
+        path: "/custom-field",
+        body: {
+          customFields: {
+            groupedCustomFieldsMedicalFile: newCustomFieldsMedicalFile,
+          },
+          medicalFiles: await Promise.all(updatedMedicalFiles.map(prepareMedicalFileForEncryption(newCustomFieldsMedicalFileFlat)).map(encryptItem)),
         },
-        medicalFiles: await Promise.all(updatedMedicalFiles.map(prepareMedicalFileForEncryption(newCustomFieldsMedicalFileFlat)).map(encryptItem)),
-      },
-    });
-    if (response.ok) {
+      })
+    );
+    if (!error) {
       toast.success("Choix mis à jour !");
       setOrganisation(response.data);
     }
@@ -276,26 +286,25 @@ const MedicalFileCustomField = ({ item: customField, groupTitle: typeName }) => 
   };
 
   const onDeleteField = async () => {
-    try {
-      const newCustomFieldsMedicalFile = groupedCustomFieldsMedicalFile.map((type) => {
-        if (type.name !== typeName) return type;
-        return {
-          ...type,
-          fields: type.fields.filter((field) => field.name !== customField.name),
-        };
-      });
-      const response = await API.put({
+    const newCustomFieldsMedicalFile = groupedCustomFieldsMedicalFile.map((type) => {
+      if (type.name !== typeName) return type;
+      return {
+        ...type,
+        fields: type.fields.filter((field) => field.name !== customField.name),
+      };
+    });
+    const [error, response] = await tryFetchExpectOk(async () =>
+      API.put({
         path: `/organisation/${organisation._id}`,
         body: { groupedCustomFieldsMedicalFile: newCustomFieldsMedicalFile },
-      });
-      if (response.ok) {
-        toast.success("Mise à jour !");
-        setOrganisation(response.data);
-        refresh();
-      }
-    } catch (orgUpdateError) {
-      console.log("error in updating organisation", orgUpdateError);
-      toast.error(orgUpdateError.message);
+      })
+    );
+    if (!error) {
+      toast.success("Mise à jour !");
+      setOrganisation(response.data);
+      refresh();
+    } else {
+      toast.error(errorMessage(error));
     }
     setIsEditingField(false);
   };

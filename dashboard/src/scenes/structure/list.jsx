@@ -4,7 +4,7 @@ import Table from "../../components/table";
 import { toast } from "react-toastify";
 import ButtonCustom from "../../components/ButtonCustom";
 import Search from "../../components/search";
-import API from "../../services/api";
+import API, { tryFetch, tryFetchExpectOk } from "../../services/api";
 import { formatDateWithFullMonth } from "../../services/date";
 import useTitle from "../../services/useTitle";
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "../../components/tailwind/Modal";
@@ -13,6 +13,7 @@ import { useRecoilValue } from "recoil";
 import { userState } from "../../recoil/auth";
 import { flattenedStructuresCategoriesSelector } from "../../recoil/structures";
 import { filterBySearch } from "../search/utils";
+import { errorMessage } from "../../utils";
 
 const List = () => {
   const [structures, setStructures] = useState([]);
@@ -29,10 +30,12 @@ const List = () => {
   useTitle("Structures");
 
   const getStructures = async () => {
-    const response = await API.get({ path: "/structure" });
-    if (response.ok) {
-      setStructures(response.data);
+    const [error, response] = await tryFetchExpectOk(async () => API.get({ path: "/structure" }));
+    if (error) {
+      toast.error(errorMessage(error));
+      return setIsLoading(false);
     }
+    setStructures(response.data);
     setIsLoading(false);
   };
 
@@ -153,27 +156,29 @@ const Structure = ({ structure: initStructure, onSuccess, open, onClose, onOpen 
   const onSubmit = async (e) => {
     e.preventDefault();
     setDisabled(true);
-    try {
-      if (!structure.name) throw new Error("Le nom de la structure est obligatoire");
-      const isNew = !initStructure?._id;
-      const res = !isNew
-        ? await API.put({ path: `/structure/${initStructure._id}`, body: structure })
-        : await API.post({ path: "/structure", body: structure });
-      setDisabled(false);
-      if (!res.ok) return;
-      toast.success(!isNew ? "Structure mise à jour !" : "Structure créée !");
-      onSuccess();
-      onResetAndClose();
-    } catch (errorCreatingStructure) {
-      toast.error(errorCreatingStructure.message);
+    if (!structure.name) throw new Error("Le nom de la structure est obligatoire");
+    const isNew = !initStructure?._id;
+    const [error] = await tryFetch(async () =>
+      !isNew ? API.put({ path: `/structure/${initStructure._id}`, body: structure }) : API.post({ path: "/structure", body: structure })
+    );
+    setDisabled(false);
+    if (error) {
+      toast.error(errorMessage(error));
+      return;
     }
+    toast.success(!isNew ? "Structure mise à jour !" : "Structure créée !");
+    onSuccess();
+    onResetAndClose();
     setDisabled(false);
   };
 
   const onDeleteStructure = async () => {
     if (window.confirm("Voulez-vous vraiment supprimer cette structure ? Cette action est irréversible.")) {
-      const res = await API.delete({ path: `/structure/${structure._id}` });
-      if (!res.ok) return;
+      const [error] = await tryFetchExpectOk(async () => API.delete({ path: `/structure/${structure._id}` }));
+      if (error) {
+        toast.error(errorMessage(error));
+        return;
+      }
       toast.success("Structure supprimée !");
       onSuccess();
       onResetAndClose();

@@ -6,8 +6,8 @@ import { toast } from "react-toastify";
 import { useLocation, useHistory } from "react-router-dom";
 import { CANCEL, DONE, TODO } from "../recoil/actions";
 import { currentTeamState, organisationState, teamsState, userState } from "../recoil/auth";
-import { allowedActionFieldsInHistory, prepareActionForEncryption } from "../recoil/actions";
-import API, { encryptItem } from "../services/api";
+import { allowedActionFieldsInHistory, encryptAction } from "../recoil/actions";
+import API, { tryFetchExpectOk } from "../services/api";
 import { dayjsInstance, outOfBoundariesDate } from "../services/date";
 import { modalConfirmState } from "./ModalConfirm";
 import SelectStatus from "./SelectStatus";
@@ -26,8 +26,9 @@ import { useDataLoader } from "./DataLoader";
 import ActionsCategorySelect from "./tailwind/ActionsCategorySelect";
 import AutoResizeTextarea from "./AutoresizeTextArea";
 import { groupsState } from "../recoil/groups";
-import { prepareCommentForEncryption } from "../recoil/comments";
+import { prepareCommentForEncryption, encryptComment } from "../recoil/comments";
 import { capture } from "../services/sentry";
+import { encryptItem } from "../services/encryption";
 
 export default function ActionModal() {
   const actionsObjects = useRecoilValue(itemsGroupedByActionSelector);
@@ -179,57 +180,57 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
       }
       if (Object.keys(historyEntry.data).length) body.history = [...(action.history || []), historyEntry];
 
-      const actionResponse = await API.put({
-        path: `/action/${data._id}`,
-        body: prepareActionForEncryption(body),
-      });
-
-      if (!actionResponse.ok) {
+      const [actionError] = await tryFetchExpectOk(async () =>
+        API.put({
+          path: `/action/${data._id}`,
+          body: await encryptAction(body),
+        })
+      );
+      if (actionError) {
         toast.error("Erreur lors de la mise à jour de l'action, les données n'ont pas été sauvegardées.");
-        capture("error updating action", { extra: { actionId: action._id } });
         return false;
       }
 
       const actionCancelled = action.status !== CANCEL && body.status === CANCEL;
       if (actionCancelled && window.confirm("Cette action est annulée, voulez-vous la dupliquer ? Avec une date ultérieure par exemple")) {
         const { name, person, dueAt, withTime, description, categories, urgent, teams } = data;
-        const response = await API.post({
-          path: "/action",
-          body: prepareActionForEncryption({
-            name,
-            person,
-            teams,
-            user: user._id,
-            dueAt,
-            withTime,
-            status: TODO,
-            description,
-            categories,
-            urgent,
-          }),
-        });
-        if (!response.ok) {
+        const [actionError, actionReponse] = await tryFetchExpectOk(async () =>
+          API.post({
+            path: "/action",
+            body: await encryptAction({
+              name,
+              person,
+              teams,
+              user: user._id,
+              dueAt,
+              withTime,
+              status: TODO,
+              description,
+              categories,
+              urgent,
+            }),
+          })
+        );
+        if (actionError) {
           toast.error("Erreur lors de la duplication de l'action, les données n'ont pas été sauvegardées.");
-          capture("error duplicating action", { extra: { actionId: action._id } });
           return;
         }
         for (let c of action.comments.filter((c) => c.action === action._id)) {
           const body = {
             comment: c.comment,
-            action: response.decryptedData._id,
+            action: actionReponse.data._id,
             user: c.user || user._id,
             team: c.team || currentTeam._id,
             organisation: c.organisation,
           };
-          const res = await API.post({ path: "/comment", body: prepareCommentForEncryption(body) });
-          if (!res.ok) {
+          const [error] = await tryFetchExpectOk(async () => API.post({ path: "/comment", body: await encryptComment(body) }));
+          if (error) {
             toast.error("Erreur lors de la duplication des commentaires de l'action, les données n'ont pas été sauvegardées.");
-            capture("error duplicating comments", { extra: { actionId: action._id, newActionId: response.decryptedData._id } });
             return;
           }
         }
         const searchParams = new URLSearchParams(history.location.search);
-        searchParams.set("actionId", response.decryptedData._id);
+        searchParams.set("actionId", actionReponse.data._id);
         history.replace(`?${searchParams.toString()}`);
       }
 
@@ -237,48 +238,50 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
     } else {
       let actionsId = [];
       if (Array.isArray(body.person)) {
-        const actionResponse = await API.post({
-          path: "/action/multiple",
-          body: await Promise.all(
-            body.person
-              .map((personId) =>
-                prepareActionForEncryption({
+        const [actionError, actionResponse] = await tryFetchExpectOk(async () =>
+          API.post({
+            path: "/action/multiple",
+            body: await Promise.all(
+              body.person.map((personId) =>
+                encryptAction({
                   ...body,
                   person: personId,
                 })
               )
-              .map(encryptItem)
-          ),
-        });
-        if (!actionResponse.ok) {
+            ),
+          })
+        );
+        if (actionError) {
           toast.error("Erreur lors de la création des action, les données n'ont pas été sauvegardées.");
-          capture("error creating multiple actions", { extra: { actionResponse } });
           return false;
         }
-        actionsId = actionResponse.decryptedData.map((a) => a._id);
+        actionsId = actionResponse.data.map((a) => a._id);
       } else {
-        const actionResponse = await API.post({
-          path: "/action",
-          body: prepareActionForEncryption(body),
-        });
-        if (!actionResponse.ok) {
+        const [actionError, actionResponse] = await tryFetchExpectOk(async () =>
+          API.post({
+            path: "/action",
+            body: await encryptAction(body),
+          })
+        );
+        if (actionError) {
           toast.error("Erreur lors de la création de l'action, les données n'ont pas été sauvegardées.");
           capture("error creating single action", { extra: { actionResponse } });
           return false;
         }
-        actionsId.push(actionResponse.decryptedData._id);
+        actionsId.push(actionResponse.data._id);
       }
       // Creer les commentaires.
       for (const actionId of actionsId) {
         if (body.comments?.length) {
           for (const comment of body.comments) {
-            const commentResponse = await API.post({
-              path: "/comment",
-              body: prepareCommentForEncryption({ ...comment, action: actionId }),
-            });
-            if (!commentResponse.ok) {
+            const [actionError] = await tryFetchExpectOk(async () =>
+              API.post({
+                path: "/comment",
+                body: await encryptComment({ ...comment, action: actionId }),
+              })
+            );
+            if (actionError) {
               toast.error("Erreur lors de la création du commentaire, l'action a été sauvegardée mais pas les commentaires.");
-              capture("error creating comment", { extra: { actionId } });
               return false;
             }
           }
@@ -647,8 +650,11 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                 const newData = { ...data, comments: data.comments.filter((c) => c._id !== comment._id) };
                 setData(newData);
                 if (isNewAction) {
-                  const res = await API.delete({ path: `/comment/${comment._id}` });
-                  if (!res.ok) return false;
+                  const [error] = await tryFetchExpectOk(() => API.delete({ path: `/comment/${comment._id}` }));
+                  if (error) {
+                    toast.error("Erreur lors de la suppression du commentaire");
+                    return false;
+                  }
                   toast.success("Suppression réussie");
                   refresh();
                   return true;
@@ -662,18 +668,20 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                 if (isNewAction) return;
 
                 if (isNewComment) {
-                  const response = await API.post({ path: "/comment", body: prepareCommentForEncryption(comment) });
-                  if (!response.ok) {
+                  const [error] = await tryFetchExpectOk(async () => API.post({ path: "/comment", body: await encryptComment(comment) }));
+                  if (error) {
                     toast.error("Erreur lors de l'ajout du commentaire");
                     return;
                   }
                   toast.success("Commentaire ajouté !");
                 } else {
-                  const response = await API.put({
-                    path: `/comment/${comment._id}`,
-                    body: prepareCommentForEncryption(comment),
-                  });
-                  if (!response.ok) {
+                  const [error] = await tryFetchExpectOk(async () =>
+                    API.put({
+                      path: `/comment/${comment._id}`,
+                      body: await encryptComment(comment),
+                    })
+                  );
+                  if (error) {
                     toast.error("Erreur lors de l'ajout du commentaire");
                     return;
                   }
@@ -705,15 +713,15 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
             onClick={async (e) => {
               e.stopPropagation();
               if (!window.confirm("Voulez-vous supprimer cette action ?")) return;
-              const response = await API.delete({ path: `/action/${action._id}` });
-              if (!response.ok) {
+              const [error] = await tryFetchExpectOk(() => API.delete({ path: `/action/${action._id}` }));
+              if (error) {
                 toast.error("Erreur lors de la suppression de l'action");
                 return;
               }
               for (let comment of action.comments) {
                 if (!comment._id) continue;
-                const commentRes = await API.delete({ path: `/comment/${comment._id}` });
-                if (!commentRes.ok) {
+                const [error] = await tryFetchExpectOk(() => API.delete({ path: `/comment/${comment._id}` }));
+                if (error) {
                   toast.error("Erreur lors de la suppression des commentaires liés à l'action");
                   return;
                 }

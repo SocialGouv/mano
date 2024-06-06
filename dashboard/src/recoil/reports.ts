@@ -8,6 +8,8 @@ import API from "../services/api";
 import type { ReportInstance, ReadyToEncryptReportInstance } from "../types/report";
 import { keepOnlyOneReportAndReturnReportToDelete } from "../utils/delete-duplicated-reports";
 
+import { encryptItem } from "../services/encryption";
+
 const collectionName = "report";
 export const reportsState = atom({
   key: collectionName,
@@ -36,7 +38,8 @@ export const reportsState = atom({
           for (const [key, reportsByDate] of duplicateReports) {
             const reportsToDelete = keepOnlyOneReportAndReturnReportToDelete(reportsByDate);
             for (const reportToDelete of reportsToDelete) {
-              await API.delete({ path: `report/${reportToDelete._id}` });
+              // TODO : réfléchir si on traite les erreurs ici ou si on les laisse remonter
+              await API.delete({ path: `/report/${reportToDelete._id}` });
             }
             capture("Duplicated reports " + key, {
               extra: {
@@ -125,4 +128,8 @@ export function prepareReportForEncryption(report: ReportInstance, { checkRequir
     decrypted,
     entityKey: report.entityKey,
   };
+}
+
+export async function encryptReport(report: ReportInstance, { checkRequiredFields = true } = {}) {
+  return encryptItem(prepareReportForEncryption(report, { checkRequiredFields }));
 }

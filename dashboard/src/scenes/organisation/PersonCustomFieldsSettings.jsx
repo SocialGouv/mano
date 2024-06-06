@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useDataLoader } from "../../components/DataLoader";
 import { organisationState } from "../../recoil/auth";
-import API, { encryptItem } from "../../services/api";
+import API, { tryFetchExpectOk } from "../../services/api";
 import { toast } from "react-toastify";
 import DragAndDropSettings from "./DragAndDropSettings";
 import { EditCustomField } from "../../components/TableCustomFields";
@@ -32,11 +32,13 @@ const PersonCustomFieldsSettings = () => {
   const { refresh } = useDataLoader();
 
   const onAddGroup = async (name) => {
-    const res = await API.put({
-      path: `/organisation/${organisation._id}`,
-      body: { customFieldsPersons: [...customFieldsPersons, { name, fields: [] }] },
-    });
-    if (res.ok) {
+    const [error, res] = await tryFetchExpectOk(async () =>
+      API.put({
+        path: `/organisation/${organisation._id}`,
+        body: { customFieldsPersons: [...customFieldsPersons, { name, fields: [] }] },
+      })
+    );
+    if (!error) {
       toast.success("Groupe ajouté", { autoclose: 2000 });
       setOrganisation(res.data);
     }
@@ -58,11 +60,13 @@ const PersonCustomFieldsSettings = () => {
 
     const oldOrganisation = organisation;
     setOrganisation({ ...organisation, customFieldsPersons: newCustomFieldsPersons }); // optimistic UI
-    const response = await API.put({
-      path: `/organisation/${organisation._id}`,
-      body: { customFieldsPersons: newCustomFieldsPersons },
-    });
-    if (response.ok) {
+    const [error, response] = await tryFetchExpectOk(async () =>
+      API.put({
+        path: `/organisation/${organisation._id}`,
+        body: { customFieldsPersons: newCustomFieldsPersons },
+      })
+    );
+    if (!error) {
       refresh();
       setOrganisation(response.data);
       toast.success("Groupe mise à jour. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
@@ -78,11 +82,13 @@ const PersonCustomFieldsSettings = () => {
     const oldOrganisation = organisation;
     setOrganisation({ ...organisation, customFieldsPersons: newCustomFieldsPersons }); // optimistic UI
 
-    const response = await API.put({
-      path: `/organisation/${organisation._id}`,
-      body: { customFieldsPersons: newCustomFieldsPersons },
-    });
-    if (response.ok) {
+    const [error, response] = await tryFetchExpectOk(async () =>
+      API.put({
+        path: `/organisation/${organisation._id}`,
+        body: { customFieldsPersons: newCustomFieldsPersons },
+      })
+    );
+    if (!error) {
       toast.success("Groupe supprimé", { autoclose: 2000 });
       setOrganisation(response.data);
       refresh();
@@ -97,11 +103,13 @@ const PersonCustomFieldsSettings = () => {
         name: group.groupTitle,
         fields: group.items.map((customFieldName) => flattenedCustomFieldsPersons.find((f) => f.name === customFieldName)),
       }));
-      const res = await API.put({
-        path: `/organisation/${organisation._id}`,
-        body: { customFieldsPersons: newCustomFieldsPersons },
-      });
-      if (res.ok) {
+      const [error, res] = await tryFetchExpectOk(async () =>
+        API.put({
+          path: `/organisation/${organisation._id}`,
+          body: { customFieldsPersons: newCustomFieldsPersons },
+        })
+      );
+      if (!error) {
         setOrganisation(res.data);
         refresh();
       }
@@ -140,11 +148,13 @@ const AddField = ({ groupTitle: typeName }) => {
           fields: [...type.fields, newField].map(sanitizeFields),
         };
       });
-      const response = await API.put({
-        path: `/organisation/${organisation._id}`,
-        body: { customFieldsPersons: newCustomFieldsPersons },
-      });
-      if (response.ok) {
+      const [error, response] = await tryFetchExpectOk(async () =>
+        API.put({
+          path: `/organisation/${organisation._id}`,
+          body: { customFieldsPersons: newCustomFieldsPersons },
+        })
+      );
+      if (!error) {
         toast.success("Mise à jour !");
         setOrganisation(response.data);
         refresh();
@@ -206,7 +216,7 @@ const ConsultationCustomField = ({ item: customField, groupTitle: typeName }) =>
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const allPersons = useRecoilValue(personsState);
   const customFieldsPersons = useRecoilValue(customFieldsPersonsSelector);
-  const preparePersonForEncryption = usePreparePersonForEncryption();
+  const { encryptPerson } = usePreparePersonForEncryption();
 
   const { refresh } = useDataLoader();
 
@@ -219,11 +229,13 @@ const ConsultationCustomField = ({ item: customField, groupTitle: typeName }) =>
           fields: type.fields.map((field) => (field.name !== editedField.name ? field : editedField)).map(sanitizeFields),
         };
       });
-      const response = await API.put({
-        path: `/organisation/${organisation._id}`,
-        body: { customFieldsPersons: newCustomFieldsPersons },
-      });
-      if (response.ok) {
+      const [error, response] = await tryFetchExpectOk(async () =>
+        API.put({
+          path: `/organisation/${organisation._id}`,
+          body: { customFieldsPersons: newCustomFieldsPersons },
+        })
+      );
+      if (!error) {
         toast.success("Mise à jour !");
         setOrganisation(response.data);
         refresh();
@@ -253,16 +265,18 @@ const ConsultationCustomField = ({ item: customField, groupTitle: typeName }) =>
     setIsEditingField(false);
     const updatedPersons = replaceOldChoiceByNewChoice(allPersons, oldChoice, newChoice, field);
 
-    const response = await API.post({
-      path: "/custom-field",
-      body: {
-        customFields: {
-          customFieldsPersons: newCustomFieldsPersons,
+    const [error, response] = await tryFetchExpectOk(async () =>
+      API.post({
+        path: "/custom-field",
+        body: {
+          customFields: {
+            customFieldsPersons: newCustomFieldsPersons,
+          },
+          persons: await Promise.all(updatedPersons.map(encryptPerson)),
         },
-        persons: await Promise.all(updatedPersons.map(preparePersonForEncryption).map(encryptItem)),
-      },
-    });
-    if (response.ok) {
+      })
+    );
+    if (!error) {
       toast.success("Choix mis à jour !");
       setOrganisation(response.data);
     }
@@ -278,11 +292,13 @@ const ConsultationCustomField = ({ item: customField, groupTitle: typeName }) =>
           fields: type.fields.filter((field) => field.name !== customField.name),
         };
       });
-      const response = await API.put({
-        path: `/organisation/${organisation._id}`,
-        body: { customFieldsPersons: newCustomFieldsPersons },
-      });
-      if (response.ok) {
+      const [error, response] = await tryFetchExpectOk(async () =>
+        API.put({
+          path: `/organisation/${organisation._id}`,
+          body: { customFieldsPersons: newCustomFieldsPersons },
+        })
+      );
+      if (!error) {
         toast.success("Mise à jour !");
         setOrganisation(response.data);
         refresh();

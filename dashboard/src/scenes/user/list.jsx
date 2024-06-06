@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useRecoilValue } from "recoil";
 import { teamsState, userState } from "../../recoil/auth";
-import API from "../../services/api";
+import API, { tryFetchExpectOk } from "../../services/api";
 import { formatDateWithFullMonth } from "../../services/date";
 import useTitle from "../../services/useTitle";
 import { useLocalStorage } from "../../services/useLocalStorage";
@@ -13,7 +13,7 @@ import Loading from "../../components/loading";
 import Table from "../../components/table";
 import TagTeam from "../../components/TagTeam";
 import SelectRole from "../../components/SelectRole";
-import { emailRegex } from "../../utils";
+import { emailRegex, errorMessage } from "../../utils";
 import dayjs from "dayjs";
 
 const defaultSort = (a, b, sortOrder) => (sortOrder === "ASC" ? (a.name || "").localeCompare(b.name) : (b.name || "").localeCompare(a.name));
@@ -81,9 +81,9 @@ const List = () => {
   );
 
   useEffect(() => {
-    API.get({ path: "/user" }).then((response) => {
-      if (response.error) {
-        toast.error(response.error);
+    tryFetchExpectOk(async () => API.get({ path: "/user" })).then(([error, response]) => {
+      if (error) {
+        toast.error(errorMessage(error));
         return false;
       }
       setUsers(response.data);
@@ -232,9 +232,10 @@ const Create = ({ onChange, users }) => {
         return false;
       }
       setIsSubmitting(true);
-      const { ok } = await API.post({ path: "/user", body: data });
+      const [error] = await tryFetchExpectOk(async () => API.post({ path: "/user", body: data }));
       setIsSubmitting(false);
-      if (!ok) {
+      if (error) {
+        toast.error(errorMessage(error));
         return false;
       }
       toast.success("Création réussie !");

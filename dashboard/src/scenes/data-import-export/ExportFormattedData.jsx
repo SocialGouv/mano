@@ -5,7 +5,7 @@ import { personFieldsIncludingCustomFieldsSelector, personsState } from "../../r
 import { utils, writeFile } from "@e965/xlsx";
 import { dayjsInstance } from "../../services/date";
 import { teamsState, userState } from "../../recoil/auth";
-import API from "../../services/api";
+import API, { tryFetchExpectOk } from "../../services/api";
 import { customFieldsObsSelector } from "../../recoil/territoryObservations";
 import { territoriesState } from "../../recoil/territory";
 import { consultationFieldsSelector } from "../../recoil/consultations";
@@ -23,8 +23,8 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
 
   async function fetchUsers() {
     if (users.length) return users;
-    const response = await API.get({ path: "/user" });
-    if (response.data) {
+    const [error, response] = await tryFetchExpectOk(async () => API.get({ path: "/user" }));
+    if (!error && response?.data) {
       setUsers(response.data);
       return response.data;
     }

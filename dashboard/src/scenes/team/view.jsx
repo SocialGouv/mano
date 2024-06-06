@@ -9,7 +9,7 @@ import Loading from "../../components/loading";
 import ButtonCustom from "../../components/ButtonCustom";
 import NightSessionModale from "../../components/NightSessionModale";
 import { currentTeamState, teamsState } from "../../recoil/auth";
-import API from "../../services/api";
+import API, { tryFetch, tryFetchExpectOk } from "../../services/api";
 import { useRecoilState, useRecoilValue } from "recoil";
 import useTitle from "../../services/useTitle";
 import DeleteButtonAndConfirmModal from "../../components/DeleteButtonAndConfirmModal";
@@ -21,6 +21,7 @@ import { personsState } from "../../recoil/persons";
 import { passagesState } from "../../recoil/passages";
 import { rencontresState } from "../../recoil/rencontres";
 import BackButton from "../../components/backButton";
+import { errorMessage } from "../../utils";
 
 const View = () => {
   const [team, setTeam] = useState(null);
@@ -59,8 +60,12 @@ const View = () => {
   const [teams, setTeams] = useRecoilState(teamsState);
 
   const getTeam = async () => {
-    const { data } = await API.get({ path: `/team/${id}` });
-    setTeam(data);
+    const [error, response] = await tryFetchExpectOk(async () => API.get({ path: `/team/${id}` }));
+    if (error) {
+      toast.error(errorMessage(error));
+      return;
+    }
+    setTeam(response.data);
   };
 
   useEffect(() => {
@@ -79,21 +84,17 @@ const View = () => {
         initialValues={team}
         enableReinitialize
         onSubmit={async (body) => {
-          try {
-            const response = await API.put({ path: `/team/${team._id}`, body });
-            if (response.ok) {
-              toast.success("Mise à jour !");
-              setTeams(
-                teams.map((t) => {
-                  if (t._id !== id) return t;
-                  return response.data;
-                })
-              );
-              if (currentTeam._id === id) setCurrentTeam(response.data);
-            }
-          } catch (errorUpdatingTeam) {
-            console.log("error in updating team", errorUpdatingTeam);
-            toast.error(errorUpdatingTeam.message);
+          const [error, response] = await tryFetchExpectOk(async () => API.put({ path: `/team/${team._id}`, body }));
+          if (error) return toast.error(errorMessage(error));
+          if (!error) {
+            toast.success("Mise à jour !");
+            setTeams(
+              teams.map((t) => {
+                if (t._id !== id) return t;
+                return response.data;
+              })
+            );
+            if (currentTeam._id === id) setCurrentTeam(response.data);
           }
         }}
       >
@@ -135,8 +136,10 @@ const View = () => {
                   // disabled={teams.length === 1}
                   // disabledTitle="Vous ne pouvez pas supprimer la dernière équipe"
                   onConfirm={async () => {
-                    const res = await API.delete({ path: `/team/${id}` });
-                    if (!res.ok) return;
+                    const [error] = await tryFetch(async () => await API.delete({ path: `/team/${id}` }));
+                    if (error) {
+                      return toast.error(errorMessage(error));
+                    }
                     setTeams(teams.filter((t) => t._id !== id));
                     toast.success("Suppression réussie");
                     history.goBack();

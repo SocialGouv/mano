@@ -5,8 +5,8 @@ import { useHistory, useLocation } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { organisationState, userState } from "../../../recoil/auth";
 import { dayjsInstance, outOfBoundariesDate } from "../../../services/date";
-import API from "../../../services/api";
-import { allowedTreatmentFieldsInHistory, prepareTreatmentForEncryption } from "../../../recoil/treatments";
+import API, { tryFetchExpectOk } from "../../../services/api";
+import { allowedTreatmentFieldsInHistory, prepareTreatmentForEncryption, encryptTreatment } from "../../../recoil/treatments";
 import DatePicker from "../../../components/DatePicker";
 import { CommentsModule } from "../../../components/CommentsGeneric";
 import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from "../../../components/tailwind/Modal";
@@ -18,6 +18,8 @@ import { DocumentsModule } from "../../../components/DocumentsGeneric";
 import TabsNav from "../../../components/tailwind/TabsNav";
 import PersonName from "../../../components/PersonName";
 import { useDataLoader } from "../../../components/DataLoader";
+import { errorMessage } from "../../../utils";
+import { decryptItem } from "../../../services/encryption";
 
 export default function TreatmentModal() {
   const treatmentsObjects = useRecoilValue(itemsGroupedByTreatmentSelector);
@@ -170,20 +172,23 @@ function TreatmentContent({ onClose, treatment, personId }) {
       }
     }
 
-    const treatmentResponse = isNewTreatment
-      ? await API.post({
-          path: "/treatment",
-          body: prepareTreatmentForEncryption(body),
-        })
-      : await API.put({
-          path: `/treatment/${data._id}`,
-          body: prepareTreatmentForEncryption({ ...body, user: data.user || user._id }),
-        });
-    if (!treatmentResponse.ok) {
-      toast.error("Impossible d'enregistrer le traitement. Notez toutes les informations et contactez le support.");
+    const [error, treatmentResponse] = await tryFetchExpectOk(async () =>
+      isNewTreatment
+        ? API.post({
+            path: "/treatment",
+            body: await encryptTreatment(body),
+          })
+        : API.put({
+            path: `/treatment/${data._id}`,
+            body: await encryptTreatment({ ...body, user: data.user || user._id }),
+          })
+    );
+    if (error) {
+      toast.error(errorMessage(error));
       return false;
     }
-    setData(treatmentResponse.decryptedData);
+    const decryptedData = await decryptItem(treatmentResponse.data);
+    setData(decryptedData);
     await refresh();
     if (closeOnSubmit) onClose();
     return true;
@@ -454,8 +459,11 @@ function TreatmentContent({ onClose, treatment, personId }) {
             onClick={async (e) => {
               e.stopPropagation();
               if (!window.confirm("Voulez-vous supprimer ce traitement ?")) return;
-              const response = await API.delete({ path: `/treatment/${treatment._id}` });
-              if (!response.ok) return;
+              const [error] = await tryFetchExpectOk(async () => API.delete({ path: `/treatment/${treatment._id}` }));
+              if (error) {
+                toast.error(errorMessage(error));
+                return;
+              }
               await refresh();
               toast.success("Traitement supprimé !");
               onClose();

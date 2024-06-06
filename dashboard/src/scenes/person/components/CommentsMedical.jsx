@@ -1,9 +1,9 @@
 import { useMemo } from "react";
 import { useRecoilValue } from "recoil";
 import { v4 as uuidv4 } from "uuid";
-import { customFieldsMedicalFileSelector, prepareMedicalFileForEncryption } from "../../../recoil/medicalFiles";
+import { customFieldsMedicalFileSelector, prepareMedicalFileForEncryption, encryptMedicalFile } from "../../../recoil/medicalFiles";
 import { CommentsModule } from "../../../components/CommentsGeneric";
-import API from "../../../services/api";
+import API, { tryFetchExpectOk } from "../../../services/api";
 import { toast } from "react-toastify";
 import { useDataLoader } from "../../../components/DataLoader";
 
@@ -30,11 +30,16 @@ const CommentsMedical = ({ person }) => {
             ...medicalFile,
             comments: medicalFile.comments.filter((c) => c._id !== comment._id),
           };
-          const response = await API.put({
-            path: `/medical-file/${medicalFile._id}`,
-            body: prepareMedicalFileForEncryption(customFieldsMedicalFile)(newMedicalFile),
-          });
-          if (!response.ok) return;
+          const [error] = await tryFetchExpectOk(async () =>
+            API.put({
+              path: `/medical-file/${medicalFile._id}`,
+              body: await encryptMedicalFile(customFieldsMedicalFile)(newMedicalFile),
+            })
+          );
+          if (error) {
+            toast.error("Erreur lors de la suppression du commentaire");
+            return;
+          }
           toast.success("Commentaire supprimé");
           await refresh();
         }}
@@ -50,11 +55,16 @@ const CommentsMedical = ({ person }) => {
                   return c;
                 }),
           };
-          const response = await API.put({
-            path: `/medical-file/${medicalFile._id}`,
-            body: prepareMedicalFileForEncryption(customFieldsMedicalFile)(newMedicalFile),
-          });
-          if (!response.ok) return;
+          const [error] = await tryFetchExpectOk(async () =>
+            API.put({
+              path: `/medical-file/${medicalFile._id}`,
+              body: await encryptMedicalFile(customFieldsMedicalFile)(newMedicalFile),
+            })
+          );
+          if (error) {
+            toast.error("Erreur lors de l'enregistrement du commentaire");
+            return;
+          }
           toast.success("Commentaire enregistré");
           await refresh();
         }}

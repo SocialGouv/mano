@@ -1,9 +1,9 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useDataLoader } from "../../components/DataLoader";
-import { actionsCategoriesSelector, flattenedActionsCategoriesSelector, actionsState, prepareActionForEncryption } from "../../recoil/actions";
+import { actionsCategoriesSelector, flattenedActionsCategoriesSelector, actionsState, encryptAction } from "../../recoil/actions";
 import { organisationState, userState } from "../../recoil/auth";
-import API, { encryptItem } from "../../services/api";
+import API, { tryFetchExpectOk } from "../../services/api";
 import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from "../../components/tailwind/Modal";
 import { toast } from "react-toastify";
 import DragAndDropSettings from "./DragAndDropSettings";
@@ -21,11 +21,13 @@ const ActionCategoriesSettings = () => {
   const { refresh } = useDataLoader();
 
   const onAddGroup = async (groupTitle) => {
-    const res = await API.put({
-      path: `/organisation/${organisation._id}`,
-      body: { actionsGroupedCategories: [...actionsGroupedCategories, { groupTitle, categories: [] }] },
-    });
-    if (res.ok) {
+    const [error, res] = await tryFetchExpectOk(async () =>
+      API.put({
+        path: `/organisation/${organisation._id}`,
+        body: { actionsGroupedCategories: [...actionsGroupedCategories, { groupTitle, categories: [] }] },
+      })
+    );
+    if (!error) {
       toast.success("Groupe ajouté", { autoclose: 2000 });
       setOrganisation(res.data);
     }
@@ -44,13 +46,15 @@ const ActionCategoriesSettings = () => {
     const oldOrganisation = organisation;
     setOrganisation({ ...organisation, actionsGroupedCategories: newActionsGroupedCategories }); // optimistic UI
 
-    const response = await API.put({
-      path: `/category`,
-      body: {
-        actionsGroupedCategories: newActionsGroupedCategories,
-      },
-    });
-    if (response.ok) {
+    const [error, response] = await tryFetchExpectOk(async () =>
+      API.put({
+        path: `/category`,
+        body: {
+          actionsGroupedCategories: newActionsGroupedCategories,
+        },
+      })
+    );
+    if (!error) {
       refresh();
       setOrganisation(response.data);
       toast.success("Groupe mis à jour. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
@@ -65,13 +69,15 @@ const ActionCategoriesSettings = () => {
     const oldOrganisation = organisation;
     setOrganisation({ ...organisation, actionsGroupedCategories: newActionsGroupedCategories }); // optimistic UI
 
-    const response = await API.put({
-      path: `/category`,
-      body: {
-        actionsGroupedCategories: newActionsGroupedCategories,
-      },
-    });
-    if (response.ok) {
+    const [error, response] = await tryFetchExpectOk(async () =>
+      API.put({
+        path: `/category`,
+        body: {
+          actionsGroupedCategories: newActionsGroupedCategories,
+        },
+      })
+    );
+    if (!error) {
       refresh();
       setOrganisation(response.data);
       toast.success("Catégorie supprimée. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
@@ -83,11 +89,13 @@ const ActionCategoriesSettings = () => {
   const onDragAndDrop = useCallback(
     async (newGroups) => {
       newGroups = newGroups.map((group) => ({ groupTitle: group.groupTitle, categories: group.items }));
-      const res = await API.put({
-        path: `/organisation/${organisation._id}`,
-        body: { actionsGroupedCategories: newGroups },
-      });
-      if (res.ok) {
+      const [error, res] = await tryFetchExpectOk(async () =>
+        API.put({
+          path: `/organisation/${organisation._id}`,
+          body: { actionsGroupedCategories: newGroups },
+        })
+      );
+      if (!error) {
         setOrganisation(res.data);
         refresh();
       }
@@ -135,14 +143,16 @@ const AddCategory = ({ groupTitle }) => {
 
     const oldOrganisation = organisation;
     setOrganisation({ ...organisation, actionsGroupedCategories: newActionsGroupedCategories }); // optimistic UI
-    const response = await API.put({
-      path: `/category`,
-      body: {
-        actionsGroupedCategories: newActionsGroupedCategories,
-      },
-    });
-    if (response.ok) {
-      setOrganisation(response.data);
+    const [error, res] = await tryFetchExpectOk(async () =>
+      API.put({
+        path: `/category`,
+        body: {
+          actionsGroupedCategories: newActionsGroupedCategories,
+        },
+      })
+    );
+    if (!error) {
+      setOrganisation(res.data);
       toast.success("Catégorie ajoutée. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
     } else {
       setOrganisation(oldOrganisation);
@@ -193,8 +203,7 @@ const Category = ({ item: category, groupTitle }) => {
           ...action,
           categories: [...new Set(action.categories.map((cat) => (cat === oldCategory ? newCategory.trim() : cat)))],
         }))
-        .map((action) => prepareActionForEncryption({ ...action, user: action.user || user._id }))
-        .map(encryptItem)
+        .map((action) => encryptAction({ ...action, user: action.user || user._id }))
     );
     const newActionsGroupedCategories = actionsGroupedCategories.map((group) => {
       if (group.groupTitle !== groupTitle) return group;
@@ -206,16 +215,18 @@ const Category = ({ item: category, groupTitle }) => {
     const oldOrganisation = organisation;
     setOrganisation({ ...organisation, actionsGroupedCategories: newActionsGroupedCategories }); // optimistic UI
 
-    const response = await API.put({
-      path: `/category`,
-      body: {
-        actionsGroupedCategories: newActionsGroupedCategories,
-        actions: encryptedActions,
-      },
-    });
-    if (response.ok) {
+    const [error, res] = await tryFetchExpectOk(async () =>
+      API.put({
+        path: `/category`,
+        body: {
+          actionsGroupedCategories: newActionsGroupedCategories,
+          actions: encryptedActions,
+        },
+      })
+    );
+    if (!error) {
       refresh();
-      setOrganisation(response.data);
+      setOrganisation(res.data);
       setIsEditingCategory(false);
       toast.success("Catégorie mise à jour. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
     } else {
@@ -235,16 +246,18 @@ const Category = ({ item: category, groupTitle }) => {
     const oldOrganisation = organisation;
     setOrganisation({ ...organisation, actionsGroupedCategories: newActionsGroupedCategories }); // optimistic UI
 
-    const response = await API.put({
-      path: `/category`,
-      body: {
-        actionsGroupedCategories: newActionsGroupedCategories,
-      },
-    });
-    if (response.ok) {
+    const [error, res] = await tryFetchExpectOk(async () =>
+      API.put({
+        path: `/category`,
+        body: {
+          actionsGroupedCategories: newActionsGroupedCategories,
+        },
+      })
+    );
+    if (!error) {
       refresh();
       setIsEditingCategory(false);
-      setOrganisation(response.data);
+      setOrganisation(res.data);
       toast.success("Catégorie supprimée. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
     } else {
       setOrganisation(oldOrganisation);

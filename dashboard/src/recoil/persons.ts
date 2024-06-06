@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { capture } from "../services/sentry";
 import type { PersonInstance } from "../types/person";
 import type { PredefinedField, CustomField, CustomOrPredefinedField, Filter } from "../types/field";
+import { encryptItem } from "../services/encryption";
 
 const collectionName = "person";
 export const personsState = atom<PersonInstance[]>({
@@ -219,7 +220,10 @@ export const usePreparePersonForEncryption = () => {
       entityKey: person.entityKey,
     };
   };
-  return preparePersonForEncryption;
+  const encryptPerson = (person: PersonInstance, { checkRequiredFields = true } = {}) => {
+    return encryptItem(preparePersonForEncryption(person, { checkRequiredFields }));
+  };
+  return { encryptPerson, preparePersonForEncryption };
 };
 
 type SortOrder = "ASC" | "DESC";

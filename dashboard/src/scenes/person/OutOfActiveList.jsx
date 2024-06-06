@@ -6,7 +6,7 @@ import { useRecoilValue } from "recoil";
 import { userState } from "../../recoil/auth";
 import ButtonCustom from "../../components/ButtonCustom";
 import { fieldsPersonsCustomizableOptionsSelector, usePreparePersonForEncryption } from "../../recoil/persons";
-import API from "../../services/api";
+import API, { tryFetchExpectOk } from "../../services/api";
 import { outOfBoundariesDate } from "../../services/date";
 import SelectCustom from "../../components/SelectCustom";
 import DatePicker from "../../components/DatePicker";
@@ -17,7 +17,7 @@ const OutOfActiveList = ({ person }) => {
   const [open, setOpen] = useState(false);
   const { refresh } = useDataLoader();
 
-  const preparePersonForEncryption = usePreparePersonForEncryption();
+  const { encryptPerson } = usePreparePersonForEncryption();
   const user = useRecoilValue(userState);
 
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
@@ -34,11 +34,13 @@ const OutOfActiveList = ({ person }) => {
     };
 
     const history = [...(cleanHistory(person.history) || []), historyEntry];
-    const response = await API.put({
-      path: `/person/${person._id}`,
-      body: preparePersonForEncryption({ ...person, outOfActiveList: false, outOfActiveListReasons: [], outOfActiveListDate: null, history }),
-    });
-    if (response.ok) {
+    const [error] = await tryFetchExpectOk(async () =>
+      API.put({
+        path: `/person/${person._id}`,
+        body: await encryptPerson({ ...person, outOfActiveList: false, outOfActiveListReasons: [], outOfActiveListDate: null, history }),
+      })
+    );
+    if (!error) {
       await refresh();
       toast.success(person.name + " est réintégré dans la file active");
     }
@@ -61,11 +63,13 @@ const OutOfActiveList = ({ person }) => {
     };
 
     updatedPerson.history = [...(cleanHistory(person.history) || []), historyEntry];
-    const response = await API.put({
-      path: `/person/${person._id}`,
-      body: preparePersonForEncryption(updatedPerson),
-    });
-    if (response.ok) {
+    const [error] = await tryFetchExpectOk(async () =>
+      API.put({
+        path: `/person/${person._id}`,
+        body: await encryptPerson(updatedPerson),
+      })
+    );
+    if (!error) {
       await refresh();
       toast.success(person.name + " est hors de la file active");
     }

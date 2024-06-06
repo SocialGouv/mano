@@ -12,9 +12,9 @@ import { actionsState, TODO } from "../../recoil/actions";
 import { currentTeamState, userState, organisationState } from "../../recoil/auth";
 import { personsState } from "../../recoil/persons";
 import { selector, selectorFamily, useRecoilValue, useSetRecoilState } from "recoil";
-import API from "../../services/api";
+import API, { tryFetchExpectOk } from "../../services/api";
 import dayjs from "dayjs";
-import { passagesState, preparePassageForEncryption } from "../../recoil/passages";
+import { passagesState, preparePassageForEncryption, encryptPassage } from "../../recoil/passages";
 import useTitle from "../../services/useTitle";
 import { capture } from "../../services/sentry";
 import { consultationsState } from "../../recoil/consultations";
@@ -150,35 +150,33 @@ const Reception = () => {
       date: new Date(),
       optimisticId,
     };
-    const response = await API.post({ path: "/passage", body: preparePassageForEncryption(newPassage) });
+    const response = await API.post({ path: "/passage", body: await encryptPassage(newPassage) });
     if (response.ok) {
       await refresh();
     }
   };
 
   const onAddPassageForPersons = async () => {
-    try {
-      if (!selectedPersons.length) return;
-      setAddingPassage(true);
-      const newPassages = [];
-      for (const [index, person] of Object.entries(selectedPersons)) {
-        newPassages.push({
-          person: person._id,
-          user: user._id,
-          team: currentTeam._id,
-          date: new Date(),
-          optimisticId: index,
-        });
-      }
-      for (const [, passage] of Object.entries(newPassages)) {
-        await API.post({ path: "/passage", body: preparePassageForEncryption(passage) });
-      }
-      await refresh();
-      setAddingPassage(false);
-    } catch (e) {
-      capture(e, { extra: { selectedPersons: selectedPersons.map((p) => p._id), currentTeam }, user });
-      toast.error("Désolé une erreur est survenue, l'équipe technique est prévenue");
+    if (!selectedPersons.length) return;
+    setAddingPassage(true);
+    const newPassages = [];
+    for (const [index, person] of Object.entries(selectedPersons)) {
+      newPassages.push({
+        person: person._id,
+        user: user._id,
+        team: currentTeam._id,
+        date: new Date(),
+        optimisticId: index,
+      });
     }
+    for (const [, passage] of Object.entries(newPassages)) {
+      const [error] = await tryFetchExpectOk(async () => API.post({ path: "/passage", body: await encryptPassage(passage) }));
+      if (error) {
+        toast.error("Un passage n'a pas pu être enregistré.");
+      }
+    }
+    await refresh();
+    setAddingPassage(false);
   };
 
   return (

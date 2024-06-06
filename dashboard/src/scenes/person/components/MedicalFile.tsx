@@ -10,6 +10,7 @@ import MergeTwoPersons from "../MergeTwoPersons";
 import { flattenedCustomFieldsPersonsSelector } from "../../../recoil/persons";
 import {
   customFieldsMedicalFileSelector,
+  encryptMedicalFile,
   groupedCustomFieldsMedicalFileSelector,
   prepareMedicalFileForEncryption,
 } from "../../../recoil/medicalFiles";
@@ -17,12 +18,13 @@ import { Treatments } from "./Treatments";
 import { useEffect, useMemo } from "react";
 import PersonDocumentsMedical from "./PersonDocumentsMedical";
 import { MedicalFilePrint } from "./MedicalFilePrint";
-import API from "../../../services/api";
+import API, { tryFetchExpectOk } from "../../../services/api";
 import CommentsMedical from "./CommentsMedical";
 import type { PersonPopulated } from "../../../types/person";
 import type { CustomField, CustomFieldsGroup } from "../../../types/field";
 import Constantes from "./Constantes";
 import { useDataLoader } from "../../../components/DataLoader";
+import { toast } from "react-toastify";
 
 interface MedicalFileProps {
   person: PersonPopulated;
@@ -67,17 +69,23 @@ export default function MedicalFile({ person }: MedicalFileProps) {
 
   useEffect(() => {
     if (!medicalFile) {
-      API.post({
-        path: "/medical-file",
-        body: prepareMedicalFileForEncryption(flatCustomFieldsMedicalFile)({
-          person: person._id,
-          documents: [],
-          organisation: organisation._id,
-        }),
-      }).then((response) => {
-        if (!response.ok) return;
-        refresh();
-      });
+      encryptMedicalFile(flatCustomFieldsMedicalFile)({
+        person: person._id,
+        documents: [],
+        organisation: organisation._id,
+      }).then((body) =>
+        tryFetchExpectOk(async () =>
+          API.post({
+            path: "/medical-file",
+            body,
+          })
+        ).then(([error]) => {
+          if (error) {
+            toast.error("Erreur lors de la création du dossier médical");
+          }
+          refresh();
+        })
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [medicalFile]);

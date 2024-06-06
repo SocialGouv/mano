@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
-import API from "../services/api";
+import API, { tryFetchExpectOk } from "../services/api";
 import { capture } from "../services/sentry";
+import { toast } from "react-toastify";
 
 export default function IncrementorSmall({ service, team, date, count: initialValue, onUpdated, dataTestId, disabled = false, className = "" }) {
   const debounced = useDebouncedCallback(
@@ -10,8 +11,12 @@ export default function IncrementorSmall({ service, team, date, count: initialVa
       if (!date || !team || date === "undefined") {
         return capture("Missing params for initServices in IncrementorSmall", { extra: { date, team, service, initialValue } });
       }
-      API.post({ path: `/service/team/${team}/date/${date}`, body: { count: value, service } }).then((res) => {
-        if (res.ok) onUpdated(res.data.count);
+
+      tryFetchExpectOk(async () => API.post({ path: `/service/team/${team}/date/${date}`, body: { count: value, service } })).then(([error, res]) => {
+        if (error) {
+          return toast.error("Erreur lors de la mise à jour du service");
+        }
+        onUpdated(res.data.count);
       });
     },
     import.meta.env.TEST === "true" ? 0 : 1000,

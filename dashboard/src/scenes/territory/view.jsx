@@ -5,7 +5,7 @@ import Loading from "../../components/loading";
 import Observations from "../territory-observations/list";
 import { territoriesState } from "../../recoil/territory";
 import { useRecoilState, useRecoilValue } from "recoil";
-import API from "../../services/api";
+import API, { tryFetchExpectOk } from "../../services/api";
 import useTitle from "../../services/useTitle";
 import DeleteButtonAndConfirmModal from "../../components/DeleteButtonAndConfirmModal";
 import { userState } from "../../recoil/auth";
@@ -73,8 +73,8 @@ const View = () => {
                 title={`Voulez-vous vraiment supprimer le territoire ${territory.name}`}
                 textToConfirm={territory.name}
                 onConfirm={async () => {
-                  const res = await API.delete({ path: `/territory/${id}` });
-                  if (res.ok) {
+                  const [error] = await tryFetchExpectOk(async () => API.delete({ path: `/territory/${id}` }));
+                  if (!error) {
                     await refresh();
                     toast.success("Suppression réussie");
                     history.goBack();

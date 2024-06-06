@@ -1,4 +1,4 @@
-const isNullOrUndefined = (value) => {
+export const isNullOrUndefined = (value) => {
   if (typeof value === "undefined") return true;
   if (value === null) return true;
   return false;
@@ -32,7 +32,7 @@ export const newCustomField = () => ({
 });
 
 // Download a file in browser.
-function download(file, fileName) {
+export function download(file, fileName) {
   if (window.navigator.msSaveOrOpenBlob) {
     //IE11 & Edge
     window.navigator.msSaveOrOpenBlob(file, fileName);
@@ -47,7 +47,7 @@ function download(file, fileName) {
 }
 
 // https://gist.github.com/abbotto/1e9f275877cef9408e60
-async function viewBlobInNewWindow(url) {
+export async function viewBlobInNewWindow(url) {
   const response = await fetch(url);
 
   if (!response.ok) {
@@ -66,4 +66,10 @@ async function viewBlobInNewWindow(url) {
   }
 }
 
-export { download, isNullOrUndefined, viewBlobInNewWindow };
+export function errorMessage(e) {
+  const message = e?.message || e;
+  if (message === "Failed to fetch") {
+    return "Impossible de transmettre les données. Veuillez vérifier votre connexion internet.";
+  }
+  return message;
+}

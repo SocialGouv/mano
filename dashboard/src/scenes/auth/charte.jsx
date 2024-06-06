@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useRecoilState } from "recoil";
 import ButtonCustom from "../../components/ButtonCustom";
 import { userState } from "../../recoil/auth";
-import API from "../../services/api";
+import API, { tryFetchExpectOk } from "../../services/api";
 import OpenNewWindowIcon from "../../components/OpenNewWindowIcon";
 
 const Charte = () => {
@@ -12,8 +12,8 @@ const Charte = () => {
   const onSigninValidated = async () => {
     setLoading(true);
     const termsAccepted = Date.now();
-    const response = await API.put({ path: "/user", body: { termsAccepted } });
-    if (!response.ok) return;
+    const [error] = await tryFetchExpectOk(async () => API.put({ path: "/user", body: { termsAccepted } }));
+    if (error) return;
     setUser({ ...user, termsAccepted });
   };
 

@@ -2,11 +2,12 @@ import React, { useState, useCallback, useMemo } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useDataLoader } from "../../components/DataLoader";
 import { organisationState } from "../../recoil/auth";
-import API, { encryptItem } from "../../services/api";
+import API, { tryFetchExpectOk } from "../../services/api";
 import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from "../../components/tailwind/Modal";
 import { toast } from "react-toastify";
 import DragAndDropSettings from "./DragAndDropSettings";
 import { prepareReportForEncryption, reportsState } from "../../recoil/reports";
+import { encryptItem } from "../../services/encryption";
 
 function CollaborationsSettings() {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
@@ -23,12 +24,14 @@ function CollaborationsSettings() {
 
   const onDragAndDrop = useCallback(
     async (newGroups) => {
-      const res = await API.put({
-        path: `/organisation/${organisation._id}`,
-        body: { collaborations: newGroups[0].items },
-      });
-      if (res.ok) {
-        setOrganisation(res.data);
+      const [error, response] = await tryFetchExpectOk(async () =>
+        API.put({
+          path: `/organisation/${organisation._id}`,
+          body: { collaborations: newGroups[0].items },
+        })
+      );
+      if (!error) {
+        setOrganisation(response.data);
         refresh();
       }
     },
@@ -60,14 +63,16 @@ const AddCollaboration = ({ groupTitle }) => {
 
     const oldOrganisation = organisation;
     setOrganisation({ ...organisation, collaborations: newCollaborations }); // optimistic UI
-    const response = await API.put({
-      path: `/organisation/${organisation._id}`,
-      body: {
-        collaborations: newCollaborations,
-      },
-    });
+    const [error, response] = await tryFetchExpectOk(async () =>
+      API.put({
+        path: `/organisation/${organisation._id}`,
+        body: {
+          collaborations: newCollaborations,
+        },
+      })
+    );
 
-    if (response.ok) {
+    if (!error) {
       setOrganisation(response.data);
       toast.success("Co-intervention ajoutée. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
     } else {
@@ -120,14 +125,17 @@ const Collaboration = ({ item: collaboration }) => {
         .map(encryptItem)
     );
 
-    const response = await API.put({
-      path: `/collaboration`,
-      body: {
-        collaborations: newCollaborations,
-        reports: encryptedReports,
-      },
-    });
-    if (response.ok) {
+    const [error, response] = await tryFetchExpectOk(
+      async () =>
+        await API.put({
+          path: `/collaboration`,
+          body: {
+            collaborations: newCollaborations,
+            reports: encryptedReports,
+          },
+        })
+    );
+    if (!error) {
       await refresh();
       setOrganisation(response.data);
       setIsEditingCollaboration(false);
@@ -143,13 +151,15 @@ const Collaboration = ({ item: collaboration }) => {
     const oldOrganisation = organisation;
     setOrganisation({ ...organisation, collaborations: newCollaborations }); // optimistic UI
 
-    const response = await API.put({
-      path: `/organisation/${organisation._id}`,
-      body: {
-        collaborations: newCollaborations,
-      },
-    });
-    if (response.ok) {
+    const [error, response] = await tryFetchExpectOk(async () =>
+      API.put({
+        path: `/organisation/${organisation._id}`,
+        body: {
+          collaborations: newCollaborations,
+        },
+      })
+    );
+    if (!error) {
       refresh();
       setIsEditingCollaboration(false);
       setOrganisation(response.data);

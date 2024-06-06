@@ -3,26 +3,21 @@ import { Col, FormGroup, Row, Label } from "reactstrap";
 import { Formik } from "formik";
 import { toast } from "react-toastify";
 
-import {
-  customFieldsObsSelector,
-  groupedCustomFieldsObsSelector,
-  prepareObsForEncryption,
-  territoryObservationsState,
-} from "../recoil/territoryObservations";
+import { customFieldsObsSelector, encryptObs, groupedCustomFieldsObsSelector } from "../recoil/territoryObservations";
 import SelectTeam from "./SelectTeam";
 import ButtonCustom from "./ButtonCustom";
 import SelectCustom from "./SelectCustom";
 import CustomFieldInput from "./CustomFieldInput";
 import { currentTeamState, teamsState, userState } from "../recoil/auth";
 import { territoriesState } from "../recoil/territory";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 import { dayjsInstance, outOfBoundariesDate } from "../services/date";
-import API from "../services/api";
+import API, { tryFetchExpectOk } from "../services/api";
 import DatePicker from "./DatePicker";
 import { ModalBody, ModalContainer, ModalHeader, ModalFooter } from "./tailwind/Modal";
 import SelectAndCreatePerson from "../scenes/reception/SelectAndCreatePerson";
 import Rencontre from "./Rencontre";
-import { prepareRencontreForEncryption, rencontresState } from "../recoil/rencontres";
+import { encryptRencontre, rencontresState } from "../recoil/rencontres";
 import { useLocalStorage } from "../services/useLocalStorage";
 import DateBloc, { TimeBlock } from "./DateBloc";
 import PersonName from "./PersonName";
@@ -39,13 +34,11 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
   const territories = useRecoilValue(territoriesState);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
   const groupedCustomFieldsObs = useRecoilValue(groupedCustomFieldsObsSelector);
-  const setTerritoryObservations = useSetRecoilState(territoryObservationsState);
   const fieldsGroupNames = groupedCustomFieldsObs.map((f) => f.name).filter((f) => f);
   const [open, setOpen] = useState(false);
   const [rencontre, setRencontre] = useState(undefined);
   const [activeTab, setActiveTab] = useState(fieldsGroupNames[0]);
   const [rencontresInProgress, setRencontresInProgress] = useState([]);
-  const setRencontres = useSetRecoilState(rencontresState);
   const rencontres = useRecoilValue(rencontresState);
   const { refresh } = useDataLoader();
 
@@ -61,29 +54,33 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
   }, [forceOpen]);
 
   const addTerritoryObs = async (obs) => {
-    const res = await API.post({ path: "/territory-observation", body: prepareObsForEncryption(customFieldsObs)(obs) });
-    if (res.ok) {
+    const [error, response] = await tryFetchExpectOk(async () =>
+      API.post({ path: "/territory-observation", body: await encryptObs(customFieldsObs)(obs) })
+    );
+    if (!error) {
       await refresh();
     }
-    return res;
+    return response;
   };
 
   const updateTerritoryObs = async (obs) => {
-    const res = await API.put({ path: `/territory-observation/${obs._id}`, body: prepareObsForEncryption(customFieldsObs)(obs) });
-    if (res.ok) {
+    const [error, response] = await tryFetchExpectOk(async () =>
+      API.put({ path: `/territory-observation/${obs._id}`, body: await encryptObs(customFieldsObs)(obs) })
+    );
+    if (!error) {
       await refresh();
     }
-    return res;
+    return response;
   };
 
   const onDelete = async (id) => {
     const confirm = window.confirm("Êtes-vous sûr ?");
     if (confirm) {
-      const res = await API.delete({ path: `/territory-observation/${id}` });
-      if (res.ok) {
+      const [error] = await tryFetchExpectOk(async () => API.delete({ path: `/territory-observation/${id}` }));
+      if (!error) {
         await refresh();
       }
-      if (!res.ok) return;
+      if (error) return;
       toast.success("Suppression réussie");
       setOpen(false);
     }
@@ -123,11 +120,13 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
             if (res.data._id && rencontresInProgress.length > 0) {
               let rencontreSuccess = true;
               for (const rencontre of rencontresInProgress) {
-                const response = await API.post({
-                  path: "/rencontre",
-                  body: prepareRencontreForEncryption({ ...rencontre, observation: res.data._id }),
-                });
-                if (!response.ok) {
+                const [error] = await tryFetchExpectOk(async () =>
+                  API.post({
+                    path: "/rencontre",
+                    body: await encryptRencontre({ ...rencontre, observation: res.data._id }),
+                  })
+                );
+                if (error) {
                   rencontreSuccess = false;
                 }
               }

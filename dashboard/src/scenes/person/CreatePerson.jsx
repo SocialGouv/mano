@@ -9,7 +9,7 @@ import ButtonCustom from "../../components/ButtonCustom";
 import { currentTeamState, userState } from "../../recoil/auth";
 import { personsState, usePreparePersonForEncryption } from "../../recoil/persons";
 import { useRecoilState, useRecoilValue } from "recoil";
-import API from "../../services/api";
+import API, { tryFetchExpectOk } from "../../services/api";
 import SelectTeamMultiple from "../../components/SelectTeamMultiple";
 import dayjs from "dayjs";
 import { useDataLoader } from "../../components/DataLoader";
@@ -21,7 +21,7 @@ const CreatePerson = () => {
   const user = useRecoilValue(userState);
   const history = useHistory();
   const [persons] = useRecoilState(personsState);
-  const preparePersonForEncryption = usePreparePersonForEncryption();
+  const { encryptPerson } = usePreparePersonForEncryption();
 
   return (
     <>
@@ -45,11 +45,13 @@ const CreatePerson = () => {
               if (existingPerson) return toast.error("Une personne existe déjà à ce nom");
               body.followedSince = dayjs();
               body.user = user._id;
-              const response = await API.post({
-                path: "/person",
-                body: preparePersonForEncryption(body),
-              });
-              if (response.ok) {
+              const [error, response] = await tryFetchExpectOk(async () =>
+                API.post({
+                  path: "/person",
+                  body: await encryptPerson(body),
+                })
+              );
+              if (!error) {
                 await refresh();
                 toast.success("Création réussie !");
                 setOpen(false);

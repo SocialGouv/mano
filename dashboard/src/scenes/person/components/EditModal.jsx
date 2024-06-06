@@ -18,13 +18,9 @@ import { useMemo, useState } from "react";
 import ButtonCustom from "../../../components/ButtonCustom";
 import { Formik } from "formik";
 import { toast } from "react-toastify";
-import API from "../../../services/api";
+import API, { tryFetchExpectOk } from "../../../services/api";
 import DatePicker from "../../../components/DatePicker";
-import {
-  customFieldsMedicalFileSelector,
-  groupedCustomFieldsMedicalFileSelector,
-  prepareMedicalFileForEncryption,
-} from "../../../recoil/medicalFiles";
+import { customFieldsMedicalFileSelector, encryptMedicalFile, groupedCustomFieldsMedicalFileSelector } from "../../../recoil/medicalFiles";
 import { useDataLoader } from "../../../components/DataLoader";
 import { cleanHistory } from "../../../utils/person-history";
 
@@ -54,7 +50,7 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
     return c;
   }, [groupedCustomFieldsMedicalFile, flattenedCustomFieldsPersons]);
 
-  const preparePersonForEncryption = usePreparePersonForEncryption();
+  const { encryptPerson } = usePreparePersonForEncryption();
   const personFields = useRecoilValue(personFieldsSelector);
 
   return (
@@ -105,11 +101,13 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
               if (body[key] !== person[key]) historyEntry.data[key] = { oldValue: person[key], newValue: body[key] };
             }
             if (Object.keys(historyEntry.data).length) body.history = [...cleanHistory(person.history || []), historyEntry];
-            const response = await API.put({
-              path: `/person/${person._id}`,
-              body: preparePersonForEncryption(body),
-            });
-            if (response.ok) {
+            const [error] = await tryFetchExpectOk(async () =>
+              API.put({
+                path: `/person/${person._id}`,
+                body: await encryptPerson(body),
+              })
+            );
+            if (!error) {
               await refresh();
               toast.success("Mis à jour !");
               onClose();
@@ -344,11 +342,13 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                 bodyMedicalFile.history = [...(medicalFile.history || []), historyEntry];
               }
 
-              const mfResponse = await API.put({
-                path: `/medical-file/${medicalFile._id}`,
-                body: prepareMedicalFileForEncryption(flatCustomFieldsMedicalFile)({ ...medicalFile, ...bodyMedicalFile }),
-              });
-              let success = mfResponse.ok;
+              const [mfError] = await tryFetchExpectOk(async () =>
+                API.put({
+                  path: `/medical-file/${medicalFile._id}`,
+                  body: await encryptMedicalFile(flatCustomFieldsMedicalFile)({ ...medicalFile, ...bodyMedicalFile }),
+                })
+              );
+              let success = !mfError;
               if (success) {
                 await refresh();
               }
@@ -375,11 +375,13 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                 }
                 if (Object.keys(historyEntry.data).length) bodySocial.history = [...(person.history || []), historyEntry];
 
-                const personResponse = await API.put({
-                  path: `/person/${person._id}`,
-                  body: preparePersonForEncryption(bodySocial),
-                });
-                if (personResponse.ok) {
+                const [personError] = await tryFetchExpectOk(async () =>
+                  API.put({
+                    path: `/person/${person._id}`,
+                    body: await encryptPerson(bodySocial),
+                  })
+                );
+                if (!personError) {
                   await refresh();
                 } else {
                   success = false;

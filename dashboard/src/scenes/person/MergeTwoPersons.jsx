@@ -18,17 +18,18 @@ import SelectTeamMultiple from "../../components/SelectTeamMultiple";
 import UserName from "../../components/UserName";
 import Table from "../../components/table";
 import { currentTeamState, organisationState, teamsState, userState } from "../../recoil/auth";
-import API, { encryptItem } from "../../services/api";
-import { commentsState, prepareCommentForEncryption } from "../../recoil/comments";
-import { actionsState, prepareActionForEncryption } from "../../recoil/actions";
-import { passagesState, preparePassageForEncryption } from "../../recoil/passages";
-import { rencontresState, prepareRencontreForEncryption } from "../../recoil/rencontres";
+import API, { tryFetchExpectOk } from "../../services/api";
+import { commentsState, prepareCommentForEncryption, encryptComment } from "../../recoil/comments";
+import { actionsState, prepareActionForEncryption, encryptAction } from "../../recoil/actions";
+import { passagesState, preparePassageForEncryption, encryptPassage } from "../../recoil/passages";
+import { rencontresState, prepareRencontreForEncryption, encryptRencontre } from "../../recoil/rencontres";
 import { prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from "../../recoil/relPersonPlace";
-import { consultationsState, prepareConsultationForEncryption } from "../../recoil/consultations";
+import { consultationsState, prepareConsultationForEncryption, encryptConsultation } from "../../recoil/consultations";
 import { prepareTreatmentForEncryption, treatmentsState } from "../../recoil/treatments";
-import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from "../../recoil/medicalFiles";
+import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption, encryptMedicalFile } from "../../recoil/medicalFiles";
 import { useDataLoader } from "../../components/DataLoader";
 import { formatAge } from "../../services/date";
+import { encryptItem } from "../../services/encryption";
 
 const getRawValue = (field, value) => {
   try {
@@ -78,7 +79,7 @@ const MergeTwoPersons = ({ person }) => {
   const medicalFiles = useRecoilValue(medicalFileState);
   const treatments = useRecoilValue(treatmentsState);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
-  const preparePersonForEncryption = usePreparePersonForEncryption();
+  const { preparePersonForEncryption } = usePreparePersonForEncryption();
 
   const { refresh } = useDataLoader();
 
@@ -240,7 +241,7 @@ const MergeTwoPersons = ({ person }) => {
                   }
                 }
 
-                if (!!Object.keys(historyEntry.data)?.length) body.history = [...(initMergedPerson.history || []), historyEntry];
+                if (Object.keys(historyEntry.data)?.length) body.history = [...(initMergedPerson.history || []), historyEntry];
 
                 const mergedPerson = preparePersonForEncryption(body);
 
@@ -321,24 +322,26 @@ const MergeTwoPersons = ({ person }) => {
                   return {};
                 })();
 
-                const response = await API.post({
-                  path: "/merge/persons",
-                  body: {
-                    mergedPerson: await encryptItem(mergedPerson),
-                    mergedActions: await Promise.all(mergedActions.map(encryptItem)),
-                    mergedComments: await Promise.all(mergedComments.map(encryptItem)),
-                    mergedRelsPersonPlace: await Promise.all(mergedRelsPersonPlace.map(encryptItem)),
-                    mergedPassages: await Promise.all(mergedPassages.map(encryptItem)),
-                    mergedRencontres: await Promise.all(mergedRencontres.map(encryptItem)),
-                    mergedConsultations: await Promise.all(mergedConsultations.map(encryptItem)),
-                    mergedTreatments: await Promise.all(mergedTreatments.map(encryptItem)),
-                    mergedMedicalFile: mergedMedicalFile ? await encryptItem(mergedMedicalFile) : undefined,
-                    personToDeleteId: personToMergeAndDelete._id,
-                    medicalFileToDeleteId,
-                  },
-                });
+                const [error] = await tryFetchExpectOk(async () =>
+                  API.post({
+                    path: "/merge/persons",
+                    body: {
+                      mergedPerson: await encryptItem(mergedPerson),
+                      mergedActions: await Promise.all(mergedActions.map(encryptItem)),
+                      mergedComments: await Promise.all(mergedComments.map(encryptItem)),
+                      mergedRelsPersonPlace: await Promise.all(mergedRelsPersonPlace.map(encryptItem)),
+                      mergedPassages: await Promise.all(mergedPassages.map(encryptItem)),
+                      mergedRencontres: await Promise.all(mergedRencontres.map(encryptItem)),
+                      mergedConsultations: await Promise.all(mergedConsultations.map(encryptItem)),
+                      mergedTreatments: await Promise.all(mergedTreatments.map(encryptItem)),
+                      mergedMedicalFile: mergedMedicalFile ? await encryptItem(mergedMedicalFile) : undefined,
+                      personToDeleteId: personToMergeAndDelete._id,
+                      medicalFileToDeleteId,
+                    },
+                  })
+                );
 
-                if (!response.ok) {
+                if (error) {
                   toast.error("Échec de la fusion");
                   setSubmitting(false);
                   return;

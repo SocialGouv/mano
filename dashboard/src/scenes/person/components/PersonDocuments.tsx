@@ -4,7 +4,7 @@ import { useRecoilValue } from "recoil";
 import type { RecoilValueReadOnly } from "recoil";
 import { organisationAuthentifiedState } from "../../../recoil/auth";
 import { usePreparePersonForEncryption } from "../../../recoil/persons";
-import API from "../../../services/api";
+import API, { tryFetchExpectOk } from "../../../services/api";
 import { capture } from "../../../services/sentry";
 import { DocumentsModule } from "../../../components/DocumentsGeneric";
 import { groupsState } from "../../../recoil/groups";
@@ -12,7 +12,7 @@ import type { PersonPopulated, PersonInstance } from "../../../types/person";
 import type { Document, FolderWithLinkedItem } from "../../../types/document";
 import type { UUIDV4 } from "../../../types/uuid";
 import { personsObjectSelector } from "../../../recoil/selectors";
-import { prepareActionForEncryption } from "../../../recoil/actions";
+import { encryptAction } from "../../../recoil/actions";
 import { useDataLoader } from "../../../components/DataLoader";
 
 interface PersonDocumentsProps {
@@ -25,7 +25,7 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
   const { refresh } = useDataLoader();
   const organisation = useRecoilValue(organisationAuthentifiedState);
   const groups = useRecoilValue(groupsState);
-  const preparePersonForEncryption = usePreparePersonForEncryption();
+  const { encryptPerson } = usePreparePersonForEncryption();
   const persons = useRecoilValue<PersonIndex>(personsObjectSelector as RecoilValueReadOnly<PersonIndex>);
 
   const needsActionsFolder =
@@ -85,22 +85,24 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
       onSaveNewOrder={async (nextDocuments) => {
         // Mise à jour des documents de la personne
         const personNextDocuments = nextDocuments.filter((d) => d.linkedItem.type === "person" && d._id !== "actions");
-        const personResponse = await API.put({
-          path: `/person/${person._id}`,
-          body: preparePersonForEncryption({
-            ...person,
-            documents: [
-              ...personNextDocuments,
-              ...(person.documents || []).filter((docOrFolder) => {
-                const document = docOrFolder as unknown as Document;
-                return !!document.group;
-              }),
-            ],
-          }),
+
+        const [personError] = await tryFetchExpectOk(async () => {
+          return API.put({
+            path: `/person/${person._id}`,
+            body: await encryptPerson({
+              ...person,
+              documents: [
+                ...personNextDocuments,
+                ...(person.documents || []).filter((docOrFolder) => {
+                  const document = docOrFolder as unknown as Document;
+                  return !!document.group;
+                }),
+              ],
+            }),
+          });
         });
-        if (!personResponse.ok) {
+        if (personError) {
           toast.error("Erreur lors de l'enregistrement des documents, vous pouvez contactez le support");
-          capture("Error while ordering documents", { extra: { personResponseError: personResponse.error } });
           return false;
         }
 
@@ -118,17 +120,17 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
           if (JSON.stringify(action.documents) === JSON.stringify(actionNextDocuments.filter((d) => d.linkedItem._id === actionId))) {
             continue;
           }
-          const actionResponse = await API.put({
-            path: `/action/${actionId}`,
-            body: prepareActionForEncryption({
-              ...action,
-              documents: actionNextDocuments.filter((d) => d.linkedItem._id === actionId),
-            }),
+          const [actionError] = await tryFetchExpectOk(async () => {
+            return API.put({
+              path: `/action/${actionId}`,
+              body: await encryptPerson({
+                ...action,
+                documents: actionNextDocuments.filter((d) => d.linkedItem._id === actionId),
+              }),
+            });
           });
-          if (!actionResponse.ok) {
+          if (actionError) {
             toast.error("Erreur lors de l'enregistrement des documents des actions, vous pouvez contactez le support");
-            capture("Error while ordering documents (action)", { extra: { actionResponseError: actionResponse.error } });
-            return false;
           }
         }
 
@@ -144,23 +146,24 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
         // On a un edge case ici: si on a ajouté des documents pour quelqu'un d'autre, on les laisse dedans
         // et donc on les perds. Il faudrait probablement vérifier pour toutes les personnes du groupe.
         const _person = persons[folder.linkedItem._id];
-        const personResponse = await API.put({
-          path: `/person/${_person._id}`,
-          body: preparePersonForEncryption({
-            ..._person,
-            // If there are no document yet and default documents are present,
-            // we save the default documents since they are modified by the user.
-            documents: (_person.documents || [...defaultDocuments])
-              .filter((f) => f._id !== folder._id)
-              .map((item) => {
-                if (item.parentId === folder._id) return { ...item, parentId: "" };
-                return item;
-              }),
-          }),
+        const [personError] = await tryFetchExpectOk(async () => {
+          return API.put({
+            path: `/person/${_person._id}`,
+            body: await encryptPerson({
+              ..._person,
+              // If there are no document yet and default documents are present,
+              // we save the default documents since they are modified by the user.
+              documents: (_person.documents || [...defaultDocuments])
+                .filter((f) => f._id !== folder._id)
+                .map((item) => {
+                  if (item.parentId === folder._id) return { ...item, parentId: "" };
+                  return item;
+                }),
+            }),
+          });
         });
-        if (!personResponse.ok) {
+        if (personError) {
           toast.error("Erreur lors de la suppression du dossier, vous pouvez contactez le support");
-          capture("Error while deleting folder", { extra: { personResponseError: personResponse.error } });
           return false;
         }
 
@@ -174,19 +177,20 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
             capture("Error while deleting folder (action not found)", { extra: { actionDocument } });
             return false;
           }
-          const actionResponse = await API.put({
-            path: `/action/${action._id}`,
-            body: prepareActionForEncryption({
-              ...action,
-              documents: action.documents.map((d) => {
-                if (d._id === actionDocument._id) return { ...d, parentId: "actions" }; // On remet dans le dossier "actions" par défaut
-                return d;
+          const [actionError] = await tryFetchExpectOk(async () => {
+            return API.put({
+              path: `/action/${action._id}`,
+              body: await encryptAction({
+                ...action,
+                documents: action.documents.map((d) => {
+                  if (d._id === actionDocument._id) return { ...d, parentId: "actions" }; // On remet dans le dossier "actions" par défaut
+                  return d;
+                }),
               }),
-            }),
+            });
           });
-          if (!actionResponse.ok) {
+          if (actionError) {
             toast.error("Erreur lors de la suppression du dossier pour les actions liées, vous pouvez contactez le support");
-            capture("Error while deleting folder (action)", { extra: { actionResponseError: actionResponse.error } });
             return false;
           }
         }
@@ -198,7 +202,14 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
         // the document can be a group document, or a person document
         // so we need to get the person to update
         const _person = persons[document.linkedItem._id];
-        await API.delete({ path: document.downloadPath ?? `/person/${_person._id}/document/${document.file.filename}` });
+        const [documentError] = await tryFetchExpectOk(async () => {
+          return API.delete({ path: document.downloadPath ?? `/person/${_person._id}/document/${document.file.filename}` });
+        });
+        if (documentError) {
+          toast.error("Erreur lors de la suppression du document, vous pouvez contactez le support");
+          return false;
+        }
+
         if (document.linkedItem.type === "action") {
           const action = person.actions.find((a) => a._id === document.linkedItem._id);
           if (!action) {
@@ -206,31 +217,33 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
             capture("Error while deleting document (action not found)", { extra: { document } });
             return false;
           }
-          const actionResponse = await API.put({
-            path: `/action/${action._id}`,
-            body: prepareActionForEncryption({
-              ...action,
-              documents: action.documents.filter((d) => d._id !== document._id),
-            }),
+          const [actionError] = await tryFetchExpectOk(async () => {
+            return API.put({
+              path: `/action/${action._id}`,
+              body: await encryptAction({
+                ...action,
+                documents: action.documents.filter((d) => d._id !== document._id),
+              }),
+            });
           });
-          if (!actionResponse.ok) {
+          if (actionError) {
             toast.error("Erreur lors de la suppression du document pour les actions liées, vous pouvez contactez le support");
-            capture("Error while deleting document (action)", { extra: { actionResponseError: actionResponse.error } });
             return false;
           }
         } else {
-          const personResponse = await API.put({
-            path: `/person/${_person._id}`,
-            body: preparePersonForEncryption({
-              ..._person,
-              // If there are no document yet and default documents are present,
-              // we save the default documents since they are modified by the user.
-              documents: (_person.documents || [...defaultDocuments])?.filter((d) => d._id !== document._id),
-            }),
+          const [personError] = await tryFetchExpectOk(async () => {
+            return API.put({
+              path: `/person/${_person._id}`,
+              body: await encryptPerson({
+                ..._person,
+                // If there are no document yet and default documents are present,
+                // we save the default documents since they are modified by the user.
+                documents: (_person.documents || [...defaultDocuments])?.filter((d) => d._id !== document._id),
+              }),
+            });
           });
-          if (!personResponse.ok) {
+          if (personError) {
             toast.error("Erreur lors de la suppression du document, vous pouvez contactez le support");
-            capture("Error while deleting document", { extra: { personResponseError: personResponse.error } });
             return false;
           }
         }
@@ -247,40 +260,42 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
             capture("Error while updating document (action not found)", { extra: { documentOrFolder } });
             return;
           }
-          const actionResponse = await API.put({
-            path: `/action/${action._id}`,
-            body: prepareActionForEncryption({
-              ...action,
-              documents: action.documents.map((d) => {
-                if (d._id === documentOrFolder._id) return documentOrFolder;
-                return d;
+          const [actionError] = await tryFetchExpectOk(async () => {
+            return API.put({
+              path: `/action/${action._id}`,
+              body: await encryptAction({
+                ...action,
+                documents: action.documents.map((d) => {
+                  if (d._id === documentOrFolder._id) return documentOrFolder;
+                  return d;
+                }),
               }),
-            }),
+            });
           });
-          if (!actionResponse.ok) {
+          if (actionError) {
             toast.error("Erreur lors de la mise à jour du document pour les actions liées, vous pouvez contactez le support");
-            capture("Error while updating document (action)", { extra: { actionResponseError: actionResponse.error } });
             return;
           }
         } else {
           // the document can be a group document, or a person document, or a folder
           // so we need to get the person to update
           const _person = persons[documentOrFolder.linkedItem._id];
-          const personResponse = await API.put({
-            path: `/person/${_person._id}`,
-            body: preparePersonForEncryption({
-              ..._person,
-              // If there are no document yet and default documents are present,
-              // we save the default documents since they are modified by the user.
-              documents: (_person.documents || [...defaultDocuments])?.map((d) => {
-                if (d._id === documentOrFolder._id) return documentOrFolder;
-                return d;
+          const [personError] = await tryFetchExpectOk(async () => {
+            return API.put({
+              path: `/person/${_person._id}`,
+              body: await encryptPerson({
+                ..._person,
+                // If there are no document yet and default documents are present,
+                // we save the default documents since they are modified by the user.
+                documents: (_person.documents || [...defaultDocuments])?.map((d) => {
+                  if (d._id === documentOrFolder._id) return documentOrFolder;
+                  return d;
+                }),
               }),
-            }),
+            });
           });
-          if (!personResponse.ok) {
+          if (personError) {
             toast.error("Erreur lors de la mise à jour du document, vous pouvez contactez le support");
-            capture("Error while updating document", { extra: { personResponseError: personResponse.error } });
             return;
           }
         }
@@ -288,18 +303,19 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
         refresh();
       }}
       onAddDocuments={async (newDocuments) => {
-        const personResponse = await API.put({
-          path: `/person/${person._id}`,
-          body: preparePersonForEncryption({
-            ...person,
-            // If there are no document yet and default documents are present,
-            // we save the default documents since they are modified by the user.
-            documents: [...(person.documents || [...defaultDocuments]), ...newDocuments],
-          }),
+        const [personError] = await tryFetchExpectOk(async () => {
+          return API.put({
+            path: `/person/${person._id}`,
+            body: await encryptPerson({
+              ...person,
+              // If there are no document yet and default documents are present,
+              // we save the default documents since they are modified by the user.
+              documents: [...(person.documents || [...defaultDocuments]), ...newDocuments],
+            }),
+          });
         });
-        if (!personResponse.ok) {
+        if (personError) {
           toast.error("Erreur lors de la création du document, vous pouvez contactez le support");
-          capture("Error while creating document", { extra: { personResponseError: personResponse.error } });
           return;
         }
         if (newDocuments.filter((d) => d.type === "document").length > 1) toast.success("Documents enregistrés !");

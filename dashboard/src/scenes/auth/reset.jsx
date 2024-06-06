@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { Redirect, useLocation } from "react-router-dom";
 import ChangePassword from "../../components/ChangePassword";
-import API from "../../services/api";
+import API, { tryFetch } from "../../services/api";
 import { useRecoilValue } from "recoil";
 import { deploymentShortCommitSHAState } from "../../recoil/version";
 import { toast } from "react-toastify";
+import { errorMessage } from "../../utils";
 
 const Reset = () => {
-  const [redirect, setRedirect] = useState(false);
   const deploymentCommit = useRecoilValue(deploymentShortCommitSHAState);
 
   const location = useLocation();
@@ -17,7 +17,6 @@ const Reset = () => {
   const [name, setName] = useState("");
 
   if (!token) return <Redirect to="/" />;
-  if (redirect) return <Redirect to="/" />;
 
   return (
     <div className="tw-mx-10 tw-my-20 tw-w-full tw-max-w-lg tw-overflow-y-auto tw-overflow-x-hidden tw-rounded-lg tw-bg-white tw-px-7 tw-pb-2 tw-pt-10 tw-text-black tw-shadow-[0_0_20px_0_rgba(0,0,0,0.2)]">
@@ -31,24 +30,34 @@ const Reset = () => {
         </div>
       ) : null}
       <ChangePassword
-        onSubmit={({ newPassword }) => {
+        onSubmit={async ({ newPassword }) => {
           if (newUser && !name) {
             toast.error("Veuillez renseigner votre prénom et nom");
             return false;
           }
-          return API.post({
-            path: "/user/forgot_password_reset",
-            body: {
-              token,
-              name,
-              password: newPassword,
-            },
-          });
+          const [error, res] = await tryFetch(async () =>
+            API.post({
+              path: "/user/forgot_password_reset",
+              body: {
+                token,
+                name,
+                password: newPassword,
+              },
+            })
+          );
+          if (error) {
+            toast.error(errorMessage(error));
+            return false;
+          }
+          return res;
         }}
         onFinished={(res) => {
           if (res) {
-            setRedirect(true);
-            API.logout(false);
+            // Dans le doute on déconnecte l'utilisateur
+            tryFetchExpectOk(() => API.post({ path: "/user/logout" })).then(([error]) => {
+              if (error) return toast.error(errorMessage(error));
+              API.reset({ redirect: true });
+            });
           }
         }}
         withCurrentPassword={false}

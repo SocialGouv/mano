@@ -10,12 +10,12 @@ import Loading from "../../components/loading";
 import Table from "../../components/table";
 import ButtonCustom from "../../components/ButtonCustom";
 import Search from "../../components/search";
-import { territoryTypes, territoriesState, prepareTerritoryForEncryption, sortTerritories } from "../../recoil/territory";
+import { territoryTypes, territoriesState, prepareTerritoryForEncryption, sortTerritories, encryptTerritory } from "../../recoil/territory";
 import SelectCustom from "../../components/SelectCustom";
 import { onlyFilledObservationsTerritories } from "../../recoil/selectors";
 import { currentTeamState, organisationState, userState } from "../../recoil/auth";
 import { formatDateWithFullMonth } from "../../services/date";
-import API from "../../services/api";
+import API, { tryFetchExpectOk } from "../../services/api";
 import { filterBySearch } from "../search/utils";
 import useTitle from "../../services/useTitle";
 import useSearchParamState from "../../services/useSearchParamState";
@@ -156,8 +156,10 @@ export function TerritoryModal({ open, setOpen, territory = {} }) {
             if (!body.name) return toast.error("Le nom est obligatoire");
 
             if (isNew) {
-              const res = await API.post({ path: "/territory", body: prepareTerritoryForEncryption({ ...body, user: user._id }) });
-              if (res.ok) {
+              const [error, res] = await tryFetchExpectOk(async () =>
+                API.post({ path: "/territory", body: await encryptTerritory({ ...body, user: user._id }) })
+              );
+              if (!error) {
                 await refresh();
                 actions.setSubmitting(false);
                 toast.success("Création réussie !");
@@ -165,11 +167,13 @@ export function TerritoryModal({ open, setOpen, territory = {} }) {
                 history.push(`/territory/${res.data._id}`);
               }
             } else {
-              const res = await API.put({
-                path: `/territory/${territory._id}`,
-                body: prepareTerritoryForEncryption({ ...body, user: body.user || user._id }),
-              });
-              if (res.ok) {
+              const [error] = await tryFetchExpectOk(async () =>
+                API.delete({
+                  path: `/territory/${territory._id}`,
+                  body: await encryptTerritory({ ...body, user: body.user || user._id }),
+                })
+              );
+              if (!error) {
                 await refresh();
                 actions.setSubmitting(false);
                 toast.success("Mis à jour !");

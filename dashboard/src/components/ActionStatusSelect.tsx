@@ -1,10 +1,10 @@
 import { useRecoilValue } from "recoil";
-import { DONE, TODO, CANCEL, prepareActionForEncryption } from "../recoil/actions";
-import API from "../services/api";
+import { DONE, TODO, CANCEL, encryptAction } from "../recoil/actions";
+import API, { tryFetchExpectOk } from "../services/api";
 import { now } from "../services/date";
 import { toast } from "react-toastify";
 import { organisationState, userState } from "../recoil/auth";
-import { prepareConsultationForEncryption } from "../recoil/consultations";
+import { encryptConsultation } from "../recoil/consultations";
 import { ConsultationInstance } from "../types/consultation";
 import { ActionInstance } from "../types/action";
 import { useDataLoader } from "./DataLoader";
@@ -48,17 +48,19 @@ export default function ActionStatusSelect({ action }: { action: ActionInstance 
 
         if (isConsultation(action)) {
           const consultation = action;
-          const consultationResponse = await API.put({
-            path: `/consultation/${consultation._id}`,
-            body: prepareConsultationForEncryption(organisation.consultations)({
-              ...consultation,
-              status,
-              completedAt,
-              user: updatedUser,
-              history: updatedHistory,
-            }),
-          });
-          if (!consultationResponse.ok) {
+          const [error] = await tryFetchExpectOk(async () =>
+            API.put({
+              path: `/consultation/${consultation._id}`,
+              body: await encryptConsultation(organisation.consultations)({
+                ...consultation,
+                status,
+                completedAt,
+                user: updatedUser,
+                history: updatedHistory,
+              }),
+            })
+          );
+          if (error) {
             toast.error("Erreur lors de la mise à jour de la consultation");
             return;
           }
@@ -66,17 +68,19 @@ export default function ActionStatusSelect({ action }: { action: ActionInstance 
           toast.success("Le statut de la consultation a été mis à jour");
           return;
         } else {
-          const actionResponse = await API.put({
-            path: `/action/${action._id}`,
-            body: prepareActionForEncryption({
-              ...action,
-              status,
-              completedAt,
-              user: updatedUser,
-              history: updatedHistory,
-            }),
-          });
-          if (!actionResponse.ok) {
+          const [error] = await tryFetchExpectOk(async () =>
+            API.put({
+              path: `/action/${action._id}`,
+              body: await encryptAction({
+                ...action,
+                status,
+                completedAt,
+                user: updatedUser,
+                history: updatedHistory,
+              }),
+            })
+          );
+          if (error) {
             toast.error("Erreur lors de la mise à jour de l'action");
             return;
           }

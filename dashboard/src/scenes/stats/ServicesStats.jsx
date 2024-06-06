@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { CustomResponsivePie } from "./charts";
 import { useRecoilValue } from "recoil";
-import API from "../../services/api";
+import API, { tryFetchExpectOk } from "../../services/api";
 import { toast } from "react-toastify";
 import { dayjsInstance } from "../../services/date";
 import { useLocalStorage } from "../../services/useLocalStorage";
@@ -25,16 +25,16 @@ const ServicesStats = ({ period, teamIds }) => {
         setServicesFromDatabase({});
         return;
       }
-      API.get({ path: `/service/team/${teamIds.join(",")}/stats`, query: startDate ? { from: startDate, to: endDate || startDate } : {} }).then(
-        (res) => {
-          if (!res.ok) return toast.error("Erreur lors du chargement des statistiques des services de l'accueil");
-          const servicesObj = {};
-          for (const service of allServices) {
-            servicesObj[service] = Number(res.data.find((s) => s.service === service)?.count || 0);
-          }
-          setServicesFromDatabase(servicesObj);
+      tryFetchExpectOk(async () =>
+        API.get({ path: `/service/team/${teamIds.join(",")}/stats`, query: startDate ? { from: startDate, to: endDate || startDate } : {} })
+      ).then(([error, response]) => {
+        if (error) return toast.error("Erreur lors du chargement des statistiques des services de l'accueil");
+        const servicesObj = {};
+        for (const service of allServices) {
+          servicesObj[service] = Number(response.data.find((s) => s.service === service)?.count || 0);
         }
-      );
+        setServicesFromDatabase(servicesObj);
+      });
     },
     [teamIds, startDate, endDate, allServices]
   );

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import API from "../../services/api";
+import API, { tryFetchExpectOk } from "../../services/api";
 import { OrganisationInstance } from "../../types/organisation";
 import { ModalContainer, ModalBody, ModalHeader, ModalFooter } from "../../components/tailwind/Modal";
 import { toast } from "react-toastify";
@@ -21,8 +21,8 @@ export default function OrganisationSuperadminSettings({
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    API.put({ path: `/organisation/superadmin/${organisation._id}`, body: data }).then((res) => {
-      if (res.ok) {
+    tryFetchExpectOk(() => API.put({ path: `/organisation/superadmin/${organisation._id}`, body: data })).then(([error, res]) => {
+      if (!error) {
         toast.success("Organisation mise à jour");
         setOpen(false);
         updateOrganisation(res.data);

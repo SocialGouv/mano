@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { toast } from "react-toastify";
 import { useHistory } from "react-router-dom";
-import API from "../../services/api";
+import API, { tryFetchExpectOk } from "../../services/api";
 import Table from "../../components/table";
 import { useLocalStorage } from "../../services/useLocalStorage";
 import { dayjsInstance, formatAge, formatDateWithFullMonth } from "../../services/date";
@@ -10,10 +10,19 @@ import { organisationState } from "../../recoil/auth";
 import TagTeam from "../../components/TagTeam";
 import { useDataLoader } from "../../components/DataLoader";
 import Loading from "../../components/loading";
+import { decryptItem } from "../../services/encryption";
 
 async function fetchPersons(organisationId) {
-  const res = await API.get({ path: "/organisation/" + organisationId + "/deleted-data", query: {}, decryptDeleted: true });
-  return res.decryptedData;
+  const [error, response] = await tryFetchExpectOk(async () => API.get({ path: "/organisation/" + organisationId + "/deleted-data" }));
+  if (error) {
+    throw new Error(error);
+  }
+  const decryptedData = {};
+  for (const [key, value] of Object.entries(response.data)) {
+    const decryptedEntries = await Promise.all(value.map((item) => decryptItem(item, { decryptDeleted: true })));
+    decryptedData[key] = decryptedEntries;
+  }
+  return decryptedData;
 }
 
 export default function Poubelle() {
@@ -71,11 +80,13 @@ export default function Poubelle() {
     const associatedDataAsText = getAssociatedDataAsText(associatedData);
 
     if (confirm("Voulez-vous restaurer cette personne ? Les données associées seront également restaurées :\n" + associatedDataAsText.join(", "))) {
-      API.post({
-        path: "/organisation/" + organisation._id + "/restore-deleted-data",
-        body: { ...associatedData, persons: [id] },
-      }).then((res) => {
-        if (res.ok) {
+      tryFetchExpectOk(() =>
+        API.post({
+          path: "/organisation/" + organisation._id + "/restore-deleted-data",
+          body: { ...associatedData, persons: [id] },
+        })
+      ).then(([error]) => {
+        if (!error) {
           refresh().then(() => {
             toast.success("La personne a été restaurée avec succès, ainsi que ses données associées !");
             history.push(`/person/${id}`);
@@ -97,11 +108,13 @@ export default function Poubelle() {
           associatedDataAsText.join(", ")
       )
     ) {
-      API.delete({
-        path: "/organisation/" + organisation._id + "/permanent-delete-data",
-        body: { ...associatedData, persons: [id] },
-      }).then((res) => {
-        if (res.ok) {
+      tryFetchExpectOk(() =>
+        API.delete({
+          path: "/organisation/" + organisation._id + "/permanent-delete-data",
+          body: { ...associatedData, persons: [id] },
+        })
+      ).then(([error]) => {
+        if (!error) {
           refresh().then(() => {
             toast.success("La personne a été supprimée définitivement avec succès, ainsi que ses données associées !");
             setRefreshKey(refreshKey + 1);

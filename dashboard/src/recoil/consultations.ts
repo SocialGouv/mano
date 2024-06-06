@@ -6,6 +6,7 @@ import type { ConsultationInstance } from "../types/consultation";
 import type { CustomFieldsGroup } from "../types/field";
 import type { UserInstance } from "../types/user";
 import { organisationState } from "./auth";
+import { encryptItem } from "../services/encryption";
 
 const collectionName = "consultation";
 export const consultationsState = atom<ConsultationInstance[]>({
@@ -153,6 +154,12 @@ export const prepareConsultationForEncryption =
       decrypted,
       entityKey: consultation.entityKey,
     };
+  };
+
+export const encryptConsultation =
+  (customFieldsConsultations: CustomFieldsGroup[]) =>
+  (consultation: ConsultationInstance, { checkRequiredFields = true } = {}) => {
+    return encryptItem(prepareConsultationForEncryption(customFieldsConsultations)(consultation, { checkRequiredFields }));
   };
 
 export const defaultConsultationFields = { isConsultation: true, withTime: true };

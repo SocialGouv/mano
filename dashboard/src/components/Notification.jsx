@@ -3,16 +3,16 @@ import React, { useMemo, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useLocalStorage } from "../services/useLocalStorage";
-import { actionsState, CANCEL, DONE, prepareActionForEncryption, sortActionsOrConsultations, TODO } from "../recoil/actions";
+import { actionsState, CANCEL, DONE, encryptAction, sortActionsOrConsultations, TODO } from "../recoil/actions";
 import { currentTeamState, userState } from "../recoil/auth";
-import { commentsState, prepareCommentForEncryption } from "../recoil/comments";
+import { commentsState, encryptComment } from "../recoil/comments";
 import { personsState } from "../recoil/persons";
 import { formatTime } from "../services/date";
 import ButtonCustom from "./ButtonCustom";
 import DateBloc, { TimeBlock } from "./DateBloc";
 import Table from "./table";
 import UserName from "./UserName";
-import API from "../services/api";
+import API, { tryFetchExpectOk } from "../services/api";
 import { ModalContainer, ModalBody, ModalFooter } from "./tailwind/Modal";
 import PersonName from "./PersonName";
 import BellIconWithNotifications from "../assets/icons/BellIconWithNotifications";
@@ -168,11 +168,13 @@ const Actions = ({ setShowModal, actions, setSortOrder, setSortBy, sortBy, sortO
                   onClick={async (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    const actionResponse = await API.put({
-                      path: `/action/${action._id}`,
-                      body: prepareActionForEncryption({ ...action, urgent: false, user: action.user || user._id }),
-                    });
-                    if (actionResponse.ok) {
+                    const [error] = await tryFetchExpectOk(async () =>
+                      API.put({
+                        path: `/action/${action._id}`,
+                        body: await encryptAction({ ...action, urgent: false, user: action.user || user._id }),
+                      })
+                    );
+                    if (!error) {
                       await refresh();
                     }
                   }}
@@ -296,16 +298,18 @@ const Comments = ({ setShowModal, comments }) => {
                   onClick={async (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    const commentResponse = await API.put({
-                      path: `/comment/${comment._id}`,
-                      body: prepareCommentForEncryption({
-                        ...comment,
-                        user: comment.user || user._id,
-                        team: comment.team || currentTeam._id,
-                        urgent: false,
-                      }),
-                    });
-                    if (commentResponse.ok) {
+                    const [error] = await tryFetchExpectOk(async () =>
+                      API.put({
+                        path: `/comment/${comment._id}`,
+                        body: await encryptComment({
+                          ...comment,
+                          user: comment.user || user._id,
+                          team: comment.team || currentTeam._id,
+                          urgent: false,
+                        }),
+                      })
+                    );
+                    if (!error) {
                       await refresh();
                     }
                   }}
