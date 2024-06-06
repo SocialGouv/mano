@@ -458,9 +458,6 @@ const View = () => {
                               </p>
                             </Col>
                           </Row>
-                          <div className="tw-mb-10 tw-flex tw-justify-end">
-                            <EncryptionKey isMain={undefined} />
-                          </div>
                         </>
                       )}
                     </>
