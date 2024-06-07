@@ -155,8 +155,11 @@ const Structure = ({ structure: initStructure, onSuccess, open, onClose, onOpen 
   const onChange = (e) => setStructure({ ...structure, [e.target.name]: e.target.value });
   const onSubmit = async (e) => {
     e.preventDefault();
+    if (!structure.name) {
+      toast.error("Le nom de la structure est obligatoire");
+      return;
+    }
     setDisabled(true);
-    if (!structure.name) throw new Error("Le nom de la structure est obligatoire");
     const isNew = !initStructure?._id;
     const [error] = await tryFetch(async () =>
       !isNew ? API.put({ path: `/structure/${initStructure._id}`, body: structure }) : API.post({ path: "/structure", body: structure })
