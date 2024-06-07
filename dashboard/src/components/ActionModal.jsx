@@ -26,9 +26,8 @@ import { useDataLoader } from "./DataLoader";
 import ActionsCategorySelect from "./tailwind/ActionsCategorySelect";
 import AutoResizeTextarea from "./AutoresizeTextArea";
 import { groupsState } from "../recoil/groups";
-import { prepareCommentForEncryption, encryptComment } from "../recoil/comments";
+import { encryptComment } from "../recoil/comments";
 import { capture } from "../services/sentry";
-import { encryptItem } from "../services/encryption";
 
 export default function ActionModal() {
   const actionsObjects = useRecoilValue(itemsGroupedByActionSelector);

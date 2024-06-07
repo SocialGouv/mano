@@ -81,7 +81,6 @@ const EncryptionKey = ({ isMain }) => {
         setEncryptingStatus(`Chiffrement des données : (${path.replace("/", "")}s)`);
         const [error, cryptedItems] = await tryFetchExpectOk(async () =>
           API.get({
-            skipDecrypt: true,
             path,
             query: {
               organisation: organisation._id,

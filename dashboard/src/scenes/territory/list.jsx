@@ -3,14 +3,14 @@ import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader, Input, Label } from
 import { useHistory } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Formik } from "formik";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 import { useLocalStorage } from "../../services/useLocalStorage";
 import Page from "../../components/pagination";
 import Loading from "../../components/loading";
 import Table from "../../components/table";
 import ButtonCustom from "../../components/ButtonCustom";
 import Search from "../../components/search";
-import { territoryTypes, territoriesState, prepareTerritoryForEncryption, sortTerritories, encryptTerritory } from "../../recoil/territory";
+import { territoryTypes, territoriesState, sortTerritories, encryptTerritory } from "../../recoil/territory";
 import SelectCustom from "../../components/SelectCustom";
 import { onlyFilledObservationsTerritories } from "../../recoil/selectors";
 import { currentTeamState, organisationState, userState } from "../../recoil/auth";
@@ -168,7 +168,7 @@ export function TerritoryModal({ open, setOpen, territory = {} }) {
               }
             } else {
               const [error] = await tryFetchExpectOk(async () =>
-                API.delete({
+                API.put({
                   path: `/territory/${territory._id}`,
                   body: await encryptTerritory({ ...body, user: body.user || user._id }),
                 })

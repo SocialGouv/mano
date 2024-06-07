@@ -12,7 +12,6 @@ import {
   customFieldsMedicalFileSelector,
   encryptMedicalFile,
   groupedCustomFieldsMedicalFileSelector,
-  prepareMedicalFileForEncryption,
 } from "../../../recoil/medicalFiles";
 import { Treatments } from "./Treatments";
 import { useEffect, useMemo } from "react";

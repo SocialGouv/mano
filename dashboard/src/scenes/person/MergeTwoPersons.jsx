@@ -19,14 +19,14 @@ import UserName from "../../components/UserName";
 import Table from "../../components/table";
 import { currentTeamState, organisationState, teamsState, userState } from "../../recoil/auth";
 import API, { tryFetchExpectOk } from "../../services/api";
-import { commentsState, prepareCommentForEncryption, encryptComment } from "../../recoil/comments";
-import { actionsState, prepareActionForEncryption, encryptAction } from "../../recoil/actions";
-import { passagesState, preparePassageForEncryption, encryptPassage } from "../../recoil/passages";
-import { rencontresState, prepareRencontreForEncryption, encryptRencontre } from "../../recoil/rencontres";
+import { commentsState, prepareCommentForEncryption } from "../../recoil/comments";
+import { actionsState, prepareActionForEncryption } from "../../recoil/actions";
+import { passagesState, preparePassageForEncryption } from "../../recoil/passages";
+import { rencontresState, prepareRencontreForEncryption } from "../../recoil/rencontres";
 import { prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from "../../recoil/relPersonPlace";
-import { consultationsState, prepareConsultationForEncryption, encryptConsultation } from "../../recoil/consultations";
+import { consultationsState, prepareConsultationForEncryption } from "../../recoil/consultations";
 import { prepareTreatmentForEncryption, treatmentsState } from "../../recoil/treatments";
-import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption, encryptMedicalFile } from "../../recoil/medicalFiles";
+import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from "../../recoil/medicalFiles";
 import { useDataLoader } from "../../components/DataLoader";
 import { formatAge } from "../../services/date";
 import { encryptItem } from "../../services/encryption";
@@ -287,7 +287,7 @@ const MergeTwoPersons = ({ person }) => {
                   .map((treatment) => prepareTreatmentForEncryption({ ...treatment, person: originPerson._id, user: treatment.user || user._id }));
 
                 const { mergedMedicalFile, medicalFileToDeleteId } = (() => {
-                  if (!!originPersonMedicalFile) {
+                  if (originPersonMedicalFile) {
                     return {
                       mergedMedicalFile: prepareMedicalFileForEncryption(customFieldsMedicalFile)({
                         ...body,

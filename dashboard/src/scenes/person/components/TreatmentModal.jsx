@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import { organisationState, userState } from "../../../recoil/auth";
 import { dayjsInstance, outOfBoundariesDate } from "../../../services/date";
 import API, { tryFetchExpectOk } from "../../../services/api";
-import { allowedTreatmentFieldsInHistory, prepareTreatmentForEncryption, encryptTreatment } from "../../../recoil/treatments";
+import { allowedTreatmentFieldsInHistory, encryptTreatment } from "../../../recoil/treatments";
 import DatePicker from "../../../components/DatePicker";
 import { CommentsModule } from "../../../components/CommentsGeneric";
 import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from "../../../components/tailwind/Modal";

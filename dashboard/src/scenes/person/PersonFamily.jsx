@@ -8,7 +8,7 @@ import UserName from "../../components/UserName";
 import { userState } from "../../recoil/auth";
 import { dayjsInstance } from "../../services/date";
 import API, { tryFetchExpectOk } from "../../services/api";
-import { groupSelector, groupsState, prepareGroupForEncryption, encryptGroup } from "../../recoil/groups";
+import { groupSelector, groupsState, encryptGroup } from "../../recoil/groups";
 import SelectPerson from "../../components/SelectPerson";
 import { useDataLoader } from "../../components/DataLoader";
 import PersonName from "../../components/PersonName";

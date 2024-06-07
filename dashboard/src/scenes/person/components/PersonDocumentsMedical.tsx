@@ -1,10 +1,10 @@
 import { useMemo } from "react";
 import { toast } from "react-toastify";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 import { organisationAuthentifiedState, userAuthentifiedState } from "../../../recoil/auth";
-import { consultationsState, prepareConsultationForEncryption, encryptConsultation } from "../../../recoil/consultations";
-import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption, encryptMedicalFile } from "../../../recoil/medicalFiles";
-import { encryptTreatment, prepareTreatmentForEncryption, treatmentsState } from "../../../recoil/treatments";
+import { prepareConsultationForEncryption, encryptConsultation } from "../../../recoil/consultations";
+import { customFieldsMedicalFileSelector, prepareMedicalFileForEncryption, encryptMedicalFile } from "../../../recoil/medicalFiles";
+import { encryptTreatment } from "../../../recoil/treatments";
 import API, { tryFetchExpectOk } from "../../../services/api";
 import { capture } from "../../../services/sentry";
 import { DocumentsModule } from "../../../components/DocumentsGeneric";
@@ -22,14 +22,11 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
   const organisation = useRecoilValue(organisationAuthentifiedState);
   const { refresh } = useDataLoader();
 
-  const setAllConsultations = useSetRecoilState(consultationsState);
   const consultations = useMemo(() => person.consultations ?? [], [person.consultations]);
 
-  const setAllTreatments = useSetRecoilState(treatmentsState);
   const treatments = useMemo(() => person.treatments ?? [], [person.treatments]);
 
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
-  const setAllMedicalFiles = useSetRecoilState(medicalFileState);
   const medicalFile = person.medicalFile;
 
   const allMedicalDocuments = useMemo(() => {

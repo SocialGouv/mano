@@ -2,9 +2,9 @@ import React from "react";
 import { useHistory } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useRecoilValue } from "recoil";
-import { actionsState, prepareActionForEncryption, encryptAction } from "../../../recoil/actions";
+import { actionsState, encryptAction } from "../../../recoil/actions";
 import API, { tryFetchExpectOk } from "../../../services/api";
-import { commentsState, prepareCommentForEncryption, encryptComment } from "../../../recoil/comments";
+import { commentsState, encryptComment } from "../../../recoil/comments";
 import { passagesState } from "../../../recoil/passages";
 import { rencontresState } from "../../../recoil/rencontres";
 import DeleteButtonAndConfirmModal from "../../../components/DeleteButtonAndConfirmModal";
@@ -14,7 +14,7 @@ import { consultationsState } from "../../../recoil/consultations";
 import { treatmentsState } from "../../../recoil/treatments";
 import { userState } from "../../../recoil/auth";
 import { useDataLoader } from "../../../components/DataLoader";
-import { prepareGroupForEncryption, encryptGroup } from "../../../recoil/groups";
+import { prepareGroupForEncryption } from "../../../recoil/groups";
 import { encryptItem } from "../../../services/encryption";
 
 const DeletePersonButton = ({ person }) => {

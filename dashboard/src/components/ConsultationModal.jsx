@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import { useLocation, useHistory } from "react-router-dom";
 import { CANCEL, DONE, TODO } from "../recoil/actions";
 import { currentTeamState, organisationState, teamsState, userState } from "../recoil/auth";
-import { consultationsFieldsIncludingCustomFieldsSelector, prepareConsultationForEncryption, encryptConsultation } from "../recoil/consultations";
+import { consultationsFieldsIncludingCustomFieldsSelector, encryptConsultation } from "../recoil/consultations";
 import API, { tryFetchExpectOk } from "../services/api";
 import { dayjsInstance } from "../services/date";
 import CustomFieldInput from "./CustomFieldInput";

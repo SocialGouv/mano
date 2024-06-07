@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { toast } from "react-toastify";
-import { prepareReportForEncryption, encryptReport } from "../../../recoil/reports";
+import { encryptReport } from "../../../recoil/reports";
 import API, { tryFetchExpectOk } from "../../../services/api";
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "../../../components/tailwind/Modal";
 import SelectAndCreateCollaboration from "../SelectAndCreateCollaboration";

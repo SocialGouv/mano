@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useRecoilValue } from "recoil";
 import { toast } from "react-toastify";
 import { CommentsModule } from "../../../components/CommentsGeneric";
-import { prepareCommentForEncryption, encryptComment } from "../../../recoil/comments";
+import { encryptComment } from "../../../recoil/comments";
 import API, { tryFetchExpectOk } from "../../../services/api";
 import { organisationState, userState } from "../../../recoil/auth";
 import { groupsState } from "../../../recoil/groups";
