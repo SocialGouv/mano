@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Redirect, useLocation } from "react-router-dom";
 import ChangePassword from "../../components/ChangePassword";
-import API, { tryFetch } from "../../services/api";
+import API, { tryFetch, tryFetchExpectOk } from "../../services/api";
 import { useRecoilValue } from "recoil";
 import { deploymentShortCommitSHAState } from "../../recoil/version";
 import { toast } from "react-toastify";
