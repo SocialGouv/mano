@@ -62,7 +62,7 @@ class Api {
         "Content-Type": "application/json",
         Accept: "application/json",
         platform: "dashboard",
-        version: "2.0.0",
+        version: "2.1.0",
       },
     };
   }
@@ -149,7 +149,7 @@ class Api {
         ...(this.token ? { Authorization: `JWT ${this.token}` } : {}),
         Accept: "application/json",
         platform: "dashboard",
-        version: "2.0.0",
+        version: "2.1.0",
       },
 
       method: "POST",
