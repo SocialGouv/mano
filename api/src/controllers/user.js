@@ -141,7 +141,7 @@ function createUserLog(req, user) {
 
 router.get(
   "/me",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser(["admin", "normal", "superadmin", "restricted-access", "stats-only"]),
   catchErrors(async (req, res) => {
     const user = await User.findOne({ where: { _id: req.user._id } });
@@ -156,7 +156,7 @@ router.get(
 
 router.post(
   "/logout",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser(["admin", "normal", "superadmin", "restricted-access", "stats-only"]),
   catchErrors(async (req, res) => {
     UserLog.create({
@@ -253,7 +253,7 @@ router.post(
 
 router.get(
   "/signin-token",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser(["admin", "normal", "superadmin", "restricted-access", "stats-only"]),
   catchErrors(async (req, res, next) => {
     try {
@@ -402,7 +402,7 @@ router.post(
 
 router.post(
   "/",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser(["superadmin", "admin"]),
   catchErrors(async (req, res, next) => {
     try {
@@ -480,7 +480,7 @@ router.post(
 
 router.post(
   "/reset_password",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser(["admin", "normal", "superadmin", "restricted-access", "stats-only"]),
   catchErrors(async (req, res, next) => {
     try {
@@ -540,7 +540,7 @@ router.post(
 
 router.post(
   "/decrypt-attempt-failure",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser(["admin", "normal", "superadmin", "restricted-access", "stats-only"]),
   catchErrors(async (req, res) => {
     const _id = req.user._id;
@@ -562,7 +562,7 @@ router.post(
 
 router.post(
   "/decrypt-attempt-success",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser(["admin", "normal", "superadmin", "restricted-access", "stats-only"]),
   catchErrors(async (req, res) => {
     const _id = req.user._id;
@@ -581,7 +581,7 @@ router.post(
 
 router.get(
   "/:_id",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser("admin"),
   catchErrors(async (req, res, next) => {
     try {
@@ -621,7 +621,7 @@ router.get(
 
 router.get(
   "/",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser(["admin", "normal", "superadmin", "restricted-access", "stats-only"]),
   catchErrors(async (req, res, next) => {
     try {
@@ -678,7 +678,7 @@ router.get(
 
 router.put(
   "/",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser(["admin", "normal", "superadmin", "restricted-access", "stats-only"]),
   catchErrors(async (req, res, next) => {
     try {
@@ -754,7 +754,7 @@ router.put(
 
 router.put(
   "/:_id",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser("admin"),
   catchErrors(async (req, res, next) => {
     try {
@@ -831,7 +831,7 @@ router.put(
 
 router.delete(
   "/me",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   catchErrors(async (req, res) => {
     const userId = req.user._id;
 
@@ -857,7 +857,7 @@ router.delete(
 
 router.delete(
   "/:_id",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser(["admin", "superadmin"]),
   catchErrors(async (req, res, next) => {
     try {
@@ -895,7 +895,7 @@ router.delete(
 
 router.post(
   "/generate-link",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser(["superadmin"]),
   catchErrors(async (req, res, next) => {
     try {

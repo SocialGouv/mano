@@ -12,7 +12,7 @@ const { Organisation, TerritoryObservation, sequelize } = require("../db/sequeli
 
 router.put(
   "/:migrationName",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateEncryptionAndMigrations,
   validateUser(["admin", "normal", "restricted-access", "stats-only"]),
   catchErrors(async (req, res, next) => {

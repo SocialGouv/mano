@@ -9,7 +9,7 @@ const validateUser = require("../middleware/validateUser");
 
 router.post(
   "/",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser("admin"),
   catchErrors(async (req, res, next) => {
     try {
@@ -31,7 +31,7 @@ router.post(
 
 router.get(
   "/",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser(["superadmin", "admin", "normal", "restricted-access", "stats-only"]),
   catchErrors(async (req, res) => {
     const data = await Team.findAll({ where: { organisation: req.user.organisation }, include: ["Organisation"] });
@@ -41,7 +41,7 @@ router.get(
 
 router.get(
   "/:_id",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser("admin"),
   catchErrors(async (req, res, next) => {
     try {
@@ -62,7 +62,7 @@ router.get(
 
 router.put(
   "/:_id",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser("admin"),
   catchErrors(async (req, res, next) => {
     try {
@@ -97,7 +97,7 @@ router.put(
 
 router.delete(
   "/:_id",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser("admin"),
   catchErrors(async (req, res, next) => {
     try {

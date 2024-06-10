@@ -10,7 +10,7 @@ const validateEncryptionAndMigrations = require("../middleware/validateEncryptio
 
 router.post(
   "/persons",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateEncryptionAndMigrations,
   validateUser(["admin", "normal", "restricted-access"]),
   catchErrors(async (req, res, next) => {

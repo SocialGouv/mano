@@ -39,7 +39,7 @@ const { serializeOrganisation } = require("../utils/data-serializer");
 // and to make sure everything is changed by using a transaction.
 router.post(
   "/",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser("admin"),
   catchErrors(async (req, res, next) => {
     const objectsKeys = [

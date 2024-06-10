@@ -39,7 +39,7 @@ const { STORAGE_DIRECTORY } = require("../config");
 
 router.get(
   "/stats",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser(["superadmin", "admin", "normal", "restricted-access", "stats-only"]),
   catchErrors(async (req, res, next) => {
     try {
@@ -109,7 +109,7 @@ router.get(
 
 router.post(
   "/",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser("superadmin"),
   catchErrors(async (req, res, next) => {
     try {
@@ -178,7 +178,7 @@ router.post(
 
 router.get(
   "/",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser("superadmin"),
   catchErrors(async (req, res, next) => {
     try {
@@ -251,7 +251,7 @@ router.get(
 
 router.put(
   "/:_id",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser(["admin", "normal", "restricted-access"]),
   catchErrors(async (req, res, next) => {
     try {
@@ -367,7 +367,7 @@ router.put(
 
 router.put(
   "/superadmin/:_id",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser(["superadmin"]),
   catchErrors(async (req, res, next) => {
     try {
@@ -405,7 +405,7 @@ router.put(
 
 router.delete(
   "/:_id",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser(["superadmin", "admin"]),
   catchErrors(async (req, res, next) => {
     try {
@@ -436,7 +436,7 @@ router.delete(
 
 router.get(
   "/:id/teams",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser(["superadmin"]),
   catchErrors(async (req, res, next) => {
     try {
@@ -456,7 +456,7 @@ router.get(
 // Récupère la liste complète des données supprimée pour une organisation
 router.get(
   "/:id/deleted-data",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser(["admin"]),
   catchErrors(async (req, res, next) => {
     try {
@@ -509,7 +509,7 @@ router.get(
 // Restaure des données arbitraires dans une organisation (pas de vérification de cohérence)
 router.post(
   "/:id/restore-deleted-data",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser(["admin"]),
   catchErrors(async (req, res, next) => {
     try {
@@ -644,7 +644,7 @@ router.post(
 // SUpprime définitivement des données arbitraires dans une organisation (pas de vérification de cohérence)
 router.delete(
   "/:id/permanent-delete-data",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser(["admin"]),
   catchErrors(async (req, res, next) => {
     try {
@@ -757,7 +757,7 @@ router.delete(
 
 router.post(
   "/merge",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser(["superadmin"]),
   catchErrors(async (req, res, next) => {
     try {

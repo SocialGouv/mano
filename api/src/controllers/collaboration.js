@@ -11,7 +11,7 @@ const { serializeOrganisation } = require("../utils/data-serializer");
 
 router.put(
   "/",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser("admin"),
   validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {

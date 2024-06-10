@@ -16,7 +16,7 @@ const STATUS = [TODO, DONE, CANCEL];
 
 router.post(
   "/",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser(["admin", "normal", "restricted-access"]),
   validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
@@ -65,7 +65,7 @@ router.post(
 
 router.post(
   "/multiple",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser(["admin", "normal", "restricted-access"]),
   validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
@@ -120,7 +120,7 @@ router.post(
 
 router.get(
   "/",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser(["admin", "normal", "restricted-access", "stats-only"]),
   catchErrors(async (req, res, next) => {
     try {
@@ -191,7 +191,7 @@ router.get(
 
 router.put(
   "/:_id",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser(["admin", "normal", "restricted-access"]),
   validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
@@ -252,7 +252,7 @@ router.put(
 
 router.delete(
   "/:_id",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser(["admin", "normal"]),
   catchErrors(async (req, res, next) => {
     try {

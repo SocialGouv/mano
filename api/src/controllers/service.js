@@ -13,7 +13,7 @@ const { Organisation, Service, sequelize } = require("../db/sequelize");
 
 router.post(
   "/team/:team/date/:date",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   catchErrors(async (req, res, next) => {
     try {
       z.object({ count: z.number(), service: z.string().min(1) }).parse(req.body);
@@ -43,7 +43,7 @@ router.post(
 
 router.get(
   "/team/:team/date/:date",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   catchErrors(async (req, res, next) => {
     try {
       z.object({
@@ -67,7 +67,7 @@ router.get(
 
 router.get(
   "/for-reports",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   catchErrors(async (req, res, next) => {
     try {
       z.object({
@@ -108,7 +108,7 @@ router.get(
 
 router.get(
   "/all",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   catchErrors(async (req, res) => {
     const services = await Service.findAll({ where: { organisation: req.user.organisation } });
 
@@ -136,7 +136,7 @@ router.get(
 // [{ date: "2021-01-01", count: 10 }, { date: "2021-01-02", count: 5 }, ...]
 router.get(
   "/team/:team/month-stats/:date",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   catchErrors(async (req, res, next) => {
     try {
       z.object({
@@ -168,7 +168,7 @@ router.get(
 // [{ service: "service1", count: 10 }, { service: "service2", count: 5 }, ...]
 router.get(
   "/team/:team/stats",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   catchErrors(async (req, res, next) => {
     try {
       z.object({
@@ -214,7 +214,7 @@ router.get(
 // Update service name (from old to new)
 router.put(
   "/update-service-name",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateUser("admin"),
   catchErrors(async (req, res, next) => {
     try {
@@ -240,7 +240,7 @@ router.put(
 // Update service configuration
 router.put(
   "/update-configuration",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user", { session: false, failWithError: true }),
   validateEncryptionAndMigrations,
   validateUser("admin"),
   catchErrors(async (req, res, next) => {
