@@ -20,7 +20,7 @@ import API, { tryFetch, tryFetchExpectOk } from "../../services/api";
 import { useDataLoader } from "../../components/DataLoader";
 import useMinimumWidth from "../../services/useMinimumWidth";
 import { deploymentShortCommitSHAState } from "../../recoil/version";
-import { checkEncryptedVerificationKey, setOrgEncryptionKey } from "../../services/encryption";
+import { checkEncryptedVerificationKey, resetOrgEncryptionKey, setOrgEncryptionKey } from "../../services/encryption";
 import { errorMessage } from "../../utils";
 
 const SignIn = () => {
@@ -159,6 +159,7 @@ const SignIn = () => {
       const organisationKey = await setOrgEncryptionKey(signinForm.orgEncryptionKey.trim(), { needDerivation: true });
       const encryptionIsValid = await checkEncryptedVerificationKey(organisation.encryptedVerificationKey, organisationKey);
       if (!encryptionIsValid) {
+        resetOrgEncryptionKey();
         toast.error(
           "La clé de chiffrement ne semble pas être correcte, veuillez réessayer ou demander à un membre de votre organisation de vous aider (les équipes ne mano ne la connaissent pas)"
         );

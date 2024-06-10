@@ -41,6 +41,7 @@ import ConsultationModal from "./components/ConsultationModal";
 import TreatmentModal from "./scenes/person/components/TreatmentModal";
 import BottomBar from "./components/BottomBar";
 import CGUs from "./scenes/auth/cgus";
+import { getHashedOrgEncryptionKey } from "./services/encryption";
 
 RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = import.meta.env.VITE_DISABLE_RECOIL_DUPLICATE_ATOM_KEY_CHECKING ? false : true;
 
@@ -89,22 +90,23 @@ if (ENV === "production") {
 const App = ({ resetRecoil }) => {
   const user = useRecoilValue(userState);
   const initialLoadIsDone = useRecoilValue(initialLoadIsDoneState);
-
   const recoilResetKey = useRecoilValue(recoilResetKeyState);
   useEffect(() => {
     if (recoilResetKey) {
       resetRecoil();
     }
   }, [recoilResetKey, resetRecoil]);
-
   const { refresh } = useDataLoader();
+  const apiToken = API.getToken();
 
   useEffect(() => {
     const onWindowFocus = (e) => {
-      if (API.getToken() && e.newState === "active") {
+      if (apiToken && e.newState === "active") {
         // will force logout if session is expired
         tryFetch(() => API.get({ path: "/check-auth" })).then(() => {
-          if (initialLoadIsDone) {
+          // On ne recharge que s'il y a une clé de chiffrement
+          // Sinon ça met du bazar en cache (parce que ça va chercher des données chiffrées et que ça échoue)
+          if (initialLoadIsDone && getHashedOrgEncryptionKey()) {
             refresh();
           }
         });
@@ -114,7 +116,7 @@ const App = ({ resetRecoil }) => {
     return () => {
       lifecycle.removeEventListener("statechange", onWindowFocus);
     };
-  }, [refresh, initialLoadIsDone]);
+  }, [apiToken, refresh, initialLoadIsDone]);
 
   return (
     <div className="main-container">
