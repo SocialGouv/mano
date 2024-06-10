@@ -9,6 +9,7 @@ import type { Dayjs } from "dayjs";
 import type { FilterableField } from "../types/field";
 import type { EvolutiveStatOption } from "../types/evolutivesStats";
 import { SelectedPersonsModal } from "../scenes/stats/PersonsStats";
+import { itemsGroupedByPersonSelector } from "../recoil/selectors";
 
 interface EvolutiveStatsViewerProps {
   evolutiveStatsIndicators: IndicatorsSelection;
@@ -22,6 +23,9 @@ interface EvolutiveStatsViewerProps {
 
 export default function EvolutiveStatsViewer({ evolutiveStatsIndicators, period, persons, filterBase }: EvolutiveStatsViewerProps) {
   try {
+    const [personsModalOpened, setPersonsModalOpened] = useState(false);
+    const personsObject = useRecoilValue(itemsGroupedByPersonSelector);
+
     const evolutiveStatsPerson = useRecoilValue(
       evolutiveStatsForPersonsSelector({
         persons,
@@ -30,74 +34,81 @@ export default function EvolutiveStatsViewer({ evolutiveStatsIndicators, period,
         evolutiveStatsIndicators,
       })
     );
-    if (!evolutiveStatsPerson) return null;
+
     const {
       startDateConsolidated,
       endDateConsolidated,
-      fieldLabel,
       valueStart,
       valueEnd,
-      countStart,
-      countEnd,
-      fieldData, // structure example for field gender: { 'Homme': { 20240101: 1, 20240102: 2, 20240103: 3 }, 'Femme': { 20240101: 4, 20240102: 5, 20240103: 6 } }
-      personsAtStartByValue,
-      personsAtEndByValue,
+      countSwitched,
+      countPersonSwitched,
+      percentSwitched,
+      indicatorFieldLabel,
+      personsIdsSwitched,
     } = evolutiveStatsPerson;
 
+    // TODO: dans un second temps, on pourra afficher un tableau avec les stats par valeur
     if (valueStart == null) return null;
-    if (valueEnd == null) {
-      return (
-        <>
-          <h4 className="tw-mb-4">
-            Évolution du champ {fieldLabel} entre le {startDateConsolidated.format("DD/MM/YYYY")} et le {endDateConsolidated.format("DD/MM/YYYY")}
-          </h4>
-
-          <StreamChart
-            personsAtStartByValue={personsAtStartByValue}
-            personsAtEndByValue={personsAtEndByValue}
-            startDateConsolidated={startDateConsolidated}
-            endDateConsolidated={endDateConsolidated}
-            fieldData={fieldData}
-            field={filterBase.find((f) => f.name === evolutiveStatsIndicators[0].fieldName)}
-          />
-        </>
-      );
+    if (valueEnd == null) return null;
+    if (startDateConsolidated.isSame(endDateConsolidated)) {
+      return <p>Pour afficher des stats évolutives, veuillez sélectionner une période entre deux dates différentes</p>;
     }
 
     return (
-      <div className="tw-flex tw-w-full tw-justify-around">
-        <div className="tw-flex tw-shrink-0 tw-basis-1/4 tw-flex-col tw-items-center tw-justify-end tw-gap-y-4">
-          <h5>Au {startDateConsolidated.format("DD/MM/YYYY")}</h5>
-          <div className="tw-flex tw-w-full tw-flex-col tw-items-center tw-justify-around tw-rounded-lg tw-border tw-p-4">
-            <p className="tw-text-6xl tw-font-bold tw-text-main">{countStart}</p>
-            <p>{valueStart}</p>
-          </div>
-        </div>
-        <div className="tw-flex tw-basis-1/2 tw-flex-col tw-items-center tw-justify-end tw-gap-y-4">
-          {countStart > 0 && (
-            <div className="tw-flex tw-flex-col tw-items-center tw-justify-around tw-p-4">
-              <p className="tw-text-6xl tw-font-bold tw-text-main">{Math.round((countEnd / countStart) * 1000) / 10}%</p>
-              <p className="tw-m-0 tw-text-center">
-                des{" "}
-                <strong>
-                  {fieldLabel}: {valueStart}
-                </strong>{" "}
-                au {startDateConsolidated.format("DD/MM/YYYY")}
+      <>
+        <div className="tw-flex tw-w-full tw-justify-around tw-flex-col tw-items-center tw-gap-y-4">
+          <h5>
+            Entre le {startDateConsolidated.format("DD/MM/YYYY")} et le {endDateConsolidated.format("DD/MM/YYYY")}
+          </h5>
+
+          <div className="tw-flex tw-shrink-0 tw-items-center tw-justify-evenly tw-gap-y-4 tw-w-full">
+            <button
+              className="tw-flex tw-flex-col tw-items-center tw-justify-around tw-rounded-lg tw-border tw-p-4"
+              type="button"
+              onClick={() => {
+                setPersonsModalOpened(true);
+              }}
+            >
+              <div className="tw-flex tw-items-baseline tw-gap-x-2">
+                <p className="tw-text-6xl tw-font-bold tw-text-main">{countSwitched}</p>
+                <p>changements</p>
+              </div>
+              <p className="tw-text-center">
+                de <strong>{indicatorFieldLabel}</strong> de <strong>{valueStart} </strong> vers <strong>{valueEnd}</strong>
                 <br />
-                {valueStart === valueEnd ? " sont restés à " : " ont évolué vers "}
-                <strong>{valueEnd}</strong> au {endDateConsolidated.format("DD/MM/YYYY")}
+                ont été effectués
               </p>
-            </div>
-          )}
-        </div>
-        <div className="tw-flex tw-shrink-0 tw-basis-1/4 tw-flex-col tw-items-center tw-justify-end tw-gap-y-4">
-          <h5>Au {endDateConsolidated.format("DD/MM/YYYY")}</h5>
-          <div className="tw-flex tw-w-full tw-flex-col tw-items-center tw-justify-around tw-rounded-lg tw-border tw-p-4">
-            <p className="tw-text-6xl tw-font-bold tw-text-main">{countEnd}</p>
-            <p>{valueEnd}</p>
+            </button>
+          </div>
+          <div className="tw-flex tw-items-baseline tw-gap-x-2">
+            <p className="tw-text-center">
+              impactant <strong>{countPersonSwitched}</strong> personnes (<strong>{percentSwitched}%</strong>)
+            </p>
           </div>
         </div>
-      </div>
+
+        <SelectedPersonsModal
+          open={personsModalOpened}
+          onClose={() => {
+            setPersonsModalOpened(false);
+          }}
+          persons={personsIdsSwitched.map((id) => personsObject[id])}
+          sliceField={filterBase.find((f) => f.name === evolutiveStatsIndicators[0].fieldName)}
+          onAfterLeave={() => {}}
+          title={
+            <p className="tw-basis-1/2">
+              Personnes dont le champ {indicatorFieldLabel} est passé de {valueStart} à {valueEnd} entre le{" "}
+              {startDateConsolidated.format("DD/MM/YYYY")} et le {endDateConsolidated.format("DD/MM/YYYY")}
+              <br />
+              <br />
+              <small className="tw-text-gray-500 tw-block tw-text-xs">
+                Attention: cette liste affiche les personnes <strong>telles qu'elles sont aujourd'hui</strong>.
+                <br /> Pour en savoir plus sur l'évolution de chaque personne, cliquez dessus et consultez son historique.
+              </small>
+            </p>
+          }
+        />
+      </>
     );
   } catch (error) {
     capture(error, {
@@ -112,273 +123,5 @@ export default function EvolutiveStatsViewer({ evolutiveStatsIndicators, period,
       <h4>Erreur</h4>
       <p>Une erreur est survenue lors de l'affichage des statistiques évolutives. Les équipes techniques ont été prévenues</p>
     </div>
-  );
-}
-
-function StreamChart({
-  fieldData,
-  startDateConsolidated,
-  endDateConsolidated,
-  personsAtStartByValue,
-  personsAtEndByValue,
-  field,
-}: {
-  fieldData: Record<string, Record<string, number>>;
-  startDateConsolidated: Dayjs;
-  endDateConsolidated: Dayjs;
-  personsAtStartByValue: Record<EvolutiveStatOption, Array<PersonPopulated>>;
-  personsAtEndByValue: Record<EvolutiveStatOption, Array<PersonPopulated>>;
-  field: FilterableField;
-}) {
-  const chartData = useMemo(() => {
-    const data = [];
-    const legend = [];
-    const daysDiff = endDateConsolidated.diff(startDateConsolidated, "days");
-    const spacing = Math.floor(Math.max(1, daysDiff / 6));
-    // end date
-    const keys = Object.keys(fieldData)
-      .map((option) => ({
-        key: option,
-        value: fieldData[option][endDateConsolidated.format("YYYYMMDD")],
-      }))
-      .sort((a, b) => b.value - a.value)
-      .map((entry) => entry.key);
-    const lastDateValue: Record<(typeof keys)[number], number> = {} as any;
-    for (const option of keys) {
-      const value = fieldData[option][endDateConsolidated.format("YYYYMMDD")];
-      lastDateValue[option] = value;
-    }
-    for (let i = 0; i < daysDiff; i += spacing) {
-      const date = startDateConsolidated.add(i, "days");
-      legend.push(date.format("DD/MM/YYYY"));
-      const dateValue: any = {};
-      for (const option of keys) {
-        const value = fieldData[option][date.format("YYYYMMDD")];
-        dateValue[option] = value;
-      }
-      data.push(dateValue);
-    }
-    data.push(lastDateValue);
-    legend.push(endDateConsolidated.format("DD/MM/YYYY"));
-    return { data, legend, keys };
-  }, [startDateConsolidated, endDateConsolidated, fieldData]);
-
-  return (
-    <div>
-      <div
-        className={[
-          "tw-mx-auto tw-flex tw-h-[50vh] tw-w-[50vw] tw-basis-full tw-items-center tw-justify-center tw-font-bold print:tw-w-[600px] print:tw-max-w-[55%] print:!tw-grow print:!tw-basis-0",
-          // onItemClick ? '[&_path]:tw-cursor-pointer' : '',
-        ].join(" ")}
-      >
-        <ResponsiveStream
-          data={chartData.data}
-          keys={chartData.keys}
-          margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
-          axisTop={null}
-          axisRight={null}
-          axisBottom={{
-            // ori: 'bottom',
-            tickSize: 5,
-            tickPadding: 5,
-            tickRotation: -15,
-            legend: "",
-            legendOffset: 36,
-            format: (index) => chartData.legend[index],
-          }}
-          axisLeft={{
-            // orient: 'left',
-            tickSize: 5,
-            tickPadding: 5,
-            tickRotation: 0,
-            truncateTickAt: 1,
-            legend: "",
-            legendOffset: -40,
-            format: (e) => (Math.floor(e) === e ? e : ""),
-          }}
-          curve="basis"
-          enableGridX={true}
-          enableGridY={false}
-          offsetType="none"
-          colors={{ scheme: "set2" }}
-          fillOpacity={0.85}
-          borderColor={{ theme: "background" }}
-          dotSize={8}
-          dotColor={{ from: "color" }}
-          dotBorderWidth={2}
-          dotBorderColor={{
-            from: "color",
-            modifiers: [["darker", 0.7]],
-          }}
-          legends={[
-            {
-              anchor: "bottom-right",
-              direction: "column",
-              translateX: 100,
-              itemWidth: 80,
-              itemHeight: 20,
-              itemTextColor: "#999999",
-              symbolSize: 12,
-              symbolShape: "circle",
-              effects: [
-                {
-                  on: "hover",
-                  style: {
-                    itemTextColor: "#000000",
-                  },
-                },
-              ],
-            },
-          ]}
-        />
-      </div>
-      <EvolutiveStatsTable
-        chartData={chartData}
-        startDateConsolidated={startDateConsolidated}
-        endDateConsolidated={endDateConsolidated}
-        personsAtStartByValue={personsAtStartByValue}
-        personsAtEndByValue={personsAtEndByValue}
-        field={field}
-      />
-    </div>
-  );
-}
-
-function EvolutiveStatsTable({
-  personsAtStartByValue,
-  personsAtEndByValue,
-  chartData,
-  startDateConsolidated,
-  endDateConsolidated,
-  field,
-}: {
-  personsAtStartByValue: Record<EvolutiveStatOption, Array<PersonPopulated>>;
-  personsAtEndByValue: Record<EvolutiveStatOption, Array<PersonPopulated>>;
-  chartData: {
-    data: Array<Record<string, number>>;
-    keys: Array<string>;
-    legend: any;
-  };
-  startDateConsolidated: Dayjs;
-  endDateConsolidated: Dayjs;
-  field: FilterableField;
-}) {
-  const [personsModalOpened, setPersonsModalOpened] = useState(false);
-  const [sliceDate, setSliceDate] = useState(null);
-  const [sliceField, setSliceField] = useState(null);
-  const [sliceValue, setSliceValue] = useState(null);
-  const [slicedData, setSlicedData] = useState([]);
-
-  const onLineClick = (date: string, option: string, personsByValue: Record<EvolutiveStatOption, Array<PersonPopulated>>) => {
-    setSliceDate(date);
-    setSliceField(field);
-    setSliceValue(option);
-    const slicedData = personsByValue[option];
-    setSlicedData(slicedData);
-    setPersonsModalOpened(true);
-  };
-
-  console.log({
-    personsModalOpened,
-    sliceDate,
-    sliceField,
-    sliceValue,
-    slicedData,
-  });
-
-  return (
-    <>
-      <div className="tw-flex tw-basis-1/3 tw-items-center tw-justify-center">
-        <table className="tw-w-full tw-border tw-border-zinc-400">
-          <thead>
-            <tr>
-              <td className="tw-cursor-default tw-border tw-border-zinc-400 tw-p-1">Option</td>
-              <td className="tw-cursor-default tw-border tw-border-zinc-400 tw-p-1 tw-text-center">
-                Au {startDateConsolidated.format("DD/MM/YYYY")}
-              </td>
-              <td className="tw-cursor-default tw-border tw-border-zinc-400 tw-p-1 tw-text-center">Au {endDateConsolidated.format("DD/MM/YYYY")}</td>
-              <td className="tw-cursor-default tw-border tw-border-zinc-400 tw-p-1 tw-text-center">Différence</td>
-              <td className="tw-cursor-default tw-border tw-border-zinc-400 tw-p-1 tw-text-center">Différence (%)</td>
-            </tr>
-          </thead>
-          <tbody>
-            {chartData.keys.map((option) => {
-              const startValue = chartData.data[0][option];
-              const endValue = chartData.data.at(-1)[option];
-              const diff = endValue - startValue;
-              const sign = diff > 0 ? "+" : "";
-              const percentDiff = startValue === 0 || endValue === 0 ? 0 : Math.round((diff / startValue) * 1000) / 10;
-              return (
-                <tr key={option}>
-                  <td className="tw-cursor-default tw-border tw-border-zinc-400 tw-p-1">{option}</td>
-                  <td
-                    onClick={
-                      startValue > 0
-                        ? () => {
-                            console.log({ startDateConsolidated, option, personsAtStartByValue });
-                            onLineClick(startDateConsolidated.format("DD/MM/YYYY"), option, personsAtStartByValue);
-                          }
-                        : undefined
-                    }
-                    className={[
-                      "tw-border tw-border-zinc-400 tw-p-1 tw-text-center",
-                      startValue > 0 ? "tw-cursor-pointer" : "tw-cursor-default",
-                    ].join(" ")}
-                  >
-                    {startValue}
-                  </td>
-                  <td
-                    onClick={
-                      endValue > 0
-                        ? () => {
-                            console.log({ endDateConsolidated, option, personsAtEndByValue });
-                            onLineClick(endDateConsolidated.format("DD/MM/YYYY"), option, personsAtEndByValue);
-                          }
-                        : undefined
-                    }
-                    className={[
-                      "tw-border  tw-border-zinc-400 tw-p-1  tw-text-center",
-                      endValue > 0 ? "tw-cursor-pointer" : "tw-cursor-default",
-                    ].join(" ")}
-                  >
-                    {endValue}
-                  </td>
-                  <td className="tw-cursor-default tw-border tw-border-zinc-400 tw-p-1 tw-text-center">{diff === 0 ? "" : `${sign}${diff}`}</td>
-                  <td className="tw-cursor-default tw-border tw-border-zinc-400 tw-p-1 tw-text-center">
-                    {percentDiff === 0 ? "" : `${sign}${percentDiff}%`}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-      <SelectedPersonsModal
-        open={personsModalOpened}
-        onClose={() => {
-          setPersonsModalOpened(false);
-        }}
-        persons={slicedData}
-        sliceField={sliceField}
-        onAfterLeave={() => {
-          setSliceDate(null);
-          setSliceField(null);
-          setSliceValue(null);
-          setSlicedData([]);
-        }}
-        title={
-          <p className="tw-basis-1/2">
-            {`${sliceField?.label} au ${sliceDate}: ${sliceValue} (${slicedData.length})`}
-            <br />
-            <br />
-            <small className="tw-text-gray-500 tw-block tw-text-xs">
-              Attention: cette liste affiche les personnes <strong>telles qu'elles sont aujourd'hui</strong>, et non pas telles qu'elles sont au{" "}
-              {sliceDate}.
-              <br /> Pour en savoir plus sur l'évolution de chaque personne, cliquez dessus et consultez son historique.
-            </small>
-          </p>
-        }
-      />
-    </>
   );
 }

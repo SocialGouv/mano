@@ -85,12 +85,14 @@ export default function PersonStats({
             selection={evolutiveStatsIndicators}
             onChange={setEvolutiveStatsIndicators}
           />
-          <EvolutiveStatsViewer
-            evolutiveStatsIndicators={evolutiveStatsIndicators}
-            period={period}
-            persons={personsForStats}
-            filterBase={filterBase}
-          />
+          {!!evolutiveStatsIndicators.length && (
+            <EvolutiveStatsViewer
+              evolutiveStatsIndicators={evolutiveStatsIndicators}
+              period={period}
+              persons={personsForStats}
+              filterBase={filterBase}
+            />
+          )}
         </>
       ) : (
         <>

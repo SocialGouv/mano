@@ -34,7 +34,6 @@ async function deleteDB() {
 
 export async function clearCache(iteration = 0) {
   if (iteration > 10) throw new Error("Failed to clear cache");
-
   await deleteDB().catch(capture);
   window.localStorage?.clear();
   window.sessionStorage?.clear();
