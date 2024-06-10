@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useRecoilValue } from "recoil";
-import { teamsState, userState } from "../../recoil/auth";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { teamsState, usersState, userState } from "../../recoil/auth";
 import API, { tryFetchExpectOk } from "../../services/api";
 import { formatDateWithFullMonth } from "../../services/date";
 import useTitle from "../../services/useTitle";
@@ -46,7 +46,7 @@ const sortUsers = (sortBy, sortOrder) => (a, b) => {
 const List = () => {
   useTitle("Utilisateurs");
 
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useRecoilState(usersState);
   const user = useRecoilValue(userState);
 
   const history = useHistory();
