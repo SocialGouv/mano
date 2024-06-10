@@ -216,7 +216,7 @@ export async function tryFetch<T extends ApiResponse>(callback: FetchCallback<T>
 export async function tryFetchExpectOk<T extends ApiResponse>(callback: FetchCallback<T>): Promise<[Error | undefined, T | undefined]> {
   try {
     const result = await callback();
-    if (!result?.ok) throw new Error(result.error);
+    if (result && result?.ok === false) throw new Error(result.error);
     return [undefined, result];
   } catch (error) {
     capture(error);
