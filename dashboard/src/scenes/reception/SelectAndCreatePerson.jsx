@@ -186,7 +186,7 @@ const SelectAndCreatePerson = ({ value, onChange, inputId, classNamePrefix, show
         );
         setIsDisabled(false);
         const decryptedData = await decryptItem(response.data);
-        if (!error) {
+        if (!error && decryptedData) {
           await refresh();
           toast.success("Nouvelle personne ajoutée !");
           onChange([...currentValue, decryptedData]);

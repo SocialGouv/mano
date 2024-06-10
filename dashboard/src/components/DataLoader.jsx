@@ -230,7 +230,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
           return API.get({ path: "/person", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
-        const decryptedData = await Promise.all(res.data.map((p) => decryptItem(p)));
+        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadPersons(page + 1);
@@ -248,7 +248,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
           return API.get({ path: "/group", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
-        const decryptedData = await Promise.all(res.data.map((p) => decryptItem(p)));
+        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadGroups(page + 1);
@@ -266,7 +266,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
           return API.get({ path: "/report", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
-        const decryptedData = await Promise.all(res.data.map((p) => decryptItem(p)));
+        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadReports(page + 1);
@@ -284,7 +284,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
           return API.get({ path: "/passage", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
-        const decryptedData = await Promise.all(res.data.map((p) => decryptItem(p)));
+        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadPassages(page + 1);
@@ -302,7 +302,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
           return API.get({ path: "/rencontre", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
-        const decryptedData = await Promise.all(res.data.map((p) => decryptItem(p)));
+        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadRencontres(page + 1);
@@ -320,7 +320,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
           return API.get({ path: "/action", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
-        const decryptedData = await Promise.all(res.data.map((p) => decryptItem(p)));
+        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadActions(page + 1);
@@ -338,7 +338,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
           return API.get({ path: "/territory", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
-        const decryptedData = await Promise.all(res.data.map((p) => decryptItem(p)));
+        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadTerritories(page + 1);
@@ -356,7 +356,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
           return API.get({ path: "/place", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
-        const decryptedData = await Promise.all(res.data.map((p) => decryptItem(p)));
+        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadPlaces(page + 1);
@@ -374,7 +374,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
           return API.get({ path: "/relPersonPlace", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
-        const decryptedData = await Promise.all(res.data.map((p) => decryptItem(p)));
+        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadRelPersonPlaces(page + 1);
@@ -392,7 +392,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
           return API.get({ path: "/territory-observation", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
-        const decryptedData = await Promise.all(res.data.map((p) => decryptItem(p)));
+        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadObservations(page + 1);
@@ -410,7 +410,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
           return API.get({ path: "/comment", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
-        const decryptedData = await Promise.all(res.data.map((p) => decryptItem(p)));
+        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadComments(page + 1);
@@ -428,7 +428,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
           return API.get({ path: "/consultation", query: { ...query, page: String(page), after: isStartingInitialLoad ? 0 : lastLoadValue } });
         });
         if (error) return resetLoaderOnError();
-        const decryptedData = await Promise.all(res.data.map((p) => decryptItem(p)));
+        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadConsultations(page + 1);
@@ -446,7 +446,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
           return API.get({ path: "/treatment", query: { ...query, page: String(page), after: isStartingInitialLoad ? 0 : lastLoadValue } });
         });
         if (error) return resetLoaderOnError();
-        const decryptedData = await Promise.all(res.data.map((p) => decryptItem(p)));
+        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadTreatments(page + 1);
@@ -464,7 +464,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
           return API.get({ path: "/medical-file", query: { ...query, page: String(page), after: isStartingInitialLoad ? 0 : lastLoadValue } });
         });
         if (error) return resetLoaderOnError();
-        const decryptedData = await Promise.all(res.data.map((p) => decryptItem(p)));
+        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadMedicalFiles(page + 1);

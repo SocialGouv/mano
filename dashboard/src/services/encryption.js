@@ -213,6 +213,10 @@ export const encryptItem = async (item) => {
   return item;
 };
 
+// On retourne null si l'item n'a pas pu être déchiffré
+// Cela permet de ne pas stocker en cache ou dans le state des données non déchiffrées
+// Qui du coup ne se mettraient plus à jour correctement.
+// Par contre quand on appelle cette fonction, il faut vérifier si l'item est null et ne pas l'utiliser.
 export const decryptItem = async (item, { decryptDeleted = false } = {}) => {
   if (!getEnableEncrypt()) return item;
   if (!item.encrypted) return item;
@@ -227,7 +231,7 @@ export const decryptItem = async (item, { decryptDeleted = false } = {}) => {
     capture(`ERROR DECRYPTING ITEM : ${errorDecrypt}`, {
       extra: { message: "ERROR DECRYPTING ITEM", item },
     });
-    return item;
+    return null;
   }
 
   const { content, entityKey } = decryptedItem;
@@ -239,7 +243,7 @@ export const decryptItem = async (item, { decryptDeleted = false } = {}) => {
   } catch (errorDecryptParsing) {
     toast.error("Une erreur est survenue lors de la récupération des données déchiffrées: " + errorDecryptParsing);
     capture("ERROR PARSING CONTENT", { extra: { errorDecryptParsing, content } });
-    return item;
+    return null;
   }
   return {
     ...item,

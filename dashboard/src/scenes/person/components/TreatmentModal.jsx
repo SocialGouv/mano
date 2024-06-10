@@ -188,6 +188,10 @@ function TreatmentContent({ onClose, treatment, personId }) {
       return false;
     }
     const decryptedData = await decryptItem(treatmentResponse.data);
+    if (!decryptedData) {
+      toast.error("Erreur lors de la récupération des données du traitement");
+      return false;
+    }
     setData(decryptedData);
     await refresh();
     if (closeOnSubmit) onClose();

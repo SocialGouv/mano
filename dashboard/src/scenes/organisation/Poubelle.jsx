@@ -19,7 +19,7 @@ async function fetchPersons(organisationId) {
   }
   const decryptedData = {};
   for (const [key, value] of Object.entries(response.data)) {
-    const decryptedEntries = await Promise.all(value.map((item) => decryptItem(item, { decryptDeleted: true })));
+    const decryptedEntries = (await Promise.all(value.map((item) => decryptItem(item, { decryptDeleted: true })))).filter((e) => e);
     decryptedData[key] = decryptedEntries;
   }
   return decryptedData;

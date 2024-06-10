@@ -172,6 +172,10 @@ const RelPersonPlaceModal = ({ open, setOpen, person, relPersonPlaceModal, setPl
       return;
     }
     const decryptedData = await decryptItem(response.data);
+    if (!decryptedData) {
+      toast.error("Erreur lors de la création du lieu");
+      return;
+    }
     // On doit mettre à jour les places à la main pour être sûr qu'elles sont prêtes directement
     // Ce problème est visible dans les tests unitaires, qui peuvent parfois rater si on ne fait pas ça.
     // Il existe peut-être une meilleure solution.

@@ -169,10 +169,11 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
     );
     if (error) return false;
     const decryptedData = await decryptItem(response.data, data);
-    setData(decryptedData);
-    await refresh();
+    if (decryptedData) {
+      setData(decryptedData);
+      await refresh();
+    }
     if (closeOnSubmit) onClose();
-
     return true;
   }
 
