@@ -154,6 +154,12 @@ class Api {
   }
 }
 
+type RequestInit = {
+  headers: Record<string, string>;
+  mode: "cors";
+  credentials: "include";
+};
+
 type ApiResponse = {
   ok: boolean;
   data?: unknown;

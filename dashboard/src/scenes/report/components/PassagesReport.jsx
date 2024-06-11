@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import dayjs from "dayjs";
 import Passage from "../../../components/Passage";
 import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from "../../../components/tailwind/Modal";
@@ -10,7 +10,6 @@ import UserName from "../../../components/UserName";
 import TagTeam from "../../../components/TagTeam";
 import PersonName from "../../../components/PersonName";
 import DateBloc, { TimeBlock } from "../../../components/DateBloc";
-import Card from "../../../components/Card";
 import { useLocalStorage } from "../../../services/useLocalStorage";
 import { sortPassages } from "../../../recoil/passages";
 import { personsObjectSelector } from "../../../recoil/selectors";

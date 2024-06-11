@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CustomResponsivePie } from "./charts";
 import { useRecoilValue } from "recoil";
 import API, { tryFetchExpectOk } from "../../services/api";

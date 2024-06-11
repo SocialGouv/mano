@@ -1,11 +1,10 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { useHistory } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import Table from "./table";
 import DateBloc, { TimeBlock } from "./DateBloc";
 import ActionOrConsultationName from "./ActionOrConsultationName";
 import PersonName from "./PersonName";
-import { formatTime } from "../services/date";
 import { CANCEL, DONE, sortActionsOrConsultations } from "../recoil/actions";
 import { currentTeamState, organisationState, userState } from "../recoil/auth";
 import ExclamationMarkButton from "./tailwind/ExclamationMarkButton";

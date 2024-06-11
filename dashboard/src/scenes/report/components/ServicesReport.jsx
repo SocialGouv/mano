@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Spinner } from "reactstrap";
 import { toast } from "react-toastify";
 import { organisationState } from "../../../recoil/auth";
@@ -168,7 +168,7 @@ export default function ServicesReport({ period, selectedTeamsObject }) {
   );
 }
 
-function ServicesFullScreen({ open, onClose, period, isSingleDay, teamIds, services, setServices, serviceSumsForAllReports, selectedTeamsObject }) {
+function ServicesFullScreen({ open, onClose, period, isSingleDay, teamIds, services, setServices, selectedTeamsObject }) {
   const [show, setShow] = useState([]);
 
   return (

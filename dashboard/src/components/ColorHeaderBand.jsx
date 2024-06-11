@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useRecoilValue } from "recoil";
 import { teamsState } from "../recoil/auth";
 

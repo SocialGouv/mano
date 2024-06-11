@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { useHistory } from "react-router-dom";
 import { selector, selectorFamily, useRecoilValue } from "recoil";
 import { useLocalStorage } from "../../services/useLocalStorage";
@@ -38,9 +38,9 @@ const personsFilteredSelector = selectorFamily({
       const personsWithBirthDate = get(personsWithMedicalFileAndConsultationsMergedSelector);
       const currentTeam = get(currentTeamState);
       let pFiltered = personsWithBirthDate;
-      if (!!filters?.filter((f) => Boolean(f?.value)).length) pFiltered = filterData(pFiltered, filters);
-      if (!!alertness) pFiltered = pFiltered.filter((p) => !!p.alertness);
-      if (!!viewAllOrganisationData) return pFiltered;
+      if (filters?.filter((f) => Boolean(f?.value)).length) pFiltered = filterData(pFiltered, filters);
+      if (alertness) pFiltered = pFiltered.filter((p) => !!p.alertness);
+      if (viewAllOrganisationData) return pFiltered;
       return pFiltered.filter((p) => p.assignedTeams?.includes(currentTeam._id));
     },
 });

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useRecoilValue, selectorFamily } from "recoil";
 import { organisationState, userState } from "../../../recoil/auth";
 import { CANCEL, DONE, flattenedActionsCategoriesSelector, mappedIdsToLabels } from "../../../recoil/actions";
@@ -201,7 +201,7 @@ const ActionsTable = ({ filteredData }) => {
   return (
     <table className="table table-striped">
       <tbody className="small">
-        {filteredData.map((action, i) => {
+        {filteredData.map((action) => {
           const date = formatDateWithNameOfDay([DONE, CANCEL].includes(action.status) ? action.completedAt : action.dueAt);
           const time = action.withTime && action.dueAt ? ` ${formatTime(action.dueAt)}` : "";
           return (

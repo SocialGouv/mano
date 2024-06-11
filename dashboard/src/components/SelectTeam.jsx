@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import SelectCustom from "./SelectCustom";
 
 const SelectTeam = ({ name, onChange = () => null, teamId = null, teams = null, style = null, inputId = "", ...rest }) => {

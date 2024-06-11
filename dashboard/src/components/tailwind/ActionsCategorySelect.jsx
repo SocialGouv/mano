@@ -78,7 +78,7 @@ const ActionsCategorySelect = ({ label, values, onChange, id, withMostUsed, isDi
   const categories2Ref = useRef(null);
   const sortable1Ref = useRef(null);
   const sortable2Ref = useRef(null);
-  const onDragAndDrop = (ref, from) => () => {
+  const onDragAndDrop = (ref) => () => {
     if (!ref.current) return;
     const categoriesElement = ref.current.querySelectorAll("[data-category]");
     setSelected([...categoriesElement].map((el) => el.dataset.category));

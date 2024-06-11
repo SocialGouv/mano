@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { CustomResponsivePie } from "./charts";
 import { getPieData } from "./utils";
 import { AgeRangeBar } from "./PersonsStats";

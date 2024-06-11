@@ -396,10 +396,10 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
               }
             }}
           >
-            {({ values, handleChange, handleSubmit, isSubmitting, setFieldValue }) => {
+            {({ values, handleChange, handleSubmit, isSubmitting }) => {
               return (
                 <>
-                  {groupedCustomFieldsMedicalFileWithLegacyFields.map(({ name, fields }, index) => {
+                  {groupedCustomFieldsMedicalFileWithLegacyFields.map(({ name, fields }) => {
                     const key = groupedCustomFieldsMedicalFileWithLegacyFields.length === 1 ? "Dossier Médical" : name;
                     return (
                       <div key={key}>

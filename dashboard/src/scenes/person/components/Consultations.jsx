@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { useHistory } from "react-router-dom";
 import { organisationState, userState } from "../../../recoil/auth";
@@ -115,7 +115,7 @@ export const Consultations = ({ person }) => {
   );
 };
 
-const ConsultationsFilters = ({ data, filteredData, setConsultationTypes, setConsultationStatuses, consultationStatuses, consultationTypes }) => {
+const ConsultationsFilters = ({ data, setConsultationTypes, setConsultationStatuses, consultationStatuses, consultationTypes }) => {
   const organisation = useRecoilValue(organisationState);
 
   return (
@@ -161,7 +161,7 @@ const ConsultationsFilters = ({ data, filteredData, setConsultationTypes, setCon
   );
 };
 
-const ConsultationsTable = ({ filteredData, person }) => {
+const ConsultationsTable = ({ filteredData }) => {
   const user = useRecoilValue(userState);
   const history = useHistory();
 

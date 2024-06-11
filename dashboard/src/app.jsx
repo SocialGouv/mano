@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { RecoilEnv, RecoilRoot, useRecoilValue } from "recoil";
 import RecoilNexus from "recoil-nexus";
 import { Router, Switch, Redirect } from "react-router-dom";
@@ -184,11 +184,11 @@ export default function ContextedApp() {
     <RecoilRoot>
       {/* We need React.Suspense here because default values for `person`, `action` etc. tables is an async cache request */}
       {/* https://recoiljs.org/docs/guides/asynchronous-data-queries#query-default-atom-values */}
-      <React.Suspense fallback={<div></div>}>
+      <Suspense fallback={<div></div>}>
         {/* Recoil Nexus allows to use Recoil state outside React tree */}
         <RecoilNexus />
         <App />
-      </React.Suspense>
+      </Suspense>
     </RecoilRoot>
   );
 }

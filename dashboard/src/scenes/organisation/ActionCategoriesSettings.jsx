@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useDataLoader } from "../../components/DataLoader";
 import { actionsCategoriesSelector, flattenedActionsCategoriesSelector, actionsState, encryptAction } from "../../recoil/actions";

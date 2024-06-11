@@ -35,14 +35,15 @@ interface DocumentsOrganizerProps {
 const modalWidth = window.innerWidth * 0.9;
 const informationsWidth = modalWidth * 0.4;
 const informationsStyle = { flexBasis: informationsWidth };
+const emptyFunction = () => {};
 
 export default function DocumentsOrganizer({
   items,
   htmlId,
   rootFolderName = "Dossier Racine",
   onSave,
-  onDragStart = () => {},
-  onDragEnd = () => {},
+  onDragStart = emptyFunction,
+  onDragEnd = emptyFunction,
   onFolderClick,
   onDocumentClick,
   color,
@@ -99,7 +100,7 @@ export default function DocumentsOrganizer({
       // setReloadeTreeKey((k) => k + 1);
       setIsSaving(false);
     },
-    [items, htmlId, onSave]
+    [items, htmlId, onSave, onDragEnd]
   );
 
   if (!items.length) return null;

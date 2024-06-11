@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from "../../../components/tailwind/Modal";
 import { FullScreenIcon } from "../../../assets/icons/FullScreenIcon";
 import TabsNav from "../../../components/tailwind/TabsNav";

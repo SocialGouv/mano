@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { personsState, usePreparePersonForEncryption } from "../../recoil/persons";
 import { selector, useRecoilState, useRecoilValue } from "recoil";

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { useHistory } from "react-router-dom";
 import { userState } from "../../../recoil/auth";
@@ -84,7 +84,7 @@ export const Treatments = ({ person }) => {
   );
 };
 
-const TreatmentsTable = ({ filteredData, person }) => {
+const TreatmentsTable = ({ filteredData }) => {
   const user = useRecoilValue(userState);
   const history = useHistory();
 
@@ -109,9 +109,7 @@ const TreatmentsTable = ({ filteredData, person }) => {
           return (
             <tr
               key={treatment._id}
-              className={["tw-w-full tw-border-t tw-border-zinc-200 tw-bg-blue-900", Boolean(i % 2) ? "tw-bg-opacity-0" : "tw-bg-opacity-5"].join(
-                " "
-              )}
+              className={["tw-w-full tw-border-t tw-border-zinc-200 tw-bg-blue-900", i % 2 ? "tw-bg-opacity-0" : "tw-bg-opacity-5"].join(" ")}
             >
               <td>
                 <div
@@ -148,7 +146,7 @@ const TreatmentsTable = ({ filteredData, person }) => {
 };
 
 function TreatmentDate({ treatment }) {
-  if (!!treatment.endDate) {
+  if (treatment.endDate) {
     return (
       <p className="tw-m-0">
         Du {formatDateWithFullMonth(treatment.startDate)} au {formatDateWithFullMonth(treatment.endDate)}

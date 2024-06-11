@@ -9,7 +9,7 @@ const DuplicatedReportsTestChecker = () => {
       reportsByDate[`${report.date}-${report.team}`].push(report);
       return reportsByDate;
     }, {})
-  ).filter(([key, reportsByDate]) => reportsByDate.length > 1);
+  ).filter(([_key, reportsByDate]) => reportsByDate.length > 1);
   if (duplicateReports.length === 0) return null;
   return (
     <div className="tw-fixed tw-inset-0 tw-z-[999999999] tw-flex tw-flex-col tw-items-center tw-justify-center tw-gap-3 tw-bg-red-500">

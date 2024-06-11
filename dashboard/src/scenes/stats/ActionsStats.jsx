@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { CustomResponsiveBar } from "./charts";
 import { mappedIdsToLabels } from "../../recoil/actions";
 import SelectCustom from "../../components/SelectCustom";
@@ -77,7 +77,7 @@ const ActionsStats = ({
       </div>
       <div className="tw-mb-5 tw-flex tw-basis-full tw-items-center">
         <label htmlFor="filter-by-status" className="tw-w-64 tw-shrink-0">
-          Filtrer par statut :
+          Filtrer par statut&nbsp;:
         </label>
         <div className="tw-basis-[500px]">
           <SelectCustom
@@ -95,7 +95,7 @@ const ActionsStats = ({
       </div>
       <div className="tw-mb-5 tw-flex tw-basis-full tw-items-center">
         <label htmlFor="filter-by-status" className="tw-w-64 tw-shrink-0">
-          Filtrer par groupe de catégories :
+          Filtrer par groupe de catégories&nbsp;:
         </label>
         <div className="tw-basis-[500px]">
           <SelectCustom

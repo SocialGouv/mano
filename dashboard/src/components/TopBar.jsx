@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from "reactstrap";
 import logo from "../assets/logo-green-creux-plus-petit.png";

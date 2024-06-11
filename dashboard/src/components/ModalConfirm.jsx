@@ -1,4 +1,3 @@
-import React from "react";
 import { atom, useRecoilState } from "recoil";
 import { ModalContainer, ModalFooter, ModalBody, ModalHeader } from "./tailwind/Modal";
 
@@ -58,7 +57,7 @@ const ModalConfirm = () => {
         </ModalBody>
       )}
       <ModalFooter>
-        {buttons.map(({ text, onClick, className }, index) => (
+        {buttons.map(({ text, onClick, className }) => (
           <button
             name={text}
             key={text}

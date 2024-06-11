@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { components } from "react-select";
 import SortableJS from "sortablejs";
 import SelectCustom from "./SelectCustom";

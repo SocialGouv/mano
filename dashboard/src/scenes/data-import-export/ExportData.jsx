@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { utils, writeFile } from "@e965/xlsx";
 
 import ButtonCustom from "../../components/ButtonCustom";
@@ -42,7 +42,7 @@ const createSheet = (data) => {
   ];
 
   const sheet = data.reduce(
-    (xlsxData, item, index) => {
+    (xlsxData, item) => {
       const row = [];
       for (let column of header) {
         const value = item[column];

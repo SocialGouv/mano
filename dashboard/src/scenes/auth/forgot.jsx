@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import validator from "validator";
 import { toast } from "react-toastify";
 import ButtonCustom from "../../components/ButtonCustom";

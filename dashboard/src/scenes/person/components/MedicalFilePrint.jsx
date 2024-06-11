@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { useRecoilValue } from "recoil";
 import { flattenedCustomFieldsPersonsSelector } from "../../../recoil/persons";
 import { currentTeamState, organisationState, usersState } from "../../../recoil/auth";

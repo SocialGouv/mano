@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import TabsNav from "../../../components/tailwind/TabsNav";
 import type { PersonPopulated } from "../../../types/person";
@@ -12,7 +12,7 @@ import { filterBySearch } from "../../search/utils";
 import TreatmentsSortableList from "./TreatmentsSortableList";
 import ActionsSortableList from "../../../components/ActionsSortableList";
 import CommentsSortableList from "../../../components/CommentsSortableList";
-import { DocumentsModule, DocumentTable } from "../../../components/DocumentsGeneric";
+import { DocumentsModule } from "../../../components/DocumentsGeneric";
 
 export default function SearchInPerson({ person }: { person: PersonPopulated }) {
   const [search, setSearch] = useLocalStorage("person-search", "");

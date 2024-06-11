@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Loading from "../../components/loading";
 import Table from "../../components/table";
 import { toast } from "react-toastify";
@@ -140,7 +140,7 @@ const List = () => {
 };
 
 const Structure = ({ structure: initStructure, onSuccess, open, onClose, onOpen }) => {
-  const structureRef = React.useRef(initStructure);
+  const structureRef = useRef(initStructure);
   const user = useRecoilValue(userState);
   const categories = useRecoilValue(flattenedStructuresCategoriesSelector);
 

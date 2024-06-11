@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Redirect, useLocation } from "react-router-dom";
 import ChangePassword from "../../components/ChangePassword";
 import API, { tryFetch, tryFetchExpectOk } from "../../services/api";

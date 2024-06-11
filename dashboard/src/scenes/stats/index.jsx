@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { selectorFamily, useRecoilValue } from "recoil";
 import { useLocalStorage } from "../../services/useLocalStorage";
 import {
@@ -510,7 +510,15 @@ const Stats = () => {
       );
     }
     return filterBase;
-  });
+  }, [
+    filterPersonsBase,
+    fieldsPersonsCustomizableOptions,
+    flattenedCustomFieldsPersons,
+    customFieldsMedicalFile,
+    consultationFields,
+    currentTeam,
+    user,
+  ]);
 
   const availableTabs = tabs.filter((tabCaption) => {
     if (["Observations"].includes(tabCaption)) {

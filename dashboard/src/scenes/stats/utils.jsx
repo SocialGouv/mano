@@ -7,11 +7,11 @@ export const getDuration = (timestampFromNow) => {
   return [Math.round(inYears), "années"];
 };
 
-export const getPieData = (source, key, { options = null, isBoolean = false, debug = false } = {}) => {
+export const getPieData = (source, key, { options = null, isBoolean = false } = {}) => {
   const data = source.reduce(
     (newData, item) => {
       if (isBoolean) {
-        newData[Boolean(item[key]) ? "Oui" : "Non"]++;
+        newData[item[key] ? "Oui" : "Non"]++;
         return newData;
       }
       if (!item[key] || !item[key].length || item[key].includes("Choisissez") || item[key].includes("Choisir")) {
@@ -59,7 +59,7 @@ const initOptions = (options) => {
 export const getMultichoiceBarData = (source, key, { options = [] } = {}) => {
   options = initOptions(options);
 
-  const reducedDataPerOption = source.reduce((newData, item, index) => {
+  const reducedDataPerOption = source.reduce((newData, item) => {
     if (!item[key] || !item[key].length) {
       newData["Non renseigné"].push(item);
       return newData;

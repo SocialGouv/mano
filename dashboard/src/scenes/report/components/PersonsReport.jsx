@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import dayjs from "dayjs";
 import { useHistory } from "react-router-dom";
 import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from "../../../components/tailwind/Modal";
 import { FullScreenIcon } from "../../../assets/icons/FullScreenIcon";
@@ -54,7 +53,7 @@ export const PersonsReport = ({ personsCreated, period, selectedTeams }) => {
   );
 };
 
-const PersonsTable = ({ period, personsCreated, selectedTeams }) => {
+const PersonsTable = ({ personsCreated }) => {
   const [sortBy, setPersonSortBy] = useLocalStorage("person-sortBy", "name");
   const [sortOrder, setPersonSortOrder] = useLocalStorage("person-sortOrder", "ASC");
   const history = useHistory();

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useDataLoader } from "../../components/DataLoader";
 import { organisationState } from "../../recoil/auth";
@@ -50,7 +50,7 @@ function CollaborationsSettings() {
   );
 }
 
-const AddCollaboration = ({ groupTitle }) => {
+const AddCollaboration = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
 
   const onAddCategory = async (e) => {
@@ -100,7 +100,7 @@ const Collaboration = ({ item: collaboration }) => {
   const [isSelected, setIsSelected] = useState(false);
   const [isEditingCategory, setIsEditingCollaboration] = useState(false);
   const [organisation, setOrganisation] = useRecoilState(organisationState);
-  const [reports, setReports] = useRecoilState(reportsState);
+  const reports = useRecoilValue(reportsState);
 
   const { refresh } = useDataLoader();
 

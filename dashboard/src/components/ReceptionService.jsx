@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { servicesSelector } from "../recoil/reports";
 import { useRecoilValue } from "recoil";
 import API from "../services/api";

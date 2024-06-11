@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import SelectCustom from "./SelectCustom";
 import { components } from "react-select";
 import { dayjsInstance, isOnSameDay } from "../services/date";
@@ -318,8 +318,8 @@ const numberOptions = [
 ];
 
 const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
-  const [comparator, setComparator] = React.useState(null);
-  const [unfilledChecked, setUnfilledChecked] = React.useState(value === "Non renseigné");
+  const [comparator, setComparator] = useState(null);
+  const [unfilledChecked, setUnfilledChecked] = useState(value === "Non renseigné");
   if (!field) return <></>;
   const current = base.find((filter) => filter.field === field);
   if (!current) return <></>;

@@ -7,7 +7,7 @@ import SelectUser from "./SelectUser";
 import { teamsState, userState } from "../recoil/auth";
 import { useRecoilValue } from "recoil";
 import API, { tryFetchExpectOk } from "../services/api";
-import { preparePassageForEncryption, encryptPassage } from "../recoil/passages";
+import { encryptPassage } from "../recoil/passages";
 import SelectTeam from "./SelectTeam";
 import SelectPerson from "./SelectPerson";
 import DatePicker from "./DatePicker";

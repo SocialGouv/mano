@@ -1,11 +1,11 @@
-import React, { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useDataLoader } from "../../components/DataLoader";
 import { organisationState } from "../../recoil/auth";
 import API, { tryFetchExpectOk } from "../../services/api";
 import { toast } from "react-toastify";
 import DragAndDropSettings from "./DragAndDropSettings";
-import { consultationsState, prepareConsultationForEncryption, encryptConsultation } from "../../recoil/consultations";
+import { consultationsState, prepareConsultationForEncryption } from "../../recoil/consultations";
 import { EditCustomField } from "../../components/TableCustomFields";
 import CustomFieldSetting from "../../components/CustomFieldSetting";
 import { encryptItem } from "../../services/encryption";

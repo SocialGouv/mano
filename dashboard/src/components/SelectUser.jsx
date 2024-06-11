@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useRecoilValue } from "recoil";
 import { usersState } from "../recoil/auth";
 import SelectCustom from "./SelectCustom";

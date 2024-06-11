@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import QuestionMarkButton from "./QuestionMarkButton";
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "./tailwind/Modal";
 

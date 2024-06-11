@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import dayjs from "dayjs";
 import { ModalHeader, ModalBody, ModalContainer, ModalFooter } from "../../../components/tailwind/Modal";
 import { FullScreenIcon } from "../../../assets/icons/FullScreenIcon";

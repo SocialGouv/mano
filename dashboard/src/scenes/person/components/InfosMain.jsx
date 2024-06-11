@@ -1,5 +1,5 @@
 import { dayjsInstance, formatAge } from "../../../services/date";
-import React, { useState } from "react";
+import { useState } from "react";
 import EditModal from "./EditModal";
 import TagTeam from "../../../components/TagTeam";
 import ExclamationMarkButton from "../../../components/tailwind/ExclamationMarkButton";

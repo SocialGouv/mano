@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import { useParams, useHistory } from "react-router-dom";
 import { toast } from "react-toastify";
 import Loading from "../../components/loading";
@@ -22,7 +22,7 @@ const View = () => {
   const [, setSelectedTerritories] = useLocalStorage("stats-territories");
   const user = useRecoilValue(userState);
   const [territories] = useRecoilState(territoriesState);
-  const [modalOpen, setModalOpen] = React.useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const territory = territories.find((t) => t._id === id);
 
   useTitle(`${territory?.name} - Territoire`);

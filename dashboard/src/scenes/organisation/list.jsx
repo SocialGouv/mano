@@ -9,9 +9,6 @@ import API, { tryFetch, tryFetchExpectOk } from "../../services/api";
 import { formatAge, formatDateWithFullMonth } from "../../services/date";
 import useTitle from "../../services/useTitle";
 import DeleteButtonAndConfirmModal from "../../components/DeleteButtonAndConfirmModal";
-import { capture } from "../../services/sentry";
-import { useRecoilValue } from "recoil";
-import { userState } from "../../recoil/auth";
 import { download, emailRegex, errorMessage } from "../../utils";
 import SelectRole from "../../components/SelectRole";
 import SelectCustom from "../../components/SelectCustom";
@@ -22,7 +19,6 @@ import { checkEncryptedVerificationKey, derivedMasterKey } from "../../services/
 
 const List = () => {
   const [organisations, setOrganisations] = useState(null);
-  const user = useRecoilValue(userState);
   const [updateKey, setUpdateKey] = useState(null);
   const [sortBy, setSortBy] = useState("countersTotal");
   const [sortOrder, setSortOrder] = useState("DESC");
@@ -336,7 +332,7 @@ const Create = ({ onChange, open, setOpen }) => {
             return errors;
           }}
           onSubmit={async (body, actions) => {
-            const [error, response] = await tryFetch(async () => API.post({ path: "/organisation", body }));
+            const [error] = await tryFetch(async () => API.post({ path: "/organisation", body }));
             actions.setSubmitting(false);
             if (error) {
               return toast.error(errorMessage(error));
@@ -346,7 +342,7 @@ const Create = ({ onChange, open, setOpen }) => {
             setOpen(false);
           }}
         >
-          {({ values, handleChange, handleSubmit, isSubmitting, touched, errors }) => (
+          {({ values, handleChange, handleSubmit, touched, errors }) => (
             <>
               <ModalBody className="tw-px-4 tw-py-2 tw-pb-20">
                 <React.Fragment>
@@ -597,7 +593,7 @@ const CreateUser = ({ onChange, open, setOpen, organisation }) => {
             }
           }}
         >
-          {({ values, handleChange, handleSubmit, isSubmitting }) => (
+          {({ values, handleChange, handleSubmit }) => (
             <>
               <ModalHeader title={`Créer un utilisateur pour ${organisation.orgId}`} />
               <ModalBody className="tw-px-4 tw-py-2 tw-pb-20">

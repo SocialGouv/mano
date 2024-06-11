@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import validator from "validator";
 import { Link, useHistory } from "react-router-dom";
 import { toast } from "react-toastify";

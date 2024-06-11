@@ -223,7 +223,7 @@ const ActionsCalendar = ({ actions, isNightSession, columns = ["Heure", "Nom", "
           `${renderDate(addOneDay(currentDate))} (${theDayAfterActions.length})`,
           ">",
         ]}
-        onClick={(tab, index) => {
+        onClick={(_tab, index) => {
           if (index === 0) return setCurrentDate(subtractOneDay(currentDate));
           if (index === 4) return setCurrentDate(addOneDay(currentDate));
           setActiveTabIndex(index);
@@ -240,13 +240,13 @@ const ActionsCalendar = ({ actions, isNightSession, columns = ["Heure", "Nom", "
       </div>
       <div>
         {activeTabIndex === 1 && (
-          <div className={!!theDayBeforeActions.length ? "tw-pb-8" : ""}>{renderActionsTable(theDayBeforeActions, subtractOneDay(currentDate))}</div>
+          <div className={theDayBeforeActions.length ? "tw-pb-8" : ""}>{renderActionsTable(theDayBeforeActions, subtractOneDay(currentDate))}</div>
         )}
         {activeTabIndex === 2 && (
-          <div className={!!theCurrentDayActions.length ? "tw-pb-8" : ""}>{renderActionsTable(theCurrentDayActions, currentDate)}</div>
+          <div className={theCurrentDayActions.length ? "tw-pb-8" : ""}>{renderActionsTable(theCurrentDayActions, currentDate)}</div>
         )}
         {activeTabIndex === 3 && (
-          <div className={!!theDayAfterActions.length ? "tw-pb-8" : ""}>{renderActionsTable(theDayAfterActions, addOneDay(currentDate))}</div>
+          <div className={theDayAfterActions.length ? "tw-pb-8" : ""}>{renderActionsTable(theDayAfterActions, addOneDay(currentDate))}</div>
         )}
       </div>
     </>

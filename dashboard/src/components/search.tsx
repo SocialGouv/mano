@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, forwardRef } from "react";
 
 type SearchProps = {
   value?: string;
@@ -7,7 +7,7 @@ type SearchProps = {
   id?: string;
 };
 
-const Search = React.forwardRef<HTMLInputElement, SearchProps>(
+const Search = forwardRef<HTMLInputElement, SearchProps>(
   ({ value = "", onChange = Function.prototype, placeholder = "Recherche", id = "search" }, ref) => {
     const [cachedValue, setCachedValue] = useState(value);
 
@@ -35,5 +35,7 @@ const Search = React.forwardRef<HTMLInputElement, SearchProps>(
     );
   }
 );
+
+Search.displayName = "Search";
 
 export default Search;

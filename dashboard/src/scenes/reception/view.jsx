@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useRef, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { Modal, ModalBody, ModalHeader } from "reactstrap";
 import { useHistory, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -11,7 +11,7 @@ import SelectStatus from "../../components/SelectStatus";
 import { actionsState, TODO } from "../../recoil/actions";
 import { currentTeamState, userState, organisationState } from "../../recoil/auth";
 import { personsState } from "../../recoil/persons";
-import { selector, selectorFamily, useRecoilValue, useSetRecoilState } from "recoil";
+import { selector, selectorFamily, useRecoilValue } from "recoil";
 import API, { tryFetchExpectOk } from "../../services/api";
 import dayjs from "dayjs";
 import { passagesState, encryptPassage } from "../../recoil/passages";
@@ -98,7 +98,6 @@ const Reception = () => {
   const { refresh } = useDataLoader();
   const currentTeam = useRecoilValue(currentTeamState);
   const organisation = useRecoilValue(organisationState);
-  const setPassages = useSetRecoilState(passagesState);
   const passages = useRecoilValue(todaysPassagesSelector);
   const [status, setStatus] = useState(TODO);
   const actionsByStatus = useRecoilValue(actionsByStatusSelector({ status }));

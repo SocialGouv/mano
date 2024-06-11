@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { CustomResponsivePie } from "./charts";
 import { getPieData } from "./utils";
 import CustomFieldsStats from "./CustomFieldsStats";

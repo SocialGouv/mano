@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { useHistory } from "react-router-dom";
 import { v4 as uuid } from "uuid";
@@ -12,7 +12,6 @@ import API, { tryFetch, tryFetchBlob } from "../services/api";
 import { download, errorMessage, viewBlobInNewWindow } from "../utils";
 import type { UUIDV4 } from "../types/uuid";
 import PersonName from "./PersonName";
-import { capture } from "../services/sentry";
 import { toast } from "react-toastify";
 import DocumentsOrganizer from "./DocumentsOrganizer";
 import { decryptFile, encryptFile, getHashedOrgEncryptionKey } from "../services/encryption";
@@ -542,7 +541,7 @@ function DocumentsDropZone({ children, personId, onAddDocuments, color, classNam
           onDragOver={(e) => {
             e.preventDefault(); // Prevent default behavior (Prevent file from being opened)
           }}
-          onDragLeave={(e) => {
+          onDragLeave={() => {
             if (isInDropzone) setIsInDropzone(false);
           }}
           onDrop={async (e) => {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { organisationState, userState } from "../recoil/auth";
 import { usePreparePersonForEncryption } from "../recoil/persons";

@@ -12,7 +12,7 @@ import {
   usePreparePersonForEncryption,
 } from "../../recoil/persons";
 import TableCustomFields from "../../components/TableCustomFields";
-import { organisationState, userState, encryptionKeyLengthState, MINIMUM_ENCRYPTION_KEY_LENGTH } from "../../recoil/auth";
+import { organisationState, encryptionKeyLengthState, MINIMUM_ENCRYPTION_KEY_LENGTH } from "../../recoil/auth";
 import API, { tryFetchExpectOk } from "../../services/api";
 import ExportData from "../data-import-export/ExportData";
 import ImportPersons from "../data-import-export/ImportPersons";
@@ -70,7 +70,6 @@ function MenuButton({ selected, text, onClick }: { selected: boolean; text: stri
 
 const View = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
-  const user = useRecoilValue(userState);
   const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);

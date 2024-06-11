@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
 
 import picture1 from "../assets/MANO_livraison_elements-07_green.png";

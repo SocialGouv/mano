@@ -12,7 +12,7 @@ import { relsPersonPlaceState } from "../../recoil/relPersonPlace";
 import { sortTerritories, territoriesState } from "../../recoil/territory";
 import { selector, selectorFamily, useRecoilValue } from "recoil";
 import { itemsGroupedByPersonSelector, onlyFilledObservationsTerritories, personsObjectSelector } from "../../recoil/selectors";
-import { formatBirthDate, formatDateWithFullMonth, formatTime } from "../../services/date";
+import { formatBirthDate, formatDateWithFullMonth } from "../../services/date";
 import { useDataLoader } from "../../components/DataLoader";
 import { placesState } from "../../recoil/places";
 import { filterBySearch } from "./utils";
@@ -45,7 +45,7 @@ const personsWithFormattedBirthDateSelector = selector({
 const personsFilteredBySearchForSearchSelector = selectorFamily({
   key: "personsFilteredBySearchForSearchSelector",
   get:
-    ({ search, sortBy, sortOrder }) =>
+    ({ search }) =>
     ({ get }) => {
       const persons = get(personsWithFormattedBirthDateSelector);
       const personsPopulated = get(itemsGroupedByPersonSelector);
@@ -72,7 +72,6 @@ const commentsPopulatedSelector = selector({
   key: "commentsPopulatedSelector",
   get: ({ get }) => {
     const comments = get(commentsState);
-    const persons = get(personsObjectSelector);
     const actions = get(actionsObjectSelector);
     const commentsObject = {};
     for (const comment of comments) {
@@ -351,103 +350,6 @@ const Persons = ({ persons }) => {
           render: (p) => formatDateWithFullMonth(p.followedSince || p.createdAt || ""),
         },
       ].filter((c) => organisation.groupsEnabled || c.dataKey !== "group")}
-    />
-  );
-};
-
-const Comments = ({ comments }) => {
-  const history = useHistory();
-  const organisation = useRecoilValue(organisationState);
-
-  if (!comments?.length) return <div />;
-  const moreThanOne = comments.length > 1;
-
-  return (
-    <Table
-      className="Table"
-      title={`Commentaire${moreThanOne ? "s" : ""} (${comments.length})`}
-      data={comments}
-      noData="Pas de commentaire"
-      onRowClick={(comment) => {
-        history.push(`/${comment.type}/${comment[comment.type]._id}`);
-      }}
-      rowKey="_id"
-      columns={[
-        {
-          title: "",
-          dataKey: "urgentOrGroup",
-          small: true,
-          render: (comment) => {
-            return (
-              <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
-                {!!comment.urgent && <ExclamationMarkButton />}
-                {!!organisation.groupsEnabled && !!comment.group && (
-                  <span className="tw-text-3xl" aria-label="Commentaire familial" title="Commentaire familial">
-                    👪
-                  </span>
-                )}
-              </div>
-            );
-          },
-        },
-        {
-          title: "Date",
-          dataKey: "date",
-          render: (comment) => (
-            <span>
-              {dayjs(comment.date || comment.createdAt).format("ddd DD/MM/YY")}
-              <br />à {dayjs(comment.date || comment.createdAt).format("HH:mm")}
-            </span>
-          ),
-        },
-        {
-          title: "Utilisateur",
-          dataKey: "user",
-          render: (comment) => <UserName id={comment.user} />,
-        },
-        {
-          title: "Type",
-          dataKey: "type",
-          render: (comment) => <span>{comment.type === "action" ? "Action" : "Personne suivie"}</span>,
-        },
-        {
-          title: "Nom",
-          dataKey: "person",
-          render: (comment) => (
-            <>
-              <b></b>
-              <b>{comment[comment.type]?.name}</b>
-              {comment.type === "action" && (
-                <>
-                  <br />
-                  <i>(pour {comment.person?.name || ""})</i>
-                </>
-              )}
-            </>
-          ),
-        },
-        {
-          title: "Commentaire",
-          dataKey: "comment",
-          render: (comment) => {
-            return (
-              <p>
-                {comment.comment
-                  ? comment.comment.split("\n").map((c, i, a) => {
-                      if (i === a.length - 1) return c;
-                      return (
-                        <React.Fragment key={i}>
-                          {c}
-                          <br />
-                        </React.Fragment>
-                      );
-                    })
-                  : ""}
-              </p>
-            );
-          },
-        },
-      ]}
     />
   );
 };

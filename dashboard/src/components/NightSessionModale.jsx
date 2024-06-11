@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Modal, ModalBody, ModalHeader } from "reactstrap";
 import QuestionMarkButton from "./QuestionMarkButton";
 

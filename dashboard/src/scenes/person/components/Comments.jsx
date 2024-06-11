@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { CommentsModule } from "../../../components/CommentsGeneric";
 import { encryptComment } from "../../../recoil/comments";
 import API, { tryFetchExpectOk } from "../../../services/api";
-import { organisationState, userState } from "../../../recoil/auth";
+import { organisationState } from "../../../recoil/auth";
 import { groupsState } from "../../../recoil/groups";
 import { useDataLoader } from "../../../components/DataLoader";
 import { errorMessage } from "../../../utils";
@@ -13,7 +13,7 @@ export default function Comments({ person }) {
   const organisation = useRecoilValue(organisationState);
   const groups = useRecoilValue(groupsState);
   const { refresh } = useDataLoader();
-  const user = useRecoilValue(userState);
+
   // On affiche les commentaires médicaux partagés par les professionnels de santés
   // à tout le monde s'ils ont coché la case "Partager avec les professionnels non-médicaux"
   const medicalCommentsVisibleByAll = useMemo(() => {
@@ -21,7 +21,7 @@ export default function Comments({ person }) {
       .filter((e) => e.share === true)
       .map((e) => ({ ...e, isMedicalCommentShared: true }))
       .sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
-  }, [person, user.healthcareProfessional]);
+  }, [person]);
   const comments = useMemo(
     () =>
       [...(person?.comments || []), ...medicalCommentsVisibleByAll].sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt)),

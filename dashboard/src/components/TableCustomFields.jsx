@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { useRecoilState } from "recoil";
 import { organisationState } from "../recoil/auth";
@@ -89,7 +89,7 @@ const TableCustomFields = ({
     setIsSubmitting(false);
   };
 
-  const handleSort = async (keys, oldData) => {
+  const handleSort = async (keys) => {
     setIsSubmitting(true);
     const dataForApi = keys.map((key) => mutableData.find((field) => field.name === key));
     const [error, response] = await tryFetchExpectOk(async () =>

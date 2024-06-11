@@ -175,6 +175,8 @@ const ModalBody = forwardRef<HTMLDivElement, ModalBodyProps>(({ children, classN
   );
 });
 
+ModalBody.displayName = "ModalBody";
+
 interface ModalFooterProps {
   children: React.ReactNode;
 }

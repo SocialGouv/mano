@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { utils, writeFile } from "@e965/xlsx";
-import SelectCustom from "../../components/SelectCustom";
 import CustomFieldsStats from "./CustomFieldsStats";
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "../../components/tailwind/Modal";
 import { currentTeamState, teamsState, usersState, userState } from "../../recoil/auth";

@@ -135,7 +135,7 @@ const ServicesSettings = () => {
   );
 };
 
-const AddService = ({ groupTitle, services, onDragAndDrop }) => {
+const AddService = ({ groupTitle }) => {
   const groupedServices = useRecoilValue(servicesSelector);
   // const reports = useRecoilValue(reportsState);
   const flattenedServices = useRecoilValue(flattenedServicesSelector);

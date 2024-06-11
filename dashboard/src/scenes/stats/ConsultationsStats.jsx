@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { CustomResponsivePie } from "./charts";
 import { getPieData } from "./utils";
 import { organisationState, userState } from "../../recoil/auth";

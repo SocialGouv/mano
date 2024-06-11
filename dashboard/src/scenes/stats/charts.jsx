@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { ResponsivePie } from "@nivo/pie";
 import { ResponsiveBar } from "@nivo/bar";
 import HelpButtonAndModal from "../../components/HelpButtonAndModal";
@@ -169,7 +169,7 @@ export const CustomResponsiveBar = ({
       <div
         className={[
           "tw-relative tw-flex tw-h-80 tw-max-w-[50%] tw-basis-1/2 tw-items-center tw-justify-center tw-font-bold print:tw-order-2 print:tw-mt-4 print:!tw-max-w-none print:!tw-basis-0",
-          !!onItemClick ? "[&_rect]:tw-cursor-pointer" : "",
+          onItemClick ? "[&_rect]:tw-cursor-pointer" : "",
         ].join(" ")}
       >
         {!!showWarning && (

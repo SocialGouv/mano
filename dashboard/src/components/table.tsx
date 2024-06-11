@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import Sortable from "sortablejs";
 import useMinimumWidth from "../services/useMinimumWidth";
 
@@ -118,16 +118,16 @@ const Table = <T extends { [key: string]: any } & HasId>({
               };
               return (
                 <td
-                  className={[column.className || "", !!onSortBy ? "tw-cursor-pointer" : "tw-cursor-default"].join(" ")}
+                  className={[column.className || "", onSortBy ? "tw-cursor-pointer" : "tw-cursor-default"].join(" ")}
                   style={column.style || {}}
                   key={String(dataKey) + String(column.title)}
                 >
-                  <button aria-label="Changer l'ordre de tri" type="button" onClick={!!onSortBy ? onNameClick : null}>
+                  <button aria-label="Changer l'ordre de tri" type="button" onClick={onSortBy ? onNameClick : null}>
                     {column.title}
                   </button>
                   {column.help && <>{column.help}</>}
                   {!!onSortBy && (sortBy === sortableKey || sortBy === dataKey) && (
-                    <button onClick={!!onSortBy ? onNameClick : null} type="button" aria-label="Changer l'ordre de tri">
+                    <button onClick={onSortBy ? onNameClick : null} type="button" aria-label="Changer l'ordre de tri">
                       {sortOrder === "ASC" && <span className="tw-mx-1" onClick={() => onSortOrder("DESC")}>{`\u00A0\u2193`}</span>}
                       {sortOrder === "DESC" && <span className="tw-mx-1" onClick={() => onSortOrder("ASC")}>{`\u00A0\u2191`}</span>}
                     </button>
@@ -155,22 +155,13 @@ const Table = <T extends { [key: string]: any } & HasId>({
                   data-test-id={item[dataTestId] || item[rowKey] || item._id}
                   tabIndex={0}
                   className={[
-                    rowDisabled(item)
-                      ? "tw-cursor-not-allowed"
-                      : isSortable
-                        ? "tw-cursor-move"
-                        : Boolean(onRowClick)
-                          ? "tw-cursor-pointer"
-                          : "tw-cursor-auto",
+                    rowDisabled(item) ? "tw-cursor-not-allowed" : isSortable ? "tw-cursor-move" : onRowClick ? "tw-cursor-pointer" : "tw-cursor-auto",
                   ].join(" ")}
                   style={item.style || {}}
                 >
                   {columns.map((column) => {
                     return (
-                      <td
-                        className={([column.className || ""].join(" "), !!column.small ? "small" : "not-small")}
-                        key={item[rowKey] + column.dataKey}
-                      >
+                      <td className={([column.className || ""].join(" "), column.small ? "small" : "not-small")} key={item[rowKey] + column.dataKey}>
                         {column.render ? column.render(item) : item[column.dataKey] || nullDisplay}
                       </td>
                     );
