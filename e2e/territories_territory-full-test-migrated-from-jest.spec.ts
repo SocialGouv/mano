@@ -16,15 +16,21 @@ test("test territories", async ({ page }) => {
   await page.getByRole("button", { name: "Créer un territoire" }).click();
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Le nom est obligatoire").click();
-  await page.getByRole("dialog").getByLabel("Nom").fill("test de territoire new");
+  await page.getByRole("dialog").getByLabel("Nom").fill("test de territoire");
   await page.getByLabel("Périmètre").click();
   await page.getByLabel("Périmètre").fill("mon périmètre");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
   await page.getByText("Retour").click();
+  await page.getByRole("cell", { name: "test de territoire" }).click();
+  await page.getByRole("button", { name: "Modifier" }).click();
+  await page.getByRole("dialog").getByLabel("Nom").fill("test de territoire new");
+  await page.getByRole("button", { name: "Sauvegarder" }).click();
+  await page.getByText("Mis à jour !").click();
+  await page.getByRole("link", { name: "Territoires" }).click();
+  await expect(page).toHaveURL("http://localhost:8090/territory");
 
   // Create observation
-  await expect(page).toHaveURL("http://localhost:8090/territory");
   await page.getByRole("cell", { name: "test de territoire new" }).click();
   await page.getByRole("button", { name: "Nouvelle observation" }).click();
   await page.getByLabel("Nombre de personnes non connues hommes rencontrées").click();
