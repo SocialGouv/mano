@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import validator from "validator";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useHistory, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { detect } from "detect-browser";
@@ -31,6 +31,7 @@ const SignIn = () => {
   const setUsers = useSetRecoilState(usersState);
   const [user, setUser] = useRecoilState(userState);
   const history = useHistory();
+  const location = useLocation();
   const [showErrors, setShowErrors] = useState(false);
   const [userName, setUserName] = useState(false);
   const [showSelectTeam, setShowSelectTeam] = useState(false);
@@ -40,6 +41,8 @@ const SignIn = () => {
   const [authViaCookie, setAuthViaCookie] = useState(false);
   const { startInitialLoad, isLoading, resetCache } = useDataLoader();
 
+  const isDisconnected = new URLSearchParams(location.search).get("disconnected");
+
   const deploymentCommit = useRecoilValue(deploymentShortCommitSHAState);
   const setEncryptionKeyLength = useSetRecoilState(encryptionKeyLengthState);
 
@@ -47,6 +50,13 @@ const SignIn = () => {
   const [signinFormErrors, setSigninFormErrors] = useState({ email: "", password: "", orgEncryptionKey: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isDesktop = useMinimumWidth("sm");
+
+  useEffect(() => {
+    if (isDisconnected) {
+      toast.error("Votre session a expiré, veuillez vous reconnecter");
+      history.replace("/auth");
+    }
+  }, [isDisconnected, history]);
 
   useEffect(() => {
     if (isLoading !== true) return;
