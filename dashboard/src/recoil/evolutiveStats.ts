@@ -183,26 +183,26 @@ export function computeEvolutiveStatsForPersons({
   // if the date is between the start date and the end date, we take the value of the field at this date
   // we keep this value until we meet another entry in the history for the field, etc. until today / until the end date
 
-  let startDateConsolidated = startDate
+  const startDateConsolidated = startDate
     ? dayjsInstance(dayjsInstance(startDate).startOf("day").format("YYYY-MM-DD"))
     : dayjsInstance(startHistoryFeatureDate);
 
-  let endDateConsolidated = endDate ? dayjsInstance(dayjsInstance(endDate).endOf("day").format("YYYY-MM-DD")) : dayjsInstance();
+  const endDateConsolidated = endDate ? dayjsInstance(dayjsInstance(endDate).endOf("day").format("YYYY-MM-DD")) : dayjsInstance();
 
-  let startDateFormatted = startDateConsolidated.format("YYYYMMDD");
+  const startDateFormatted = startDateConsolidated.format("YYYYMMDD");
   let endDateFormatted = endDateConsolidated.format("YYYYMMDD");
-  let tonight = dayjsInstance().endOf("day").format("YYYYMMDD");
+  const tonight = dayjsInstance().endOf("day").format("YYYYMMDD");
   endDateFormatted = endDateFormatted > tonight ? endDateFormatted : tonight;
 
   // for now we only support one indicator
-  let indicator = evolutiveStatsIndicators[0];
-  let indicatorFieldName = indicator?.fieldName; // ex: custom-field-1
-  let indicatorFieldLabel = evolutiveStatsIndicatorsBase.find((f) => f.name === indicatorFieldName)?.label; // exemple: "Ressources"
+  const indicator = evolutiveStatsIndicators[0];
+  const indicatorFieldName = indicator?.fieldName; // ex: custom-field-1
+  const indicatorFieldLabel = evolutiveStatsIndicatorsBase.find((f) => f.name === indicatorFieldName)?.label; // exemple: "Ressources"
 
-  let valueStart = indicator?.fromValue;
-  let valueEnd = indicator?.toValue;
+  const valueStart = indicator?.fromValue;
+  const valueEnd = indicator?.toValue;
 
-  let personsIdsSwitchedByValue: Record<EvolutiveStatOption, Array<PersonPopulated["id"]>> = {};
+  const personsIdsSwitchedByValue: Record<EvolutiveStatOption, Array<PersonPopulated["id"]>> = {};
 
   if (startDateConsolidated.isSame(endDateConsolidated))
     return {
@@ -217,18 +217,18 @@ export function computeEvolutiveStatsForPersons({
       personsIdsSwitched: [],
     };
 
-  for (let person of persons) {
-    let followedSince = dayjsInstance(person.followedSince || person.createdAt).format("YYYYMMDD");
+  for (const person of persons) {
+    const followedSince = dayjsInstance(person.followedSince || person.createdAt).format("YYYYMMDD");
     if (followedSince > endDateFormatted) continue;
-    let initSnapshotDate = followedSince > startDateFormatted ? followedSince : startDateFormatted;
-    let initSnapshot = getPersonSnapshotAtDate({ person, snapshotDate: initSnapshotDate, indicator });
+    const initSnapshotDate = followedSince > startDateFormatted ? followedSince : startDateFormatted;
+    const initSnapshot = getPersonSnapshotAtDate({ person, snapshotDate: initSnapshotDate, indicator });
     let countSwitchedValueDuringThePeriod = 0;
 
-    let currentRawValue = getValueByField(indicator, initSnapshot[indicatorFieldName ?? ""]);
+    const currentRawValue = getValueByField(indicator, initSnapshot[indicatorFieldName ?? ""]);
     let currentValue = Array.isArray(currentRawValue) ? currentRawValue : [currentRawValue].filter(Boolean);
     let currentPerson = initSnapshot;
 
-    for (let historyItem of person.history ?? []) {
+    for (const historyItem of person.history ?? []) {
       const historyDate = dayjsInstance(historyItem.date).format("YYYYMMDD");
       if (followedSince === historyDate) continue; // we don't want to take the snapshot date (it's already done before the loop)
       if (historyDate < initSnapshotDate) continue;
@@ -237,9 +237,9 @@ export function computeEvolutiveStatsForPersons({
       let nextPerson = structuredClone(currentPerson);
       for (const historyChangeField of Object.keys(historyItem.data)) {
         if (historyChangeField !== indicatorFieldName) continue; // we support only one indicator for now
-        let oldValue = getValueByField(indicator, historyItem.data[historyChangeField].oldValue);
-        let historyNewValue = getValueByField(indicator, historyItem.data[historyChangeField].newValue);
-        let currentPersonValue = getValueByField(indicator, currentPerson[historyChangeField]);
+        const oldValue = getValueByField(indicator, historyItem.data[historyChangeField].oldValue);
+        const historyNewValue = getValueByField(indicator, historyItem.data[historyChangeField].newValue);
+        const currentPersonValue = getValueByField(indicator, currentPerson[historyChangeField]);
         if (JSON.stringify(oldValue) !== JSON.stringify(currentPersonValue)) {
           capture(new Error("Incoherent history in computeEvolutiveStatsForPersons"), {
             extra: {
@@ -265,8 +265,8 @@ export function computeEvolutiveStatsForPersons({
           [historyChangeField]: historyNewValue,
         };
       }
-      let nextRawValue = getValueByField(indicator, nextPerson[indicatorFieldName ?? ""]);
-      let nextValue = Array.isArray(nextRawValue) ? nextRawValue : [nextRawValue].filter(Boolean);
+      const nextRawValue = getValueByField(indicator, nextPerson[indicatorFieldName ?? ""]);
+      const nextValue = Array.isArray(nextRawValue) ? nextRawValue : [nextRawValue].filter(Boolean);
 
       if (historyDate >= startDateFormatted) {
         // now we have the person at the date of the history item
@@ -274,7 +274,7 @@ export function computeEvolutiveStatsForPersons({
         if (currentValue.includes(valueStart)) {
           if (!nextValue.includes(valueStart)) {
             countSwitchedValueDuringThePeriod++;
-            for (let value of nextValue) {
+            for (const value of nextValue) {
               if (!personsIdsSwitchedByValue[value]) {
                 personsIdsSwitchedByValue[value] = [];
               }
@@ -295,11 +295,11 @@ export function computeEvolutiveStatsForPersons({
     }
   }
 
-  let countSwitched = personsIdsSwitchedByValue[valueEnd]?.length ?? 0;
-  let personsIdsSwitched = [...new Set(personsIdsSwitchedByValue[valueEnd] ?? [])];
+  const countSwitched = personsIdsSwitchedByValue[valueEnd]?.length ?? 0;
+  const personsIdsSwitched = [...new Set(personsIdsSwitchedByValue[valueEnd] ?? [])];
   // TODO FIXME: is this percentage really useful ?
-  let countPersonSwitched = personsIdsSwitched.length;
-  let percentSwitched = Math.round((persons.length ? countPersonSwitched / persons.length : 0) * 100);
+  const countPersonSwitched = personsIdsSwitched.length;
+  const percentSwitched = Math.round((persons.length ? countPersonSwitched / persons.length : 0) * 100);
 
   return {
     countSwitched,

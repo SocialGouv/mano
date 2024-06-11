@@ -68,7 +68,7 @@ const DeleteButtonAndConfirmModal = ({
             id={`delete-${textToConfirm}`}
             onSubmit={async (e) => {
               e.preventDefault();
-              let _textToConfirm = Object.fromEntries(new FormData(e.currentTarget))?.textToConfirm as string;
+              const _textToConfirm = Object.fromEntries(new FormData(e.currentTarget))?.textToConfirm as string;
               if (!_textToConfirm) return toast.error("Veuillez rentrer le texte demandé");
               if (_textToConfirm.trim().toLocaleLowerCase() !== textToConfirm.trim().toLocaleLowerCase()) {
                 return toast.error("Le texte renseigné est incorrect");
