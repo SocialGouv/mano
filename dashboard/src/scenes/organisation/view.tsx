@@ -272,7 +272,7 @@ const View = () => {
                     <>
                       <TabTitle>Chiffrement</TabTitle>
                       <div className="tw-mb-10 tw-flex tw-justify-around">
-                        {encryptionChangeOfKeyEnabled ? (
+                        {encryptionChangeOfKeyEnabled || !organisation.encryptionEnabled ? (
                           <EncryptionKey isMain />
                         ) : (
                           <p>
