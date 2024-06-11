@@ -1,5 +1,4 @@
 import { MouseEventHandler, useEffect, useRef, useState } from "react";
-import { Row, Col } from "reactstrap";
 import { Formik } from "formik";
 import { toast } from "react-toastify";
 import { useRecoilState, useRecoilValue } from "recoil";
@@ -14,14 +13,13 @@ import {
 } from "../../recoil/persons";
 import TableCustomFields from "../../components/TableCustomFields";
 import { organisationState, userState, encryptionKeyLengthState, MINIMUM_ENCRYPTION_KEY_LENGTH } from "../../recoil/auth";
-import API, { tryFetch, tryFetchExpectOk } from "../../services/api";
+import API, { tryFetchExpectOk } from "../../services/api";
 import ExportData from "../data-import-export/ExportData";
-import ImportData from "../data-import-export/ImportData";
+import ImportPersons from "../data-import-export/ImportPersons";
 import ImportConfig from "../data-import-export/ImportConfig";
-import DownloadExample from "../data-import-export/DownloadExample";
+import DownloadPersonsImportExample from "../data-import-export/DownloadPersonsImportExample";
 import useTitle from "../../services/useTitle";
 import DeleteButtonAndConfirmModal from "../../components/DeleteButtonAndConfirmModal";
-import { capture } from "../../services/sentry";
 
 import { useDataLoader } from "../../components/DataLoader";
 import ActionCategoriesSettings from "./ActionCategoriesSettings";
@@ -34,11 +32,13 @@ import StructuresCategoriesSettings from "./StructuresCategoriesSettings";
 import Poubelle from "./Poubelle";
 import CollaborationsSettings from "./CollaborationsSettings";
 import { customFieldsMedicalFileSelector } from "../../recoil/medicalFiles";
-import DocumentsOrganizer from "../../components/DocumentsOrganizer";
 import DefaultPersonFolders from "./DefaultPersonFolders";
 import { dayjsInstance, now } from "../../services/date";
 import { encryptItem } from "../../services/encryption";
 import { errorMessage } from "../../utils";
+import ImportTerritories from "../data-import-export/ImportTerritories";
+import { territoriesFields } from "../../recoil/territory";
+import DownloadTerritoriesImportExample from "../data-import-export/DownloadTerritoriesImportExample";
 
 const getSettingTitle = (tabId) => {
   if (tabId === "infos") return "Informations";
@@ -164,6 +164,7 @@ const View = () => {
           <div className="rounded tw-mx-auto tw-w-full tw-p-2 my-2 tw-flex tw-bg-main25 tw-flex-col tw-gap-2 tw-items-start tw">
             <MenuButton selected={tab === "import"} text="Import de personnes suivies" onClick={() => setTab("import")} />
             <MenuButton selected={tab === "import-configuration"} text="Import de configuration" onClick={() => setTab("import-configuration")} />
+            <MenuButton selected={tab === "import-territories"} text="Import de territoires" onClick={() => setTab("import-territories")} />
             <MenuButton selected={tab === "export"} text="Export des données" onClick={() => setTab("export")} />
           </div>
           <div className="tw-text-white tw-font-bold tw-text-sm mt-3">Maintenance</div>
@@ -450,14 +451,14 @@ const View = () => {
                         </>
                       ) : (
                         <>
-                          <Row>
-                            <Col md={10}>
+                          <div className="tw-flex tw-flex-wrap -tw-mx-4">
+                            <div className="tw-basis-10/12 tw-w-full tw-px-4">
                               <p>
                                 Désolé, cette fonctionnalité qui consiste à personnaliser les champs disponibles pour les personnes suivies n'existe
                                 que pour les organisations chiffrées.
                               </p>
-                            </Col>
-                          </Row>
+                            </div>
+                          </div>
                         </>
                       )}
                     </>
@@ -466,11 +467,11 @@ const View = () => {
                   return (
                     <>
                       <TabTitle>Exporter des données</TabTitle>
-                      <Row>
-                        <Col md={10}>
+                      <div className="tw-flex tw-flex-wrap -tw-mx-4">
+                        <div className="tw-basis-10/12 tw-w-full tw-px-4">
                           <p>Vous pouvez exporter l'ensemble de vos données dans un fichier Excel.</p>
-                        </Col>
-                      </Row>
+                        </div>
+                      </div>
                       <div className="tw-mb-10 tw-flex tw-justify-end">
                         <ExportData />
                       </div>
@@ -498,8 +499,8 @@ const View = () => {
                   return (
                     <>
                       <TabTitle>Importer des personnes suivies</TabTitle>
-                      <Row>
-                        <Col md={10}>
+                      <div className="tw-flex tw-flex-wrap -tw-mx-4">
+                        <div className="tw-basis-10/12 tw-w-full tw-px-4">
                           <p>
                             Vous pouvez importer une liste de personnes suivies depuis un fichier Excel. Ce fichier doit avoir quelques
                             caractéristiques:
@@ -512,7 +513,7 @@ const View = () => {
                             <li>
                               les colonnes qui seront importées peuvent être parmi la liste suivante - toute colonne qui ne s'appelle pas ainsi ne
                               sera pas prise en compte - certaines colonnes ont des valeurs imposées :
-                              <table className="table-sm table" style={{ fontSize: "14px", marginTop: "2rem" }}>
+                              <table className="table-sm table tw-text-sm tw-mt-8">
                                 <thead>
                                   <tr>
                                     <th>Colonne</th>
@@ -546,11 +547,60 @@ const View = () => {
                               </table>
                             </li>
                           </ul>
-                        </Col>
-                      </Row>
+                        </div>
+                      </div>
                       <div className="tw-mb-10 tw-flex tw-justify-end tw-gap-4">
-                        <DownloadExample />
-                        <ImportData />
+                        <DownloadPersonsImportExample />
+                        <ImportPersons />
+                      </div>
+                    </>
+                  );
+                case "import-territories":
+                  return (
+                    <>
+                      <TabTitle>Importer des territoires</TabTitle>
+                      <div className="tw-flex tw-flex-wrap -tw-mx-4">
+                        <div className="tw-basis-10/12 tw-w-full tw-px-4">
+                          <p>
+                            Vous pouvez importer une liste de territoires depuis un fichier Excel. Ce fichier doit avoir quelques caractéristiques:
+                          </p>
+                          <ul className="tw-mt-4 tw-list-inside tw-list-disc">
+                            <li>
+                              avoir un onglet dont le nom contient <code>territoire</code>
+                            </li>
+                            <li>avoir en première ligne de cet onglet des têtes de colonnes</li>
+                            <li>
+                              les colonnes qui seront importées peuvent être parmi la liste suivante - toute colonne qui ne s'appelle pas ainsi ne
+                              sera pas prise en compte - certaines colonnes ont des valeurs imposées :
+                              <table className="table-sm table tw-text-sm tw-mt-8">
+                                <thead>
+                                  <tr>
+                                    <th>Colonne</th>
+                                    <th>Valeur</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {territoriesFields
+                                    .filter((f) => f.importable)
+                                    .map((f, i) => {
+                                      return (
+                                        <tr key={f.label + i}>
+                                          <td>{f.label}</td>
+                                          <td>
+                                            <ImportFieldDetails field={f} />
+                                          </td>
+                                        </tr>
+                                      );
+                                    })}
+                                </tbody>
+                              </table>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                      <div className="tw-mb-10 tw-flex tw-justify-end tw-gap-4">
+                        <DownloadTerritoriesImportExample />
+                        <ImportTerritories />
                       </div>
                     </>
                   );

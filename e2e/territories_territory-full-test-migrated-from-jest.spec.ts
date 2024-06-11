@@ -44,7 +44,7 @@ test("test territories", async ({ page }) => {
 
   // Custom field territory
   await page.getByRole("link", { name: "Organisation" }).click();
-  await page.getByRole("button", { name: "Territoires" }).click();
+  await page.getByRole("button", { name: "Territoires", exact: true }).click();
   await page.getByRole("button", { name: "Ajouter un champ" }).click();
   await page.getByRole("dialog").getByLabel("Nom").fill("Mon nouveau champ de territoire");
   await page.getByRole("button", { name: "Enregistrer" }).click();

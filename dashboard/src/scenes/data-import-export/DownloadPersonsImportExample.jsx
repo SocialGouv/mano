@@ -5,7 +5,7 @@ import { currentTeamState } from "../../recoil/auth";
 import { personFieldsIncludingCustomFieldsSelector } from "../../recoil/persons";
 import { customFieldsMedicalFileSelector } from "../../recoil/medicalFiles";
 
-export default function DownloadExample() {
+export default function DownloadPersonsImportExample() {
   const currentTeam = useRecoilValue(currentTeamState);
   const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
@@ -32,7 +32,7 @@ export default function DownloadExample() {
           [...importable.map((f) => placeholder(f)), ...customFieldsMedicalFile.map((f) => placeholder(f))],
         ]);
         const workbook = { Sheets: { personne: ws }, SheetNames: ["personne"] };
-        writeFile(workbook, "data.xlsx");
+        writeFile(workbook, "persons.xlsx");
       }}
       color="primary"
       title="Télécharger un exemple"

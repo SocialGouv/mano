@@ -47,7 +47,7 @@ test("test", async ({ page }) => {
     await page.getByRole("button", { name: "Ajouter un champ" }).nth(1).click();
     await addCustomField(page, "Pansements", "Choix multiple dans une liste", ["Gros", "Très gros", "Très très gros"]);
 
-    await page.getByRole("button", { name: "Territoires" }).click();
+    await page.getByRole("button", { name: "Territoires", exact: true }).click();
     await page.getByRole("button", { name: "Ajouter un champ" }).click();
     await addCustomField(page, "Policiers", "Choix dans une liste", ["beaucoup", "Très beaucoup", "Très très beaucoup"]);
   });
@@ -246,7 +246,7 @@ test("test", async ({ page }) => {
     await page.getByRole("dialog", { name: "Éditer le choix: Gros" }).getByRole("button", { name: "Enregistrer" }).click();
     await page.getByText("Choix mis à jour !").click();
 
-    await page.getByRole("button", { name: "Territoires" }).click();
+    await page.getByRole("button", { name: "Territoires", exact: true }).click();
 
     await page.hover('[data-test-id="Policiers"]');
     await page

@@ -5,6 +5,7 @@ import { encryptItem } from "../services/encryption";
 import { toast } from "react-toastify";
 import { capture } from "../services/sentry";
 import type { TerritoryInstance, ReadyToEncryptTerritoryInstance } from "../types/territory";
+import type { PredefinedField } from "../types/field";
 
 const collectionName = "territory";
 export const territoriesState = atom<Array<TerritoryInstance>>({
@@ -102,3 +103,55 @@ export const sortTerritories = (sortBy: SortBy, sortOrder: SortOrder) => (a: Ter
   // default sort: name
   return defaultSort(a, b, sortOrder);
 };
+
+export const territoriesFields: Array<PredefinedField> = [
+  {
+    name: "name",
+    label: "Nom",
+    type: "text",
+    encrypted: true,
+    importable: true,
+    filterable: true,
+    enabled: true,
+  },
+  {
+    name: "perimeter",
+    label: "Périmètre",
+    type: "text",
+    encrypted: true,
+    importable: true,
+    filterable: true,
+    enabled: true,
+  },
+  {
+    name: "description",
+    label: "Description",
+    type: "textarea",
+    encrypted: true,
+    importable: true,
+    filterable: true,
+    enabled: true,
+  },
+  {
+    name: "types",
+    label: "Types",
+    type: "multi-choice",
+    options: [
+      "Lieu de conso",
+      "Lieu de deal",
+      "Carrefour de passage",
+      "Campement",
+      "Lieu de vie",
+      "Prostitution",
+      "Errance",
+      "Mendicité",
+      "Loisir",
+      "Rassemblement communautaire",
+      "Historique",
+    ],
+    encrypted: true,
+    importable: true,
+    filterable: true,
+    enabled: true,
+  },
+];

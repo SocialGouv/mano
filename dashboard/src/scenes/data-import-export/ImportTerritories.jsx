@@ -1,55 +1,36 @@
-import React, { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { read } from "@e965/xlsx";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 import { toast } from "react-toastify";
 import { Modal, ModalBody, ModalHeader, Alert } from "reactstrap";
 import ButtonCustom from "../../components/ButtonCustom";
-import { personFieldsIncludingCustomFieldsSelector, usePreparePersonForEncryption } from "../../recoil/persons";
 import { teamsState, userState } from "../../recoil/auth";
 import { isNullOrUndefined } from "../../utils";
 import API, { tryFetchExpectOk } from "../../services/api";
 import { formatDateWithFullMonth, now } from "../../services/date";
 import { sanitizeFieldValueFromExcel } from "./importSanitizer";
-import { customFieldsMedicalFileSelector, prepareMedicalFileForEncryption, encryptMedicalFile } from "../../recoil/medicalFiles";
 import { useDataLoader } from "../../components/DataLoader";
-import { encryptItem } from "../../services/encryption";
+import { encryptTerritory, territoriesFields } from "../../recoil/territory";
 
-const ImportData = () => {
+const importableFields = territoriesFields.filter((field) => field.importable);
+const importableLabels = importableFields.map((f) => f.label);
+const importableFieldsObjectByName = importableFields.reduce((acc, field) => {
+  acc[field.name] = field;
+  return acc;
+}, {});
+
+export default function ImportTerritories() {
   const user = useRecoilValue(userState);
-  const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
-  const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
   const fileDialogRef = useRef(null);
   const { refresh } = useDataLoader();
   const teams = useRecoilValue(teamsState);
 
-  const { encryptPerson } = usePreparePersonForEncryption();
-
   const [showImportSummary, setShowImportSummary] = useState(false);
-  const [personsToImport, setPersonsToImport] = useState([]);
-  const [medicalFilesToImport, setMedicalFilesToImport] = useState([]);
+  const [territoriesToImport, setTerritoriesToImport] = useState([]);
   const [importedFields, setImportedFields] = useState([]);
   const [ignoredFields, setIgnoredFields] = useState([]);
   const [reloadKey, setReloadKey] = useState(0); // because input type 'file' doesn't trigger 'onChange' for uploading twice the same file
-
-  const importableFields = useMemo(
-    () =>
-      [...personFieldsIncludingCustomFields.filter((field) => field.importable), ...customFieldsMedicalFile].map((field) => ({
-        ...field,
-        options: field.name === "assignedTeams" ? teams.map((team) => team.name) : field.options,
-      })),
-    [personFieldsIncludingCustomFields, teams]
-  );
-  const importableLabels = useMemo(() => importableFields.map((f) => f.label), [importableFields]);
-
-  const medicalFieldsObjectByName = customFieldsMedicalFile.reduce((acc, field) => {
-    acc[field.name] = field;
-    return acc;
-  }, {});
-  const personFieldsObjectByName = personFieldsIncludingCustomFields.reduce((acc, field) => {
-    acc[field.name] = field;
-    return acc;
-  }, {});
 
   const onParseData = async (event) => {
     try {
@@ -61,8 +42,8 @@ const ImportData = () => {
       // I only took one part of the code, because we use "w" only.
       const workbook = read(data, { dateNF: "yyyy-mm-dd" });
       const { SheetNames, Sheets } = workbook;
-      const personsSheetName = SheetNames.find((name) => name.toLocaleLowerCase().includes("person"));
-      const personsSheet = Sheets[personsSheetName];
+      const territoriesSheetName = SheetNames.find((name) => name.toLocaleLowerCase().includes("territoire"));
+      const territoriesSheet = Sheets[territoriesSheetName];
       /*
       something like that:
       !margins: {left: 1, right: 1, top: 1, bottom: 1, header: 0.25, …}
@@ -76,22 +57,22 @@ const ImportData = () => {
       A7: {t: 's', v: 'a462c3ec-fb9c-47db-9386-8b5e08fec7d3', r: '<t>a462c3ec-fb9c-47db-9386-8b5e08fec7d3</t>', h: 'a462c3ec-fb9c-47db-9386-8b5e08fec7d3', w: 'a462c3ec-fb9c-47db-9386-8b5e08fec7d3'}
 
       */
-      const sheetCells = Object.keys(personsSheet);
+      const sheetCells = Object.keys(territoriesSheet);
       const headerCells = sheetCells.filter((cell) => cell.replace(/\D+/g, "") === "1"); // ['A1', 'B1'...]
 
       const fieldsToIgnore = headerCells
-        .filter((headerKey) => !importableLabels.includes(personsSheet[headerKey].v))
-        .map((headerKey) => personsSheet[headerKey].v?.trim()); // ['Un champ bidon', 'Un autre']
+        .filter((headerKey) => !importableLabels.includes(territoriesSheet[headerKey].v))
+        .map((headerKey) => territoriesSheet[headerKey].v?.trim()); // ['Un champ bidon', 'Un autre']
       setIgnoredFields(fieldsToIgnore);
 
-      const headersCellsToImport = headerCells.filter((headerKey) => importableLabels.includes(personsSheet[headerKey].v?.trim()));
+      const headersCellsToImport = headerCells.filter((headerKey) => importableLabels.includes(territoriesSheet[headerKey].v?.trim()));
       const headerColumnsAndField = headersCellsToImport.map((cell) => {
         const column = cell.replace("1", ""); // ['A', 'B'...]
-        const field = importableFields.find((f) => f.label === personsSheet[cell].v?.trim()); // { name: type: label: importable: options: }
+        const field = importableFields.find((f) => f.label === territoriesSheet[cell].v?.trim()); // { name: type: label: importable: options: }
         return [column, field];
       });
-      setImportedFields(headersCellsToImport.map((headerKey) => personsSheet[headerKey].v?.trim()));
-      const lastRow = parseInt(personsSheet["!ref"].split(":")[1].replace(/\D+/g, ""), 10);
+      setImportedFields(headersCellsToImport.map((headerKey) => territoriesSheet[headerKey].v?.trim()));
+      const lastRow = parseInt(territoriesSheet["!ref"].split(":")[1].replace(/\D+/g, ""), 10);
 
       const nameField = importableFields.find((f) => f.name === "name");
 
@@ -104,43 +85,36 @@ const ImportData = () => {
         return;
       }
 
-      const persons = [];
-      const medicalFiles = [];
+      const territories = [];
       for (let i = 2; i <= lastRow; i++) {
-        const person = {};
-        const medicalFile = {};
+        const territory = {};
         for (const [column, field] of headerColumnsAndField) {
-          if (!personsSheet[`${column}${i}`]) continue;
-          const value = sanitizeFieldValueFromExcel(field, personsSheet[`${column}${i}`]);
+          if (!territoriesSheet[`${column}${i}`]) continue;
+          const value = sanitizeFieldValueFromExcel(field, territoriesSheet[`${column}${i}`]);
           if (!isNullOrUndefined(value)) {
-            if (personFieldsObjectByName[field.name]) person[field.name] = value;
-            if (medicalFieldsObjectByName[field.name]) medicalFile[field.name] = value;
+            if (importableFieldsObjectByName[field.name]) territory[field.name] = value;
             if (field.name === "assignedTeams" && value.length > 0) {
-              person[field.name] = value.map((teamName) => teams.find((team) => team.name === teamName)?._id).filter((a) => a);
+              territory[field.name] = value.map((teamName) => teams.find((team) => team.name === teamName)?._id).filter((a) => a);
             }
           }
         }
-        if (Object.keys(person).length || Object.keys(medicalFile).length) {
-          person._id = uuidv4();
+        if (Object.keys(territory).length) {
+          territory._id = uuidv4();
+          territory.user = user._id;
         }
-        if (Object.keys(person).length) {
-          person.description = `Données importées le ${formatDateWithFullMonth(now())}\n${person.description || ""}`;
-          if (!person.name) {
+        if (Object.keys(territory).length) {
+          territory.description = `Données importées le ${formatDateWithFullMonth(now())}\n\n${territory.description || ""}`;
+          if (!territory.name) {
             toast.error(`La colonne "${nameField.label}" ne doit pas être vide, vérifiez la ligne ${i} du fichier.`);
             setReloadKey((k) => k + 1);
             return;
           }
-          persons.push(person);
-        }
-        if (Object.keys(medicalFile).length) {
-          medicalFiles.push({ ...medicalFile, person: person._id });
+          territories.push(territory);
         }
       }
 
-      const encryptedPersons = await Promise.all(persons.map(encryptPerson));
-      setPersonsToImport(encryptedPersons);
-      const encryptedMedicalFiles = await Promise.all(medicalFiles.map(prepareMedicalFileForEncryption(customFieldsMedicalFile)).map(encryptItem));
-      setMedicalFilesToImport(encryptedMedicalFiles);
+      const encryptedTerritories = await Promise.all(territories.map(encryptTerritory));
+      setTerritoriesToImport(encryptedTerritories);
       setShowImportSummary(true);
     } catch (e) {
       console.log(e);
@@ -150,8 +124,8 @@ const ImportData = () => {
   };
 
   const onImportData = async () => {
-    if (window.confirm(`Voulez-vous vraiment importer ${personsToImport.length} personnes dans Mano ? Cette opération est irréversible.`)) {
-      const [error] = await tryFetchExpectOk(async () => API.post({ path: "/person/import", body: { personsToImport, medicalFilesToImport } }));
+    if (window.confirm(`Voulez-vous vraiment importer ${territoriesToImport.length} territoires dans Mano ? Cette opération est irréversible.`)) {
+      const [error] = await tryFetchExpectOk(async () => API.post({ path: "/territory/import", body: { territoriesToImport } }));
       if (!error) toast.success("Importation réussie !");
       refresh();
       setShowImportSummary(false);
@@ -173,15 +147,15 @@ const ImportData = () => {
         onChange={onParseData}
       />
       <Modal isOpen={showImportSummary} toggle={() => setShowImportSummary(false)} size="lg" backdrop="static">
-        <ModalHeader toggle={() => setShowImportSummary(false)}>Résumé de l'import de personnes</ModalHeader>
+        <ModalHeader toggle={() => setShowImportSummary(false)}>Résumé de l'import de territoires</ModalHeader>
         <ModalBody>
           <p>
-            Nombre de personnes à importer&nbsp;: <strong>{personsToImport.length}</strong>
+            Nombre de territoires à importer&nbsp;: <strong>{territoriesToImport.length}</strong>
           </p>
           <Alert color="warning">
             Vérifiez bien la liste des champs ci-dessous. S'il manque un champ (par exemple parce qu'une colonne ne contient pas le nom exact indiqué
-            dans Mano), alors <strong>ce champ ne sera pas considéré</strong> et votre file active sera donc corrompue. Les corrections devront être
-            effectuées à la main au cas par cas, ce qui peut être un peu long.
+            dans Mano), alors <strong>ce champ ne sera pas considéré</strong> et votre liste de territoires sera donc corrompue. Les corrections
+            devront être effectuées à la main au cas par cas, ce qui peut être un peu long.
           </Alert>
           {Boolean(ignoredFields.length) && (
             <>
@@ -220,6 +194,4 @@ const ImportData = () => {
       </Modal>
     </>
   );
-};
-
-export default ImportData;
+}

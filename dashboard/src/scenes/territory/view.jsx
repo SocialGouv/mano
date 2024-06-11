@@ -54,7 +54,18 @@ const View = () => {
           </div>
         </div>
         <div>
-          Description&nbsp;: <i>{territory.description || "..."}</i>
+          Description&nbsp;:{" "}
+          <i>
+            {territory.description?.split("\n").map((paragraph, i, description) => {
+              if (i === description.length - 1) return paragraph;
+              return (
+                <React.Fragment key={i}>
+                  {paragraph}
+                  <br />
+                </React.Fragment>
+              );
+            }) || "..."}
+          </i>
         </div>
         <div className="tw-flex tw-justify-end">
           {!["restricted-access"].includes(user.role) && (

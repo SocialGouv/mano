@@ -77,7 +77,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.locator(".Toastify__close-button").last().click();
 
-  await page.getByRole("button", { name: "Territoires" }).click();
+  await page.getByRole("button", { name: "Territoires", exact: true }).click();
 
   await page.getByRole("button", { name: "Ajouter un champ" }).click();
 
@@ -187,7 +187,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Mise à jour !").click();
 
-  await page.getByRole("button", { name: "Territoires" }).click();
+  await page.getByRole("button", { name: "Territoires", exact: true }).click();
 
   await page.hover(`[data-test-id='${testObsTerritoryField}']`);
   await page

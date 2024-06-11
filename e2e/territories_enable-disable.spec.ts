@@ -28,7 +28,7 @@ test("Territories - enable - disable", async ({ page }) => {
 
   await test.step("Disable territories", async () => {
     await page.getByRole("link", { name: "Organisation" }).click();
-    await page.getByRole("button", { name: "Territoires" }).click();
+    await page.getByRole("button", { name: "Territoires", exact: true }).click();
 
     await page
       .getByLabel(
@@ -50,7 +50,7 @@ test("Territories - enable - disable", async ({ page }) => {
 
   await test.step("Enable territories", async () => {
     await page.getByRole("link", { name: "Organisation" }).click();
-    await page.getByRole("button", { name: "Territoires" }).click();
+    await page.getByRole("button", { name: "Territoires", exact: true }).click();
 
     await page
       .getByLabel(

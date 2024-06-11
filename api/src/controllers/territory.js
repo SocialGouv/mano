@@ -48,6 +48,46 @@ router.post(
   })
 );
 
+router.post(
+  "/import",
+  passport.authenticate("user", { session: false }),
+  validateUser("admin"),
+  validateEncryptionAndMigrations,
+  catchErrors(async (req, res, next) => {
+    try {
+      z.object({
+        territoriesToImport: z.array(
+          z.object({
+            _id: z.optional(z.string().regex(looseUuidRegex)),
+            encrypted: z.string(),
+            encryptedEntityKey: z.string(),
+          })
+        ),
+      }).parse(req.body);
+    } catch (e) {
+      const error = new Error(`Invalid request in territories import: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+
+    const territories = req.body.territoriesToImport.map((t) => {
+      const territory = {
+        _id: t._id,
+        encrypted: t.encrypted,
+        encryptedEntityKey: t.encryptedEntityKey,
+        organisation: req.user.organisation,
+        user: req.user._id,
+      };
+      return territory;
+    });
+    await Territory.bulkCreate(territories);
+
+    return res.status(200).send({
+      ok: true,
+    });
+  })
+);
+
 router.get(
   "/",
   passport.authenticate("user", { session: false, failWithError: true }),
