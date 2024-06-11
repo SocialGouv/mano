@@ -20,8 +20,10 @@ export http_proxy=http://sesclaprx-vip.grita.fr:3128
 cd /var/mano
 git pull
 
-docker compose build dashboard
-docker compose build api
+SHA=$(git rev-parse HEAD)
+
+docker compose build --build-arg SHA=$SHA dashboard
+docker compose build --build-arg SHA=$SHA api
 docker compose build website
 
 docker rollout dashboard

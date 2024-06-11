@@ -1,5 +1,9 @@
 FROM node:20
 
+ARG SHA=replaceme
+
+ENV SHA $SHA
+
 WORKDIR /usr/src/app
 COPY yarn.lock .yarnrc.yml ./
 COPY .yarn .yarn

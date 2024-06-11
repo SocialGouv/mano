@@ -49,7 +49,7 @@ const SCHEME =
     ? import.meta.env.VITE_SCHEME
     : "https";
 const ENV = process.env.NODE_ENV || "production";
-const VERSION = packageInfo.version;
+const VERSION = process.env.SHA || packageInfo.version;
 const DEFAULT_ORGANISATION_KEY =
   process.env.NODE_ENV === "development" && import.meta.env.VITE_TEST !== "true" ? import.meta.env.VITE_DEFAULT_ORGANISATION_KEY : "";
 
