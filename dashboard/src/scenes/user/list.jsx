@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { teamsState, usersState, userState } from "../../recoil/auth";
-import API, { tryFetchExpectOk } from "../../services/api";
+import API, { tryFetch, tryFetchExpectOk } from "../../services/api";
 import { formatDateWithFullMonth } from "../../services/date";
 import useTitle from "../../services/useTitle";
 import { useLocalStorage } from "../../services/useLocalStorage";
@@ -232,7 +232,7 @@ const Create = ({ onChange, users }) => {
         return false;
       }
       setIsSubmitting(true);
-      const [error] = await tryFetchExpectOk(async () => API.post({ path: "/user", body: data }));
+      const [error] = await tryFetch(async () => API.post({ path: "/user", body: data }));
       setIsSubmitting(false);
       if (error) {
         toast.error(errorMessage(error));
