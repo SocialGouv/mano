@@ -1,4 +1,9 @@
-export const cleanHistory = <T>(history: { date: string; data: T }[]): { date: string; data: T }[] => {
+type HistoryEntry<T> = {
+  date: string;
+  data: T;
+};
+
+export const cleanHistory = <T>(history: Array<HistoryEntry<T>> = []): Array<HistoryEntry<T>> => {
   const alreadyExisting = {};
   return history.filter((h) => {
     const stringifiedEntry = JSON.stringify(h.data);
