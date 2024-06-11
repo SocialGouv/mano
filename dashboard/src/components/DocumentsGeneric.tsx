@@ -499,7 +499,9 @@ function AddDocumentInput({ personId, onAddDocuments }: AddDocumentInputProps) {
           personId,
           user,
         });
-        onAddDocuments(docsResponses);
+        if (docsResponses) {
+          onAddDocuments(docsResponses);
+        }
         setResetFileInputKey((k) => k + 1);
       }}
     />
