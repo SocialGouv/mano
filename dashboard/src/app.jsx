@@ -1,10 +1,9 @@
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect } from "react";
 import { RecoilEnv, RecoilRoot, useRecoilValue } from "recoil";
 import RecoilNexus from "recoil-nexus";
 import { Router, Switch, Redirect } from "react-router-dom";
 import { createBrowserHistory } from "history";
 import * as Sentry from "@sentry/react";
-import { BrowserTracing } from "@sentry/tracing";
 import { fr } from "date-fns/esm/locale";
 import { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -62,11 +61,7 @@ if (ENV === "production") {
     dsn: "https://2e784fe581bff74181600b4460c01955@o4506615228596224.ingest.sentry.io/4506672157229056",
     environment: "dashboard",
     release: VERSION,
-    integrations: [
-      new BrowserTracing({
-        routingInstrumentation: Sentry.reactRouterV5Instrumentation(history),
-      }),
-    ],
+    integrations: [Sentry.reactRouterV5BrowserTracingIntegration({ history })],
 
     // Set tracesSampleRate to 1.0 to capture 100%
     // of transactions for performance monitoring.

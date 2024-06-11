@@ -3166,15 +3166,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/tracing@npm:^7.116.0":
-  version: 7.116.0
-  resolution: "@sentry/tracing@npm:7.116.0"
-  dependencies:
-    "@sentry-internal/tracing": "npm:7.116.0"
-  checksum: 1aa29b14a6ff6110329ac0711a841d19735f0f4af4ba2a86dc4712a18bc6dbb42012f7373f039ed42b084245891090dd7efcabebe766f1433534150746d06aae
-  languageName: node
-  linkType: hard
-
 "@sentry/types@npm:6.19.7":
   version: 6.19.7
   resolution: "@sentry/types@npm:6.19.7"
@@ -5485,7 +5476,6 @@ __metadata:
     "@react-hookz/web": "npm:^23.0.0"
     "@sentry/browser": "npm:^6.19.7"
     "@sentry/react": "npm:^7.116.0"
-    "@sentry/tracing": "npm:^7.116.0"
     "@sentry/vite-plugin": "npm:^2.17.0"
     "@tailwindcss/forms": "npm:^0.5.3"
     "@types/babel__preset-env": "npm:^7"
