@@ -12,7 +12,7 @@ const SelectUser = ({ value, onChange, ...props }) => {
         .filter((i) => i.name)
         .filter((p) => {
           if (p.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())) return true;
-          if (p.email.toLocaleLowerCase().includes(search.toLocaleLowerCase())) return true;
+          if ((p.email || "").toLocaleLowerCase().includes(search.toLocaleLowerCase())) return true;
           return false;
         })
     : allUsers.filter((i) => i.name);
