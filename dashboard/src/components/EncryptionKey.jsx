@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Formik } from "formik";
 import { toast } from "react-toastify";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
@@ -38,12 +38,6 @@ const EncryptionKey = ({ isMain }) => {
   const [encryptingProgress, setEncryptingProgress] = useState(0);
   const [encryptionDone, setEncryptionDone] = useState(false);
   const { isLoading } = useDataLoader();
-
-  useEffect(() => {
-    if (open) {
-      // do seomething on the next PR
-    }
-  }, [open]);
 
   if (!["admin"].includes(user.role)) return null;
 
@@ -348,11 +342,9 @@ const EncryptionKey = ({ isMain }) => {
 
   return (
     <>
-      {import.meta.env.VITE_TEST_PLAYWRIGHT === "true" ? (
-        <button className="button-submit !tw-bg-black" onClick={() => setOpen(true)} type="button">
-          {organisation.encryptionEnabled ? "Changer la clé de chiffrement" : "Activer le chiffrement"}
-        </button>
-      ) : null}
+      <button className="button-submit !tw-bg-black" onClick={() => setOpen(true)} type="button">
+        {organisation.encryptionEnabled ? "Changer la clé de chiffrement" : "Activer le chiffrement"}
+      </button>
       <ModalContainer
         open={open}
         onClose={() => setOpen(false)}

@@ -68,6 +68,8 @@ function MenuButton({ selected, text, onClick }: { selected: boolean; text: stri
   );
 }
 
+const encryptionChangeOfKeyEnabled = import.meta.env.VITE_TEST_PLAYWRIGHT === "true";
+
 const View = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
@@ -117,7 +119,7 @@ const View = () => {
 
   return (
     <div className="relative tw--m-12 tw--mt-4 tw-flex tw-h-[calc(100%+4rem)] tw-flex-col">
-      {organisation.encryptionEnabled && encryptionKeyLength < MINIMUM_ENCRYPTION_KEY_LENGTH && (
+      {encryptionChangeOfKeyEnabled && organisation.encryptionEnabled && encryptionKeyLength < MINIMUM_ENCRYPTION_KEY_LENGTH && (
         <div className="tw-rounded tw-border tw-border-orange-50 tw-bg-amber-100 tw-px-5 tw-py-3 tw-text-orange-900">
           Votre clé de chiffrement est trop courte. Pour des raisons de sécurité, nous vous recommandons de la changer.
           <br />
@@ -127,7 +129,7 @@ const View = () => {
           ou sur le bouton «&nbsp;Chiffrement&nbsp;» pour la modifier.
         </div>
       )}
-      {now().diff(dayjsInstance(organisation.encryptionLastUpdateAt), "year") > 1 && (
+      {encryptionChangeOfKeyEnabled && now().diff(dayjsInstance(organisation.encryptionLastUpdateAt), "year") > 1 && (
         <div className="tw-rounded tw-border tw-border-orange-50 tw-bg-amber-100 tw-px-5 tw-py-3 tw-text-orange-900">
           Votre clé de chiffrement n'a pas été modifiée depuis plus d'un an. Pour des raisons de sécurité, nous vous recommandons de la mettre à jour.
           <br />
@@ -270,7 +272,13 @@ const View = () => {
                     <>
                       <TabTitle>Chiffrement</TabTitle>
                       <div className="tw-mb-10 tw-flex tw-justify-around">
-                        <EncryptionKey isMain />
+                        {encryptionChangeOfKeyEnabled ? (
+                          <EncryptionKey isMain />
+                        ) : (
+                          <p>
+                            Désolé, le changement de clé de chiffrement n'est pas disponible pour le moment. Il le sera d'ici la fin de la semaine.
+                          </p>
+                        )}
                       </div>
                     </>
                   );
