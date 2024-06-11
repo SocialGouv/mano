@@ -2,12 +2,9 @@ import { useRecoilValue } from "recoil";
 import { evolutiveStatsForPersonsSelector } from "../recoil/evolutiveStats";
 import type { PersonPopulated } from "../types/person";
 import type { IndicatorsSelection } from "../types/evolutivesStats";
-import { ResponsiveStream } from "@nivo/stream";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { capture } from "../services/sentry";
-import type { Dayjs } from "dayjs";
 import type { FilterableField } from "../types/field";
-import type { EvolutiveStatOption } from "../types/evolutivesStats";
 import { SelectedPersonsModal } from "../scenes/stats/PersonsStats";
 import { itemsGroupedByPersonSelector } from "../recoil/selectors";
 
@@ -22,19 +19,18 @@ interface EvolutiveStatsViewerProps {
 }
 
 export default function EvolutiveStatsViewer({ evolutiveStatsIndicators, period, persons, filterBase }: EvolutiveStatsViewerProps) {
+  const [personsModalOpened, setPersonsModalOpened] = useState(false);
+  const personsObject = useRecoilValue(itemsGroupedByPersonSelector);
+
+  const evolutiveStatsPerson = useRecoilValue(
+    evolutiveStatsForPersonsSelector({
+      persons,
+      startDate: period.startDate,
+      endDate: period.endDate,
+      evolutiveStatsIndicators,
+    })
+  );
   try {
-    const [personsModalOpened, setPersonsModalOpened] = useState(false);
-    const personsObject = useRecoilValue(itemsGroupedByPersonSelector);
-
-    const evolutiveStatsPerson = useRecoilValue(
-      evolutiveStatsForPersonsSelector({
-        persons,
-        startDate: period.startDate,
-        endDate: period.endDate,
-        evolutiveStatsIndicators,
-      })
-    );
-
     const {
       startDateConsolidated,
       endDateConsolidated,

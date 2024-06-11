@@ -4,7 +4,7 @@ import { capture } from "../services/sentry";
 import type { PersonPopulated } from "../types/person";
 import type { CustomOrPredefinedField } from "../types/field";
 import type { IndicatorsSelection } from "../types/evolutivesStats";
-import type { EvolutiveStatsPersonFields, EvolutiveStatOption, EvolutiveStatDateYYYYMMDD } from "../types/evolutivesStats";
+import type { EvolutiveStatOption } from "../types/evolutivesStats";
 import { dayjsInstance } from "../services/date";
 import { personFieldsIncludingCustomFieldsSelector } from "./persons";
 import type { Dayjs } from "dayjs";
@@ -42,25 +42,6 @@ export const evolutiveStatsIndicatorsBaseSelector = selector({
 });
 
 export const startHistoryFeatureDate = "2022-09-23";
-
-type FieldsMap = Record<CustomOrPredefinedField["name"], CustomOrPredefinedField>;
-
-function getValuesOptionsByField(field: CustomOrPredefinedField, fieldsMap: FieldsMap): Array<EvolutiveStatOption> {
-  if (!field) return [];
-  const current = fieldsMap[field.name];
-  if (!current) return [];
-  if (["yes-no"].includes(current.type)) return ["Oui", "Non", "Non renseigné"];
-  if (["boolean"].includes(current.type)) return ["Oui", "Non"];
-  if (current?.name === "outOfActiveList") return current.options ?? ["Oui", "Non"];
-  if (current?.options?.length) {
-    // eslint-disable-next-line no-unsafe-optional-chaining
-    return [...current?.options, "Non renseigné"].filter((option) => {
-      if (option.includes("Choisissez un genre")) return false;
-      return true;
-    });
-  }
-  return ["Non renseigné"];
-}
 
 function getValueByField(indicator: IndicatorsSelection[0], value: any): string | Array<string> {
   if (!indicator) return "";
