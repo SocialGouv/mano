@@ -49,7 +49,7 @@ const SessionCountDownLimiter = () => {
 
   if (remainingTimeBeforeDeconnection < 1) {
     tryFetchExpectOk(() => API.post({ path: "/user/logout" })).then(() => {
-      API.reset({ redirect: true });
+      window.location.href = "/auth";
     });
   }
 

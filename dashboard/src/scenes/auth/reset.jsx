@@ -56,7 +56,7 @@ const Reset = () => {
             // Dans le doute on déconnecte l'utilisateur
             tryFetchExpectOk(() => API.post({ path: "/user/logout" })).then(([error]) => {
               if (error) return toast.error(errorMessage(error));
-              API.reset({ redirect: true });
+              window.location.href = "/auth";
             });
           }
         }}

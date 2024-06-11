@@ -68,7 +68,7 @@ const SignIn = () => {
     setShowPassword(false);
     setAuthViaCookie(false);
     tryFetchExpectOk(() => API.post({ path: "/user/logout" })).then(() => {
-      API.reset();
+      window.location.href = "/auth";
     });
   };
 

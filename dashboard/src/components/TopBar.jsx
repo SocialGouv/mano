@@ -31,7 +31,9 @@ const TopBar = () => {
       tryFetchExpectOk(() => API.post({ path: "/user/logout" })).then(() => {
         // On met un timeout pour laisser le temps aux personnes de lire si jamais ça va trop vite.
         // Il n'a donc aucune utilité d'un point de vue code.
-        setTimeout(() => API.reset({ redirect: true }), 1500);
+        setTimeout(() => {
+          window.location.href = "/auth";
+        }, 1500);
       });
     });
   }
@@ -116,7 +118,7 @@ const TopBar = () => {
               <DropdownItem
                 onClick={() => {
                   tryFetchExpectOk(() => API.post({ path: "/user/logout" })).then(() => {
-                    API.reset({ redirect: true });
+                    window.location.href = "/auth";
                   });
                 }}
               >

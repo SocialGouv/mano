@@ -2,11 +2,14 @@ import { getRecoil, setRecoil } from "recoil-nexus";
 import { HOST, SCHEME } from "../config";
 import { organisationState } from "../recoil/auth";
 import { deploymentCommitState, deploymentDateState } from "../recoil/version";
-import { resetOrgEncryptionKey, setEnableEncrypt } from "./encryption";
-import { AppSentry, capture } from "./sentry";
-import { atom } from "recoil";
+import { capture } from "./sentry";
 
-export const recoilResetKeyState = atom({ key: "recoilResetKeyState", default: 0 });
+class AuthError extends Error {
+  constructor() {
+    super("Connexion expirée");
+    this.name = "AuthError";
+  }
+}
 
 class Api {
   protected token: string | null = null;
@@ -75,18 +78,6 @@ class Api {
     return this.token;
   }
 
-  reset({ redirect = false }: { redirect?: boolean } = {}) {
-    this.setToken(null);
-    resetOrgEncryptionKey();
-    setEnableEncrypt(false);
-    setRecoil(recoilResetKeyState, Date.now());
-    AppSentry.setUser({});
-    AppSentry.setTag("organisationId", "");
-    if (redirect) {
-      window.location.href = "/auth";
-    }
-  }
-
   async post({ path, body = {}, query = {} }: { path: string; body?: unknown; query?: Record<string, string | Date | boolean> }) {
     const response = await fetch(this.getUrl(path, { ...this.organisationEncryptionStatus(), ...query }), {
       ...this.fetchParams(),
@@ -94,10 +85,7 @@ class Api {
       body: typeof body === "string" ? body : JSON.stringify(body),
     });
     this.updateDeploymentStatus(response);
-    if (this.needAuthRedirection(response)) {
-      this.reset({ redirect: true });
-      return;
-    }
+    if (this.needAuthRedirection(response)) throw new AuthError();
     return response.json();
   }
 
@@ -108,10 +96,7 @@ class Api {
       body: typeof body === "string" ? body : JSON.stringify(body),
     });
     this.updateDeploymentStatus(response);
-    if (this.needAuthRedirection(response)) {
-      this.reset({ redirect: true });
-      return;
-    }
+    if (this.needAuthRedirection(response)) throw new AuthError();
     return response.json();
   }
 
@@ -122,20 +107,14 @@ class Api {
       body: typeof body === "string" ? body : JSON.stringify(body),
     });
     this.updateDeploymentStatus(response);
-    if (this.needAuthRedirection(response)) {
-      this.reset({ redirect: true });
-      return;
-    }
+    if (this.needAuthRedirection(response)) throw new AuthError();
     return response.json();
   }
 
   async get({ path, query = {} }: { path: string; query?: Record<string, string | Date | boolean> }) {
     const response = await fetch(this.getUrl(path, { ...this.organisationEncryptionStatus(), ...query }), { ...this.fetchParams(), method: "GET" });
     this.updateDeploymentStatus(response);
-    if (this.needAuthRedirection(response)) {
-      this.reset({ redirect: true });
-      return;
-    }
+    if (this.needAuthRedirection(response)) throw new AuthError();
     return response.json();
   }
 
@@ -156,20 +135,14 @@ class Api {
       body: formData,
     });
     this.updateDeploymentStatus(response);
-    if (this.needAuthRedirection(response)) {
-      this.reset({ redirect: true });
-      return;
-    }
+    if (this.needAuthRedirection(response)) throw new AuthError();
     return response.json();
   }
 
   async download({ path, query = {} }: { path: string; query?: Record<string, string | Date | boolean> }) {
     const response = await fetch(this.getUrl(path, { ...this.organisationEncryptionStatus(), ...query }), { ...this.fetchParams(), method: "GET" });
     this.updateDeploymentStatus(response);
-    if (this.needAuthRedirection(response)) {
-      this.reset({ redirect: true });
-      return;
-    }
+    if (this.needAuthRedirection(response)) throw new AuthError();
     return response.blob();
   }
 
@@ -194,7 +167,8 @@ export async function tryFetchBlob<T extends Blob>(callback: FetchCallback<T>): 
     const result = await callback();
     return [undefined, result];
   } catch (error) {
-    capture(error);
+    if (error instanceof AuthError) window.location.href = "/auth";
+    else capture(error);
     return [error, undefined];
   }
 }
@@ -205,7 +179,8 @@ export async function tryFetch<T extends ApiResponse>(callback: FetchCallback<T>
     if (result && !result.ok) return [new Error(result.error), result];
     return [undefined, result];
   } catch (error) {
-    capture(error);
+    if (error instanceof AuthError) window.location.href = "/auth";
+    else capture(error);
     return [error, undefined];
   }
 }
@@ -219,7 +194,8 @@ export async function tryFetchExpectOk<T extends ApiResponse>(callback: FetchCal
     if (result && result?.ok === false) throw new Error(result.error);
     return [undefined, result];
   } catch (error) {
-    capture(error);
+    if (error instanceof AuthError) window.location.href = "/auth";
+    else capture(error);
     return [error, undefined];
   }
 }

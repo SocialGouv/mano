@@ -26,7 +26,7 @@ import Reception from "./scenes/reception";
 import ActionModal from "./components/ActionModal";
 import Charte from "./scenes/auth/charte";
 import { userState } from "./recoil/auth";
-import API, { recoilResetKeyState, tryFetch } from "./services/api";
+import API, { tryFetch } from "./services/api";
 import ScrollToTop from "./components/ScrollToTop";
 import TopBar from "./components/TopBar";
 import VersionOutdatedAlert from "./components/VersionOutdatedAlert";
@@ -87,15 +87,9 @@ if (ENV === "production") {
   });
 }
 
-const App = ({ resetRecoil }) => {
+const App = () => {
   const user = useRecoilValue(userState);
   const initialLoadIsDone = useRecoilValue(initialLoadIsDoneState);
-  const recoilResetKey = useRecoilValue(recoilResetKeyState);
-  useEffect(() => {
-    if (recoilResetKey) {
-      resetRecoil();
-    }
-  }, [recoilResetKey, resetRecoil]);
   const { refresh } = useDataLoader();
   const apiToken = API.getToken();
 
@@ -186,16 +180,14 @@ const RestrictedRoute = ({ component: Component, _isLoggedIn, ...rest }) => {
 };
 
 export default function ContextedApp() {
-  // https://github.com/facebookexperimental/Recoil/issues/758#issuecomment-737471220
-  const [recoilKey, setRecoilKey] = useState(0);
   return (
-    <RecoilRoot key={recoilKey}>
+    <RecoilRoot>
       {/* We need React.Suspense here because default values for `person`, `action` etc. tables is an async cache request */}
       {/* https://recoiljs.org/docs/guides/asynchronous-data-queries#query-default-atom-values */}
       <React.Suspense fallback={<div></div>}>
         {/* Recoil Nexus allows to use Recoil state outside React tree */}
         <RecoilNexus />
-        <App resetRecoil={() => setRecoilKey((k) => k + 1)} />
+        <App />
       </React.Suspense>
     </RecoilRoot>
   );

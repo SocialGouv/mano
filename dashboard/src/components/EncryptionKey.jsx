@@ -250,7 +250,7 @@ const EncryptionKey = ({ isMain }) => {
             className="button-submit !tw-bg-black"
             onClick={() => {
               tryFetchExpectOk(() => API.post({ path: "/user/logout" })).then(() => {
-                API.reset({ redirect: true });
+                window.location.href = "/auth";
               });
             }}
             type="button"

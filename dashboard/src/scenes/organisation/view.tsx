@@ -214,7 +214,7 @@ const View = () => {
                             if (!error) {
                               toast.success("Organisation supprimée");
                               tryFetchExpectOk(() => API.post({ path: "/user/logout" })).then(() => {
-                                API.reset({ redirect: true });
+                                window.location.href = "/auth";
                               });
                             } else {
                               toast.error(errorMessage(error));
