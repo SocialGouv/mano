@@ -83,6 +83,12 @@ if (ENV === "production") {
       // Since other browsers don't have this problem, we don't care about it,
       // it may be a false positive.
       "AbortError: The operation was aborted",
+      // Sur safari, on a des erreur de type "TypeError: cancelled" qui seraient liées
+      // au bouton "X" (ou refresh) pressé pendant un fetch. Il semblerait que la meilleure
+      // approche soit de les ignorer.
+      // Cf: https://stackoverflow.com/a/60860369/978690
+      "TypeError: cancelled",
+      "TypeError: annulé",
     ],
   });
 }
