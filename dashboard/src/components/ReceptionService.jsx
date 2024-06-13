@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { servicesSelector } from "../recoil/reports";
 import { useRecoilValue } from "recoil";
-import API from "../services/api";
+import API, { tryFetchExpectOk } from "../services/api";
 import { toast } from "react-toastify";
 import IncrementorSmall from "./IncrementorSmall";
 import { organisationState } from "../recoil/auth";
@@ -18,8 +18,8 @@ const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = "", ser
       if (!dateString || !team?._id || dateString === "undefined") {
         return capture("Missing params for initServices in reception", { extra: { dateString, team, report } });
       }
-      API.get({ path: `/service/team/${team._id}/date/${dateString}` }).then((res) => {
-        if (!res.ok) return toast.error(<ErrorOnGetServices />);
+      tryFetchExpectOk(() => API.get({ path: `/service/team/${team._id}/date/${dateString}` })).then(([error, res]) => {
+        if (error) return toast.error(<ErrorOnGetServices />);
         const servicesFromLegacyReport = report?.services?.length ? JSON.parse(report?.services) : {};
         const servicesFromDatabase = res.data.reduce((acc, service) => {
           acc[service.service] = (servicesFromLegacyReport[service.service] || 0) + service.count;
