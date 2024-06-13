@@ -68,7 +68,7 @@ export async function viewBlobInNewWindow(url) {
 
 export function errorMessage(e) {
   const message = e?.message || e;
-  if (message === "Failed to fetch") {
+  if (message === "Failed to fetch" || message === "Load failed") {
     return "Impossible de transmettre les données. Veuillez vérifier votre connexion internet.";
   }
   return message;
