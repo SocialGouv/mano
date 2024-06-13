@@ -53,7 +53,7 @@ class Api {
   }
 
   protected needAuthRedirection(response: Response) {
-    return response.status === 401 && window?.location?.pathname !== "/auth";
+    return response.status === 401;
   }
 
   protected fetchParams(): RequestInit {
