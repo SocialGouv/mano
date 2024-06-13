@@ -20,6 +20,20 @@ export default function ActionStatusSelect({ action }: { action: ActionInstance 
 
   if (!organisation || !user) return null;
 
+  const disabled = isConsultation(action) && !user.healthcareProfessional;
+
+  if (disabled) {
+    return (
+      <div
+        className={`tw-cursor-not-allowed tw-appearance-none tw-rounded tw-border-none tw-px-2 tw-transition hover:tw-scale-105 ${
+          action.status === DONE ? "tw-bg-green-700" : action.status === TODO ? "tw-bg-red-700" : "tw-bg-cyan-700"
+        } tw-text-center tw-text-[11px] tw-font-bold tw-text-white tw-outline-none`}
+      >
+        {action.status === TODO ? "À faire" : action.status === DONE ? "Fait" : "Annulé"}
+      </div>
+    );
+  }
+
   return (
     <select
       className={`tw-cursor-pointer tw-appearance-none tw-rounded tw-border-none tw-px-2 tw-transition hover:tw-scale-105 ${
