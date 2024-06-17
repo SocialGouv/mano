@@ -83,8 +83,8 @@ test("test territories", async ({ page }) => {
   await page.getByLabel("Mot de passe").click();
   await page.getByLabel("Mot de passe").fill("secret");
   await page.getByRole("button", { name: "Se connecter" }).click();
-  await page.getByLabel("Clé de chiffrement d'organisation").fill("plouf");
-  await page.getByLabel("Clé de chiffrement d'organisation").press("Enter");
+  await page.locator("#orgEncryptionKey").pressSequentially("plouf");
+  await page.locator("#orgEncryptionKey").press("Enter");
   await page.getByRole("link", { name: "Territoires" }).click();
   await page.getByRole("cell", { name: "test de territoire new" }).click();
   await page.getByText("Mon nouveau champ de territoire: AH VOILA LE NOUVEAU").click();

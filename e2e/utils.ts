@@ -15,7 +15,7 @@ export async function loginWith(page: Page, email: string, password: string = "s
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Mot de passe").fill(password);
   await page.getByRole("button", { name: "Se connecter" }).click();
-  await page.getByLabel("Clé de chiffrement d'organisation").fill(orgKey);
+  await page.locator("#orgEncryptionKey").pressSequentially(orgKey);
   await page.getByRole("button", { name: "Se connecter" }).click();
 }
 

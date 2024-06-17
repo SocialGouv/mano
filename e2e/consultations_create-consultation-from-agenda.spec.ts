@@ -13,7 +13,7 @@ test("test", async ({ page }) => {
   await page.getByLabel("Email").press("Tab");
   await page.getByLabel("Mot de passe").fill("secret");
   await page.getByLabel("Mot de passe").press("Enter");
-  await page.getByLabel("Clé de chiffrement d'organisation").fill("plouf");
+  await page.locator("#orgEncryptionKey").pressSequentially("plouf");
   await page.getByRole("button", { name: "Se connecter" }).click();
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await page.getByRole("button", { name: "Créer une personne" }).click();

@@ -28,7 +28,7 @@ test("test", async ({ page }) => {
 
   await page.getByRole("button", { name: "Se connecter" }).click();
 
-  await page.getByLabel("Clé de chiffrement d'organisation").fill("plouf");
+  await page.locator("#orgEncryptionKey").pressSequentially("plouf");
 
   await page.getByRole("button", { name: "Se connecter" }).click();
   await expect(page).toHaveURL("http://localhost:8090/reception?calendarTab=2");
