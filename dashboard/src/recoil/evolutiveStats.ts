@@ -158,12 +158,13 @@ export function computeEvolutiveStatsForPersons({
   // if `fromValue` is defined, we present nothing from now - we will present the number of switches to any values from the `fromValue`
   // if `toValue` is defined, we present two numbers only
   // how do we calculate ?
-  // we start by the snapshot at the initial value
+  // we start by the snapshot at the initial value (a snapshot is the picture of a person at a given date)
   // then we go forward in time, and when we meet an entry in the history for the field,
-  // if the date is beyond the start date or the end date, we skip it
-  // if the date is between the start date and the end date, we take the value of the field at this date
-  // we keep this value until we meet another entry in the history for the field, etc. until today / until the end date
+  // we ignore the history dates outside the period
+  // we check the number of switches from `fromValue` to `toValue` for the field during the period
+  // CAREFUL: if there is an `intermediateValue` between `fromValue` and `toValue`, it's not a switch
 
+  // FIXME: why we need both the formats YYYY-MM-DD and YYYYMMDD ? why not only YYYY-MM-DD ?
   const startDateConsolidated = startDate
     ? dayjsInstance(dayjsInstance(startDate).startOf("day").format("YYYY-MM-DD"))
     : dayjsInstance(startHistoryFeatureDate);
@@ -183,8 +184,7 @@ export function computeEvolutiveStatsForPersons({
   const valueStart = indicator?.fromValue;
   const valueEnd = indicator?.toValue;
 
-  const personsIdsSwitchedByValue: Record<EvolutiveStatOption, Array<PersonPopulated["id"]>> = {};
-
+  // FIXME: should we have evolutive stats on a single day ?
   if (startDateConsolidated.isSame(endDateConsolidated))
     return {
       countSwitched: 0,
@@ -198,7 +198,10 @@ export function computeEvolutiveStatsForPersons({
       personsIdsSwitched: [],
     };
 
+  const personsIdsSwitchedByValue: Record<EvolutiveStatOption, Array<PersonPopulated["id"]>> = {};
+
   for (const person of persons) {
+    // FIXME: on doit prendre en compte la date de suivi par équipe, et non la date de création
     const followedSince = dayjsInstance(person.followedSince || person.createdAt).format("YYYYMMDD");
     if (followedSince > endDateFormatted) continue;
     const initSnapshotDate = followedSince > startDateFormatted ? followedSince : startDateFormatted;
@@ -272,6 +275,7 @@ export function computeEvolutiveStatsForPersons({
       if (!personsIdsSwitchedByValue[valueStart]) {
         personsIdsSwitchedByValue[valueStart] = [];
       }
+      // FIXME: is there a bug here ? we don'tcheck if the person has the valueStart, should we ?
       personsIdsSwitchedByValue[valueStart].push(person._id); // from `fromValue` to `fromValue`
     }
   }
