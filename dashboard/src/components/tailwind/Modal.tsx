@@ -86,7 +86,7 @@ const ModalContainer = ({
               >
                 <Dialog.Panel
                   className={[
-                    "tw-relative tw-flex tw-max-h-[90vh] tw-transform tw-flex-col tw-overflow-hidden tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all sm:tw-my-8 sm:tw-w-full",
+                    "tw-relative tw-flex tw-max-h-[90vh] tw-transform tw-flex-col tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all sm:tw-my-8 sm:tw-w-full",
                     size === "lg" ? "sm:tw-max-w-lg" : "",
                     size === "xl" ? "sm:tw-max-w-xl" : "",
                     size === "3xl" ? "sm:tw-max-w-3xl" : "",
