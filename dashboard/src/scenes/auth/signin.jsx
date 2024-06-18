@@ -297,23 +297,7 @@ const SignIn = () => {
         {!!showEncryption && (
           <div className="tw-mb-6">
             <div className="tw-flex tw-flex-col-reverse">
-              {organisation._id === "00000000-5f5a-89e2-2e60-88fa20cc50bf" ? (
-                <KeyInput id="orgEncryptionKey" onChange={handleKeyChange} onPressEnter={handleSubmit} initialValue={signinForm.orgEncryptionKey} />
-              ) : (
-                <PasswordInput
-                  className="tw-mb-1.5 tw-block tw-w-full tw-rounded tw-border tw-border-main75 tw-bg-transparent tw-p-2.5 tw-text-[8px] tw-leading-[18px] tw-tracking-[3.5px] tw-text-black tw-outline-main tw-transition-all [&.hide-password]:tw-font-['password']"
-                  name="orgEncryptionKey"
-                  type="search" // for the delete button
-                  autoComplete="off"
-                  id="orgEncryptionKey"
-                  autoFocus
-                  value={signinForm.orgEncryptionKey}
-                  onChange={handleChangeRequest}
-                  showPassword={showPassword}
-                  setShowPassword={setShowPassword}
-                />
-              )}
-
+              <KeyInput id="orgEncryptionKey" onChange={handleKeyChange} onPressEnter={handleSubmit} initialValue={signinForm.orgEncryptionKey} />
               <label htmlFor="orgEncryptionKey">Clé de chiffrement d'organisation</label>
             </div>
             <p className="tw-text-xs">
