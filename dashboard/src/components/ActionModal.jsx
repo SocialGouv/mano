@@ -660,20 +660,25 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                 }
               }}
               onSubmitComment={async (comment, isNewComment) => {
-                const newData = isNewComment
-                  ? { ...data, comments: [{ ...comment, _id: uuidv4() }, ...data.comments] }
-                  : { ...data, comments: data.comments.map((c) => (c._id === comment._id ? comment : c)) };
-                setData(newData);
-                if (isNewAction) return;
-
                 if (isNewComment) {
-                  const [error] = await tryFetchExpectOk(async () => API.post({ path: "/comment", body: await encryptComment(comment) }));
-                  if (error) {
-                    toast.error("Erreur lors de l'ajout du commentaire");
+                  if (isNewAction) {
+                    // On a besoin d'un identifiant temporaire pour les nouveaux commentaires dans une nouvelle action
+                    // Car on peut ajouter, supprimer, éditer des commentaires qui n'existent pas en base de données.
+                    // Cet identifiant sera remplacé par l'identifiant de l'objet créé par le serveur.
+                    setData({ ...data, comments: [{ ...comment, _id: uuidv4() }, ...data.comments] });
                     return;
+                  } else {
+                    const [error, response] = await tryFetchExpectOk(async () => API.post({ path: "/comment", body: await encryptComment(comment) }));
+                    if (error) {
+                      toast.error("Erreur lors de l'ajout du commentaire");
+                      return;
+                    }
+                    setData({ ...data, comments: [{ ...comment, _id: response.data._id }, ...data.comments] });
+                    toast.success("Commentaire ajouté !");
                   }
-                  toast.success("Commentaire ajouté !");
                 } else {
+                  setData({ ...data, comments: data.comments.map((c) => (c._id === comment._id ? comment : c)) });
+                  if (isNewAction) return;
                   const [error] = await tryFetchExpectOk(async () =>
                     API.put({
                       path: `/comment/${comment._id}`,
