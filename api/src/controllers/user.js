@@ -338,8 +338,8 @@ router.post(
     user.forgotPasswordResetToken = token;
     user.forgotPasswordResetExpires = new Date(Date.now() + 60 * 60 * 24 * 30 * 1000); // 30 days
 
-    const link = `https://espace-mano.sesan.fr/auth/reset?token=${token}`;
-
+    let link = `https://espace-mano.sesan.fr/auth/reset?token=${token}`;
+    if (!user.name) link += `&newUser=true`;
     await user.save();
 
     const subject = "Réinitialiser votre mot de passe";
@@ -915,7 +915,8 @@ router.post(
     const token = crypto.randomBytes(20).toString("hex");
     user.forgotPasswordResetToken = token;
     user.forgotPasswordResetExpires = new Date(Date.now() + 60 * 60 * 24 * 30 * 1000); // 30 days
-    const link = `https://espace-mano.sesan.fr/auth/reset?token=${token}`;
+    let link = `https://espace-mano.sesan.fr/auth/reset?token=${token}`;
+    if (!user.name) link += `&newUser=true`;
     await user.save();
 
     return res.status(200).send({ ok: true, data: { link } });

@@ -1,20 +1,23 @@
-import { useState } from "react";
-import { Redirect, useLocation } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { Link, Redirect, useLocation } from "react-router-dom";
 import ChangePassword from "../../components/ChangePassword";
 import API, { tryFetch, tryFetchExpectOk } from "../../services/api";
-import { useRecoilValue } from "recoil";
-import { deploymentShortCommitSHAState } from "../../recoil/version";
 import { toast } from "react-toastify";
 import { errorMessage } from "../../utils";
 
 const Reset = () => {
-  const deploymentCommit = useRecoilValue(deploymentShortCommitSHAState);
-
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const token = searchParams.get("token");
   const newUser = searchParams.get("newUser") === "true";
   const [name, setName] = useState("");
+  const [hasError, setHasError] = useState(false);
+
+  const renewLink = useMemo(() => {
+    let path = "/auth/forgot?newLinkRequest=true";
+    if (newUser) path += "&newUser=true";
+    return path;
+  }, [newUser]);
 
   if (!token) return <Redirect to="/" />;
 
@@ -47,6 +50,7 @@ const Reset = () => {
           );
           if (error) {
             toast.error(errorMessage(error));
+            setHasError(true);
             return false;
           }
           return res;
@@ -63,7 +67,11 @@ const Reset = () => {
         withCurrentPassword={false}
         centerButton
       />
-      <p className="tw-mx-auto tw-mb-0 tw-mt-5 tw-block tw-text-center tw-text-xs tw-text-gray-500">Version&nbsp;: {deploymentCommit}</p>
+      {hasError && (
+        <Link to={renewLink} className="tw-mx-auto tw-mb-0 tw-mt-5 tw-block tw-text-center tw-text-sm">
+          Demander un nouveau lien de connexion
+        </Link>
+      )}
     </div>
   );
 };

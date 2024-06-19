@@ -68,7 +68,7 @@ function MenuButton({ selected, text, onClick }: { selected: boolean; text: stri
   );
 }
 
-const encryptionChangeOfKeyEnabled = import.meta.env.VITE_TEST_PLAYWRIGHT === "true";
+const encryptionChangeOfKeyEnabled = process.env.NODE_ENV === "development" || import.meta.env.VITE_TEST_PLAYWRIGHT === "true";
 
 const View = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
