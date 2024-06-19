@@ -1,5 +1,6 @@
 // types/user.ts
 import { UUIDV4 } from "./uuid";
+import { TeamInstance } from "./team";
 
 export type UserInstance = {
   _id: UUIDV4;
@@ -12,8 +13,8 @@ export type UserInstance = {
   phone: string | null;
   healthcareProfessional: boolean | null;
   role: "normal" | "admin" | "superadmin" | "restricted-access" | "stats-only";
-  team?: UUIDV4[];
-  teams?: UUIDV4[];
+  team?: Array<TeamInstance["_id"]>;
+  teams?: Array<TeamInstance>;
   createdAt?: Date;
   decryptAttempts?: number;
 };

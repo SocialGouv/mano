@@ -183,8 +183,8 @@ const ObservationsStats = ({
 };
 
 const SelectedObsModal = ({ open, onClose, observations, territories, title, onAfterLeave, selectedTeams, period }) => {
-  const [observationToEdit, setObservationToEdit] = useState({});
-  const [openObservationModaleKey, setOpenObservationModaleKey] = useState(0);
+  const [observationToEdit, setObservationToEdit] = useState(undefined);
+  const [openObservationModale, setOpenObservationModale] = useState(false);
   const teams = useRecoilValue(teamsState);
   const team = useRecoilValue(currentTeamState);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
@@ -254,7 +254,7 @@ const SelectedObsModal = ({ open, onClose, observations, territories, title, onA
               data={observations}
               onRowClick={(obs) => {
                 setObservationToEdit(obs);
-                setOpenObservationModaleKey((k) => k + 1);
+                setOpenObservationModale(true);
               }}
               rowKey={"_id"}
               columns={[
@@ -320,7 +320,7 @@ const SelectedObsModal = ({ open, onClose, observations, territories, title, onA
           </button>
         </ModalFooter>
       </ModalContainer>
-      <CreateObservation observation={observationToEdit} forceOpen={openObservationModaleKey} />
+      <CreateObservation observation={observationToEdit} open={openObservationModale} setOpen={setOpenObservationModale} />
     </>
   );
 };

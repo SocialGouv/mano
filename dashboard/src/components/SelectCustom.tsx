@@ -3,13 +3,13 @@ import CreatableSelect from "react-select/creatable";
 import { theme } from "../config";
 import type { GroupBase, Props } from "react-select";
 
-interface CustomProps<Option, IsMulti extends boolean = false, Group extends GroupBase<Option> = GroupBase<Option>>
+export interface SelectCustomProps<Option, IsMulti extends boolean = false, Group extends GroupBase<Option> = GroupBase<Option>>
   extends Props<Option, IsMulti, Group> {
   creatable?: boolean;
 }
 
 function SelectCustom<Option, IsMulti extends boolean = false, Group extends GroupBase<Option> = GroupBase<Option>>(
-  allProps: CustomProps<Option, IsMulti, Group>
+  allProps: SelectCustomProps<Option, IsMulti, Group>
 ) {
   const { creatable, ...props } = allProps;
   const Component = creatable ? CreatableSelect : Select;

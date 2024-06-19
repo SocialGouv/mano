@@ -5,7 +5,7 @@ import SelectCustom from "./SelectCustom";
 import { capture } from "../services/sentry";
 import DatePicker from "./DatePicker";
 
-const CustomFieldInput = ({ field, values, handleChange, model, colWidth = null, disabled, hideLabel = false }) => {
+const CustomFieldInput = ({ field, values, handleChange, model, colWidth = null, disabled = false, hideLabel = false }) => {
   const id = useMemo(() => {
     const slugifiedLabel =
       field.label

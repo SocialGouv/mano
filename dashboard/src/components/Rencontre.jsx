@@ -15,7 +15,7 @@ import { outOfBoundariesDate } from "../services/date";
 import AutoResizeTextarea from "./AutoresizeTextArea";
 import { useDataLoader } from "./DataLoader";
 
-const Rencontre = ({ rencontre, personId, onFinished, onSave, disableAccessToPerson = false }) => {
+const Rencontre = ({ rencontre, onFinished, onSave = undefined, personId = null, disableAccessToPerson = false }) => {
   const user = useRecoilValue(userState);
   const teams = useRecoilValue(teamsState);
   const [open, setOpen] = useState(false);

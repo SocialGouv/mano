@@ -1,14 +1,14 @@
 import { UUIDV4 } from "./uuid";
 
 export interface TerritoryObservationInstance {
-  _id: string;
-  organisation: UUIDV4;
-  entityKey: string;
-  createdAt: string; // ISO date
-  deletedAt?: string; // ISO date
-  updatedAt: string; // ISO date
+  _id?: string;
+  organisation?: UUIDV4;
+  entityKey?: string;
+  createdAt?: string | Date;
+  deletedAt?: string | Date;
+  updatedAt?: string | Date;
 
-  territory: UUIDV4;
+  territory?: UUIDV4;
   user: UUIDV4;
   team: UUIDV4;
   observedAt: Date;
@@ -20,9 +20,9 @@ export interface ReadyToEncryptTerritoryObservationInstance {
   _id: string;
   organisation: UUIDV4;
   entityKey: string;
-  createdAt: string; // ISO date
-  deletedAt?: string; // ISO date
-  updatedAt: string; // ISO date
+  createdAt?: string | Date;
+  deletedAt?: string | Date;
+  updatedAt?: string | Date;
 
   decrypted: {
     territory?: UUIDV4;

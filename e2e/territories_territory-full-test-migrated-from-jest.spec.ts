@@ -40,11 +40,11 @@ test("test territories", async ({ page }) => {
   await page.getByRole("dialog").getByLabel("Commentaire").fill("HELLO COMMENTAIRE");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
-  await page.getByText("HELLO COMMENTAIRE").click();
+  await page.getByRole("cell", { name: "Nombre de personnes non" }).click();
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Observation mise à jour").click();
   page.once("dialog", (dialog) => dialog.accept());
-  await page.getByText("HELLO COMMENTAIRE").click();
+  await page.getByRole("cell", { name: "Nombre de personnes non" }).click();
   await page.getByRole("dialog", { name: "Modifier l'observation" }).getByRole("button", { name: "Supprimer" }).click();
   await page.getByText("Suppression réussie").click();
 

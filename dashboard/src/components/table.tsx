@@ -2,15 +2,15 @@ import { useCallback, useEffect, useRef } from "react";
 import Sortable from "sortablejs";
 import useMinimumWidth from "../services/useMinimumWidth";
 
-interface HasId {
-  _id: string;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string;
-  organisation: string;
+interface RootItem {
+  _id?: string;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+  deletedAt?: string | Date;
+  organisation?: string;
 }
 
-interface TableProps<T extends HasId> {
+interface TableProps<T extends RootItem> {
   columns?: {
     title: string;
     dataKey: string;
@@ -39,7 +39,7 @@ interface TableProps<T extends HasId> {
   renderCellSmallDevices?: (item: T) => React.ReactNode;
 }
 
-const Table = <T extends { [key: string]: any } & HasId>({
+const Table = <T extends { [key: string]: any } & RootItem>({
   columns = [],
   data = [],
   rowKey,
