@@ -25,6 +25,10 @@ const KeyInput = ({
     }
   }, []);
 
+  const isAndroid = () => {
+    return /Android/i.test(navigator.userAgent);
+  };
+
   function setCursorToEnd() {
     document.getSelection().selectAllChildren(inputRef.current);
     document.getSelection().collapseToEnd();
@@ -71,7 +75,8 @@ const KeyInput = ({
       }}
       onInput={(e) => {
         // Cas particulier: Si on est en train de faire une composition (comme ^ + i pour î par exemple), on gère à l'extérieur.
-        if ((e.nativeEvent as InputEvent).isComposing) return;
+        // Sauf que sur android, on ne peut pas détecter la composition parce que tout semble composition, donc on laisse passer.
+        if (!isAndroid() && (e.nativeEvent as InputEvent).isComposing) return;
 
         const innerText = (e.target as HTMLElement).innerText;
         let newValue: string;
