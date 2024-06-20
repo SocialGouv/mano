@@ -23,7 +23,7 @@ interface ModalContainerProps {
   onAfterEnter?: () => void;
   onAfterLeave?: () => void;
   onBeforeLeave?: () => void;
-  size?: "lg" | "xl" | "3xl" | "full" | "prose";
+  size?: "lg" | "xl" | "3xl" | "4xl" | "full" | "prose";
   blurryBackground?: boolean; // if true, the background will be blurred
   dataTestId?: string;
 }
@@ -90,6 +90,7 @@ const ModalContainer = ({
                     size === "lg" ? "sm:tw-max-w-lg" : "",
                     size === "xl" ? "sm:tw-max-w-xl" : "",
                     size === "3xl" ? "sm:tw-max-w-3xl" : "",
+                    size === "4xl" ? "sm:tw-max-w-4xl" : "",
                     size === "full" ? "sm:tw-max-w-[90vw]" : "",
                     size === "prose" ? "sm:tw-max-w-prose" : "",
                   ].join(" ")}
