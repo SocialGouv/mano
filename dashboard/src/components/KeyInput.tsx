@@ -78,7 +78,9 @@ const KeyInput = ({
         // Sauf que sur android, on ne peut pas détecter la composition parce que tout semble composition, donc on laisse passer.
         if (!isAndroid() && (e.nativeEvent as InputEvent).isComposing) return;
 
-        const innerText = (e.target as HTMLElement).innerText;
+        let innerText = (e.target as HTMLElement).innerText;
+        // On enlève les caractères de retour à la ligne (sur iOS, quand on efface tout, il reste un retour à la ligne)
+        innerText = (innerText || "").replace(/[\r\n]/g, "");
         let newValue: string;
 
         if (innerText.length === value.length + 1) {
