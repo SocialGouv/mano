@@ -167,7 +167,18 @@ const SignIn = () => {
     if (token) API.setToken(token);
     setSessionInitialTimestamp(Date.now());
     if (!["superadmin"].includes(user.role) && !!signinForm.orgEncryptionKey && organisation.encryptionEnabled) {
-      const organisationKey = await setOrgEncryptionKey(signinForm.orgEncryptionKey.trim(), { needDerivation: true });
+      let organisationKey;
+      try {
+        organisationKey = await setOrgEncryptionKey(signinForm.orgEncryptionKey.trim(), { needDerivation: true });
+      } catch (e) {
+        setIsSubmitting(false);
+        // Si c'est une erreur de dom sur `window.btoa`, on ne peut pas continuer
+        if (e instanceof DOMException) {
+          toast.error("La clé ne peut pas être chiffrée, elle contient des caractères invalides");
+          return setIsSubmitting(false);
+        }
+        throw e;
+      }
       const encryptionIsValid = await checkEncryptedVerificationKey(organisation.encryptedVerificationKey, organisationKey);
       if (!encryptionIsValid) {
         resetOrgEncryptionKey();
