@@ -116,6 +116,7 @@ const KeyInput = ({
       }}
       autoCorrect="off"
       spellCheck="false"
+      autoCapitalize="off"
       // Il est très important de laisser `tw-whitespace-pre-wrap` pour éviter
       // que le navigateur remplace les espaces par des espaces insécables.
       className="tw-whitespace-pre-wrap tw-mb-1.5 tw-block tw-w-full tw-rounded tw-border tw-border-main75 tw-bg-transparent tw-p-2.5 tw-text-black tw-outline-main tw-transition-all"
