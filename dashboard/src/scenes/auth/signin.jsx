@@ -23,6 +23,7 @@ import { deploymentShortCommitSHAState } from "../../recoil/version";
 import { checkEncryptedVerificationKey, resetOrgEncryptionKey, setOrgEncryptionKey } from "../../services/encryption";
 import { errorMessage } from "../../utils";
 import KeyInput from "../../components/KeyInput";
+import { capture } from "../../services/sentry";
 
 const SignIn = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
@@ -175,6 +176,7 @@ const SignIn = () => {
         // Si c'est une erreur de dom sur `window.btoa`, on ne peut pas continuer
         if (e instanceof DOMException) {
           toast.error("La clé ne peut pas être chiffrée, elle contient des caractères invalides");
+          capture(e);
           return setIsSubmitting(false);
         }
         throw e;
