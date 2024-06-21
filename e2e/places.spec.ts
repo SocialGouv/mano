@@ -23,7 +23,6 @@ test("Lieux fréquentés", async ({ page }) => {
   await page.getByText("Création réussie !").click();
 
   await page.getByRole("button", { name: "Lieux fréquentés (0)" }).click();
-  await page.getByRole("button", { name: "Fermer" }).first().click();
 
   await page.getByRole("button", { name: "Ajouter un lieu" }).click();
   await page.locator(".place__input-container").click();

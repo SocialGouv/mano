@@ -91,7 +91,6 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Mis à jour !").click();
   await page.getByRole("button", { name: "Lieux fréquentés (0)" }).click();
-  await page.getByRole("button", { name: "Fermer" }).first().click();
   await page.getByRole("button", { name: "Ajouter un lieu" }).click();
   await page.getByRole("combobox", { name: "Lieu" }).fill("test lieu");
   await page.getByText('Créer "test lieu"').click();
@@ -148,7 +147,6 @@ test("test", async ({ page }) => {
   await page.getByText("MDEIDAL").click();
   await page.getByText("12345").click();
   await page.getByRole("button", { name: "Lieux fréquentés (1)" }).click();
-  await page.getByRole("button", { name: "Fermer" }).first().click();
   await page.locator('[data-test-id="test lieu"]').click();
   await page.getByRole("button", { name: "Liens familiaux (1)" }).click();
   await page.getByRole("cell", { name: premier + " et " + deuxieme }).click();

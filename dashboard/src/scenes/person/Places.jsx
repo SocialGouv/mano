@@ -35,12 +35,6 @@ const PersonPlaces = ({ person }) => {
     await refresh();
   };
 
-  const sameMultiplePlaces = useMemo(() => {
-    const personPlaces = person.relsPersonPlace?.map((relPersonPlace) => relPersonPlace.place);
-    if (!personPlaces?.length) return false;
-    return personPlaces.length !== new Set(personPlaces).size;
-  }, [person.relsPersonPlace]);
-
   const sortedPlaces = useMemo(() => {
     if (!person.relsPersonPlace?.length) return [];
     return [...person.relsPersonPlace]?.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -137,7 +131,7 @@ const PersonPlaces = ({ person }) => {
         relPersonPlaceModal={relPersonPlaceModal}
         setPlaceToEdit={setPlaceToEdit}
       />
-      <HelpModal open={!!helpModal} setOpen={setHelpModal} sameMultiplePlaces={sameMultiplePlaces} />
+      <HelpModal open={!!helpModal} setOpen={setHelpModal} />
     </>
   );
 };
@@ -393,15 +387,7 @@ const EditRelPersonPlaceModal = ({ open, setOpen, placeToEdit }) => {
   );
 };
 
-const HelpModal = ({ open, setOpen, sameMultiplePlaces }) => {
-  useEffect(() => {
-    if (!window.localStorage.getItem("lieux-fréquentés-help-modal-seen")) {
-      setOpen(true);
-    }
-    if (!open) {
-      window.localStorage.setItem("lieux-fréquentés-help-modal-seen", true);
-    }
-  }, [open, setOpen]);
+const HelpModal = ({ open, setOpen }) => {
   return (
     <ModalContainer open={open} size="3xl">
       <ModalHeader title="Aide" />
@@ -417,12 +403,6 @@ const HelpModal = ({ open, setOpen, sameMultiplePlaces }) => {
             <br />
             La liste des "Lieux fréquentés" ci-dessous est la liste des lieux <b>uniques fréquentés par cette personne.</b>
           </p>
-          {!!sameMultiplePlaces && (
-            <small>
-              Le fonctionnement des lieux a changé depuis début 2023. Nous n'avons pas voulu supprimer vos données déjà créées, c'est pourquoi cette
-              personne a plusieurs fois le même lieu. Mais il est désormais impossible de rajouter plusieurs lieux identiques pour une même personne.
-            </small>
-          )}
         </div>
       </ModalBody>
       <ModalFooter>

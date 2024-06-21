@@ -177,7 +177,6 @@ test("test", async ({ page }) => {
   await page.getByText("AZAZAZAZAZAZAZAZA").click();
   await page.getByRole("button", { name: "Fermer" }).first().click();
   await page.getByRole("button", { name: "Lieux fréquentés (0)" }).click();
-  await page.getByRole("button", { name: "Fermer" }).first().click();
 
   await page.getByRole("button", { name: "Historique" }).click();
   await page.locator('[data-test-id="Autres pseudos\\: \\"\\" ➔ \\"test pseudo\\""]').click();
