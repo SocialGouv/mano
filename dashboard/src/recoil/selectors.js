@@ -159,7 +159,10 @@ export const itemsGroupedByPersonSelector = selector({
     for (const person of persons) {
       if (!person.documents?.length) continue;
       const documentsForModule = [];
+      const uniqueDocIds = {}; // to avoid duplicates
       for (const document of person.documents) {
+        if (uniqueDocIds[document._id]) continue;
+        uniqueDocIds[document._id] = true;
         const documentForModule = {
           ...document,
           type: document.type ?? "document", // or 'folder'

@@ -467,25 +467,28 @@ type ItemState = {
   parentId?: DocumentOrFolderId;
 };
 
-const findChildrenRecursive = async (folder: HTMLDivElement, allItems: ItemState[]) => {
+const findChildrenRecursive = async (folder: HTMLDivElement, allItems: ItemState[], uniqueIds: Record<DocumentOrFolderId, boolean>) => {
   const childrenContainer = folder.querySelector(`#child-container-${folder.dataset.id}`);
   if (childrenContainer === null) return;
   for (const [index, child] of Object.entries(Array.from(childrenContainer.children))) {
     const childElement = child as HTMLDivElement;
     if (childElement.dataset.id === "empty-folder") continue;
     if (childElement.dataset.id === "family-documents") continue;
+    if (uniqueIds[childElement.dataset.id]) continue;
+    uniqueIds[childElement.dataset.id] = true;
     const updatedChild = {
       position: Number(index) + 1,
       parentId: folder.dataset.id,
       _id: childElement.dataset.id,
     };
     allItems.push(updatedChild);
-    if (childElement.dataset.type === "folder") findChildrenRecursive(childElement, allItems);
+    if (childElement.dataset.type === "folder") findChildrenRecursive(childElement, allItems, uniqueIds);
   }
 };
 
 const getElementsNewState = (root: HTMLDivElement) => {
   const allItems: ItemState[] = [];
-  findChildrenRecursive(root, allItems);
+  const uniqueIds: Record<DocumentOrFolderId, boolean> = {}; // to make sure we don't save duplicates
+  findChildrenRecursive(root, allItems, uniqueIds);
   return allItems;
 };
