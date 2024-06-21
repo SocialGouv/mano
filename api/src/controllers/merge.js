@@ -3,7 +3,19 @@ const router = express.Router();
 const passport = require("passport");
 const { z } = require("zod");
 const { catchErrors } = require("../errors");
-const { Person, RelPersonPlace, Action, Consultation, Treatment, MedicalFile, Comment, Passage, Rencontre, sequelize } = require("../db/sequelize");
+const {
+  Person,
+  RelPersonPlace,
+  Action,
+  Consultation,
+  Treatment,
+  MedicalFile,
+  Comment,
+  Passage,
+  Rencontre,
+  sequelize,
+  Group,
+} = require("../db/sequelize");
 const validateUser = require("../middleware/validateUser");
 const { looseUuidRegex } = require("../utils");
 const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
@@ -63,9 +75,23 @@ router.post(
       return next(error);
     }
     try {
+      z.optional(
+        z.object({
+          _id: z.string().regex(looseUuidRegex),
+          encrypted: z.string(),
+          encryptedEntityKey: z.string(),
+        })
+      ).parse(req.body.mergedGroup);
+    } catch (e) {
+      const error = new Error(`Invalid request in merge two persons mergedGroup: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+    try {
       z.object({
         personToDeleteId: z.string().regex(looseUuidRegex),
         medicalFileToDeleteId: z.optional(z.string().regex(looseUuidRegex)),
+        groupToDeleteId: z.optional(z.string().regex(looseUuidRegex)),
       }).parse(req.body);
     } catch (e) {
       const error = new Error(`Invalid request in merge two persons personToDeleteId: ${e}`);
@@ -84,6 +110,8 @@ router.post(
         mergedPassages,
         mergedRencontres,
         mergedRelsPersonPlace,
+        mergedGroup,
+        groupToDeleteId,
         personToDeleteId,
         medicalFileToDeleteId,
       } = req.body;
@@ -110,6 +138,12 @@ router.post(
         }
       }
 
+      if (mergedGroup) {
+        for (let { encrypted, encryptedEntityKey, _id } of [mergedGroup]) {
+          await Group.update({ encrypted, encryptedEntityKey }, { where: { _id, organisation: req.user.organisation }, transaction: tx });
+        }
+      }
+
       for (let { encrypted, encryptedEntityKey, _id } of mergedComments) {
         await Comment.update({ encrypted, encryptedEntityKey }, { where: { _id, organisation: req.user.organisation }, transaction: tx });
       }
@@ -129,6 +163,10 @@ router.post(
       let person = await Person.findOne({ where: { _id: personToDeleteId, organisation: req.user.organisation } });
       if (person) await person.destroy({ transaction: tx });
 
+      if (groupToDeleteId) {
+        let group = await Group.findOne({ where: { _id: groupToDeleteId, organisation: req.user.organisation } });
+        await group.destroy({ transaction: tx });
+      }
       if (medicalFileToDeleteId) {
         let medicalFile = await MedicalFile.findOne({ where: { _id: medicalFileToDeleteId, organisation: req.user.organisation } });
         await medicalFile.destroy({ transaction: tx });

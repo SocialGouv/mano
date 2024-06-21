@@ -30,6 +30,7 @@ import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileFo
 import { useDataLoader } from "../../components/DataLoader";
 import { formatAge } from "../../services/date";
 import { encryptItem } from "../../services/encryption";
+import { groupsState, prepareGroupForEncryption } from "../../recoil/groups";
 
 const getRawValue = (field, value) => {
   try {
@@ -74,6 +75,7 @@ const MergeTwoPersons = ({ person }) => {
   const actions = useRecoilValue(actionsState);
   const passages = useRecoilValue(passagesState);
   const rencontres = useRecoilValue(rencontresState);
+  const groups = useRecoilValue(groupsState);
   const relsPersonPlace = useRecoilValue(relsPersonPlaceState);
   const consultations = useRecoilValue(consultationsState);
   const medicalFiles = useRecoilValue(medicalFileState);
@@ -272,6 +274,47 @@ const MergeTwoPersons = ({ person }) => {
                   .filter((r) => r.person === personToMergeAndDelete._id)
                   .map((rencontre) => prepareRencontreForEncryption({ ...rencontre, person: originPerson._id }));
 
+                const existingGroups = groups.filter((r) => r.persons.includes(personToMergeAndDelete._id) || r.persons.includes(originPerson._id));
+                const groupToDeleteId =
+                  existingGroups.length === 2
+                    ? existingGroups.find((group) => group.persons.includes(personToMergeAndDelete._id) && !group.persons.includes(originPerson._id))
+                        ?._id
+                    : undefined;
+                const mergedGroup = existingGroups?.length
+                  ? prepareGroupForEncryption(
+                      existingGroups.reduce(
+                        (newGroup, group) => {
+                          const newPersons = group.persons.filter((personId) => personId !== personToMergeAndDelete._id);
+                          const newRelations = group.relations
+                            .filter((relation) => {
+                              // on retire la relation entre les deux personnes à fusionner
+                              if (relation.persons.includes(personToMergeAndDelete._id) && relation.persons.includes(originPerson._id)) return false;
+                              // on garde toutes les autres relations...
+                              // quitte à ce que les doublons existent et qu'ils soient triés manuellement par les utilisateurs
+                              return true;
+                            })
+                            .map((relation) => {
+                              if (!relation.persons.includes(personToMergeAndDelete._id)) return relation;
+                              return {
+                                ...relation,
+                                persons: relation.persons.map((personId) => (personId === personToMergeAndDelete._id ? originPerson._id : personId)),
+                              };
+                            });
+                          return {
+                            ...newGroup,
+                            ...group,
+                            persons: [...new Set([...newGroup.persons, ...newPersons])],
+                            relations: [...newGroup.relations, ...newRelations],
+                          };
+                        },
+                        {
+                          persons: [],
+                          relations: [],
+                        }
+                      )
+                    )
+                  : undefined;
+
                 const mergedConsultations = consultations
                   .filter((consultation) => consultation.person === personToMergeAndDelete._id)
                   .map((consultation) =>
@@ -335,6 +378,8 @@ const MergeTwoPersons = ({ person }) => {
                       mergedConsultations: await Promise.all(mergedConsultations.map(encryptItem)),
                       mergedTreatments: await Promise.all(mergedTreatments.map(encryptItem)),
                       mergedMedicalFile: mergedMedicalFile ? await encryptItem(mergedMedicalFile) : undefined,
+                      mergedGroup: mergedGroup ? await encryptItem(mergedGroup) : undefined,
+                      groupToDeleteId,
                       personToDeleteId: personToMergeAndDelete._id,
                       medicalFileToDeleteId,
                     },
