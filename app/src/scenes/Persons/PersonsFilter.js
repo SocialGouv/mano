@@ -26,7 +26,7 @@ const PersonsFilter = ({ route, navigation }) => {
       <ScreenTitle title="Filtres" onBack={onBackRequested} />
       <ScrollContainer>
         <CheckboxLabelled
-          label="N'afficher que les personnes identifiées comme vulnérables où ayant besoin d'une attention particulière"
+          label="N'afficher que les personnes identifiées comme vulnérables ou ayant besoin d'une attention particulière"
           value={filterAlertness}
           onPress={() => setFilterAlertness(!filterAlertness)}
         />

@@ -309,7 +309,7 @@ const View = () => {
                               onChange={handleChange}
                             />
                             <label htmlFor="receptionEnabled">
-                              Activer l'accueil de jour, pour pouvoir enregistrer les services proposés par votre oranisation. Un menu "Accueil"
+                              Activer l'accueil de jour, pour pouvoir enregistrer les services proposés par votre organisation. Un menu "Accueil"
                               apparaîtra sur la barre de navigation latérale.
                             </label>
                           </div>

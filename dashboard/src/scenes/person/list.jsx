@@ -179,7 +179,7 @@ const List = () => {
                     value={alertness}
                     onChange={() => setFilterAlertness(!alertness)}
                   />
-                  N'afficher que les personnes vulnérables où ayant besoin d'une attention particulière
+                  N'afficher que les personnes vulnérables ou ayant besoin d'une attention particulière
                 </label>
               </div>
               <div className="tw-flex tw-w-full tw-items-center">

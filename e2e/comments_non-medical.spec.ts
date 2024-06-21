@@ -66,19 +66,19 @@ test("test", async ({ page }) => {
     .click();
   await page.getByRole("dialog", { name: "Commentaire" }).getByRole("button", { name: "Fermer" }).click();
   await page.getByRole("button", { name: "＋ Ajouter un commentaire" }).click();
-  await page.getByLabel("Commentaire", { exact: true }).fill("Nouveau commentaire d'ation");
+  await page.getByLabel("Commentaire", { exact: true }).fill("Nouveau commentaire d'action");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Commentaire ajouté !").click();
   await page
     .getByRole("dialog", { name: "Action: Nouvelle action (créée par User Admin Test - 1)" })
-    .getByText("Nouveau commentaire d'ation")
+    .getByText("Nouveau commentaire d'action")
     .click();
   await page.getByRole("button", { name: "Modifier" }).click();
   await page.getByRole("button", { name: "Annuler" }).click();
   await page.getByRole("button", { name: "Informations", exact: true }).click();
   await page.getByText("Fermer").click();
   await new Promise((r) => setTimeout(r, 1000));
-  await page.getByText("Nouveau commentaire d'ation").click();
+  await page.getByText("Nouveau commentaire d'action").click();
   await page.getByRole("dialog", { name: "Commentaire" }).getByRole("button", { name: "Modifier" }).click();
   await page.getByLabel("Commentaire", { exact: true }).fill("Nouveau commentaire d'action");
   await page.getByRole("button", { name: "Enregistrer" }).click();
