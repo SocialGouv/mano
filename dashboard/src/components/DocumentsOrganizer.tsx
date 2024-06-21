@@ -7,7 +7,7 @@ import { organisationAuthentifiedState } from "../recoil/auth";
 import UserName from "./UserName";
 import { formatDateTimeWithNameOfDay } from "../services/date";
 
-type Item = DocumentWithLinkedItem | FolderWithLinkedItem;
+type Item = DocumentWithLinkedItem | FolderWithLinkedItem | Folder;
 
 interface DocumentForTree extends DocumentWithLinkedItem {}
 interface FolderForTree extends FolderWithLinkedItem {
@@ -20,9 +20,9 @@ interface RootForTree extends Folder {
 
 type FolderChildren = Array<FolderForTree | DocumentForTree | RootForTree>;
 
-interface DocumentsOrganizerProps {
-  items: Item[] | Folder[];
-  onSave: (newOrder: Array<Item>) => Promise<boolean>;
+interface DocumentsOrganizerProps<T extends Item> {
+  items: T[];
+  onSave: (newOrder: T[]) => Promise<boolean>;
   onDragStart?: () => void;
   onDragEnd?: () => void;
   onFolderClick: (folder: FolderForTree) => void;
@@ -30,6 +30,7 @@ interface DocumentsOrganizerProps {
   color: "main" | "blue-900";
   htmlId: "social" | "family" | "medical";
   rootFolderName?: "Dossier Racine" | "👪 Documents familiaux";
+  debug?: boolean;
 }
 
 const modalWidth = window.innerWidth * 0.9;
@@ -37,7 +38,7 @@ const informationsWidth = modalWidth * 0.4;
 const informationsStyle = { flexBasis: informationsWidth };
 const emptyFunction = () => {};
 
-export default function DocumentsOrganizer({
+export default function DocumentsOrganizer<T extends Item>({
   items,
   htmlId,
   rootFolderName = "Dossier Racine",
@@ -47,10 +48,11 @@ export default function DocumentsOrganizer({
   onFolderClick,
   onDocumentClick,
   color,
-}: DocumentsOrganizerProps) {
+  debug = false,
+}: DocumentsOrganizerProps<T>) {
   const [openedFolderIds, setOpenedFolderIds] = useState<DocumentOrFolderId[]>(["root"]);
 
-  const itemsRef = useRef(items);
+  const itemsRef = useRef<T[]>(items);
   const documentsTree = useMemo(() => {
     if (JSON.stringify(itemsRef.current) === JSON.stringify(items)) {
       return buildFolderTree(itemsRef.current, rootFolderName);
@@ -93,7 +95,7 @@ export default function DocumentsOrganizer({
           ...originalItem,
           position: newItem.position,
           parentId: newItem.parentId,
-        } as Item;
+        };
       });
       // setReloadeTreeKey((k) => k + 1);
       if (save) onSave(newOrder);
@@ -138,6 +140,7 @@ export default function DocumentsOrganizer({
           openedFolderIds={openedFolderIds}
           setOpenedFolderIds={setOpenedFolderIds}
           color={color}
+          debug={debug}
         />
       </div>
       {!!isSaving && (
@@ -164,6 +167,7 @@ interface BranchProps {
   setOpenedFolderIds: (ids: DocumentOrFolderId[]) => void;
   openedFolderIds: DocumentOrFolderId[];
   color: "main" | "blue-900";
+  debug?: boolean;
 }
 
 function Branch({
@@ -181,6 +185,7 @@ function Branch({
   openedFolderIds,
   initShowOpen,
   color,
+  debug = false,
 }: BranchProps) {
   const open = initShowOpen || openedFolderIds.includes(folder._id);
   if (!folder.children.length && !openedFolderIds.includes(folder._id)) {
@@ -300,6 +305,7 @@ function Branch({
                 openedFolderIds={openedFolderIds}
                 setOpenedFolderIds={setOpenedFolderIds}
                 color={color}
+                debug={debug}
               />
             );
           }
@@ -314,6 +320,7 @@ function Branch({
               onDocumentClick={onDocumentClick}
               parentIsOpen={open}
               color={color}
+              debug={debug}
             />
           );
         })}
@@ -330,9 +337,10 @@ interface DocumentRowProps {
   parentId: DocumentOrFolderId;
   onDocumentClick: (document: DocumentForTree) => void;
   color: "main" | "blue-900";
+  debug: boolean;
 }
 
-function DocumentRow({ document, level, parentIsOpen, position, parentId, color, onDocumentClick }: DocumentRowProps) {
+function DocumentRow({ document, level, parentIsOpen, position, parentId, color, onDocumentClick, debug }: DocumentRowProps) {
   const organisation = useRecoilValue(organisationAuthentifiedState);
 
   return (
@@ -353,15 +361,26 @@ function DocumentRow({ document, level, parentIsOpen, position, parentId, color,
         <button
           type="button"
           onClick={() => onDocumentClick?.(document)}
-          className="tw-inline-flex tw-flex-1 tw-overflow-hidden tw-py-2 tw-pr-5 tw-text-left"
+          className="tw-inline-flex tw-flex-1 tw-flex-col tw-py-2 tw-pr-5 tw-text-left"
         >
-          {!!organisation.groupsEnabled && !!document.group && (
-            <span className="tw-mr-2 tw-text-xl" aria-label="Document familial" title="Document familial">
-              👪
-            </span>
+          <div className="tw-inline-flex tw-flex-1 tw-overflow-hidden tw-text-left tw-max-w-full">
+            {!!organisation.groupsEnabled && !!document.group && (
+              <span className="tw-mr-2 tw-text-xl" aria-label="Document familial" title="Document familial">
+                👪
+              </span>
+            )}
+            <span>📃</span>
+            <span className="tw-ml-2 tw-truncate">{document.name}</span>
+          </div>
+          {document.type === "document" && debug && (
+            <div className="tw-inline-flex tw-flex-1 tw-flex-col tw-text-left tw-max-w-full tw-pl-10">
+              <>
+                <p className="tw-block m-0 tw-shrink-0 tw-grow tw-basis-0 tw-text-wrap tw-text-xs tw-text-gray-400">
+                  {JSON.stringify(document, null, 2)}
+                </p>
+              </>
+            </div>
           )}
-          <span>📃</span>
-          <span className="tw-ml-2 tw-truncate">{document.name}</span>
         </button>
         <Informations item={document} />
       </div>
@@ -372,7 +391,7 @@ function DocumentRow({ document, level, parentIsOpen, position, parentId, color,
   );
 }
 
-function Informations({ item }: { item: Item | FolderForTree | RootForTree }) {
+function Informations({ item }: { item: Item | FolderForTree | RootForTree; debug?: boolean }) {
   if (item.type === "folder") {
     if (["root", "treatment", "consultation"].includes(item._id)) return null;
   }
@@ -389,7 +408,7 @@ function Informations({ item }: { item: Item | FolderForTree | RootForTree }) {
 }
 
 const buildFolderTree = (items: Item[] | Folder[], rootFolderName: "Dossier Racine" | "👪 Documents familiaux") => {
-  const rootFolderItem: Omit<Item, "linkedItem"> = {
+  const rootFolderItem: Folder = {
     _id: "root",
     name: rootFolderName,
     position: 0,
@@ -398,7 +417,7 @@ const buildFolderTree = (items: Item[] | Folder[], rootFolderName: "Dossier Raci
     createdAt: new Date(),
     createdBy: "we do not care",
     movable: false,
-  } as Item;
+  };
 
   const findChildren = (folder: Item | Folder): FolderChildren => {
     const children = items
@@ -434,7 +453,7 @@ const buildFolderTree = (items: Item[] | Folder[], rootFolderName: "Dossier Raci
       });
     return children;
   };
-  const rootChildren = findChildren(rootFolderItem as unknown as Item);
+  const rootChildren = findChildren(rootFolderItem);
   const rootForTree: RootForTree = {
     ...rootFolderItem,
     children: rootChildren,

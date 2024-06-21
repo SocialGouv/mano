@@ -16,11 +16,8 @@ import { toast } from "react-toastify";
 import DocumentsOrganizer from "./DocumentsOrganizer";
 import { decryptFile, encryptFile, getHashedOrgEncryptionKey } from "../services/encryption";
 
-type ItemWithLink = DocumentWithLinkedItem | FolderWithLinkedItem;
-type Item = Document | Folder;
-
-interface DocumentsModuleProps {
-  documents: ItemWithLink[];
+interface DocumentsModuleProps<T> {
+  documents: T[];
   title?: string;
   personId: UUIDV4;
   showPanel?: boolean;
@@ -29,14 +26,14 @@ interface DocumentsModuleProps {
   canToggleGroupCheck?: boolean;
   socialOrMedical: "social" | "medical";
   onDeleteDocument: (item: DocumentWithLinkedItem) => Promise<boolean>;
-  onSubmitDocument: (item: ItemWithLink) => Promise<void>;
-  onAddDocuments?: (items: Item[]) => Promise<void>;
-  onSaveNewOrder?: (items: ItemWithLink[]) => Promise<boolean>;
+  onSubmitDocument: (item: T) => Promise<void>;
+  onAddDocuments?: (items: Array<Document | Folder>) => Promise<void>;
+  onSaveNewOrder?: (items: T[]) => Promise<boolean>;
   onDeleteFolder?: (item: FolderWithLinkedItem) => Promise<boolean>;
   color?: "main" | "blue-900";
 }
 
-export function DocumentsModule({
+export function DocumentsModule<T extends DocumentWithLinkedItem | FolderWithLinkedItem>({
   documents = [],
   title = "Documents",
   socialOrMedical,
@@ -51,7 +48,7 @@ export function DocumentsModule({
   onSaveNewOrder,
   onDeleteFolder = async () => false,
   color = "main",
-}: DocumentsModuleProps) {
+}: DocumentsModuleProps<T>) {
   if (!onDeleteDocument) throw new Error("onDeleteDocument is required");
   if (!onSubmitDocument) throw new Error("onSubmitDocument is required");
   const [documentToEdit, setDocumentToEdit] = useState<DocumentWithLinkedItem | null>(null);
@@ -64,7 +61,7 @@ export function DocumentsModule({
     if (!onSaveNewOrder) throw new Error("onSaveNewOrder is required");
     if (!onDeleteFolder) throw new Error("onDeleteFolder is required");
   }
-  const onlyDocuments = useMemo(() => documents.filter((d) => d.type !== "folder"), [documents]) as DocumentWithLinkedItem[];
+  const onlyDocuments = useMemo(() => documents.filter((d) => d.type !== "folder") as DocumentWithLinkedItem[], [documents]) as T[];
 
   return (
     <>
@@ -97,7 +94,7 @@ export function DocumentsModule({
           </div>
           <DocumentTable
             withClickableLabel
-            documents={onlyDocuments}
+            documents={onlyDocuments as DocumentWithLinkedItem[]}
             color={color}
             onDisplayDocument={setDocumentToEdit}
             onAddDocuments={onAddDocuments}
@@ -114,7 +111,7 @@ export function DocumentsModule({
           color={color}
         >
           <DocumentTable
-            documents={onlyDocuments}
+            documents={onlyDocuments as DocumentWithLinkedItem[]}
             color={color}
             onDisplayDocument={setDocumentToEdit}
             onAddDocuments={onAddDocuments}
@@ -130,7 +127,7 @@ export function DocumentsModule({
           personId={personId}
           onClose={() => setDocumentToEdit(null)}
           onDelete={onDeleteDocument}
-          onSubmit={onSubmitDocument}
+          onSubmit={(item: DocumentWithLinkedItem) => onSubmitDocument(item as T)}
           canToggleGroupCheck={canToggleGroupCheck}
           color={color}
           showAssociatedItem={showAssociatedItem}
@@ -145,7 +142,7 @@ export function DocumentsModule({
             setAddFolder(false);
           }}
           onDelete={onDeleteFolder}
-          onSubmit={onSubmitDocument}
+          onSubmit={(item: FolderWithLinkedItem) => onSubmitDocument(item as T)}
           onAddFolder={(folder) => onAddDocuments([folder])}
           color={color}
         />
@@ -168,22 +165,22 @@ export function DocumentsModule({
   );
 }
 
-interface DocumentsFullScreenProps {
+interface DocumentsFullScreenProps<T> {
   open: boolean;
-  documents: Array<DocumentWithLinkedItem | FolderWithLinkedItem>;
+  documents: T[];
   socialOrMedical: "social" | "medical";
   personId: UUIDV4;
-  onSaveNewOrder?: (documents: ItemWithLink[]) => Promise<boolean>;
+  onSaveNewOrder?: (documents: T[]) => Promise<boolean>;
+  onEditFolderRequest: (folder: FolderWithLinkedItem) => void;
   onAddDocuments: (documents: Document[]) => Promise<void>;
   onDisplayDocument: (document: DocumentWithLinkedItem) => void;
   onClose: () => void;
   onAddFolderRequest: () => void;
-  onEditFolderRequest: (folder: FolderWithLinkedItem) => void;
   title: string;
   color: "main" | "blue-900";
 }
 
-function DocumentsFullScreen({
+function DocumentsFullScreen<T extends DocumentWithLinkedItem | FolderWithLinkedItem>({
   open,
   personId,
   documents,
@@ -196,10 +193,11 @@ function DocumentsFullScreen({
   onSaveNewOrder,
   onAddFolderRequest,
   onEditFolderRequest,
-}: DocumentsFullScreenProps) {
+}: DocumentsFullScreenProps<T>) {
   const withDocumentOrganizer = !!onSaveNewOrder;
   const organisation = useRecoilValue(organisationAuthentifiedState);
   const [enableDropZone, setEnableDropZone] = useState(true);
+  const [debug, setDebug] = useState(false);
 
   return (
     <ModalContainer open={open} size={withDocumentOrganizer ? "full" : "prose"} onClose={onClose}>
@@ -240,6 +238,7 @@ function DocumentsFullScreen({
               {socialOrMedical === "social" && (
                 <>
                   <DocumentsOrganizer
+                    debug={debug}
                     onDragStart={() => setEnableDropZone(false)}
                     onDragEnd={() => setEnableDropZone(true)}
                     items={documents
@@ -269,6 +268,7 @@ function DocumentsFullScreen({
                   />
                   {!!organisation.groupsEnabled && (
                     <DocumentsOrganizer
+                      debug={debug}
                       onDragStart={() => setEnableDropZone(false)}
                       onDragEnd={() => setEnableDropZone(true)}
                       items={documents
@@ -299,6 +299,7 @@ function DocumentsFullScreen({
               )}
               {socialOrMedical === "medical" && (
                 <DocumentsOrganizer
+                  debug={debug}
                   onDragStart={() => setEnableDropZone(false)}
                   onDragEnd={() => setEnableDropZone(true)}
                   htmlId="medical"
@@ -327,6 +328,14 @@ function DocumentsFullScreen({
         </DocumentsDropZone>
       </ModalBody>
       <ModalFooter>
+        <button
+          type="button"
+          name="cancel"
+          className="button-cancel tw-mr-auto tw-opacity-5 hover:tw-opacity-100"
+          onClick={() => setDebug((d) => !d)}
+        >
+          Debug
+        </button>
         <button type="button" name="cancel" className="button-cancel" onClick={onClose}>
           Fermer
         </button>
@@ -620,18 +629,27 @@ async function handleFilesUpload({ files, personId, user }) {
   return docsResponses;
 }
 
-type DocumentModalProps = {
-  document: DocumentWithLinkedItem;
+interface DocumentModalProps<T extends DocumentWithLinkedItem> {
+  document: T;
   personId: UUIDV4;
   onClose: () => void;
-  onSubmit: (document: DocumentWithLinkedItem) => Promise<void>;
-  onDelete: (document: DocumentWithLinkedItem) => Promise<boolean>;
+  onSubmit: (document: T) => Promise<void>;
+  onDelete: (document: T) => Promise<boolean>;
   canToggleGroupCheck: boolean;
   showAssociatedItem: boolean;
   color: string;
-};
+}
 
-function DocumentModal({ document, onClose, personId, onDelete, onSubmit, showAssociatedItem, canToggleGroupCheck, color }: DocumentModalProps) {
+function DocumentModal<T extends DocumentWithLinkedItem>({
+  document,
+  onClose,
+  personId,
+  onDelete,
+  onSubmit,
+  showAssociatedItem,
+  canToggleGroupCheck,
+  color,
+}: DocumentModalProps<T>) {
   const initialName = useMemo(() => document.name, [document.name]);
   const [name, setName] = useState(initialName);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -829,16 +847,23 @@ function DocumentModal({ document, onClose, personId, onDelete, onSubmit, showAs
   );
 }
 
-interface FolderModalProps {
-  folder?: FolderWithLinkedItem | Folder | null;
+interface FolderModalProps<T> {
+  folder?: T | null;
   onClose: () => void;
-  onDelete: (folder: FolderWithLinkedItem | Folder) => Promise<boolean>;
-  onSubmit: (folder: FolderWithLinkedItem | Folder) => Promise<void>;
+  onDelete: (folder: T) => Promise<boolean>;
+  onSubmit: (folder: T) => Promise<void>;
   onAddFolder: (items: Folder) => Promise<void>;
   color?: "main" | "blue-900";
 }
 
-export function FolderModal({ folder, onClose, onDelete, onSubmit, onAddFolder, color }: FolderModalProps) {
+export function FolderModal<T extends FolderWithLinkedItem | Folder>({
+  folder,
+  onClose,
+  onDelete,
+  onSubmit,
+  onAddFolder,
+  color,
+}: FolderModalProps<T>) {
   const isNewFolder = !folder?._id;
   const user = useRecoilValue(userAuthentifiedState);
 

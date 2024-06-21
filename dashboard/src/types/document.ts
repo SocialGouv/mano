@@ -30,7 +30,7 @@ export interface Document {
   position: number | undefined;
   movable?: boolean;
   // type is always equal to 'document'
-  type: string;
+  type: "document";
 }
 
 export interface Folder {
@@ -42,7 +42,7 @@ export interface Folder {
   position: number | undefined;
   movable?: boolean;
   // type is always equal to 'folder'
-  type: string;
+  type: "folder";
 }
 
 export interface DocumentWithLinkedItem extends Document {
