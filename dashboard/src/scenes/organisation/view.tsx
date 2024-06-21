@@ -375,7 +375,7 @@ const View = () => {
                             checked={values.passagesEnabled || false}
                             onChange={handleChange}
                           />
-                          <label htmlFor="territoriesEnabled">
+                          <label htmlFor="passagesEnabled">
                             Activer les passages vous permettra de comptabiliser les personnes qui passent sur votre structure.
                           </label>
                         </div>
@@ -391,7 +391,7 @@ const View = () => {
                             checked={values.rencontresEnabled || false}
                             onChange={handleChange}
                           />
-                          <label htmlFor="territoriesEnabled">
+                          <label htmlFor="rencontresEnabled">
                             Activer les rencontres vous permettra de comptabiliser les personnes rencontrées en rue.
                           </label>
                         </div>
