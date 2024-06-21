@@ -94,6 +94,7 @@
     "start": "serve -s build -l 8083",
     "build": "tsc && vite build",
     "lint": "eslint --fix --ext .ts,.tsx src",
+    "lint-errors": "eslint --quiet --ext .ts,.tsx src",
     "preview": "vite preview"
   },
   "prettier": {

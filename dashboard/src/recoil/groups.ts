@@ -23,7 +23,7 @@ export const groupSelector = selectorFamily({
     ({ personId }: { personId: UUIDV4 }) =>
     ({ get }) => {
       const groups = get(groupsState);
-      return groups.find((group) => group?.persons?.includes?.(personId)) || { persons: [], relations: [] };
+      return groups.find((group) => group?.persons?.includes?.(personId)) || ({ persons: [], relations: [] } as GroupInstance);
     },
 });
 

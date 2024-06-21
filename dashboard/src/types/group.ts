@@ -1,6 +1,7 @@
 import { UUIDV4 } from "./uuid";
 
 export type Relation = {
+  _id: UUIDV4;
   persons: UUIDV4[];
   description: string;
   createdAt: Date;
@@ -16,12 +17,12 @@ export interface EncryptedGroupFields {
 }
 
 export interface GroupInstance extends EncryptedGroupFields {
-  _id: UUIDV4;
-  organisation: UUIDV4;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt?: Date;
-  entityKey: string;
+  _id?: UUIDV4;
+  organisation?: UUIDV4;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+  deletedAt?: Date | string;
+  entityKey?: string;
 }
 
 export type GroupToBeEncrypted = Omit<GroupInstance, EncryptedGroupKeys> & {

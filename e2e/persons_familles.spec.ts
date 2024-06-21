@@ -143,8 +143,6 @@ test("Familles", async ({ page }) => {
     await clickOnEmptyReactSelect(page, "person-family-relation", person1Name);
     await page.getByLabel("Relation/commentaire").fill("fiston");
     await page.getByRole("button", { name: "Enregistrer" }).click();
-    await page.getByRole("textbox", { name: "Père/fille, mère/fils..." }).fill("nada");
-    await page.getByRole("button", { name: "Enregistrer" }).click();
     await page.getByText("Il y a déjà un lien entre ces deux personnes").click();
     await page.getByRole("button", { name: "Annuler" }).click();
   });
