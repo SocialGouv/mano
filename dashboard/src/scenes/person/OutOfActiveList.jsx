@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader, Label } from "reactstrap";
 import { Formik } from "formik";
 import { toast } from "react-toastify";
 import { useRecoilValue } from "recoil";
-import { userState } from "../../recoil/auth";
+import { teamsState, userState } from "../../recoil/auth";
 import ButtonCustom from "../../components/ButtonCustom";
 import { fieldsPersonsCustomizableOptionsSelector, usePreparePersonForEncryption } from "../../recoil/persons";
 import API, { tryFetchExpectOk } from "../../services/api";
@@ -12,10 +11,12 @@ import SelectCustom from "../../components/SelectCustom";
 import DatePicker from "../../components/DatePicker";
 import { useDataLoader } from "../../components/DataLoader";
 import { cleanHistory } from "../../utils/person-history";
+import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "../../components/tailwind/Modal";
 
 const OutOfActiveList = ({ person }) => {
   const [open, setOpen] = useState(false);
   const { refresh } = useDataLoader();
+  const teams = useRecoilValue(teamsState);
 
   const { encryptPerson } = usePreparePersonForEncryption();
   const user = useRecoilValue(userState);
@@ -46,35 +47,79 @@ const OutOfActiveList = ({ person }) => {
     }
   };
 
-  const setOutOfActiveList = async (updatedPerson) => {
-    updatedPerson.outOfActiveList = true;
+  const setOutOfActiveList = async (data) => {
+    if (data.team === "all") {
+      if (data.outOfActiveListDate && outOfBoundariesDate(data.outOfActiveListDate))
+        return toast.error("La date de sortie de file active est hors limites (entre 1900 et 2100)");
+      const historyEntry = {
+        date: new Date(),
+        user: user._id,
+        data: {
+          outOfActiveList: { newValue: true },
+          outOfActiveListReasons: { newValue: data.outOfActiveListReasons },
+          outOfActiveListDate: { newValue: data.outOfActiveListDate },
+        },
+      };
 
-    if (updatedPerson.outOfActiveListDate && outOfBoundariesDate(updatedPerson.outOfActiveListDate))
-      return toast.error("La date de sortie de file active est hors limites (entre 1900 et 2100)");
+      const [error] = await tryFetchExpectOk(async () =>
+        API.put({
+          path: `/person/${person._id}`,
+          body: await encryptPerson({
+            ...person,
+            ...data,
+            outOfActiveList: true,
+            history: [...(cleanHistory(person.history) || []), historyEntry],
+          }),
+        })
+      );
+      if (!error) {
+        await refresh();
+        toast.success(person.name + " est hors de la file active");
+      }
+    } else {
+      const nextAssignedTeams = person.assignedTeams.filter((team) => team !== data.team);
+      if (nextAssignedTeams.length < 1) {
+        return toast.error("Une personne doit être suivie par au moins une équipe");
+      }
+      const historyEntry = {
+        date: new Date(),
+        user: user._id,
+        data: {
+          assignedTeams: {
+            oldValue: person.assignedTeams,
+            newValue: nextAssignedTeams,
+          },
+          outOfTeamsInformations: [
+            {
+              team: data.team,
+              reasons: data.outOfActiveListReasons,
+            },
+          ],
+        },
+      };
 
-    const historyEntry = {
-      date: new Date(),
-      user: user._id,
-      data: {
-        outOfActiveList: { newValue: true },
-        outOfActiveListReasons: { newValue: updatedPerson.outOfActiveListReasons },
-        outOfActiveListDate: { newValue: updatedPerson.outOfActiveListDate },
-      },
-    };
+      const history = [...(cleanHistory(person.history) || []), historyEntry];
 
-    updatedPerson.history = [...(cleanHistory(person.history) || []), historyEntry];
-    const [error] = await tryFetchExpectOk(async () =>
-      API.put({
-        path: `/person/${person._id}`,
-        body: await encryptPerson(updatedPerson),
-      })
-    );
-    if (!error) {
-      await refresh();
-      toast.success(person.name + " est hors de la file active");
+      const [error] = await tryFetchExpectOk(async () =>
+        API.put({
+          path: `/person/${person._id}`,
+          body: await encryptPerson({
+            ...person,
+            assignedTeams: person.assignedTeams.filter((team) => team !== data.team),
+            history,
+          }),
+        })
+      );
+      if (!error) {
+        await refresh();
+        toast.success(person.name + " est hors de la file active de " + teams.find((t) => t._id === data.team)?.name);
+      }
     }
+
     setOpen(false);
   };
+
+  const teamsWithAll = [{ _id: "all", name: "Toute l'organisation" }, ...teams.filter((t) => person.assignedTeams.includes(t._id))];
 
   return (
     <>
@@ -84,63 +129,66 @@ const OutOfActiveList = ({ person }) => {
         onClick={() => (person.outOfActiveList ? reintegerInActiveList() : setOpen(true))}
         color={"warning"}
       />
-      <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
-        <ModalHeader className="tw-break-all" toggle={() => setOpen(false)}>
-          Sortie de file active de {person.name}
-        </ModalHeader>
-        <ModalBody>
-          <Formik initialValues={{ ...person, outOfActiveListDate: Date.now(), outOfActiveListReasons: [] }} onSubmit={setOutOfActiveList}>
-            {({ values, handleChange, handleSubmit, isSubmitting }) => (
-              <React.Fragment>
-                <Row>
-                  <Col md={6}>
-                    <FormGroup>
-                      <label htmlFor="person-select-outOfActiveListReasons">
-                        Veuillez préciser le(s) motif(s) de sortie
-                        <SelectCustom
-                          options={fieldsPersonsCustomizableOptions
-                            .find((f) => f.name === "outOfActiveListReasons")
-                            .options?.map((_option) => ({ value: _option, label: _option }))}
-                          name="outOfActiveListReasons"
-                          onChange={(values) =>
-                            handleChange({ currentTarget: { value: values.map((v) => v.value), name: "outOfActiveListReasons" } })
-                          }
-                          isClearable={false}
-                          isMulti
-                          inputId="person-select-outOfActiveListReasons"
-                          classNamePrefix="person-select-outOfActiveListReasons"
-                          value={values.outOfActiveListReasons?.map((_option) => ({ value: _option, label: _option })) || []}
-                          placeholder={"Choisir..."}
-                          getOptionValue={(i) => i.value}
-                          getOptionLabel={(i) => i.label}
-                          styles={{ width: "800px" }}
-                          style={{ width: "800px" }}
-                        />
-                      </label>
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label htmlFor="person-birthdate">Date de sortie de file active</Label>
+      <ModalContainer open={open} size="full">
+        <ModalHeader title={`Sortie de file active de ${person.name}`} />
+        <Formik initialValues={{ team: "all", outOfActiveListDate: Date.now(), outOfActiveListReasons: [] }} onSubmit={setOutOfActiveList}>
+          {({ values, handleChange, handleSubmit, isSubmitting }) => (
+            <React.Fragment>
+              <ModalBody overflowY={false}>
+                <div className="tw-p-4">
+                  <div className="tw-p-4 tw-grid tw-grid-cols-3 tw-gap-2">
+                    <div>
+                      <label htmlFor="person-name">Sortie de file active de</label>
+                      <SelectCustom
+                        name="team"
+                        options={teamsWithAll}
+                        onChange={(value) => handleChange({ currentTarget: { value: value._id, name: "team" } })}
+                        value={teamsWithAll.find((t) => t._id === values.team)}
+                        getOptionValue={(team) => team._id}
+                        getOptionLabel={(team) => team.name}
+                        isDisabled={false}
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="person-select-outOfActiveListReasons">Motif(s) de sortie </label>
+                      <SelectCustom
+                        options={fieldsPersonsCustomizableOptions
+                          .find((f) => f.name === "outOfActiveListReasons")
+                          .options?.map((_option) => ({ value: _option, label: _option }))}
+                        name="outOfActiveListReasons"
+                        onChange={(values) => handleChange({ currentTarget: { value: values.map((v) => v.value), name: "outOfActiveListReasons" } })}
+                        isClearable={false}
+                        isMulti
+                        inputId="person-select-outOfActiveListReasons"
+                        classNamePrefix="person-select-outOfActiveListReasons"
+                        value={values.outOfActiveListReasons?.map((_option) => ({ value: _option, label: _option })) || []}
+                        placeholder={"Choisir..."}
+                        getOptionValue={(i) => i.value}
+                        getOptionLabel={(i) => i.label}
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="person-birthdate">Date de sortie de file active</label>
                       <div>
-                        <DatePicker id="outOfActiveListDate" defaultValue={values.outOfActiveListDate} onChange={handleChange} />
+                        <DatePicker
+                          disabled={values.team !== "all"}
+                          id="outOfActiveListDate"
+                          defaultValue={values.outOfActiveListDate}
+                          onChange={handleChange}
+                        />
                       </div>
-                    </FormGroup>
-                  </Col>
-                </Row>
-                <br />
-                <div className="tw-mt-4 tw-flex tw-justify-end">
-                  <ButtonCustom
-                    onClick={() => !isSubmitting && handleSubmit()}
-                    disabled={!!isSubmitting}
-                    title={isSubmitting ? "Sauvegarde..." : "Sauvegarder"}
-                  />
+                    </div>
+                  </div>
                 </div>
-              </React.Fragment>
-            )}
-          </Formik>
-        </ModalBody>
-      </Modal>
+              </ModalBody>
+              <ModalFooter>
+                <ButtonCustom title="Annuler" type="button" onClick={() => setOpen(false)} color="secondary" />
+                <ButtonCustom title="Sauvegarder" type="submit" onClick={handleSubmit} color="primary" disabled={isSubmitting} />
+              </ModalFooter>
+            </React.Fragment>
+          )}
+        </Formik>
+      </ModalContainer>
     </>
   );
 };

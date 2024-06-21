@@ -19,6 +19,7 @@ import TabsNav from "../../components/tailwind/TabsNav";
 import { useDataLoader } from "../../components/DataLoader";
 import SearchInPerson from "./components/SearchInPerson";
 import { errorMessage } from "../../utils";
+import OutOfActiveListBanner from "./OutOfActiveListBanner";
 
 export default function View() {
   const { personId } = useParams();
@@ -109,20 +110,7 @@ export default function View() {
         </div>
       </div>
       <div className="tw-pt-4" data-test-id={person?.name + currentTab}>
-        {person.outOfActiveList && (
-          <Alert color="warning" className="noprint">
-            {person?.name} est en dehors de la file active
-            {person.outOfActiveListReasons?.length ? (
-              <>
-                , pour {person.outOfActiveListReasons.length > 1 ? "les motifs suivants" : "le motif suivant"} :{" "}
-                <b>{person.outOfActiveListReasons.join(", ")}</b>
-              </>
-            ) : (
-              ""
-            )}{" "}
-            {person.outOfActiveListDate && ` depuis le ${formatDateWithFullMonth(person.outOfActiveListDate)}`}
-          </Alert>
-        )}
+        <OutOfActiveListBanner person={person} />
         {currentTab === "Résumé" && <Summary person={person} />}
         {!["restricted-access"].includes(user.role) && (
           <>

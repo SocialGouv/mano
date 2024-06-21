@@ -9,6 +9,7 @@ interface DatePickerProps {
   name?: string;
   required?: boolean;
   onInvalid?: (e: FormEvent<HTMLInputElement>) => void;
+  disabled?: boolean;
 }
 
 export default function DatePicker({
@@ -19,6 +20,7 @@ export default function DatePicker({
   name = "",
   required = false,
   onInvalid = () => null,
+  disabled = false,
 }: DatePickerProps): JSX.Element {
   return (
     <input
@@ -28,6 +30,7 @@ export default function DatePicker({
       className="form-control"
       type={withTime ? "datetime-local" : "date"}
       defaultValue={dateForInputDate(defaultValue, withTime)}
+      disabled={disabled}
       onChange={(e) => {
         onChange({ target: { name: e.target.name, value: dateFromInputDate(e.target.value) } });
       }}

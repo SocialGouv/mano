@@ -106,6 +106,21 @@ export default function PersonHistory({ person }) {
                         </p>
                       );
                     }
+                    if (key === "outOfTeamsInformations") {
+                      if (!Array.isArray(value)) return null;
+                      return (
+                        <p className="tw-flex tw-flex-col" key={key}>
+                          Motifs de sortie d'équipe :{" "}
+                          {value.map(({ team, reasons }) => {
+                            return (
+                              <code className="tw-text-main" key={team}>
+                                {teams.find((t) => t._id === team)?.name} : {reasons.join(", ") || "Non renseigné"}
+                              </code>
+                            );
+                          })}
+                        </p>
+                      );
+                    }
 
                     return (
                       <p
