@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { selector, useRecoilValue } from 'recoil';
 import { TouchableOpacity, View, ScrollView, Modal } from 'react-native';
-import { actionsCategoriesSelector, actionsState } from '../recoil/actions';
+import { actionsCategoriesSelector, actionsState, flattenedActionsCategoriesSelector } from '../recoil/actions';
 import Label from './Label';
 import { MyText } from './MyText';
 import Row from './Row';
@@ -18,6 +18,7 @@ const categoriesSortedByMostUsedSelector = selector({
   key: 'categoriesSortedByMostUsedSelector',
   get: ({ get }) => {
     const actions = get(actionsState);
+    const flattenedActionsCategories = get(flattenedActionsCategoriesSelector);
     const categories = {};
     for (const action of actions) {
       if (!action.categories) continue;
@@ -29,7 +30,8 @@ const categoriesSortedByMostUsedSelector = selector({
 
     return Object.entries(categories) // [[{category}, {count}], [{category}, {count}]]
       .sort(([_, countCat1], [__, countCat2]) => countCat2 - countCat1)
-      .map(([category]) => category);
+      .map(([category]) => category)
+      .filter((category) => flattenedActionsCategories.includes(category));
   },
 });
 

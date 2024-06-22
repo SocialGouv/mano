@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { selector, useRecoilValue } from "recoil";
-import { actionsCategoriesSelector, actionsState } from "../../recoil/actions";
+import { actionsCategoriesSelector, actionsState, flattenedActionsCategoriesSelector } from "../../recoil/actions";
 import SortableJS from "sortablejs";
 import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from "./Modal";
 
@@ -8,6 +8,7 @@ const categoriesSortedByMostUsedSelector = selector({
   key: "categoriesSortedByMostUsedSelector",
   get: ({ get }) => {
     const actions = get(actionsState);
+    const flattenedActionsCategories = get(flattenedActionsCategoriesSelector);
     if (!actions?.length) return [];
     const categories = {};
     for (const action of actions) {
@@ -20,7 +21,8 @@ const categoriesSortedByMostUsedSelector = selector({
 
     return Object.entries(categories) // [[{category}, {count}], [{category}, {count}]]
       .sort(([_, countCat1], [__, countCat2]) => countCat2 - countCat1)
-      .map(([category]) => category);
+      .map(([category]) => category)
+      .filter((category) => flattenedActionsCategories.includes(category));
   },
 });
 
