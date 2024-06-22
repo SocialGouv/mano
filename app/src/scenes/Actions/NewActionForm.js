@@ -31,6 +31,7 @@ const NewActionForm = ({ route, navigation }) => {
   const [name, setName] = useState('');
   const [dueAt, setDueAt] = useState(null);
   const [withTime, setWithTime] = useState(false);
+  const [description, setDescription] = useState('');
   const [urgent, setUrgent] = useState(false);
   const [group, setGroup] = useState(false);
   const [actionPersons, setActionPersons] = useState(() => (route.params?.person ? [route.params?.person] : []));
@@ -75,6 +76,7 @@ const NewActionForm = ({ route, navigation }) => {
               name,
               person: person._id,
               teams: [currentTeam._id],
+              description,
               dueAt,
               withTime,
               urgent,
@@ -197,6 +199,7 @@ const NewActionForm = ({ route, navigation }) => {
             setWithTime={setWithTime}
             testID="new-action-dueAt"
           />
+          <InputLabelled label="Description" onChangeText={setDescription} value={description} placeholder="Description" multiline editable />
           <ActionCategoriesModalSelect withMostUsed onChange={setCategories} values={categories} editable />
           <CheckboxLabelled
             label="Action prioritaire (cette action sera mise en avant par rapport aux autres)"
