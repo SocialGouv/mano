@@ -154,7 +154,7 @@ export const itemsGroupedDateSelector = selector({
       if (!itemsGroupedByDate[date]) {
         itemsGroupedByDate[date] = emptyItemsForReport();
       }
-      itemsGroupedByDate[date].passages.push(rencontre);
+      itemsGroupedByDate[date].rencontres.push(rencontre);
     }
 
     for (const observation of territoryObservations) {

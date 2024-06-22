@@ -8,8 +8,6 @@ import { ListEmptyPassage, ListNoMorePassages } from '../../components/ListEmpty
 import { passagesForReport } from './selectors';
 import { getPeriodTitle } from './utils';
 import { currentTeamState } from '../../recoil/auth';
-import RencontreRow from '../Persons/RencontreRow';
-import { Text, View } from 'react-native';
 import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
 import BubbleRow from '../../components/BubbleRow';
 const keyExtractor = (item) => item._id;
