@@ -119,7 +119,7 @@ const OutOfActiveList = ({ person }) => {
     setOpen(false);
   };
 
-  const teamsWithAll = [{ _id: "all", name: "Toute l'organisation" }, ...teams.filter((t) => person.assignedTeams.includes(t._id))];
+  const teamsWithAll = [{ _id: "all", name: "Toute l'organisation" }, ...teams.filter((t) => (person.assignedTeams || []).includes(t._id))];
 
   return (
     <>
