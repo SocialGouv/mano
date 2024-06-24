@@ -60,6 +60,17 @@ export async function setCacheItem(key: string, value: any) {
   try {
     if (customStore) await set(key, value, customStore);
   } catch (error) {
+    if (error instanceof Error && error?.message?.includes("connection is closing")) {
+      // Si on a une erreur de type "connection is closing", on va essayer de réinitialiser
+      // la connexion à la base de données et de sauvegarder la donnée à nouveau
+      setupDB();
+      try {
+        await set(key, value, customStore);
+      } catch (error) {
+        capture(error, { tags: { key } });
+        return;
+      }
+    }
     capture(error, { tags: { key } });
   }
 }
@@ -70,6 +81,18 @@ export async function getCacheItem(key: string) {
     const data = await get(key, customStore);
     return data;
   } catch (error) {
+    if (error instanceof Error && error?.message?.includes("connection is closing")) {
+      // Si on a une erreur de type "connection is closing", on va essayer de réinitialiser
+      // la connexion à la base de données et de récupérer la donnée à nouveau
+      setupDB();
+      try {
+        const data = await get(key, customStore);
+        return data;
+      } catch (error) {
+        capture(error, { tags: { key } });
+        return null;
+      }
+    }
     capture(error, { tags: { key } });
     return null;
   }
