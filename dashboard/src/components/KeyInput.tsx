@@ -25,6 +25,9 @@ const KeyInput = ({
       setValue(DEFAULT_ORGANISATION_KEY);
       inputRef.current.innerText = "•".repeat(DEFAULT_ORGANISATION_KEY.length);
     }
+    // Focus sur le champ
+    inputRef.current.focus();
+    setCursorToEnd();
   }, []);
 
   const isAndroid = () => {
@@ -41,6 +44,8 @@ const KeyInput = ({
       <div
         id={id}
         contentEditable
+        // L'auto-focus ne semble pas fonctionner ici, donc on utilise un useEffect pour forcer le focus.
+        autoFocus
         ref={inputRef}
         onPaste={(e) => {
           // Pas de copier/coller
