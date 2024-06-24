@@ -12,7 +12,7 @@ test.beforeAll(async () => {
   await populate();
 });
 
-test("Lieux fréquentés", async ({ page }) => {
+test("Territoires et lieux fréquentés", async ({ page }) => {
   await loginWith(page, "admin1@example.org");
 
   await page.getByRole("link", { name: "Personnes suivies" }).click();
@@ -22,7 +22,7 @@ test("Lieux fréquentés", async ({ page }) => {
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
 
-  await page.getByRole("button", { name: "Lieux fréquentés (0)" }).click();
+  await page.getByRole("button", { name: "Territoires et lieux fréquentés" }).click();
 
   await page.getByRole("button", { name: "Ajouter un lieu" }).click();
   await page.locator(".place__input-container").click();
@@ -53,7 +53,7 @@ test("Lieux fréquentés", async ({ page }) => {
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
 
-  await page.getByRole("button", { name: "Lieux fréquentés (0)" }).click();
+  await page.getByRole("button", { name: "Territoires et lieux fréquentés" }).click();
 
   await page.getByRole("button", { name: "Ajouter un lieu" }).click();
   await clickOnEmptyReactSelect(page, "place", "parking haut");
@@ -81,7 +81,7 @@ test("Lieux fréquentés", async ({ page }) => {
 
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await page.getByRole("cell", { name: "personne 1" }).click();
-  await page.getByRole("button", { name: "Lieux fréquentés (2)" }).click();
+  await page.getByRole("button", { name: "Territoires et lieux fréquentés" }).click();
   await page.getByRole("button", { name: "Ajouter un lieu" }).click();
   await clickOnEmptyReactSelect(page, "place", "faux lieu");
   await page.getByRole("button", { name: "Enregistrer" }).click();
@@ -95,7 +95,7 @@ test("Lieux fréquentés", async ({ page }) => {
 
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await page.getByRole("cell", { name: "personne 2" }).click();
-  await page.getByRole("button", { name: "Lieux fréquentés (3)" }).click();
+  await page.getByRole("button", { name: "Territoires et lieux fréquentés" }).click();
   await page.hover("data-test-id=gare du nord");
   await page.getByRole("button", { name: "Modifier le nom du lieu gare du nord" }).click();
 
@@ -113,6 +113,6 @@ test("Lieux fréquentés", async ({ page }) => {
 
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await page.getByRole("cell", { name: "personne 1" }).click();
-  await page.getByRole("button", { name: "Lieux fréquentés (1)" }).click();
+  await page.getByRole("button", { name: "Territoires et lieux fréquentés" }).click();
   await expect(page.locator("data-test-id=gare du nord")).not.toBeVisible();
 });

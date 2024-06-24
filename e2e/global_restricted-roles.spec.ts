@@ -99,7 +99,7 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.getByText("Régime Général")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Documents" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Dossier Médical" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Lieux fréquentés (0)" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Territoires et lieux fréquentés" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Historique" })).toBeVisible();
     await page.getByRole("button", { name: "Dossier Médical" }).click();
     await expect(page.getByText("Régime Général")).toBeVisible();
@@ -166,7 +166,7 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.getByText("Régime Général")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Documents" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Dossier Médical" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Lieux fréquentés (0)" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Territoires et lieux fréquentés" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Historique" })).toBeVisible();
     await page.getByRole("button", { name: "Dossier Médical" }).click();
     await expect(page.getByText("Régime Général")).toBeVisible();
@@ -234,7 +234,7 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.getByText("Régime Général")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Documents" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Dossier Médical" })).not.toBeVisible();
-    await expect(page.getByRole("button", { name: "Lieux fréquentés (0)" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Territoires et lieux fréquentés" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Historique" })).toBeVisible();
 
     await expect(page.getByRole("link", { name: "Territoires" })).toBeVisible();
@@ -294,7 +294,7 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.getByText("Régime Général")).not.toBeVisible();
     await expect(page.getByRole("heading", { name: "Documents" })).not.toBeVisible();
     await expect(page.getByRole("button", { name: "Dossier Médical" })).not.toBeVisible();
-    await expect(page.getByRole("button", { name: "Lieux fréquentés (0)" })).not.toBeVisible();
+    await expect(page.getByRole("button", { name: "Territoires et lieux fréquentés" })).not.toBeVisible();
     await expect(page.getByRole("button", { name: "Historique" })).not.toBeVisible();
 
     await expect(page.getByRole("link", { name: "Territoires" })).toBeVisible();
