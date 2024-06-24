@@ -276,6 +276,7 @@ function TreatmentContent({ onClose, treatment, personId }) {
                 {isEditing ? (
                   <input
                     className="tailwindui"
+                    autoComplete="off"
                     required
                     onInvalid={() => setActiveTab("Informations")}
                     placeholder="Amoxicilline"
@@ -305,6 +306,7 @@ function TreatmentContent({ onClose, treatment, personId }) {
                 {isEditing ? (
                   <input
                     className="tailwindui"
+                    autoComplete="off"
                     placeholder="1 fois par jour"
                     name="frequency"
                     id="frequency"
@@ -322,6 +324,7 @@ function TreatmentContent({ onClose, treatment, personId }) {
                 {isEditing ? (
                   <input
                     className="tailwindui"
+                    autoComplete="off"
                     placeholder="Angine"
                     name="indication"
                     id="indication"

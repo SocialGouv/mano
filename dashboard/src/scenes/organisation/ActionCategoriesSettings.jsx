@@ -296,7 +296,7 @@ const Category = ({ item: category, groupTitle }) => {
               <label htmlFor="newCategory" className="tailwindui">
                 Nouveau nom de la catégorie
               </label>
-              <input className="tailwindui" id="newCategory" name="newCategory" type="text" placeholder={category} />
+              <input className="tailwindui" autoComplete="off" id="newCategory" name="newCategory" type="text" placeholder={category} />
             </div>
           </form>
         </ModalBody>

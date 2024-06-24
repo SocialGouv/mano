@@ -126,7 +126,7 @@ const DragAndDropSettings = ({
               <label htmlFor="groupTitle" className="tailwindui">
                 Titre du groupe
               </label>
-              <input type="text" id="groupTitle" name="groupTitle" placeholder="Titre du groupe" className="tailwindui" />
+              <input type="text" id="groupTitle" name="groupTitle" placeholder="Titre du groupe" autoComplete="off" className="tailwindui" />
             </div>
           </form>
         </ModalBody>
@@ -246,7 +246,7 @@ const Group = ({
                 <label htmlFor="newGroupTitle" className="tailwindui">
                   Nouveau nom du groupe
                 </label>
-                <input type="text" id="newGroupTitle" name="newGroupTitle" placeholder={groupTitle} className="tailwindui" />
+                <input type="text" id="newGroupTitle" name="newGroupTitle" placeholder={groupTitle} autoComplete="off" className="tailwindui" />
               </div>
             </form>
           </ModalBody>

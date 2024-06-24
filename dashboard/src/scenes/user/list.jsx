@@ -269,11 +269,27 @@ const Create = ({ onChange, users }) => {
             <div className="tw-flex tw-w-full tw-flex-wrap">
               <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
                 <label htmlFor="email">Email</label>
-                <input className="tailwindui" placeholder="email@truc.fr" name="email" id="email" value={data.email} onChange={handleChange} />
+                <input
+                  className="tailwindui"
+                  autoComplete="off"
+                  placeholder="email@truc.fr"
+                  name="email"
+                  id="email"
+                  value={data.email}
+                  onChange={handleChange}
+                />
               </div>
               <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
                 <label htmlFor="phone">Téléphone</label>
-                <input className="tailwindui" placeholder="0612345678" name="phone" id="phone" value={data.phone} onChange={handleChange} />
+                <input
+                  className="tailwindui"
+                  autoComplete="off"
+                  placeholder="0612345678"
+                  name="phone"
+                  id="phone"
+                  value={data.phone}
+                  onChange={handleChange}
+                />
               </div>
               <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
                 <label htmlFor="role">Role</label>

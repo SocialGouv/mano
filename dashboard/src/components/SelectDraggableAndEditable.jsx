@@ -98,6 +98,7 @@ const SelectDraggableAndEditable = ({ onChange, classNamePrefix, value, onEditCh
               </label>
               <input
                 className="tailwindui"
+                autoComplete="off"
                 id="newChoice"
                 name="newChoice"
                 type="text"

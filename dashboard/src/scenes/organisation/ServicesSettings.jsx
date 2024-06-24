@@ -316,7 +316,7 @@ const Service = ({ item: service, groupTitle }) => {
               <label htmlFor="newService" className="tailwindui">
                 Nouveau nom du service
               </label>
-              <input className="tailwindui" id="newService" name="newService" type="text" placeholder={service} />
+              <input className="tailwindui" autoComplete="off" id="newService" name="newService" type="text" placeholder={service} />
             </div>
           </form>
         </ModalBody>

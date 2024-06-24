@@ -25,6 +25,7 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
       <div className="tw-relative tw-flex tw-flex-wrap tw-items-stretch tw-w-full">
         <input
           className="tailwindui"
+          autoComplete="off"
           id={id}
           placeholder={placeholder}
           value={cachedValue}

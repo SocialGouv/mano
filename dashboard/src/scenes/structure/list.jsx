@@ -199,13 +199,21 @@ const Structure = ({ structure: initStructure, onSuccess, open, onClose, onOpen 
               <label className="tailwindui" htmlFor="name">
                 Nom
               </label>
-              <input type="text" className="tailwindui" name="name" id="name" value={structure?.name || ""} onChange={onChange} />
+              <input type="text" className="tailwindui" autoComplete="off" name="name" id="name" value={structure?.name || ""} onChange={onChange} />
             </div>
             <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
               <label className="tailwindui" htmlFor="phone">
                 Téléphone
               </label>
-              <input type="text" className="tailwindui" name="phone" id="phone" value={structure?.phone || ""} onChange={onChange} />
+              <input
+                type="text"
+                className="tailwindui"
+                autoComplete="off"
+                name="phone"
+                id="phone"
+                value={structure?.phone || ""}
+                onChange={onChange}
+              />
             </div>
             <div className="tw-flex tw-basis-full tw-flex-col tw-px-4 tw-py-2">
               <label className="tailwindui" htmlFor="adresse">
@@ -223,7 +231,7 @@ const Structure = ({ structure: initStructure, onSuccess, open, onClose, onOpen 
               <label className="tailwindui" htmlFor="city">
                 Ville
               </label>
-              <input type="text" className="tailwindui" name="city" id="city" value={structure?.city || ""} onChange={onChange} />
+              <input type="text" className="tailwindui" autoComplete="off" name="city" id="city" value={structure?.city || ""} onChange={onChange} />
             </div>
             <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
               <label className="tailwindui" htmlFor="description">

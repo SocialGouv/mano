@@ -350,7 +350,7 @@ const Create = ({ onChange, open, setOpen }) => {
                     <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
                       <div className="tw-mb-4">
                         <label htmlFor="orgName">Nom</label>
-                        <input className="tailwindui" name="orgName" id="orgName" value={values.orgName} onChange={handleChange} />
+                        <input className="tailwindui" autoComplete="off" name="orgName" id="orgName" value={values.orgName} onChange={handleChange} />
                         {touched.orgName && errors.orgName && <span className="tw-text-xs tw-text-red-500">{errors.orgName}</span>}
                       </div>
                     </div>
@@ -359,7 +359,7 @@ const Create = ({ onChange, open, setOpen }) => {
                         <label htmlFor="orgName">
                           Identifiant interne <small>(non modifiable)</small>
                         </label>
-                        <input className="tailwindui" name="orgId" id="orgId" value={values.orgId} onChange={handleChange} />
+                        <input className="tailwindui" autoComplete="off" name="orgId" id="orgId" value={values.orgId} onChange={handleChange} />
                         {touched.orgId && errors.orgId && <span className="tw-text-xs tw-text-red-500">{errors.orgId}</span>}
                       </div>
                     </div>
@@ -399,14 +399,14 @@ const Create = ({ onChange, open, setOpen }) => {
                     <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
                       <div className="tw-mb-4">
                         <label htmlFor="name">Nom de l’administrateur</label>
-                        <input className="tailwindui" name="name" id="name" value={values.name} onChange={handleChange} />
+                        <input className="tailwindui" autoComplete="off" name="name" id="name" value={values.name} onChange={handleChange} />
                         {touched.name && errors.name && <span className="tw-text-xs tw-text-red-500">{errors.name}</span>}
                       </div>
                     </div>
                     <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
                       <div className="tw-mb-4">
                         <label htmlFor="email">Email de l’administrateur</label>
-                        <input className="tailwindui" name="email" id="email" value={values.email} onChange={handleChange} />
+                        <input className="tailwindui" autoComplete="off" name="email" id="email" value={values.email} onChange={handleChange} />
                         {touched.email && errors.email && <span className="tw-text-xs tw-text-red-500">{errors.email}</span>}
                       </div>
                     </div>
@@ -478,6 +478,7 @@ const MergeOrganisations = ({ open, setOpen, organisations, onChange }) => {
           Clé de l’orga (les deux clés doivent être identiques)
           <input
             className="tailwindui"
+            autoComplete="off"
             type="text"
             value={secretKey}
             onChange={(e) => {
@@ -602,20 +603,36 @@ const CreateUser = ({ onChange, open, setOpen, organisation }) => {
                     <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
                       <div className="tw-mb-4">
                         <label htmlFor="name">Nom</label>
-                        <input className="tailwindui" name="name" id="name" value={values.name} onChange={handleChange} />
+                        <input className="tailwindui" autoComplete="off" name="name" id="name" value={values.name} onChange={handleChange} />
                       </div>
                     </div>
 
                     <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
                       <div className="tw-mb-4">
                         <label htmlFor="email">Email</label>
-                        <input className="tailwindui" type="email" name="email" id="email" value={values.email} onChange={handleChange} />
+                        <input
+                          className="tailwindui"
+                          autoComplete="off"
+                          type="email"
+                          name="email"
+                          id="email"
+                          value={values.email}
+                          onChange={handleChange}
+                        />
                       </div>
                     </div>
                     <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
                       <div className="tw-mb-4">
                         <label htmlFor="phone">Téléphone</label>
-                        <input className="tailwindui" type="tel" name="phone" id="phone" value={values.phone} onChange={handleChange} />
+                        <input
+                          className="tailwindui"
+                          autoComplete="off"
+                          type="tel"
+                          name="phone"
+                          id="phone"
+                          value={values.phone}
+                          onChange={handleChange}
+                        />
                       </div>
                     </div>
                     <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">

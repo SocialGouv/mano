@@ -677,7 +677,15 @@ function DocumentModal<T extends DocumentWithLinkedItem>({
               <label className={isEditing ? "" : `tw-text-sm tw-font-semibold tw-blue-${color}`} htmlFor="document-name">
                 Nom
               </label>
-              <input required className="tailwindui" id="document-name" name="name" value={name} onChange={(e) => setName(e.target.value)} />
+              <input
+                required
+                className="tailwindui"
+                autoComplete="off"
+                id="document-name"
+                name="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
             </form>
           ) : (
             <div className="tw-flex tw-w-full tw-flex-col tw-items-center tw-gap-2">
@@ -915,6 +923,7 @@ export function FolderModal<T extends FolderWithLinkedItem | Folder>({
                   </label>
                   <input
                     className="tailwindui"
+                    autoComplete="off"
                     placeholder="Nouveau dossier"
                     id="folder-name"
                     name="name"

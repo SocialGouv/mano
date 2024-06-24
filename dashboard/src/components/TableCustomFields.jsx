@@ -312,6 +312,7 @@ export const EditCustomField = ({ open, onDelete, data, editingField, onClose, o
             </label>
             <input
               className="tailwindui"
+              autoComplete="off"
               type="text"
               id="label"
               name="label"

@@ -200,7 +200,14 @@ const Collaboration = ({ item: collaboration }) => {
               <label htmlFor="newCollaboration" className="tailwindui">
                 Nouvelle co-intervention
               </label>
-              <input className="tailwindui" id="newCollaboration" name="newCollaboration" type="text" placeholder={collaboration} />
+              <input
+                className="tailwindui"
+                autoComplete="off"
+                id="newCollaboration"
+                name="newCollaboration"
+                type="text"
+                placeholder={collaboration}
+              />
             </div>
           </form>
         </ModalBody>

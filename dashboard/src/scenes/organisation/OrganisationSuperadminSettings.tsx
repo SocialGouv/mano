@@ -52,7 +52,7 @@ export default function OrganisationSuperadminSettings({
             <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
               <div className="tw-mb-4">
                 <label htmlFor="orgName">Nom</label>
-                <input className="tailwindui" disabled name="name" id="name" defaultValue={data.name} />
+                <input className="tailwindui" autoComplete="off" disabled name="name" id="name" defaultValue={data.name} />
               </div>
             </div>
             <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
@@ -60,7 +60,7 @@ export default function OrganisationSuperadminSettings({
                 <label htmlFor="orgName" aria-disabled={true}>
                   Identifiant interne <small>(non modifiable)</small>
                 </label>
-                <input className="tailwindui" disabled name="orgId" id="orgId" defaultValue={data.orgId} />
+                <input className="tailwindui" autoComplete="off" disabled name="orgId" id="orgId" defaultValue={data.orgId} />
               </div>
             </div>
 

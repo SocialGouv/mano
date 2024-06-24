@@ -29,7 +29,15 @@ const Reset = () => {
       {newUser ? (
         <div className="tw-mb-4 tw-flex tw-flex-col tw-py-2">
           <label htmlFor="email">Prénom et nom</label>
-          <input className="tailwindui" name="name" id="name" type="search" value={name} onChange={(e) => setName(e.target.value)} />
+          <input
+            className="tailwindui"
+            autoComplete="off"
+            name="name"
+            id="name"
+            type="search"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
         </div>
       ) : null}
       <ChangePassword

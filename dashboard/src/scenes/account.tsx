@@ -41,13 +41,31 @@ const Account = () => {
               <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
                 <div className="tw-mb-4">
                   <label htmlFor="orgName">Nom</label>
-                  <input className="tailwindui" type="text" name="name" id="name" value={values.name} onChange={handleChange} required />
+                  <input
+                    className="tailwindui"
+                    autoComplete="off"
+                    type="text"
+                    name="name"
+                    id="name"
+                    value={values.name}
+                    onChange={handleChange}
+                    required
+                  />
                 </div>
               </div>
               <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
                 <div className="tw-mb-4">
                   <label htmlFor="email">Email</label>
-                  <input className="tailwindui" type="email" name="email" id="email" value={values.email} onChange={handleChange} required />
+                  <input
+                    className="tailwindui"
+                    autoComplete="off"
+                    type="email"
+                    name="email"
+                    id="email"
+                    value={values.email}
+                    onChange={handleChange}
+                    required
+                  />
                 </div>
               </div>
             </div>

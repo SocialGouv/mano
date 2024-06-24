@@ -101,20 +101,20 @@ const View = () => {
               <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
                 <div className="tw-mb-4">
                   <label htmlFor="name">Nom</label>
-                  <input className="tailwindui" name="name" id="name" value={values.name} onChange={handleChange} />
+                  <input className="tailwindui" autoComplete="off" name="name" id="name" value={values.name} onChange={handleChange} />
                 </div>
               </div>
 
               <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
                 <div className="tw-mb-4">
                   <label htmlFor="email">Email</label>
-                  <input className="tailwindui" name="email" id="email" value={values.email} onChange={handleChange} required />
+                  <input className="tailwindui" autoComplete="off" name="email" id="email" value={values.email} onChange={handleChange} required />
                 </div>
               </div>
               <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
                 <div className="tw-mb-4">
                   <label htmlFor="phone">Téléphone</label>
-                  <input className="tailwindui" name="phone" id="phone" value={values.phone} onChange={handleChange} />
+                  <input className="tailwindui" autoComplete="off" name="phone" id="phone" value={values.phone} onChange={handleChange} />
                 </div>
               </div>
               <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">

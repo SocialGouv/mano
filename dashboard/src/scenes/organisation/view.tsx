@@ -204,7 +204,7 @@ const View = () => {
                       <div className="tw-mb-4 tw-flex tw-gap-4 tw-flex-wrap tw-flex-row tw-basis-full">
                         <div className="tw-flex tw-flex-col tw-basis-full tw-mb-4 tw-p-4">
                           <label htmlFor="name">Nom</label>
-                          <input className="tailwindui" name="name" id="name" value={values.name} onChange={handleChange} />
+                          <input className="tailwindui" autoComplete="off" name="name" id="name" value={values.name} onChange={handleChange} />
                         </div>
                       </div>
                       <div className="tw-mb-10 tw-flex tw-justify-end tw-gap-4">

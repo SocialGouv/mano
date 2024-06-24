@@ -307,7 +307,14 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                   Nom (facultatif)
                 </label>
                 {isEditing ? (
-                  <input className="tailwindui" id="create-consultation-name" name="name" value={data.name} onChange={handleChange} />
+                  <input
+                    className="tailwindui"
+                    autoComplete="off"
+                    id="create-consultation-name"
+                    name="name"
+                    value={data.name}
+                    onChange={handleChange}
+                  />
                 ) : (
                   <CustomFieldDisplay type="text" value={data.name} />
                 )}
@@ -457,6 +464,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                   ) : (
                     <input
                       className="tailwindui"
+                      autoComplete="off"
                       value={data["constantes-poids"]}
                       onChange={handleChange}
                       type="number"
@@ -482,6 +490,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                       value={data["constantes-taille"]}
                       onChange={handleChange}
                       className="tailwindui"
+                      autoComplete="off"
                       type="number"
                       min="20"
                       max="280"
@@ -504,6 +513,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                       value={data["constantes-frequence-cardiaque"]}
                       onChange={handleChange}
                       className="tailwindui"
+                      autoComplete="off"
                       type="number"
                       min="20"
                       max="240"
@@ -526,6 +536,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                       value={data["constantes-frequence-respiratoire"]}
                       onChange={handleChange}
                       className="tailwindui"
+                      autoComplete="off"
                       type="number"
                       min="1"
                       max="90"
@@ -548,6 +559,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                       value={data["constantes-saturation-o2"]}
                       onChange={handleChange}
                       className="tailwindui"
+                      autoComplete="off"
                       type="number"
                       min="50"
                       max="150"
@@ -570,6 +582,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                       value={data["constantes-glycemie-capillaire"]}
                       onChange={handleChange}
                       className="tailwindui"
+                      autoComplete="off"
                       type="number"
                       min="0"
                       max="10"
@@ -594,6 +607,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                       value={data["constantes-temperature"]}
                       onChange={handleChange}
                       className="tailwindui"
+                      autoComplete="off"
                       type="number"
                       min="35"
                       max="43"
@@ -624,6 +638,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                         value={data["constantes-tension-arterielle-systolique"]}
                         onChange={handleChange}
                         className="tailwindui"
+                        autoComplete="off"
                         type="number"
                         min="0"
                         onInvalid={() => setActiveTab("Constantes")}
@@ -643,6 +658,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
                         value={data["constantes-tension-arterielle-diastolique"]}
                         onChange={handleChange}
                         className="tailwindui"
+                        autoComplete="off"
                         type="number"
                         min="0"
                         onInvalid={() => setActiveTab("Constantes")}

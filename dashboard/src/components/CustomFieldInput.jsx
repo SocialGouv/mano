@@ -38,6 +38,7 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = null,
               disabled={disabled}
               name={field.name}
               className="tailwindui"
+              autoComplete="off"
               required={field.required}
               value={values[field.name] || ""}
               onChange={(e) => {

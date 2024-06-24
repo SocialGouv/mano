@@ -205,6 +205,7 @@ function Transmission({ report, team, day, teamId, reactSelectInputId }) {
               <textarea
                 rows={27}
                 className="tailwindui"
+                autoComplete="off"
                 id="description"
                 name="description"
                 type="text"
