@@ -236,9 +236,12 @@ const NewRelation = ({ open, setOpen, onAddFamilyLink, person }) => {
     ?.filter((personId) => personId !== person?._id)
     ?.filter((personId) => !personExistingGroup.persons.includes(personId));
 
-  const alreadyExistingNewRelation = newRelationExistingGroup?.persons?.filter((personId) => personId === person?._id)?.length
-    ? newRelationExistingGroup.relations.find((rel) => rel.persons.includes(newPersonId) && rel.persons.includes(person._id))
-    : null;
+  const isSamePerson = newPersonId === person._id;
+
+  const alreadyExistingNewRelation =
+    !isSamePerson && newRelationExistingGroup?.persons?.filter((personId) => personId === person?._id)?.length
+      ? newRelationExistingGroup.relations.find((rel) => rel.persons.includes(newPersonId) && rel.persons.includes(person._id))
+      : null;
 
   return (
     <ModalContainer open={open} size="3xl">
@@ -280,6 +283,18 @@ const NewRelation = ({ open, setOpen, onAddFamilyLink, person }) => {
               />
             </div>
           </div>
+          {newPersonId && isSamePerson && (
+            <>
+              <hr />
+              <p className="tw-text-gray-500 tw-text-sm tw-px-8 tw-m-0 tw-mt-2">
+                Un lien entre <span className="tw-font-bold">{persons[newPersonId]?.name}</span> et{" "}
+                <span className="tw-font-bold">{person.name}</span> ? 🧐
+              </p>
+              <blockquote className="tw-text-gray-500 tw-text-sm tw-ml-8 tw-font-extrabold tw-border-l-2 tw-border-l-gray-200 tw-pl-4 tw-py-4 tw-my-4">
+                Si ce n'est moi c'est donc mon frère 👯
+              </blockquote>
+            </>
+          )}
           {newPersonId && alreadyExistingNewRelation && (
             <>
               <hr />
