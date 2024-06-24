@@ -222,7 +222,7 @@ const View = () => {
   const currentTeam = useRecoilValue(currentTeamState);
   const teams = useRecoilValue(teamsState);
   const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage("reports-allOrg", teams.length === 1);
-  const [selectedTeamIds, setSelectedTeamIds] = useLocalStorage("reports-teams", [currentTeam._id]);
+  const [selectedTeamIds, setSelectedTeamIds] = useLocalStorage("reports-teams", currentTeam?._id ? [currentTeam._id] : []);
 
   const [preset, setPreset, removePreset] = useLocalStorage("reports-date-preset", null);
   let [period, setPeriod] = useLocalStorage("reports-period", {
