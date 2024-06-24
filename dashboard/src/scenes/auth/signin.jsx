@@ -150,7 +150,7 @@ const SignIn = () => {
       }
       response = signinResponse;
     }
-
+    window.localStorage.clear("automaticReload"); //  to enable automatiq reload when outdated version is used
     const { user, token, ok } = response;
     if (!ok) return setIsSubmitting(false);
     const { organisation } = user;
