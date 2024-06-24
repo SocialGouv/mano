@@ -234,7 +234,7 @@ const NewRelation = ({ open, setOpen, onAddFamilyLink, person }) => {
   const existingFamilyOfNewRelation = newRelationExistingGroup?.persons
     ?.filter((personId) => personId !== newPersonId)
     ?.filter((personId) => personId !== person?._id)
-    ?.filter((personId) => !personExistingGroup.persons.includes(personId));
+    ?.filter((personId) => !personExistingGroup?.persons?.includes(personId));
 
   const isSamePerson = newPersonId === person._id;
 
