@@ -18,7 +18,7 @@ export default function VersionOutdatedAlert() {
           e.preventDefault();
           window.localStorage.setItem("deploymentDate", deploymentDate);
           window.localStorage.setItem("deploymentCommit", deploymentCommit);
-          window.localStorage.clear("automaticReload");
+          window.localStorage.removeItem("automaticReload");
           window.location.reload(true);
         }}
       >
