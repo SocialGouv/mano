@@ -96,6 +96,10 @@ const SignIn = () => {
         setAuthViaCookie(true);
         const { organisation } = user;
         const storedOrganisationId = window.localStorage.getItem("mano-organisationId");
+        console.log(
+          { storedOrganisationId, organisation },
+          !storedOrganisationId || storedOrganisationId !== organisation._id ? "resetting cache" : ""
+        );
         if (storedOrganisationId && storedOrganisationId !== organisation._id) {
           await resetCache();
         }
@@ -155,7 +159,8 @@ const SignIn = () => {
     if (!ok) return setIsSubmitting(false);
     const { organisation } = user;
     const storedOrganisationId = window.localStorage.getItem("mano-organisationId");
-    if (storedOrganisationId && organisation._id !== storedOrganisationId) {
+    console.log({ storedOrganisationId, organisation }, !storedOrganisationId || storedOrganisationId !== organisation._id ? "resetting cache" : "");
+    if (storedOrganisationId && storedOrganisationId !== organisation._id) {
       await resetCache();
     }
     setOrganisation(organisation);
