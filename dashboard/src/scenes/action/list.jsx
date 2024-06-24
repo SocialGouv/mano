@@ -6,7 +6,7 @@ import ActionsCalendar from "../../components/ActionsCalendar";
 import ActionsWeekly from "../../components/ActionsWeekly";
 import SelectCustom from "../../components/SelectCustom";
 import { mappedIdsToLabels, TODO } from "../../recoil/actions";
-import { currentTeamState, teamsState, userState } from "../../recoil/auth";
+import { currentTeamState, organisationState, teamsState, userState } from "../../recoil/auth";
 import { arrayOfitemsGroupedByActionSelector, arrayOfitemsGroupedByConsultationSelector } from "../../recoil/selectors";
 import { filterBySearch } from "../search/utils";
 import useTitle from "../../services/useTitle";
@@ -67,7 +67,7 @@ const actionsByTeamAndStatusSelector = selectorFamily({
 const consultationsByStatusSelector = selectorFamily({
   key: "consultationsByStatusSelector",
   get:
-    ({ statuses, teamIds, viewAllOrganisationData, viewNoTeamData, actionsWithNoCategory }) =>
+    ({ statuses, teamIds, consultationTypes, viewAllOrganisationData, viewNoTeamData, actionsWithNoCategory }) =>
     ({ get }) => {
       // On retourne seulement les actions si "Actions sans catégorie" est coché
       if (actionsWithNoCategory) return [];
@@ -84,6 +84,9 @@ const consultationsByStatusSelector = selectorFamily({
         if (statuses.length) {
           if (!statuses.includes(consultation.status)) return false;
         }
+        if (consultationTypes?.length) {
+          if (!consultationTypes.includes(consultation.type)) return false;
+        }
         return true;
       });
       return consultationsByStatus;
@@ -93,7 +96,7 @@ const consultationsByStatusSelector = selectorFamily({
 const dataFilteredBySearchSelector = selectorFamily({
   key: "dataFilteredBySearchSelector",
   get:
-    ({ search, statuses, categories, teamIds, viewAllOrganisationData, viewNoTeamData, actionsWithNoCategory, showType }) =>
+    ({ search, statuses, categories, teamIds, viewAllOrganisationData, viewNoTeamData, actionsWithNoCategory, showType, consultationTypes }) =>
     ({ get }) => {
       const actions =
         showType === "Actions" || showType === "Actions et consultations"
@@ -102,7 +105,9 @@ const dataFilteredBySearchSelector = selectorFamily({
       // When we filter by category, we don't want to see all consultations.
       const consultations =
         !categories?.length && (showType === "Consultations" || showType === "Actions et consultations")
-          ? get(consultationsByStatusSelector({ statuses, teamIds, viewNoTeamData, viewAllOrganisationData, actionsWithNoCategory }))
+          ? get(
+              consultationsByStatusSelector({ statuses, consultationTypes, teamIds, viewNoTeamData, viewAllOrganisationData, actionsWithNoCategory })
+            )
           : [];
 
       if (!search) {
@@ -119,6 +124,7 @@ const List = () => {
   const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
   const teams = useRecoilValue(teamsState);
+  const organisation = useRecoilValue(organisationState);
 
   const history = useHistory();
   const [search, setSearch] = useSearchParamState("search", "");
@@ -129,6 +135,7 @@ const List = () => {
   const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage("action-allOrg", false);
   const [viewNoTeamData, setViewNoTeamData] = useLocalStorage("action-noTeam", false);
   const [actionsWithNoCategory, setActionsWithNoCategory] = useLocalStorage("action-noCategory", false);
+  const [consultationTypes, setConsultationTypes] = useLocalStorage("action-consultationTypes", []);
 
   const [showAs, setShowAs] = useLocalStorage("action-showAs", showAsOptions[0]); // calendar, list
   const [showType, setShowType] = useLocalStorage("action-showType", "Actions et consultations"); // actions, consultations, both
@@ -139,6 +146,7 @@ const List = () => {
       statuses,
       categories,
       showType,
+      consultationTypes,
       teamIds: selectedTeamIds,
       viewAllOrganisationData,
       viewNoTeamData,
@@ -210,11 +218,17 @@ const List = () => {
         </div>
       </div>
       {isDesktop && (
-        <div className="tw-mb-10 tw-mt-4 tw-flex tw-flex-wrap tw-border-b tw-border-gray-200">
-          <div className="tw-mb-5 tw-grid tw-grid-cols-2 tw-w-full tw-items-center tw-px-2 tw-gap-8">
-            <div className="tw-flex tw-items-center">
-              <label htmlFor="actions-show-as" className="tw-w-36 tw-shrink-0 tw-m-0">
-                Afficher par&nbsp;:
+        <div className="tw-flex tw-flex-wrap tw-rounded-lg -tw-mx-4 tw-mb-8">
+          <div className="tw-px-4 tw-py-8 tw-grid tw-grid-cols-3 tw-w-full tw-items-start tw-gap-4">
+            <div className="tw-flex tw-items-center tw-col-span-3">
+              <label htmlFor="search" className="tw-w-24 tw-shrink-0 tw-m-0">
+                Recherche
+              </label>
+              <Search placeholder="Par mot clé, nom, catégorie, commentaire, ..." value={search} onChange={setSearch} />
+            </div>
+            <div className="tw-flex tw-flex-col">
+              <label htmlFor="actions-show-as" className="tw-w-24 tw-shrink-0 tw-m-0">
+                Afficher par
               </label>
               <div className="tw-grow">
                 <SelectCustom
@@ -229,9 +243,9 @@ const List = () => {
                 />
               </div>
             </div>
-            <div className="tw-flex tw-items-center">
-              <label htmlFor="actions-show-as" className="tw-w-36 tw-shrink-0 tw-m-0">
-                Éléments affichés&nbsp;:
+            <div className="tw-flex tw-flex-col">
+              <label htmlFor="actions-show-as" className="tw-shrink-0 tw-m-0">
+                Éléments affichés
               </label>
               <div className="tw-grow">
                 <SelectCustom
@@ -246,85 +260,108 @@ const List = () => {
                 />
               </div>
             </div>
-          </div>
-          <div className="tw-mb-5 tw-flex tw-w-full tw-items-center tw-px-2">
-            <label htmlFor="search" className="tw-w-36 tw-shrink-0 tw-m-0">
-              Recherche&nbsp;:
-            </label>
-            <Search placeholder="Par mot clé, présent dans le nom, la catégorie, un commentaire, ..." value={search} onChange={setSearch} />
-          </div>
-          <div className="tw-mb-5 tw-flex tw-basis-1/3 tw-flex-col tw-items-start tw-px-2">
-            <label htmlFor="action-select-categories-filter">Filtrer par catégorie&nbsp;:</label>
-            <div className="tw-w-full">
-              <ActionsCategorySelect
-                id="action-select-categories-filter"
-                onChange={(c) => setCategories(c)}
-                values={categories}
-                isDisabled={!!actionsWithNoCategory}
-              />
+            <div className="tw-flex tw-flex-col tw-items-start">
+              <label htmlFor="action-select-status-filter" className="tw-shrink-0 tw-m-0">
+                Filtrer par statut
+              </label>
+              <div className="tw-w-full">
+                <SelectCustom
+                  inputId="action-select-status-filter"
+                  classNamePrefix="action-select-status-filter"
+                  options={mappedIdsToLabels}
+                  getOptionValue={(s) => s._id}
+                  getOptionLabel={(s) => s.name}
+                  name="statuses"
+                  onChange={(s) => setStatuses(s.map((s) => s._id))}
+                  isClearable
+                  isMulti
+                  value={mappedIdsToLabels.filter((s) => statuses.includes(s._id))}
+                />
+              </div>
             </div>
-            <label htmlFor="actionsWithNoCategory" className="tw-flex tw-items-center tw-text-sm">
-              <input
-                id="actionsWithNoCategory"
-                type="checkbox"
-                className="tw-mr-2"
-                checked={actionsWithNoCategory}
-                onChange={() => setActionsWithNoCategory(!actionsWithNoCategory)}
-              />
-              Actions sans catégorie
-            </label>
-          </div>
-          <div className="tw-mb-5 tw-flex tw-basis-1/3 tw-flex-col tw-items-start tw-px-2">
-            <label htmlFor="action-select-categories-filter">Filtrer par équipe&nbsp;:</label>
-            <div className="tw-w-full">
-              <SelectTeamMultiple
-                onChange={setSelectedTeamIds}
-                value={selectedTeamIds}
-                colored
-                isDisabled={viewAllOrganisationData || viewNoTeamData}
-              />
-              {teams.length > 1 && (
-                <label htmlFor="viewAllOrganisationData" className="tw-flex tw-items-center tw-text-sm tw-m-0">
-                  <input
-                    id="viewAllOrganisationData"
-                    type="checkbox"
-                    className="tw-mr-2"
-                    checked={viewAllOrganisationData}
-                    disabled={viewNoTeamData}
-                    onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
-                  />
-                  Actions/consultations de toute l'organisation
-                </label>
-              )}
-              {teams.length > 1 && (
-                <label htmlFor="viewNoTeamData" className="tw-flex tw-items-center tw-text-sm">
-                  <input
-                    id="viewNoTeamData"
-                    type="checkbox"
-                    className="tw-mr-2"
-                    checked={viewNoTeamData}
-                    onChange={() => setViewNoTeamData(!viewNoTeamData)}
-                  />
-                  Actions/consultations sans équipe attribuée
-                </label>
-              )}
+            <div className="tw-flex tw-flex-col">
+              <label htmlFor="action-select-categories-filter" className="tw-shrink-0 tw-m-0">
+                Filtrer par équipe
+              </label>
+              <div className="tw-w-grow">
+                <SelectTeamMultiple
+                  onChange={setSelectedTeamIds}
+                  value={selectedTeamIds}
+                  colored
+                  isDisabled={viewAllOrganisationData || viewNoTeamData}
+                />
+                {teams.length > 1 && (
+                  <label htmlFor="viewAllOrganisationData" className="tw-flex tw-items-center tw-text-sm tw-m-0">
+                    <input
+                      id="viewAllOrganisationData"
+                      type="checkbox"
+                      className="tw-mr-2"
+                      checked={viewAllOrganisationData}
+                      disabled={viewNoTeamData}
+                      onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
+                    />
+                    Agenda de toute l'organisation
+                  </label>
+                )}
+                {teams.length > 1 && (
+                  <label htmlFor="viewNoTeamData" className="tw-flex tw-items-center tw-text-sm tw-m-0">
+                    <input
+                      id="viewNoTeamData"
+                      type="checkbox"
+                      className="tw-mr-2"
+                      checked={viewNoTeamData}
+                      onChange={() => setViewNoTeamData(!viewNoTeamData)}
+                    />
+                    Éléments sans équipe attribuée
+                  </label>
+                )}
+              </div>
             </div>
-          </div>
-          <div className="tw-mb-5 tw-flex tw-basis-1/3 tw-flex-col tw-items-start tw-px-2">
-            <label htmlFor="action-select-status-filter">Filtrer par statut&nbsp;:</label>
-            <div className="tw-w-full">
-              <SelectCustom
-                inputId="action-select-status-filter"
-                classNamePrefix="action-select-status-filter"
-                options={mappedIdsToLabels}
-                getOptionValue={(s) => s._id}
-                getOptionLabel={(s) => s.name}
-                name="statuses"
-                onChange={(s) => setStatuses(s.map((s) => s._id))}
-                isClearable
-                isMulti
-                value={mappedIdsToLabels.filter((s) => statuses.includes(s._id))}
-              />
+            <div className="tw-flex tw-flex-col tw-items-start">
+              <label htmlFor="action-select-categories-filter" className="tw-shrink-0 tw-m-0">
+                Filtrer par catégorie d'action
+              </label>
+              <div className="tw-w-full">
+                <ActionsCategorySelect
+                  id="action-select-categories-filter"
+                  onChange={(c) => setCategories(c)}
+                  values={categories}
+                  isDisabled={Boolean(actionsWithNoCategory) || showType === "Consultations"}
+                />
+              </div>
+              <label htmlFor="actionsWithNoCategory" className="tw-flex tw-items-center tw-text-sm">
+                <input
+                  id="actionsWithNoCategory"
+                  disabled={showType === "Consultations"}
+                  type="checkbox"
+                  className="tw-mr-2"
+                  checked={actionsWithNoCategory}
+                  onChange={() => setActionsWithNoCategory(!actionsWithNoCategory)}
+                />
+                Actions sans catégorie
+              </label>
+            </div>
+            <div className="tw-flex tw-flex-col tw-items-start">
+              <label htmlFor="action-select-categories-filter" className="tw-shrink-0 tw-m-0">
+                Filtrer par type de consultation
+              </label>
+              <div className="tw-w-full">
+                <SelectCustom
+                  isDisabled={!user.healthcareProfessional || showType === "Actions"}
+                  inputId="action-select-consultation-type-filter"
+                  classNamePrefix="action-select-consultation-type-filter"
+                  options={organisation.consultations.map((e) => ({ value: e.name, label: e.name }))}
+                  name="consultationTypes"
+                  onChange={(s) => setConsultationTypes(s.map((s) => s.value))}
+                  value={
+                    user.healthcareProfessional
+                      ? organisation.consultations.filter((s) => consultationTypes.includes(s.name)).map((e) => ({ value: e.name, label: e.name }))
+                      : []
+                  }
+                  isClearable
+                  isMulti
+                />
+              </div>
             </div>
           </div>
         </div>
