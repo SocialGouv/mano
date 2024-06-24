@@ -170,6 +170,8 @@ const SelectAndCreatePerson = ({ value, onChange, inputId, classNamePrefix, show
       isDisabled={isDisabled}
       isSearchable
       onChange={onChange}
+      getOptionValue={(option) => option._id}
+      getOptionLabel={(option) => option.name}
       placeholder={"Entrez un nom, une date de naissance…"}
       onCreateOption={async (name) => {
         const existingPerson = persons.find((p) => p.name === name);
