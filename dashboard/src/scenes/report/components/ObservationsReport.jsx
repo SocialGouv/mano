@@ -124,8 +124,8 @@ const ObservationsTable = ({ period, observations, selectedTeams }) => {
             onClick={() => {
               setObservationToEdit({
                 user: user._id,
-                team: null,
-                observedAt: dayjsInstance().toDate(),
+                team: selectedTeams.length === 1 ? selectedTeams[0]._id : null,
+                observedAt: dayjsInstance(period.startDate).toDate(),
                 createdAt: dayjsInstance().toDate(),
                 territory: null,
               });
