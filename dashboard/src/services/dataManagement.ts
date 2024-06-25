@@ -10,7 +10,7 @@ const storeName = "store";
 let customStore: UseStore | null = null;
 const savedCacheKey = window.localStorage.getItem("mano-currentCacheKey");
 if (savedCacheKey !== dashboardCurrentCacheKey) {
-  clearCache("savedCacheKey diff dashboardCurrentCacheKey").then(() => setupDB());
+  clearCache("savedCacheKey diff dashboardCurrentCacheKey");
 } else {
   setupDB();
 }
@@ -52,6 +52,7 @@ export async function clearCache(calledFrom = "not defined", iteration = 0) {
   // If the cache is not empty, try again
   return new Promise((resolve) => {
     if (localStorageEmpty && sessionStorageEmpty && indexedDBEmpty) {
+      setupDB();
       resolve(true);
     } else {
       clearCache("try again clearCache", iteration + 1).then(resolve);
