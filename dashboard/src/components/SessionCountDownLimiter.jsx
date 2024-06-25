@@ -3,13 +3,12 @@ import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import utc from "dayjs/plugin/utc";
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "./tailwind/Modal";
-import PasswordInput from "./PasswordInput";
-import validator from "validator";
 import { useRecoilValue } from "recoil";
 import { organisationState, sessionInitialDateTimestamp } from "../recoil/auth";
 import API, { tryFetch, tryFetchExpectOk } from "../services/api";
 import { checkEncryptedVerificationKey, resetOrgEncryptionKey, setOrgEncryptionKey } from "../services/encryption";
 import { toast } from "react-toastify";
+import KeyInput from "./KeyInput";
 
 dayjs.extend(utc);
 dayjs.extend(duration);
@@ -90,7 +89,22 @@ const SessionCountDownLimiter = () => {
 const ReloadModal = ({ open, onSuccess }) => {
   const [encryptionKey, setEncryptionKey] = useState("");
   const organisation = useRecoilValue(organisationState);
-  const [showPassword, setShowPassword] = useState(false);
+
+  async function handleSubmit(e) {
+    if (e) e.preventDefault();
+    const organisationKey = await setOrgEncryptionKey(encryptionKey.trim());
+    const encryptionIsValid = await checkEncryptedVerificationKey(organisation.encryptedVerificationKey, organisationKey);
+    if (!encryptionIsValid) {
+      toast.error("Clé de chiffrement invalide");
+      setEncryptionKey("");
+      resetOrgEncryptionKey();
+      await tryFetch(() => API.post({ path: "/user/decrypt-attempt-failure" }));
+      return;
+    }
+
+    await tryFetch(() => API.post({ path: "/user/decrypt-attempt-success" }));
+    onSuccess(false);
+  }
 
   return (
     <ModalContainer
@@ -99,47 +113,18 @@ const ReloadModal = ({ open, onSuccess }) => {
       blurryBackground
       onAfterLeave={() => {
         setEncryptionKey("");
-        setShowPassword(false);
       }}
     >
       <ModalHeader title="Veuillez saisir votre clé de chiffrement d'organisation" />
       <ModalBody>
-        <form
-          id="reconnect-encryption-key-form"
-          className="tw-flex tw-flex-col tw-gap-4 tw-px-8 tw-py-4"
-          onSubmit={async (e) => {
-            e.preventDefault();
-            const organisationKey = await setOrgEncryptionKey(encryptionKey.trim());
-            const encryptionIsValid = await checkEncryptedVerificationKey(organisation.encryptedVerificationKey, organisationKey);
-            if (!encryptionIsValid) {
-              toast.error("Clé de chiffrement invalide");
-              setEncryptionKey("");
-              resetOrgEncryptionKey();
-              await tryFetch(() => API.post({ path: "/user/decrypt-attempt-failure" }));
-              return;
-            }
-
-            await tryFetch(() => API.post({ path: "/user/decrypt-attempt-success" }));
-            onSuccess(false);
-          }}
-        >
+        <form id="reconnect-encryption-key-form" className="tw-flex tw-flex-col tw-gap-4 tw-px-8 tw-py-4" onSubmit={handleSubmit}>
           <label htmlFor="orgEncryptionKey">Clé de chiffrement d'organisation</label>
-          <PasswordInput
-            className={[
-              "focus:tw-shadow-outline tw-mb-1 tw-block tw-w-full tw-rounded tw-border tw-border-teal-500 tw-bg-transparent tw-p-2 tw-leading-5 tw-text-gray-900 tw-outline-none tw-transition-all tw-duration-200 focus:tw-border-main50 focus:tw-outline-none",
-              !showPassword ? "tw-font-[password] tw-text-xs tw-tracking-widest" : "",
-            ].join(" ")}
-            name="orgEncryptionKey"
-            type="search" // for the delete button
-            autoComplete="off"
+          <KeyInput
             id="orgEncryptionKey"
-            autoFocus
-            value={encryptionKey}
-            onChange={(e) => {
-              setEncryptionKey(e.target.value);
+            onChange={setEncryptionKey}
+            onPressEnter={() => {
+              handleSubmit();
             }}
-            showPassword={showPassword}
-            setShowPassword={setShowPassword}
           />
         </form>
       </ModalBody>

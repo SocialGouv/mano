@@ -2,11 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-  font-family: "password";
-  src: url("./assets/password.woff");
-}
-
 :root {
   --toastify-z-index: 9999;
 }
