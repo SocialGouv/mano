@@ -488,7 +488,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     // an error was thrown, the data was not downloaded,
     // this can result in data corruption, we need to reset the loader
     setLastLoad(0);
-    await clearCache();
+    await clearCache("resetLoaderOnError");
     toast.error(errorMessage(error || "Désolé, une erreur est survenue lors du chargement de vos données, veuillez réessayer"), {
       onClose: () => window.location.replace("/auth"),
       autoClose: 5000,
@@ -496,7 +496,8 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     return false;
   }
 
-  async function resetCache() {
+  async function resetCache(calledFrom = "not defined") {
+    console.log("Resetting cache from", calledFrom);
     setLastLoad(0);
     setPersons([]);
     setGroups([]);
@@ -512,7 +513,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     setConsultations([]);
     setTreatments([]);
     setMedicalFiles([]);
-    await clearCache();
+    await clearCache("called from RestCache from " + calledFrom);
   }
 
   return {

@@ -27,7 +27,7 @@ const TopBar = () => {
   function resetCacheAndLogout() {
     // On affiche une fenêtre pendant notre vidage du cache pour éviter toute manipulation de la part des utilisateurs.
     setModalCacheOpen(true);
-    resetCache().then(() => {
+    resetCache("call ResetCache from TopBar.jsx").then(() => {
       tryFetchExpectOk(() => API.post({ path: "/user/logout" })).then(() => {
         // On met un timeout pour laisser le temps aux personnes de lire si jamais ça va trop vite.
         // Il n'a donc aucune utilité d'un point de vue code.

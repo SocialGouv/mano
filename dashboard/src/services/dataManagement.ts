@@ -10,7 +10,7 @@ const storeName = "store";
 let customStore: UseStore | null = null;
 const savedCacheKey = window.localStorage.getItem("mano-currentCacheKey");
 if (savedCacheKey !== dashboardCurrentCacheKey) {
-  clearCache().then(() => setupDB());
+  clearCache("savedCacheKey diff dashboardCurrentCacheKey").then(() => setupDB());
 } else {
   setupDB();
 }
@@ -32,10 +32,13 @@ async function deleteDB() {
   return await delMany(ks, customStore);
 }
 
-export async function clearCache(iteration = 0) {
+export async function clearCache(calledFrom = "not defined", iteration = 0) {
+  console.log("clearing cache from ", calledFrom, "iteration", iteration);
   if (iteration > 10) throw new Error("Failed to clear cache");
   await deleteDB().catch(capture);
+  console.log("clearing localStorage");
   window.localStorage?.clear();
+  console.log("cleared localStorage");
   window.sessionStorage?.clear();
 
   // wait 200ms to make sure the cache is cleared
@@ -51,7 +54,7 @@ export async function clearCache(iteration = 0) {
     if (localStorageEmpty && sessionStorageEmpty && indexedDBEmpty) {
       resolve(true);
     } else {
-      clearCache(iteration + 1).then(resolve);
+      clearCache("try again clearCache", iteration + 1).then(resolve);
     }
   });
 }
