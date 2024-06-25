@@ -63,13 +63,18 @@ const Reset = () => {
           }
           return res;
         }}
-        onFinished={(res) => {
+        onFinished={async (res) => {
           if (res) {
-            // Dans le doute on déconnecte l'utilisateur
-            tryFetchExpectOk(() => API.post({ path: "/user/logout" })).then(([error]) => {
-              if (error) return toast.error(errorMessage(error));
-              window.location.href = "/auth";
-            });
+            // Dans le doute on déconnecte l'utilisateur, mais on s'en fiche si ça ne marche pas
+            // On ne veut pas signaler d'erreur à l'utilisateur ni le rediriger vers la page de connexion
+            // avec un message qui dit que sa connexion est expirée.
+            try {
+              await API.post({ path: "/user/logout" });
+            } catch (_e) {
+              // On ignore l'erreur
+            }
+            // Et dans tous les cas on redirige
+            window.location.href = "/auth";
           }
         }}
         withCurrentPassword={false}
