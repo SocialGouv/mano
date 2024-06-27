@@ -646,7 +646,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
               onDeleteComment={async (comment) => {
                 const newData = { ...data, comments: data.comments.filter((c) => c._id !== comment._id) };
                 setData(newData);
-                if (isNewAction) {
+                if (!isNewAction) {
                   const [error] = await tryFetchExpectOk(() => API.delete({ path: `/comment/${comment._id}` }));
                   if (error) {
                     toast.error("Erreur lors de la suppression du commentaire");
