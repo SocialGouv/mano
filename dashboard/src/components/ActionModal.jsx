@@ -675,6 +675,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                     }
                     setData({ ...data, comments: [{ ...comment, _id: response.data._id }, ...data.comments] });
                     toast.success("Commentaire ajouté !");
+                    refresh();
                   }
                 } else {
                   setData({ ...data, comments: data.comments.map((c) => (c._id === comment._id ? comment : c)) });
@@ -690,6 +691,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                     return;
                   }
                   toast.success("Commentaire mis à jour");
+                  refresh();
                 }
               }}
             />
