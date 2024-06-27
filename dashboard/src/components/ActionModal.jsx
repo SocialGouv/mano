@@ -644,8 +644,6 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
               typeForNewComment="action"
               actionId={action?._id}
               onDeleteComment={async (comment) => {
-                const confirm = window.confirm("Voulez-vous vraiment supprimer ce commentaire ?");
-                if (!confirm) return false;
                 const newData = { ...data, comments: data.comments.filter((c) => c._id !== comment._id) };
                 setData(newData);
                 if (isNewAction) {
