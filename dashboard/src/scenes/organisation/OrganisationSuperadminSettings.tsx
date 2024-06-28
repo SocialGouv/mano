@@ -51,16 +51,30 @@ export default function OrganisationSuperadminSettings({
           <form id="organisation-settings" onSubmit={handleSubmit} className="-tw-mx-4 tw-flex tw-flex-row tw-flex-wrap tw-pb-40">
             <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
               <div className="tw-mb-4">
-                <label htmlFor="orgName">Nom</label>
-                <input className="tailwindui" autoComplete="off" disabled name="name" id="name" defaultValue={data.name} />
+                <label htmlFor="name">Nom</label>
+                <input
+                  className="tailwindui"
+                  autoComplete="off"
+                  name="name"
+                  id="name"
+                  defaultValue={data.name}
+                  onChange={(e) => setData({ ...data, name: e.target.value })}
+                />
               </div>
             </div>
             <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
               <div className="tw-mb-4">
-                <label htmlFor="orgName" aria-disabled={true}>
-                  Identifiant interne <small>(non modifiable)</small>
+                <label htmlFor="orgId" aria-disabled={true}>
+                  Identifiant interne <small>(non modifiable par les users)</small>
                 </label>
-                <input className="tailwindui" autoComplete="off" disabled name="orgId" id="orgId" defaultValue={data.orgId} />
+                <input
+                  className="tailwindui"
+                  autoComplete="off"
+                  name="orgId"
+                  id="orgId"
+                  defaultValue={data.orgId}
+                  onChange={(e) => setData({ ...data, orgId: e.target.value })}
+                />
               </div>
             </div>
 

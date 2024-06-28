@@ -376,6 +376,8 @@ router.put(
           _id: z.string().regex(looseUuidRegex),
         }),
         body: z.object({
+          name: z.string().min(1),
+          orgId: z.string().min(1),
           city: z.optional(z.string().min(1)),
           responsible: z.optional(z.string()),
         }),
@@ -393,6 +395,8 @@ router.put(
     const updateOrg = {};
     if (req.body.hasOwnProperty("city")) updateOrg.city = req.body.city;
     if (req.body.hasOwnProperty("responsible")) updateOrg.responsible = req.body.responsible || null;
+    if (req.body.hasOwnProperty("name")) updateOrg.name = req.body.name;
+    if (req.body.hasOwnProperty("orgId")) updateOrg.orgId = req.body.orgId;
 
     await organisation.update(updateOrg);
 

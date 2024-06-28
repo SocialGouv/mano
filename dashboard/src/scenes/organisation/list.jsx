@@ -356,8 +356,8 @@ const Create = ({ onChange, open, setOpen }) => {
                     </div>
                     <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
                       <div className="tw-mb-4">
-                        <label htmlFor="orgName">
-                          Identifiant interne <small>(non modifiable)</small>
+                        <label htmlFor="orgId">
+                          Identifiant interne <small>(non modifiable par les users)</small>
                         </label>
                         <input className="tailwindui" autoComplete="off" name="orgId" id="orgId" value={values.orgId} onChange={handleChange} />
                         {touched.orgId && errors.orgId && <span className="tw-text-xs tw-text-red-500">{errors.orgId}</span>}
