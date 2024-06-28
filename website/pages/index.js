@@ -256,7 +256,7 @@ export default function NewIndex() {
                 Mano, c’est un service public numérique dont la mission est de proposer un outil adapté aux pratiques de ses utilisateurs, pensé par
                 et pour ces derniers, afin d’aider à améliorer l’accompagnement proposé aux plus précaires d’entre nous. L’histoire commence avec le
                 CAARUD EGO de l’Association Aurore à Paris, continue à travers la France en étant incubé à la Fabrique numérique des ministères
-                sociaux, et attérit au GIP Sesan pour péréniser son action au long-cours.
+                sociaux, et attérit au GIP Sesan pour pérenniser son action au long cours.
               </div>
             </div>
             <div className="bg-mano rounded p-6 text-white md:mx-0 mx-2">
