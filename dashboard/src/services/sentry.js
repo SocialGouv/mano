@@ -1,6 +1,7 @@
 import * as Sentry from "@sentry/react";
 
 export const capture = (err, context = {}) => {
+  console.log("capture", err, context);
   if (typeof context === "string") {
     context = JSON.parse(context);
   } else {
