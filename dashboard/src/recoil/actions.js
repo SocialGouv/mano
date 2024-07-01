@@ -140,6 +140,7 @@ const sortDoneOrCancel = (a, b, sortOrder) => {
 export const getName = (item) => {
   if (item.name) return item.name;
   if (item.isConsultation) return `Consultation ${item.type}`;
+  if (item.categories.length) return item.categories.join(", ");
   return "Action"; // should never happen
 };
 

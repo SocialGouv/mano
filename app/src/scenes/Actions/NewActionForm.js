@@ -121,11 +121,11 @@ const NewActionForm = ({ route, navigation }) => {
   }, [name, forCurrentPerson, actionPersons, dueAt]);
 
   const isReadyToSave = useMemo(() => {
-    if (!name || !name.length || !name.trim().length) return false;
+    if (!name?.trim()?.length && !categories?.length) return false;
     if (!actionPersons.length) return false;
     if (!dueAt) return false;
     return true;
-  }, [name, dueAt, actionPersons]);
+  }, [name, categories, dueAt, actionPersons]);
 
   const onGoBackRequested = () => {
     if (canGoBack) return onBack();

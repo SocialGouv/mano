@@ -406,11 +406,15 @@ const Action = ({ navigation, route }) => {
 
   const { name, dueAt, withTime, description, categories, status, urgent, group } = action;
 
+  const displayActionName = name.trim() || categories.join(', ') || 'Action';
+
   return (
     <SceneContainer>
       <ScreenTitle
         title={
-          persons?.length && persons.length === 1 ? `${!!organisation.groupsEnabled && !!group ? '👪 ' : ''}${name} - ${persons[0]?.name}` : name
+          persons?.length && persons.length === 1
+            ? `${!!organisation.groupsEnabled && !!group ? '👪 ' : ''}${displayActionName} - ${persons[0]?.name}`
+            : displayActionName
         }
         onBack={onGoBackRequested}
         onEdit={!editable ? () => setEditable(true) : null}

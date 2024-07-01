@@ -1,7 +1,7 @@
 import { test, expect, Page } from "@playwright/test";
 import { nanoid } from "nanoid";
 import { populate } from "./scripts/populate-db";
-import { changeReactSelectValue, createAction, loginWith } from "./utils";
+import { changeReactSelectValue, clickOnEmptyReactSelect, createAction, loginWith } from "./utils";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import "dayjs/locale/fr";
@@ -26,6 +26,32 @@ test("Actions", async ({ page }) => {
     await page.getByLabel("Nom").fill(personName);
     await page.getByRole("button", { name: "Sauvegarder" }).click();
     await page.getByText("Création réussie !").click();
+  });
+
+  await test.step("Actions should have at least a name or a category", async () => {
+    await page.getByRole("link", { name: "Agenda" }).click();
+    await page.getByRole("button", { name: "Créer une action" }).click();
+    await clickOnEmptyReactSelect(page, "create-action-person-select", personName);
+    await page.getByRole("button", { name: "Sauvegarder" }).click();
+    await page.getByText("L'action doit avoir au moins un nom ou une catégorie").click();
+    await page.getByLabel("Nom de l'action").fill("Un joli nom");
+    await page.getByRole("button", { name: "Sauvegarder" }).click();
+    await page.getByText("Création réussie !").click();
+
+    await page.getByRole("link", { name: "Agenda" }).click();
+    await page.getByRole("button", { name: "Créer une action" }).click();
+    await clickOnEmptyReactSelect(page, "create-action-person-select", personName);
+    await page.getByRole("button", { name: "Sauvegarder" }).click();
+    await page.getByText("L'action doit avoir au moins un nom ou une catégorie").click();
+    await page.locator("#categories").getByText("Choisir...").click();
+    await page.getByRole("button", { name: "impots" }).click();
+    await page.getByRole("dialog", { name: "Sélectionner des catégories" }).getByRole("button", { name: "Fermer" }).click();
+
+    await page.getByRole("button", { name: "Sauvegarder" }).click();
+    await page.getByText("Création réussie !").click();
+
+    await expect(page.getByRole("cell", { name: "impots impots" })).toBeVisible();
+    await expect(page.getByRole("cell", { name: "Un joli nom" })).toBeVisible();
   });
 
   await test.step("Create actions", async () => {

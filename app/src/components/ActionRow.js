@@ -16,7 +16,7 @@ const ActionRow = ({ onActionPress, onPseudoPress, showStatus, action, withTeamN
   const personsObject = useRecoilValue(itemsGroupedByPersonSelector);
   const organisation = useRecoilValue(organisationState);
 
-  const name = action?.name;
+  const name = action?.name?.trim() || action?.categories?.join(', ') || 'Action';
   const status = action?.status;
   const withTime = action?.withTime;
   const urgent = action?.urgent;

@@ -48,6 +48,7 @@ async function createUsersAndOrgas() {
         "receptionEnabled",
         collaborations,
         "fieldsPersonsCustomizableOptions",
+        "actionsGroupedCategories",
         city
       ) VALUES (
         $1,
@@ -61,6 +62,7 @@ async function createUsersAndOrgas() {
         true,
         '{"Ma première collab"}',
         '[{"name": "outOfActiveListReasons", "type": "multi-choice", "label": "Motif(s) de sortie de file active", "enabled": true, "options": ["Relai vers autre structure", "Hébergée", "Décès", "Incarcération", "Départ vers autre région", "Perdu de vue", "Hospitalisation", "Reconduite à la frontière"], "showInStats": true}]',
+        '[{"groupTitle": "Toutes mes catégories", "categories": ["impots"]}]',
         $4
       );`,
       [orgId, date, `Orga Test - ${i}`, city]

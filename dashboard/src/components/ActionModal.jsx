@@ -147,7 +147,9 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
   async function handleSubmit({ newData = {}, closeOnSubmit = false } = {}) {
     const body = { ...data, ...newData };
 
-    if (!body.name) return toast.error("Le nom est obligatoire");
+    body.name = body.name.trim();
+
+    if (!body.name.trim()?.length && !body.categories.length) return toast.error("L'action doit avoir au moins un nom ou une catégorie");
     if (!body.teams?.length) return toast.error("Une action doit être associée à au moins une équipe");
     if (!isMulti && !body.person) return toast.error("La personne suivie est obligatoire");
     if (isMulti && !body.person?.length) return toast.error("Une personne suivie est obligatoire");
@@ -197,7 +199,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
           API.post({
             path: "/action",
             body: await encryptAction({
-              name,
+              name: name.trim(),
               person,
               teams,
               user: user._id,
@@ -320,8 +322,8 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
           <div className="tw-flex tw-mr-12 tw-gap-2">
             <div className="tw-grow">
               {isNewAction && "Ajouter une action"}
-              {!isNewAction && !isEditing && `Action: ${action?.name}`}
-              {!isNewAction && isEditing && `Modifier l'action: ${action?.name}`}
+              {!isNewAction && !isEditing && `Action: ${action?.name?.trim() || action?.categories?.join(", ")}`}
+              {!isNewAction && isEditing && `Modifier l'action: ${action?.name?.trim() || action?.categories?.join(", ")}`}
             </div>
             {!isNewAction && action?.user && (
               <div>
