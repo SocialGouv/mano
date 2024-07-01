@@ -217,6 +217,7 @@ export default function PersonStats({
                 "outOfActiveListReasons"
               )}
             />
+            <StatsPersonsByFamille groupsForPersons={groupsForPersons} />
           </details>
           {customFieldsPersons.map((section) => {
             return (
@@ -690,3 +691,35 @@ export const SelectedPersonsModal = ({ open, onClose, persons, title, onAfterLea
     </ModalContainer>
   );
 };
+
+function StatsPersonsByFamille({ groupsForPersons }) {
+  const counts = {};
+  for (const p of groupsForPersons) {
+    if (!p.relations?.length) continue;
+    // On ajoute +1 pour la personne elle-même
+    const length = p.relations?.length + 1;
+    if (length >= 7) {
+      if (!counts["Familles de 7+ personnes"]) counts["Familles de 7+ personnes"] = 0;
+      counts["Familles de 7+ personnes"]++;
+    } else {
+      const text = "Famille de " + length + " personnes";
+      if (!counts[text]) counts[text] = 0;
+      counts[text]++;
+    }
+  }
+  const data = Object.entries(counts)
+    .sort((a, b) => a[0].localeCompare(b[0]))
+
+    .map(([key, value]) => (value > 0 ? { name: key, [key]: value } : null))
+    .filter(Boolean);
+  return (
+    <CustomResponsiveBar
+      title="Nombre de personnes par familles"
+      help={`Nombre de personnes par familles dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
+      axisTitleY="Nombre de familles concernées"
+      axisTitleX="todo"
+      totalTitleForMultiChoice={<span className="tw-font-bold">Nombre de personnes par famille</span>}
+      data={data}
+    />
+  );
+}
