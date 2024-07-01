@@ -1,10 +1,13 @@
-import React from 'react';
-import styled from 'styled-components/native';
+import React, { useState } from 'react';
 import CheckboxLabelled from '../CheckboxLabelled';
 import InputLabelled from '../InputLabelled';
 import Label from '../Label';
+import { View, TouchableOpacity } from 'react-native';
+import { MyText } from '../MyText';
 
-const MultiCheckBoxes = ({ label, source, values, onChange, editable, emptyValue }) => {
+const MultiCheckBoxes = ({ label, source, values, onChange, editable, emptyValue, allowCreateOption }) => {
+  const [saisieLibre, setSaisieLibre] = useState('');
+
   if (!Array.isArray(values)) values = [];
   if (!editable) {
     return <InputLabelled label={label} value={values.length ? values.join(', ') : emptyValue} editable={false} />;
@@ -15,40 +18,35 @@ const MultiCheckBoxes = ({ label, source, values, onChange, editable, emptyValue
     onChange(newValues);
   };
 
+  function onAddSaisieLibre() {
+    onCheck({ _id: saisieLibre });
+    setSaisieLibre('');
+  }
+
   return (
-    <Container>
+    <View>
       {label && <Label label={label} />}
-      <RowsContainer>
-        {source.map((value) => (
-          <CheckBoxContainer key={value}>
+      <View className="mt-2.5 flex-wrap justify-start">
+        {[...source, ...values.filter((value) => !source.includes(value))].map((value) => (
+          <View className="rounded-xl bg-white grow shrink-0 border border-gray-200 w-full mb-3 justify-center" key={value}>
             <CheckboxLabelled onPress={onCheck} label={value} value={values.includes(value)} _id={value} />
-          </CheckBoxContainer>
+          </View>
         ))}
-      </RowsContainer>
-    </Container>
+      </View>
+      {allowCreateOption && (
+        <InputLabelled onChangeText={setSaisieLibre} value={saisieLibre} placeholder="Autre (précisez)" editable>
+          <View className="absolute right-3 justify-center items-center self-center h-full">
+            <TouchableOpacity
+              onPress={onAddSaisieLibre}
+              className="justify-center border-main75 border items-center self-center flex-row py-2 px-2 rounded-md">
+              <MyText className="self-center text-main75 justify-center text-xs">Ajouter</MyText>
+            </TouchableOpacity>
+          </View>
+        </InputLabelled>
+      )}
+    </View>
   );
 };
-
-const Container = styled.TouchableOpacity`
-  margin-bottom: 15px;
-`;
-
-const RowsContainer = styled.View`
-  margin-top: 10px;
-  flex-wrap: wrap;
-  /* flex-direction: row; */
-  justify-content: flex-start;
-`;
-
-const CheckBoxContainer = styled.View`
-  border: 1px solid rgba(30, 36, 55, 0.1);
-  border-radius: 12px;
-  flex-shrink: 0;
-  flex-grow: 1;
-  width: 100%;
-  justify-content: center;
-  margin-bottom: 12px;
-`;
 
 export default MultiCheckBoxes;
 

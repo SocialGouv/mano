@@ -42,10 +42,25 @@ const CustomFieldInput = forwardRef(({ label, field, value, handleChange, ...pro
       {!!['boolean'].includes(field.type) && <CheckboxLabelled label={label} alone onPress={() => handleChange(!value)} value={value} />}
       {!!['yes-no'].includes(field.type) && <YesNoSelect label={label} value={value} onSelect={handleChange} {...props} />}
       {!!['enum'].includes(field.type) && (
-        <SelectLabelled label={label} values={choices} value={value || choices[0]} onSelect={handleChange} {...props} />
+        <SelectLabelled
+          allowCreateOption={field.allowCreateOption}
+          label={label}
+          values={choices}
+          value={value || choices[0]}
+          onSelect={handleChange}
+          {...props}
+        />
       )}
       {!!['multi-choice'].includes(field.type) && (
-        <MultiCheckBoxes label={label} source={field.options} values={value || []} onChange={handleChange} {...props} emptyValue="-- Aucun --" />
+        <MultiCheckBoxes
+          allowCreateOption={field.allowCreateOption}
+          label={label}
+          source={field.options}
+          values={value || []}
+          onChange={handleChange}
+          {...props}
+          emptyValue="-- Aucun --"
+        />
       )}
     </>
   );

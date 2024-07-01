@@ -1,16 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components/native';
 import { Picker } from '@react-native-picker/picker';
-import { Platform, TouchableOpacity, Modal } from 'react-native';
+import { Platform, TouchableOpacity, Modal, View } from 'react-native';
 import InputLabelled from '../InputLabelled';
 import { MyText } from '../MyText';
 
-const SelectLabelled = ({ editable = true, buttonCaption, buttonValue, buttonColor, buttonBg, onSelectAndSave, ...props }) => {
+const SelectLabelled = ({
+  editable = true,
+  buttonCaption,
+  buttonValue,
+  buttonColor,
+  buttonBg,
+  onSelectAndSave,
+  allowCreateOption,
+  values,
+  value,
+  onSelect,
+  mappedIdsToLabels,
+  label,
+  row,
+  testID,
+}) => {
+  const [saisieLibre, setSaisieLibre] = useState('');
+
+  values = values.includes(value) ? values : [...values, value];
+
   if (!editable) {
     return (
       <InputLabelled
-        label={props.label}
-        value={props.mappedIdsToLabels?.find(({ _id }) => _id === props.value)?.name || props.value}
+        label={label}
+        value={mappedIdsToLabels?.find(({ _id }) => _id === value)?.name || value}
         editable={false}
         onButtonPress={onSelectAndSave}
         buttonCaption={buttonCaption}
@@ -20,9 +39,38 @@ const SelectLabelled = ({ editable = true, buttonCaption, buttonValue, buttonCol
       />
     );
   }
-  if (Platform.OS === 'android') return <SelectAndroid {...props} />;
-  if (Platform.OS === 'ios') return <SelectIos {...props} />;
-  return null;
+  return (
+    <>
+      {Platform.OS === 'android' && (
+        <SelectAndroid
+          value={value}
+          values={values}
+          onSelect={onSelect}
+          mappedIdsToLabels={mappedIdsToLabels}
+          label={label}
+          row={row}
+          testID={testID}
+        />
+      )}
+      {Platform.OS === 'ios' && (
+        <SelectIos value={value} values={values} onSelect={onSelect} mappedIdsToLabels={mappedIdsToLabels} label={label} row={row} testID={testID} />
+      )}
+      {allowCreateOption && (
+        <InputLabelled onChangeText={setSaisieLibre} value={saisieLibre} placeholder="Autre (précisez)" editable>
+          <View className="absolute right-3 justify-center items-center self-center h-full">
+            <TouchableOpacity
+              onPress={() => {
+                onSelect(saisieLibre);
+                setSaisieLibre('');
+              }}
+              className="justify-center border-main75 border items-center self-center flex-row py-2 px-2 rounded-md">
+              <MyText className="self-center text-main75 justify-center text-xs">Ajouter</MyText>
+            </TouchableOpacity>
+          </View>
+        </InputLabelled>
+      )}
+    </>
+  );
 };
 
 // values has to be array of unique strings
@@ -37,7 +85,7 @@ const SelectLabelled = ({ editable = true, buttonCaption, buttonValue, buttonCol
 ]
 */
 
-const SelectAndroid = ({ label, value, values, onSelect, row, mappedIdsToLabels = null, testID }) => (
+const SelectAndroid = ({ value, values, onSelect, label, row, mappedIdsToLabels = null, testID }) => (
   <InputContainer row={row} testID={testID}>
     {Boolean(label) && (
       <Label bold row={row}>

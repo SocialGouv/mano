@@ -7,41 +7,44 @@ import { MyText, MyTextInput } from './MyText';
 import colors from '../utils/colors';
 import Spacer from './Spacer';
 
-const InputLabelled = React.forwardRef(({ error, label, multiline, editable = true, onClear, noMargin, EndIcon, onEndIconPress, ...props }, ref) => {
-  if (!editable) {
-    const value = String(props.value || '')
-      .split('\\n')
-      .join('\u000A');
+const InputLabelled = React.forwardRef(
+  ({ error, label, multiline, editable = true, onClear, noMargin, EndIcon, children, onEndIconPress, ...props }, ref) => {
+    if (!editable) {
+      const value = String(props.value || '')
+        .split('\\n')
+        .join('\u000A');
+      return (
+        <FieldContainer noMargin={noMargin}>
+          {!!label && <InlineLabel bold>{`${label} : `}</InlineLabel>}
+          <Row>
+            <Content ref={ref}>{value}</Content>
+            <Spacer grow />
+          </Row>
+        </FieldContainer>
+      );
+    }
     return (
-      <FieldContainer noMargin={noMargin}>
-        {!!label && <InlineLabel bold>{`${label} : `}</InlineLabel>}
-        <Row>
-          <Content ref={ref}>{value}</Content>
-          <Spacer grow />
-        </Row>
-      </FieldContainer>
+      <InputContainer>
+        {label && <Label label={label} />}
+        {multiline ? (
+          <InputMultilineAutoAdjust ref={ref} {...props} />
+        ) : (
+          <Input autoComplete="off" ref={ref} {...props} value={String(props.value || '')} />
+        )}
+        {Boolean(EndIcon) && Boolean(props?.value?.length) && (
+          <TouchableWithoutFeedback onPress={onEndIconPress}>
+            <IconWrapper>
+              <EndIcon size={20} color={colors.app.color} />
+            </IconWrapper>
+          </TouchableWithoutFeedback>
+        )}
+        {children}
+        {/* {Boolean(onClear) && Boolean(props?.value?.length) && <ButtonReset onPress={onClear} />} */}
+        {!!error && <Error>{error}</Error>}
+      </InputContainer>
     );
   }
-  return (
-    <InputContainer>
-      {label && <Label label={label} />}
-      {multiline ? (
-        <InputMultilineAutoAdjust ref={ref} {...props} />
-      ) : (
-        <Input autoComplete="off" ref={ref} {...props} value={String(props.value || '')} />
-      )}
-      {Boolean(EndIcon) && Boolean(props?.value?.length) && (
-        <TouchableWithoutFeedback onPress={onEndIconPress}>
-          <IconWrapper>
-            <EndIcon size={20} color={colors.app.color} />
-          </IconWrapper>
-        </TouchableWithoutFeedback>
-      )}
-      {/* {Boolean(onClear) && Boolean(props?.value?.length) && <ButtonReset onPress={onClear} />} */}
-      {!!error && <Error>{error}</Error>}
-    </InputContainer>
-  );
-});
+);
 
 const FieldContainer = styled.View`
   flex-grow: 1;
