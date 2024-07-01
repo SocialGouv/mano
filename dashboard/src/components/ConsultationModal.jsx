@@ -770,7 +770,10 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
               e.stopPropagation();
               if (!window.confirm("Voulez-vous supprimer cette consultation ?")) return;
               const [error] = await tryFetchExpectOk(async () => API.delete({ path: `/consultation/${consultation._id}` }));
-              if (error) return;
+              if (error) {
+                toast.error("Impossible de supprimer cette consultation");
+                return;
+              }
               await refresh();
               toast.success("Consultation supprimée !");
               onClose();
