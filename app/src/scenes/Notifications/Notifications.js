@@ -25,41 +25,34 @@ export const urgentItemsSelector = selector({
     const actions = get(actionsState);
     const actionsObject = get(actionsObjectSelector);
     const comments = get(commentsState);
-    const actionsFiltered = actions
-      .filter(
-        (action) =>
-          (Array.isArray(action.teams) ? action.teams.includes(currentTeam?._id) : action.team === currentTeam?._id) &&
-          action.status === TODO &&
-          action.urgent
-      )
-      .map((c) => ({
-        ...c,
-        isAction: true,
-      }));
-
-    const commentsFiltered = comments
-      .filter((c) => c.urgent)
-      .map((comment) => {
-        const commentPopulated = { ...comment };
-        if (comment.person) {
-          const id = comment.person;
-          commentPopulated.person = persons[id];
-          commentPopulated.type = 'person';
+    const actionsFiltered = [];
+    for (const action of actions) {
+      if (Array.isArray(action.teams) ? action.teams.includes(currentTeam?._id) : action.team === currentTeam?._id) {
+        if (action.status === TODO && action.urgent) {
+          actionsFiltered.push({ ...action, isAction: true });
         }
-        if (comment.action) {
-          const id = comment.action;
-          const action = actionsObject[id];
-          commentPopulated.action = action;
-          if (action?.person) commentPopulated.person = persons[action?.person];
-          commentPopulated.type = 'action';
-        }
-        return commentPopulated;
-      })
-      .filter((c) => c.action || c.person)
-      .map((c) => ({
-        ...c,
-        isComment: true,
-      }));
+      }
+    }
+    const commentsFiltered = [];
+    for (const comment of comments) {
+      if (!comment.urgent) continue;
+      if (comment.team !== currentTeam?._id) continue;
+      if (!comment.action && !comment.person) continue;
+      const commentPopulated = { ...comment, isComment: true };
+      if (comment.person) {
+        const id = comment.person;
+        commentPopulated.person = persons[id];
+        commentPopulated.type = 'person';
+      }
+      if (comment.action) {
+        const id = comment.action;
+        const action = actionsObject[id];
+        commentPopulated.action = action;
+        if (action?.person) commentPopulated.person = persons[action?.person];
+        commentPopulated.type = 'action';
+      }
+      commentsFiltered.push(commentPopulated);
+    }
 
     return { actionsFiltered, commentsFiltered };
   },
