@@ -271,7 +271,7 @@ router.delete(
         organisation: req.user.organisation,
       },
     });
-    if (!action) return res.status(200).send({ ok: true });
+    if (!action) return res.status(404).send({ ok: false, error: "Not Found" });
 
     await action.destroy();
 

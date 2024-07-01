@@ -159,7 +159,7 @@ router.delete(
     const query = { where: { _id: req.params._id, organisation: req.user.organisation } };
 
     const comment = await Comment.findOne(query);
-    if (!comment) return res.status(200).send({ ok: true });
+    if (!comment) return res.status(404).send({ ok: false, error: "Not Found" });
 
     await comment.destroy();
     res.status(200).send({ ok: true });

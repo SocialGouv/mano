@@ -159,7 +159,7 @@ router.delete(
     const query = { where: { _id: req.params._id, organisation: req.user.organisation } };
 
     const treatment = await Treatment.findOne(query);
-    if (!treatment) return res.status(200).send({ ok: true });
+    if (!treatment) return res.status(404).send({ ok: false, error: "Not Found" });
 
     await treatment.destroy();
     res.status(200).send({ ok: true });

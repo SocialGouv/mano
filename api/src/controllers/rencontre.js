@@ -160,7 +160,7 @@ router.delete(
     const query = { where: { _id: req.params._id, organisation: req.user.organisation } };
 
     const rencontre = await Rencontre.findOne(query);
-    if (!rencontre) return res.status(200).send({ ok: true });
+    if (!rencontre) return res.status(404).send({ ok: false, error: "Not Found" });
 
     await rencontre.destroy();
     res.status(200).send({ ok: true });

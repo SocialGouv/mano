@@ -240,7 +240,7 @@ router.delete(
         organisation: req.user.organisation,
       },
     });
-    if (!consultation) return res.status(200).send({ ok: true });
+    if (!consultation) return res.status(404).send({ ok: false, error: "Not Found" });
 
     await consultation.destroy();
 

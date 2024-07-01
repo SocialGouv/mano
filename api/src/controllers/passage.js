@@ -160,7 +160,7 @@ router.delete(
     const query = { where: { _id: req.params._id, organisation: req.user.organisation } };
 
     const passage = await Passage.findOne(query);
-    if (!passage) return res.status(200).send({ ok: true });
+    if (!passage) return res.status(404).send({ ok: false, error: "Not Found" });
 
     await passage.destroy();
     res.status(200).send({ ok: true });
