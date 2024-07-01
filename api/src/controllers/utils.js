@@ -28,10 +28,13 @@ router.get("/version", async (req, res) => {
     inAppMessage: [
       `La nouvelle version ${MOBILE_APP_VERSION} de Mano est disponible !`,
       `Vous avez la version ${req.headers.version} actuellement sur votre téléphone.
-Cette nouvelle version :
-- Affiche les passages et les consultations dans les comptes rendus
-- Corrige le tri des consultations dans le dossier des personnes suivies
-- Corrige l'affichage des anniversaires (en mois jusqu'à 2 ans, puis avec la mention "et demi" pour les enfants de moins de 7 ans)
+Cette nouvelle version apporte ces correctifs :
+- Une catégorie d'action supprimée ne doit pas apparaître dans les catégories les plus utilisées
+- Dans les comptes-rendus,les rencontres ne sont plus mélangées aux passages
+- On peut ajouter une description directement depuis la création d'une nouvelle action
+- Une action doit avoir au moins un nom OU une catégorie - on affiche la catégorie à la place du lorsque le nom est absent
+- La saisie libre est enfin disponible pour les champs custos autorisés via le paramétrage
+- On restreint les commentaires urgents à l'équipe actuelle
 `,
       [
         { text: "Télécharger", link: `https://mano.sesan.fr/download?ts=${Date.now()}` },
