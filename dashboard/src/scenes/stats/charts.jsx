@@ -3,6 +3,24 @@ import { ResponsivePie } from "@nivo/pie";
 import { ResponsiveBar } from "@nivo/bar";
 import HelpButtonAndModal from "../../components/HelpButtonAndModal";
 
+function EmptyData({ title, help }) {
+  return (
+    <div className="tw-mx-0 tw-my-4 tw-grid tw-gap-12 tw-w-full tw-flex-wrap tw-items-center tw-justify-center tw-rounded-2xl tw-border tw-border-main25 tw-bg-white tw-p-4  print:tw-break-before-all print:tw-break-inside-avoid">
+      <div className="tw-mx-auto tw-text-center tw-text-lg tw-font-medium tw-text-black tw-mt-4 tw-flex tw-justify-center print:tw-basis-0 print:tw-mb-0">
+        <div>
+          {title} {!!help && <HelpButtonAndModal title={title} help={help} />}
+        </div>
+      </div>
+      <div className="mx-auto tw-pb-4 tw-max-w-[450px] tw-text-center tw-text-gray-400">
+        <p className="tw-text-lg tw-font-bold">Aucun élément à afficher</p>
+        <p className="tw-mt-2 tw-text-sm">
+          Pour afficher des données pour ce graphique, vérifiez le contexte sélectionné (dates, équipe, filtres, etc.)
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export const CustomResponsivePie = ({ data = [], title, onItemClick = null, help }) => {
   const total = data.reduce((sum, item) => sum + item.value, 0);
 
@@ -11,11 +29,13 @@ export const CustomResponsivePie = ({ data = [], title, onItemClick = null, help
     onItemClick(id);
   };
 
+  if (data.length === 0) return <EmptyData title={title} help={help} />;
+
   return (
-    <div className="tw-mx-0 tw-my-4 tw-flex tw-w-full tw-flex-wrap  tw-items-center tw-justify-between tw-rounded-2xl tw-border tw-border-main25 tw-bg-white tw-p-4 print:tw-break-before-all print:tw-break-inside-avoid print:tw-flex-col">
+    <div className="tw-mx-0 tw-my-4 tw-grid tw-grid-cols-7 print:tw-grid-cols-1 tw-gap-12 tw-w-full tw-flex-wrap tw-items-center tw-justify-between tw-rounded-2xl tw-border tw-border-main25 tw-bg-white tw-p-4  print:tw-break-before-all print:tw-break-inside-avoid">
       <div
         className={[
-          "tw-relative tw-mb-12 tw-mt-4 tw-flex tw-basis-full tw-justify-center",
+          "tw-relative tw-col-span-7 print:tw-col-span-1 tw-mt-4 tw-flex tw-basis-full tw-justify-center print:tw-basis-0 print:tw-mb-0",
           data.length > 40 ? "print:!tw-mb-4 print:!tw-mt-0" : "",
         ].join(" ")}
       >
@@ -23,10 +43,17 @@ export const CustomResponsivePie = ({ data = [], title, onItemClick = null, help
           {title} {!!help && <HelpButtonAndModal title={title} help={help} />}
         </p>
       </div>
-      <div className="tw-flex tw-basis-1/3 tw-items-center tw-justify-center print:tw-max-h-screen">
-        <table
-          className={["tw-w-full tw-border-zinc-400 [&_td]:tw-p-1", data.length > 40 ? "print:![font-size:14px] [&_td]:print:!tw-p-0" : ""].join(" ")}
-        >
+      <div className="tw-flex tw-w-full tw-col-span-3 print:tw-col-span-1 tw-items-center tw-justify-center">
+        <table className="tw-w-full tw-border tw-border-zinc-200 tw-text-sm print:tw-max-w-xl">
+          <thead>
+            <tr className="tw-bg-zinc-100">
+              <th className="tw-border tw-border-zinc-200 tw-py-1 tw-px-2 tw-max-w-32">
+                <div className="tw-truncate tw-max-w-full">{title}</div>
+              </th>
+              <th className="tw-text-right tw-border tw-border-zinc-200 tw-py-1 tw-px-2">Nb</th>
+              {total ? <th className="tw-text-right tw-border tw-border-zinc-200 tw-py-1 tw-px-2">%</th> : <></>}
+            </tr>
+          </thead>
           <tbody>
             {[...data]
               .sort((a, b) => {
@@ -36,22 +63,28 @@ export const CustomResponsivePie = ({ data = [], title, onItemClick = null, help
               })
               .map(({ key, label, value }) => (
                 <tr key={key + label + value} onClick={() => onClick({ id: label })}>
-                  <td className="tw-border tw-border-zinc-400 [overflow-wrap:anywhere]">{label}</td>
-                  <td className="tw-border tw-border-zinc-400 tw-text-center">{value}</td>
-                  {total ? <td className="tw-border tw-border-zinc-400 tw-text-center">{`${Math.round((value / total) * 1000) / 10}%`}</td> : <></>}
+                  <td className="tw-border tw-border-zinc-200 tw-py-1 tw-px-2 [overflow-wrap:anywhere]">{label}</td>
+                  <td className="tw-border tw-border-zinc-200 tw-py-1 tw-px-2 tw-text-right">{value}</td>
+                  {total ? (
+                    <td className="tw-border tw-border-zinc-200 tw-py-1 tw-px-2 tw-text-right">
+                      {`${Math.round((value / total) * 1000) / 10}`}&nbsp;%
+                    </td>
+                  ) : (
+                    <></>
+                  )}
                 </tr>
               ))}
             <tr>
-              <td className="tw-border tw-border-zinc-400 tw-font-bold">Total</td>
-              <td className="tw-border tw-border-zinc-400 tw-text-center tw-font-bold">{total}</td>
-              {total ? <td className="tw-border tw-border-zinc-400 tw-text-center tw-font-bold">100%</td> : <></>}
+              <td className="tw-border tw-border-zinc-200 tw-py-1 tw-px-2 tw-font-bold">Total</td>
+              <td className="tw-border tw-border-zinc-200 tw-py-1 tw-px-2 tw-text-right tw-font-bold">{total}</td>
+              {total ? <td className="tw-border tw-border-zinc-200 tw-py-1 tw-px-2 tw-text-right tw-font-bold">100&nbsp;%</td> : <></>}
             </tr>
           </tbody>
         </table>
       </div>
       <div
         className={[
-          "tw-flex tw-h-80 tw-max-w-[50%] tw-basis-1/2 tw-items-center tw-justify-center tw-font-bold print:tw-order-2 print:tw-mt-4 print:tw-max-w-none print:!tw-grow print:!tw-basis-0",
+          "tw-col-span-4 print:tw-col-span-1 tw-flex tw-h-80 tw-items-center tw-justify-center tw-font-bold print:tw-order-2 print:!tw-w-none print:tw-mx-auto",
           onItemClick ? "[&_path]:tw-cursor-pointer" : "",
         ].join(" ")}
       >
@@ -121,45 +154,56 @@ export const CustomResponsiveBar = ({
     onItemClick(id);
   };
 
+  if (data.length === 0) return <EmptyData title={title} help={help} />;
+
   return (
-    <div className="tw-mx-0 tw-my-4 tw-flex tw-w-full tw-flex-wrap tw-items-center tw-justify-between tw-rounded-2xl tw-border tw-border-main25 tw-bg-white tw-p-4  print:tw-break-before-all print:tw-break-inside-avoid print:tw-flex-col">
-      <div className="tw-relative tw-mb-12 tw-mt-4 tw-flex tw-basis-full tw-justify-center print:tw-basis-0">
+    <div className="tw-mx-0 tw-my-4 tw-grid tw-grid-cols-7 print:tw-grid-cols-1 tw-gap-12 tw-w-full tw-flex-wrap tw-items-center tw-justify-between tw-rounded-2xl tw-border tw-border-main25 tw-bg-white tw-p-4  print:tw-break-before-all print:tw-break-inside-avoid">
+      <div className="tw-relative tw-col-span-7 print:tw-col-span-1 tw-mt-4 tw-flex tw-basis-full tw-justify-center print:tw-basis-0 print:tw-mb-0">
         <p className="tw-m-0 tw-inline-block tw-text-center tw-text-lg tw-font-medium tw-text-black">
           {title} {!!help && <HelpButtonAndModal title={title} help={help} />}
         </p>
       </div>
-      <div className="tw-flex tw-basis-1/3 tw-items-center tw-justify-center">
-        <table className="tw-w-full tw-border tw-border-zinc-400">
+      <div className="tw-flex tw-w-full tw-col-span-3 print:tw-col-span-1 tw-items-center tw-justify-center">
+        <table className="tw-w-full tw-border tw-border-zinc-200 tw-text-sm print:tw-max-w-xl">
+          <thead>
+            <tr className="tw-bg-zinc-100">
+              <th className="tw-border tw-border-zinc-200 tw-py-1 tw-px-2 tw-max-w-32">
+                <div className="tw-truncate tw-max-w-full">{title}</div>
+              </th>
+              <th className="tw-text-right tw-border tw-border-zinc-200 tw-py-1 tw-px-2">Nb</th>
+              <th className="tw-text-right tw-border tw-border-zinc-200 tw-py-1 tw-px-2">%</th>
+            </tr>
+          </thead>
           <tbody>
             {[...data].map((item) => {
               return (
                 <tr key={item.name} onClick={() => onClick({ id: item.name })}>
-                  <td className="tw-border tw-border-zinc-400 tw-p-1">{item.name}</td>
-                  <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center">{getItemValue(item)}</td>
-                  <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center">{`${
-                    Math.round((getItemValue(item) / (isMultiChoice ? totalForMultiChoice : total)) * 1000) / 10
-                  }%`}</td>
+                  <td className="tw-border tw-border-zinc-200 tw-py-1 tw-px-2">{item.name}</td>
+                  <td className="tw-border tw-border-zinc-200 tw-py-1 tw-px-2 tw-text-right">{getItemValue(item)}</td>
+                  <td className="tw-border tw-border-zinc-200 tw-py-1 tw-px-2 tw-text-right">
+                    {`${Math.round((getItemValue(item) / (isMultiChoice ? totalForMultiChoice : total)) * 1000) / 10}`}&nbsp;%
+                  </td>
                 </tr>
               );
             })}
             {!isMultiChoice && (
               <tr>
-                <td className="tw-border tw-border-zinc-400 tw-p-1 tw-font-bold ">Total</td>
-                <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center tw-font-bold ">{total}</td>
-                {total ? <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center tw-font-bold ">100%</td> : <></>}
+                <td className="tw-border tw-border-zinc-200 tw-py-1 tw-px-2 tw-font-bold ">Total</td>
+                <td className="tw-border tw-border-zinc-200 tw-py-1 tw-px-2 tw-text-right tw-font-bold ">{total}</td>
+                {total ? <td className="tw-border tw-border-zinc-200 tw-py-1 tw-px-2 tw-text-right tw-font-bold ">100 %</td> : <></>}
               </tr>
             )}
             {Boolean(isMultiChoice) && Boolean(totalForMultiChoice) && (
               <>
                 <tr>
-                  <td className="tw-border tw-border-zinc-400 tw-p-1">{totalTitleForMultiChoice}</td>
-                  <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center tw-font-bold">{totalForMultiChoice}</td>
-                  <td className="tw-border tw-border-zinc-400 tw-p-1"></td>
+                  <td className="tw-border tw-border-zinc-200 tw-py-1 tw-px-2">{totalTitleForMultiChoice}</td>
+                  <td className="tw-border tw-border-zinc-200 tw-py-1 tw-px-2 tw-text-right tw-font-bold">{totalForMultiChoice}</td>
+                  <td className="tw-border tw-border-zinc-200 tw-py-1 tw-px-2"></td>
                 </tr>
                 <tr>
-                  <td className="tw-border tw-border-zinc-400 tw-p-1 tw-font-bold">Total des valeurs</td>
-                  <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center tw-font-bold">{total}</td>
-                  <td className="tw-border tw-border-zinc-400 tw-p-1"></td>
+                  <td className="tw-border tw-border-zinc-200 tw-py-1 tw-px-2 tw-font-bold">Total des valeurs</td>
+                  <td className="tw-border tw-border-zinc-200 tw-py-1 tw-px-2 tw-text-right tw-font-bold">{total}</td>
+                  <td className="tw-border tw-border-zinc-200 tw-py-1 tw-px-2"></td>
                 </tr>
               </>
             )}
@@ -168,7 +212,7 @@ export const CustomResponsiveBar = ({
       </div>
       <div
         className={[
-          "tw-relative tw-flex tw-h-80 tw-max-w-[50%] tw-basis-1/2 tw-items-center tw-justify-center tw-font-bold print:tw-order-2 print:tw-mt-4 print:!tw-max-w-none print:!tw-basis-0",
+          "tw-col-span-4 print:tw-col-span-1 tw-flex tw-h-80 tw-items-center tw-justify-center tw-font-bold print:tw-order-2 print:!tw-w-none print:tw-mx-auto",
           onItemClick ? "[&_rect]:tw-cursor-pointer" : "",
         ].join(" ")}
       >
