@@ -67,11 +67,21 @@ export default function Constantes({ person }: { person: PersonPopulated }) {
     .filter((c) => c["constantes-tension-arterielle-diastolique"])
     .map((c) => ({ x: dayjsInstance(c.completedAt || c.dueAt).format("YYYY-MM-DD"), y: c["constantes-tension-arterielle-diastolique"] }))
     .sort((a, b) => (a.x > b.x ? 1 : -1));
+  // IMC : on récupère l'IMC seulement quand la taille et le poids sont renseignés
+  const constantesIMC = personConsultationsFiltered
+    .filter((c) => c["constantes-taille"] && c["constantes-poids"])
+    .map((c) => {
+      const taille = c["constantes-taille"];
+      const poids = c["constantes-poids"];
+      return { x: dayjsInstance(c.completedAt || c.dueAt).format("YYYY-MM-DD"), y: (poids / Math.pow(taille / 100, 2)).toFixed(2) };
+    })
+    .sort((a, b) => (a.x > b.x ? 1 : -1));
 
   return (
     <div className="noprint tw-my-4 tw-grid tw-grid-cols-2 tw-gap-3">
       <LineChart data={constantesPoids} name="Poids" scheme="set1" unit="kg" />
       <LineChart data={constantesTaille} name="Taille" scheme="dark2" unit="cm" />
+      <LineChart data={constantesIMC} name="IMC" scheme="paired" unit="" />
       <LineChart data={constantesFrequenceCardiaque} name="Fréquence cardiaque" scheme="category10" unit="bpm" />
       <LineChart data={constantesFrequenceRespiratoire} name="Fréquence respiratoire" scheme="accent" unit="mvt/min" />
       <LineChart data={constantesSaturationO2} name="Saturation O2" scheme="paired" unit="%" />
