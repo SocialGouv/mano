@@ -90,6 +90,7 @@ const SelectAndCreatePerson = ({ value, onChange, inputId, classNamePrefix, show
       actions.reduce((acc, action) => {
         if (!acc[action.person] || action.dueAt > acc[action.person].dueAt) {
           acc[action.person] = {
+            _id: action._id,
             name: action.name,
             dueAt: action.dueAt,
             person: action.person,
@@ -141,6 +142,7 @@ const SelectAndCreatePerson = ({ value, onChange, inputId, classNamePrefix, show
         .reduce((acc, action) => {
           if (!acc[action.person] || action.dueAt > acc[action.person].dueAt) {
             acc[action.person] = {
+              _id: action._id,
               name: action.name,
               dueAt: action.dueAt,
               person: action.person,
