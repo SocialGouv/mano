@@ -75,58 +75,60 @@ const ActionsStats = ({
       <div className="tw-flex tw-basis-full tw-items-center">
         <Filters title={filterTitle} base={filterBase} filters={filterPersons} onChange={setFilterPersons} />
       </div>
-      <div className="tw-mb-5 tw-flex tw-basis-full tw-items-center">
-        <label htmlFor="filter-by-status" className="tw-w-64 tw-shrink-0">
-          Filtrer par statut&nbsp;:
-        </label>
-        <div className="tw-basis-[500px]">
-          <SelectCustom
-            inputId="action-select-status-filter"
-            options={mappedIdsToLabels}
-            getOptionValue={(s) => s._id}
-            getOptionLabel={(s) => s.name}
-            name="action-status"
-            onChange={(s) => setActionsStatuses(s.map((s) => s._id))}
-            isClearable
-            isMulti
-            value={mappedIdsToLabels.filter((s) => actionsStatuses.includes(s._id))}
-          />
+      <div className="tw-grid lg:tw-grid-cols-3 tw-grid-cols-1 tw-gap-2 tw-mb-8">
+        <div>
+          <label htmlFor="filter-by-status" className="tw-m-0">
+            Filtrer par statut
+          </label>
+          <div>
+            <SelectCustom
+              inputId="action-select-status-filter"
+              options={mappedIdsToLabels}
+              getOptionValue={(s) => s._id}
+              getOptionLabel={(s) => s.name}
+              name="action-status"
+              onChange={(s) => setActionsStatuses(s.map((s) => s._id))}
+              isClearable
+              isMulti
+              value={mappedIdsToLabels.filter((s) => actionsStatuses.includes(s._id))}
+            />
+          </div>
         </div>
-      </div>
-      <div className="tw-mb-5 tw-flex tw-basis-full tw-items-center">
-        <label htmlFor="filter-by-status" className="tw-w-64 tw-shrink-0">
-          Filtrer par groupe de catégories&nbsp;:
-        </label>
-        <div className="tw-basis-[500px]">
-          <SelectCustom
-            value={actionsCategoriesGroups?.map((_option) => ({ value: _option, label: _option })) || []}
-            options={groupsCategories.map((group) => group.groupTitle).map((_option) => ({ value: _option, label: _option }))}
-            getOptionValue={(s) => s.value}
-            getOptionLabel={(s) => s.label}
-            onChange={(groups) => setActionsCategoriesGroups(groups.map((s) => s.value))}
-            name="action-category-group"
-            inputId="action-select-group-category-filter"
-            isClearable
-            isMulti
-          />
+        <div>
+          <label htmlFor="filter-by-status" className="tw-m-0">
+            Filtrer par groupe de catégories
+          </label>
+          <div>
+            <SelectCustom
+              value={actionsCategoriesGroups?.map((_option) => ({ value: _option, label: _option })) || []}
+              options={groupsCategories.map((group) => group.groupTitle).map((_option) => ({ value: _option, label: _option }))}
+              getOptionValue={(s) => s.value}
+              getOptionLabel={(s) => s.label}
+              onChange={(groups) => setActionsCategoriesGroups(groups.map((s) => s.value))}
+              name="action-category-group"
+              inputId="action-select-group-category-filter"
+              isClearable
+              isMulti
+            />
+          </div>
         </div>
-      </div>
-      <div className="tw-mb-5 tw-flex tw-basis-full tw-items-center">
-        <label htmlFor="filter-by-status" className="tw-w-64 tw-shrink-0">
-          Filtrer par catégorie:
-        </label>
-        <div className="tw-basis-[500px]">
-          <SelectCustom
-            options={filterableActionsCategories.map((_option) => ({ value: _option, label: _option }))}
-            value={actionsCategories?.map((_option) => ({ value: _option, label: _option })) || []}
-            getOptionValue={(s) => s.value}
-            getOptionLabel={(s) => s.label}
-            onChange={(categories) => setActionsCategories(categories.map((s) => s.value))}
-            inputId="action-select-category-filter"
-            name="action-category"
-            isClearable
-            isMulti
-          />
+        <div>
+          <label htmlFor="filter-by-status" className="tw-m-0">
+            Filtrer par catégorie
+          </label>
+          <div>
+            <SelectCustom
+              options={filterableActionsCategories.map((_option) => ({ value: _option, label: _option }))}
+              value={actionsCategories?.map((_option) => ({ value: _option, label: _option })) || []}
+              getOptionValue={(s) => s.value}
+              getOptionLabel={(s) => s.label}
+              onChange={(categories) => setActionsCategories(categories.map((s) => s.value))}
+              inputId="action-select-category-filter"
+              name="action-category"
+              isClearable
+              isMulti
+            />
+          </div>
         </div>
       </div>
 
