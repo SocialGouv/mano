@@ -2,9 +2,7 @@ import { getDuration } from "./utils";
 import Card from "../../components/Card";
 
 export const Block = ({ data, title = "Nombre de personnes suivies", help = null }) => (
-  <div className="tw-px-4 tw-py-2 md:tw-basis-1/2 lg:tw-basis-1/3">
-    <Card title={title} count={Array.isArray(data) ? String(data.length) : data} help={help} />
-  </div>
+  <Card title={title} count={Array.isArray(data) ? String(data.length) : data} help={help} />
 );
 
 export const BlockDateWithTime = ({ data, field, help }) => {

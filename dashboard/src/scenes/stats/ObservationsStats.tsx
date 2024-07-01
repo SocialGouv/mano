@@ -20,6 +20,7 @@ import type { CustomField } from "../../types/field";
 import type { Period } from "../../types/date";
 import type { TeamInstance } from "../../types/team";
 import type { PersonPopulated } from "../../types/person";
+import Card from "../../components/Card";
 
 interface ObservationsStatsProps {
   territories: Array<TerritoryInstance>;
@@ -121,29 +122,37 @@ const ObservationsStats = ({
     <>
       <h3 className="tw-my-5 tw-text-xl">Statistiques des observations de territoire</h3>
       <Filters base={filterBase} filters={filterObs} onChange={setFilterObs} />
-      <CustomFieldsStats
-        data={observations}
-        customFields={customFieldsObs}
-        onSliceClick={user.role === "stats-only" ? undefined : onSliceClick}
-        dataTestId="number-observations"
-        additionalCols={[
-          {
-            title: "Nombre d'observations de territoire",
-            value: observations.length,
-            onBlockClick:
+      <div>
+        <div className="tw-py-2">
+          <Card
+            title="Nombre d'observations de territoire"
+            count={observations.length}
+            dataTestId="number-observations"
+            help={`Nombre d'observations de territoire des territoires sélectionnés, dans la période définie.\n\nLa moyenne de cette données est basée sur le nombre d'observations faites.`}
+            onClick={
               user.role === "stats-only"
                 ? undefined
                 : () => {
                     setSlicedData(observations);
                     setObsModalOpened(true);
-                  },
-          },
-        ]}
-        help={(label) =>
-          `${label.capitalize()} des observations des territoires sélectionnés, dans la période définie.\n\nLa moyenne de cette données est basée sur le nombre d'observations faites.`
-        }
-        totalTitleForMultiChoice={<span className="tw-font-bold">Nombre d'observations concernées</span>}
-      />
+                  }
+            }
+            unit={undefined}
+            countId={undefined}
+          >
+            <></>
+          </Card>
+        </div>
+        <CustomFieldsStats
+          data={observations}
+          customFields={customFieldsObs}
+          onSliceClick={user.role === "stats-only" ? undefined : onSliceClick}
+          help={(label) =>
+            `${label.capitalize()} des observations des territoires sélectionnés, dans la période définie.\n\nLa moyenne de cette données est basée sur le nombre d'observations faites.`
+          }
+          totalTitleForMultiChoice={<span className="tw-font-bold">Nombre d'observations concernées</span>}
+        />
+      </div>
       <CustomResponsivePie
         title="Nombre de personnes suivies différentes rencontrées (sur les territoires)"
         help={`Répartition par territoire du nombre de personnes suivies ayant été rencontrées lors de la saisie d'une observation dans la période définie. Si une personne est rencontrée plusieurs fois sur un même territoire, elle n'est comptabilisée qu'une seule fois. Si elle est rencontrée sur deux territoires différents, elle sera comptée indépendamment sur chaque territoire.\n\nSi aucune période n'est définie, on considère l'ensemble des observations.`}

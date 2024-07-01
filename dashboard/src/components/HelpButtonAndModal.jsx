@@ -9,7 +9,7 @@ const HelpButtonAndModal = ({ title, help }) => {
 
   return (
     <>
-      <QuestionMarkButton title={help} aria-label={help} className="noprint tw-ml-5 tw-shrink-0" onClick={() => setHelpOpen(true)} />
+      <QuestionMarkButton title={help} aria-label={help} className="noprint tw-ml-2 tw-shrink-0" onClick={() => setHelpOpen(true)} />
       <HelpModal open={helpOpen} setOpen={setHelpOpen} title={title} help={help} />
     </>
   );

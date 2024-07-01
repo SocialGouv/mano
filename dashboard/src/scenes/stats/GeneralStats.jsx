@@ -19,7 +19,7 @@ const GeneralStats = ({
       <div className="tw-flex tw-basis-full tw-items-center">
         <Filters title="Filtrer par personnes suivies:" base={filterBase} filters={filterPersons} onChange={setFilterPersons} />
       </div>
-      <div className="-tw-mx-4 tw-flex tw-flex-wrap tw-justify-around">
+      <div className="tw-grid tw-grid-cols-2 xl:tw-grid-cols-3 2xl:tw-grid-cols-4 tw-gap-4 tw-my-8">
         <Block
           data={personsCreated}
           title="Nombre de personnes créées"

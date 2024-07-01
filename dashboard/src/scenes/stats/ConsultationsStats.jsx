@@ -54,7 +54,7 @@ export default function ConsultationsStats({ consultations, personsWithConsultat
         <summary className="tw-mx-0 tw-my-8">
           <h4 className="tw-inline tw-text-xl tw-text-black75">Global</h4>
         </summary>
-        <div className="tw-mb-5 tw-flex tw-justify-center">
+        <div className="tw-mb-5 tw-flex tw-gap-4 tw-justify-center">
           <Block
             data={consultations}
             title="Nombre de consultations"

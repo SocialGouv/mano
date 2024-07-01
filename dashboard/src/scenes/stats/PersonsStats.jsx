@@ -109,7 +109,7 @@ export default function PersonStats({
             <summary className="tw-mx-0 tw-my-8">
               <h4 className="tw-inline tw-text-xl tw-text-black75">Général</h4>
             </summary>
-            <div className="-tw-mx-4 tw-flex tw-flex-wrap tw-justify-around">
+            <div className="tw-grid tw-grid-cols-2 2xl:tw-grid-cols-4 tw-gap-4 tw-mb-8">
               <Block data={personsForStats} title={`Nombre de ${title}`} help={firstBlockHelp} />
               <BlockCreatedAt persons={personsForStats} />
               <BlockWanderingAt persons={personsForStats} />
@@ -274,25 +274,19 @@ export default function PersonStats({
 const BlockWanderingAt = ({ persons }) => {
   persons = persons.filter((p) => Boolean(p.wanderingAt));
   if (!persons.length) {
-    return (
-      <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">
-        <Card title="Temps d'errance des personnes en&nbsp;moyenne" unit={"N/A"} count={0} />
-      </div>
-    );
+    return <Card title="Temps d'errance des personnes en&nbsp;moyenne" unit={"N/A"} count={0} />;
   }
   const averageWanderingAt = persons.reduce((total, person) => total + Date.parse(person.wanderingAt), 0) / (persons.length || 1);
   const durationFromNowToAverage = Date.now() - averageWanderingAt;
   const [count, unit] = getDuration(durationFromNowToAverage);
 
   return (
-    <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">
-      <Card
-        title="Temps d'errance des personnes en&nbsp;moyenne"
-        unit={unit}
-        count={count}
-        help={`Cela veut dire qu'en moyenne, chaque personne considérée est en rue depuis ${count} ${unit}`}
-      />
-    </div>
+    <Card
+      title="Temps d'errance des personnes en&nbsp;moyenne"
+      unit={unit}
+      count={count}
+      help={`Cela veut dire qu'en moyenne, chaque personne considérée est en rue depuis ${count} ${unit}`}
+    />
   );
 };
 
@@ -300,29 +294,25 @@ const BlockGroup = ({ title, groups }) => {
   try {
     if (!groups.length) {
       return (
-        <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">
-          <Card
-            title={title}
-            count={0}
-            help={`Une personne ne peut appartenir qu'à une famille. On comptabilise donc le nombre de familles dans lesquelles se trouvent les personnes concernées.\n\nSi plusieurs personnes appartiennent à la même famille, on comptabilisera seulement une seule famille.`}
-          />
-        </div>
+        <Card
+          title={title}
+          count={0}
+          help={`Une personne ne peut appartenir qu'à une famille. On comptabilise donc le nombre de familles dans lesquelles se trouvent les personnes concernées.\n\nSi plusieurs personnes appartiennent à la même famille, on comptabilisera seulement une seule famille.`}
+        />
       );
     }
 
     const avg = Math.round((groups.reduce((total, group) => total + group.relations.length, 0) / groups.length) * 100) / 100;
     return (
-      <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">
-        <Card
-          title={title}
-          count={groups.length}
-          help={`Une personne ne peut appartenir qu'à une famille. On comptabilise donc le nombre de familles dans lesquelles se trouvent les personnes concernées.\n\nSi plusieurs personnes appartiennent à la même famille, on comptabilisera seulement une seule famille.`}
-        >
-          <span className="font-weight-normal">
-            Taille moyenne des familles: <strong>{avg}</strong>
-          </span>
-        </Card>
-      </div>
+      <Card
+        title={title}
+        count={groups.length}
+        help={`Une personne ne peut appartenir qu'à une famille. On comptabilise donc le nombre de familles dans lesquelles se trouvent les personnes concernées.\n\nSi plusieurs personnes appartiennent à la même famille, on comptabilisera seulement une seule famille.`}
+      >
+        <span className="font-weight-normal">
+          Taille moyenne des familles: <strong>{avg}</strong>
+        </span>
+      </Card>
     );
   } catch (errorBlockTotal) {
     capture("error block total", errorBlockTotal, { title, groups });
@@ -332,11 +322,7 @@ const BlockGroup = ({ title, groups }) => {
 
 const BlockCreatedAt = ({ persons }) => {
   if (persons.length === 0) {
-    return (
-      <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">
-        <Card title="Temps de suivi moyen" count={"-"} />
-      </div>
-    );
+    return <Card title="Temps de suivi moyen" count={"-"} />;
   }
 
   const averageFollowedTime =
@@ -374,14 +360,12 @@ const BlockCreatedAt = ({ persons }) => {
   const [count, unit] = getDuration(averageFollowedTime);
 
   return (
-    <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">
-      <Card
-        title="Temps de suivi moyen"
-        unit={unit}
-        count={count}
-        help={`Cela veut dire qu'en moyenne, chaque personne considérée est suivie depuis ${count} ${unit}`}
-      />
-    </div>
+    <Card
+      title="Temps de suivi moyen"
+      unit={unit}
+      count={count}
+      help={`Cela veut dire qu'en moyenne, chaque personne considérée est suivie depuis ${count} ${unit}`}
+    />
   );
 };
 
