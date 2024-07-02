@@ -1,22 +1,10 @@
 import React from 'react';
 import MultiCheckBoxes from './MultiCheckBoxes';
-
-// prettier-ignore
-export const territoryTypes = [
-  'Lieu de conso',
-  'Lieu de deal',
-  'Carrefour de passage',
-  'Campement',
-  'Lieu de vie',
-  'Prostitution',
-  'Errance',
-  'Mendicité',
-  'Loisir',
-  'Rassemblement communautaire',
-  'Historique',
-];
+import { useRecoilValue } from 'recoil';
+import { flattenedTerritoriesTypesSelector } from '../../recoil/territory';
 
 const TerritoryMultiCheckBoxes = ({ values = [], onChange, editable }) => {
+  const territoryTypes = useRecoilValue(flattenedTerritoriesTypesSelector);
   return (
     <MultiCheckBoxes label="Type" source={territoryTypes} values={values} onChange={onChange} editable={editable} emptyValue="-- Choisissez --" />
   );

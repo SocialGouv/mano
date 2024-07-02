@@ -1,8 +1,9 @@
-import { atom } from 'recoil';
+import { atom, selector } from 'recoil';
 import { storage } from '../services/dataManagement';
 import { looseUuidRegex } from '../utils/regex';
 import { capture } from '../services/sentry';
 import { Alert } from 'react-native';
+import { organisationState } from './auth';
 
 export const territoriesState = atom({
   key: 'territoriesState',
@@ -43,16 +44,18 @@ export const prepareTerritoryForEncryption = (territory) => {
   };
 };
 
-export const territoryTypes = [
-  'Lieu de conso',
-  'Lieu de deal',
-  'Carrefour de passage',
-  'Campement',
-  'Lieu de vie',
-  'Prostitution',
-  'Errance',
-  'Mendicité',
-  'Loisir',
-  'Rassemblement communautaire',
-  'Historique',
-];
+export const territoriesTypesSelector = selector({
+  key: 'territoriesTypesSelector',
+  get: ({ get }) => {
+    const organisation = get(organisationState);
+    return organisation.territoriesGroupedTypes;
+  },
+});
+
+export const flattenedTerritoriesTypesSelector = selector({
+  key: 'flattenedTerritoriesTypesSelector',
+  get: ({ get }) => {
+    const territoriesGroupedTypes = get(territoriesTypesSelector);
+    return territoriesGroupedTypes.reduce((allTypes, { types }) => [...allTypes, ...types], []);
+  },
+});

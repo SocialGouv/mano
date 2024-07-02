@@ -43,6 +43,24 @@ function serializeOrganisation(organisation) {
         categories: [],
       },
     ],
+    territoriesGroupedTypes: organisation.territoriesGroupedTypes || [
+      {
+        groupTitle: "Tous mes types",
+        types: [
+          "Lieu de conso",
+          "Lieu de deal",
+          "Carrefour de passage",
+          "Campement",
+          "Lieu de vie",
+          "Prostitution",
+          "Errance",
+          "Mendicité",
+          "Loisir",
+          "Rassemblement communautaire",
+          "Historique",
+        ],
+      },
+    ],
     defaultPersonsFolders: organisation.defaultPersonsFolders || [],
 
     /* services settings */

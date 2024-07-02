@@ -11,17 +11,11 @@ import API, { tryFetchExpectOk } from "../../services/api";
 import { formatDateWithFullMonth, now } from "../../services/date";
 import { sanitizeFieldValueFromExcel } from "./importSanitizer";
 import { useDataLoader } from "../../components/DataLoader";
-import { encryptTerritory, territoriesFields } from "../../recoil/territory";
-
-const importableFields = territoriesFields.filter((field) => field.importable);
-const importableLabels = importableFields.map((f) => f.label);
-const importableFieldsObjectByName = importableFields.reduce((acc, field) => {
-  acc[field.name] = field;
-  return acc;
-}, {});
+import { encryptTerritory, flattenedTerritoriesTypesSelector, territoriesFields } from "../../recoil/territory";
 
 export default function ImportTerritories() {
   const user = useRecoilValue(userState);
+  const territoriesTypes = useRecoilValue(flattenedTerritoriesTypesSelector);
   const fileDialogRef = useRef(null);
   const { refresh } = useDataLoader();
   const teams = useRecoilValue(teamsState);
@@ -31,6 +25,13 @@ export default function ImportTerritories() {
   const [importedFields, setImportedFields] = useState([]);
   const [ignoredFields, setIgnoredFields] = useState([]);
   const [reloadKey, setReloadKey] = useState(0); // because input type 'file' doesn't trigger 'onChange' for uploading twice the same file
+
+  const importableFields = territoriesFields(territoriesTypes).filter((field) => field.importable);
+  const importableLabels = importableFields.map((f) => f.label);
+  const importableFieldsObjectByName = importableFields.reduce((acc, field) => {
+    acc[field.name] = field;
+    return acc;
+  }, {});
 
   const onParseData = async (event) => {
     try {

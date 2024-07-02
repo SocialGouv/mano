@@ -10,6 +10,11 @@ interface GroupedServices {
   services: string[];
 }
 
+interface GroupedTypes {
+  groupTitle: string;
+  types: string[];
+}
+
 export interface OrganisationInstance {
   _id: string;
   orgId: string;
@@ -48,6 +53,7 @@ export interface OrganisationInstance {
 
   actionsGroupedCategories?: GroupedCategories[];
   structuresGroupedCategories?: GroupedCategories[];
+  territoriesGroupedTypes?: GroupedTypes[];
 
   defaultPersonsFolders?: Folder[];
 

@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { capture } from "../services/sentry";
 import type { TerritoryInstance, ReadyToEncryptTerritoryInstance } from "../types/territory";
 import type { PredefinedField } from "../types/field";
+import { organisationState } from "./auth";
 
 const collectionName = "territory";
 export const territoriesState = atom<Array<TerritoryInstance>>({
@@ -59,20 +60,6 @@ export async function encryptTerritory(territory: TerritoryInstance, { checkRequ
   return encryptItem(prepareTerritoryForEncryption(territory, { checkRequiredFields }));
 }
 
-export const territoryTypes = [
-  "Lieu de conso",
-  "Lieu de deal",
-  "Carrefour de passage",
-  "Campement",
-  "Lieu de vie",
-  "Prostitution",
-  "Errance",
-  "Mendicité",
-  "Loisir",
-  "Rassemblement communautaire",
-  "Historique",
-];
-
 type SortOrder = "ASC" | "DESC";
 
 type SortBy = "name" | "createdAt" | "types" | "perimeter";
@@ -104,7 +91,7 @@ export const sortTerritories = (sortBy: SortBy, sortOrder: SortOrder) => (a: Ter
   return defaultSort(a, b, sortOrder);
 };
 
-export const territoriesFields: Array<PredefinedField> = [
+export const territoriesFields = (territoriesTypes: Array<string>): Array<PredefinedField> => [
   {
     name: "name",
     label: "Nom",
@@ -136,22 +123,26 @@ export const territoriesFields: Array<PredefinedField> = [
     name: "types",
     label: "Types",
     type: "multi-choice",
-    options: [
-      "Lieu de conso",
-      "Lieu de deal",
-      "Carrefour de passage",
-      "Campement",
-      "Lieu de vie",
-      "Prostitution",
-      "Errance",
-      "Mendicité",
-      "Loisir",
-      "Rassemblement communautaire",
-      "Historique",
-    ],
+    options: territoriesTypes,
     encrypted: true,
     importable: true,
     filterable: true,
     enabled: true,
   },
 ];
+
+export const territoriesTypesSelector = selector({
+  key: "territoriesTypesSelector",
+  get: ({ get }) => {
+    const organisation = get(organisationState);
+    return organisation.territoriesGroupedTypes;
+  },
+});
+
+export const flattenedTerritoriesTypesSelector = selector({
+  key: "flattenedTerritoriesTypesSelector",
+  get: ({ get }) => {
+    const territoriesGroupedTypes = get(territoriesTypesSelector);
+    return territoriesGroupedTypes.reduce((allTypes, { types }) => [...allTypes, ...types], []);
+  },
+});

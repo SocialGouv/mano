@@ -1,8 +1,10 @@
 import { utils, writeFile } from "@e965/xlsx";
 import ButtonCustom from "../../components/ButtonCustom";
-import { territoriesFields } from "../../recoil/territory";
+import { flattenedTerritoriesTypesSelector, territoriesFields } from "../../recoil/territory";
+import { useRecoilValue } from "recoil";
 
 export default function DownloadTerritoriesImportExample() {
+  const territoriesTypes = useRecoilValue(flattenedTerritoriesTypesSelector);
   function placeholder(f) {
     if (f.options?.length) return f.options[0];
     return "test";
@@ -11,7 +13,7 @@ export default function DownloadTerritoriesImportExample() {
   return (
     <ButtonCustom
       onClick={() => {
-        const importable = territoriesFields.filter((f) => f.importable);
+        const importable = territoriesFields(territoriesTypes).filter((f) => f.importable);
         const ws = utils.aoa_to_sheet([importable.map((f) => f.label), importable.map((f) => placeholder(f))]);
         const workbook = { Sheets: { territoire: ws }, SheetNames: ["territoire"] };
         writeFile(workbook, "territoires.xlsx");

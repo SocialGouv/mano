@@ -37,8 +37,9 @@ import { dayjsInstance, now } from "../../services/date";
 import { encryptItem } from "../../services/encryption";
 import { errorMessage } from "../../utils";
 import ImportTerritories from "../data-import-export/ImportTerritories";
-import { territoriesFields } from "../../recoil/territory";
+import { flattenedTerritoriesTypesSelector, territoriesFields } from "../../recoil/territory";
 import DownloadTerritoriesImportExample from "../data-import-export/DownloadTerritoriesImportExample";
+import TerritoriesTypesSettings from "./TerritoriesTypesSettings";
 
 const getSettingTitle = (tabId) => {
   if (tabId === "infos") return "Informations";
@@ -76,6 +77,7 @@ const View = () => {
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
   const encryptionKeyLength = useRecoilValue(encryptionKeyLengthState);
+  const territoriesTypes = useRecoilValue(flattenedTerritoriesTypesSelector);
 
   const persons = useRecoilValue(personsState);
   const { preparePersonForEncryption } = usePreparePersonForEncryption();
@@ -357,6 +359,8 @@ const View = () => {
                         />
                       </div>
                       <hr />
+                      <TerritoriesTypesSettings />
+                      <hr />
                       <ObservationsSettings />
                     </>
                   );
@@ -587,7 +591,7 @@ const View = () => {
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  {territoriesFields
+                                  {territoriesFields(territoriesTypes)
                                     .filter((f) => f.importable)
                                     .map((f, i) => {
                                       return (

@@ -259,6 +259,7 @@ router.put(
         name: z.optional(z.string().min(1)),
         actionsGroupedCategories: z.optional(z.array(z.object({ groupTitle: z.string(), categories: z.array(z.string().min(1)) }))),
         structuresGroupedCategories: z.optional(z.array(z.object({ groupTitle: z.string(), categories: z.array(z.string().min(1)) }))),
+        territoriesGroupedTypes: z.optional(z.array(z.object({ groupTitle: z.string(), types: z.array(z.string().min(1)) }))),
         defaultPersonsFolders: z.optional(z.array(folderSchema)),
         groupedServices: z.optional(z.array(z.object({ groupedServices: z.string(), services: z.array(z.string().min(1)) }))),
         collaborations: z.optional(z.array(z.string().min(1))),
@@ -323,6 +324,7 @@ router.put(
     if (req.body.hasOwnProperty("name")) updateOrg.name = req.body.name;
     if (req.body.hasOwnProperty("actionsGroupedCategories")) updateOrg.actionsGroupedCategories = req.body.actionsGroupedCategories;
     if (req.body.hasOwnProperty("structuresGroupedCategories")) updateOrg.structuresGroupedCategories = req.body.structuresGroupedCategories;
+    if (req.body.hasOwnProperty("territoriesGroupedTypes")) updateOrg.territoriesGroupedTypes = req.body.territoriesGroupedTypes;
     if (req.body.hasOwnProperty("defaultPersonsFolders")) updateOrg.defaultPersonsFolders = req.body.defaultPersonsFolders;
     if (req.body.hasOwnProperty("groupedServices")) updateOrg.groupedServices = req.body.groupedServices;
     if (req.body.hasOwnProperty("collaborations")) updateOrg.collaborations = req.body.collaborations;
@@ -892,6 +894,19 @@ router.post(
         const mainGroup = mainStructuresGroupedCategories.find((g) => g.groupTitle === secondaryGroup.groupTitle);
         if (!mainGroup) mainStructuresGroupedCategories.push(secondaryGroup);
       }
+      // territoriesGroupedTypes
+      const mainTerritoriesGroupedTypes = structuredClone(mainOrg.territoriesGroupedTypes) || [];
+      const secondaryTerritoriesGroupedTypes = structuredClone(secondaryOrg.territoriesGroupedTypes) || [];
+      for (const mainGroup of mainTerritoriesGroupedTypes) {
+        const secondaryGroup = secondaryTerritoriesGroupedTypes.find((g) => g.groupTitle === mainGroup.groupTitle);
+        if (!secondaryGroup) continue;
+        mainGroup.types = Array.from(new Set([...mainGroup.types, ...secondaryGroup.types]));
+      }
+      // merge remaining secondary groups
+      for (const secondaryGroup of secondaryTerritoriesGroupedTypes) {
+        const mainGroup = mainTerritoriesGroupedTypes.find((g) => g.groupTitle === secondaryGroup.groupTitle);
+        if (!mainGroup) mainTerritoriesGroupedTypes.push(secondaryGroup);
+      }
 
       // ...
       // We do not merge defaultPersonsFolders, we keep the main ones.
@@ -1004,6 +1019,7 @@ router.post(
         {
           actionsGroupedCategories: mainActionsGroupedCategories,
           structuresGroupedCategories: mainStructuresGroupedCategories,
+          territoriesGroupedTypes: mainTerritoriesGroupedTypes,
           groupedServices: mainGroupedServices,
           consultations: mainConsultations,
           customFieldsPersons: mainCustomFieldsPersons,

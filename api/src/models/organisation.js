@@ -14,6 +14,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.JSONB,
       // example: [{"groupTitle": "lala", categories: ["carud", "mairie"]}, { "groupTitle": "lolo", "categories": ["entretien", "lavage"]}]
     },
+    territoriesGroupedTypes: {
+      type: DataTypes.JSONB,
+      // example: [{"groupTitle": "Tous mes types", "types": ["Lieu de conso", "Lieu de deal", "Carrefour de passage", "Campement", "Lieu de vie", "Prostitution", "Errance", "Mendicité", "Loisir", "Rassemblement communautaire", "Historique"]}]
+    },
     defaultPersonsFolders: { type: DataTypes.JSONB, defaultValue: [] },
     collaborations: { type: [DataTypes.ARRAY(DataTypes.TEXT)], defaultValue: [] },
     consultations: DataTypes.JSONB,

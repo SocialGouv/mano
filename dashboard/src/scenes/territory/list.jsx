@@ -10,7 +10,7 @@ import Loading from "../../components/loading";
 import Table from "../../components/table";
 import ButtonCustom from "../../components/ButtonCustom";
 import Search from "../../components/search";
-import { territoryTypes, territoriesState, sortTerritories, encryptTerritory } from "../../recoil/territory";
+import { territoriesState, sortTerritories, encryptTerritory, flattenedTerritoriesTypesSelector } from "../../recoil/territory";
 import SelectCustom from "../../components/SelectCustom";
 import { onlyFilledObservationsTerritories } from "../../recoil/selectors";
 import { currentTeamState, organisationState, userState } from "../../recoil/auth";
@@ -145,6 +145,7 @@ export function TerritoryModal({ open, setOpen, territory = {} }) {
   const user = useRecoilValue(userState);
   const isNew = !territory._id;
   const initialValues = { name: "", types: [], perimeter: "", description: "", ...territory };
+  const territoryTypes = useRecoilValue(flattenedTerritoriesTypesSelector);
 
   return (
     <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">

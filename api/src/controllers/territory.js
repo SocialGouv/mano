@@ -4,10 +4,11 @@ const passport = require("passport");
 const { z } = require("zod");
 const { looseUuidRegex, positiveIntegerRegex } = require("../utils");
 const { catchErrors } = require("../errors");
-const { Territory } = require("../db/sequelize");
+const { Territory, Organisation, sequelize } = require("../db/sequelize");
 const { Op } = require("sequelize");
 const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
 const validateUser = require("../middleware/validateUser");
+const { serializeOrganisation } = require("../utils/data-serializer");
 
 router.post(
   "/",
@@ -127,6 +128,53 @@ router.get(
       attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "createdAt", "updatedAt", "deletedAt"],
     });
     return res.status(200).send({ ok: true, data, hasMore: data.length === Number(limit), total });
+  })
+);
+
+router.put(
+  "/types",
+  passport.authenticate("user", { session: false, failWithError: true }),
+  validateUser("admin"),
+  validateEncryptionAndMigrations,
+  catchErrors(async (req, res, next) => {
+    try {
+      z.object({
+        territories: z.optional(
+          z.array(
+            z.object({
+              _id: z.string().regex(looseUuidRegex),
+              encrypted: z.string(),
+              encryptedEntityKey: z.string(),
+            })
+          )
+        ),
+        territoriesGroupedTypes: z.array(
+          z.object({
+            groupTitle: z.string(),
+            types: z.array(z.string()),
+          })
+        ),
+      }).parse(req.body);
+    } catch (e) {
+      const error = new Error(`Invalid request in territories types update: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+
+    const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
+    if (!organisation) return res.status(404).send({ ok: false, error: "Not Found" });
+
+    const { territories = [], territoriesGroupedTypes = [] } = req.body;
+
+    await sequelize.transaction(async (tx) => {
+      for (let { encrypted, encryptedEntityKey, _id } of territories) {
+        await Territory.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
+      }
+
+      organisation.set({ territoriesGroupedTypes });
+      await organisation.save({ transaction: tx });
+    });
+    return res.status(200).send({ ok: true, data: serializeOrganisation(organisation) });
   })
 );
 
