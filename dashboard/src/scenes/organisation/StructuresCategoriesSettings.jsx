@@ -39,7 +39,7 @@ const StructuresCategoriesSettings = () => {
 
   return (
     <DragAndDropSettings
-      title="Catégories de structures"
+      title={<h3 className="tw-mb-0 tw-text-xl tw-font-extrabold">Catégories de structures</h3>}
       data={dataFormatted}
       dataItemKey={(cat) => cat}
       ItemComponent={Category}

@@ -40,7 +40,7 @@ function CollaborationsSettings() {
 
   return (
     <DragAndDropSettings
-      title="Co-interventions"
+      title={<h3 className="tw-mb-0 tw-text-xl tw-font-extrabold">Co-interventions</h3>}
       data={dataFormatted}
       dataItemKey={(cat) => cat}
       ItemComponent={Collaboration}
