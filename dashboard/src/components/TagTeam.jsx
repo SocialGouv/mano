@@ -22,7 +22,7 @@ const TagTeam = ({ teamId }) => {
   );
 };
 
-const teamsColors = [
+export const teamsColors = [
   "#255c99cc",
   "#74776bcc",
   "#00c6a5cc",
@@ -39,7 +39,7 @@ const teamsColors = [
   "#28A428cc",
   "#f5c000cc",
 ];
-const borderColors = [
+export const borderColors = [
   "#255c99",
   "#74776b",
   "#00c6a5",

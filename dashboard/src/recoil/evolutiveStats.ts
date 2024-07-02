@@ -76,7 +76,7 @@ function getValueByField(indicator: IndicatorsSelection[0], value: any): string 
   return value;
 }
 
-function getPersonSnapshotAtDate({
+export function getPersonSnapshotAtDate({
   person,
   snapshotDate,
   indicator,

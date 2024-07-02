@@ -5,6 +5,7 @@ import { personFieldsIncludingCustomFieldsSelector } from "../../../recoil/perso
 import { formatDateWithFullMonth, dayjsInstance } from "../../../services/date";
 import { customFieldsMedicalFileSelector } from "../../../recoil/medicalFiles";
 import { cleanHistory } from "../../../utils/person-history";
+import PersonTeamHistory from "./PersonTeamHistory";
 
 function UserName({ id, name }) {
   const users = useRecoilValue(usersState);
@@ -32,6 +33,7 @@ export default function PersonHistory({ person }) {
 
   return (
     <div>
+      <PersonTeamHistory person={person} history={history} teams={teams} />
       <div className="tw-my-10 tw-flex tw-items-center tw-gap-2">
         <h3 className="tw-mb-0 tw-flex tw-items-center tw-gap-5 tw-text-xl tw-font-extrabold">Historique</h3>
       </div>

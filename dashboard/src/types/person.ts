@@ -27,23 +27,25 @@ interface PersonInstanceBase {
 
 type PersonField = keyof PersonInstanceBase | CustomField["name"];
 
+export interface PersonHistoryEntry {
+  date: Date;
+  user: UUIDV4;
+  data: Record<
+    PersonField,
+    {
+      oldValue: any;
+      newValue: any;
+    }
+  >;
+}
+
 export interface PersonInstance extends PersonInstanceBase {
   _id: UUIDV4;
   organisation: UUIDV4;
   createdAt: Date;
   updatedAt: Date;
   deletedAt?: Date;
-  history?: Array<{
-    date: Date;
-    user: UUIDV4;
-    data: Record<
-      PersonField,
-      {
-        oldValue: any;
-        newValue: any;
-      }
-    >;
-  }>;
+  history?: Array<PersonHistoryEntry>;
   [key: CustomField["name"]]: any;
 }
 
