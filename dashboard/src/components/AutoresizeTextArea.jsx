@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
-export default function AutoResizeTextarea({ name, value, onChange, rows = 1, placeholder = "Description", id }) {
+export default function AutoResizeTextarea({ name, value, onChange, rows = 1, placeholder = "Description", disabled = false, id }) {
   const [resizedHeight, setResizedHeight] = useState(null);
   const textbox = useRef(null);
   useEffect(() => {
@@ -49,9 +49,11 @@ export default function AutoResizeTextarea({ name, value, onChange, rows = 1, pl
         name={name}
         id={id || name}
         onChange={onChange}
-        className="tw-absolute tw-inset-0 tw-h-full tw-w-full tw-px-3 tw-py-1.5"
+        className="tw-absolute tw-inset-0 tw-h-full tw-w-full tw-px-3 tw-py-1.5 disabled:tw-cursor-not-allowed"
         placeholder={placeholder}
         rows={rows}
+        title={disabled ? "Seul l'auteur/trice peut modifier ce champ" : ""}
+        disabled={disabled}
       />
     </div>
   );

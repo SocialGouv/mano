@@ -64,6 +64,6 @@ test("Création de rencontres dans les observations de territoire", async ({ pag
   await page.getByText("2rencontresRencontres (2)").click();
   await page.getByRole("button", { name: "Passer les rencontres en" }).click();
   await page.locator('[data-test-id="modal"]').getByRole("cell", { name: "raph" }).click();
-  await page.getByLabel("Close").click();
+  await page.locator(`[data-test-id="modal-rencontre-create-edit-delete"]`).getByRole("button", { name: "Fermer", exact: true }).first().click();
   await page.locator('[data-test-id="modal"]').getByText("arnaud").click();
 });

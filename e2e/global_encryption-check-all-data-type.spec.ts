@@ -154,10 +154,10 @@ test("test", async ({ page }) => {
   await page.getByText("SUIVI HOP").click();
   await page.getByText("MDEIDAL").click();
   await page.getByText("le passage").first().click();
-  await page.getByRole("button", { name: "Close" }).click();
+  await page.locator(`[data-test-id="modal-passage-create-edit-delete"]`).getByRole("button", { name: "Fermer", exact: true }).first().click();
   await page.getByRole("button", { name: "Rencontres (1)" }).click();
   await page.getByText("La rencontre").first().click();
-  await page.getByRole("button", { name: "Close" }).click();
+  await page.locator(`[data-test-id="modal-rencontre-create-edit-delete"]`).getByRole("button", { name: "Fermer", exact: true }).first().click();
   await page.getByRole("link", { name: "Territoires" }).click();
   await page.getByText(testTerritoire).click();
   await page.getByText("Un commentaire").click();
