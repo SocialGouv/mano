@@ -304,7 +304,7 @@ export const EditCustomField = ({ open, onDelete, data, editingField, onClose, o
     <ModalContainer open={open} onClose={() => onClose(null)} size="3xl">
       <ModalHeader title={!isNewField ? "Modifier le champ" : "Créer un nouveau champ"} />
       <ModalBody ref={bodyRef}>
-        <form id="custom-field-form" className="tw-flex tw-min-h-[75vh] tw-w-full tw-flex-wrap tw-px-4" onSubmit={onSubmit}>
+        <form id="custom-field-form" className="tw-flex tw-w-full tw-flex-wrap tw-px-4" onSubmit={onSubmit}>
           <div className="tw-basis-full tw-p-4">
             <input type="hidden" name="name" value={field.name} />
             <label htmlFor="label" className="tailwindui">

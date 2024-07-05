@@ -16,6 +16,10 @@ function SelectCustom<Option, IsMulti extends boolean = false, Group extends Gro
 
   return (
     <Component
+      // These two options seems magical, they make the dropdown appear on top of everything
+      // https://stackoverflow.com/a/64973481/978690
+      menuPosition="fixed"
+      menuPortalTarget={document.body}
       styles={filterStyles}
       placeholder="Choisir..."
       noOptionsMessage={() => "Aucun résultat"}
