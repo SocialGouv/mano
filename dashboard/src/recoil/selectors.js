@@ -180,6 +180,7 @@ export const itemsGroupedByPersonSelector = selector({
         }
       }
       for (const teamId of oldestTeams) {
+        if (!assignedTeamsPeriods[teamId]) assignedTeamsPeriods[teamId] = [];
         assignedTeamsPeriods[teamId].push({ startDate: person.followedSince || person.createdAt });
       }
       personsObject[person._id].assignedTeamsPeriods = assignedTeamsPeriods;
