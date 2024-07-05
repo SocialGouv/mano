@@ -27,11 +27,13 @@ const RencontresStats = ({
       <div className="tw-flex tw-basis-full tw-items-center">
         <Filters title={filterTitle} base={filterBase} filters={filterPersons} onChange={setFilterPersons} />
       </div>
-      <Block
-        data={rencontres.length}
-        title="Nombre de rencontres"
-        help={`Nombre de rencontres enregistrées dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des rencontres.`}
-      />
+      <div className="tw-mb-5 tw-flex tw-gap-4 tw-justify-center">
+        <Block
+          data={rencontres.length}
+          title="Nombre de rencontres"
+          help={`Nombre de rencontres enregistrées dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des rencontres.`}
+        />
+      </div>
       <CustomResponsivePie
         title="Répartition des rencontres"
         help={`Répartition par genre des rencontres non-anonymes (c'est-à-dire attachées à une personne) enregistrées dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des rencontres.`}
