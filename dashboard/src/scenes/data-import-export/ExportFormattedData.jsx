@@ -9,6 +9,7 @@ import API, { tryFetchExpectOk } from "../../services/api";
 import { customFieldsObsSelector } from "../../recoil/territoryObservations";
 import { territoriesState } from "../../recoil/territory";
 import { consultationFieldsSelector } from "../../recoil/consultations";
+import { customFieldsMedicalFileSelector } from "../../recoil/medicalFiles";
 
 // Source: https://tailwindui.com/components/application-ui/elements/dropdowns
 export default function ExportFormattedData({ personCreated, personUpdated, actions, rencontres, passages, observations, consultations }) {
@@ -17,6 +18,7 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
   const territories = useRecoilValue(territoriesState);
   const user = useRecoilValue(userState);
   const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
+  const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
   const consultationsFields = useRecoilValue(consultationFieldsSelector);
   const [users, setUsers] = useState([]);
@@ -51,6 +53,33 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
           else fields[field.label || field.name] = person[field.name];
           return fields;
         }, {}),
+      "Créée par": loadedUsers.find((u) => u._id === person.user)?.name,
+      "Créée le": dayjsInstance(person.createdAt).format("YYYY-MM-DD HH:mm"),
+      "Mise à jour le": dayjsInstance(person.updatedAt).format("YYYY-MM-DD HH:mm"),
+    };
+  };
+
+  const transformPersonMedical = (loadedUsers) => (person) => {
+    return {
+      id: person._id,
+      ...[
+        // On conserve quelques champs généraux pour les dossiers médicaux
+        ...personFieldsIncludingCustomFields.filter((field) => ["assignedTeams", "name", "otherNames", "gender", "birthdate"].includes(field.name)),
+        // Et on prend tous les champs du dossier médical
+        ...customFieldsMedicalFile,
+      ].reduce((fields, field) => {
+        if (field.name === "assignedTeams") {
+          fields[field.label] = (person[field.name] || []).map((t) => teams.find((person) => person._id === t)?.name)?.join(", ");
+        } else if (["date", "date-with-time", "duration"].includes(field.type))
+          fields[field.label || field.name] = person[field.name]
+            ? dayjsInstance(person[field.name]).format(field.type === "date" ? "YYYY-MM-DD" : "YYYY-MM-DD HH:mm")
+            : "";
+        else if (["boolean"].includes(field.type)) fields[field.label || field.name] = person[field.name] ? "Oui" : "Non";
+        else if (["yes-no"].includes(field.type)) fields[field.label || field.name] = person[field.name];
+        else if (Array.isArray(person[field.name])) fields[field.label || field.name] = person[field.name].join(", ");
+        else fields[field.label || field.name] = person[field.name];
+        return fields;
+      }, {}),
       "Créée par": loadedUsers.find((u) => u._id === person.user)?.name,
       "Créée le": dayjsInstance(person.createdAt).format("YYYY-MM-DD HH:mm"),
       "Mise à jour le": dayjsInstance(person.updatedAt).format("YYYY-MM-DD HH:mm"),
@@ -192,7 +221,9 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
         leaveFrom="tw-transform tw-opacity-100 tw-scale-100"
         leaveTo="tw-transform tw-opacity-0 tw-scale-95"
       >
-        <Menu.Items className="tw-absolute tw-right-0 tw-z-50 tw-mt-2 tw-w-56 tw-origin-top-right tw-rounded-md tw-bg-white tw-shadow-lg tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none">
+        <Menu.Items
+          className={`tw-absolute tw-right-0 tw-z-50 tw-mt-2 ${user.healthcareProfessional ? "tw-w-72" : "tw-w-56"} tw-origin-top-right tw-rounded-md tw-bg-white tw-shadow-lg tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none`}
+        >
           <div className="tw-py-1">
             <MenuItem
               text="Personnes suivies"
@@ -208,6 +239,24 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
                 exportXlsx("Personnes créées", personCreated.map(transformPerson(loadedUsers)));
               }}
             />
+            {user.healthcareProfessional ? (
+              <>
+                <MenuItem
+                  text="Dossier médical des personnes suivies"
+                  onClick={async () => {
+                    const loadedUsers = await fetchUsers();
+                    exportXlsx("Personnes suivies", personUpdated.map(transformPersonMedical(loadedUsers)));
+                  }}
+                />
+                <MenuItem
+                  text="Dossier médical des personnes créées"
+                  onClick={async () => {
+                    const loadedUsers = await fetchUsers();
+                    exportXlsx("Personnes créées", personCreated.map(transformPersonMedical(loadedUsers)));
+                  }}
+                />
+              </>
+            ) : null}
             <MenuItem
               text="Actions"
               onClick={async () => {
