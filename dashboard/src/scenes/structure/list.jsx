@@ -11,21 +11,26 @@ import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "../../compo
 import SelectCustom from "../../components/SelectCustom";
 import { useRecoilValue } from "recoil";
 import { userState } from "../../recoil/auth";
-import { flattenedStructuresCategoriesSelector } from "../../recoil/structures";
+import { flattenedStructuresCategoriesSelector, sortStructures } from "../../recoil/structures";
 import { filterBySearch } from "../search/utils";
 import { errorMessage } from "../../utils";
+import { useLocalStorage } from "../../services/useLocalStorage";
 
 const List = () => {
   const [structures, setStructures] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [sortBy, setSortBy] = useLocalStorage("structures-sortBy", "dueAt");
+  const [sortOrder, setSortOrder] = useLocalStorage("structures-sortOrder", "ASC");
 
   const [search, setSearch] = useState("");
   const [currentStructure, setCurrentStructure] = useState(null);
   const [currentStructureOpen, setCurrentStructureOpen] = useState(false);
 
   const filteredStructures = useMemo(() => {
-    return filterBySearch(search, structures);
-  }, [search, structures]);
+    const orderedStructures = [...structures].sort(sortStructures(sortBy, sortOrder));
+    if (!search) return orderedStructures;
+    return filterBySearch(search, orderedStructures);
+  }, [search, sortBy, sortOrder, structures]);
 
   useTitle("Structures");
 
@@ -85,6 +90,10 @@ const List = () => {
           {
             title: "Nom",
             dataKey: "name",
+            onSortOrder: setSortOrder,
+            onSortBy: setSortBy,
+            sortBy,
+            sortOrder,
             render: (structure) => {
               return (
                 <div className="[overflow-wrap:anywhere] tw-min-w-32">
@@ -96,12 +105,20 @@ const List = () => {
           {
             title: "Description",
             dataKey: "description",
+            onSortOrder: setSortOrder,
+            onSortBy: setSortBy,
+            sortBy,
+            sortOrder,
             render: (structure) => <div className="[overflow-wrap:anywhere] tw-text-xs">{structure.description}</div>,
           },
-          { title: "Téléphone", dataKey: "phone" },
+          { title: "Téléphone", dataKey: "phone", onSortOrder: setSortOrder, onSortBy: setSortBy, sortBy, sortOrder },
           {
             title: "Adresse",
             dataKey: "adresse",
+            onSortOrder: setSortOrder,
+            onSortBy: setSortBy,
+            sortBy,
+            sortOrder,
             render: (structure) => {
               return (
                 <>
@@ -115,6 +132,10 @@ const List = () => {
           {
             title: "Catégories",
             dataKey: "categories",
+            onSortOrder: setSortOrder,
+            onSortBy: setSortBy,
+            sortBy,
+            sortOrder,
             render: (structure) => {
               return (
                 <>
@@ -132,7 +153,15 @@ const List = () => {
               );
             },
           },
-          { title: "Créée le", dataKey: "createdAt", render: (i) => formatDateWithFullMonth(i.createdAt) },
+          {
+            title: "Créée le",
+            dataKey: "createdAt",
+            onSortOrder: setSortOrder,
+            onSortBy: setSortBy,
+            sortBy,
+            sortOrder,
+            render: (i) => formatDateWithFullMonth(i.createdAt),
+          },
         ]}
       />
     </>
