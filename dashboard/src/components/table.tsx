@@ -118,7 +118,7 @@ const Table = <T extends { [key: string]: any } & RootItem>({
               };
               return (
                 <td
-                  className={[column.className || "", onSortBy ? "tw-cursor-pointer" : "tw-cursor-default"].join(" ")}
+                  className={["tw-whitespace-nowrap", column.className || "", onSortBy ? "tw-cursor-pointer" : "tw-cursor-default"].join(" ")}
                   style={column.style || {}}
                   key={String(dataKey) + String(column.title)}
                 >
