@@ -49,6 +49,7 @@ async function importDB() {
     await createDb();
     await createManoSchema();
     await importDB();
+    console.log("Database initialized successfully!");
     process.exit(0);
   } catch (err) {
     console.error(err);
