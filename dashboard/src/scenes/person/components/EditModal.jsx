@@ -9,7 +9,7 @@ import {
   personsState,
   usePreparePersonForEncryption,
 } from "../../../recoil/persons";
-import { outOfBoundariesDate } from "../../../services/date";
+import { dayjsInstance, outOfBoundariesDate } from "../../../services/date";
 import SelectTeamMultiple from "../../../components/SelectTeamMultiple";
 import { currentTeamState, userState } from "../../../recoil/auth";
 import { useRecoilState, useRecoilValue } from "recoil";
@@ -85,6 +85,10 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                 if (body.birthdate && outOfBoundariesDate(body.birthdate)) {
                   setOpenPanels(["main"]);
                   return toast.error("La date de naissance est hors limites (entre 1900 et 2100)");
+                }
+                if (body.birthdate && dayjsInstance(body.birthdate).isAfter(dayjsInstance())) {
+                  setOpenPanels(["main"]);
+                  return toast.error("La date de naissance ne peut pas être dans le futur");
                 }
                 if (body.wanderingAt && outOfBoundariesDate(body.wanderingAt)) {
                   setOpenPanels(["main"]);
