@@ -102,7 +102,7 @@ export const itemsGroupedByPersonSelector = selector({
       // assignedTeamsPeriods
       // final format example, after looping the whole history: { teamIdA: [{ endDate: startDate: }, { endDate: startDate: }] }
       // current format: { teamIdA: [{ endDate: now,  startDate: undefined }] }
-      const assignedTeamsPeriods = person.assignedTeams.reduce(
+      const assignedTeamsPeriods = (person.assignedTeams || []).reduce(
         (acc, teamId) => {
           acc[teamId] = [{ isoEndDate: dayjsInstance().toISOString(), isoStartDate: undefined }];
           return acc;
@@ -116,7 +116,7 @@ export const itemsGroupedByPersonSelector = selector({
           ],
         }
       );
-      let oldestTeams = person.assignedTeams;
+      let oldestTeams = person.assignedTeams || [];
       personsObject[person._id] = {
         ...person,
         followedSince: person.followedSince || person.createdAt,
