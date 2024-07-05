@@ -314,10 +314,11 @@ function CommentsTable({ comments, onDisplayComment, onEditComment, onAddComment
                         </span>
                       )}
                       <div className="[overflow-wrap:anywhere]">
-                        {(comment.comment || "").split("\n").map((e, i) => (
-                          <p key={e + i} className="tw-mb-0">
-                            {e}
-                          </p>
+                        {(comment.comment || "").split?.("\n")?.map((sentence, index) => (
+                          <React.Fragment key={sentence + index}>
+                            {sentence}
+                            <br />
+                          </React.Fragment>
                         ))}
                       </div>
 
