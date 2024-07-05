@@ -39,7 +39,7 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Ajouter un commentaire" }).first().click();
   await page.getByRole("textbox", { name: "Commentaire" }).click();
   await page.getByRole("textbox", { name: "Commentaire" }).fill("idem meme si il est prioritaire");
-  await page.getByLabel("Commentaire prioritaire Ce commentaire sera mis en avant par rapport aux autres").check();
+  await page.getByLabel("Commentaire prioritaire").check();
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Commentaire enregistré").click();
   await page.getByRole("button", { name: "Ajouter un passage" }).click();

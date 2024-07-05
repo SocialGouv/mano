@@ -30,7 +30,7 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Commentaires", exact: true }).click();
   await page.getByRole("dialog", { name: "Ajouter une action" }).getByRole("button", { name: "＋ Ajouter un commentaire" }).click();
   await page.getByLabel("Commentaire", { exact: true }).fill("Commentaire intégré");
-  await page.getByText("Commentaire prioritaire Ce commentaire sera mis en avant par rapport aux autres").click();
+  await page.getByLabel("Commentaire prioritaire").click();
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
@@ -43,7 +43,7 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Ajouter un commentaire" }).click();
   await page.getByLabel("Commentaire", { exact: true }).click();
   await page.getByLabel("Commentaire", { exact: true }).fill("Commentaire de personne");
-  await page.getByText("Commentaire prioritaire Ce commentaire sera mis en avant par rapport aux autres").click();
+  await page.getByLabel("Commentaire prioritaire").click();
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Commentaire enregistré").click();
   await page.getByText("Commentaire de personne").click();

@@ -421,30 +421,23 @@ function CommentDisplay({ comment, onClose, onEditComment, canToggleUrgentCheck,
               </div>
             </div>
             {canToggleUrgentCheck || canToggleGroupCheck || canToggleShareComment ? (
-              <div className="tw-flex tw-gap-8">
+              <div className="tw-flex tw-gap-8 tw-mb-4">
                 {canToggleUrgentCheck && comment.urgent ? (
                   <div className="tw-flex tw-flex-1 tw-flex-col">
-                    <label htmlFor="create-comment-urgent">
-                      Commentaire prioritaire <br />
-                      <small className="text-muted">Ce commentaire sera mis en avant par rapport aux autres</small>
-                    </label>
+                    <div>✓ Commentaire prioritaire</div>
+                    <div className="tw-text-xs tw-text-zinc-500">Ce commentaire est mis en avant par rapport aux autres</div>
                   </div>
                 ) : null}
-                {canToggleGroupCheck ? (
+                {canToggleGroupCheck && comment.group ? (
                   <div className="tw-flex tw-flex-1 tw-flex-col">
-                    <label htmlFor="create-comment-for-group">
-                      <input type="checkbox" className="tw-mr-2" id="create-comment-for-group" name="group" checked={comment.group} disabled />
-                      Commentaire familial <br />
-                      <small className="text-muted">Ce commentaire sera valable pour chaque membre de la famille</small>
-                    </label>
+                    <div>✓ Commentaire familial</div>
+                    <div className="tw-text-xs tw-text-zinc-500">Ce commentaire est valable pour chaque membre de la famille</div>
                   </div>
                 ) : null}
-                {canToggleShareComment ? (
+                {canToggleShareComment && comment.share ? (
                   <div className="tw-flex tw-flex-1 tw-flex-col">
-                    <label htmlFor="create-comment-for-share">
-                      <input type="checkbox" className="tw-mr-2" id="create-comment-for-share" name="share" checked={comment.share} disabled />
-                      Partager ce commentaire médical avec les professionnels non-médicaux
-                    </label>
+                    <div>✓ Commentaire médical partagé</div>
+                    <div className="tw-text-xs tw-text-zinc-500">Ce commentaire médical est partagé avec les professionnels non-médicaux</div>
                   </div>
                 ) : null}
               </div>
@@ -593,7 +586,7 @@ function CommentModal({
                     <div className="tw-flex tw-gap-8">
                       {canToggleUrgentCheck ? (
                         <div className="tw-flex tw-flex-1 tw-flex-col">
-                          <label htmlFor="create-comment-urgent">
+                          <label htmlFor="create-comment-urgent" className="tw-mb-0">
                             <input
                               type="checkbox"
                               id="create-comment-urgent"
@@ -602,14 +595,14 @@ function CommentModal({
                               checked={values.urgent}
                               onChange={handleChange}
                             />
-                            Commentaire prioritaire <br />
-                            <small className="text-muted">Ce commentaire sera mis en avant par rapport aux autres</small>
+                            Commentaire prioritaire
                           </label>
+                          <div className="tw-text-xs tw-text-zinc-500">Ce commentaire sera mis en avant par rapport aux autres</div>
                         </div>
                       ) : null}
                       {canToggleGroupCheck ? (
                         <div className="tw-flex tw-flex-1 tw-flex-col">
-                          <label htmlFor="create-comment-for-group">
+                          <label htmlFor="create-comment-for-group" className="tw-mb-0">
                             <input
                               type="checkbox"
                               className="tw-mr-2"
@@ -618,14 +611,14 @@ function CommentModal({
                               checked={values.group}
                               onChange={handleChange}
                             />
-                            Commentaire familial <br />
-                            <small className="text-muted">Ce commentaire sera valable pour chaque membre de la famille</small>
+                            Commentaire familial
                           </label>
+                          <div className="tw-text-xs tw-text-zinc-500">Ce commentaire sera valable pour chaque membre de la famille</div>
                         </div>
                       ) : null}
                       {canToggleShareComment ? (
                         <div className="tw-flex tw-flex-1 tw-flex-col">
-                          <label htmlFor="create-comment-for-share">
+                          <label htmlFor="create-comment-for-share" className="tw-mb-0">
                             <input
                               type="checkbox"
                               className="tw-mr-2"
@@ -634,8 +627,9 @@ function CommentModal({
                               checked={values.share}
                               onChange={handleChange}
                             />
-                            Partager ce commentaire médical avec les professionnels non-médicaux
+                            Commentaire médical partagé
                           </label>
+                          <div className="tw-text-xs tw-text-zinc-500">Ce commentaire médical sera partagé avec les professionnels non-médicaux</div>
                         </div>
                       ) : null}
                     </div>
