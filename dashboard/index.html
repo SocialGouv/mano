@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr" translate="no">
   <head>
     <meta charset="utf-8" />
@@ -6,7 +6,7 @@
     <link rel="manifest" href="mano.webmanifest" />
     <meta name="theme-color" content="#008e7f" />
     <link rel="shortcut icon" href="/favicon.png" />
-    <title>Mano - Admin</title>
+    <title>Mano</title>
   </head>
 
   <body>
@@ -16,12 +16,12 @@
       // https://stackoverflow.com/a/19999868/5225096
       function checkIEFromUserAgent() {
         const ua = window.navigator.userAgent;
-        const msie = ua.indexOf('MSIE ');
+        const msie = ua.indexOf("MSIE ");
         return msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./);
       }
 
       (function () {
-        if (checkIEFromUserAgent()) window.location.href = '/ie.html';
+        if (checkIEFromUserAgent()) window.location.href = "/ie.html";
       })();
     </script>
 

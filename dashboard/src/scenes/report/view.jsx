@@ -281,7 +281,7 @@ const View = () => {
     // for print use only
     document.title = `Compte rendu Mano - Organisation ${organisation.name} - ${dayjsInstance(dateString).format("DD-MM-YYYY")} - imprimé par ${user.name}`;
     return () => {
-      document.title = "Mano - Admin";
+      document.title = "Mano";
     };
   });
   const canSeeComments = ["admin", "normal"].includes(user.role);
