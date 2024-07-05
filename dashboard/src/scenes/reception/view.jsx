@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { Modal, ModalBody, ModalHeader } from "reactstrap";
 import { useHistory, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import { formatDateWithNameOfDay, getIsDayWithinHoursOffsetOfPeriod, isToday, now, startOfToday } from "../../services/date";
@@ -24,6 +23,7 @@ import Passage from "../../components/Passage";
 import UserName from "../../components/UserName";
 import ReceptionService from "../../components/ReceptionService";
 import { useDataLoader } from "../../components/DataLoader";
+import { ModalContainer, ModalHeader, ModalBody, ModalFooter } from "../../components/tailwind/Modal";
 
 const actionsForCurrentTeamSelector = selector({
   key: "actionsForCurrentTeamSelector",
@@ -297,9 +297,9 @@ const PassagesToday = ({ passages, isOpen, setOpen }) => {
   const [passageToEdit, setPassageToEdit] = useState(null);
 
   return (
-    <Modal isOpen={isOpen} toggle={() => setOpen(false)} size="lg" backdrop="static">
-      <ModalHeader toggle={() => setOpen(false)}>Passages du {formatDateWithNameOfDay(now())}</ModalHeader>
-      <ModalBody>
+    <ModalContainer open={isOpen} onAfterLeave={() => setOpen(false)} size="4xl">
+      <ModalHeader onClose={() => setOpen(false)} title={`Passages du ${formatDateWithNameOfDay(now())}`} />
+      <ModalBody className="tw-pt-4 tw-px-4">
         <Passage passage={passageToEdit} personId={passageToEdit?.person} onFinished={() => setPassageToEdit(null)} />
         {!!passages.length && (
           <Table
@@ -336,7 +336,19 @@ const PassagesToday = ({ passages, isOpen, setOpen }) => {
           />
         )}
       </ModalBody>
-    </Modal>
+      <ModalFooter>
+        <button
+          type="button"
+          name="cancel"
+          className="button-cancel"
+          onClick={() => {
+            setOpen(false);
+          }}
+        >
+          Fermer
+        </button>
+      </ModalFooter>
+    </ModalContainer>
   );
 };
 
