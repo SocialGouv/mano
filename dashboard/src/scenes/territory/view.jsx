@@ -13,6 +13,8 @@ import BackButton from "../../components/backButton";
 import { TerritoryModal } from "./list";
 import { useLocalStorage } from "../../services/useLocalStorage";
 import { useDataLoader } from "../../components/DataLoader";
+import { territoryObservationsState } from "../../recoil/territoryObservations";
+import { errorMessage } from "../../utils";
 
 const View = () => {
   const { refresh } = useDataLoader();
@@ -24,6 +26,9 @@ const View = () => {
   const [territories] = useRecoilState(territoriesState);
   const [modalOpen, setModalOpen] = useState(false);
   const territory = territories.find((t) => t._id === id);
+  const territoryObservations = useRecoilValue(territoryObservationsState);
+
+  const observations = territoryObservations.filter((obs) => obs.territory === territory?._id);
 
   useTitle(`${territory?.name} - Territoire`);
 
@@ -81,22 +86,36 @@ const View = () => {
                 Statistiques du territoire
               </button>
               <DeleteButtonAndConfirmModal
-                title={`Voulez-vous vraiment supprimer le territoire ${territory.name}`}
+                // eslint-disable-next-line no-irregular-whitespace
+                title={`Voulez-vous vraiment supprimer le territoire ${territory.name} ?`}
                 textToConfirm={territory.name}
                 onConfirm={async () => {
-                  const [error] = await tryFetchExpectOk(async () => API.delete({ path: `/territory/${id}` }));
-                  if (!error) {
-                    await refresh();
-                    toast.success("Suppression réussie");
-                    history.goBack();
+                  const [error] = await tryFetchExpectOk(async () =>
+                    API.delete({
+                      path: `/territory/${id}`,
+                    })
+                  );
+                  if (error) {
+                    toast.error(errorMessage(error));
+                    return;
                   }
+                  for (let observation of observations) {
+                    if (!observation._id) continue;
+                    const [error] = await tryFetchExpectOk(() => API.delete({ path: `/territory-observation/${observation._id}` }));
+                    if (error) {
+                      toast.error(errorMessage(error));
+                      // On ne break pas pour supprimer le maximum d'observations.
+                    }
+                  }
+                  await refresh();
+                  toast.success("Suppression réussie");
+                  history.goBack();
                 }}
               >
-                <span style={{ marginBottom: 30, display: "block", width: "100%", textAlign: "center" }}>
-                  Cette opération est irréversible
-                  <br />
-                  et entrainera la suppression définitive de toutes les observations liées au territoire.
-                </span>
+                <div className="tw-px-8 tw-pb-8 tw-text-center">
+                  Cette opération est <u>irréversible</u> et entrainera la <b>suppression définitive</b> de <b>toutes les observations</b> liées au
+                  territoire, <b>y compris dans les statistiques</b>.
+                </div>
               </DeleteButtonAndConfirmModal>
               <button
                 className="button-submit"
