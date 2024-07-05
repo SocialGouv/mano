@@ -50,7 +50,7 @@ const DeleteButtonAndConfirmModal = ({
       <ModalContainer open={open} onClose={() => setOpen(false)} size="3xl">
         <ModalHeader>
           <div className="tw-px-4">
-            <p className="tw-block tw-text-center tw-text-xl tw-text-red-500">{title}</p>
+            <h2 className="tw-block tw-text-center tw-text-xl tw-text-red-500 tw-mb-0">{title}</h2>
           </div>
         </ModalHeader>
         <ModalBody className="tw-py-4">
