@@ -81,7 +81,7 @@ const DeleteButtonAndConfirmModal = ({
             }}
             className="tw-flex tw-w-full tw-items-center tw-justify-center tw-px-12"
           >
-            <input className="tailwindui tw-basis-1/2" name="textToConfirm" placeholder={textToConfirm} type="text" />
+            <input className="tailwindui tw-basis-1/2" name="textToConfirm" autoComplete="off" placeholder={textToConfirm} type="text" />
           </form>
         </ModalBody>
         <ModalFooter>
