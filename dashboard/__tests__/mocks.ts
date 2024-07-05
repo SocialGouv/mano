@@ -43,6 +43,9 @@ export const personPopulated: PersonPopulated = {
   interactions: [dayjs("2023-01-01").toDate()],
   lastUpdateCheckForGDPR: new Date(),
   forTeamFiltering: [],
+  assignedTeamsPeriods: {
+    all: [{ isoStartDate: "2023-01-01", isoEndDate: "2024-01-01" }],
+  },
 };
 
 export const mockedEvolutiveStatsIndicatorsBase: Array<CustomOrPredefinedField> = [

@@ -66,6 +66,7 @@ export interface PersonPopulated extends PersonInstance {
   lastUpdateCheckForGDPR: Date;
   group?: GroupInstance;
   forTeamFiltering: ForTeamFilteringType;
+  assignedTeamsPeriods: Record<UUIDV4, Array<{ isoStartDate: string; isoEndDate: string }>>;
   documentsForModule?: DocumentWithLinkedItem[];
   groupDocuments?: DocumentWithLinkedItem[];
   actions?: any[];

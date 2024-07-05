@@ -5,10 +5,13 @@ import type { PersonPopulated } from "../types/person";
 import type { CustomOrPredefinedField } from "../types/field";
 import type { IndicatorsSelection } from "../types/evolutivesStats";
 import type { EvolutiveStatOption } from "../types/evolutivesStats";
+import type { UUIDV4 } from "../types/uuid";
+import type { PeriodISODate } from "../types/date";
 import { dayjsInstance } from "../services/date";
 import { personFieldsIncludingCustomFieldsSelector } from "./persons";
 import type { Dayjs } from "dayjs";
 import { currentTeamState } from "./auth";
+import { mergedPersonAssignedTeamPeriodsWithQueryPeriod } from "../utils/person-merge-assigned-team-periods-with-query-period";
 
 export const evolutiveStatsIndicatorsBaseSelector = selector({
   key: "evolutiveStatsIndicatorsBaseSelector",
@@ -83,13 +86,13 @@ export function getPersonSnapshotAtDate({
 }: {
   person: PersonPopulated;
   indicator: IndicatorsSelection[0];
-  snapshotDate: string; // YYYYMMDD
+  snapshotDate: string; // YYYY-MM-DD
 }): PersonPopulated | null {
   if (!person.history?.length) return person;
   const reversedHistory = [...person.history].reverse();
   let snapshot = structuredClone(person);
   for (const historyItem of reversedHistory) {
-    const historyDate = dayjsInstance(historyItem.date).format("YYYYMMDD");
+    const historyDate = dayjsInstance(historyItem.date).format("YYYY-MM-DD");
     // history is: before the date
     // snapshot is: after the date
     // what should we do for a history change on the same day as the snapshot ?
@@ -143,12 +146,16 @@ export function computeEvolutiveStatsForPersons({
   persons,
   evolutiveStatsIndicators,
   evolutiveStatsIndicatorsBase,
+  viewAllOrganisationData,
+  selectedTeamsObjectWithOwnPeriod,
 }: {
   startDate: string | null;
   endDate: string | null;
   persons: Array<PersonPopulated>;
   evolutiveStatsIndicators: IndicatorsSelection;
   evolutiveStatsIndicatorsBase: Array<CustomOrPredefinedField>;
+  viewAllOrganisationData: boolean;
+  selectedTeamsObjectWithOwnPeriod: Record<UUIDV4, PeriodISODate>;
 }): EvolutiveStatRenderData {
   // concepts:
   // we select "indicators" (for now only one by one is possible) that are fields of the person
@@ -164,17 +171,16 @@ export function computeEvolutiveStatsForPersons({
   // we check the number of switches from `fromValue` to `toValue` for the field during the period
   // CAREFUL: if there is an `intermediateValue` between `fromValue` and `toValue`, it's not a switch
 
-  // FIXME: why we need both the formats YYYY-MM-DD and YYYYMMDD ? why not only YYYY-MM-DD ?
   const startDateConsolidated = startDate
     ? dayjsInstance(dayjsInstance(startDate).startOf("day").format("YYYY-MM-DD"))
     : dayjsInstance(startHistoryFeatureDate);
 
   const endDateConsolidated = endDate ? dayjsInstance(dayjsInstance(endDate).endOf("day").format("YYYY-MM-DD")) : dayjsInstance();
 
-  const startDateFormatted = startDateConsolidated.format("YYYYMMDD");
-  let endDateFormatted = endDateConsolidated.format("YYYYMMDD");
-  const tonight = dayjsInstance().endOf("day").format("YYYYMMDD");
-  endDateFormatted = endDateFormatted > tonight ? endDateFormatted : tonight;
+  const queryStartDateFormatted = startDateConsolidated.format("YYYY-MM-DD");
+  let queryEndDateFormatted = endDateConsolidated.format("YYYY-MM-DD");
+  const tonight = dayjsInstance().endOf("day").format("YYYY-MM-DD");
+  queryEndDateFormatted = queryEndDateFormatted > tonight ? queryEndDateFormatted : tonight;
 
   // for now we only support one indicator
   const indicator = evolutiveStatsIndicators[0];
@@ -201,82 +207,91 @@ export function computeEvolutiveStatsForPersons({
   const personsIdsSwitchedByValue: Record<EvolutiveStatOption, Array<PersonPopulated["id"]>> = {};
 
   for (const person of persons) {
-    // FIXME: on doit prendre en compte la date de suivi par équipe, et non la date de création
-    const followedSince = dayjsInstance(person.followedSince || person.createdAt).format("YYYYMMDD");
-    if (followedSince > endDateFormatted) continue;
-    const initSnapshotDate = followedSince > startDateFormatted ? followedSince : startDateFormatted;
-    const initSnapshot = getPersonSnapshotAtDate({ person, snapshotDate: initSnapshotDate, indicator });
-    let countSwitchedValueDuringThePeriod = 0;
+    const personPeriods = mergedPersonAssignedTeamPeriodsWithQueryPeriod({
+      viewAllOrganisationData,
+      isoStartDate: queryStartDateFormatted,
+      isoEndDate: queryEndDateFormatted,
+      selectedTeamsObjectWithOwnPeriod,
+      assignedTeamsPeriods: person.assignedTeamsPeriods,
+    });
+    for (const period of personPeriods) {
+      const periodStartDate = dayjsInstance(period.isoStartDate).format("YYYY-MM-DD");
+      if (periodStartDate > queryEndDateFormatted) continue;
+      const initSnapshotDate = periodStartDate > queryStartDateFormatted ? periodStartDate : queryStartDateFormatted;
+      const initSnapshot = getPersonSnapshotAtDate({ person, snapshotDate: initSnapshotDate, indicator });
+      let countSwitchedValueDuringThePeriod = 0;
 
-    const currentRawValue = getValueByField(indicator, initSnapshot[indicatorFieldName ?? ""]);
-    let currentValue = Array.isArray(currentRawValue) ? currentRawValue : [currentRawValue].filter(Boolean);
-    let currentPerson = initSnapshot;
+      const currentRawValue = getValueByField(indicator, initSnapshot[indicatorFieldName ?? ""]);
+      let currentValue = Array.isArray(currentRawValue) ? currentRawValue : [currentRawValue].filter(Boolean);
+      let currentPerson = initSnapshot;
 
-    for (const historyItem of person.history ?? []) {
-      const historyDate = dayjsInstance(historyItem.date).format("YYYYMMDD");
-      if (followedSince === historyDate) continue; // we don't want to take the snapshot date (it's already done before the loop)
-      if (historyDate < initSnapshotDate) continue;
-      if (historyDate > endDateFormatted) break;
+      for (const historyItem of person.history ?? []) {
+        const historyDate = dayjsInstance(historyItem.date).format("YYYY-MM-DD");
+        if (periodStartDate === historyDate) continue; // we don't want to take the snapshot date (it's already done before the loop)
+        if (historyDate < initSnapshotDate) continue;
+        if (historyDate > queryEndDateFormatted) break;
 
-      let nextPerson = structuredClone(currentPerson);
-      for (const historyChangeField of Object.keys(historyItem.data)) {
-        if (historyChangeField !== indicatorFieldName) continue; // we support only one indicator for now
-        const oldValue = getValueByField(indicator, historyItem.data[historyChangeField].oldValue);
-        const historyNewValue = getValueByField(indicator, historyItem.data[historyChangeField].newValue);
-        const currentPersonValue = getValueByField(indicator, currentPerson[historyChangeField]);
-        if (JSON.stringify(oldValue) !== JSON.stringify(currentPersonValue)) {
-          capture(new Error("Incoherent history in computeEvolutiveStatsForPersons"), {
-            extra: {
-              followedSince,
-              historyDate,
-              initSnapshotDate,
-              endDateFormatted,
-              historyItem,
-              historyChangeField,
-              oldValue,
-              historyNewValue,
-              currentPersonValue,
-              // currentPerson,
-              // person,
-              // initSnapshot,
-            },
-          });
+        let nextPerson = structuredClone(currentPerson);
+        for (const historyChangeField of Object.keys(historyItem.data)) {
+          if (historyChangeField !== indicatorFieldName) continue; // we support only one indicator for now
+          const oldValue = getValueByField(indicator, historyItem.data[historyChangeField].oldValue);
+          const historyNewValue = getValueByField(indicator, historyItem.data[historyChangeField].newValue);
+          const currentPersonValue = getValueByField(indicator, currentPerson[historyChangeField]);
+          if (JSON.stringify(oldValue) !== JSON.stringify(currentPersonValue)) {
+            capture(new Error("Incoherent history in computeEvolutiveStatsForPersons"), {
+              extra: {
+                personPeriods,
+                periodStartDate,
+                historyDate,
+                initSnapshotDate,
+                queryEndDateFormatted,
+                historyItem,
+                historyChangeField,
+                oldValue,
+                historyNewValue,
+                currentPersonValue,
+                // currentPerson,
+                // person,
+                // initSnapshot,
+              },
+            });
+          }
+
+          if (oldValue === "") continue;
+          nextPerson = {
+            ...nextPerson,
+            [historyChangeField]: historyNewValue,
+          };
         }
+        const nextRawValue = getValueByField(indicator, nextPerson[indicatorFieldName ?? ""]);
+        const nextValue = Array.isArray(nextRawValue) ? nextRawValue : [nextRawValue].filter(Boolean);
 
-        if (oldValue === "") continue;
-        nextPerson = {
-          ...nextPerson,
-          [historyChangeField]: historyNewValue,
-        };
-      }
-      const nextRawValue = getValueByField(indicator, nextPerson[indicatorFieldName ?? ""]);
-      const nextValue = Array.isArray(nextRawValue) ? nextRawValue : [nextRawValue].filter(Boolean);
+        if (historyDate >= queryStartDateFormatted) {
+          // now we have the person at the date of the history item
 
-      if (historyDate >= startDateFormatted) {
-        // now we have the person at the date of the history item
-
-        if (currentValue.includes(valueStart)) {
-          if (!nextValue.includes(valueStart)) {
-            countSwitchedValueDuringThePeriod++;
-            for (const value of nextValue) {
-              if (!personsIdsSwitchedByValue[value]) {
-                personsIdsSwitchedByValue[value] = [];
+          if (currentValue.includes(valueStart)) {
+            if (!nextValue.includes(valueStart)) {
+              countSwitchedValueDuringThePeriod++;
+              for (const value of nextValue) {
+                if (!personsIdsSwitchedByValue[value]) {
+                  personsIdsSwitchedByValue[value] = [];
+                }
+                personsIdsSwitchedByValue[value].push(person._id);
               }
-              personsIdsSwitchedByValue[value].push(person._id);
             }
           }
         }
+        currentPerson = nextPerson;
+        currentValue = nextValue;
       }
-      currentPerson = nextPerson;
-      currentValue = nextValue;
-    }
 
-    if (countSwitchedValueDuringThePeriod === 0) {
-      if (!personsIdsSwitchedByValue[valueStart]) {
-        personsIdsSwitchedByValue[valueStart] = [];
+      if (countSwitchedValueDuringThePeriod === 0) {
+        if (!personsIdsSwitchedByValue[valueStart]) {
+          personsIdsSwitchedByValue[valueStart] = [];
+        }
+        // FIXME: is there a bug here ? we don'tcheck if the person has the valueStart, should we ?
+        personsIdsSwitchedByValue[valueStart].push(person._id); // from `fromValue` to `fromValue`
       }
-      // FIXME: is there a bug here ? we don'tcheck if the person has the valueStart, should we ?
-      personsIdsSwitchedByValue[valueStart].push(person._id); // from `fromValue` to `fromValue`
     }
   }
 
@@ -307,11 +322,15 @@ export const evolutiveStatsForPersonsSelector = selectorFamily({
       endDate,
       persons,
       evolutiveStatsIndicators,
+      viewAllOrganisationData,
+      selectedTeamsObjectWithOwnPeriod,
     }: {
       startDate: string | null;
       endDate: string | null;
       persons: Array<PersonPopulated>;
       evolutiveStatsIndicators: IndicatorsSelection;
+      viewAllOrganisationData: boolean;
+      selectedTeamsObjectWithOwnPeriod: Record<UUIDV4, PeriodISODate>;
     }) =>
     ({ get }) => {
       const evolutiveStatsIndicatorsBase = get(evolutiveStatsIndicatorsBaseSelector);
@@ -322,6 +341,8 @@ export const evolutiveStatsForPersonsSelector = selectorFamily({
         persons,
         evolutiveStatsIndicators,
         evolutiveStatsIndicatorsBase,
+        viewAllOrganisationData,
+        selectedTeamsObjectWithOwnPeriod,
       });
     },
 });

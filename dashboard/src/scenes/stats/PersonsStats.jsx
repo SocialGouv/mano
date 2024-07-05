@@ -33,6 +33,8 @@ export default function PersonStats({
   evolutivesStatsActivated,
   evolutiveStatsIndicators,
   setEvolutiveStatsIndicators,
+  viewAllOrganisationData,
+  selectedTeamsObjectWithOwnPeriod,
 }) {
   const allGroups = useRecoilValue(groupsState);
   const customFieldsPersons = useRecoilValue(customFieldsPersonsSelector);
@@ -91,6 +93,8 @@ export default function PersonStats({
               period={period}
               persons={personsForStats}
               filterBase={filterBase}
+              viewAllOrganisationData={viewAllOrganisationData}
+              selectedTeamsObjectWithOwnPeriod={selectedTeamsObjectWithOwnPeriod}
             />
           )}
         </>

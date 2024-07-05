@@ -674,6 +674,8 @@ const Stats = () => {
             period={period}
             evolutiveStatsIndicators={evolutiveStatsIndicators}
             setEvolutiveStatsIndicators={setEvolutiveStatsIndicators}
+            viewAllOrganisationData={viewAllOrganisationData}
+            selectedTeamsObjectWithOwnPeriod={selectedTeamsObjectWithOwnPeriod}
           />
         )}
         {activeTab === "Personnes suivies" && (
@@ -691,6 +693,8 @@ const Stats = () => {
             period={period}
             evolutiveStatsIndicators={evolutiveStatsIndicators}
             setEvolutiveStatsIndicators={setEvolutiveStatsIndicators}
+            viewAllOrganisationData={viewAllOrganisationData}
+            selectedTeamsObjectWithOwnPeriod={selectedTeamsObjectWithOwnPeriod}
           />
         )}
         {!!organisation.passagesEnabled && activeTab === "Passages" && (

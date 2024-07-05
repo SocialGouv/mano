@@ -16,9 +16,18 @@ interface EvolutiveStatsViewerProps {
   };
   persons: Array<PersonPopulated>;
   filterBase: Array<FilterableField>;
+  viewAllOrganisationData: boolean;
+  selectedTeamsObjectWithOwnPeriod: Record<string, { isoStartDate: string; isoEndDate: string }>;
 }
 
-export default function EvolutiveStatsViewer({ evolutiveStatsIndicators, period, persons, filterBase }: EvolutiveStatsViewerProps) {
+export default function EvolutiveStatsViewer({
+  evolutiveStatsIndicators,
+  period,
+  persons,
+  filterBase,
+  viewAllOrganisationData,
+  selectedTeamsObjectWithOwnPeriod,
+}: EvolutiveStatsViewerProps) {
   const [personsModalOpened, setPersonsModalOpened] = useState(false);
   const personsObject = useRecoilValue(itemsGroupedByPersonSelector);
 
@@ -28,6 +37,8 @@ export default function EvolutiveStatsViewer({ evolutiveStatsIndicators, period,
       startDate: period.startDate,
       endDate: period.endDate,
       evolutiveStatsIndicators,
+      viewAllOrganisationData,
+      selectedTeamsObjectWithOwnPeriod,
     })
   );
   try {
