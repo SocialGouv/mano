@@ -49,7 +49,7 @@ const SelectPerson = ({
             : sortedPersonsByName.find((i) => i._id === defaultValue)
         }
         getOptionValue={(i) => i._id}
-        getOptionLabel={(i) => i?.name}
+        getOptionLabel={(i) => (i?.otherNames ? `${i?.name} ${i?.otherNames}` : i?.name)}
         formatOptionLabel={(i, options) => {
           return (
             <div style={{ display: "flex", alignItems: "center" }}>
