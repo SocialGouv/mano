@@ -56,6 +56,7 @@ export interface OrganisationInstance {
   territoriesGroupedTypes?: GroupedTypes[];
 
   defaultPersonsFolders?: Folder[];
+  defaultMedicalFolders?: Folder[];
 
   responsible?: string;
 }

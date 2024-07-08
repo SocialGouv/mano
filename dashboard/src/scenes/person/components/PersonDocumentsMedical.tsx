@@ -29,6 +29,14 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
   const medicalFile = person.medicalFile;
 
+  const defaultDocuments: Array<FolderWithLinkedItem> = organisation.defaultMedicalFolders.map((folder) => ({
+    ...folder,
+    linkedItem: {
+      _id: person._id,
+      type: "person",
+    },
+  }));
+
   const allMedicalDocuments = useMemo(() => {
     if (!medicalFile) return [];
     const treatmentsDocs: Array<DocumentWithLinkedItem | FolderWithLinkedItem> = [
@@ -111,8 +119,10 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
       otherDocs.push(docWithLinkedItem);
     }
 
-    return [...treatmentsDocs, ...consultationsDocs, ...otherDocs].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  }, [consultations, medicalFile, treatments, user._id]);
+    return [...treatmentsDocs, ...consultationsDocs, ...otherDocs, ...(otherDocs?.length > 0 ? [] : defaultDocuments)].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  }, [consultations, defaultDocuments, medicalFile, treatments, user._id]);
 
   return (
     <DocumentsModule
@@ -183,7 +193,11 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
               path: `/medical-file/${medicalFile._id}`,
               body: await encryptMedicalFile(customFieldsMedicalFile)({
                 ...medicalFile,
-                documents: medicalFile.documents.filter((d) => d._id !== documentOrFolder._id),
+                // If there are no document yet and default documents are present,
+                // we save the default documents since they are modified by the user.
+                documents: (medicalFile.documents?.length ? medicalFile.documents : [...defaultDocuments]).filter(
+                  (d) => d._id !== documentOrFolder._id
+                ),
               }),
             })
           );
@@ -261,7 +275,9 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
                 path: `/medical-file/${medicalFile._id}`,
                 body: await encryptMedicalFile(customFieldsMedicalFile)({
                   ...medicalFile,
-                  documents: medicalFile.documents.map((d) => {
+                  // If there are no document yet and default documents are present,
+                  // we save the default documents since they are modified by the user.
+                  documents: (medicalFile.documents?.length ? medicalFile.documents : [...defaultDocuments]).map((d) => {
                     if (d._id === documentOrFolder._id) {
                       // remove linkedItem from document
                       const { linkedItem, ...rest } = documentOrFolder;
@@ -283,7 +299,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
       }}
       onSaveNewOrder={async (nextDocuments) => {
         try {
-          const groupedById: any = {
+          const groupedById = {
             treatment: {},
             consultation: {},
             "medical-file": {},
@@ -358,7 +374,9 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
               path: `/medical-file/${medicalFile._id}`,
               body: await encryptMedicalFile(customFieldsMedicalFile)({
                 ...medicalFile,
-                documents: [...(medicalFile.documents || []), ...nextDocuments],
+                // If there are no document yet and default documents are present,
+                // we save the default documents since they are modified by the user.
+                documents: [...(medicalFile.documents?.length ? medicalFile.documents : [...defaultDocuments]), ...nextDocuments],
               }),
             })
         );

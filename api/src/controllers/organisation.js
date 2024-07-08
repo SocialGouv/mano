@@ -261,6 +261,7 @@ router.put(
         structuresGroupedCategories: z.optional(z.array(z.object({ groupTitle: z.string(), categories: z.array(z.string().min(1)) }))),
         territoriesGroupedTypes: z.optional(z.array(z.object({ groupTitle: z.string(), types: z.array(z.string().min(1)) }))),
         defaultPersonsFolders: z.optional(z.array(folderSchema)),
+        defaultMedicalFolders: z.optional(folderSchema),
         groupedServices: z.optional(z.array(z.object({ groupedServices: z.string(), services: z.array(z.string().min(1)) }))),
         collaborations: z.optional(z.array(z.string().min(1))),
         groupedCustomFieldsObs: z.optional(z.array(customFieldGroupSchema)),
@@ -326,6 +327,7 @@ router.put(
     if (req.body.hasOwnProperty("structuresGroupedCategories")) updateOrg.structuresGroupedCategories = req.body.structuresGroupedCategories;
     if (req.body.hasOwnProperty("territoriesGroupedTypes")) updateOrg.territoriesGroupedTypes = req.body.territoriesGroupedTypes;
     if (req.body.hasOwnProperty("defaultPersonsFolders")) updateOrg.defaultPersonsFolders = req.body.defaultPersonsFolders;
+    if (req.body.hasOwnProperty("defaultMedicalFolders")) updateOrg.defaultMedicalFolders = req.body.defaultMedicalFolders;
     if (req.body.hasOwnProperty("groupedServices")) updateOrg.groupedServices = req.body.groupedServices;
     if (req.body.hasOwnProperty("collaborations")) updateOrg.collaborations = req.body.collaborations;
     if (req.body.hasOwnProperty("groupedCustomFieldsObs"))
@@ -909,7 +911,7 @@ router.post(
       }
 
       // ...
-      // We do not merge defaultPersonsFolders, we keep the main ones.
+      // We do not merge defaultPersonsFolders nor defaultMedicalFolders, we keep the main ones.
       // ...
 
       // groupedServices

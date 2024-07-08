@@ -32,7 +32,6 @@ import StructuresCategoriesSettings from "./StructuresCategoriesSettings";
 import Poubelle from "./Poubelle";
 import CollaborationsSettings from "./CollaborationsSettings";
 import { customFieldsMedicalFileSelector } from "../../recoil/medicalFiles";
-import DefaultPersonFolders from "./DefaultPersonFolders";
 import { dayjsInstance, now } from "../../services/date";
 import { encryptItem } from "../../services/encryption";
 import { errorMessage } from "../../utils";
@@ -40,6 +39,7 @@ import ImportTerritories from "../data-import-export/ImportTerritories";
 import { flattenedTerritoriesTypesSelector, territoriesFields } from "../../recoil/territory";
 import DownloadTerritoriesImportExample from "../data-import-export/DownloadTerritoriesImportExample";
 import TerritoriesTypesSettings from "./TerritoriesTypesSettings";
+import { DefaultFoldersMedical, DefaultFoldersPersons } from "./DefaultFolders";
 
 const getSettingTitle = (tabId) => {
   if (tabId === "infos") return "Informations";
@@ -289,7 +289,14 @@ const View = () => {
                 case "collaborations":
                   return <CollaborationsSettings />;
                 case "medicalFile":
-                  return <MedicalFileSettings />;
+                  return (
+                    <div>
+                      <MedicalFileSettings />
+                      <hr />
+                      <h4 className="tw-my-8">Dossiers par défaut</h4>
+                      <DefaultFoldersMedical />
+                    </div>
+                  );
                 case "actions":
                   return <ActionCategoriesSettings />;
                 case "structures":
@@ -458,7 +465,7 @@ const View = () => {
                           <PersonCustomFieldsSettings />
                           <hr />
                           <h4 className="tw-my-8">Dossiers par défaut</h4>
-                          <DefaultPersonFolders />
+                          <DefaultFoldersPersons />
                         </>
                       ) : (
                         <>

@@ -19,6 +19,7 @@ module.exports = (sequelize, DataTypes) => {
       // example: [{"groupTitle": "Tous mes types", "types": ["Lieu de conso", "Lieu de deal", "Carrefour de passage", "Campement", "Lieu de vie", "Prostitution", "Errance", "Mendicité", "Loisir", "Rassemblement communautaire", "Historique"]}]
     },
     defaultPersonsFolders: { type: DataTypes.JSONB, defaultValue: [] },
+    defaultMedicalFolders: { type: DataTypes.JSONB, defaultValue: [] },
     collaborations: { type: [DataTypes.ARRAY(DataTypes.TEXT)], defaultValue: [] },
     consultations: DataTypes.JSONB,
     encryptionEnabled: { type: DataTypes.BOOLEAN },

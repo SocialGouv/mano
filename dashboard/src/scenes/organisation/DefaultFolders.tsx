@@ -8,26 +8,33 @@ import API, { tryFetchExpectOk } from "../../services/api";
 import { capture } from "../../services/sentry";
 import { toast } from "react-toastify";
 
-export default function DefaultPersonFolders() {
+function DefaultFolders({
+  errorText,
+  organisationProperty,
+}: {
+  errorText: string;
+  organisationProperty: "defaultPersonsFolders" | "defaultMedicalFolders";
+}) {
   const organisation = useRecoilValue(organisationAuthentifiedState);
   const [folderToEdit, setFolderToEdit] = useState<Folder | null>(null);
   const [addFolder, setAddFolder] = useState(false);
-  const [items, setItems] = useState<Array<Folder>>(organisation.defaultPersonsFolders || []);
+  const [items, setItems] = useState<Array<Folder>>(organisation[organisationProperty] || []);
   useEffect(() => {
     // FIXME: trouver une meilleure méthode de comparaison
-    if (JSON.stringify(organisation.defaultPersonsFolders) !== JSON.stringify(items)) {
-      tryFetchExpectOk(() => API.put({ path: `/organisation/${organisation._id}`, body: { defaultPersonsFolders: items } }))
+    if (JSON.stringify(organisation[organisationProperty]) !== JSON.stringify(items)) {
+      tryFetchExpectOk(() => API.put({ path: `/organisation/${organisation._id}`, body: { [organisationProperty]: items } }))
         .then(([error]) => {
           if (error) {
-            toast.error("Erreur lors de la mise à jour des dossiers par défaut des personnes");
+            toast.error(errorText);
           }
         })
         .catch((error) => {
-          toast.error("Erreur lors de la mise à jour des dossiers par défaut des personnes");
+          toast.error(errorText);
           capture(error);
         });
     }
-  }, [items, organisation]);
+  }, [errorText, items, organisation, organisationProperty]);
+
   return (
     <>
       <div className="tw-mb-8">
@@ -89,5 +96,20 @@ export default function DefaultPersonFolders() {
         Ajouter un dossier
       </button>
     </>
+  );
+}
+
+export function DefaultFoldersPersons() {
+  return (
+    <DefaultFolders errorText="Erreur lors de la mise à jour des dossiers par défaut des personnes" organisationProperty="defaultPersonsFolders" />
+  );
+}
+
+export function DefaultFoldersMedical() {
+  return (
+    <DefaultFolders
+      errorText="Erreur lors de la mise à jour des dossiers par défaut des dossiers médicaux"
+      organisationProperty="defaultMedicalFolders"
+    />
   );
 }
