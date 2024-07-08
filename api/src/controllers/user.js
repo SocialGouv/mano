@@ -145,11 +145,12 @@ router.get(
   validateUser(["admin", "normal", "superadmin", "restricted-access", "stats-only"]),
   catchErrors(async (req, res) => {
     const user = await User.findOne({ where: { _id: req.user._id } });
-    const teams = await user.getTeams();
+    const treams = await user.getTeams();
     const organisation = await user.getOrganisation();
+    const orgTeams = await Team.findAll({ where: { organisation: organisation._id } });
     return res.status(200).send({
       ok: true,
-      user: serializeUserWithTeamsAndOrganisation(user, teams, organisation),
+      user: serializeUserWithTeamsAndOrganisation(user, treams, organisation, orgTeams),
     });
   })
 );
@@ -247,7 +248,7 @@ router.post(
     const token = jwt.sign({ _id: user._id }, config.SECRET, { expiresIn: JWT_MAX_AGE });
     res.cookie("jwt", token, cookieOptions());
 
-    return res.status(200).send({ ok: true, token, user: serializeUserWithTeamsAndOrganisation(user, teams, organisation) });
+    return res.status(200).send({ ok: true, token, user: serializeUserWithTeamsAndOrganisation(user, teams, organisation, orgTeams) });
   })
 );
 
@@ -301,7 +302,7 @@ router.get(
 
     createUserLog(req, user);
 
-    return res.status(200).send({ ok: true, token, user: serializeUserWithTeamsAndOrganisation(user, teams, organisation) });
+    return res.status(200).send({ ok: true, token, user: serializeUserWithTeamsAndOrganisation(user, teams, organisation, orgTeams) });
   })
 );
 

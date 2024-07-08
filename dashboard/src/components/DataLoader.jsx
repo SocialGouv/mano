@@ -17,7 +17,7 @@ import { relsPersonPlaceState } from "../recoil/relPersonPlace";
 import { territoryObservationsState } from "../recoil/territoryObservations";
 import { consultationsState, formatConsultation } from "../recoil/consultations";
 import { commentsState } from "../recoil/comments";
-import { organisationState, userState } from "../recoil/auth";
+import { organisationState, teamsState, userState } from "../recoil/auth";
 
 import { clearCache, dashboardCurrentCacheKey, getCacheItemDefaultValue, setCacheItem } from "../services/dataManagement";
 import API, { tryFetch, tryFetchExpectOk } from "../services/api";
@@ -92,6 +92,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
   const setTotal = useSetRecoilState(totalState);
 
   const setUser = useSetRecoilState(userState);
+  const setTeams = useSetRecoilState(teamsState);
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const { migrateData } = useDataMigrator();
 
@@ -158,11 +159,13 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     if (userError || !userResponse.ok) return resetLoaderOnError(userError || userResponse.error);
     const latestOrganisation = userResponse.user.organisation;
     const latestUser = userResponse.user;
+    const latestTeams = userResponse.user.orgTeams;
     const organisationId = latestOrganisation._id;
     if (organisation.encryptionLastUpdateAt !== latestOrganisation.encryptionLastUpdateAt) {
       return toast.error("La clé de chiffrement a changé ou a été régénérée. Veuillez vous déconnecter et vous reconnecter avec la nouvelle clé.");
     }
     setOrganisation(latestOrganisation);
+    setTeams(latestTeams);
     setUser(latestUser);
     if (isStartingInitialLoad) {
       const migrationIsSuccessful = await migrateData(latestOrganisation);

@@ -110,7 +110,7 @@ function serializeTeam(team) {
   };
 }
 
-function serializeUserWithTeamsAndOrganisation(user, teams, organisation) {
+function serializeUserWithTeamsAndOrganisation(user, teams, organisation, orgTeams) {
   return {
     _id: user._id,
     name: user.name,
@@ -124,6 +124,7 @@ function serializeUserWithTeamsAndOrganisation(user, teams, organisation) {
     cgusAccepted: user.cgusAccepted,
     gaveFeedbackEarly2023: user.gaveFeedbackEarly2023,
     teams: teams.map(serializeTeam),
+    orgTeams: orgTeams.map(serializeTeam),
     organisation: serializeOrganisation(organisation),
   };
 }
