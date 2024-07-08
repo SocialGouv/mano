@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { Formik } from "formik";
 import ExclamationMarkButton from "./tailwind/ExclamationMarkButton";
 import TagTeam from "./TagTeam";
-import { currentTeamState, organisationState, userState, usersState } from "../recoil/auth";
+import { currentTeamState, organisationState, teamsState, userState, usersState } from "../recoil/auth";
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "./tailwind/Modal";
 import { dayjsInstance, formatDateTimeWithNameOfDay } from "../services/date";
 import SelectUser from "./SelectUser";
@@ -16,6 +16,7 @@ import AutoResizeTextarea from "./AutoresizeTextArea";
 import UserName from "./UserName";
 import CustomFieldDisplay from "./CustomFieldDisplay";
 import ConsultationButton from "./ConsultationButton";
+import SelectTeam from "./SelectTeam";
 
 /*
 3 components:
@@ -396,23 +397,21 @@ function CommentDisplay({ comment, onClose, onEditComment, canToggleUrgentCheck,
 
   return (
     <>
-      <ModalContainer open size="3xl">
+      <ModalContainer open size="4xl">
         <ModalHeader toggle={onClose} title="Commentaire" />
         <ModalBody className="tw-px-4 tw-py-2">
-          <div className="tw-flex tw-w-full tw-flex-col tw-gap-6">
-            <div className="tw-my-2 tw-flex tw-gap-8">
-              <div className="tw-basis-1/2 [overflow-wrap:anywhere]">
-                <div className="tw-text-sm tw-font-semibold tw-text-gray-600">Créé par</div>
-                <UserName id={comment.user} />
-              </div>
-              <div className="tw-basis-1/2 [overflow-wrap:anywhere]">
-                <div className="tw-text-sm tw-font-semibold tw-text-gray-600">Créé le / Concerne le</div>
-                <div>
-                  <CustomFieldDisplay type="date" value={comment.date || comment.createdAt} />
-                </div>
+          <div className="tw-grid tw-w-full sm:tw-grid-cols-2 tw-gap-6 tw-py-4">
+            <div className="[overflow-wrap:anywhere]">
+              <div className="tw-text-sm tw-font-semibold tw-text-gray-600">Créé par</div>
+              <UserName id={comment.user} />
+            </div>
+            <div className="[overflow-wrap:anywhere]">
+              <div className="tw-text-sm tw-font-semibold tw-text-gray-600">Créé le / Concerne le</div>
+              <div>
+                <CustomFieldDisplay type="date" value={comment.date || comment.createdAt} />
               </div>
             </div>
-            <div className="tw-flex tw-flex-1 tw-flex-col">
+            <div className="sm:tw-col-span-2">
               <div className="tw-basis-full [overflow-wrap:anywhere]">
                 <div className="tw-text-sm tw-font-semibold tw-text-gray-600">Commentaire</div>
                 <div>
@@ -420,21 +419,21 @@ function CommentDisplay({ comment, onClose, onEditComment, canToggleUrgentCheck,
                 </div>
               </div>
             </div>
-            {canToggleUrgentCheck || canToggleGroupCheck || canToggleShareComment ? (
-              <div className="tw-flex tw-gap-8 tw-mb-4">
-                {canToggleUrgentCheck && comment.urgent ? (
+            {comment.urgent || comment.group || comment.share ? (
+              <div className="tw-flex tw-gap-8">
+                {comment.urgent ? (
                   <div className="tw-flex tw-flex-1 tw-flex-col">
                     <div>✓ Commentaire prioritaire</div>
                     <div className="tw-text-xs tw-text-zinc-500">Ce commentaire est mis en avant par rapport aux autres</div>
                   </div>
                 ) : null}
-                {canToggleGroupCheck && comment.group ? (
+                {comment.group ? (
                   <div className="tw-flex tw-flex-1 tw-flex-col">
                     <div>✓ Commentaire familial</div>
                     <div className="tw-text-xs tw-text-zinc-500">Ce commentaire est valable pour chaque membre de la famille</div>
                   </div>
                 ) : null}
-                {canToggleShareComment && comment.share ? (
+                {comment.share ? (
                   <div className="tw-flex tw-flex-1 tw-flex-col">
                     <div>✓ Commentaire médical partagé</div>
                     <div className="tw-text-xs tw-text-zinc-500">Ce commentaire médical est partagé avec les professionnels non-médicaux</div>
@@ -442,6 +441,10 @@ function CommentDisplay({ comment, onClose, onEditComment, canToggleUrgentCheck,
                 ) : null}
               </div>
             ) : null}
+            <div className="[overflow-wrap:anywhere]">
+              <div className="tw-text-sm tw-font-semibold tw-text-gray-600">Équipe</div>
+              <TagTeam teamId={comment.team} />
+            </div>
           </div>
         </ModalBody>
         <ModalFooter>
@@ -481,6 +484,7 @@ function CommentModal({
   const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
   const currentTeam = useRecoilValue(currentTeamState);
+  const teams = useRecoilValue(teamsState);
 
   const isEditable = useMemo(() => {
     if (isNewComment) return true;
@@ -496,7 +500,7 @@ function CommentModal({
           window.sessionStorage.removeItem("currentComment");
           onClose();
         }}
-        size="3xl"
+        size="4xl"
       >
         <ModalHeader toggle={onClose} title={isNewComment ? "Créer un commentaire" : "Éditer le commentaire"} />
         <Formik
@@ -504,6 +508,7 @@ function CommentModal({
             urgent: false,
             group: false,
             share: false,
+            team: currentTeam._id,
             ...comment,
             comment: comment.comment || window.sessionStorage.getItem("currentComment"),
           }}
@@ -542,31 +547,29 @@ function CommentModal({
         >
           {({ values, handleChange, isSubmitting, handleSubmit }) => (
             <React.Fragment>
-              <ModalBody className="tw-px-4 tw-py-2">
-                <div className="tw-flex tw-w-full tw-flex-col tw-gap-6">
-                  <div className="tw-flex tw-gap-8">
-                    <div className="tw-flex tw-flex-1 tw-flex-col">
-                      <label htmlFor="user">Créé par</label>
-                      <SelectUser
-                        inputId="user"
-                        isDisabled={true}
-                        value={values.user || user._id}
-                        onChange={(userId) => handleChange({ target: { value: userId, name: "user" } })}
-                      />
-                    </div>
-                    <div className="tw-flex tw-flex-1 tw-flex-col">
-                      <label htmlFor="date">Créé le / Concerne le</label>
-                      <DatePicker
-                        required
-                        withTime
-                        disabled={!isEditable}
-                        id="date"
-                        defaultValue={(values.date || values.createdAt) ?? new Date()}
-                        onChange={handleChange}
-                      />
-                    </div>
+              <ModalBody className="tw-px-4 tw-py-4">
+                <div className="tw-grid sm:tw-grid-cols-2 tw-w-full tw-gap-x-8 tw-gap-y-4">
+                  <div className="tw-flex tw-flex-col">
+                    <label htmlFor="user">Créé par</label>
+                    <SelectUser
+                      inputId="user"
+                      isDisabled={true}
+                      value={values.user || user._id}
+                      onChange={(userId) => handleChange({ target: { value: userId, name: "user" } })}
+                    />
                   </div>
-                  <div className="tw-flex tw-flex-1 tw-flex-col">
+                  <div className="tw-flex tw-flex-col">
+                    <label htmlFor="date">Créé le / Concerne le</label>
+                    <DatePicker
+                      required
+                      withTime
+                      disabled={!isEditable}
+                      id="date"
+                      defaultValue={(values.date || values.createdAt) ?? new Date()}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div className="tw-flex sm:tw-col-span-2 tw-flex-col">
                     <label htmlFor="comment">Commentaire</label>
                     <div className="tw-block tw-w-full tw-overflow-hidden tw-rounded tw-border tw-border-gray-300 tw-text-base tw-transition-all">
                       <AutoResizeTextarea
@@ -582,11 +585,12 @@ function CommentModal({
                       />
                     </div>
                   </div>
+
                   {canToggleUrgentCheck || canToggleGroupCheck || canToggleShareComment ? (
-                    <div className="tw-flex tw-gap-8">
+                    <div className="tw-flex tw-flex-col tw-gap-4">
                       {canToggleUrgentCheck ? (
-                        <div className="tw-flex tw-flex-1 tw-flex-col">
-                          <label htmlFor="create-comment-urgent" className="tw-mb-0">
+                        <div className="tw-flex tw-flex-col">
+                          <label htmlFor="create-comment-urgent" className="tw-mb-0 tw-text-left">
                             <input
                               type="checkbox"
                               id="create-comment-urgent"
@@ -601,7 +605,7 @@ function CommentModal({
                         </div>
                       ) : null}
                       {canToggleGroupCheck ? (
-                        <div className="tw-flex tw-flex-1 tw-flex-col">
+                        <div className="tw-flex tw-flex-col">
                           <label htmlFor="create-comment-for-group" className="tw-mb-0">
                             <input
                               type="checkbox"
@@ -617,7 +621,7 @@ function CommentModal({
                         </div>
                       ) : null}
                       {canToggleShareComment ? (
-                        <div className="tw-flex tw-flex-1 tw-flex-col">
+                        <div className="tw-flex tw-flex-col">
                           <label htmlFor="create-comment-for-share" className="tw-mb-0">
                             <input
                               type="checkbox"
@@ -634,6 +638,18 @@ function CommentModal({
                       ) : null}
                     </div>
                   ) : null}
+                  <div className="tw-flex tw-flex-col">
+                    <label htmlFor="observation-select-team">Sous l'équipe</label>
+                    <SelectTeam
+                      menuPlacement="top"
+                      name="team"
+                      teams={user.role === "admin" ? teams : user.teams}
+                      teamId={values?.team}
+                      onChange={(team) => handleChange({ target: { value: team._id, name: "team" } })}
+                      inputId="observation-select-team"
+                      classNamePrefix="observation-select-team"
+                    />
+                  </div>
                 </div>
               </ModalBody>
               <ModalFooter>
