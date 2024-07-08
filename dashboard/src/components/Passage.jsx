@@ -13,6 +13,7 @@ import { outOfBoundariesDate } from "../services/date";
 import AutoResizeTextarea from "./AutoresizeTextArea";
 import { useDataLoader } from "./DataLoader";
 import { ModalContainer, ModalHeader, ModalFooter, ModalBody } from "./tailwind/Modal";
+
 const Passage = ({ passage, personId, onFinished }) => {
   const user = useRecoilValue(userState);
   const teams = useRecoilValue(teamsState);
@@ -38,6 +39,7 @@ const Passage = ({ passage, personId, onFinished }) => {
   const isNew = !passage?._id;
   const isForPerson = !!passage?.person;
   const showMultiSelect = isNew && !isForPerson;
+  const isEditingAnonymous = !isNew && !isForPerson;
 
   return (
     <ModalContainer
@@ -56,7 +58,7 @@ const Passage = ({ passage, personId, onFinished }) => {
           if (outOfBoundariesDate(body.date)) return toast.error("La date est hors limites (entre 1900 et 2100)");
           if (!body.team) return toast.error("L'équipe est obligatoire");
           if (body.anonymous && !body.anonymousNumberOfPassages) return toast.error("Veuillez spécifier le nombre de passages anonymes");
-          if (!body.anonymous && (showMultiSelect ? !body.persons?.length : !body.person?.length))
+          if (!body.anonymous && (showMultiSelect ? !body.persons?.length : !body.person?.length) && !isEditingAnonymous)
             return toast.error("Veuillez spécifier une personne");
 
           if (isNew) {
@@ -127,7 +129,7 @@ const Passage = ({ passage, personId, onFinished }) => {
           return (
             <>
               <ModalBody>
-                <div className="tw-flex-wrap tw-flex-row tw-w-full tw-flex">
+                <div className="tw-flex-wrap tw-flex-row tw-w-full tw-flex tw-mb-2">
                   {!!isNew && !isForPerson && (
                     <div className="tw-basis-full tw-px-4 tw-py-2">
                       <div className="tw-flex tw-flex-1 tw-flex-col">
@@ -166,23 +168,25 @@ const Passage = ({ passage, personId, onFinished }) => {
                       </>
                     ) : showMultiSelect ? (
                       <SelectPerson value={values.persons} onChange={handleChange} isClearable isMulti name="persons" />
-                    ) : (
+                    ) : !isEditingAnonymous ? (
                       <SelectPerson value={values.person} onChange={handleChange} />
-                    )}
+                    ) : null}
                   </div>
-                  <div className="tw-basis-full tw-px-4 tw-py-2">
-                    <label htmlFor="update-passage-comment">Commentaire</label>
-                    <div className="tw-rounded tw-border tw-border-gray-300">
-                      <AutoResizeTextarea
-                        id="update-passage-comment"
-                        name="comment"
-                        placeholder="Tapez votre commentaire ici..."
-                        value={values.comment}
-                        rows={7}
-                        onChange={handleChange}
-                      />
+                  {!isEditingAnonymous ? (
+                    <div className="tw-basis-full tw-px-4 tw-py-2">
+                      <label htmlFor="update-passage-comment">Commentaire</label>
+                      <div className="tw-rounded tw-border tw-border-gray-300">
+                        <AutoResizeTextarea
+                          id="update-passage-comment"
+                          name="comment"
+                          placeholder="Tapez votre commentaire ici..."
+                          value={values.comment}
+                          rows={7}
+                          onChange={handleChange}
+                        />
+                      </div>
                     </div>
-                  </div>
+                  ) : null}
                   <div className="tw-basis-1/2 tw-px-4 tw-py-2">
                     <label htmlFor="update-passage-user-select">Créé par</label>
                     <SelectUser
