@@ -106,6 +106,8 @@ const newActionInitialState = (organisationId, personId, userId, dueAt, complete
 });
 
 function ActionContent({ onClose, action, personId = null, personIds = null, isMulti = false, completedAt = null, dueAt = null }) {
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
   const teams = useRecoilValue(teamsState);
   const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
@@ -118,7 +120,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
   const newActionInitialStateRef = useRef(
     newActionInitialState(organisation?._id, personId, user?._id, dueAt, completedAt, teams, isMulti, personIds)
   );
-  const [isEditing, setIsEditing] = useState(!action);
+  const [isEditing, setIsEditing] = useState(!action || searchParams.get("isEditing") === "true");
 
   const initialState = useMemo(() => {
     if (action) {
@@ -193,49 +195,70 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
       }
 
       const actionCancelled = action.status !== CANCEL && body.status === CANCEL;
-      if (actionCancelled && window.confirm("Cette action est annulée, voulez-vous la dupliquer ? Avec une date ultérieure par exemple")) {
-        const { name, person, dueAt, withTime, description, categories, urgent, teams } = data;
-        const [actionError, actionReponse] = await tryFetchExpectOk(async () =>
-          API.post({
-            path: "/action",
-            body: await encryptAction({
-              name: name.trim(),
-              person,
-              teams,
-              user: user._id,
-              dueAt,
-              withTime,
-              status: TODO,
-              description,
-              categories,
-              urgent,
-            }),
-          })
-        );
-        if (actionError) {
-          toast.error("Erreur lors de la duplication de l'action, les données n'ont pas été sauvegardées.");
-          return;
-        }
-        for (let c of action.comments.filter((c) => c.action === action._id)) {
-          const body = {
-            comment: c.comment,
-            action: actionReponse.data._id,
-            user: c.user || user._id,
-            team: c.team || currentTeam._id,
-            organisation: c.organisation,
-          };
-          const [error] = await tryFetchExpectOk(async () => API.post({ path: "/comment", body: await encryptComment(body) }));
-          if (error) {
-            toast.error("Erreur lors de la duplication des commentaires de l'action, les données n'ont pas été sauvegardées.");
-            return;
-          }
-        }
-        const searchParams = new URLSearchParams(history.location.search);
-        searchParams.set("actionId", actionReponse.data._id);
-        history.replace(`?${searchParams.toString()}`);
-      }
-
       toast.success("Mise à jour !");
+      if (actionCancelled) {
+        const { name, person, dueAt, withTime, description, categories, urgent, teams } = data;
+        const comments = action.comments.filter((c) => c.action === action._id);
+        setModalConfirmState({
+          open: true,
+          options: {
+            title: "Cette action est annulée, voulez-vous la dupliquer ?",
+            subTitle: "Avec une date ultérieure par exemple",
+            buttons: [
+              {
+                text: "Non merci !",
+                className: "button-cancel",
+              },
+              {
+                text: "Oui",
+                className: "button-submit",
+                onClick: async () => {
+                  const [actionError, actionReponse] = await tryFetchExpectOk(async () =>
+                    API.post({
+                      path: "/action",
+                      body: await encryptAction({
+                        name: name.trim(),
+                        person,
+                        teams,
+                        user: user._id,
+                        dueAt,
+                        withTime,
+                        status: TODO,
+                        description,
+                        categories,
+                        urgent,
+                      }),
+                    })
+                  );
+                  if (actionError) {
+                    toast.error("Erreur lors de la duplication de l'action, les données n'ont pas été sauvegardées.");
+                    return;
+                  }
+                  for (let c of comments) {
+                    const body = {
+                      comment: c.comment,
+                      action: actionReponse.data._id,
+                      user: c.user || user._id,
+                      team: c.team || currentTeam._id,
+                      organisation: c.organisation,
+                    };
+                    const [error] = await tryFetchExpectOk(async () => API.post({ path: "/comment", body: await encryptComment(body) }));
+                    if (error) {
+                      toast.error("Erreur lors de la duplication des commentaires de l'action, les données n'ont pas été sauvegardées.");
+                      return;
+                    }
+                  }
+                  await refresh();
+                  const searchParams = new URLSearchParams(history.location.search);
+                  searchParams.set("actionId", actionReponse.data._id);
+                  searchParams.set("isEditing", "true");
+                  history.replace(`?${searchParams.toString()}`);
+                },
+              },
+            ],
+          },
+        });
+      }
     } else {
       let actionsId = [];
       if (Array.isArray(body.person)) {

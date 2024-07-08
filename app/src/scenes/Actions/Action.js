@@ -277,7 +277,7 @@ const Action = ({ navigation, route }) => {
     onRefresh();
     if (actionCancelled) {
       Alert.alert('Cette action est annulée, voulez-vous la dupliquer ?', 'Avec une date ultérieure par exemple', [
-        { text: 'OK', onPress: onDuplicate },
+        { text: 'Oui', onPress: onDuplicate },
         { text: 'Non merci !', onPress: onBack, style: 'cancel' },
       ]);
       return;
