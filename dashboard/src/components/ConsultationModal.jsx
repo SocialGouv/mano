@@ -136,7 +136,8 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
     if (!body.type) return toast.error("Veuillez choisir un type de consultation");
     if (!body.dueAt) return toast.error("Vous devez préciser une date prévue");
     if (!body.person) return toast.error("Veuillez sélectionner une personne suivie");
-    if (!body.teams.length) return toast.error("Veuillez sélectionner au moins une équipe");
+    const orgTeamIds = teams.map((t) => t._id);
+    if (!body.teams?.filter((teamId) => orgTeamIds.includes(teamId)).length) return toast.error("Veuillez sélectionner au moins une équipe");
     if ([DONE, CANCEL].includes(body.status)) {
       body.completedAt = body.completedAt || new Date();
     } else {

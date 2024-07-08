@@ -29,6 +29,8 @@ const actionsByTeamAndStatusSelector = selectorFamily({
     ({ statuses, categories, teamIds, viewAllOrganisationData, viewNoTeamData, actionsWithNoCategory }) =>
     ({ get }) => {
       const actions = get(arrayOfitemsGroupedByActionSelector);
+      const teams = get(teamsState);
+      const orgTeamIds = teams.map((t) => t._id);
 
       const actionsByTeamAndStatus = actions.filter((action) => {
         if (!viewAllOrganisationData) {
@@ -41,11 +43,8 @@ const actionsByTeamAndStatusSelector = selectorFamily({
           }
         }
         if (viewNoTeamData) {
-          if (Array.isArray(action.teams)) {
-            if (action.teams.length) return false;
-          } else {
-            if (action.team) return false;
-          }
+          const actionTeams = (Array.isArray(action.teams) ? action.teams : [action.team]).filter((teamId) => orgTeamIds.includes(teamId));
+          if (actionTeams.length) return false;
         }
         if (statuses.length) {
           if (!statuses.includes(action.status)) return false;
@@ -69,6 +68,9 @@ const consultationsByStatusSelector = selectorFamily({
   get:
     ({ statuses, teamIds, consultationTypes, viewAllOrganisationData, viewNoTeamData, actionsWithNoCategory }) =>
     ({ get }) => {
+      const teams = get(teamsState);
+      const orgTeamIds = teams.map((t) => t._id);
+
       // On retourne seulement les actions si "Actions sans catégorie" est coché
       if (actionsWithNoCategory) return [];
       const consultations = get(arrayOfitemsGroupedByConsultationSelector);
@@ -79,7 +81,7 @@ const consultationsByStatusSelector = selectorFamily({
           }
         }
         if (viewNoTeamData) {
-          if (consultation.teams?.length) return false;
+          if (consultation.teams?.filter((teamId) => orgTeamIds.includes(teamId))?.length) return false;
         }
         if (statuses.length) {
           if (!statuses.includes(consultation.status)) return false;

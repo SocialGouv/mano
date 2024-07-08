@@ -152,7 +152,10 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
     body.name = body.name.trim();
 
     if (!body.name.trim()?.length && !body.categories.length) return toast.error("L'action doit avoir au moins un nom ou une catégorie");
-    if (!body.teams?.length) return toast.error("Une action doit être associée à au moins une équipe");
+    const orgTeamIds = teams.map((t) => t._id);
+    if (!body.teams?.filter((teamId) => orgTeamIds.includes(teamId)).length) {
+      return toast.error("Une action doit être associée à au moins une équipe");
+    }
     if (!isMulti && !body.person) return toast.error("La personne suivie est obligatoire");
     if (isMulti && !body.person?.length) return toast.error("Une personne suivie est obligatoire");
     if (!body.dueAt) return toast.error("La date d'échéance est obligatoire");
