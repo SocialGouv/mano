@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CustomResponsivePie } from "./charts";
+import { CustomResponsivePie } from "./Charts";
 import { getPieData } from "./utils";
 import CustomFieldsStats from "./CustomFieldsStats";
 import Filters, { filterData } from "../../components/Filters";

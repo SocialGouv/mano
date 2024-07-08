@@ -12,7 +12,7 @@ import CreateObservation from "../../components/CreateObservation";
 import Filters, { filterData } from "../../components/Filters";
 import DateBloc, { TimeBlock } from "../../components/DateBloc";
 import CustomFieldDisplay from "../../components/CustomFieldDisplay";
-import { CustomResponsivePie } from "./charts";
+import { CustomResponsivePie } from "./Charts";
 import type { TerritoryInstance } from "../../types/territory";
 import type { Filter, FilterableField } from "../../types/field";
 import type { TerritoryObservationInstance } from "../../types/territoryObs";
@@ -168,7 +168,7 @@ const ObservationsStats = ({
         data={Object.entries(filteredRencontresByTerritories).map(([territory, rencontres]) => ({
           id: territory,
           label: territory,
-          value: rencontres || 0,
+          value: Number(rencontres || 0),
         }))}
       />
       <SelectedObsModal

@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { CustomResponsiveBar } from "./charts";
+import { CustomResponsiveBar } from "./Charts";
 import { mappedIdsToLabels } from "../../recoil/actions";
 import SelectCustom from "../../components/SelectCustom";
 import { getMultichoiceBarData } from "./utils";

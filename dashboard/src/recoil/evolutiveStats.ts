@@ -137,7 +137,7 @@ type EvolutiveStatRenderData = {
   countSwitched: number;
   countPersonSwitched: number;
   percentSwitched: number;
-  personsIdsSwitched: Array<PersonPopulated["id"]>;
+  personsIdsSwitchedByValue: Record<EvolutiveStatOption, Array<PersonPopulated["id"]>>;
 };
 
 export function computeEvolutiveStatsForPersons({
@@ -201,7 +201,7 @@ export function computeEvolutiveStatsForPersons({
       valueEnd,
       startDateConsolidated,
       endDateConsolidated,
-      personsIdsSwitched: [],
+      personsIdsSwitchedByValue: {},
     };
 
   const personsIdsSwitchedByValue: Record<EvolutiveStatOption, Array<PersonPopulated["id"]>> = {};
@@ -310,7 +310,7 @@ export function computeEvolutiveStatsForPersons({
     valueEnd,
     startDateConsolidated,
     endDateConsolidated,
-    personsIdsSwitched,
+    personsIdsSwitchedByValue,
   };
 }
 

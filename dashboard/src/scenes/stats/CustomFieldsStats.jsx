@@ -1,6 +1,6 @@
 import { useRecoilValue } from "recoil";
 import { currentTeamState } from "../../recoil/auth";
-import { CustomResponsiveBar, CustomResponsivePie } from "./charts";
+import { CustomResponsiveBar, CustomResponsivePie } from "./Charts";
 import { BlockDateWithTime, BlockTotal } from "./Blocks";
 import { getMultichoiceBarData, getPieData } from "./utils";
 

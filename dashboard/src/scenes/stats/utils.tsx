@@ -1,4 +1,6 @@
-export const getDuration = (timestampFromNow) => {
+import type { PieData, BarData } from "./Charts";
+
+export const getDuration = (timestampFromNow: number) => {
   const inDays = Math.round(timestampFromNow / 1000 / 60 / 60 / 24);
   if (inDays < 90) return [inDays, "jours"];
   const inMonths = inDays / (365 / 12);
@@ -7,7 +9,17 @@ export const getDuration = (timestampFromNow) => {
   return [Math.round(inYears), "années"];
 };
 
-export const getPieData = (source, key, { options = null, isBoolean = false } = {}) => {
+export function getPieData(
+  source: Array<any>,
+  key: string,
+  {
+    options = null,
+    isBoolean = false,
+  }: {
+    options?: Array<string>;
+    isBoolean?: boolean;
+  } = {}
+): PieData {
   const data = source.reduce(
     (newData, item) => {
       if (isBoolean) {
@@ -20,7 +32,7 @@ export const getPieData = (source, key, { options = null, isBoolean = false } = 
       }
       if (options && options.length) {
         let hasMatched = false;
-        for (let option of [...options, "Uniquement"]) {
+        for (const option of [...options, "Uniquement"]) {
           if (typeof item[key] === "string" ? item[key] === option : item[key].includes(option)) {
             if (!newData[option]) newData[option] = 0;
             newData[option]++;
@@ -46,18 +58,21 @@ export const getPieData = (source, key, { options = null, isBoolean = false } = 
   return Object.keys(data)
     .map((key) => ({ id: key, label: key, value: data[key] }))
     .filter((d) => d.value > 0);
-};
+}
 
-const initOptions = (options) => {
-  const objoptions = { "Non renseigné": [] };
-  for (const cat of options) {
-    objoptions[cat] = [];
+export function getMultichoiceBarData(
+  source: Array<any>,
+  key: string,
+  {
+    options = [],
+  }: {
+    options?: Array<string>;
+  } = {}
+): BarData {
+  const objOptions = { "Non renseigné": [] };
+  for (const option of options) {
+    objOptions[option] = [];
   }
-  return objoptions;
-};
-
-export const getMultichoiceBarData = (source, key, { options = [] } = {}) => {
-  options = initOptions(options);
 
   const reducedDataPerOption = source.reduce((newData, item) => {
     if (!item[key] || !item[key].length) {
@@ -71,12 +86,12 @@ export const getMultichoiceBarData = (source, key, { options = [] } = {}) => {
       newData[choice].push(item);
     }
     return newData;
-  }, options);
+  }, objOptions);
 
   const barData = Object.keys(reducedDataPerOption)
     .filter((key) => reducedDataPerOption[key]?.length > 0)
-    .map((key) => ({ name: key, [key]: reducedDataPerOption[key]?.length }))
+    .map((key) => ({ name: key, [key]: String(reducedDataPerOption[key]?.length) }))
     .sort((a, b) => (b[b.name] > a[a.name] ? 1 : -1));
 
   return barData;
-};
+}

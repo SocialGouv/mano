@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { utils, writeFile } from "@e965/xlsx";
 import { useLocalStorage } from "../../services/useLocalStorage";
-import { CustomResponsiveBar, CustomResponsivePie } from "./charts";
+import { CustomResponsiveBar, CustomResponsivePie } from "./Charts";
 import Filters, { filterData } from "../../components/Filters";
 import { getDuration, getMultichoiceBarData, getPieData } from "./utils";
 import Card from "../../components/Card";

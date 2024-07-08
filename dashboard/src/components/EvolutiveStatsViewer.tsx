@@ -7,6 +7,8 @@ import { capture } from "../services/sentry";
 import type { FilterableField } from "../types/field";
 import { SelectedPersonsModal } from "../scenes/stats/PersonsStats";
 import { itemsGroupedByPersonSelector } from "../recoil/selectors";
+import { CustomResponsivePie } from "../scenes/stats/Charts";
+import { userAuthentifiedState } from "../recoil/auth";
 
 interface EvolutiveStatsViewerProps {
   evolutiveStatsIndicators: IndicatorsSelection;
@@ -29,7 +31,9 @@ export default function EvolutiveStatsViewer({
   selectedTeamsObjectWithOwnPeriod,
 }: EvolutiveStatsViewerProps) {
   const [personsModalOpened, setPersonsModalOpened] = useState(false);
+  const [modalValueEnd, setModalValueEnd] = useState<string | null>(null);
   const personsObject = useRecoilValue(itemsGroupedByPersonSelector);
+  const user = useRecoilValue(userAuthentifiedState);
 
   const evolutiveStatsPerson = useRecoilValue(
     evolutiveStatsForPersonsSelector({
@@ -51,61 +55,86 @@ export default function EvolutiveStatsViewer({
       countPersonSwitched,
       percentSwitched,
       indicatorFieldLabel,
-      personsIdsSwitched,
+      personsIdsSwitchedByValue,
     } = evolutiveStatsPerson;
 
-    // TODO: dans un second temps, on pourra afficher un tableau avec les stats par valeur
-    if (valueStart == null) return null;
-    if (valueEnd == null) return null;
     if (startDateConsolidated.isSame(endDateConsolidated)) {
       return <p>Pour afficher des stats évolutives, veuillez sélectionner une période entre deux dates différentes</p>;
     }
+    if (valueStart == null) return null;
 
     return (
       <>
-        <div className="tw-flex tw-w-full tw-justify-around tw-flex-col tw-items-center tw-gap-y-4">
-          <h5>
-            Entre le {startDateConsolidated.format("DD/MM/YYYY")} et le {endDateConsolidated.format("DD/MM/YYYY")}
-          </h5>
+        {valueEnd?.length && (
+          <>
+            <div className="tw-flex tw-w-full tw-justify-around tw-flex-col tw-items-center tw-gap-y-4">
+              <h5>
+                Entre le {startDateConsolidated.format("DD/MM/YYYY")} et le {endDateConsolidated.format("DD/MM/YYYY")}
+              </h5>
 
-          <div className="tw-flex tw-shrink-0 tw-items-center tw-justify-evenly tw-gap-y-4 tw-w-full">
-            <button
-              className="tw-flex tw-flex-col tw-items-center tw-justify-around tw-rounded-lg tw-border tw-p-4"
-              type="button"
-              onClick={() => {
-                setPersonsModalOpened(true);
-              }}
-            >
-              <div className="tw-flex tw-items-baseline tw-gap-x-2">
-                <p className="tw-text-6xl tw-font-bold tw-text-main">{countSwitched}</p>
-                <p>changements</p>
+              <div className="tw-flex tw-shrink-0 tw-items-center tw-justify-evenly tw-gap-y-4 tw-w-full">
+                <button
+                  className="tw-flex tw-flex-col tw-items-center tw-justify-around tw-rounded-lg tw-border tw-p-4"
+                  type="button"
+                  onClick={() => {
+                    setPersonsModalOpened(true);
+                    setModalValueEnd(valueEnd);
+                  }}
+                >
+                  <div className="tw-flex tw-items-baseline tw-gap-x-2">
+                    <p className="tw-text-6xl tw-font-bold tw-text-main">{countSwitched}</p>
+                    <p>changements</p>
+                  </div>
+                  <p className="tw-text-center">
+                    de <strong>{indicatorFieldLabel}</strong> de <strong>{valueStart} </strong> vers <strong>{valueEnd}</strong>
+                    <br />
+                    ont été effectués
+                  </p>
+                </button>
               </div>
-              <p className="tw-text-center">
-                de <strong>{indicatorFieldLabel}</strong> de <strong>{valueStart} </strong> vers <strong>{valueEnd}</strong>
-                <br />
-                ont été effectués
-              </p>
-            </button>
-          </div>
-          <div className="tw-flex tw-items-baseline tw-gap-x-2">
-            <p className="tw-text-center">
-              impactant <strong>{countPersonSwitched}</strong> personnes (<strong>{percentSwitched}%</strong>)
-            </p>
-          </div>
-        </div>
-
+              <div className="tw-flex tw-items-baseline tw-gap-x-2">
+                <p className="tw-text-center">
+                  impactant <strong>{countPersonSwitched}</strong> personnes (<strong>{percentSwitched}%</strong>)
+                </p>
+              </div>
+            </div>
+          </>
+        )}
+        <CustomResponsivePie
+          title={`${indicatorFieldLabel}: de ${valueStart} à ...`}
+          onItemClick={
+            user.role === "stats-only"
+              ? undefined
+              : (newSlice) => {
+                  console.log("newSlice", newSlice);
+                  setPersonsModalOpened(true);
+                  setModalValueEnd(newSlice);
+                }
+          }
+          data={Object.keys(personsIdsSwitchedByValue).map((key) => {
+            return {
+              id: key,
+              label: key === valueStart ? `${key} (pas de changement)` : key,
+              value: personsIdsSwitchedByValue[key].length,
+            };
+          })}
+          help={`On compte le nombre de changements pour le champ ${indicatorFieldLabel} en partant de la valeur ${valueStart} vers toutes les valeurs possibles, dans la période définie.`}
+        />
         <SelectedPersonsModal
           open={personsModalOpened}
           onClose={() => {
             setPersonsModalOpened(false);
+            setModalValueEnd(null);
           }}
-          persons={personsIdsSwitched.map((id) => personsObject[id])}
+          persons={modalValueEnd ? [...new Set(personsIdsSwitchedByValue[modalValueEnd] ?? [])].map((id) => personsObject[id]) : []}
           sliceField={filterBase.find((f) => f.name === evolutiveStatsIndicators[0].fieldName)}
           onAfterLeave={() => {}}
           title={
             <p className="tw-basis-1/2">
-              Personnes dont le champ {indicatorFieldLabel} est passé de {valueStart} à {valueEnd} entre le{" "}
-              {startDateConsolidated.format("DD/MM/YYYY")} et le {endDateConsolidated.format("DD/MM/YYYY")}
+              Personnes dont le champ {indicatorFieldLabel}{" "}
+              {valueStart === modalValueEnd ? `est resté à ${valueStart}` : `est passé de ${valueStart} à ${modalValueEnd}`}
+              <br />
+              entre le {startDateConsolidated.format("DD/MM/YYYY")} et le {endDateConsolidated.format("DD/MM/YYYY")}
               <br />
               <br />
               <small className="tw-text-gray-500 tw-block tw-text-xs">

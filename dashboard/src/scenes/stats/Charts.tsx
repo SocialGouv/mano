@@ -21,7 +21,19 @@ function EmptyData({ title, help }) {
   );
 }
 
-export const CustomResponsivePie = ({ data = [], title, onItemClick = null, help }) => {
+export type PieData = Array<{ id: string; label: string; value: number }>;
+
+export const CustomResponsivePie = ({
+  data = [],
+  title,
+  onItemClick = null,
+  help,
+}: {
+  data: PieData;
+  title: string;
+  onItemClick?: (id: string) => void;
+  help?: string;
+}) => {
   const total = data.reduce((sum, item) => sum + item.value, 0);
 
   const onClick = ({ id }) => {
@@ -61,8 +73,8 @@ export const CustomResponsivePie = ({ data = [], title, onItemClick = null, help
                 if (a.value < b.value) return 1;
                 return -1;
               })
-              .map(({ key, label, value }) => (
-                <tr key={key + label + value} onClick={() => onClick({ id: label })}>
+              .map(({ id, label, value }) => (
+                <tr key={id + label + value} onClick={() => onClick({ id })}>
                   <td className="tw-border tw-border-zinc-200 tw-py-1 tw-px-2 [overflow-wrap:anywhere]">{label}</td>
                   <td className="tw-border tw-border-zinc-200 tw-py-1 tw-px-2 tw-text-right">{value}</td>
                   {total ? (
@@ -105,7 +117,7 @@ export const CustomResponsivePie = ({ data = [], title, onItemClick = null, help
           arcLabelsSkipAngle={data.length > 20 ? 12 : 8}
           enableArcLinkLabels
           onClick={onClick}
-          sliceLabelsTextColor="#333333"
+          arcLabelsTextColor="#333333"
           valueFormat={(value) => `${value} (${Math.round((value / total) * 1000) / 10}%)`}
         />
       </div>
@@ -113,7 +125,11 @@ export const CustomResponsivePie = ({ data = [], title, onItemClick = null, help
   );
 };
 
-const getItemValue = (item) => item[item.name];
+export type BarData = Array<{ name: string; [key: string]: string }>;
+
+const getItemValue = (item: { name: string; [key: string]: string }) => {
+  return Number(item[item.name] || 0);
+};
 
 export const CustomResponsiveBar = ({
   title,
@@ -126,6 +142,16 @@ export const CustomResponsiveBar = ({
   totalForMultiChoice,
   totalTitleForMultiChoice,
   help,
+}: {
+  title: string;
+  data: BarData;
+  categories?: string[];
+  onItemClick?: (id: string) => void;
+  axisTitleY: string;
+  isMultiChoice?: boolean;
+  totalForMultiChoice?: number;
+  totalTitleForMultiChoice?: string;
+  help?: string;
 }) => {
   // if we have too many categories with small data, we see nothing in the chart
   // so we filter by keeping the first 15 categories whatever
@@ -137,12 +163,12 @@ export const CustomResponsiveBar = ({
 
   const biggestValue = useMemo(() => {
     if (!isMultiChoice) {
-      return chartData.map((item) => getItemValue(item)).reduce((max, value) => Math.max(max, value), 1);
+      return chartData.map((item) => getItemValue(item)).reduce((max, value) => Math.max(max, Number(value)), 1);
     }
     // if we have multiple choice, data is sorted already in getMultichoiceBarData
     const biggestItem = chartData[0]; // { name: 'A name', ['A name']: 123 }
     const biggestItemValue = biggestItem?.[biggestItem?.name];
-    return biggestItemValue || 1;
+    return Number(biggestItemValue || 1);
   }, [chartData, isMultiChoice]);
 
   const total = useMemo(() => {
@@ -258,8 +284,6 @@ export const CustomResponsiveBar = ({
           labelSkipHeight={0}
           labelTextColor={{ from: "color", modifiers: [["darker", 1.6]] }}
           animate={true}
-          motionStiffness={90}
-          motionDamping={15}
         />
       </div>
     </div>

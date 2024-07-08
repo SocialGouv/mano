@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { CustomResponsivePie } from "./charts";
+import { CustomResponsivePie } from "./Charts";
 import { useRecoilValue } from "recoil";
 import API, { tryFetchExpectOk } from "../../services/api";
 import { toast } from "react-toastify";
