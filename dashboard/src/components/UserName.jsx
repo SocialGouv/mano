@@ -9,7 +9,7 @@ const UserName = ({ id, wrapper = (name) => name, canAddUser = null, handleChang
   const user = users.find((u) => u._id === id);
 
   if (!user?.name) {
-    if (!canAddUser) return null;
+    if (!canAddUser) return <span className="tw-text-gray-500 tw-italic">Utilisateur supprimé</span>;
   }
   return (
     <span className={[className, "tw-text-left"].join(" ")}>
