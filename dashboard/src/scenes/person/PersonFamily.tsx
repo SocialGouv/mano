@@ -254,7 +254,7 @@ const NewRelation = ({ open, setOpen, onAddFamilyLink, person }) => {
         onClose={() => setOpen(false)}
       />
       <ModalBody>
-        <form id="new-family-relation" className="tw-flex tw-min-h-[50vh] tw-w-full tw-flex-col tw-gap-4 tw-px-8" onSubmit={onAddFamilyLink}>
+        <form id="new-family-relation" className="tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8 tw-pb-2" onSubmit={onAddFamilyLink}>
           <div className="tw-flex tw-w-full tw-flex-wrap">
             <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
               <label htmlFor="personId" className="form-text tailwindui">

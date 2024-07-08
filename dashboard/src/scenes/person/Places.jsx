@@ -269,11 +269,7 @@ const RelPersonPlaceModal = ({ open, setOpen, person, relPersonPlaceModal, setPl
     <ModalContainer open={open}>
       <ModalHeader title="Ajouter un lieu fréquenté" />
       <ModalBody>
-        <form
-          id="new-rel-person-place"
-          className="tw-flex tw-min-h-[50vh] tw-w-full tw-flex-col tw-gap-4 tw-px-8 tw-py-4"
-          onSubmit={onSaveRelPersonPlace}
-        >
+        <form id="new-rel-person-place" className="tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8 tw-py-4" onSubmit={onSaveRelPersonPlace}>
           <div>
             <label htmlFor="place" className="tailwindui">
               Lieu
