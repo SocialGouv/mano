@@ -412,7 +412,9 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
         onAdd={() => onGoToConsultation()}
         testID="person-consultations-list"
         data={consultations}
-        renderItem={(consultation) => <ConsultationRow consultation={consultation} key={consultation._id} onConsultationPress={onGoToConsultation} />}
+        renderItem={(consultation) => (
+          <ConsultationRow consultation={consultation} key={consultation._id} onConsultationPress={onGoToConsultation} showStatus />
+        )}
         ifEmpty="Pas encore de consultation"
       />
       <SubList
