@@ -447,6 +447,8 @@ const MergeOrganisations = ({ open, setOpen, organisations, onChange }) => {
           Organisation <b>principale</b> (celle qui reste)
           <SelectCustom
             name="name"
+            inputId="organisation-merge-main"
+            classNamePrefix="organisation-merge-main"
             options={organisations}
             onChange={(org) => {
               setSelectedOrganisationMain(org);
@@ -465,6 +467,8 @@ const MergeOrganisations = ({ open, setOpen, organisations, onChange }) => {
           Organisation <b>secondaire</b> (celle qui sera supprimée)
           <SelectCustom
             name="name"
+            inputId="organisation-merge-secondary"
+            classNamePrefix="organisation-merge-secondary"
             options={organisations}
             onChange={(org) => {
               setSelectedOrganisationSecondary(org);
