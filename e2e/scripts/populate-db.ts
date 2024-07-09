@@ -15,25 +15,21 @@ async function createUsersAndOrgas() {
   });
   await client.connect();
   await client.query(`delete from mano."Organisation" where name like 'Orga Test - %'`);
-  await client.query(`delete from mano."User" where name like 'User Test - %'`);
-  await client.query(`delete from mano."User" where name like 'User Admin Test - %'`);
-  await client.query(`delete from mano."User" where name like 'User Health Professional Test - %'`);
-  await client.query(`delete from mano."User" where name like 'User Normal Test - %'`);
-  await client.query(`delete from mano."User" where name like 'User Restricted Test - %'`);
+  await client.query(`delete from mano."User" where email like '%@example.org'`);
   await client.query(`delete from mano."Team" where name like 'Team Test - %'`);
+
+  const passwordSecret = bcrypt.hashSync("secret", 10);
+  const city = "Rouen";
+  const date = "2021-01-01";
 
   for (let i = 1; i < 12; i++) {
     const orgId = uuidv4();
-    const city = "Rouen";
     const adminId = uuidv4();
     const healthProfessionalId = uuidv4();
     const normalUserId = uuidv4();
     const restrictedUserId = uuidv4();
     const statsOnlyUserId = uuidv4();
     const teamId = uuidv4();
-    const passwordSecret = bcrypt.hashSync("secret", 10);
-
-    const date = "2021-01-01";
 
     await client.query(
       `INSERT INTO mano."Organisation" (
@@ -365,6 +361,47 @@ async function createUsersAndOrgas() {
       [uuidv4(), statsOnlyUserId, teamId, date, orgId]
     );
   }
+
+  // Get first organisation ID
+  const res = await client.query(`SELECT _id FROM mano."Organisation" LIMIT 1`);
+  const orgId = res.rows[0]._id;
+
+  const superAdminId = uuidv4();
+  await client.query(
+    `INSERT INTO mano."User" (
+      _id,
+      name,
+      email,
+      password,
+      organisation,
+      "lastLoginAt",
+      "createdAt",
+      "updatedAt",
+      role,
+      "lastChangePasswordAt",
+      "forgotPasswordResetExpires",
+      "forgotPasswordResetToken",
+      "termsAccepted",
+      "cgusAccepted"
+    ) VALUES (
+      $1,
+      'Super Administrateur',
+      'superadmin@example.org',
+      $2,
+      $5,
+      $3,
+      $3,
+      $3,
+      'superadmin',
+      $4::date,
+      null,
+      null,
+      $3,
+      $3
+    );`,
+    [superAdminId, passwordSecret, date, date, orgId]
+  );
+
   await client.end();
 }
 

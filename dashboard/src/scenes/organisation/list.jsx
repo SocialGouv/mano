@@ -239,6 +239,7 @@ const List = () => {
                       <button
                         className="button-classic"
                         type="button"
+                        data-testid={`Modifier l'organisation ${organisation.name}`}
                         onClick={() => {
                           setSelectedOrganisation(organisation);
                           setOpenOrgSettingsModal(true);
@@ -251,6 +252,7 @@ const List = () => {
                       <button
                         className="button-classic"
                         type="button"
+                        data-testid={`Voir les utilisateurs ${organisation.name}`}
                         onClick={() => {
                           setSelectedOrganisation(organisation);
                           setOpenUserListModal(true);
@@ -262,6 +264,7 @@ const List = () => {
                     <div>
                       <button
                         type="button"
+                        data-testid={`Ajouter utilisateur ${organisation.name}`}
                         onClick={() => {
                           setSelectedOrganisation(organisation);
                           setOpenCreateUserModal(true);
@@ -382,10 +385,12 @@ const Create = ({ onChange, open, setOpen }) => {
                   </div>
                   <div className="tw-flex tw-basis-full tw-flex-col tw-py-2">
                     <div className="tw-mb-4">
-                      <label htmlFor="city">Responsable / Chargé de déploiement</label>
+                      <label htmlFor="organisation-responsible">Responsable / Chargé de déploiement</label>
                       <SelectCustom
                         name="responsible"
                         id="organisation-responsible"
+                        inputId="organisation-responsible"
+                        classNamePrefix="organisation-responsible"
                         value={options.find((o) => o.value === values.responsible)}
                         onChange={(nextResponsible) => {
                           handleChange({ target: { name: "responsible", value: nextResponsible.value } });

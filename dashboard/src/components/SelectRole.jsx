@@ -14,6 +14,7 @@ const SelectRole = ({ value, handleChange }) => (
     onChange={({ value }) => handleChange({ target: { value, name: "role" } })}
     value={roles.find((r) => r.value === value)}
     inputId="role"
+    classNamePrefix="role"
   />
 );
 

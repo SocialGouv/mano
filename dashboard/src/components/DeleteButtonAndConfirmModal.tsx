@@ -88,7 +88,7 @@ const DeleteButtonAndConfirmModal = ({
           <button type="button" name="cancel" className="button-cancel" onClick={() => setOpen(false)}>
             Annuler
           </button>
-          <button type="submit" className="button-destructive" form={`delete-${textToConfirm}`}>
+          <button type="submit" className="button-destructive" data-test-id={`button-delete-${textToConfirm}`} form={`delete-${textToConfirm}`}>
             Supprimer
           </button>
         </ModalFooter>
