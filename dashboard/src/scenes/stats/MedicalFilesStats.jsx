@@ -19,7 +19,7 @@ const MedicalFilesStats = ({ filterBase, filterPersons, setFilterPersons, person
     if (["stats-only"].includes(user.role)) return;
     const newSlicefield = filterBase.find((f) => f.field === fieldName);
     if (!newSlicefield) {
-      capture("newSlicefield not found", { fieldName, filterBase });
+      capture("newSlicefield not found in medical file stats", { extra: { fieldName, filterBase } });
       return;
     }
     setSliceField(newSlicefield);

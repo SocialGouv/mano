@@ -59,7 +59,7 @@ export default function PersonStats({
     if (["stats-only"].includes(user.role)) return;
     const newSlicefield = filterBase.find((f) => f.field === fieldName);
     if (!newSlicefield) {
-      capture("newSlicefield not found", { fieldName, filterBase });
+      capture("newSlicefield not found in person stats", { extra: { fieldName, filterBase } });
       return;
     }
     setSliceField(newSlicefield);
