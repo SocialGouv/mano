@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, Keyboard, View } from 'react-native';
-import { useRecoilValue, useRecoilState } from 'recoil';
+import { useRecoilValue, useRecoilState, useSetRecoilState } from 'recoil';
 import { useFocusEffect } from '@react-navigation/native';
 import { v4 as uuidv4 } from 'uuid';
 import ScrollContainer from '../../components/ScrollContainer';
@@ -31,6 +31,7 @@ import InputFromSearchList from '../../components/InputFromSearchList';
 import CommentRow from '../Comments/CommentRow';
 import SubList from '../../components/SubList';
 import NewCommentInput from '../Comments/NewCommentInput';
+import { refreshTriggerState } from '../../components/Loader';
 
 const cleanValue = (value) => {
   if (typeof value === 'string') return (value || '').trim();
@@ -44,6 +45,7 @@ const Consultation = ({ navigation, route }) => {
   const currentTeam = useRecoilValue(currentTeamState);
   const person = route?.params?.personDB || route?.params?.person;
   const consultationsFieldsIncludingCustomFields = useRecoilValue(consultationsFieldsIncludingCustomFieldsSelector);
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
 
   const consultationDB = useMemo(() => {
     if (route?.params?.consultationDB?._id) {
@@ -92,6 +94,10 @@ const Consultation = ({ navigation, route }) => {
 
   const [consultation, setConsultation] = useState(() => castToConsultation(consultationDB));
 
+  useEffect(() => {
+    setConsultation(castToConsultation(consultationDB));
+  }, [consultationDB?.updatedAt]);
+
   const onChange = (keyValue) => setConsultation((c) => ({ ...c, ...keyValue }));
 
   const backRequestHandledRef = useRef(null);
@@ -126,10 +132,47 @@ const Consultation = ({ navigation, route }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editable, consultation.status, consultation.onlyVisibleBy]);
 
+  useEffect(() => {
+    if (route?.params?.duplicate) {
+      Alert.alert(
+        'La consultation est dupliquée, vous pouvez la modifier !',
+        'Les commentaires de la consultation aussi sont dupliqués. La consultation originale est annulée.'
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const onDuplicate = async () => {
+    const response = await API.post({
+      path: '/consultation',
+      body: prepareConsultationForEncryption(organisation.consultations)({
+        ...consultation,
+        _id: undefined,
+        status: TODO,
+        user: user._id,
+        teams: [currentTeam._id],
+      }),
+    });
+    if (!response.ok) {
+      Alert.alert('Impossible de dupliquer !');
+      return;
+    }
+    setRefreshTrigger({ status: true, options: { showFullScreen: false, initialLoad: false } });
+    backRequestHandledRef.current = true;
+    //  navigation.push('PersonsSearch', { fromRoute: 'Consultation' })
+    navigation.replace('Consultation', {
+      personDB: person,
+      consultationDB: response.decryptedData,
+      fromRoute: 'MedicalFile',
+      editable: true,
+      duplicate: true,
+    });
+  };
+
   const onSaveConsultationRequest = useCallback(
     async ({ goBackOnSave = true, consultationToSave = null } = {}) => {
       if (!consultationToSave) consultationToSave = consultation;
-      if (!consultationToSave.status) return Alert.alert('Veuillez indiquer un status');
+      if (!consultationToSave.status) return Alert.alert('Veuillez indiquer un statut');
       if (!consultationToSave.dueAt) return Alert.alert('Veuillez indiquer une date');
       if (!consultationToSave.type) return Alert.alert('Veuillez indiquer un type');
       if (!consultationToSave.person) return Alert.alert('Veuillez ajouter une personne');
@@ -178,6 +221,27 @@ const Consultation = ({ navigation, route }) => {
             .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
         );
       }
+      const consultationCancelled = consultationToSave.status === CANCEL && consultationDB.status !== CANCEL;
+      if (!isNew && consultationCancelled) {
+        Alert.alert('Cette consultation est annulée, voulez-vous la dupliquer ?', 'Avec une date ultérieure par exemple', [
+          { text: 'Oui', onPress: onDuplicate },
+          {
+            text: 'Non merci !',
+            onPress: () => {
+              if (goBackOnSave) {
+                onBack();
+              } else {
+                setPosting(false);
+                setConsultation(castToConsultation(consultationResponse.decryptedData));
+                return true;
+              }
+            },
+            style: 'cancel',
+          },
+        ]);
+        return;
+      }
+
       if (goBackOnSave) {
         onBack();
       } else {
