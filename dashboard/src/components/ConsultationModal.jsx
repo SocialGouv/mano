@@ -97,7 +97,10 @@ const newConsultationInitialState = (organisationId, personId, userId, date, tea
 
 function ConsultationContent({ personId, consultation, date, onClose }) {
   const organisation = useRecoilValue(organisationState);
+  const searchParams = new URLSearchParams(location.search);
   const teams = useRecoilValue(teamsState);
+  const history = useHistory();
+
   const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
   const setModalConfirmState = useSetRecoilState(modalConfirmState);
@@ -106,7 +109,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
 
   const newConsultationInitialStateRef = useRef(newConsultationInitialState(organisation._id, personId, user._id, date, teams));
 
-  const [isEditing, setIsEditing] = useState(!consultation);
+  const [isEditing, setIsEditing] = useState(!consultation || searchParams.get("isEditing") === "true");
 
   const initialState = useMemo(() => {
     if (consultation) {
@@ -175,6 +178,48 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
       await refresh();
     }
     if (closeOnSubmit) onClose();
+    if (!isNewConsultation && closeOnSubmit && consultation.status !== CANCEL && body.status === CANCEL) {
+      setModalConfirmState({
+        open: true,
+        options: {
+          title: "Cette consulation est annulée, voulez-vous la dupliquer ?",
+          subTitle: "Avec une date ultérieure par exemple",
+          buttons: [
+            {
+              text: "Non merci !",
+              className: "button-cancel",
+            },
+            {
+              text: "Oui",
+              className: "button-submit",
+              onClick: async () => {
+                const [consultationError, consultationReponse] = await tryFetchExpectOk(async () =>
+                  API.post({
+                    path: "/consultation",
+                    body: await encryptConsultation(organisation.consultations)({
+                      ...decryptedData,
+                      _id: undefined,
+                      status: TODO,
+                      user: user._id,
+                      teams: [currentTeam._id],
+                    }),
+                  })
+                );
+                if (consultationError) {
+                  toast.error("Erreur lors de la duplication de la consultation, les données n'ont pas été sauvegardées.");
+                  return;
+                }
+                await refresh();
+                const searchParams = new URLSearchParams(history.location.search);
+                searchParams.set("consultationId", consultationReponse.data._id);
+                searchParams.set("isEditing", "true");
+                history.replace(`?${searchParams.toString()}`);
+              },
+            },
+          ],
+        },
+      });
+    }
     return true;
   }
 
