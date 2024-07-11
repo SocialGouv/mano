@@ -1,7 +1,6 @@
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
-import * as SentryService from "../src/services/sentry";
 import type { ReportInstance } from "../src/types/report";
 import { reportMock } from "./mocks";
 import { keepOnlyOneReportAndReturnReportToDelete } from "../src/utils/delete-duplicated-reports";
@@ -10,7 +9,6 @@ import { keepOnlyOneReportAndReturnReportToDelete } from "../src/utils/delete-du
 jest.mock("../src/services/sentry", () => ({
   capture: jest.fn(),
 }));
-const mockedCapture = SentryService.capture as jest.MockedFunction<typeof SentryService.capture>;
 
 const teamId = "TEAM_A_ID";
 
