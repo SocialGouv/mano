@@ -178,7 +178,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
       await refresh();
     }
     if (closeOnSubmit) onClose();
-    if (!isNewConsultation && closeOnSubmit && consultation.status !== CANCEL && body.status === CANCEL) {
+    if (!isNewConsultation && closeOnSubmit && consultation && consultation.status !== CANCEL && body.status === CANCEL) {
       setModalConfirmState({
         open: true,
         options: {
