@@ -4,6 +4,7 @@ import SelectAsInput from "../../../components/SelectAsInput";
 import {
   allowedPersonFieldsInHistorySelector,
   customFieldsPersonsSelector,
+  fieldsPersonsCustomizableOptionsSelector,
   flattenedCustomFieldsPersonsSelector,
   personFieldsSelector,
   personsState,
@@ -11,7 +12,7 @@ import {
 } from "../../../recoil/persons";
 import { dayjsInstance, outOfBoundariesDate } from "../../../services/date";
 import SelectTeamMultiple from "../../../components/SelectTeamMultiple";
-import { currentTeamState, userState } from "../../../recoil/auth";
+import { currentTeamState, teamsState, userState } from "../../../recoil/auth";
 import { useRecoilState, useRecoilValue } from "recoil";
 import CustomFieldInput from "../../../components/CustomFieldInput";
 import { useMemo, useState } from "react";
@@ -23,7 +24,8 @@ import DatePicker from "../../../components/DatePicker";
 import { customFieldsMedicalFileSelector, encryptMedicalFile, groupedCustomFieldsMedicalFileSelector } from "../../../recoil/medicalFiles";
 import { useDataLoader } from "../../../components/DataLoader";
 import { cleanHistory } from "../../../utils/person-history";
-import { ModalContainer, ModalHeader, ModalBody } from "../../../components/tailwind/Modal";
+import { ModalContainer, ModalHeader, ModalBody, ModalFooter } from "../../../components/tailwind/Modal";
+import SelectCustom from "../../../components/SelectCustom";
 
 export default function EditModal({ person, selectedPanel, onClose, isMedicalFile = false }) {
   const { refresh } = useDataLoader();
@@ -36,6 +38,8 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
   const [persons] = useRecoilState(personsState);
   const flatCustomFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
   const groupedCustomFieldsMedicalFile = useRecoilValue(groupedCustomFieldsMedicalFileSelector);
+  const [isOutOfTeamsModalOpen, setIsOutOfTeamsModalOpen] = useState(false);
+  const [updatedPersonFormValues, setUpdatedPersonFormValues] = useState();
   const medicalFile = person.medicalFile;
 
   const groupedCustomFieldsMedicalFileWithLegacyFields = useMemo(() => {
@@ -54,15 +58,55 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
   const { encryptPerson } = usePreparePersonForEncryption();
   const personFields = useRecoilValue(personFieldsSelector);
 
+  async function saveAndClose(body, outOfActiveListReasons = null) {
+    body.entityKey = person.entityKey;
+
+    const historyEntry = {
+      date: new Date(),
+      user: user._id,
+      userName: user.name,
+      data: {},
+    };
+    for (const key in body) {
+      if (!allowedFieldsInHistory.includes(key)) continue;
+      if (body[key] !== person[key]) historyEntry.data[key] = { oldValue: person[key], newValue: body[key] };
+      if (key === "assignedTeams" && outOfActiveListReasons && Object.keys(outOfActiveListReasons).length) {
+        historyEntry.data["outOfTeamsInformations"] = Object.entries(outOfActiveListReasons).map(([team, reasons]) => ({ team, reasons }));
+      }
+    }
+    if (Object.keys(historyEntry.data).length) body.history = [...cleanHistory(person.history || []), historyEntry];
+    const [error] = await tryFetchExpectOk(async () =>
+      API.put({
+        path: `/person/${person._id}`,
+        body: await encryptPerson(body),
+      })
+    );
+    if (!error) {
+      await refresh();
+      toast.success("Mis à jour !");
+      onClose();
+    } else {
+      toast.error("Erreur de l'enregistrement, les données n'ont pas été enregistrées");
+    }
+  }
+
   return (
     <>
+      <OutOfTeamsModal
+        open={isOutOfTeamsModalOpen}
+        onClose={(outOfActiveListReasons) => {
+          setIsOutOfTeamsModalOpen(false);
+          saveAndClose(updatedPersonFormValues, outOfActiveListReasons);
+        }}
+        removedTeams={isOutOfTeamsModalOpen ? person.assignedTeams.filter((t) => !updatedPersonFormValues.assignedTeams.includes(t)) : []}
+      />
       <ModalContainer open={true} toggle={() => onClose()} size="4xl" backdrop="static">
         <ModalHeader title={`Modifier ${person.name}`} />
         <ModalBody>
           <div className="tw-p-4">
             <Formik
               enableReinitialize
-              initialValues={person}
+              initialValues={updatedPersonFormValues || person}
               onSubmit={async (body) => {
                 if (!body.name?.trim()?.length) {
                   setOpenPanels(["main"]);
@@ -95,31 +139,17 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                   return toast.error("La date temps passé en rue est hors limites (entre 1900 et 2100)");
                 }
 
-                body.entityKey = person.entityKey;
+                // Ce state a deux utilités:
+                // 1. Eviter un flash des anciennes valeurs au moment de l'enregistrement
+                // 2. Retrouver les valeurs si on est passé par la modale de motifs de sortie
+                setUpdatedPersonFormValues(body);
 
-                const historyEntry = {
-                  date: new Date(),
-                  user: user._id,
-                  userName: user.name,
-                  data: {},
-                };
-                for (const key in body) {
-                  if (!allowedFieldsInHistory.includes(key)) continue;
-                  if (body[key] !== person[key]) historyEntry.data[key] = { oldValue: person[key], newValue: body[key] };
-                }
-                if (Object.keys(historyEntry.data).length) body.history = [...cleanHistory(person.history || []), historyEntry];
-                const [error] = await tryFetchExpectOk(async () =>
-                  API.put({
-                    path: `/person/${person._id}`,
-                    body: await encryptPerson(body),
-                  })
-                );
-                if (!error) {
-                  await refresh();
-                  toast.success("Mis à jour !");
-                  onClose();
+                // Ouverture de la modale si et seulement si il y a des équipes qui ont été retirées
+                const teamsRemoved = person.assignedTeams.filter((t) => !body.assignedTeams.includes(t));
+                if (teamsRemoved.length) {
+                  return setIsOutOfTeamsModalOpen(true);
                 } else {
-                  toast.error("Erreur de l'enregistrement, les données n'ont pas été enregistrées");
+                  await saveAndClose(body);
                 }
               }}
             >
@@ -464,5 +494,59 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
         </ModalBody>
       </ModalContainer>
     </>
+  );
+}
+
+function OutOfTeamsModal({ open, onClose, removedTeams }) {
+  const teams = useRecoilValue(teamsState);
+  const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
+  const [outOfActiveListReasons, setOutOfActiveListReasons] = useState(removedTeams.reduce((acc, team) => ({ ...acc, [team]: [] }), {}));
+  return (
+    <ModalContainer open={open} size="3xl" backdrop="static">
+      <ModalHeader title="Motifs de sorties d'équipes" />
+      <ModalBody>
+        <div className="tw-flex tw-h-full tw-w-full tw-flex-col tw-p-4">
+          Vous pouvez indiquer des motifs de sortie pour les équipes retirées (optionnel)
+          <div className="tw-grid tw-gap-4 tw-my-4">
+            {removedTeams.map((team) => (
+              <div key={team} className="tw-mb-4">
+                <div className="tw-mb-1">
+                  Motif de sortie de l'équipe <b>{teams.find((t) => t._id === team)?.name}</b>
+                </div>
+                <SelectCustom
+                  options={fieldsPersonsCustomizableOptions
+                    .find((f) => f.name === "outOfActiveListReasons")
+                    .options?.map((_option) => ({ value: _option, label: _option }))}
+                  name="outOfActiveListReasons"
+                  onChange={(values) => setOutOfActiveListReasons({ ...outOfActiveListReasons, [team]: values.map((v) => v.value) })}
+                  isClearable={false}
+                  isMulti
+                  inputId="person-select-outOfActiveListReasons"
+                  classNamePrefix="person-select-outOfActiveListReasons"
+                  value={outOfActiveListReasons[team]?.map((_option) => ({ value: _option, label: _option })) || []}
+                  placeholder={"Choisir..."}
+                  getOptionValue={(i) => i.value}
+                  getOptionLabel={(i) => i.label}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </ModalBody>
+      <ModalFooter>
+        <ButtonCustom color="secondary" onClick={onClose} title="Ignorer cette étape" />
+        <ButtonCustom
+          color="primary"
+          onClick={() => {
+            onClose(
+              Object.entries(outOfActiveListReasons)
+                .filter(([, reasons]) => reasons.length)
+                .reduce((acc, [team, reasons]) => ({ ...acc, [team]: reasons }), {})
+            );
+          }}
+          title="Enregistrer"
+        />
+      </ModalFooter>
+    </ModalContainer>
   );
 }
