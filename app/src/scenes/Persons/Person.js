@@ -263,7 +263,6 @@ const Person = ({ route, navigation }) => {
     body.treatmentIdsToDelete = treatments.filter((c) => c.person === personDB._id).map((c) => c._id);
     body.medicalFileIdsToDelete = medicalFiles.filter((c) => c.person === personDB._id).map((c) => c._id);
 
-    console.log('ICI');
     const personRes = await API.delete({ path: `/person/${personDB._id}`, body });
     if (personRes?.ok) {
       Alert.alert('Personne supprimée !');
