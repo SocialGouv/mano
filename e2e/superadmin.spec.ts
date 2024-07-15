@@ -11,7 +11,7 @@ test.beforeAll(async () => {
   await populate();
 });
 
-test("Replace me", async ({ page }) => {
+test("Super admin", async ({ page }) => {
   // Pas besoin d'appeler l'API adresse.
   await page.route("*/**/communes?*", (route) => {
     route.fulfill({
