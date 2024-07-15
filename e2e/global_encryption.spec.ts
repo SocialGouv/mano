@@ -30,9 +30,7 @@ test("test", async ({ page }) => {
   await page.getByRole("menuitem", { name: "Se déconnecter", exact: true }).click();
 
   await expect(page).toHaveURL("http://localhost:8090/auth");
-  await page.getByLabel("Email").click();
   await page.getByLabel("Email").fill("admin8@example.org");
-  await page.getByLabel("Mot de passe").click();
   await page.getByLabel("Mot de passe").fill("secret");
   await page.getByRole("button", { name: "Se connecter" }).click();
   await page.locator("#orgEncryptionKey").click();
@@ -46,7 +44,17 @@ test("test", async ({ page }) => {
   await page.locator("#orgEncryptionKey").clear();
   await page.locator("#orgEncryptionKey").pressSequentially("nouvelle assez longue");
   await page.getByRole("button", { name: "Se connecter" }).click();
+
   await page.getByRole("link", { name: "Organisation" }).click();
   await page.getByRole("button", { name: "Chiffrement" }).click();
-  await page.getByRole("heading", { name: "Chiffrement" }).click();
+  await page.getByRole("button", { name: "Changer la clé de chiffrement" }).click();
+  await page.getByRole("textbox", { name: "Clé de chiffrement", exact: true }).fill("âûé av¨%? des^ Éccents éàâûé");
+  await page.getByLabel("Confirmez la clé de chiffrement").fill("âûé av¨%? des^ Éccents éàâûé");
+  await page.locator("data-test-id=encryption-modal").getByRole("button", { name: "Changer la clé de chiffrement" }).click();
+  await page.getByText("Données chiffrées ! Veuillez noter la clé puis vous reconnecter").click();
+  await page.locator("data-test-id=encryption-modal").getByLabel("Fermer").first().click();
+  await page.getByRole("button", { name: "User Admin Test - 8" }).click();
+  await page.getByRole("menuitem", { name: "Se déconnecter", exact: true }).click();
+  await loginWith(page, "admin8@example.org", "secret", "âûé av¨%? des^ Éccents éàâûé");
+  await page.getByRole("link", { name: "Organisation" }).click();
 });

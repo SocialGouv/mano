@@ -30,10 +30,6 @@ const KeyInput = ({
     setCursorToEnd();
   }, []);
 
-  const isAndroid = () => {
-    return /Android/i.test(navigator.userAgent);
-  };
-
   function setCursorToEnd() {
     document.getSelection().selectAllChildren(inputRef.current);
     document.getSelection().collapseToEnd();
@@ -72,21 +68,15 @@ const KeyInput = ({
             setCursorToEnd();
           }
         }}
-        onCompositionEnd={(e) => {
-          // Gestion des caractères en 2 temps (similaire à l'ajout d'un caractère à la fin).
-          const innerText = (e.target as HTMLElement).innerText;
-          const newValue = value + innerText.slice(-1);
-          onChange(newValue);
-          setValue(newValue);
-          if (!showPassword) {
-            (e.target as HTMLElement).innerText = "•".repeat(newValue.length);
-          }
-          setCursorToEnd();
-        }}
         onInput={(e) => {
           // Cas particulier: Si on est en train de faire une composition (comme ^ + i pour î par exemple), on gère à l'extérieur.
-          // Sauf que sur android, on ne peut pas détecter la composition parce que tout semble composition, donc on laisse passer.
-          if (!isAndroid() && (e.nativeEvent as InputEvent).isComposing) return;
+          // Sauf que sur android, on ne peut pas détecter la composition parce que tout est composition.
+          // Mais on ne peut pas toujours détecter si c'est android ou pas.
+          // Donc on ignore uniquement les caractères de composition courants en français comme ^¨`´.
+          // Sur les claviers non-français, l'accent peut se faire avec ' et " (pour le trema).
+          // Mais ça ne semble pas poser de problème car il n'est pas considéré comme composition.
+          const nativeEvent = e.nativeEvent as InputEvent;
+          if (nativeEvent.isComposing && /^[\^¨`´]$/.test(nativeEvent.data || "")) return;
 
           let innerText = (e.target as HTMLElement).innerText;
           // On enlève les caractères de retour à la ligne (sur iOS, quand on efface tout, il reste un retour à la ligne)
