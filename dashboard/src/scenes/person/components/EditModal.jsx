@@ -534,7 +534,7 @@ function OutOfTeamsModal({ open, onClose, removedTeams }) {
         </div>
       </ModalBody>
       <ModalFooter>
-        <ButtonCustom color="secondary" onClick={onClose} title="Ignorer cette étape" />
+        <ButtonCustom color="secondary" onClick={() => onClose()} title="Ignorer cette étape" />
         <ButtonCustom
           color="primary"
           onClick={() => {
