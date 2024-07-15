@@ -85,7 +85,7 @@ const Table = <T extends { [key: string]: any } & RootItem>({
               </td>
             </tr>
           )}
-          <tr>
+          <tr className="tw-cursor-default">
             <td colSpan={columns.length}>
               <p className="tw-m-0 tw-mb-5 tw-text-center">{noData}</p>
             </td>
