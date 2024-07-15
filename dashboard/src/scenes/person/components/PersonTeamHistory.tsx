@@ -19,10 +19,10 @@ function getPersonTeamHistory(changes: Array<PersonHistoryEntry>, creationDate: 
   if (changes.length === 0) return [];
 
   if (changes.length > 0) {
-    const initialTeams = changes[0].data.assignedTeams.oldValue;
-    initialTeams.forEach((team) => {
+    const initialTeams = changes[0].data.assignedTeams.oldValue || [];
+    for (const team of initialTeams) {
       teamHistory[team] = { startDate: creationDate, endDate: null };
-    });
+    }
   }
 
   for (const change of changes) {
