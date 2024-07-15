@@ -7,7 +7,6 @@ import * as Sentry from "@sentry/react";
 import { fr } from "date-fns/esm/locale";
 import { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import lifecycle from "page-lifecycle";
 import Account from "./scenes/account";
 import Auth from "./scenes/auth";
 import Organisation from "./scenes/organisation";
@@ -95,11 +94,22 @@ const App = () => {
   const { refresh } = useDataLoader();
   const apiToken = API.getToken();
 
+  // Abort all pending requests (that listen to this signal)
   useEffect(() => {
-    const onWindowFocus = (e) => {
-      if (apiToken && e.newState === "active") {
-        // will force logout if session is expired
-        tryFetch(() => API.get({ path: "/check-auth" })).then(() => {
+    const abort = () => {
+      API.abortController.abort(new DOMException("Aborted by navigation", "BeforeUnloadAbortError"));
+    };
+    window.addEventListener("beforeunload", abort);
+    return () => {
+      window.removeEventListener("beforeunload", abort);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleFocus = () => {
+      if (apiToken) {
+        // Cela déclenchera un logout si la session est expirée
+        tryFetch(() => API.getAbortable({ path: "/check-auth" })).then(() => {
           // On ne recharge que s'il y a une clé de chiffrement
           // Sinon ça met du bazar en cache (parce que ça va chercher des données chiffrées et que ça échoue)
           if (initialLoadIsDone && getHashedOrgEncryptionKey()) {
@@ -108,11 +118,11 @@ const App = () => {
         });
       }
     };
-    lifecycle.addEventListener("statechange", onWindowFocus);
+    window.addEventListener("focus", handleFocus);
     return () => {
-      lifecycle.removeEventListener("statechange", onWindowFocus);
+      window.removeEventListener("focus", handleFocus);
     };
-  }, [apiToken, refresh, initialLoadIsDone]);
+  }, [initialLoadIsDone, refresh, apiToken]);
 
   const showOutdateAlertBanner = useRecoilValue(showOutdateAlertBannerState);
   const deploymentCommit = useRecoilValue(deploymentCommitState);

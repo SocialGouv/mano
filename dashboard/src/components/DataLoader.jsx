@@ -154,7 +154,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
   */
 
     const [userError, userResponse] = await tryFetch(() => {
-      return API.get({ path: "/user/me" });
+      return API.getAbortable({ path: "/user/me" });
     });
     if (userError || !userResponse.ok) return resetLoaderOnError(userError || userResponse.error);
     const latestOrganisation = userResponse.user.organisation;
@@ -173,7 +173,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     }
 
     const [statsError, statsResponse] = await tryFetchExpectOk(() => {
-      return API.get({
+      return API.getAbortable({
         path: "/organisation/stats",
         query: {
           organisation: organisationId,
@@ -190,7 +190,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     // Get date from server just after getting all the stats
     // We'll set the `lastLoadValue` to this date after all the data is downloaded
     const [serverDateError, serverDateResponse] = await tryFetchExpectOk(() => {
-      return API.get({ path: "/now" });
+      return API.getAbortable({ path: "/now" });
     });
     if (serverDateError) return resetLoaderOnError(serverDateError);
     const serverDate = serverDateResponse.data;
@@ -230,7 +230,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       setLoadingText("Chargement des personnes");
       async function loadPersons(page = 0) {
         const [error, res] = await tryFetchExpectOk(async () => {
-          return API.get({ path: "/person", query: { ...query, page: String(page) } });
+          return API.getAbortable({ path: "/person", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
         const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
@@ -248,7 +248,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       setLoadingText("Chargement des familles");
       async function loadGroups(page = 0) {
         const [error, res] = await tryFetchExpectOk(async () => {
-          return API.get({ path: "/group", query: { ...query, page: String(page) } });
+          return API.getAbortable({ path: "/group", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
         const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
@@ -266,7 +266,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       setLoadingText("Chargement des comptes-rendus");
       async function loadReports(page = 0) {
         const [error, res] = await tryFetchExpectOk(async () => {
-          return API.get({ path: "/report", query: { ...query, page: String(page) } });
+          return API.getAbortable({ path: "/report", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
         const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
@@ -284,7 +284,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       setLoadingText("Chargement des passages");
       async function loadPassages(page = 0) {
         const [error, res] = await tryFetchExpectOk(async () => {
-          return API.get({ path: "/passage", query: { ...query, page: String(page) } });
+          return API.getAbortable({ path: "/passage", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
         const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
@@ -302,7 +302,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       setLoadingText("Chargement des rencontres");
       async function loadRencontres(page = 0) {
         const [error, res] = await tryFetchExpectOk(async () => {
-          return API.get({ path: "/rencontre", query: { ...query, page: String(page) } });
+          return API.getAbortable({ path: "/rencontre", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
         const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
@@ -320,7 +320,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       setLoadingText("Chargement des actions");
       async function loadActions(page = 0) {
         const [error, res] = await tryFetchExpectOk(async () => {
-          return API.get({ path: "/action", query: { ...query, page: String(page) } });
+          return API.getAbortable({ path: "/action", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
         const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
@@ -338,7 +338,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       setLoadingText("Chargement des territoires");
       async function loadTerritories(page = 0) {
         const [error, res] = await tryFetchExpectOk(async () => {
-          return API.get({ path: "/territory", query: { ...query, page: String(page) } });
+          return API.getAbortable({ path: "/territory", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
         const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
@@ -356,7 +356,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       setLoadingText("Chargement des lieux");
       async function loadPlaces(page = 0) {
         const [error, res] = await tryFetchExpectOk(async () => {
-          return API.get({ path: "/place", query: { ...query, page: String(page) } });
+          return API.getAbortable({ path: "/place", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
         const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
@@ -374,7 +374,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       setLoadingText("Chargement des relations personne-lieu");
       async function loadRelPersonPlaces(page = 0) {
         const [error, res] = await tryFetchExpectOk(async () => {
-          return API.get({ path: "/relPersonPlace", query: { ...query, page: String(page) } });
+          return API.getAbortable({ path: "/relPersonPlace", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
         const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
@@ -392,7 +392,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       setLoadingText("Chargement des observations de territoire");
       async function loadObservations(page = 0) {
         const [error, res] = await tryFetchExpectOk(async () => {
-          return API.get({ path: "/territory-observation", query: { ...query, page: String(page) } });
+          return API.getAbortable({ path: "/territory-observation", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
         const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
@@ -410,7 +410,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       setLoadingText("Chargement des commentaires");
       async function loadComments(page = 0) {
         const [error, res] = await tryFetchExpectOk(async () => {
-          return API.get({ path: "/comment", query: { ...query, page: String(page) } });
+          return API.getAbortable({ path: "/comment", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
         const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
@@ -428,7 +428,10 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       setLoadingText("Chargement des consultations");
       async function loadConsultations(page = 0) {
         const [error, res] = await tryFetchExpectOk(async () => {
-          return API.get({ path: "/consultation", query: { ...query, page: String(page), after: isStartingInitialLoad ? 0 : lastLoadValue } });
+          return API.getAbortable({
+            path: "/consultation",
+            query: { ...query, page: String(page), after: isStartingInitialLoad ? 0 : lastLoadValue },
+          });
         });
         if (error) return resetLoaderOnError();
         const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
@@ -446,7 +449,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       setLoadingText("Chargement des traitements");
       async function loadTreatments(page = 0) {
         const [error, res] = await tryFetchExpectOk(async () => {
-          return API.get({ path: "/treatment", query: { ...query, page: String(page), after: isStartingInitialLoad ? 0 : lastLoadValue } });
+          return API.getAbortable({ path: "/treatment", query: { ...query, page: String(page), after: isStartingInitialLoad ? 0 : lastLoadValue } });
         });
         if (error) return resetLoaderOnError();
         const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
@@ -464,7 +467,10 @@ export function useDataLoader(options = { refreshOnMount: false }) {
       setLoadingText("Chargement des fichiers médicaux");
       async function loadMedicalFiles(page = 0) {
         const [error, res] = await tryFetchExpectOk(async () => {
-          return API.get({ path: "/medical-file", query: { ...query, page: String(page), after: isStartingInitialLoad ? 0 : lastLoadValue } });
+          return API.getAbortable({
+            path: "/medical-file",
+            query: { ...query, page: String(page), after: isStartingInitialLoad ? 0 : lastLoadValue },
+          });
         });
         if (error) return resetLoaderOnError();
         const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
@@ -492,6 +498,9 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     // this can result in data corruption, we need to reset the loader
     setLastLoad(0);
     await clearCache("resetLoaderOnError");
+    // Pas de message d'erreur si la page est en train de se fermer
+    // et que l'erreur est liée à une requête annulable.
+    if (error?.name === "BeforeUnloadAbortError") return false;
     toast.error(errorMessage(error || "Désolé, une erreur est survenue lors du chargement de vos données, veuillez réessayer"), {
       onClose: () => window.location.replace("/auth"),
       autoClose: 5000,

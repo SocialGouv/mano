@@ -13,6 +13,11 @@ class AuthError extends Error {
 
 class Api {
   protected token: string | null = null;
+  public abortController: AbortController;
+
+  constructor() {
+    this.abortController = new AbortController();
+  }
 
   protected getUrl(path: string, query?: Record<string, string | Date | boolean>) {
     const url = new URL(`${SCHEME}://${HOST}${(path || "").startsWith("/") ? path : `/${path}`}`);
@@ -118,6 +123,17 @@ class Api {
     return response.json();
   }
 
+  async getAbortable({ path, query = {} }: { path: string; query?: Record<string, string | Date | boolean> }) {
+    const response = await fetch(this.getUrl(path, { ...this.organisationEncryptionStatus(), ...query }), {
+      ...this.fetchParams(),
+      method: "GET",
+      signal: this.abortController.signal,
+    });
+    this.updateDeploymentStatus(response);
+    if (this.needAuthRedirection(response)) throw new AuthError();
+    return response.json();
+  }
+
   async upload({ path, encryptedFile }: { path: string; encryptedFile: File }) {
     const formData = new FormData();
     formData.append("file", encryptedFile);
@@ -186,6 +202,7 @@ export async function tryFetch<T extends ApiResponse>(callback: FetchCallback<T>
     return [undefined, result];
   } catch (error) {
     if (error instanceof AuthError) window.location.href = "/auth?disconnected=1";
+    else if (error.name === "BeforeUnloadAbortError") console.error("BeforeUnloadAbortError", error);
     else capture(error);
     return [error, undefined];
   }
@@ -201,6 +218,7 @@ export async function tryFetchExpectOk<T extends ApiResponse>(callback: FetchCal
     return [undefined, result];
   } catch (error) {
     if (error instanceof AuthError) window.location.href = "/auth?disconnected=1";
+    else if (error.name === "BeforeUnloadAbortError") console.error("BeforeUnloadAbortError", error);
     else capture(error);
     return [error, undefined];
   }
