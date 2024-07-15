@@ -320,7 +320,7 @@ const Create = ({ onChange, users }) => {
                   onChange={handleChange}
                 />
               </div> */}
-              {data.role !== "restricted-access" && (
+              {data.role !== "restricted-access" && data.role !== "stats-only" && (
                 <div className="tw-flex tw-basis-full tw-flex-col tw-px-4 tw-py-2">
                   <label htmlFor="healthcareProfessional" style={{ marginBottom: 0 }}>
                     <input
