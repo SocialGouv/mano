@@ -56,3 +56,70 @@ export const sortStructures = (sortBy, sortOrder) => (a, b) => {
   // default sort: name
   return defaultSort(a, b, sortOrder);
 };
+
+export const structuresFields = (structuresTypes) => [
+  {
+    name: "name",
+    label: "Nom",
+    type: "text",
+    encrypted: true,
+    importable: true,
+    filterable: true,
+    enabled: true,
+  },
+  {
+    name: "description",
+    label: "Description",
+    type: "text",
+    encrypted: true,
+    importable: true,
+    filterable: true,
+    enabled: true,
+  },
+  {
+    name: "adresse",
+    label: "Adresse",
+    type: "text",
+    encrypted: true,
+    importable: true,
+    filterable: true,
+    enabled: true,
+  },
+  {
+    name: "postcode",
+    label: "Code postal",
+    type: "text",
+    encrypted: true,
+    importable: true,
+    filterable: true,
+    enabled: true,
+  },
+  {
+    name: "city",
+    label: "Ville",
+    type: "text",
+    encrypted: true,
+    importable: true,
+    filterable: true,
+    enabled: true,
+  },
+  {
+    name: "phone",
+    label: "Téléphone",
+    type: "text",
+    encrypted: true,
+    importable: true,
+    filterable: true,
+    enabled: true,
+  },
+  {
+    name: "categories",
+    label: "Catégories",
+    type: "multi-choice",
+    options: structuresTypes,
+    encrypted: true,
+    importable: true,
+    filterable: true,
+    enabled: true,
+  },
+];

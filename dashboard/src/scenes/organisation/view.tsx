@@ -41,6 +41,9 @@ import DownloadTerritoriesImportExample from "../data-import-export/DownloadTerr
 import TerritoriesTypesSettings from "./TerritoriesTypesSettings";
 import { DefaultFoldersMedical, DefaultFoldersPersons } from "./DefaultFolders";
 import Errors from "./Errors";
+import { flattenedStructuresCategoriesSelector, structuresFields } from "../../recoil/structures";
+import DownloadStructuresImportExample from "../data-import-export/DownloadStructuresImportExample";
+import ImportStructures from "../data-import-export/ImportStructures";
 
 const getSettingTitle = (tabId) => {
   if (tabId === "infos") return "Informations";
@@ -79,6 +82,7 @@ const View = () => {
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
   const encryptionKeyLength = useRecoilValue(encryptionKeyLengthState);
   const territoriesTypes = useRecoilValue(flattenedTerritoriesTypesSelector);
+  const structuresCategories = useRecoilValue(flattenedStructuresCategoriesSelector);
 
   const persons = useRecoilValue(personsState);
   const { preparePersonForEncryption } = usePreparePersonForEncryption();
@@ -169,6 +173,7 @@ const View = () => {
             <MenuButton selected={tab === "import"} text="Import de personnes suivies" onClick={() => setTab("import")} />
             <MenuButton selected={tab === "import-configuration"} text="Import de configuration" onClick={() => setTab("import-configuration")} />
             <MenuButton selected={tab === "import-territories"} text="Import de territoires" onClick={() => setTab("import-territories")} />
+            <MenuButton selected={tab === "import-structures"} text="Import de structures" onClick={() => setTab("import-structures")} />
             <MenuButton selected={tab === "export"} text="Export des données" onClick={() => setTab("export")} />
           </div>
           <div className="tw-text-white tw-font-bold tw-text-sm mt-3">Maintenance</div>
@@ -630,6 +635,56 @@ const View = () => {
                       <div className="tw-mb-10 tw-flex tw-justify-end tw-gap-4">
                         <DownloadTerritoriesImportExample />
                         <ImportTerritories />
+                      </div>
+                    </>
+                  );
+
+                case "import-structures":
+                  return (
+                    <>
+                      <TabTitle>Importer des structures</TabTitle>
+                      <div className="tw-flex tw-flex-wrap -tw-mx-4">
+                        <div className="tw-basis-10/12 tw-w-full tw-px-4">
+                          <p>
+                            Vous pouvez importer une liste de structures depuis un fichier Excel. Ce fichier doit avoir quelques caractéristiques:
+                          </p>
+                          <ul className="tw-mt-4 tw-list-inside tw-list-disc">
+                            <li>
+                              avoir un onglet dont le nom contient <code>structure</code>
+                            </li>
+                            <li>avoir en première ligne de cet onglet des têtes de colonnes</li>
+                            <li>
+                              les colonnes qui seront importées peuvent être parmi la liste suivante - toute colonne qui ne s'appelle pas ainsi ne
+                              sera pas prise en compte - certaines colonnes ont des valeurs imposées :
+                              <table className="table-sm table tw-text-sm tw-mt-8">
+                                <thead>
+                                  <tr>
+                                    <th>Colonne</th>
+                                    <th>Valeur</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {structuresFields(structuresCategories)
+                                    .filter((f) => f.importable)
+                                    .map((f, i) => {
+                                      return (
+                                        <tr key={f.label + i}>
+                                          <td>{f.label}</td>
+                                          <td>
+                                            <ImportFieldDetails field={f} />
+                                          </td>
+                                        </tr>
+                                      );
+                                    })}
+                                </tbody>
+                              </table>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                      <div className="tw-mb-10 tw-flex tw-justify-end tw-gap-4">
+                        <DownloadStructuresImportExample />
+                        <ImportStructures />
                       </div>
                     </>
                   );

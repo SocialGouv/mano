@@ -57,6 +57,53 @@ router.post(
   })
 );
 
+router.post(
+  "/import",
+  passport.authenticate("user", { session: false }),
+  validateUser("admin"),
+  validateEncryptionAndMigrations,
+  catchErrors(async (req, res, next) => {
+    try {
+      z.object({
+        structuresToImport: z.array(
+          z.object({
+            name: z.string().min(1),
+            description: z.optional(z.string()),
+            city: z.optional(z.string()),
+            postcode: z.optional(z.string()),
+            adresse: z.optional(z.string()),
+            phone: z.optional(z.string()),
+            categories: z.optional(z.array(z.string())),
+          })
+        ),
+      }).parse(req.body);
+    } catch (e) {
+      const error = new Error(`Invalid request in structures import: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+
+    const structures = req.body.structuresToImport.map((structure) => {
+      const newStructure = {
+        name: structure.name,
+        organisation: req.user.organisation,
+      };
+      if (structure.hasOwnProperty("phone")) newStructure.phone = structure.phone;
+      if (structure.hasOwnProperty("adresse")) newStructure.adresse = structure.adresse;
+      if (structure.hasOwnProperty("city")) newStructure.city = structure.city;
+      if (structure.hasOwnProperty("postcode")) newStructure.postcode = structure.postcode;
+      if (structure.hasOwnProperty("description")) newStructure.description = structure.description;
+      if (structure.hasOwnProperty("categories")) newStructure.categories = structure.categories;
+      return newStructure;
+    });
+    await Structure.bulkCreate(structures);
+
+    return res.status(200).send({
+      ok: true,
+    });
+  })
+);
+
 router.get(
   "/",
   passport.authenticate("user", { session: false, failWithError: true }),

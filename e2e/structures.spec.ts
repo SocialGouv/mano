@@ -15,7 +15,7 @@ test.beforeAll(async () => {
 test("Structures", async ({ page }) => {
   await loginWith(page, "admin1@example.org");
   await page.getByRole("link", { name: "Organisation" }).click();
-  await page.getByRole("button", { name: "Structures" }).click();
+  await page.getByRole("button", { name: "Structures", exact: true }).click();
   await page.locator("details[data-group='Toutes mes catégories']").getByPlaceholder("Ajouter une catégorie").fill("infirmerie");
   await page.locator("details[data-group='Toutes mes catégories']").getByRole("button", { name: "Ajouter" }).click();
   await page.getByText("Catégorie ajoutée. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard").click();

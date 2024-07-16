@@ -32,7 +32,7 @@ test("Remplissage de la première organisation", async ({ page }) => {
   await page.getByLabel("Nom").fill("territoire orga 1");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
-  await page.getByRole("link", { name: "Structures" }).click();
+  await page.getByRole("link", { name: "Structures", exact: true }).click();
   await page.getByRole("button", { name: "Créer une structure" }).click();
   await page.getByLabel("Nom").fill("structure orga 1");
   await page.getByRole("button", { name: "Enregistrer" }).click();
@@ -66,7 +66,7 @@ test("Remplissage de la première organisation", async ({ page }) => {
   await page.getByPlaceholder("Ajouter une catégorie").fill("catégorie orga 1");
   await page.getByRole("button", { name: "Ajouter", exact: true }).click();
   await page.getByText("Catégorie ajoutée. Veuillez").click();
-  await page.getByRole("button", { name: "Structures" }).click();
+  await page.getByRole("button", { name: "Structures", exact: true }).click();
   await page.getByPlaceholder("Ajouter une catégorie").click();
   await page.getByPlaceholder("Ajouter une catégorie").fill("catégorie orga 1");
   await page.getByRole("button", { name: "Ajouter" }).click();
@@ -166,7 +166,7 @@ test("Remplissage de la deuxième organisation", async ({ page }) => {
   await page.getByLabel("Nom").fill("territoire orga 2");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
-  await page.getByRole("link", { name: "Structures" }).click();
+  await page.getByRole("link", { name: "Structures", exact: true }).click();
   await page.getByRole("button", { name: "Créer une structure" }).click();
   await page.getByLabel("Nom").fill("structure orga 2");
   await page.getByRole("button", { name: "Enregistrer" }).click();
@@ -200,7 +200,7 @@ test("Remplissage de la deuxième organisation", async ({ page }) => {
   await page.getByPlaceholder("Ajouter une catégorie").fill("catégorie orga 2");
   await page.getByRole("button", { name: "Ajouter", exact: true }).click();
   await page.getByText("Catégorie ajoutée. Veuillez").click();
-  await page.getByRole("button", { name: "Structures" }).click();
+  await page.getByRole("button", { name: "Structures", exact: true }).click();
   await page.getByPlaceholder("Ajouter une catégorie").click();
   await page.getByPlaceholder("Ajouter une catégorie").fill("catégorie orga 2");
   await page.getByRole("button", { name: "Ajouter" }).click();
