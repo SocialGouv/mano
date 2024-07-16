@@ -153,8 +153,8 @@ export default function ServicesReport({ period, selectedTeamsObject }) {
         <div className="tw-grow tw-overflow-y-auto tw-border-t tw-border-main tw-border-opacity-20 tw-p-4">
           {Object.entries(serviceSumsForAllReports).map(([key, value]) => (
             <IncrementorSmall
-              dataTestId={`general-${key}-${value || 0}`}
-              key={`general-${key}-${value || 0}`}
+              dataTestId={`general-printonly-${key}-${value || 0}`}
+              key={`general-printonly-${key}-${value || 0}`}
               service={key}
               count={value || 0}
               date={dayjs(period.startDate).format("YYYY-MM-DD")}

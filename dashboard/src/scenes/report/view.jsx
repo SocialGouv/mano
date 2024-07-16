@@ -310,6 +310,8 @@ const View = () => {
               }}
               value={selectedTeams.map((e) => e?._id)}
               colored
+              inputId="report-team-select"
+              classNamePrefix="report-team-select"
               isDisabled={viewAllOrganisationData}
             />
             {teams.length > 1 && (
