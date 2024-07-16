@@ -40,6 +40,7 @@ import { flattenedTerritoriesTypesSelector, territoriesFields } from "../../reco
 import DownloadTerritoriesImportExample from "../data-import-export/DownloadTerritoriesImportExample";
 import TerritoriesTypesSettings from "./TerritoriesTypesSettings";
 import { DefaultFoldersMedical, DefaultFoldersPersons } from "./DefaultFolders";
+import Errors from "./Errors";
 
 const getSettingTitle = (tabId) => {
   if (tabId === "infos") return "Informations";
@@ -173,6 +174,7 @@ const View = () => {
           <div className="tw-text-white tw-font-bold tw-text-sm mt-3">Maintenance</div>
           <div className="rounded tw-mx-auto tw-w-full tw-p-2 my-2 tw-flex tw-bg-main25 tw-flex-col tw-gap-2 tw-items-start tw">
             <MenuButton selected={tab === "poubelle"} text="Données supprimées" onClick={() => setTab("poubelle")} />
+            <MenuButton selected={tab === "errors"} text="Données en erreur" onClick={() => setTab("errors")} />
           </div>
         </div>
         <div ref={scrollContainer} className="tw-basis-full tw-overflow-auto tw-px-6 tw-py-4">
@@ -510,6 +512,15 @@ const View = () => {
                       <TabTitle>Personnes supprimées</TabTitle>
                       <div>
                         <Poubelle />
+                      </div>
+                    </>
+                  );
+                case "errors":
+                  return (
+                    <>
+                      <TabTitle>Données en erreur</TabTitle>
+                      <div>
+                        <Errors />
                       </div>
                     </>
                   );
