@@ -18,8 +18,12 @@ const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = "", ser
       if (!dateString || !team?._id || dateString === "undefined") {
         return capture("Missing params for initServices in reception", { extra: { dateString, team, report } });
       }
-      tryFetchExpectOk(() => API.get({ path: `/service/team/${team._id}/date/${dateString}` })).then(([error, res]) => {
-        if (error) return toast.error(<ErrorOnGetServices />);
+      tryFetchExpectOk(() => API.getAbortable({ path: `/service/team/${team._id}/date/${dateString}` })).then(([error, res]) => {
+        if (error) {
+          // Pas besoin d'afficher un message d'erreur si on était en train de quitter la page pendant le chargement.
+          if (error?.name === "BeforeUnloadAbortError") return;
+          return toast.error(<ErrorOnGetServices />);
+        }
         const servicesFromLegacyReport = report?.services?.length ? JSON.parse(report?.services) : {};
         const servicesFromDatabase = res.data.reduce((acc, service) => {
           acc[service.service] = (servicesFromLegacyReport[service.service] || 0) + service.count;

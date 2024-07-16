@@ -26,9 +26,13 @@ const ServicesStats = ({ period, teamIds }) => {
         return;
       }
       tryFetchExpectOk(async () =>
-        API.get({ path: `/service/team/${teamIds.join(",")}/stats`, query: startDate ? { from: startDate, to: endDate || startDate } : {} })
+        API.getAbortable({ path: `/service/team/${teamIds.join(",")}/stats`, query: startDate ? { from: startDate, to: endDate || startDate } : {} })
       ).then(([error, response]) => {
-        if (error) return toast.error("Erreur lors du chargement des statistiques des services de l'accueil");
+        if (error) {
+          // Pas besoin d'afficher un message d'erreur si on était en train de quitter la page pendant le chargement.
+          if (error?.name === "BeforeUnloadAbortError") return;
+          return toast.error("Erreur lors du chargement des statistiques des services de l'accueil");
+        }
         const servicesObj = {};
         for (const service of allServices) {
           servicesObj[service] = Number(response.data.find((s) => s.service === service)?.count || 0);
