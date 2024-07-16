@@ -9,7 +9,6 @@ import "dayjs/locale/fr";
 test.beforeAll(async () => {
   await populate();
 });
-test.setTimeout(120000);
 
 test("Actions", async ({ page }) => {
   const personName = nanoid();

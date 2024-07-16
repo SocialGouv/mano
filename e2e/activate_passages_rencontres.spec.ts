@@ -6,7 +6,7 @@ import dayjs from "dayjs";
 test.beforeAll(async () => {
   await populate();
 });
-test.setTimeout(120000);
+test.setTimeout(90000);
 
 test("test", async ({ page }) => {
   const today = dayjs().format("YYYY-MM-DD");
