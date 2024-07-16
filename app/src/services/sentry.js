@@ -17,7 +17,6 @@ export const capture = (err, context = {}) => {
   }
   if (Sentry && err) {
     if (typeof err === 'string') {
-      console.log('PUTIN');
       Sentry.captureMessage(err, context);
     } else {
       Sentry.captureException(err, context);
