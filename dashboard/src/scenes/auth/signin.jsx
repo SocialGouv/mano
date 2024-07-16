@@ -88,6 +88,8 @@ const SignIn = () => {
     (async () => {
       const [error, response] = await tryFetch(() => API.getSigninToken());
       if (error) {
+        // Pas besoin d'afficher un message d'erreur si on était en train de quitter la page pendant le chargement.
+        if (error?.name === "BeforeUnloadAbortError") return setLoading(false);
         toast.error(errorMessage(error));
         return setLoading(false);
       }
@@ -138,6 +140,8 @@ const SignIn = () => {
     if (authViaCookie) {
       const [signinTokenError, signinTokenResponse] = await tryFetch(() => API.getSigninToken());
       if (signinTokenError || !signinTokenResponse.ok) {
+        // Pas besoin d'afficher un message d'erreur si on était en train de quitter la page pendant le chargement.
+        if (signinTokenError?.name === "BeforeUnloadAbortError") return setLoading(false);
         toast.error(errorMessage(signinTokenError || signinTokenResponse?.error));
         return setIsSubmitting(false);
       }

@@ -163,7 +163,7 @@ class Api {
   }
 
   async getSigninToken() {
-    const response = await fetch(this.getUrl("/user/signin-token"), { ...this.fetchParams(), method: "GET" });
+    const response = await fetch(this.getUrl("/user/signin-token"), { ...this.fetchParams(), method: "GET", signal: this.abortController.signal });
     this.updateDeploymentStatus(response);
     if (response.status === 200 && response.ok) return response.json();
     return {};
