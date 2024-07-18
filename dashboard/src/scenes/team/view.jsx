@@ -104,7 +104,7 @@ const View = () => {
               <Col md={6}>
                 <FormGroup>
                   <Label htmlFor="name">Nom</Label>
-                  <Input name="name" id="name" value={values.name} onChange={handleChange} />
+                  <Input autoComplete="off" name="name" id="name" value={values.name} onChange={handleChange} />
                 </FormGroup>
               </Col>
               <Col md={6} />

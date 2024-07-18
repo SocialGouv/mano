@@ -69,13 +69,13 @@ const EditContent = ({ open, setOpen, onSubmit, content, title }) => {
                 <Col md={6}>
                   <FormGroup>
                     <div>Ancien nom</div>
-                    <Input name="content" value={values.content} onChange={handleChange} disabled />
+                    <Input autoComplete="off" name="content" value={values.content} onChange={handleChange} disabled />
                   </FormGroup>
                 </Col>
                 <Col md={6}>
                   <FormGroup>
                     <div>Nouveau nom</div>
-                    <Input name="newContent" value={values.newContent} onChange={handleChange} />
+                    <Input autoComplete="off" name="newContent" value={values.newContent} onChange={handleChange} />
                   </FormGroup>
                 </Col>
               </Row>
