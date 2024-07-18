@@ -88,6 +88,16 @@ if (ENV === "production") {
   });
 }
 
+function abortRequests() {
+  // On souhaite rester silencieux sur ces erreurs, parce qu'on se contente de les annuler exprès
+  // Source: https://stackoverflow.com/a/73783869/978690
+  try {
+    API.abortController.abort(new DOMException("Aborted by navigation", "BeforeUnloadAbortError"));
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 const App = () => {
   const user = useRecoilValue(userState);
   const initialLoadIsDone = useRecoilValue(initialLoadIsDoneState);
@@ -96,18 +106,9 @@ const App = () => {
 
   // Abort all pending requests (that listen to this signal)
   useEffect(() => {
-    const abort = () => {
-      // On souhaite rester silencieux sur ces erreurs, parce qu'on se contente de les annuler exprès
-      // Source: https://stackoverflow.com/a/73783869/978690
-      try {
-        API.abortController.abort(new DOMException("Aborted by navigation", "BeforeUnloadAbortError"));
-      } catch (e) {
-        console.error(e);
-      }
-    };
-    window.addEventListener("beforeunload", abort);
+    window.addEventListener("beforeunload", abortRequests);
     return () => {
-      window.removeEventListener("beforeunload", abort);
+      window.removeEventListener("beforeunload", abortRequests);
     };
   }, []);
 
@@ -136,6 +137,7 @@ const App = () => {
 
   if (!user && showOutdateAlertBanner && !window.localStorage.getItem("automaticReload")) {
     console.log("automatic force reload 🤖💪🆙");
+    abortRequests();
     window.localStorage.setItem("deploymentDate", deploymentDate);
     window.localStorage.setItem("deploymentCommit", deploymentCommit);
     window.localStorage.setItem("automaticReload", "true"); //  to prevent infinite loop
