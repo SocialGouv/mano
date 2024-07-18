@@ -97,7 +97,13 @@ const App = () => {
   // Abort all pending requests (that listen to this signal)
   useEffect(() => {
     const abort = () => {
-      API.abortController.abort(new DOMException("Aborted by navigation", "BeforeUnloadAbortError"));
+      // On souhaite rester silencieux sur ces erreurs, parce qu'on se contente de les annuler exprès
+      // Source: https://stackoverflow.com/a/73783869/978690
+      try {
+        API.abortController.abort(new DOMException("Aborted by navigation", "BeforeUnloadAbortError"));
+      } catch (e) {
+        console.error(e);
+      }
     };
     window.addEventListener("beforeunload", abort);
     return () => {
