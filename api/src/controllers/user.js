@@ -637,25 +637,26 @@ router.get(
     }
 
     const organisationId = req.user.role === "superadmin" && req.query.organisation ? req.query.organisation : req.user.organisation;
-    const users = await User.findAll({ where: { organisation: organisationId } });
-    const data = [];
 
-    if ((req.user.role !== "admin" && req.user.role !== "superadmin") || req.query.minimal === "true") {
-      for (let user of users) {
-        data.push({
+    const includeTeams = (req.user.role === "admin" || req.user.role === "superadmin") && req.query.minimal !== "true";
+
+    const users = await User.findAll({
+      where: { organisation: organisationId },
+      include: includeTeams ? [{ model: Team, as: "Teams" }] : [],
+    });
+
+    const data = users.map((user) => {
+      if ((req.user.role !== "admin" && req.user.role !== "superadmin") || req.query.minimal === "true") {
+        return {
           name: user.name,
           _id: user._id,
           lastLoginAt: user.lastLoginAt,
           createdAt: user.createdAt,
           decryptAttempts: user.decryptAttempts,
-        });
+        };
       }
-      return res.status(200).send({ ok: true, data });
-    }
 
-    for (let user of users) {
-      const teams = await user.getTeams();
-      data.push({
+      return {
         _id: user._id,
         name: user.name,
         phone: user.phone,
@@ -670,9 +671,10 @@ router.get(
         gaveFeedbackEarly2023: user.gaveFeedbackEarly2023,
         lastLoginAt: user.lastLoginAt,
         decryptAttempts: user.decryptAttempts,
-        teams: teams.map(serializeTeam),
-      });
-    }
+        teams: user.teams ? user.teams.map(serializeTeam) : [],
+      };
+    });
+
     return res.status(200).send({ ok: true, data });
   })
 );
@@ -729,7 +731,7 @@ router.put(
           organisation: user.organisation,
           _id: { [Op.in]: team },
         },
-        transaction: tx
+        transaction: tx,
       });
       await RelUserTeam.destroy({ where: { user: _id }, transaction: tx });
       await RelUserTeam.bulkCreate(
@@ -812,7 +814,7 @@ router.put(
           organisation: req.user.organisation,
           _id: { [Op.in]: team },
         },
-        transaction: tx
+        transaction: tx,
       });
       await RelUserTeam.destroy({ where: { user: _id }, transaction: tx });
       await RelUserTeam.bulkCreate(
