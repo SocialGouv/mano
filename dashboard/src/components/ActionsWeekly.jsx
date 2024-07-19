@@ -1,6 +1,5 @@
 import { forwardRef, useMemo } from "react";
 import { useHistory } from "react-router-dom";
-import { Button } from "reactstrap";
 import { useRecoilValue } from "recoil";
 import DatePicker from "react-datepicker";
 import { CANCEL, DONE } from "../recoil/actions";
@@ -48,26 +47,22 @@ export default function ActionsWeekly({ actions, isNightSession, onCreateAction 
         </div>
       )}
       <div className="tw-mb-4 tw-flex tw-flex-row tw-items-center tw-gap-8">
-        <Button color="secondary" outline={true} onClick={() => setStartOfWeek(dayjsInstance().startOf("week").format("YYYY-MM-DD"))}>
+        <button className="button-classic" onClick={() => setStartOfWeek(dayjsInstance().startOf("week").format("YYYY-MM-DD"))}>
           Aujourd'hui
-        </Button>
-        <div className="tw-flex tw-flex-row tw-gap-1">
-          <Button
-            size="sm"
-            color="secondary"
-            outline={true}
+        </button>
+        <div className="tw-flex tw-flex-row tw-gap-1 tw-items-center">
+          <button
+            className="tw-inline-flex tw-justify-center tw-rounded-md tw-border tw-border-gray-300 tw-bg-white tw-px-2 tw-py-1 tw-font-medium tw-text-gray-700 tw-shadow-sm hover:tw-bg-gray-50 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-main focus:tw-ring-offset-2 tw-m-0 tw-w-auto tw-text-sm"
             onClick={() => setStartOfWeek(dayjsInstance(startOfWeek).subtract(1, "week").startOf("week").format("YYYY-MM-DD"))}
           >
             &lt;
-          </Button>
-          <Button
-            size="sm"
-            color="secondary"
-            outline={true}
+          </button>
+          <button
+            className="tw-inline-flex tw-justify-center tw-rounded-md tw-border tw-border-gray-300 tw-bg-white tw-px-2 tw-py-1 tw-font-medium tw-text-gray-700 tw-shadow-sm hover:tw-bg-gray-50 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-main focus:tw-ring-offset-2 tw-m-0 tw-w-auto tw-text-sm"
             onClick={() => setStartOfWeek(dayjsInstance(startOfWeek).add(1, "week").startOf("week").format("YYYY-MM-DD"))}
           >
             &gt;
-          </Button>
+          </button>
         </div>
         <div className="tw-cursor-pointer">
           <DatePicker
