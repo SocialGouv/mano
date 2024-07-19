@@ -104,14 +104,14 @@ export const itemsGroupedByPersonSelector = selector({
       // current format: { teamIdA: [{ endDate: now,  startDate: undefined }] }
       const assignedTeamsPeriods = (person.assignedTeams || []).reduce(
         (acc, teamId) => {
-          acc[teamId] = [{ isoEndDate: dayjsInstance().toISOString(), isoStartDate: undefined }];
+          acc[teamId] = [{ isoEndDate: dayjsInstance().startOf("day").toISOString(), isoStartDate: undefined }];
           return acc;
         },
         {
           all: [
             {
-              isoEndDate: dayjsInstance().toISOString(),
-              isoStartDate: dayjsInstance(person.followedSince || person.createdAt),
+              isoEndDate: dayjsInstance().startOf("day").toISOString(),
+              isoStartDate: dayjsInstance(person.followedSince || person.createdAt).toISOString(),
             },
           ],
         }
