@@ -1,5 +1,4 @@
 import { useHistory } from "react-router-dom";
-import { Label } from "reactstrap";
 import { selector, useRecoilValue } from "recoil";
 import { personsState, sortPersons } from "../recoil/persons";
 import ButtonCustom from "./ButtonCustom";
@@ -30,7 +29,7 @@ const SelectPerson = ({
 
   return (
     <>
-      {!noLabel && <Label htmlFor={inputId}>{isMulti ? "Personnes(s) suivie(s)" : "Personne suivie"}</Label>}
+      {!noLabel && <label htmlFor={inputId}>{isMulti ? "Personnes(s) suivie(s)" : "Personne suivie"}</label>}
       <SelectCustom
         options={sortedPersonsByName}
         name={name}
