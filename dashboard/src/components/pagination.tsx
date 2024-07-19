@@ -1,23 +1,19 @@
 import Pagination from "react-js-pagination";
-import { Col, Row } from "reactstrap";
 
 const Page = ({ page = 0, limit = 20, total = 0, onChange = (_args: { page: number }) => {} }) => (
-  <Row>
-    <Col md={12} style={{ marginTop: 10, marginBottom: 10 }}>
-      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", marginTop: "1rem" }}>
-        <Pagination
-          itemClass="page-item"
-          linkClass="page-link"
-          activePage={page + 1}
-          itemsCountPerPage={limit}
-          totalItemsCount={total}
-          pageRangeDisplayed={5}
-          onChange={(page: number) => onChange({ page: page - 1 })}
-        />
-        <i style={{ marginLeft: "1rem", marginBottom: "1rem", opacity: 0.5 }}>(Total: {total})</i>
-      </div>
-    </Col>
-  </Row>
+  <div className="tw-mt-3 tw-mb-2 tw-flex tw-flex-row tw-items-center">
+    <Pagination
+      itemClass="page-item"
+      linkClass="page-link"
+      innerClass="pagination !tw-mb-0"
+      activePage={page + 1}
+      itemsCountPerPage={limit}
+      totalItemsCount={total}
+      pageRangeDisplayed={5}
+      onChange={(page: number) => onChange({ page: page - 1 })}
+    />
+    <i className="tw-opacity-50 tw-ml-2">(Total: {total})</i>
+  </div>
 );
 
 export default Page;
