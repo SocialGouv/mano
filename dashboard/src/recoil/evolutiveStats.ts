@@ -75,7 +75,7 @@ function getValueByField(indicator: IndicatorsSelection[0], value: any): string 
   if (value == null || value === "") {
     return "Non renseigné"; // we cover the case of undefined, null, empty string
   }
-  if (value.includes("Choisissez un genre")) return "Non renseigné";
+  if (value?.includes("Choisissez un genre")) return "Non renseigné";
   return value;
 }
 
