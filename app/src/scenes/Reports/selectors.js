@@ -126,6 +126,7 @@ export const itemsGroupedDateSelector = selector({
       }
       if (comment.action) {
         const action = actionsObject[comment.action];
+        if (!action) continue;
         itemsGroupedByDate[date].comments.push({
           ...comment,
           action,

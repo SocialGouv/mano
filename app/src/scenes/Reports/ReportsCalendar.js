@@ -9,7 +9,7 @@ import ScrollContainer from '../../components/ScrollContainer';
 import { currentTeamState } from '../../recoil/auth';
 import colors from '../../utils/colors';
 import { refreshTriggerState } from '../../components/Loader';
-import { currentTeamReportsSelector, itemsGroupedDateSelector } from './selectors';
+import { itemsGroupedDateSelector } from './selectors';
 
 LocaleConfig.locales.fr = {
   monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
