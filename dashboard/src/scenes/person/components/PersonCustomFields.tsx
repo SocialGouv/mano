@@ -1,4 +1,3 @@
-import { Col, Row } from "reactstrap";
 import { useRecoilValue } from "recoil";
 import { currentTeamAuthentifiedState } from "../../../recoil/auth";
 import { useMemo, useState } from "react";
@@ -15,7 +14,7 @@ interface PersonCustomFieldsProps {
   isMedicalFile?: boolean;
 }
 
-export default function PersonCustomFields({ person, sectionName, fields, colspan = null, isMedicalFile = false }: PersonCustomFieldsProps) {
+export default function PersonCustomFields({ person, sectionName, fields, isMedicalFile = false }: PersonCustomFieldsProps) {
   const [editModal, setEditModal] = useState("");
   const team = useRecoilValue(currentTeamAuthentifiedState);
   const enabledFields = useMemo(() => {
@@ -43,10 +42,10 @@ export default function PersonCustomFields({ person, sectionName, fields, colspa
           <CustomFieldDisplay type="textarea" value={person.description} />
         </div>
       )}
-      <Row>
+      <div className="tw-grid tw-grid-cols-3 tw-gap-x-2">
         {enabledFields.map((field, i) => {
           return (
-            <Col key={field.label + i} md={field.type === "textarea" ? 12 : colspan ?? 4}>
+            <div key={field.label + i} className={field.type === "textarea" ? "tw-col-span-3" : "tw-col-span-3 sm:tw-col-span-1"}>
               <div className="my-2 [overflow-wrap:anywhere]">
                 <div className="tw-text-sm tw-font-semibold tw-text-gray-600">{field.label}</div>
                 <div>
@@ -56,10 +55,10 @@ export default function PersonCustomFields({ person, sectionName, fields, colspa
                   />
                 </div>
               </div>
-            </Col>
+            </div>
           );
         })}
-      </Row>
+      </div>
     </div>
   );
 }
