@@ -5,6 +5,7 @@ import OpenNewWindowIcon from "./OpenNewWindowIcon";
 import SessionCountDownLimiter from "./SessionCountDownLimiter";
 import useMinimumWidth from "../services/useMinimumWidth";
 import { deploymentShortCommitSHAState } from "../recoil/version";
+import AddPersons from "./AddPersons";
 
 export const showDrawerState = atom({
   key: "showDrawerState",
@@ -154,6 +155,14 @@ const Drawer = () => {
                   )}
                 </NavLink>
               </li>
+              {import.meta.env.VITE_ADD_MULTIPLE_PERSONS_BUTTON === "true" && (
+                <>
+                  <hr />
+                  <li>
+                    <AddPersons />
+                  </li>
+                </>
+              )}
             </>
           )}
         </div>

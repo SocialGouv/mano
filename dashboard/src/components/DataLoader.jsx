@@ -91,8 +91,8 @@ export function useDataLoader(options = { refreshOnMount: false }) {
   const setProgress = useSetRecoilState(progressState);
   const setTotal = useSetRecoilState(totalState);
 
-  const setUser = useSetRecoilState(userState);
-  const setTeams = useSetRecoilState(teamsState);
+  const [user, setUser] = useRecoilState(userState);
+  const [teams, setTeams] = useRecoilState(teamsState);
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const { migrateData } = useDataMigrator();
 
@@ -164,9 +164,15 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     if (organisation.encryptionLastUpdateAt !== latestOrganisation.encryptionLastUpdateAt) {
       return toast.error("La clé de chiffrement a changé ou a été régénérée. Veuillez vous déconnecter et vous reconnecter avec la nouvelle clé.");
     }
-    setOrganisation(latestOrganisation);
-    setTeams(latestTeams);
-    setUser(latestUser);
+    if (JSON.stringify(latestOrganisation) !== JSON.stringify(organisation)) {
+      setOrganisation(latestOrganisation);
+    }
+    if (JSON.stringify(latestTeams) !== JSON.stringify(teams)) {
+      setTeams(latestTeams);
+    }
+    if (JSON.stringify(latestUser) !== JSON.stringify(user)) {
+      setUser(latestUser);
+    }
     if (isStartingInitialLoad) {
       const migrationIsSuccessful = await migrateData(latestOrganisation);
       if (!migrationIsSuccessful) return resetLoaderOnError();
@@ -237,7 +243,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadPersons(page + 1);
-        setPersons(mergeItems(persons, newItems));
+        if (newItems.length) setPersons(mergeItems(persons, newItems));
         return true;
       }
       const personSuccess = await loadPersons(0);
@@ -255,7 +261,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadGroups(page + 1);
-        setGroups(mergeItems(groups, newItems));
+        if (newItems.length) setGroups(mergeItems(groups, newItems));
         return true;
       }
       const groupsSuccess = await loadGroups(0);
@@ -273,7 +279,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadReports(page + 1);
-        setReports(mergeItems(reports, newItems, { filterNewItemsFunction: (r) => !!r.team && !!r.date }));
+        if (newItems.length) setReports(mergeItems(reports, newItems, { filterNewItemsFunction: (r) => !!r.team && !!r.date }));
         return true;
       }
       const reportsSuccess = await loadReports(0);
@@ -291,7 +297,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadPassages(page + 1);
-        setPassages(mergeItems(passages, newItems));
+        if (newItems.length) setPassages(mergeItems(passages, newItems));
         return true;
       }
       const passagesSuccess = await loadPassages(0);
@@ -309,7 +315,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadRencontres(page + 1);
-        setRencontres(mergeItems(rencontres, newItems));
+        if (newItems.length) setRencontres(mergeItems(rencontres, newItems));
         return true;
       }
       const rencontresSuccess = await loadRencontres(0);
@@ -327,7 +333,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadActions(page + 1);
-        setActions(mergeItems(actions, newItems));
+        if (newItems.length) setActions(mergeItems(actions, newItems));
         return true;
       }
       const actionsSuccess = await loadActions(0);
@@ -345,7 +351,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadTerritories(page + 1);
-        setTerritories(mergeItems(territories, newItems));
+        if (newItems.length) setTerritories(mergeItems(territories, newItems));
         return true;
       }
       const territoriesSuccess = await loadTerritories(0);
@@ -363,7 +369,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadPlaces(page + 1);
-        setPlaces(mergeItems(places, newItems));
+        if (newItems.length) setPlaces(mergeItems(places, newItems));
         return true;
       }
       const placesSuccess = await loadPlaces(0);
@@ -381,7 +387,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadRelPersonPlaces(page + 1);
-        setRelsPersonPlace(mergeItems(relsPersonPlace, newItems));
+        if (newItems.length) setRelsPersonPlace(mergeItems(relsPersonPlace, newItems));
         return true;
       }
       const relsPersonPlacesSuccess = await loadRelPersonPlaces(0);
@@ -399,7 +405,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadObservations(page + 1);
-        setTerritoryObservations(mergeItems(territoryObservations, newItems));
+        if (newItems.length) setTerritoryObservations(mergeItems(territoryObservations, newItems));
         return true;
       }
       const territoryObservationsSuccess = await loadObservations(0);
@@ -417,7 +423,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadComments(page + 1);
-        setComments(mergeItems(comments, newItems));
+        if (newItems.length) setComments(mergeItems(comments, newItems));
         return true;
       }
       const commentsSuccess = await loadComments(0);
@@ -438,7 +444,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadConsultations(page + 1);
-        setConsultations(mergeItems(consultations, newItems, { formatNewItemsFunction: formatConsultation }));
+        if (newItems.length) setConsultations(mergeItems(consultations, newItems, { formatNewItemsFunction: formatConsultation }));
         return true;
       }
       const consultationsSuccess = await loadConsultations(0);
@@ -456,7 +462,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadTreatments(page + 1);
-        setTreatments(mergeItems(treatments, newItems));
+        if (newItems.length) setTreatments(mergeItems(treatments, newItems));
         return true;
       }
       const treatmentsSuccess = await loadTreatments(0);
@@ -477,7 +483,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadMedicalFiles(page + 1);
-        setMedicalFiles(mergeItems(medicalFiles, newItems));
+        if (newItems.length) setMedicalFiles(mergeItems(medicalFiles, newItems));
         return true;
       }
       const medicalFilesSuccess = await loadMedicalFiles(0);
@@ -509,7 +515,6 @@ export function useDataLoader(options = { refreshOnMount: false }) {
   }
 
   async function resetCache(calledFrom = "not defined") {
-    console.log("Resetting cache from", calledFrom);
     setLastLoad(0);
     setPersons([]);
     setGroups([]);

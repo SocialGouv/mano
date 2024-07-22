@@ -123,6 +123,7 @@ router.get(
   passport.authenticate("user", { session: false, failWithError: true }),
   validateUser(["admin", "normal", "restricted-access", "stats-only"]),
   catchErrors(async (req, res, next) => {
+    let now = Date.now();
     try {
       z.object({
         limit: z.optional(z.string().regex(positiveIntegerRegex)),
@@ -156,6 +157,9 @@ router.get(
       query.where.updatedAt = { [Op.gte]: new Date(Number(after)) };
     }
 
+    console.log("Action get query", query, "now", Date.now() - now);
+    now = Date.now();
+
     const sortDoneOrCancel = (a, b) => {
       if (!a.dueAt) return -1;
       if (!b.dueAt) return 1;
@@ -181,10 +185,13 @@ router.get(
         // All other fields are encrypted and should not be returned.
       ],
     });
+    console.log("Action find all", Date.now() - now);
+    now = Date.now();
     const todo = actions.filter((a) => a.status === TODO);
     const done = actions.filter((a) => a.status === DONE).sort(sortDoneOrCancel);
     const cancel = actions.filter((a) => a.status === CANCEL).sort(sortDoneOrCancel);
     const data = [...todo, ...done, ...cancel];
+    console.log("Action sort", Date.now() - now);
     return res.status(200).send({ ok: true, data, hasMore: data.length === Number(limit), total });
   })
 );

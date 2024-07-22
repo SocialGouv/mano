@@ -69,7 +69,7 @@ test("Remplissage de la première organisation", async ({ page }) => {
   await page.getByRole("button", { name: "Structures", exact: true }).click();
   await page.getByPlaceholder("Ajouter une catégorie").click();
   await page.getByPlaceholder("Ajouter une catégorie").fill("catégorie orga 1");
-  await page.getByRole("button", { name: "Ajouter" }).click();
+  await page.getByRole("button", { name: "Ajouter", exact: true }).click();
   await page.getByText("Catégorie ajoutée. Veuillez").click();
   await page.getByRole("button", { name: "Territoires", exact: true }).click();
   await page.getByPlaceholder("Ajouter un type").click();
@@ -94,7 +94,7 @@ test("Remplissage de la première organisation", async ({ page }) => {
   await page.getByRole("button", { name: "Co-interventions" }).click();
   await page.getByPlaceholder("Ajouter une co-intervention").click();
   await page.getByPlaceholder("Ajouter une co-intervention").fill("collab orga 1");
-  await page.getByRole("button", { name: "Ajouter" }).click();
+  await page.getByRole("button", { name: "Ajouter", exact: true }).click();
   await page.getByText("Co-intervention ajoutée").click();
   await page.getByRole("button", { name: "Personnes suivies", exact: true }).click();
   await page.locator('[id="Informations\\ de\\ santé"]').getByRole("button", { name: "Ajouter un champ" }).click();
@@ -203,7 +203,7 @@ test("Remplissage de la deuxième organisation", async ({ page }) => {
   await page.getByRole("button", { name: "Structures", exact: true }).click();
   await page.getByPlaceholder("Ajouter une catégorie").click();
   await page.getByPlaceholder("Ajouter une catégorie").fill("catégorie orga 2");
-  await page.getByRole("button", { name: "Ajouter" }).click();
+  await page.getByRole("button", { name: "Ajouter", exact: true }).click();
   await page.getByText("Catégorie ajoutée. Veuillez").click();
   await page.getByRole("button", { name: "Territoires", exact: true }).click();
   await page.getByPlaceholder("Ajouter un type").click();
@@ -228,7 +228,7 @@ test("Remplissage de la deuxième organisation", async ({ page }) => {
   await page.getByRole("button", { name: "Co-interventions" }).click();
   await page.getByPlaceholder("Ajouter une co-intervention").click();
   await page.getByPlaceholder("Ajouter une co-intervention").fill("collab orga 2");
-  await page.getByRole("button", { name: "Ajouter" }).click();
+  await page.getByRole("button", { name: "Ajouter", exact: true }).click();
   await page.getByText("Co-intervention ajoutée").click();
   await page.getByRole("button", { name: "Personnes suivies", exact: true }).click();
   await page.locator('[id="Informations\\ de\\ santé"]').getByRole("button", { name: "Ajouter un champ" }).click();
