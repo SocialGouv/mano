@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { FormGroup, Input, Label, Row, Col } from "reactstrap";
 
 import { useParams, useHistory } from "react-router-dom";
 import { Formik } from "formik";
@@ -100,25 +99,19 @@ const View = () => {
       >
         {({ values, handleChange, handleSubmit, isSubmitting }) => (
           <React.Fragment>
-            <Row>
-              <Col md={6}>
-                <FormGroup>
-                  <Label htmlFor="name">Nom</Label>
-                  <Input autoComplete="off" name="name" id="name" value={values.name} onChange={handleChange} />
-                </FormGroup>
-              </Col>
-              <Col md={6} />
-              <Col md={12}>
-                <FormGroup>
-                  <Label />
-                  <div style={{ display: "flex", marginLeft: 20, width: "80%" }}>
-                    <label htmlFor="nightSession">Équipe de nuit</label>
-                    <Input type="checkbox" name="nightSession" id="nightSession" checked={values.nightSession} onChange={handleChange} />
-                    <NightSessionModale />
-                  </div>
-                </FormGroup>
-              </Col>
-            </Row>
+            <div className="tw-flex tw-flex-col tw-gap-4">
+              <div className="tw-max-w-96">
+                <label htmlFor="name" className="tw-m-0">
+                  Nom
+                </label>
+                <input className="tailwindui" autoComplete="off" name="name" id="name" value={values.name} onChange={handleChange} />
+              </div>
+              <div className="tw-flex tw-items-baseline tw-gap-2">
+                <input type="checkbox" name="nightSession" id="nightSession" checked={values.nightSession} onChange={handleChange} />
+                <label htmlFor="nightSession">Équipe de nuit</label>
+                <NightSessionModale />
+              </div>
+            </div>
             <div className="tw-flex tw-justify-end tw-gap-4">
               {cantDeleteMessage ? (
                 <button
