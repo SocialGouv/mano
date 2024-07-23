@@ -94,6 +94,7 @@ function abortRequests() {
   try {
     API.abortController.abort(new DOMException("Aborted by navigation", "BeforeUnloadAbortError"));
   } catch (e) {
+    console.log("Aborting requests failed", e);
     console.error(e);
   }
 }

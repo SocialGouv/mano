@@ -189,6 +189,7 @@ export async function tryFetchBlob<T extends Blob>(callback: FetchCallback<T>): 
     const result = await callback();
     return [undefined, result];
   } catch (error) {
+    console.log("error in tryFetchBlob", error);
     if (error instanceof AuthError) window.location.href = "/auth?disconnected=1";
     else capture(error);
     return [error, undefined];
@@ -201,6 +202,7 @@ export async function tryFetch<T extends ApiResponse>(callback: FetchCallback<T>
     if (result && !result.ok) return [new Error(result.error), result];
     return [undefined, result];
   } catch (error) {
+    console.log("error in tryFetch", error);
     if (error instanceof AuthError) window.location.href = "/auth?disconnected=1";
     else if (error.name === "BeforeUnloadAbortError") console.error("BeforeUnloadAbortError", error);
     else capture(error);
@@ -217,6 +219,7 @@ export async function tryFetchExpectOk<T extends ApiResponse>(callback: FetchCal
     if (result && result?.ok === false) throw new Error(result.error);
     return [undefined, result];
   } catch (error) {
+    console.log("error in tryFetchExpectOk", error);
     if (error instanceof AuthError) window.location.href = "/auth?disconnected=1";
     else if (error.name === "BeforeUnloadAbortError") console.error("BeforeUnloadAbortError", error);
     else capture(error);
