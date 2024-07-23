@@ -33,6 +33,11 @@ const isLoadingState = atom({ key: "isLoadingState", default: false });
 const fullScreenState = atom({ key: "fullScreenState", default: true });
 const progressState = atom({ key: "progressState", default: null });
 const totalState = atom({ key: "totalState", default: null });
+export const totalLoadingDurationState = atom({
+  key: "totalLoadingDurationState",
+  default: 0,
+  effects: [({ onSet }) => onSet((newValue) => window.localStorage.setItem("totalLoadingDuration", newValue))],
+});
 const initialLoadingTextState = "En attente de chargement";
 export const loadingTextState = atom({ key: "loadingTextState", default: initialLoadingTextState });
 export const initialLoadIsDoneState = atom({ key: "initialLoadIsDoneState", default: false });
@@ -87,6 +92,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
   const [isLoading, setIsLoading] = useRecoilState(isLoadingState);
   const setLoadingText = useSetRecoilState(loadingTextState);
   const setInitialLoadIsDone = useSetRecoilState(initialLoadIsDoneState);
+  const setTotalLoadingDuration = useSetRecoilState(totalLoadingDurationState);
   const [lastLoadValue, setLastLoad] = useRecoilState(lastLoadState);
   const setProgress = useSetRecoilState(progressState);
   const setTotal = useSetRecoilState(totalState);
@@ -147,6 +153,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     setIsLoading(true);
     setFullScreen(isStartingInitialLoad);
     setLoadingText(isStartingInitialLoad ? "Chargement des données" : "Mise à jour des données");
+    let now = Date.now();
 
     /*
     Refresh organisation (and user), to get the latest organisation fields
@@ -491,6 +498,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     }
 
     setIsLoading(false);
+    if (!lastLoadValue) setTotalLoadingDuration((d) => d + Date.now() - now);
     setLastLoad(serverDate);
     setLoadingText("En attente de rafraichissement");
     setProgress(null);

@@ -1,10 +1,25 @@
 import React, { useRef, useState } from "react";
 import { Formik } from "formik";
 import { toast } from "react-toastify";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { selector, useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { useHistory } from "react-router-dom";
 
 import { MINIMUM_ENCRYPTION_KEY_LENGTH, encryptionKeyLengthState, organisationState, teamsState, userState } from "../recoil/auth";
+import { personsState } from "../recoil/persons";
+import { groupsState } from "../recoil/groups";
+import { treatmentsState } from "../recoil/treatments";
+import { actionsState } from "../recoil/actions";
+import { medicalFileState } from "../recoil/medicalFiles";
+import { passagesState } from "../recoil/passages";
+import { rencontresState } from "../recoil/rencontres";
+import { reportsState } from "../recoil/reports";
+import { territoriesState } from "../recoil/territory";
+import { placesState } from "../recoil/places";
+import { relsPersonPlaceState } from "../recoil/relPersonPlace";
+import { territoryObservationsState } from "../recoil/territoryObservations";
+import { consultationsState } from "../recoil/consultations";
+import { commentsState } from "../recoil/comments";
+
 import {
   encryptVerificationKey,
   setOrgEncryptionKey,
@@ -15,16 +30,63 @@ import {
 } from "../services/encryption";
 import { capture } from "../services/sentry";
 import API, { tryFetch, tryFetchBlob, tryFetchExpectOk } from "../services/api";
-import { useDataLoader } from "./DataLoader";
+import { totalLoadingDurationState, useDataLoader } from "./DataLoader";
 import { ModalContainer, ModalBody, ModalHeader } from "./tailwind/Modal";
 import { errorMessage } from "../utils";
 
+const totalNumberOfItemsSelector = selector({
+  key: "totalNumberOfItemsSelector",
+  get: ({ get }) => {
+    const persons = get(personsState);
+    const groups = get(groupsState);
+    const treatments = get(treatmentsState);
+    const actions = get(actionsState);
+    const medicalFiles = get(medicalFileState);
+    const passages = get(passagesState);
+    const rencontres = get(rencontresState);
+    const reports = get(reportsState);
+    const territories = get(territoriesState);
+    const places = get(placesState);
+    const relsPersonPlace = get(relsPersonPlaceState);
+    const territoryObservations = get(territoryObservationsState);
+    const consultations = get(consultationsState);
+    const comments = get(commentsState);
+    return (
+      persons.length +
+      groups.length +
+      treatments.length +
+      actions.length +
+      medicalFiles.length +
+      passages.length +
+      rencontres.length +
+      reports.length +
+      territories.length +
+      places.length +
+      relsPersonPlace.length +
+      territoryObservations.length +
+      consultations.length +
+      comments.length
+    );
+  },
+});
+
+const totalRecyptionDurationSelector = selector({
+  key: "totalRecyptionDurationSelector",
+  get: ({ get }) => {
+    let totalLoadingDuration = get(totalLoadingDurationState);
+    const totalNumberOfItems = get(totalNumberOfItemsSelector);
+    if (!totalLoadingDuration) totalLoadingDuration = (totalNumberOfItems / 1000) * 4; // 4 seconds per 1000 item (experienced in Arnaud's computer)
+    const theoreticalDuration = totalNumberOfItems * 2; // get all and decrypt + encrypt all and upload
+    return theoreticalDuration * 2; // better have a reencryption finished with half a status bar than a full status bar with a reencryption not finished
+  },
+});
+
 const EncryptionKey = ({ isMain }) => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
+  const totalRecyptionDuration = useRecoilValue(totalRecyptionDurationSelector);
   const teams = useRecoilValue(teamsState);
   const user = useRecoilValue(userState);
   const setEncryptionKeyLength = useSetRecoilState(encryptionKeyLengthState);
-  const totalDurationOnServer = useRef(1);
   const previousKey = useRef(null);
 
   const onboardingForEncryption = isMain && !organisation.encryptionEnabled;
@@ -53,6 +115,12 @@ const EncryptionKey = ({ isMain }) => {
       }
       if (values.encryptionKey !== values.encryptionKeyConfirm) return toast.error("Les clés ne sont pas identiques");
       previousKey.current = getHashedOrgEncryptionKey();
+      const updateStatusBarInterval = 2000; // in ms
+      const elpasedBarInterval = setInterval(() => {
+        setEncryptingProgress((p) => {
+          return p + updateStatusBarInterval;
+        });
+      }, updateStatusBarInterval);
       setEncryptionKey(values.encryptionKey.trim());
       const hashedOrgEncryptionKey = await setOrgEncryptionKey(values.encryptionKey.trim());
       setEncryptionKeyLength(values.encryptionKey.trim().length);
@@ -124,31 +192,10 @@ const EncryptionKey = ({ isMain }) => {
       const encryptedRelsPersonPlace = await recrypt("/relPersonPlace");
       const encryptedReports = await recrypt("/report");
 
-      const totalToEncrypt =
-        encryptedPersons.length +
-        encryptedGroups.length +
-        encryptedActions.length +
-        encryptedConsultations.length +
-        encryptedTreatments.length +
-        encryptedMedicalFiles.length +
-        encryptedComments.length +
-        encryptedPassages.length +
-        encryptedRencontres.length +
-        encryptedTerritories.length +
-        encryptedTerritoryObservations.length +
-        encryptedRelsPersonPlace.length +
-        encryptedPlaces.length +
-        encryptedReports.length;
-
-      totalDurationOnServer.current = totalToEncrypt * 0.005; // average 5 ms in server
-
       setEncryptingStatus(
         "Sauvegarde des données nouvellement chiffrées en base de donnée. Ne fermez pas votre fenêtre, cela peut prendre quelques minutes..."
       );
-      const updateStatusBarInterval = 2; // in seconds
-      const elpasedBarInterval = setInterval(() => {
-        setEncryptingProgress((p) => p + updateStatusBarInterval);
-      }, updateStatusBarInterval * 1000);
+
       setOrganisation({ ...organisation, encryptionEnabled: true });
       const [encryptError, res] = await tryFetchExpectOk(async () =>
         API.post({
@@ -181,7 +228,7 @@ const EncryptionKey = ({ isMain }) => {
       clearInterval(elpasedBarInterval);
       if (!encryptError) {
         // TODO: clean unused person documents
-        setEncryptingProgress(totalDurationOnServer.current);
+        setEncryptingProgress(totalRecyptionDuration);
         setEncryptingStatus("Données chiffrées !");
         setOrganisation(res.data);
         setEncryptionDone(true);
@@ -232,7 +279,7 @@ const EncryptionKey = ({ isMain }) => {
           <div
             className="tw-bg-main tw-rounded-full tw-transition-all tw-duration-300 tw-h-full"
             style={{
-              width: `${(encryptingProgress / totalDurationOnServer.current) * 100}%`,
+              width: `${(encryptingProgress / totalRecyptionDuration) * 100}%`,
             }}
           />
         </div>
