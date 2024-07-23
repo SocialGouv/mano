@@ -1,10 +1,8 @@
 import { useHistory, useLocation, useParams } from "react-router-dom";
-import { Alert } from "reactstrap";
 import { useRecoilValue } from "recoil";
 import Places from "./Places";
 import { itemsGroupedByPersonSelector } from "../../recoil/selectors";
 import API, { tryFetchExpectOk } from "../../services/api";
-import { formatDateWithFullMonth } from "../../services/date";
 import History from "./components/PersonHistory";
 import MedicalFile from "./components/MedicalFile";
 import Summary from "./components/Summary";
@@ -51,7 +49,7 @@ export default function View() {
         <div>
           <BackButton />
         </div>
-        <div className="tw-w-full tw-flex tw-justify-center [&>div]:tw-max-w-96">
+        <div className="tw-w-full tw-flex tw-justify-center [&>div]:tw-max-w-96 noprint">
           <SearchInPerson person={person} />
         </div>
         <div className="noprint">

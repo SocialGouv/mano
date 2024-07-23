@@ -25,7 +25,7 @@ export function formatDateWithNameOfDay(date?: PossibleDate): string {
   return dayjs(date).format("dddd D MMMM YYYY");
 }
 
-export function formatDateTimeWithNameOfDay(date: PossibleDate = null): string {
+export function formatDateTimeWithNameOfDay(date: PossibleDate): string {
   return dayjs(date).format("dddd D MMMM YYYY HH:mm");
 }
 

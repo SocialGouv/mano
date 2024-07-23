@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { useRecoilValue } from "recoil";
 import { customFieldsPersonsSelector } from "../../../recoil/persons";
-import { currentTeamAuthentifiedState, teamsState, userState, usersState } from "../../../recoil/auth";
+import { currentTeamAuthentifiedState, teamsState, userState } from "../../../recoil/auth";
 import { dayjsInstance, formatDateTimeWithNameOfDay, formatDateWithNameOfDay, formatTime } from "../../../services/date";
 import CustomFieldDisplay from "../../../components/CustomFieldDisplay";
 import { CANCEL, DONE, getName } from "../../../recoil/actions";
@@ -10,7 +10,6 @@ import UserName from "../../../components/UserName";
 
 export function SummaryPrint({ person }: { person: PersonPopulated }) {
   const user = useRecoilValue(userState);
-  const users = useRecoilValue(usersState);
   const team = useRecoilValue(currentTeamAuthentifiedState);
   const teams = useRecoilValue(teamsState);
   const customFieldsPersons = useRecoilValue(customFieldsPersonsSelector);
@@ -32,45 +31,49 @@ export function SummaryPrint({ person }: { person: PersonPopulated }) {
   );
 
   return (
-    <div className="printonly">
+    <div className="printonly tw-px-4 [&_strong]:tw-font-medium">
       <h1>Dossier social de {person?.name}</h1>
-      <small>extrait le {formatDateTimeWithNameOfDay()}</small>
+      <small className="tw-pl-8">extrait le {formatDateTimeWithNameOfDay(dayjsInstance())}</small>
       <div className="tw-mx-0 tw-mb-5 tw-mt-8 tw-flex tw-items-center">
         <h2 className="tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Informations générales</h2>
       </div>
-      <div>
-        {person.alertness && <div>Personne très vulnérable, ou ayant besoin d'une attention particulière</div>}
+      <div className="tw-px-8">
+        {person.alertness && <p>Personne très vulnérable, ou ayant besoin d'une attention particulière</p>}
         <div>
-          Date de naissance&nbsp;: <CustomFieldDisplay type="date" value={person.birthdate} />
+          <strong>Date de naissance</strong>&nbsp;: <CustomFieldDisplay type="date" value={person.birthdate} />
         </div>
         <div>
-          Genre&nbsp;: <CustomFieldDisplay type="text" value={person.gender} />
+          <strong>Genre</strong>&nbsp;: <CustomFieldDisplay type="text" value={person.gender} />
         </div>
         <div>
-          Suivi·e depuis le : <CustomFieldDisplay type="date" value={person.followedSince || person.createdAt} />
+          <strong>Suivi·e depuis le</strong>&nbsp;: <CustomFieldDisplay type="date" value={person.followedSince || person.createdAt} />
         </div>
         {person.wanderingAt ? (
           <div>
-            En rue depuis le :<CustomFieldDisplay type="date" value={person.wanderingAt} />
+            <strong>En rue depuis le</strong>&nbsp;:
+            <CustomFieldDisplay type="date" value={person.wanderingAt} />
           </div>
         ) : null}
         <div>
-          Téléphone : <CustomFieldDisplay type="text" value={person.phone} />
+          <strong>Téléphone</strong>&nbsp;: <CustomFieldDisplay type="text" value={person.phone} />
+        </div>
+        <div>
+          <strong>Email</strong>&nbsp;: <CustomFieldDisplay type="text" value={person.email} />
         </div>
       </div>
       <hr className="tw-my-8" />
-      {customFieldsPersons.map(({ name, fields }) => {
+      {customFieldsPersons.map(({ name, fields }, i) => {
         const enabledFields = fields.filter((f) => f.enabled || f.enabledTeams?.includes(team._id));
         return (
-          <React.Fragment key={name}>
+          <React.Fragment key={name + i}>
             <div className="tw-mx-0 tw-mb-5 tw-mt-16 tw-flex tw-items-center">
               <h2 className="tw-flex tw-justify-between tw-text-xl tw-font-extrabold">{name}</h2>
             </div>
-            <div>
-              {enabledFields.map((field) => {
+            <div className="tw-px-8">
+              {enabledFields.map((field, i) => {
                 return (
-                  <div key={field.label}>
-                    {field.label} : {person[field.name]}
+                  <div key={field.label + i}>
+                    <strong>{field.label}</strong>&nbsp;: <CustomFieldDisplay type={field.type} value={person[field.name]} />
                   </div>
                 );
               })}
@@ -82,45 +85,58 @@ export function SummaryPrint({ person }: { person: PersonPopulated }) {
       <div className="tw-mx-0 tw-mb-5 tw-mt-16 tw-flex tw-items-center">
         <h2 className="tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Actions</h2>
       </div>
-      <div>
+      <div className="tw-px-8">
         {Boolean(actions.length > 0) &&
-          actions.map((action) => {
+          actions.map((action, i) => {
             const date = formatDateWithNameOfDay([DONE, CANCEL].includes(action.status) ? action.completedAt : action.dueAt);
             const time = action.withTime && action.dueAt ? ` ${formatTime(action.dueAt)}` : "";
             return (
-              <div key={action._id}>
+              <div key={action._id + i}>
                 <div>
                   <b>{getName(action)}</b>
                 </div>
-                <div>{`${date}${time}`}</div>
-                {Boolean(action.categories) && (
+                <div className="tw-px-8">
                   <div>
-                    Catégories : {action.categories?.map((category: string, index: number) => <span key={category + index}>{category}</span>)}
+                    <strong>Date&nbsp;:</strong> {`${date}${time}`}
                   </div>
-                )}
-                {action.urgent ? <div>Action prioritaire</div> : null}
-                {action.description ? <div>Description : {action.description}</div> : null}
-                {action.status ? <div>Statut : {action.status}</div> : null}
-
-                <div>
-                  <span>Créée par</span>
-                  <UserName id={action.user} />
-                </div>
-                {Boolean(action.group) && <div>Action familiale</div>}
-                <div>
-                  Équipe(s) :{" "}
-                  {Array.isArray(action?.teams) ? (
-                    action.teams.map((e: string) => {
-                      const team = teams.find((u) => u._id === e);
-                      return (
-                        <div className="tw-ml-5" key={team?.name}>
-                          {team?.name}
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <span>{teams.find((u) => u._id === action.team)?.name}</span>
+                  {Boolean(action.categories) && (
+                    <div>
+                      <strong>Catégories&nbsp;: </strong>
+                      {action.categories?.join(", ")}
+                    </div>
                   )}
+                  {action.urgent ? <div>Action prioritaire</div> : null}
+                  {action.description ? (
+                    <div>
+                      <strong>Description&nbsp;: </strong> {action.description}
+                    </div>
+                  ) : null}
+                  {action.status ? (
+                    <div>
+                      <strong>Statut&nbsp;: </strong> {action.status}
+                    </div>
+                  ) : null}
+
+                  <div>
+                    <strong>Créée par&nbsp;: </strong>
+                    <UserName id={action.user} />
+                  </div>
+                  {Boolean(action.group) && <div>Action familiale</div>}
+                  <div>
+                    <strong>Équipe(s)&nbsp;: </strong>
+                    {Array.isArray(action?.teams) ? (
+                      action.teams.map((e: string, i: number) => {
+                        const team = teams.find((u) => u._id === e);
+                        return (
+                          <div className="tw-ml-5" key={team?.name + i}>
+                            {team?.name}
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <span>{teams.find((u) => u._id === action.team)?.name}</span>
+                    )}
+                  </div>
                 </div>
                 <br />
               </div>
@@ -133,14 +149,19 @@ export function SummaryPrint({ person }: { person: PersonPopulated }) {
           <div className="tw-mx-0 tw-mb-5 tw-mt-16 tw-flex tw-items-center">
             <h2 className="tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Commentaires</h2>
           </div>
-          <div>
+          <div className="tw-px-8">
             {Boolean(comments.length > 0) &&
-              comments.map((comment) => (
-                <div key={comment._id}>
+              comments.map((comment, i) => (
+                <div key={comment._id + i}>
                   {Boolean(comment.urgent) && <div>Commentaire prioritaire</div>}
-                  <div>Date : {formatDateTimeWithNameOfDay(comment.date || comment.createdAt)}</div>
-                  {Boolean(comment.group) && <div>Commentaire familial</div>}
                   <div>
+                    <strong>Date&nbsp;:</strong> {formatDateTimeWithNameOfDay(comment.date || comment.createdAt)}
+                  </div>
+                  <div>
+                    <strong>Écrit par&nbsp;:</strong> <UserName id={comment.user} />
+                  </div>
+                  {Boolean(comment.group) && <div>Commentaire familial</div>}
+                  <div className="tw-pl-4">
                     {(comment.comment || "").split("\n").map((e: string, i: number) => (
                       <p key={e + i} className="tw-mb-0">
                         {e}
@@ -155,25 +176,34 @@ export function SummaryPrint({ person }: { person: PersonPopulated }) {
           <div className="tw-mx-0 tw-mb-5 tw-mt-16 tw-flex tw-items-center">
             <h2 className="tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Passages</h2>
           </div>
-          <div>
+          <div className="tw-px-8">
             {Boolean(personPassages.length > 0) &&
-              personPassages.map((passage: any) => (
-                <div key={passage._id}>
+              personPassages.map((passage, i) => (
+                <div key={passage._id + i}>
                   <div>
                     <b>{formatDateTimeWithNameOfDay(passage.date || passage.createdAt)}</b>
                   </div>
+                  {passage.comment && (
+                    <div className="tw-max-w-fit">
+                      <strong>Commentaire&nbsp;: </strong>
+                      {(passage.comment || "")
+                        .split("\n")
+                        .filter((e: string) => e)
+                        .map((e: string, i: number) => (
+                          <p key={e + i} className="tw-mb-0 tw-pl-4">
+                            {e}
+                          </p>
+                        ))}
+                    </div>
+                  )}
                   <div>
-                    {(passage.comment || "")
-                      .split("\n")
-                      .filter((e: string) => e)
-                      .map((e: string, i: number) => (
-                        <p key={e + i} className="tw-mb-0">
-                          {e}
-                        </p>
-                      ))}
+                    <strong>Créé par&nbsp;: </strong>
+                    <UserName id={passage.user} />
                   </div>
-                  <div>Créée par {users.find((e) => e._id === passage.user)?.name}</div>
-                  <div className="tw-max-w-fit">{teams.find((u) => u._id === passage.team)?.name}</div>
+                  <div className="tw-max-w-fit">
+                    <strong>Équipe&nbsp;: </strong>
+                    <span>{teams.find((u) => u._id === passage.team)?.name}</span>
+                  </div>
                   <br />
                 </div>
               ))}
@@ -181,25 +211,34 @@ export function SummaryPrint({ person }: { person: PersonPopulated }) {
           <div className="tw-mx-0 tw-mb-5 tw-mt-16 tw-flex tw-items-center">
             <h2 className="tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Rencontres</h2>
           </div>
-          <div>
+          <div className="tw-px-8">
             {Boolean(personRencontres.length > 0) &&
-              personRencontres.map((rencontre: any) => (
-                <div key={rencontre._id}>
+              personRencontres.map((rencontre, i) => (
+                <div key={rencontre._id + i}>
                   <div>
                     <b>{formatDateTimeWithNameOfDay(rencontre.date || rencontre.createdAt)}</b>
                   </div>
+                  {rencontre.comment && (
+                    <div className="tw-max-w-fit">
+                      <strong>Commentaire&nbsp;: </strong>
+                      {(rencontre.comment || "")
+                        .split("\n")
+                        .filter((e: string) => e)
+                        .map((e: string, i: number) => (
+                          <p key={e + i} className="tw-mb-0 tw-pl-4">
+                            {e}
+                          </p>
+                        ))}
+                    </div>
+                  )}
                   <div>
-                    {(rencontre.comment || "")
-                      .split("\n")
-                      .filter((e: string) => e)
-                      .map((e: string, i: number) => (
-                        <p key={e + i} className="tw-mb-0">
-                          {e}
-                        </p>
-                      ))}
+                    <strong>Créée par&nbsp;: </strong>
+                    <UserName id={rencontre.user} />
                   </div>
-                  <div>Créée par {users.find((e) => e._id === rencontre.user)?.name}</div>
-                  <div className="tw-max-w-fit">{teams.find((u) => u._id === rencontre.team)?.name}</div>
+                  <div className="tw-max-w-fit">
+                    <strong>Équipe&nbsp;: </strong>
+                    <span>{teams.find((u) => u._id === rencontre.team)?.name}</span>
+                  </div>
                   <br />
                 </div>
               ))}
