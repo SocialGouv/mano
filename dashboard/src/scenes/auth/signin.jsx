@@ -80,12 +80,14 @@ const SignIn = () => {
     setShowPassword(false);
     setAuthViaCookie(false);
     tryFetchExpectOk(() => API.post({ path: "/user/logout" })).then(() => {
+      window.localStorage.removeItem("previously-logged-in");
       window.location.href = "/auth";
     });
   };
 
   useEffect(() => {
     (async () => {
+      if (!window.localStorage.getItem("previously-logged-in")) return setLoading(false);
       const [error, response] = await tryFetch(() => API.getSigninToken());
       if (error) {
         // Pas besoin d'afficher un message d'erreur si on était en train de quitter la page pendant le chargement.
@@ -199,6 +201,7 @@ const SignIn = () => {
       }
     }
     // now login !
+    window.localStorage.setItem("previously-logged-in", "true");
     // superadmin
     if (["superadmin"].includes(user.role)) {
       setIsSubmitting(false);

@@ -225,6 +225,7 @@ const View = () => {
                             if (!error) {
                               toast.success("Organisation supprimée");
                               tryFetchExpectOk(() => API.post({ path: "/user/logout" })).then(() => {
+                                window.localStorage.removeItem("previously-logged-in");
                                 window.location.href = "/auth";
                               });
                             } else {

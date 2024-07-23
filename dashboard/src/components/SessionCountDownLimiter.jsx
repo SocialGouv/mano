@@ -48,6 +48,7 @@ const SessionCountDownLimiter = () => {
 
   if (remainingTimeBeforeDeconnection < 1) {
     tryFetchExpectOk(() => API.post({ path: "/user/logout" })).then(() => {
+      window.localStorage.removeItem("previously-logged-in");
       window.location.href = "/auth?disconnected=1";
     });
   }
