@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "../../components/tailwind/Modal";
 import KeyInput from "../../components/KeyInput";
 import { useDataLoader } from "../../components/DataLoader";
+import DateBloc, { TimeBlock } from "../../components/DateBloc";
 
 const getErroredDecryption = async (item) => {
   try {
@@ -93,10 +94,27 @@ export default function Errors() {
           data={data}
           rowKey={"_id"}
           noData="Aucune donnée en erreur"
-          onRowClick={(row) => console.log(row)}
+          onRowClick={(row) => {
+            setItem(row);
+            setOpen(true);
+          }}
           columns={[
             { title: "_id", dataKey: "_id" },
             { title: "Type", dataKey: "type" },
+            {
+              title: "Dernière mise-à-jour",
+              dataKey: "updatedAt",
+              style: { width: "90px" },
+              small: true,
+              render: (item) => {
+                return (
+                  <>
+                    <DateBloc date={item.data.updatedAt} />
+                    <TimeBlock time={item.data.updatedAt} />
+                  </>
+                );
+              },
+            },
             {
               title: "Déchiffrer",
               dataKey: "action-dechiffrer",
@@ -104,7 +122,6 @@ export default function Errors() {
                 <button
                   className="button-classic"
                   onClick={() => {
-                    console.log(row);
                     setItem(row);
                     setOpen(true);
                   }}
@@ -188,12 +205,12 @@ export default function Errors() {
           ]}
         />
       </div>
-      <ModalRepair open={open} setOpen={setOpen} item={item} />
+      <ModalRepair open={open} setOpen={setOpen} setData={setData} item={item} />
     </div>
   );
 }
 
-function ModalRepair({ open, setOpen, item }) {
+function ModalRepair({ open, setOpen, setData, item }) {
   const user = useRecoilValue(userState);
   const [key, setKey] = useState("");
   const { refresh } = useDataLoader();
@@ -259,6 +276,7 @@ function ModalRepair({ open, setOpen, item }) {
     await refresh();
     toast.success("L'élément a été réparé !");
     setOpen(false);
+    setData((d) => d.filter((i) => i._id !== item._id));
   }
 
   if (!item) return null;

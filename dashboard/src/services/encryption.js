@@ -227,7 +227,10 @@ export const decryptItem = async (item, { decryptDeleted = false } = {}) => {
   try {
     decryptedItem = await decrypt(item.encrypted, item.encryptedEntityKey, getHashedOrgEncryptionKey());
   } catch (errorDecrypt) {
-    toast.error("Un élément n'a pas pu être déchiffré. L'équipe technique a été prévenue, nous reviendrons vers vous dans les meilleurs délais.");
+    toast.error(
+      "Un élément n'a pas pu être déchiffré. Peut-être est-il chiffré avec une ancienne clé ? Un admin peut essayer de le déchiffrer en allant dans Organisation > Données en erreur",
+      { autoClose: false }
+    );
     capture(`ERROR DECRYPTING ITEM : ${errorDecrypt}`, {
       extra: { message: "ERROR DECRYPTING ITEM", item },
     });
