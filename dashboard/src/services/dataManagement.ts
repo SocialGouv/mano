@@ -34,27 +34,33 @@ async function deleteDB() {
 
 export async function clearCache(calledFrom = "not defined", iteration = 0) {
   console.log("clearing cache from ", calledFrom, "iteration", iteration);
-  if (iteration > 10) throw new Error("Failed to clear cache");
+  if (iteration > 10) {
+    throw new Error("Failed to clear cache");
+  }
   await deleteDB().catch(capture);
   console.log("clearing localStorage");
   window.localStorage?.clear();
   console.log("cleared localStorage");
-  window.sessionStorage?.clear();
+  // window.sessionStorage?.clear();
 
   // wait 200ms to make sure the cache is cleared
   await new Promise((resolve) => setTimeout(resolve, 200));
 
   // Check if the cache is empty
   const localStorageEmpty = window.localStorage.length === 0;
-  const sessionStorageEmpty = window.sessionStorage.length === 0;
+  // const sessionStorageEmpty = window.sessionStorage.length === 0;
   const indexedDBEmpty = customStore ? (await keys(customStore)).length === 0 : true;
 
   // If the cache is not empty, try again
   return new Promise((resolve) => {
-    if (localStorageEmpty && sessionStorageEmpty && indexedDBEmpty) {
+    // if (localStorageEmpty && sessionStorageEmpty && indexedDBEmpty) {
+    if (localStorageEmpty && indexedDBEmpty) {
       setupDB();
       resolve(true);
     } else {
+      if (!localStorageEmpty) console.log("localStorage not empty", window.localStorage.key(0));
+      // if (!sessionStorageEmpty) console.log("sessionStorage not empty");
+      if (!indexedDBEmpty) console.log("indexedDB not empty");
       clearCache("try again clearCache", iteration + 1).then(resolve);
     }
   });

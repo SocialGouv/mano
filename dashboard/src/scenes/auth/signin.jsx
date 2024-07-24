@@ -100,8 +100,17 @@ const SignIn = () => {
         setAuthViaCookie(true);
         const { organisation } = user;
         const storedOrganisationId = window.localStorage.getItem("mano-organisationId");
+        console.log(
+          "storedOrganisationId",
+          storedOrganisationId,
+          "organisation._id",
+          organisation._id,
+          storedOrganisationId && storedOrganisationId !== organisation._id
+        );
         if (storedOrganisationId && storedOrganisationId !== organisation._id) {
           await resetCache("call ResetCache from useEffect in signin.jsx");
+        } else {
+          console.log("no need to reset cache from useEffect in signin.jsx");
         }
         setOrganisation(organisation);
         setUserName(user.name);
@@ -161,8 +170,17 @@ const SignIn = () => {
     if (!ok) return setIsSubmitting(false);
     const { organisation } = user;
     const storedOrganisationId = window.localStorage.getItem("mano-organisationId");
+    console.log(
+      "storedOrganisationId",
+      storedOrganisationId,
+      "organisation._id",
+      organisation._id,
+      storedOrganisationId && storedOrganisationId !== organisation._id
+    );
     if (storedOrganisationId && storedOrganisationId !== organisation._id) {
       await resetCache("call ResetCache from handleSubmit in signin.jsx");
+    } else {
+      console.log("no need to reset cache from handleSubmit in signin.jsx");
     }
     setOrganisation(organisation);
     setUser(user);

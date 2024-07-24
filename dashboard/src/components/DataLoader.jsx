@@ -26,6 +26,7 @@ import ProgressBar from "./LoaderProgressBar";
 import useDataMigrator from "./DataMigrator";
 import { decryptItem } from "../services/encryption";
 import { errorMessage } from "../utils";
+import { capture } from "../services/sentry";
 
 // Update to flush cache.
 
@@ -250,7 +251,17 @@ export function useDataLoader(options = { refreshOnMount: false }) {
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadPersons(page + 1);
-        if (newItems.length) setPersons(mergeItems(persons, newItems));
+        if (newItems.length) {
+          const newPersons = mergeItems(persons, newItems);
+          // Check if some people from previous organisations are still in the list
+          const personsFromOtherOrgs = newPersons.filter((p) => p.organisation !== organisationId);
+          if (personsFromOtherOrgs.length) {
+            // get the logs to try to understand what happened
+            const logs = window.getConsoleLogs();
+            capture("DataLoader: personsFromOtherOrgs", { extra: { logs } });
+          }
+          setPersons(newPersons);
+        }
         return true;
       }
       const personSuccess = await loadPersons(0);

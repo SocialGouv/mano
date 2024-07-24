@@ -208,7 +208,7 @@ export async function tryFetch<T extends ApiResponse>(callback: FetchCallback<T>
     console.log("signal aborted", API.abortController.signal.aborted);
     console.log("signal aborted reason", API.abortController.signal.reason); // Aborted by navigation
     if (error instanceof AuthError) window.location.href = "/auth?disconnected=1";
-    else if (error.name === "BeforeUnloadAbortError") console.error("BeforeUnloadAbortError", error);
+    else if (error.name === "BeforeUnloadAbortError") console.log("BeforeUnloadAbortError", error);
     else if (API?.abortController?.signal?.reason?.includes?.("Aborted by navigation")) console.log("Reason Signal Aborted by navigation", error);
     else capture(error);
     return [error, undefined];
@@ -229,7 +229,7 @@ export async function tryFetchExpectOk<T extends ApiResponse>(callback: FetchCal
     console.log("signal aborted", API.abortController.signal.aborted);
     console.log("signal aborted reason", API.abortController.signal.reason); // Aborted by navigation
     if (error instanceof AuthError) window.location.href = "/auth?disconnected=1";
-    else if (error.name === "BeforeUnloadAbortError") console.error("BeforeUnloadAbortError", error);
+    else if (error.name === "BeforeUnloadAbortError") console.log("BeforeUnloadAbortError", error);
     else if (API?.abortController?.signal?.reason?.includes?.("Aborted by navigation")) console.log("Reason Signal Aborted by navigation", error);
     else capture(error);
     return [error, undefined];

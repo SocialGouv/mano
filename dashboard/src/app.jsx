@@ -7,6 +7,7 @@ import * as Sentry from "@sentry/react";
 import { fr } from "date-fns/esm/locale";
 import { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import copyLogsToSessionStorage from "./utils/copy-logs-in-sessionstorage";
 import Account from "./scenes/account";
 import Auth from "./scenes/auth";
 import Organisation from "./scenes/organisation";
@@ -44,6 +45,8 @@ import { deploymentCommitState, deploymentDateState, showOutdateAlertBannerState
 
 RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = import.meta.env.VITE_DISABLE_RECOIL_DUPLICATE_ATOM_KEY_CHECKING ? false : true;
 
+copyLogsToSessionStorage();
+
 const ToastifyFastTransition = cssTransition({
   enter: "Toastify--animate Toastify__hack-force-fast Toastify__bounce-enter",
   exit: "Toastify--animate Toastify__hack-force-fast Toastify__bounce-exit",
@@ -62,7 +65,8 @@ if (ENV === "production") {
     environment: "dashboard",
     release: VERSION,
     integrations: [Sentry.reactRouterV5BrowserTracingIntegration({ history })],
-
+    maxValueLength: 10000,
+    normalizeDepth: 10,
     // Set tracesSampleRate to 1.0 to capture 100%
     // of transactions for performance monitoring.
     // We recommend adjusting this value in production
