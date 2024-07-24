@@ -93,6 +93,8 @@ function abortRequests() {
   // Source: https://stackoverflow.com/a/73783869/978690
   try {
     API.abortController.abort(new DOMException("Aborted by navigation", "BeforeUnloadAbortError"));
+    // reset new abort controller ?
+    // API.abortController = new AbortController();
   } catch (e) {
     console.log("Aborting requests failed", e);
     console.error(e);
