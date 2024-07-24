@@ -247,7 +247,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
           return API.getAbortable({ path: "/person", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
-        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
+        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p, { type: "persons" })))).filter((e) => e);
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadPersons(page + 1);
@@ -275,7 +275,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
           return API.getAbortable({ path: "/group", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
-        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
+        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p, { type: "groups" })))).filter((e) => e);
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadGroups(page + 1);
@@ -293,7 +293,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
           return API.getAbortable({ path: "/report", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
-        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
+        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p, { type: "reports" })))).filter((e) => e);
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadReports(page + 1);
@@ -311,7 +311,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
           return API.getAbortable({ path: "/passage", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
-        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
+        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p, { type: "passages" })))).filter((e) => e);
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadPassages(page + 1);
@@ -329,7 +329,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
           return API.getAbortable({ path: "/rencontre", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
-        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
+        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p, { type: "rencontres" })))).filter((e) => e);
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadRencontres(page + 1);
@@ -347,7 +347,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
           return API.getAbortable({ path: "/action", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
-        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
+        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p, { type: "actions" })))).filter((e) => e);
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadActions(page + 1);
@@ -365,7 +365,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
           return API.getAbortable({ path: "/territory", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
-        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
+        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p, { type: "territories" })))).filter((e) => e);
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadTerritories(page + 1);
@@ -383,7 +383,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
           return API.getAbortable({ path: "/place", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
-        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
+        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p, { type: "places" })))).filter((e) => e);
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadPlaces(page + 1);
@@ -401,7 +401,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
           return API.getAbortable({ path: "/relPersonPlace", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
-        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
+        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p, { type: "relsPersonPlace" })))).filter((e) => e);
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadRelPersonPlaces(page + 1);
@@ -419,7 +419,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
           return API.getAbortable({ path: "/territory-observation", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
-        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
+        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p, { type: "territoryObservations" })))).filter((e) => e);
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadObservations(page + 1);
@@ -437,7 +437,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
           return API.getAbortable({ path: "/comment", query: { ...query, page: String(page) } });
         });
         if (error) return resetLoaderOnError();
-        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
+        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p, { type: "comments" })))).filter((e) => e);
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadComments(page + 1);
@@ -458,7 +458,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
           });
         });
         if (error) return resetLoaderOnError();
-        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
+        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p, { type: "consultations" })))).filter((e) => e);
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadConsultations(page + 1);
@@ -476,7 +476,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
           return API.getAbortable({ path: "/treatment", query: { ...query, page: String(page), after: isStartingInitialLoad ? 0 : lastLoadValue } });
         });
         if (error) return resetLoaderOnError();
-        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
+        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p, { type: "treatments" })))).filter((e) => e);
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadTreatments(page + 1);
@@ -497,7 +497,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
           });
         });
         if (error) return resetLoaderOnError();
-        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p)))).filter((e) => e);
+        const decryptedData = (await Promise.all(res.data.map((p) => decryptItem(p, { type: "medicalFiles" })))).filter((e) => e);
         setProgress((p) => p + res.data.length);
         newItems.push(...decryptedData);
         if (res.hasMore) return loadMedicalFiles(page + 1);

@@ -214,7 +214,7 @@ const RelPersonPlaceModal = ({ open, setOpen, person, relPersonPlaceModal, setPl
       toast.error(errorMessage(error));
       return;
     }
-    const decryptedData = await decryptItem(response.data);
+    const decryptedData = await decryptItem(response.data, { type: "place on create" });
     if (!decryptedData) {
       toast.error("Erreur lors de la création du lieu");
       return;

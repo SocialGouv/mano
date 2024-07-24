@@ -217,7 +217,7 @@ export const encryptItem = async (item) => {
 // Cela permet de ne pas stocker en cache ou dans le state des données non déchiffrées
 // Qui du coup ne se mettraient plus à jour correctement.
 // Par contre quand on appelle cette fonction, il faut vérifier si l'item est null et ne pas l'utiliser.
-export const decryptItem = async (item, { decryptDeleted = false } = {}) => {
+export const decryptItem = async (item, { decryptDeleted = false, type = "" } = {}) => {
   if (!getEnableEncrypt()) return item;
   if (!item.encrypted) return item;
   if (item.deletedAt && !decryptDeleted) return item;
@@ -232,7 +232,8 @@ export const decryptItem = async (item, { decryptDeleted = false } = {}) => {
       { autoClose: false }
     );
     capture(`ERROR DECRYPTING ITEM : ${errorDecrypt}`, {
-      extra: { message: "ERROR DECRYPTING ITEM", item },
+      extra: { message: "ERROR DECRYPTING ITEM", item, type },
+      tags: { _id: item._id },
     });
     return null;
   }

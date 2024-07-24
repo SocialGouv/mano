@@ -187,7 +187,7 @@ function TreatmentContent({ onClose, treatment, personId }) {
       toast.error(errorMessage(error));
       return false;
     }
-    const decryptedData = await decryptItem(treatmentResponse.data);
+    const decryptedData = await decryptItem(treatmentResponse.data, { type: "treatment in modal" });
     if (!decryptedData) {
       toast.error("Erreur lors de la récupération des données du traitement");
       return false;
