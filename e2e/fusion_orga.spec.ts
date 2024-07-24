@@ -41,9 +41,9 @@ test("Remplissage de la première organisation", async ({ page }) => {
   await page.getByText("territoire orga").click();
   await page.getByRole("button", { name: "Nouvelle observation" }).click();
   await page.getByRole("button", { name: "Rencontres" }).click();
-  await page.locator(".person-select-and-create-reception__input-container").click();
-  await page.getByText("test", { exact: true }).click();
   await page.getByRole("button", { name: "+ Rencontre" }).click();
+  await page.locator('[data-test-id="modal-rencontre-create-edit-delete"]').locator(".person__input-container").click();
+  await page.getByText("test", { exact: true }).click();
   await page.locator('[data-test-id="modal-rencontre-create-edit-delete"]').getByLabel("Commentaire").fill("depuis orga 1");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByRole("button", { name: "Sauvegarder" }).click();
@@ -175,9 +175,9 @@ test("Remplissage de la deuxième organisation", async ({ page }) => {
   await page.getByText("territoire orga").click();
   await page.getByRole("button", { name: "Nouvelle observation" }).click();
   await page.getByRole("button", { name: "Rencontres" }).click();
-  await page.locator(".person-select-and-create-reception__input-container").click();
-  await page.getByText("test orga 2", { exact: true }).click();
   await page.getByRole("button", { name: "+ Rencontre" }).click();
+  await page.locator('[data-test-id="modal-rencontre-create-edit-delete"]').locator(".person__input-container").click();
+  await page.getByText("test orga 2", { exact: true }).click();
   await page.locator('[data-test-id="modal-rencontre-create-edit-delete"]').getByLabel("Commentaire").fill("depuis orga 2");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByRole("button", { name: "Sauvegarder" }).click();

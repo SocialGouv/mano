@@ -36,12 +36,12 @@ test("Création de rencontres dans les observations de territoire", async ({ pag
   await page.getByRole("button", { name: "Nouvelle observation" }).click();
   await page.getByLabel("Nombre de personnes non connues hommes rencontrées").fill("100");
   await page.getByRole("button", { name: "Rencontres" }).click();
-  await page.locator("#person-select-and-create-reception").click();
-  await page.getByText("raph", { exact: true }).click();
-  await page.locator("#person-select-and-create-reception").click();
-  await page.getByText("arnaud", { exact: true }).click();
   await page.getByRole("button", { name: "+ Rencontre" }).click();
-  await page.getByRole("textbox", { name: "Commentaire" }).fill("rencontre des deux");
+  await page.locator('[data-test-id="modal-rencontre-create-edit-delete"]').locator(".person__input-container").click();
+  await page.getByText("arnaud", { exact: true }).click();
+  await page.locator('[data-test-id="modal-rencontre-create-edit-delete"]').locator(".person__input-container").click();
+  await page.getByText("raph", { exact: true }).click();
+  await page.locator('[data-test-id="modal-rencontre-create-edit-delete"]').getByRole("textbox", { name: "Commentaire" }).fill("rencontre des deux");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByRole("row", { name: "raph" }).getByRole("button").click();
   await page.getByRole("button", { name: "Sauvegarder" }).click();

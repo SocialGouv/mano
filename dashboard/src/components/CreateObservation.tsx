@@ -25,7 +25,6 @@ import TagTeam from "./TagTeam";
 import Table from "./table";
 import { useDataLoader } from "./DataLoader";
 import type { TerritoryObservationInstance } from "../types/territoryObs";
-import type { PersonInstance } from "../types/person";
 import type { RencontreInstance } from "../types/rencontre";
 
 interface CreateObservationProps {
@@ -35,7 +34,6 @@ interface CreateObservationProps {
 }
 
 const CreateObservation = ({ observation, open, setOpen }: CreateObservationProps) => {
-  const [selectedPersons, setSelectedPersons] = useState<Array<PersonInstance>>([]);
   const user = useRecoilValue(userAuthentifiedState);
   const teams = useRecoilValue(teamsState);
   const organisation = useRecoilValue(organisationAuthentifiedState);
@@ -44,6 +42,7 @@ const CreateObservation = ({ observation, open, setOpen }: CreateObservationProp
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
   const groupedCustomFieldsObs = useRecoilValue(groupedCustomFieldsObsSelector);
   const fieldsGroupNames = groupedCustomFieldsObs.map((f) => f.name).filter((f) => f);
+  const [newRencontre, setNewRencontre] = useState(false);
   const [rencontre, setRencontre] = useState<RencontreInstance>();
   const [activeTab, setActiveTab] = useState(fieldsGroupNames[0]);
   const [rencontresInProgress, setRencontresInProgress] = useState<Array<RencontreInstance>>([]);
@@ -88,11 +87,6 @@ const CreateObservation = ({ observation, open, setOpen }: CreateObservationProp
       toast.success("Suppression réussie");
       setOpen(false);
     }
-  };
-
-  const onSelectPerson = (persons: Array<PersonInstance>) => {
-    persons = persons?.filter(Boolean) || [];
-    setSelectedPersons(persons);
   };
 
   const currentRencontres = [...rencontresInProgress, ...rencontresForObs];
@@ -210,124 +204,104 @@ const CreateObservation = ({ observation, open, setOpen }: CreateObservationProp
                           ))}
                       </div>
                     ))}
-                    {activeTab === "_rencontres" ? (
-                      <div>
-                        <div className="tw-flex">
-                          <div className="tw-grow">
-                            <SelectAndCreatePerson
-                              value={selectedPersons}
-                              onChange={onSelectPerson}
-                              inputId="person-select-and-create-reception"
-                              classNamePrefix="person-select-and-create-reception"
-                              showLinkToPerson={false}
-                            />
-                          </div>
-                          <div className="tw-flex tw-justify-end tw-w-32 tw-min-w-32">
-                            <div>
-                              <button
-                                className="button-submit"
-                                onClick={() => {
-                                  setRencontre({
-                                    persons: selectedPersons.map((p) => p._id),
-                                    user: user._id,
-                                    team: team._id,
-                                  });
-                                }}
-                              >
-                                + Rencontre
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                        <Table
-                          className="Table"
-                          noData="Aucune rencontre n'est associée à cette observation"
-                          onRowClick={(rencontre) => {
-                            if (!rencontre._id) {
-                              // Si c'est une nouvelle rencontre (pas encore sauvegardée), on fait croire que c'est
-                              // comme quand on ajoute une rencontre à la volée quand on l'édite. C'est tordu, mais
-                              // ça me fait gagner du temps.
-                              setRencontre({
-                                ...rencontre,
-                                person: undefined,
-                                persons: rencontre.person ? [rencontre.person] : [],
-                                user: user._id,
-                                team: team._id,
-                              });
-                            } else {
-                              setRencontre(rencontre);
-                            }
-                          }}
-                          data={currentRencontres}
-                          rowKey={"date"}
-                          columns={[
-                            {
-                              title: "Date",
-                              dataKey: "date",
-                              onSortOrder: setSortOrder,
-                              onSortBy: setSortBy,
-                              sortBy,
-                              sortOrder,
-                              render: (rencontre) => {
-                                return (
-                                  <>
-                                    <DateBloc date={rencontre.date} />
-                                    <TimeBlock time={rencontre.date} />
-                                  </>
-                                );
-                              },
+                    {activeTab === "_rencontres" && (
+                      <Table
+                        className="Table"
+                        noData="Aucune rencontre n'est associée à cette observation"
+                        onRowClick={(rencontre) => {
+                          if (!rencontre._id) {
+                            // Si c'est une nouvelle rencontre (pas encore sauvegardée), on fait croire que c'est
+                            // comme quand on ajoute une rencontre à la volée quand on l'édite. C'est tordu, mais
+                            // ça me fait gagner du temps.
+                            setRencontre({
+                              ...rencontre,
+                              person: rencontre.person,
+                              user: user._id,
+                              team: team._id,
+                            });
+                          } else {
+                            setRencontre(rencontre);
+                          }
+                        }}
+                        data={currentRencontres}
+                        rowKey={"date"}
+                        columns={[
+                          {
+                            title: "Date",
+                            dataKey: "date",
+                            onSortOrder: setSortOrder,
+                            onSortBy: setSortBy,
+                            sortBy,
+                            sortOrder,
+                            render: (rencontre) => {
+                              return (
+                                <>
+                                  <DateBloc date={rencontre.date} />
+                                  <TimeBlock time={rencontre.date} />
+                                </>
+                              );
                             },
-                            {
-                              title: "Personne suivie",
-                              dataKey: "person",
-                              onSortOrder: setSortOrder,
-                              onSortBy: setSortBy,
-                              sortBy,
-                              sortOrder,
-                              render: (rencontre) =>
-                                rencontre.person ? <PersonName item={rencontre} /> : <span className="tw-opacity-30 tw-italic">Anonyme</span>,
+                          },
+                          {
+                            title: "Personne suivie",
+                            dataKey: "person",
+                            onSortOrder: setSortOrder,
+                            onSortBy: setSortBy,
+                            sortBy,
+                            sortOrder,
+                            render: (rencontre) =>
+                              rencontre.person ? <PersonName item={rencontre} /> : <span className="tw-opacity-30 tw-italic">Anonyme</span>,
+                          },
+                          {
+                            title: "Enregistré par",
+                            dataKey: "user",
+                            onSortOrder: setSortOrder,
+                            onSortBy: setSortBy,
+                            sortBy,
+                            sortOrder,
+                            render: (rencontre) => (rencontre.user ? <UserName id={rencontre.user} /> : null),
+                          },
+                          { title: "Commentaire", dataKey: "comment", onSortOrder: setSortOrder, onSortBy: setSortBy, sortBy, sortOrder },
+                          {
+                            title: "Équipe en charge",
+                            dataKey: "team",
+                            render: (rencontre) => <TagTeam teamId={rencontre?.team} />,
+                          },
+                          {
+                            title: "Actions",
+                            dataKey: "actions",
+                            small: true,
+                            render: (rencontre) => {
+                              return !rencontre._id ? (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setRencontresInProgress((rencontresInProgress) =>
+                                      rencontresInProgress.filter((r) => r.person !== rencontre.person)
+                                    );
+                                  }}
+                                  className="button-destructive"
+                                >
+                                  Retirer
+                                </button>
+                              ) : null;
                             },
-                            {
-                              title: "Enregistré par",
-                              dataKey: "user",
-                              onSortOrder: setSortOrder,
-                              onSortBy: setSortBy,
-                              sortBy,
-                              sortOrder,
-                              render: (rencontre) => (rencontre.user ? <UserName id={rencontre.user} /> : null),
-                            },
-                            { title: "Commentaire", dataKey: "comment", onSortOrder: setSortOrder, onSortBy: setSortBy, sortBy, sortOrder },
-                            {
-                              title: "Équipe en charge",
-                              dataKey: "team",
-                              render: (rencontre) => <TagTeam teamId={rencontre?.team} />,
-                            },
-                            {
-                              title: "Actions",
-                              dataKey: "actions",
-                              small: true,
-                              render: (rencontre) => {
-                                return !rencontre._id ? (
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setRencontresInProgress((rencontresInProgress) =>
-                                        rencontresInProgress.filter((r) => r.person !== rencontre.person)
-                                      );
-                                    }}
-                                    className="button-destructive"
-                                  >
-                                    Retirer
-                                  </button>
-                                ) : null;
-                              },
-                            },
-                          ]}
-                        />
-                      </div>
-                    ) : null}
+                          },
+                        ]}
+                      />
+                    )}
+                    <div className="tw-flex tw-justify-center tw-items-center tw-mt-4">
+                      <button
+                        className="button-submit"
+                        onClick={() => {
+                          setNewRencontre(true);
+                        }}
+                      >
+                        + Rencontre
+                      </button>
+                    </div>
                   </div>
-                  <div className="tw-p-4">
+                  <div className="tw-p-4 tw-pt-0">
                     <div className="tw-flex tw-flex-row tw-flex-wrap">
                       <div className="tw-flex tw-basis-full tw-flex-col tw-px-4 tw-py-2">
                         <hr />
@@ -404,36 +378,35 @@ const CreateObservation = ({ observation, open, setOpen }: CreateObservationProp
           )}
         </Formik>
       </ModalContainer>
-      {
-        // On traite de deux manières différentes la modale de rencontre, en fonction de :
-        // - si on est en train d'ajouter une rencontre pour des personnes dans l'observation (les rencontres en devenir)
-        // - si on édite une rencontre déjà existante (une rencontre déjà enregistrée)
-        rencontre?.persons ? (
-          <Rencontre
-            rencontre={rencontre}
-            disableAccessToPerson
-            onFinished={() => {
-              setRencontre(undefined);
-              setSelectedPersons([]);
-            }}
-            onSave={(rencontres: Array<RencontreInstance>) => {
-              if (!rencontres.length) return;
-              setRencontresInProgress((rencontresInProgress) => [
-                ...rencontresInProgress.filter((r) => !rencontres.map((e: RencontreInstance) => e.person).includes(r.person)),
-                ...rencontres,
-              ]);
-            }}
-          />
-        ) : (
-          <Rencontre
-            rencontre={rencontre}
-            disableAccessToPerson
-            onFinished={() => {
-              setRencontre(undefined);
-            }}
-          />
-        )
-      }
+      {newRencontre && (
+        <Rencontre
+          rencontre={{
+            persons: [],
+            user: user._id,
+            team: team._id,
+          }}
+          disableAccessToPerson
+          onFinished={() => {
+            setNewRencontre(false);
+          }}
+          onSave={(rencontres: Array<RencontreInstance>) => {
+            if (!rencontres.length) return;
+            setRencontresInProgress((rencontresInProgress) => [
+              ...rencontresInProgress.filter((r) => !rencontres.map((e: RencontreInstance) => e.person).includes(r.person)),
+              ...rencontres,
+            ]);
+          }}
+        />
+      )}
+      {rencontre && (
+        <Rencontre
+          rencontre={rencontre}
+          disableAccessToPerson
+          onFinished={() => {
+            setRencontre(undefined);
+          }}
+        />
+      )}
     </div>
   );
 };

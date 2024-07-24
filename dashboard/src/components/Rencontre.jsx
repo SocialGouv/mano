@@ -12,15 +12,11 @@ import { outOfBoundariesDate } from "../services/date";
 import AutoResizeTextarea from "./AutoresizeTextArea";
 import { useDataLoader } from "./DataLoader";
 import { ModalContainer, ModalHeader, ModalFooter, ModalBody } from "./tailwind/Modal";
-import UserName from "./UserName";
-import CustomFieldDisplay from "./CustomFieldDisplay";
-import { personsObjectSelector } from "../recoil/selectors";
 import { encryptRencontre } from "../recoil/rencontres";
 
 const Rencontre = ({ rencontre, onFinished, onSave = undefined, personId = null, disableAccessToPerson = false }) => {
   const user = useRecoilValue(userState);
   const teams = useRecoilValue(teamsState);
-  const personsObject = useRecoilValue(personsObjectSelector);
   const currentTeam = useRecoilValue(currentTeamState);
   const [open, setOpen] = useState(false);
   const { refresh } = useDataLoader();
