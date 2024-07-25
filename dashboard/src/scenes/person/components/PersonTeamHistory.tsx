@@ -27,7 +27,7 @@ function getPersonTeamHistory(changes: Array<PersonHistoryEntry>, creationDate: 
 
   for (const change of changes) {
     const date = change.date;
-    const oldTeams = change.data.assignedTeams.oldValue;
+    const oldTeams = change.data.assignedTeams.oldValue || [];
     const newTeams = change.data.assignedTeams.newValue;
 
     // Équipes quittées
