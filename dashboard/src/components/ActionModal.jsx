@@ -27,7 +27,6 @@ import ActionsCategorySelect from "./tailwind/ActionsCategorySelect";
 import AutoResizeTextarea from "./AutoresizeTextArea";
 import { groupsState } from "../recoil/groups";
 import { encryptComment } from "../recoil/comments";
-import { capture } from "../services/sentry";
 
 export default function ActionModal() {
   const actionsObjects = useRecoilValue(itemsGroupedByActionSelector);
@@ -298,7 +297,6 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
         );
         if (actionError) {
           toast.error("Erreur lors de la création de l'action, les données n'ont pas été sauvegardées.");
-          capture("error creating single action", { extra: { actionResponse } });
           setIsSubmitting(false);
           return false;
         }
