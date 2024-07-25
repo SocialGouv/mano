@@ -121,6 +121,8 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
     newActionInitialState(organisation?._id, personId, user?._id, dueAt, completedAt, teams, isMulti, personIds)
   );
   const [isEditing, setIsEditing] = useState(!action || searchParams.get("isEditing") === "true");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const initialState = useMemo(() => {
     if (action) {
@@ -186,6 +188,8 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
       }
       if (Object.keys(historyEntry.data).length) body.history = [...(action.history || []), historyEntry];
 
+      setIsSubmitting(true);
+
       const [actionError] = await tryFetchExpectOk(async () =>
         API.put({
           path: `/action/${data._id}`,
@@ -194,6 +198,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
       );
       if (actionError) {
         toast.error("Erreur lors de la mise à jour de l'action, les données n'ont pas été sauvegardées.");
+        setIsSubmitting(false);
         return false;
       }
 
@@ -280,6 +285,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
         );
         if (actionError) {
           toast.error("Erreur lors de la création des action, les données n'ont pas été sauvegardées.");
+          setIsSubmitting(false);
           return false;
         }
         actionsId = actionResponse.data.map((a) => a._id);
@@ -293,6 +299,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
         if (actionError) {
           toast.error("Erreur lors de la création de l'action, les données n'ont pas été sauvegardées.");
           capture("error creating single action", { extra: { actionResponse } });
+          setIsSubmitting(false);
           return false;
         }
         actionsId.push(actionResponse.data._id);
@@ -327,8 +334,6 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
     if (JSON.stringify(data.completedAt) !== JSON.stringify(initialState.completedAt)) return true;
     return false;
   }, [data, initialState]);
-
-  const canEdit = true;
 
   const handleChange = (event) => {
     const target = event.currentTarget || event.target;
@@ -732,22 +737,24 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
         </div>
       </ModalBody>
       <ModalFooter>
-        <button name="Fermer" type="button" className="button-cancel" onClick={() => onClose()}>
+        <button name="Fermer" type="button" className="button-cancel" onClick={() => onClose()} disabled={isDeleting || isSubmitting}>
           Fermer
         </button>
         {!["restricted-access"].includes(user.role) && !isNewAction && !!isEditing && (
           <button
             type="button"
             name="cancel"
-            disabled={!canEdit}
+            disabled={isDeleting || isSubmitting}
             title="Supprimer cette action - seul le créateur peut supprimer une action"
             className="button-destructive"
             onClick={async (e) => {
               e.stopPropagation();
               if (!window.confirm("Voulez-vous supprimer cette action ?")) return;
+              setIsDeleting(true);
               const [error] = await tryFetchExpectOk(() => API.delete({ path: `/action/${action._id}` }));
               if (error) {
                 toast.error("Erreur lors de la suppression de l'action");
+                setIsDeleting(false);
                 return;
               }
               for (let comment of action.comments) {
@@ -767,7 +774,13 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
           </button>
         )}
         {(isEditing || canSave) && (
-          <button title="Sauvegarder cette action" type="submit" className="button-submit" form="add-action-form" disabled={!canEdit}>
+          <button
+            title="Sauvegarder cette action"
+            type="submit"
+            className="button-submit"
+            form="add-action-form"
+            disabled={isDeleting || isSubmitting}
+          >
             Sauvegarder
           </button>
         )}
@@ -780,7 +793,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
               setIsEditing(true);
             }}
             className={["button-submit", activeTab === "Informations" ? "tw-visible" : "tw-invisible"].join(" ")}
-            disabled={!canEdit}
+            disabled={isDeleting}
           >
             Modifier
           </button>

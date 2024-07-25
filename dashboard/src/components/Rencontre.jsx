@@ -19,6 +19,7 @@ const Rencontre = ({ rencontre, onFinished, onSave = undefined, personId = null,
   const teams = useRecoilValue(teamsState);
   const currentTeam = useRecoilValue(currentTeamState);
   const [open, setOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const { refresh } = useDataLoader();
 
   useEffect(() => {
@@ -26,6 +27,7 @@ const Rencontre = ({ rencontre, onFinished, onSave = undefined, personId = null,
   }, [rencontre]);
 
   const onDeleteRencontre = async () => {
+    setIsDeleting(true);
     const confirm = window.confirm("Êtes-vous sûr ?");
     if (confirm) {
       const [error] = await tryFetchExpectOk(async () => API.delete({ path: `/rencontre/${rencontre?._id}` }));
@@ -35,6 +37,7 @@ const Rencontre = ({ rencontre, onFinished, onSave = undefined, personId = null,
         setOpen(false);
       }
     }
+    setIsDeleting(false);
   };
 
   const isNew = !rencontre?._id;
@@ -106,7 +109,6 @@ const Rencontre = ({ rencontre, onFinished, onSave = undefined, personId = null,
             await refresh();
             setOpen(false);
             toast.success(body.person.length > 1 ? "Rencontre enregistrée" : "Rencontres enregistrées");
-            actions.setSubmitting(false);
             return;
           }
           const [error] = await tryFetchExpectOk(async () =>
@@ -123,10 +125,10 @@ const Rencontre = ({ rencontre, onFinished, onSave = undefined, personId = null,
           await refresh();
           setOpen(false);
           toast.success("Rencontre mise à jour");
-          actions.setSubmitting(false);
         }}
       >
         {({ values, handleChange, handleSubmit, isSubmitting }) => {
+          const buttonsDisabled = isSubmitting || isDeleting || !open;
           return (
             <>
               <ModalBody>
@@ -184,7 +186,7 @@ const Rencontre = ({ rencontre, onFinished, onSave = undefined, personId = null,
                 </div>
               </ModalBody>
               <ModalFooter>
-                <button type="button" name="cancel" className="button-cancel" onClick={() => setOpen(false)}>
+                <button type="button" name="cancel" disabled={buttonsDisabled} className="button-cancel" onClick={() => setOpen(false)}>
                   Fermer
                 </button>
                 {!isNew && (
@@ -193,19 +195,20 @@ const Rencontre = ({ rencontre, onFinished, onSave = undefined, personId = null,
                     name="delete"
                     className="button-destructive"
                     onClick={onDeleteRencontre}
+                    disabled={buttonsDisabled}
                     title="Seul l'auteur/trice du rencontre peut le supprimer"
                   >
-                    Supprimer
+                    {isDeleting ? "Suppression en cours..." : "Supprimer"}
                   </button>
                 )}
                 <button
                   type="submit"
                   className="button-submit !tw-bg-main"
-                  disabled={isSubmitting}
+                  disabled={buttonsDisabled}
                   onClick={handleSubmit}
                   title="Seul l'auteur/trice du rencontre peut le modifier"
                 >
-                  Enregistrer
+                  {isSubmitting ? "Enregistrement en cours..." : "Enregistrer"}
                 </button>
               </ModalFooter>
             </>

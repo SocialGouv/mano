@@ -18,6 +18,7 @@ const Passage = ({ passage, personId, onFinished }) => {
   const user = useRecoilValue(userState);
   const teams = useRecoilValue(teamsState);
   const [open, setOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const { refresh } = useDataLoader();
 
   useEffect(() => {
@@ -25,6 +26,7 @@ const Passage = ({ passage, personId, onFinished }) => {
   }, [passage]);
 
   const onDeletePassage = async () => {
+    setIsDeleting(true);
     const confirm = window.confirm("Êtes-vous sûr ?");
     if (confirm) {
       const [error] = await tryFetchExpectOk(async () => API.delete({ path: `/passage/${passage?._id}` }));
@@ -34,6 +36,7 @@ const Passage = ({ passage, personId, onFinished }) => {
         setOpen(false);
       }
     }
+    setIsDeleting(false);
   };
 
   const isNew = !passage?._id;
@@ -105,7 +108,6 @@ const Passage = ({ passage, personId, onFinished }) => {
             await refresh();
             setOpen(false);
             toast.success(body.person?.length > 1 ? "Passage enregistré !" : "Passages enregistrés !");
-            actions.setSubmitting(false);
             return;
           }
           const [error] = await tryFetchExpectOk(async () =>
@@ -122,10 +124,10 @@ const Passage = ({ passage, personId, onFinished }) => {
           await refresh();
           setOpen(false);
           toast.success("Passage mis à jour");
-          actions.setSubmitting(false);
         }}
       >
         {({ values, handleChange, handleSubmit, isSubmitting }) => {
+          const buttonsDisabled = isSubmitting || isDeleting || !open;
           return (
             <>
               <ModalBody>
@@ -207,7 +209,7 @@ const Passage = ({ passage, personId, onFinished }) => {
                 </div>
               </ModalBody>
               <ModalFooter>
-                <button type="button" name="cancel" className="button-cancel" onClick={() => setOpen(false)}>
+                <button type="button" disabled={buttonsDisabled} name="cancel" className="button-cancel" onClick={() => setOpen(false)}>
                   Fermer
                 </button>
                 {!isNew && (
@@ -216,19 +218,20 @@ const Passage = ({ passage, personId, onFinished }) => {
                     name="delete"
                     className="button-destructive"
                     onClick={onDeletePassage}
+                    disabled={buttonsDisabled}
                     title="Seul l'auteur/trice du passage peut le supprimer"
                   >
-                    Supprimer
+                    {isDeleting ? "Suppression en cours..." : "Supprimer"}
                   </button>
                 )}
                 <button
                   type="submit"
                   className="button-submit !tw-bg-main"
-                  disabled={isSubmitting}
                   onClick={handleSubmit}
+                  disabled={buttonsDisabled}
                   title="Seul l'auteur/trice du passage peut le modifier"
                 >
-                  Enregistrer
+                  {isSubmitting ? "Enregistrement en cours..." : "Enregistrer"}
                 </button>
               </ModalFooter>
             </>
