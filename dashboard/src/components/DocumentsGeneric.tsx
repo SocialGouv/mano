@@ -698,6 +698,7 @@ function DocumentModal<T extends DocumentWithLinkedItem>({
                   });
                   if (error) {
                     toast.error(errorMessage(error) || "Une erreur est survenue lors du téléchargement du document");
+                    return;
                   }
                   const file = await decryptFile(blob, document.encryptedEntityKey, getHashedOrgEncryptionKey());
                   download(file, name);
@@ -715,6 +716,7 @@ function DocumentModal<T extends DocumentWithLinkedItem>({
                   });
                   if (error) {
                     toast.error(errorMessage(error) || "Une erreur est survenue lors du téléchargement du document");
+                    return;
                   }
                   const file = await decryptFile(blob, document.encryptedEntityKey, getHashedOrgEncryptionKey());
                   const url = URL.createObjectURL(file);
