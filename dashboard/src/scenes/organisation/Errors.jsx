@@ -10,6 +10,7 @@ import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "../../compo
 import KeyInput from "../../components/KeyInput";
 import { useDataLoader } from "../../components/DataLoader";
 import DateBloc, { TimeBlock } from "../../components/DateBloc";
+import { dayjsInstance } from "../../services/date";
 
 const getErroredDecryption = async (item) => {
   try {
@@ -30,7 +31,7 @@ async function fetchErrored(organisationId, path) {
   const erroredPersons = [];
   while (!finished) {
     const [error, res] = await tryFetchExpectOk(async () => {
-      return API.get({ path, query: { ...query, page: String(page) } });
+      return API.get({ path, query: { ...query, page: String(page), withDeleted: true } });
     });
     if (error) {
       toast.error("Erreur lors de la récupération des données en erreur, pas de chance");
@@ -102,15 +103,32 @@ export default function Errors() {
             { title: "_id", dataKey: "_id" },
             { title: "Type", dataKey: "type" },
             {
-              title: "Dernière mise-à-jour",
-              dataKey: "updatedAt",
+              title: "Créé le",
+              dataKey: "createdAt",
               style: { width: "90px" },
               small: true,
               render: (item) => {
                 return (
                   <>
-                    <DateBloc date={item.data.updatedAt} />
-                    <TimeBlock time={item.data.updatedAt} />
+                    <DateBloc date={item.data.createdAt} />
+                    <TimeBlock time={item.data.createdAt} />
+                  </>
+                );
+              },
+            },
+            {
+              title: "Dernière mise-à-jour",
+              dataKey: "updatedAt",
+              style: { width: "90px" },
+              small: true,
+              render: (item) => {
+                const latestDate = dayjsInstance(item.data.updatedAt).isAfter(dayjsInstance(item.data.deletedAt))
+                  ? item.data.updatedAt
+                  : item.data.deletedAt;
+                return (
+                  <>
+                    <DateBloc date={latestDate} />
+                    <TimeBlock time={latestDate} />
                   </>
                 );
               },
@@ -131,7 +149,7 @@ export default function Errors() {
               ),
             },
             {
-              title: "Supprimer",
+              title: "Supprimer définitivement",
               dataKey: "action-supprimer",
               render: (item) => (
                 <button
