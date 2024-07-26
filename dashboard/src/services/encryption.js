@@ -229,7 +229,11 @@ export const decryptItem = async (item, { decryptDeleted = false, type = "" } = 
   } catch (errorDecrypt) {
     toast.error(
       "Un élément n'a pas pu être déchiffré. Peut-être est-il chiffré avec une ancienne clé ? Un admin peut essayer de le déchiffrer en allant dans Organisation > Données en erreur",
-      { autoClose: false }
+      {
+        autoClose: false,
+        closeOnClick: false,
+        draggable: false,
+      }
     );
     capture(`ERROR DECRYPTING ITEM : ${errorDecrypt}`, {
       extra: { message: "ERROR DECRYPTING ITEM", item, type },

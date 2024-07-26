@@ -162,7 +162,7 @@ const EncryptionKey = ({ isMain }) => {
           } catch (e) {
             capture(e);
             throw new Error(
-              `Impossible de déchiffrer et rechiffrer l'élément suivant: ${path} ${item._id}. Notez le numéro affiché et fournissez le à l'équipe de support.`
+              `Impossible de déchiffrer et rechiffrer l'élément suivant: ${path} ${item._id}. Peut-être est-il chiffré avec une ancienne clé ? Vous pouvez essayer de le déchiffrer en allant dans Organisation > Données en erreur`
             );
           }
         }
@@ -242,7 +242,11 @@ const EncryptionKey = ({ isMain }) => {
       }
     } catch (orgEncryptionError) {
       capture("erreur in organisation encryption", orgEncryptionError);
-      toast.error(orgEncryptionError.message, { autoClose: false, closeOnClick: false, draggable: false });
+      toast.error(orgEncryptionError.message, {
+        autoClose: false,
+        closeOnClick: false,
+        draggable: false,
+      });
       setEncryptingProgress(0);
       setEncryptionKey("");
       setEncryptionDone(false);

@@ -48,16 +48,22 @@ import ImportStructures from "../data-import-export/ImportStructures";
 const getSettingTitle = (tabId) => {
   if (tabId === "infos") return "Informations";
   if (tabId === "encryption") return "Chiffrement";
-  if (tabId === "reception") return "Accueil";
-  if (tabId === "persons") return "Personnes";
-  if (tabId === "consultations") return "Consultations";
-  if (tabId === "medicalFile") return "Dossier Médical";
+  if (tabId === "reception") return "Accueil de jour";
   if (tabId === "actions") return "Actions";
   if (tabId === "structures") return "Structures";
   if (tabId === "territories") return "Territoires";
-  if (tabId === "export") return "Export";
-  if (tabId === "import") return "Import";
   if (tabId === "rencontres-passages") return "Passages/rencontres";
+  if (tabId === "consultations") return "Consultations";
+  if (tabId === "collaborations") return "Co-interventions";
+  if (tabId === "persons") return "Personnes suivies";
+  if (tabId === "medicalFile") return "Dossier Médical";
+  if (tabId === "import") return "Import de personnes suivies";
+  if (tabId === "import-configuration") return "Import de configuration";
+  if (tabId === "import-territories") return "Import de territoires";
+  if (tabId === "import-structures") return "Import de structures";
+  if (tabId === "export") return "Export des données";
+  if (tabId === "poubelle") return "Données supprimées";
+  if (tabId === "errors") return "Données en erreur";
   return "";
 };
 
@@ -89,7 +95,12 @@ const View = () => {
   const [refreshErrorKey, setRefreshErrorKey] = useState(0);
   const { refresh } = useDataLoader();
 
-  const [tab, setTab] = useState(!organisation.encryptionEnabled ? "encryption" : "infos");
+  const [tab, setTab] = useState(() => {
+    if (!organisation.encryptionEnabled) return "encryption";
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.has("tab")) return searchParams.get("tab");
+    return "infos";
+  });
   const scrollContainer = useRef(null);
   useTitle(`Organisation - ${getSettingTitle(tab)}`);
 
