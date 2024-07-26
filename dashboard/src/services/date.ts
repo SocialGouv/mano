@@ -38,9 +38,9 @@ export function formatBirthDate(date: PossibleDate): string | null {
 export function formatAge(date: PossibleDate): string | null {
   if (!date) return null;
   const birthDate = dayjs(date);
-  const months = dayjs().diff(birthDate, "months");
+  const months = Math.abs(dayjs().diff(birthDate, "months"));
   if (months < 24) return months + " mois";
-  const years = dayjs().diff(birthDate, "years");
+  const years = Math.abs(dayjs().diff(birthDate, "years"));
   if (years < 7) {
     const etDemi = months % 12 >= 6;
     if (etDemi) return `${years} ans et demi`;
