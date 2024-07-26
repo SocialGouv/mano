@@ -37,6 +37,7 @@ import TabsNav from "../../components/tailwind/TabsNav";
 import { filterPersonByAssignedTeam } from "../../utils/filter-person";
 import { flattenedCustomFieldsConsultationsSelector } from "../../recoil/consultations";
 import DatePicker from "../../components/DatePicker";
+import { dayjsInstance } from "../../services/date";
 
 const tabs = [
   "Général",
@@ -299,7 +300,7 @@ const Stats = () => {
   const groupsCategories = useRecoilValue(actionsCategoriesSelector);
 
   const [snapshotDate, setSnapshotDate] = useLocalStorage("stats-snapshotDate", new Date());
-  const [activeTab, setActiveTab] = useLocalStorage("stats-tabCaption", "Général");
+  const [activeTab, setActiveTab] = useLocalStorage("stats-tabCaption", "Personnes suivies");
   const [filterPersons, setFilterPersons] = useLocalStorage("stats-filterPersons-defaultEverybody", initFilters);
   const [filterObs, setFilterObs] = useLocalStorage("stats-filterObs-defaultEverybody", []);
   const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage("stats-viewAllOrganisationData", teams.length === 1);
@@ -647,10 +648,23 @@ const Stats = () => {
                   </div>
                 </div>
                 <hr className="tw-my-0.5" />
-                <div className="tw-flex tw-flex-row tw-gap-2 tw-items-center">
-                  <p className="tw-mb-0 tw-basis-1/2">Visualiser les personnes dans leur état du:</p>
-                  <div className="tw-shrink-0 tw-basis-60 tw-p-0">
-                    <DatePicker defaultValue={snapshotDate} onChange={(event) => setSnapshotDate(event.target.value)} />
+                <div>
+                  <div className="tw-flex tw-flex-row tw-gap-2 tw-items-center">
+                    <p className="tw-mb-0 tw-basis-1/2">Visualiser les personnes dans leur état du:</p>
+                    <div>
+                      <div className="tw-shrink-0 tw-w-60 tw-p-0">
+                        <DatePicker defaultValue={snapshotDate} onChange={(event) => setSnapshotDate(event.target.value)} />
+                      </div>
+                      {period.startDate && period.endDate && !dayjsInstance(snapshotDate).isBetween(period.startDate, period.endDate) && (
+                        <div className="tw-w-full">
+                          <p className="tw-m-0 tw-text-sm tw-text-red-300">
+                            Attention: la date choisie est hors de la période sélectionnée.
+                            <br />
+                            C'est peut-être voulu, mais on préfère vous prévenir 😇
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <hr className="tw-my-0.5" />
