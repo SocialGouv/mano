@@ -54,8 +54,10 @@ console.log(VERSION); // remove me!
 const DEFAULT_ORGANISATION_KEY =
   process.env.NODE_ENV === "development" && import.meta.env.VITE_TEST !== "true" ? import.meta.env.VITE_DEFAULT_ORGANISATION_KEY : "";
 
+const MANO_TEST_ORG_ID = "00000000-5f5a-89e2-2e60-88fa20cc50bf";
+
 const DISABLED_FEATURES = {
   // "feature-key": true,
 };
 
-export { theme, HOST, SCHEME, ENV, VERSION, DEFAULT_ORGANISATION_KEY, DISABLED_FEATURES };
+export { theme, HOST, SCHEME, ENV, VERSION, DEFAULT_ORGANISATION_KEY, DISABLED_FEATURES, MANO_TEST_ORG_ID };

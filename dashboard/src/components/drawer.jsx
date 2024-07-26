@@ -6,6 +6,7 @@ import SessionCountDownLimiter from "./SessionCountDownLimiter";
 import useMinimumWidth from "../services/useMinimumWidth";
 import { deploymentShortCommitSHAState } from "../recoil/version";
 import AddPersons from "./AddPersons";
+import { MANO_TEST_ORG_ID } from "../config";
 
 export const showDrawerState = atom({
   key: "showDrawerState",
@@ -119,6 +120,13 @@ const Drawer = () => {
                   Statistiques
                 </NavLink>
               </li>
+              {organisation._id === MANO_TEST_ORG_ID && (
+                <li>
+                  <NavLink to="/stats-new" activeClassName="active">
+                    Statistiques NEW
+                  </NavLink>
+                </li>
+              )}
             </>
           )}
           {["admin"].includes(role) && isDesktop && (

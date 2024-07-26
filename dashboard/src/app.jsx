@@ -16,6 +16,7 @@ import Territory from "./scenes/territory";
 import Structure from "./scenes/structure";
 import Team from "./scenes/team";
 import Stats from "./scenes/stats";
+import StatsNew from "./scenes/stats/new";
 import SearchView from "./scenes/search";
 import User from "./scenes/user";
 import Report from "./scenes/report";
@@ -171,6 +172,7 @@ const App = () => {
           <RestrictedRoute path="/team" component={Team} />
           <RestrictedRoute path="/organisation" component={Organisation} />
           <RestrictedRoute path="/stats" component={Stats} />
+          <RestrictedRoute path="/stats-new" component={StatsNew} />
           <RestrictedRoute path="/reception" component={Reception} />
           <RestrictedRoute path="/search" component={SearchView} />
           <RestrictedRoute path="/report" component={Report} />
