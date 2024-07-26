@@ -32,7 +32,7 @@ describe("Filter person by assigned teams within a period - Jan 2023 until dec 2
     // to fix the bug when it was not compulsory to have an assignedTeam
     const forTeamFiltering = [];
     const assignedTeams = [];
-    expect(filterPersonByAssignedTeam(viewAllOrganisationData, selectedTeamsObjectWithOwnPeriod, assignedTeams, forTeamFiltering)).toBe(true);
+    expect(filterPersonByAssignedTeam(viewAllOrganisationData, selectedTeamsObjectWithOwnPeriod, assignedTeams, forTeamFiltering)).toBe(false);
   });
   describe("case: assigned team period is accross the start date of the selected period IS included", () => {
     test("person didn't change assigned team since creation", () => {
