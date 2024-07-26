@@ -9,7 +9,7 @@ export function filterPersonByAssignedTeam(
   forTeamFiltering: PersonPopulated["forTeamFiltering"]
 ) {
   if (viewAllOrganisationData) return true;
-  if (!assignedTeams?.length) return true; // no assignedTeam is currently forbidden, but hasn't always been the case
+  if (!assignedTeams?.length) return false; // no assignedTeam is currently forbidden, but hasn't always been the case
 
   // when is the person included ?
   // 5 cases:
