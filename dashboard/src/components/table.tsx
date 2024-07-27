@@ -26,8 +26,11 @@ interface TableProps<T extends RootItem> {
     small?: boolean;
   }[];
   data?: T[];
+  checked?: string[];
+  onCheck?: (checked: string[]) => void;
   rowKey: string;
   dataTestId?: string;
+  withCheckbox?: boolean;
   onRowClick?: (item: T) => void;
   rowDisabled?: (item: T) => boolean;
   nullDisplay?: string;
@@ -42,8 +45,11 @@ interface TableProps<T extends RootItem> {
 const Table = <T extends { [key: string]: any } & RootItem>({
   columns = [],
   data = [],
+  checked = [],
+  onCheck = null,
   rowKey,
   dataTestId = null,
+  withCheckbox = false,
   onRowClick = null,
   rowDisabled = () => false,
   nullDisplay = "",
@@ -62,6 +68,15 @@ const Table = <T extends { [key: string]: any } & RootItem>({
     const newOrder = [...gridRef.current.children].map((i) => i.dataset.key);
     onSort(newOrder, data);
   }, [onSort, data, isSortable]);
+
+  const onToggleCheckbox = (event: React.MouseEvent<HTMLInputElement>) => {
+    const id = event.currentTarget.id;
+    if (checked.includes(id)) {
+      onCheck(checked.filter((i) => i !== id));
+    } else {
+      onCheck([...checked, id]);
+    }
+  };
 
   useEffect(() => {
     if (!!isSortable && !!data.length) {
@@ -98,7 +113,7 @@ const Table = <T extends { [key: string]: any } & RootItem>({
   if (isDesktop || !renderCellSmallDevices) {
     return (
       <table className={[className, "table-selego"].join(" ")}>
-        <thead className="tw-hidden sm:tw-table-header-group">
+        <thead className="tw-hidden sm:tw-table-header-group tw-border-b tw-border-gray-200">
           {!!title && (
             <tr>
               <td tabIndex={0} aria-label={title} className="title" colSpan={columns.length}>
@@ -107,6 +122,22 @@ const Table = <T extends { [key: string]: any } & RootItem>({
             </tr>
           )}
           <tr>
+            {withCheckbox && (
+              <td className="tw-whitespace-nowrap tw-cursor-default">
+                <input
+                  type="checkbox"
+                  className="tw-border-2 tw-mx-2"
+                  checked={checked.length === data.length}
+                  onClick={() => {
+                    if (checked.length === data.length) {
+                      onCheck([]);
+                    } else {
+                      onCheck(data.map((i) => i._id));
+                    }
+                  }}
+                />
+              </td>
+            )}
             {columns.map((column) => {
               const { onSortBy, onSortOrder, sortBy, sortOrder, sortableKey, dataKey } = column;
               const onNameClick = () => {
@@ -159,6 +190,17 @@ const Table = <T extends { [key: string]: any } & RootItem>({
                   ].join(" ")}
                   style={item.style || {}}
                 >
+                  {withCheckbox && (
+                    <td className="tw-whitespace-nowrap tw-cursor-default">
+                      <input
+                        type="checkbox"
+                        className="tw-border-2 tw-mx-2"
+                        checked={checked.includes(item._id)}
+                        id={item._id}
+                        onClick={onToggleCheckbox}
+                      />
+                    </td>
+                  )}
                   {columns.map((column) => {
                     return (
                       <td className={([column.className || ""].join(" "), column.small ? "small" : "not-small")} key={item[rowKey] + column.dataKey}>

@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { selector, selectorFamily, useRecoilValue } from "recoil";
 import { useLocalStorage } from "../../services/useLocalStorage";
@@ -27,6 +27,9 @@ import ExclamationMarkButton from "../../components/tailwind/ExclamationMarkButt
 import { customFieldsMedicalFileSelector } from "../../recoil/medicalFiles";
 import useMinimumWidth from "../../services/useMinimumWidth";
 import { flattenedCustomFieldsConsultationsSelector } from "../../recoil/consultations";
+import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "../../components/tailwind/Modal";
+import { useDeletePerson } from "./components/DeletePersonButton";
+import { toast } from "react-toastify";
 
 const limit = 20;
 
@@ -111,7 +114,11 @@ const List = () => {
   const [page, setPage] = useSearchParamState("page", 0);
   const currentTeam = useRecoilValue(currentTeamState);
   const organisation = useRecoilValue(organisationState);
-
+  const user = useRecoilValue(userState);
+  const [deleteMultiple, setDeleteMultiple] = useState(false);
+  const [checkedForDelete, setCheckedForDelete] = useState([]);
+  const deletePerson = useDeletePerson();
+  const { refresh } = useDataLoader();
   const viewAllOrganisationData = organisation.checkboxShowAllOrgaPersons && viewAllOrganisationDataChecked;
 
   const personsFilteredBySearch = useRecoilValue(
@@ -124,6 +131,10 @@ const List = () => {
   const total = useMemo(() => personsFilteredBySearch.length, [personsFilteredBySearch]);
 
   const history = useHistory();
+
+  function onDeleteMultiple() {
+    setDeleteMultiple(true);
+  }
 
   if (!personsFilteredBySearch) return <Loading />;
 
@@ -200,172 +211,255 @@ const List = () => {
         </div>
         <Filters base={filterPersonsWithAllFields} title="" filters={filters} onChange={setFilters} saveInURLParams />
       </details>
-      <Table
+      <PersonsTable
         data={data}
-        rowKey={"_id"}
-        onRowClick={(p) => history.push(`/person/${p._id}`)}
-        renderCellSmallDevices={(p) => {
-          return (
-            <tr className="tw-my-3 tw-block tw-rounded-md tw-bg-[#f4f5f8] tw-p-4 tw-px-2">
-              <td className="tw-flex tw-flex-col tw-items-start tw-gap-1">
-                <div className="tw-flex tw-items-center tw-gap-x-2">
-                  {!!p.group && (
-                    <span aria-label="Personne avec des liens familiaux" title="Personne avec des liens familiaux">
-                      👪
-                    </span>
-                  )}
-                  {!!p.alertness && (
-                    <ExclamationMarkButton
-                      aria-label="Personne très vulnérable, ou ayant besoin d'une attention particulière"
-                      title="Personne très vulnérable, ou ayant besoin d'une attention particulière"
-                    />
-                  )}
-                  {p.outOfActiveList ? (
-                    <div className="tw-max-w-md tw-text-black50">
-                      <div className="tw-items-center tw-gap-1 tw-font-bold [overflow-wrap:anywhere]">
-                        {p.name}
-                        {p.otherNames ? <small className="tw-inline tw-text-main"> - {p.otherNames}</small> : null}
-                      </div>
-                      <div>Sortie de file active&nbsp;: {p.outOfActiveListReasons?.join(", ")}</div>
-                    </div>
-                  ) : (
-                    <div className="tw-max-w-md tw-items-center tw-gap-1 tw-font-bold [overflow-wrap:anywhere]">
-                      {p.name}
-                      {p.otherNames ? <small className="tw-inline tw-text-main"> - {p.otherNames}</small> : null}
-                    </div>
-                  )}
-                </div>
-                <span className="tw-opacity-50">{p.formattedBirthDate}</span>
-                <div className="tw-flex tw-w-full tw-flex-wrap tw-gap-2">
-                  {p.assignedTeams?.map((teamId) => (
-                    <TagTeam key={teamId} teamId={teamId} />
-                  ))}
-                </div>
-              </td>
-            </tr>
-          );
-        }}
-        columns={[
-          {
-            title: "",
-            dataKey: "group",
-            small: true,
-            onSortOrder: setSortOrder,
-            onSortBy: setSortBy,
-            sortOrder,
-            sortBy,
-            render: (person) => {
-              if (!person.group) return null;
-              return (
-                <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
-                  <span className="tw-text-3xl" aria-label="Personne avec des liens familiaux" title="Personne avec des liens familiaux">
+        setSortOrder={setSortOrder}
+        setSortBy={setSortBy}
+        sortOrder={sortOrder}
+        sortBy={sortBy}
+        history={history}
+        organisation={organisation}
+      />
+      <div className="tw-flex tw-justify-between tw-items-center">
+        <Page page={page} limit={limit} total={total} onChange={({ page }) => setPage(page, true)} />
+        {["admin", "superadmin"].includes(user.role) && (
+          <button type="button" className="button-destructive" onClick={onDeleteMultiple}>
+            Supprimer plusieurs dossiers
+          </button>
+        )}
+      </div>
+      <ModalContainer open={deleteMultiple} onClose={() => setDeleteMultiple(false)} size="full">
+        <ModalHeader title="Supprimer plusieurs dossiers" onClose={() => setDeleteMultiple(false)} />
+        <ModalBody>
+          <PersonsTable
+            data={personsFilteredBySearch}
+            setSortOrder={setSortOrder}
+            setSortBy={setSortBy}
+            sortOrder={sortOrder}
+            sortBy={sortBy}
+            history={history}
+            organisation={organisation}
+            withCheckbox
+            checked={checkedForDelete}
+            onCheck={setCheckedForDelete}
+          />
+        </ModalBody>
+        <ModalFooter>
+          <button type="button" className="button-cancel" onClick={() => setDeleteMultiple(false)}>
+            Annuler
+          </button>
+          <button
+            type="button"
+            className="button-destructive"
+            onClick={async () => {
+              if (
+                !window.confirm(
+                  "Êtes-vous sûr de vouloir supprimer ces personnes ? Cette opération est irréversible et entrainera la suppression définitive de toutes les données liées à la personne : actions, commentaires, lieux visités, passages, rencontres, documents..."
+                )
+              )
+                return;
+              let errors = [];
+              for (const personId of checkedForDelete) {
+                const [_error] = await deletePerson(personId);
+                if (_error) {
+                  toast.error(`Erreur lors de la suppression de la personne ${personsFilteredBySearch.find((p) => p._id === personId).name}`);
+                  errors.push(personId);
+                }
+              }
+              await refresh();
+              if (errors.length === 0) {
+                toast.success("Suppression réussie");
+                setCheckedForDelete([]);
+              } else {
+                toast.error(`Il y a eu ${errors.length} erreurs lors de la suppression`);
+                setCheckedForDelete(errors);
+              }
+            }}
+          >
+            Supprimer
+          </button>
+        </ModalFooter>
+      </ModalContainer>
+    </>
+  );
+};
+
+const PersonsTable = ({ data, setSortOrder, setSortBy, sortOrder, sortBy, history, organisation, withCheckbox, checked, onCheck }) => {
+  return (
+    <Table
+      data={data}
+      rowKey={"_id"}
+      withCheckbox={withCheckbox}
+      checked={checked}
+      onCheck={onCheck}
+      onRowClick={(p) => {
+        if (!withCheckbox) return history.push(`/person/${p._id}`);
+        if (checked.includes(p._id)) {
+          onCheck(checked.filter((c) => c !== p._id));
+        } else {
+          onCheck([...checked, p._id]);
+        }
+      }}
+      renderCellSmallDevices={(p) => {
+        return (
+          <tr className="tw-my-3 tw-block tw-rounded-md tw-bg-[#f4f5f8] tw-p-4 tw-px-2">
+            <td className="tw-flex tw-flex-col tw-items-start tw-gap-1">
+              <div className="tw-flex tw-items-center tw-gap-x-2">
+                {!!p.group && (
+                  <span aria-label="Personne avec des liens familiaux" title="Personne avec des liens familiaux">
                     👪
                   </span>
-                </div>
-              );
-            },
-          },
-          {
-            title: "Nom",
-            dataKey: "name",
-            onSortOrder: setSortOrder,
-            onSortBy: setSortBy,
-            sortOrder,
-            sortBy,
-            render: (p) => {
-              if (p.outOfActiveList)
-                return (
+                )}
+                {!!p.alertness && (
+                  <ExclamationMarkButton
+                    aria-label="Personne très vulnérable, ou ayant besoin d'une attention particulière"
+                    title="Personne très vulnérable, ou ayant besoin d'une attention particulière"
+                  />
+                )}
+                {p.outOfActiveList ? (
                   <div className="tw-max-w-md tw-text-black50">
-                    <p className="tw-mb-0 tw-items-center tw-gap-1 tw-font-bold [overflow-wrap:anywhere]">
+                    <div className="tw-items-center tw-gap-1 tw-font-bold [overflow-wrap:anywhere]">
                       {p.name}
                       {p.otherNames ? <small className="tw-inline tw-text-main"> - {p.otherNames}</small> : null}
-                    </p>
+                    </div>
                     <div>Sortie de file active&nbsp;: {p.outOfActiveListReasons?.join(", ")}</div>
                   </div>
-                );
-              return (
-                <p className="tw-mb-0 tw-max-w-md tw-items-center tw-gap-1 tw-font-bold [overflow-wrap:anywhere]">
-                  {p.name}
-                  {p.otherNames ? <small className="tw-inline tw-text-main"> - {p.otherNames}</small> : null}
-                </p>
-              );
-            },
-          },
-          {
-            title: "Date de naissance",
-            dataKey: "formattedBirthDate",
-            onSortOrder: setSortOrder,
-            onSortBy: setSortBy,
-            sortOrder,
-            sortBy,
-            render: (p) => {
-              if (!p.birthdate) return "";
-              else if (p.outOfActiveList) return <i className="tw-text-black50">{p.formattedBirthDate}</i>;
-              return (
-                <span>
-                  <i>{p.formattedBirthDate}</i>
+                ) : (
+                  <div className="tw-max-w-md tw-items-center tw-gap-1 tw-font-bold [overflow-wrap:anywhere]">
+                    {p.name}
+                    {p.otherNames ? <small className="tw-inline tw-text-main"> - {p.otherNames}</small> : null}
+                  </div>
+                )}
+              </div>
+              <span className="tw-opacity-50">{p.formattedBirthDate}</span>
+              <div className="tw-flex tw-w-full tw-flex-wrap tw-gap-2">
+                {p.assignedTeams?.map((teamId) => (
+                  <TagTeam key={teamId} teamId={teamId} />
+                ))}
+              </div>
+            </td>
+          </tr>
+        );
+      }}
+      columns={[
+        {
+          title: "",
+          dataKey: "group",
+          small: true,
+          onSortOrder: setSortOrder,
+          onSortBy: setSortBy,
+          sortOrder,
+          sortBy,
+          render: (person) => {
+            if (!person.group) return null;
+            return (
+              <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
+                <span className="tw-text-3xl" aria-label="Personne avec des liens familiaux" title="Personne avec des liens familiaux">
+                  👪
                 </span>
-              );
-            },
+              </div>
+            );
           },
-          {
-            title: "Vigilance",
-            dataKey: "alertness",
-            onSortOrder: setSortOrder,
-            onSortBy: setSortBy,
-            sortOrder,
-            sortBy,
-            render: (p) => {
-              return p.alertness ? (
-                <ExclamationMarkButton
-                  aria-label="Personne très vulnérable, ou ayant besoin d'une attention particulière"
-                  title="Personne très vulnérable, ou ayant besoin d'une attention particulière"
-                />
-              ) : null;
-            },
-          },
-          {
-            title: "Équipe(s) en charge",
-            dataKey: "assignedTeams",
-            render: (person) => <Teams person={person} />,
-          },
-          {
-            title: "Suivi(e) depuis le",
-            dataKey: "followedSince",
-            onSortOrder: setSortOrder,
-            onSortBy: setSortBy,
-            sortOrder,
-            sortBy,
-            render: (p) => {
-              if (p.outOfActiveList) return <div className="tw-text-black50">{formatDateWithFullMonth(p.followedSince || p.createdAt || "")}</div>;
-              return formatDateWithFullMonth(p.followedSince || p.createdAt || "");
-            },
-          },
-          {
-            title: "Dernière interaction",
-            dataKey: "lastUpdateCheckForGDPR",
-            onSortOrder: setSortOrder,
-            onSortBy: setSortBy,
-            sortOrder,
-            sortBy,
-            render: (p) => {
+        },
+        {
+          title: "Nom",
+          dataKey: "name",
+          onSortOrder: setSortOrder,
+          onSortBy: setSortBy,
+          sortOrder,
+          sortBy,
+          render: (p) => {
+            if (p.outOfActiveList)
               return (
-                <div
-                  className={
-                    dayjsInstance(p.lastUpdateCheckForGDPR).isAfter(dayjsInstance().add(-2, "year"))
-                      ? "tw-text-black50"
-                      : "tw-font-bold tw-text-red-500"
-                  }
-                >
-                  {formatDateWithFullMonth(p.lastUpdateCheckForGDPR)}
+                <div className="tw-max-w-md tw-text-black50">
+                  <p className="tw-mb-0 tw-items-center tw-gap-1 tw-font-bold [overflow-wrap:anywhere]">
+                    {p.name}
+                    {p.otherNames ? <small className="tw-inline tw-text-main"> - {p.otherNames}</small> : null}
+                  </p>
+                  <div>Sortie de file active&nbsp;: {p.outOfActiveListReasons?.join(", ")}</div>
                 </div>
               );
-            },
+            return (
+              <p className="tw-mb-0 tw-max-w-md tw-items-center tw-gap-1 tw-font-bold [overflow-wrap:anywhere]">
+                {p.name}
+                {p.otherNames ? <small className="tw-inline tw-text-main"> - {p.otherNames}</small> : null}
+              </p>
+            );
           },
-        ].filter((c) => organisation.groupsEnabled || c.dataKey !== "group")}
-      />
-      <Page page={page} limit={limit} total={total} onChange={({ page }) => setPage(page, true)} />
-    </>
+        },
+        {
+          title: "Date de naissance",
+          dataKey: "formattedBirthDate",
+          onSortOrder: setSortOrder,
+          onSortBy: setSortBy,
+          sortOrder,
+          sortBy,
+          render: (p) => {
+            if (!p.birthdate) return "";
+            else if (p.outOfActiveList) return <i className="tw-text-black50">{p.formattedBirthDate}</i>;
+            return (
+              <span>
+                <i>{p.formattedBirthDate}</i>
+              </span>
+            );
+          },
+        },
+        {
+          title: "Vigilance",
+          dataKey: "alertness",
+          onSortOrder: setSortOrder,
+          onSortBy: setSortBy,
+          sortOrder,
+          sortBy,
+          render: (p) => {
+            return p.alertness ? (
+              <ExclamationMarkButton
+                aria-label="Personne très vulnérable, ou ayant besoin d'une attention particulière"
+                title="Personne très vulnérable, ou ayant besoin d'une attention particulière"
+              />
+            ) : null;
+          },
+        },
+        {
+          title: "Équipe(s) en charge",
+          dataKey: "assignedTeams",
+          render: (person) => <Teams person={person} />,
+        },
+        {
+          title: "Suivi(e) depuis le",
+          dataKey: "followedSince",
+          onSortOrder: setSortOrder,
+          onSortBy: setSortBy,
+          sortOrder,
+          sortBy,
+          render: (p) => {
+            if (p.outOfActiveList) return <div className="tw-text-black50">{formatDateWithFullMonth(p.followedSince || p.createdAt || "")}</div>;
+            return formatDateWithFullMonth(p.followedSince || p.createdAt || "");
+          },
+        },
+        {
+          title: "Dernière interaction",
+          dataKey: "lastUpdateCheckForGDPR",
+          onSortOrder: setSortOrder,
+          onSortBy: setSortBy,
+          sortOrder,
+          sortBy,
+          render: (p) => {
+            return (
+              <div
+                className={
+                  dayjsInstance(p.lastUpdateCheckForGDPR).isAfter(dayjsInstance().add(-2, "year"))
+                    ? "tw-text-black50"
+                    : "tw-font-bold tw-text-red-500"
+                }
+              >
+                {formatDateWithFullMonth(p.lastUpdateCheckForGDPR)}
+              </div>
+            );
+          },
+        },
+      ].filter((c) => organisation.groupsEnabled || c.dataKey !== "group")}
+    />
   );
 };
 
