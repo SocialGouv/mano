@@ -205,101 +205,103 @@ const CreateObservation = ({ observation, open, setOpen }: CreateObservationProp
                       </div>
                     ))}
                     {activeTab === "_rencontres" && (
-                      <Table
-                        className="Table"
-                        noData="Aucune rencontre n'est associée à cette observation"
-                        onRowClick={(rencontre) => {
-                          if (!rencontre._id) {
-                            // Si c'est une nouvelle rencontre (pas encore sauvegardée), on fait croire que c'est
-                            // comme quand on ajoute une rencontre à la volée quand on l'édite. C'est tordu, mais
-                            // ça me fait gagner du temps.
-                            setRencontre({
-                              ...rencontre,
-                              person: rencontre.person,
-                              user: user._id,
-                              team: team._id,
-                            });
-                          } else {
-                            setRencontre(rencontre);
-                          }
-                        }}
-                        data={currentRencontres}
-                        rowKey={"date"}
-                        columns={[
-                          {
-                            title: "Date",
-                            dataKey: "date",
-                            onSortOrder: setSortOrder,
-                            onSortBy: setSortBy,
-                            sortBy,
-                            sortOrder,
-                            render: (rencontre) => {
-                              return (
-                                <>
-                                  <DateBloc date={rencontre.date} />
-                                  <TimeBlock time={rencontre.date} />
-                                </>
-                              );
+                      <>
+                        <Table
+                          className="Table"
+                          noData="Aucune rencontre n'est associée à cette observation"
+                          onRowClick={(rencontre) => {
+                            if (!rencontre._id) {
+                              // Si c'est une nouvelle rencontre (pas encore sauvegardée), on fait croire que c'est
+                              // comme quand on ajoute une rencontre à la volée quand on l'édite. C'est tordu, mais
+                              // ça me fait gagner du temps.
+                              setRencontre({
+                                ...rencontre,
+                                person: rencontre.person,
+                                user: user._id,
+                                team: team._id,
+                              });
+                            } else {
+                              setRencontre(rencontre);
+                            }
+                          }}
+                          data={currentRencontres}
+                          rowKey={"date"}
+                          columns={[
+                            {
+                              title: "Date",
+                              dataKey: "date",
+                              onSortOrder: setSortOrder,
+                              onSortBy: setSortBy,
+                              sortBy,
+                              sortOrder,
+                              render: (rencontre) => {
+                                return (
+                                  <>
+                                    <DateBloc date={rencontre.date} />
+                                    <TimeBlock time={rencontre.date} />
+                                  </>
+                                );
+                              },
                             },
-                          },
-                          {
-                            title: "Personne suivie",
-                            dataKey: "person",
-                            onSortOrder: setSortOrder,
-                            onSortBy: setSortBy,
-                            sortBy,
-                            sortOrder,
-                            render: (rencontre) =>
-                              rencontre.person ? <PersonName item={rencontre} /> : <span className="tw-opacity-30 tw-italic">Anonyme</span>,
-                          },
-                          {
-                            title: "Enregistré par",
-                            dataKey: "user",
-                            onSortOrder: setSortOrder,
-                            onSortBy: setSortBy,
-                            sortBy,
-                            sortOrder,
-                            render: (rencontre) => (rencontre.user ? <UserName id={rencontre.user} /> : null),
-                          },
-                          { title: "Commentaire", dataKey: "comment", onSortOrder: setSortOrder, onSortBy: setSortBy, sortBy, sortOrder },
-                          {
-                            title: "Équipe en charge",
-                            dataKey: "team",
-                            render: (rencontre) => <TagTeam teamId={rencontre?.team} />,
-                          },
-                          {
-                            title: "Actions",
-                            dataKey: "actions",
-                            small: true,
-                            render: (rencontre) => {
-                              return !rencontre._id ? (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setRencontresInProgress((rencontresInProgress) =>
-                                      rencontresInProgress.filter((r) => r.person !== rencontre.person)
-                                    );
-                                  }}
-                                  className="button-destructive"
-                                >
-                                  Retirer
-                                </button>
-                              ) : null;
+                            {
+                              title: "Personne suivie",
+                              dataKey: "person",
+                              onSortOrder: setSortOrder,
+                              onSortBy: setSortBy,
+                              sortBy,
+                              sortOrder,
+                              render: (rencontre) =>
+                                rencontre.person ? <PersonName item={rencontre} /> : <span className="tw-opacity-30 tw-italic">Anonyme</span>,
                             },
-                          },
-                        ]}
-                      />
+                            {
+                              title: "Enregistré par",
+                              dataKey: "user",
+                              onSortOrder: setSortOrder,
+                              onSortBy: setSortBy,
+                              sortBy,
+                              sortOrder,
+                              render: (rencontre) => (rencontre.user ? <UserName id={rencontre.user} /> : null),
+                            },
+                            { title: "Commentaire", dataKey: "comment", onSortOrder: setSortOrder, onSortBy: setSortBy, sortBy, sortOrder },
+                            {
+                              title: "Équipe en charge",
+                              dataKey: "team",
+                              render: (rencontre) => <TagTeam teamId={rencontre?.team} />,
+                            },
+                            {
+                              title: "Actions",
+                              dataKey: "actions",
+                              small: true,
+                              render: (rencontre) => {
+                                return !rencontre._id ? (
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setRencontresInProgress((rencontresInProgress) =>
+                                        rencontresInProgress.filter((r) => r.person !== rencontre.person)
+                                      );
+                                    }}
+                                    className="button-destructive"
+                                  >
+                                    Retirer
+                                  </button>
+                                ) : null;
+                              },
+                            },
+                          ]}
+                        />
+                        <div className="tw-flex tw-justify-center tw-items-center tw-mt-4">
+                          <button
+                            className="button-submit"
+                            onClick={() => {
+                              setNewRencontre(true);
+                            }}
+                          >
+                            + Rencontre
+                          </button>
+                        </div>
+                      </>
                     )}
-                    <div className="tw-flex tw-justify-center tw-items-center tw-mt-4">
-                      <button
-                        className="button-submit"
-                        onClick={() => {
-                          setNewRencontre(true);
-                        }}
-                      >
-                        + Rencontre
-                      </button>
-                    </div>
                   </div>
                   <div className="tw-p-4 tw-pt-0">
                     <div className="tw-flex tw-flex-row tw-flex-wrap">
