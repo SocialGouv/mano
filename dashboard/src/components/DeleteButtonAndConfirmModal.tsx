@@ -8,12 +8,14 @@ import type { UserInstance } from "../types/user";
 
 interface DeleteButtonAndConfirmModalProps {
   title: string;
+  buttonText?: string;
   children: React.ReactNode;
   textToConfirm: string;
   onConfirm: () => void;
   buttonWidth?: string;
   roles?: Array<UserInstance["role"]>;
   roleErrorMessage?: string;
+  className?: string;
   disabled?: boolean;
   disabledTitle?: string;
 }
@@ -23,10 +25,12 @@ const DeleteButtonAndConfirmModal = ({
   children,
   textToConfirm,
   onConfirm,
+  buttonText = "Supprimer",
   buttonWidth = null,
   roles = ["admin", "superadmin"],
   roleErrorMessage = "Désolé, seul un admin peut supprimer ce type d'élément",
   disabled = false,
+  className = "",
   disabledTitle = "Vous n'avez pas le droit de supprimer cet élément",
 }: DeleteButtonAndConfirmModalProps) => {
   const user = useRecoilValue(userState);
@@ -36,7 +40,7 @@ const DeleteButtonAndConfirmModal = ({
       <button
         type="button"
         title={disabled ? disabledTitle : title}
-        className={["button-destructive", disabled ? "tw-cursor-not-allowed" : ""].join(" ")}
+        className={["button-destructive", disabled ? "tw-cursor-not-allowed" : "", className].join(" ")}
         onClick={() => {
           if (!roles.includes(user.role)) return toast.error(roleErrorMessage);
           setOpen(true);
@@ -45,7 +49,7 @@ const DeleteButtonAndConfirmModal = ({
         aria-disabled={disabled}
         style={buttonWidth ? { width: buttonWidth } : {}}
       >
-        Supprimer
+        {buttonText}
       </button>
       <ModalContainer open={open} onClose={() => setOpen(false)} size="3xl">
         <ModalHeader>
