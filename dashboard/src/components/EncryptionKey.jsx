@@ -38,10 +38,20 @@ const totalNumberOfItemsSelector = selector({
   key: "totalNumberOfItemsSelector",
   get: ({ get }) => {
     const persons = get(personsState);
+    const personsDocuments = persons.reduce((acc, person) => acc + (person.documents?.filter((doc) => doc.type !== "folder")?.length || 0), 0);
     const groups = get(groupsState);
     const treatments = get(treatmentsState);
+    const treatmentsDocuments = treatments.reduce(
+      (acc, treatment) => acc + (treatment.documents?.filter((doc) => doc.type !== "folder")?.length || 0),
+      0
+    );
     const actions = get(actionsState);
+    const actionsDocuments = actions.reduce((acc, action) => acc + (action.documents?.filter((doc) => doc.type !== "folder")?.length || 0), 0);
     const medicalFiles = get(medicalFileState);
+    const medicalFilesDocuments = medicalFiles.reduce(
+      (acc, medicalFile) => acc + (medicalFile.documents?.filter((doc) => doc.type !== "folder")?.length || 0),
+      0
+    );
     const passages = get(passagesState);
     const rencontres = get(rencontresState);
     const reports = get(reportsState);
@@ -50,9 +60,17 @@ const totalNumberOfItemsSelector = selector({
     const relsPersonPlace = get(relsPersonPlaceState);
     const territoryObservations = get(territoryObservationsState);
     const consultations = get(consultationsState);
+    const consultationsDocuments = consultations.reduce(
+      (acc, consultation) => acc + (consultation.documents?.filter((doc) => doc.type !== "folder")?.length || 0),
+      0
+    );
     const comments = get(commentsState);
+
+    const documents = personsDocuments + treatmentsDocuments + actionsDocuments + medicalFilesDocuments + consultationsDocuments;
+
     return (
       persons.length +
+      documents +
       groups.length +
       treatments.length +
       actions.length +
@@ -75,7 +93,8 @@ const totalRecyptionDurationSelector = selector({
   get: ({ get }) => {
     let totalLoadingDuration = get(totalLoadingDurationState);
     const totalNumberOfItems = get(totalNumberOfItemsSelector);
-    if (!totalLoadingDuration) totalLoadingDuration = (totalNumberOfItems / 1000) * 4; // 4 seconds per 1000 item (experienced in Arnaud's computer)
+    // the target here is to show the user a progress bar that is not stuck at 100% nor at 0% for a long time
+    if (!totalLoadingDuration) totalLoadingDuration = (totalNumberOfItems / 1000) * 4; // 4 seconds per 1000 item (more than the 4 seconds experienced in Arnaud's computer)
     const theoreticalDuration = totalNumberOfItems * 2; // get all and decrypt + encrypt all and upload
     return theoreticalDuration * 2; // better have a reencryption finished with half a status bar than a full status bar with a reencryption not finished
   },
