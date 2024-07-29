@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import { Col, FormGroup } from "reactstrap";
 import SelectAsInput from "./SelectAsInput";
 import SelectCustom from "./SelectCustom";
 import { capture } from "../services/sentry";
@@ -26,8 +25,18 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = null,
 
   try {
     return (
-      <Col md={colWidth} key={field.name}>
-        <FormGroup>
+      <div
+        className={[
+          "tw-px-4",
+          colWidth === 4 && "tw-basis-1/3 tw-w-1/3",
+          colWidth === 12 && "tw-basis-full tw-w-full",
+          colWidth === 6 && "tw-basis-1/2 tw-w-1/2",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        key={field.name}
+      >
+        <div className="tw-mb-4">
           {!hideLabel && (
             <label className="tw-text-sm tw-font-semibold tw-text-gray-600" data-test-id={field.label} htmlFor={id}>
               {field.label}
@@ -154,23 +163,33 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = null,
               formatCreateLabel={(inputValue) => `Autre : "${inputValue}"`}
             />
           )}
-        </FormGroup>
-      </Col>
+        </div>
+      </div>
     );
   } catch (e) {
     capture(e, { extra: { field, values, model, colWidth, disabled, hideLabel } });
   }
   return (
-    <Col md={colWidth} key={field.name}>
-      <FormGroup>
+    <div
+      className={[
+        "tw-mx-4",
+        colWidth === 4 && "tw-basis-1/3 tw-w-1/3",
+        colWidth === 12 && "tw-basis-full tw-w-full",
+        colWidth === 6 && "tw-basis-1/2 tw-w-1/2",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      key={field.name}
+    >
+      <div className="tw-mb-4">
         {!hideLabel && (
           <label className="tw-text-sm tw-font-semibold tw-text-gray-600" data-test-id={field.label} htmlFor={id}>
             {field.type !== "boolean" ? field.label : ""}
           </label>
         )}
         {JSON.stringify(values[field.name])}
-      </FormGroup>
-    </Col>
+      </div>
+    </div>
   );
 };
 

@@ -1,4 +1,4 @@
-import { Col, FormGroup, Input, Label, Row } from "reactstrap";
+import { Row } from "reactstrap";
 import structuredClone from "@ungap/structured-clone";
 import SelectAsInput from "../../../components/SelectAsInput";
 import {
@@ -101,7 +101,7 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
         removedTeams={isOutOfTeamsModalOpen ? person.assignedTeams.filter((t) => !updatedPersonFormValues.assignedTeams.includes(t)) : []}
       />
       <ModalContainer open={true} toggle={() => onClose()} size="4xl" backdrop="static">
-        <ModalHeader title={`Modifier ${person.name}`} />
+        <ModalHeader title={`Modifier ${person.name}`} onClose={() => onClose()} />
         <ModalBody>
           <div className="tw-p-4">
             <Formik
@@ -173,27 +173,27 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                         </div>
                         {openPanels.includes("main") && (
                           <>
-                            <Row>
-                              <Col md={4}>
-                                <FormGroup>
-                                  <Label htmlFor="name">Nom prénom ou Pseudonyme</Label>
-                                  <Input autoComplete="off" name="name" id="name" value={values.name || ""} onChange={handleChange} />
-                                </FormGroup>
-                              </Col>
-                              <Col md={4}>
-                                <FormGroup>
-                                  <Label htmlFor="otherNames">Autres pseudos</Label>
-                                  <Input
+                            <div className="tw-flex -tw-mx-4 tw-flex-wrap">
+                              <div className="tw-basis-1/3">
+                                <div className="tw-mb-4">
+                                  <label htmlFor="name">Nom prénom ou Pseudonyme</label>
+                                  <input autoComplete="off" name="name" id="name" value={values.name || ""} onChange={handleChange} />
+                                </div>
+                              </div>
+                              <div className="tw-basis-1/3">
+                                <div className="tw-mb-4">
+                                  <label htmlFor="otherNames">Autres pseudos</label>
+                                  <input
                                     autoComplete="off"
                                     name="otherNames"
                                     id="otherNames"
                                     value={values.otherNames || ""}
                                     onChange={handleChange}
                                   />
-                                </FormGroup>
-                              </Col>
-                              <Col md={4}>
-                                <Label htmlFor="person-select-gender">Genre</Label>
+                                </div>
+                              </div>
+                              <div className="tw-basis-1/3">
+                                <label htmlFor="person-select-gender">Genre</label>
                                 <SelectAsInput
                                   options={personFields.find((f) => f.name === "gender").options}
                                   name="gender"
@@ -202,19 +202,19 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                                   inputId="person-select-gender"
                                   classNamePrefix="person-select-gender"
                                 />
-                              </Col>
+                              </div>
 
-                              <Col md={4}>
-                                <FormGroup>
-                                  <Label htmlFor="person-birthdate">Date de naissance</Label>
+                              <div className="tw-basis-1/3">
+                                <div className="tw-mb-4">
+                                  <label htmlFor="person-birthdate">Date de naissance</label>
                                   <div>
                                     <DatePicker name="birthdate" id="person-birthdate" defaultValue={values.birthdate} onChange={handleChange} />
                                   </div>
-                                </FormGroup>
-                              </Col>
-                              <Col md={4}>
-                                <FormGroup>
-                                  <Label htmlFor="person-wanderingAt">En rue depuis le</Label>
+                                </div>
+                              </div>
+                              <div className="tw-basis-1/3">
+                                <div className="tw-mb-4">
+                                  <label htmlFor="person-wanderingAt">En rue depuis le</label>
                                   <div>
                                     <DatePicker
                                       name="wanderingAt"
@@ -223,11 +223,11 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                                       onChange={handleChange}
                                     />
                                   </div>
-                                </FormGroup>
-                              </Col>
-                              <Col md={4}>
-                                <FormGroup>
-                                  <Label htmlFor="person-followedSince">Suivi(e) depuis le / Créé(e) le</Label>
+                                </div>
+                              </div>
+                              <div className="tw-basis-1/3">
+                                <div className="tw-mb-4">
+                                  <label htmlFor="person-followedSince">Suivi(e) depuis le / Créé(e) le</label>
                                   <div>
                                     <DatePicker
                                       id="person-followedSince"
@@ -236,11 +236,11 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                                       onChange={handleChange}
                                     />
                                   </div>
-                                </FormGroup>
-                              </Col>
-                              <Col md={4}>
-                                <FormGroup>
-                                  <Label htmlFor="person-select-assigned-team">Équipe(s) en charge</Label>
+                                </div>
+                              </div>
+                              <div className="tw-basis-1/3">
+                                <div className="tw-mb-4">
+                                  <label htmlFor="person-select-assigned-team">Équipe(s) en charge</label>
                                   <div>
                                     <SelectTeamMultiple
                                       onChange={(teamIds) => handleChange({ target: { value: teamIds, name: "assignedTeams" } })}
@@ -250,25 +250,25 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                                       classNamePrefix="person-select-assigned-team"
                                     />
                                   </div>
-                                </FormGroup>
-                              </Col>
-                              <Col md={4}>
-                                <FormGroup>
-                                  <Label htmlFor="phone">Téléphone</Label>
-                                  <Input autoComplete="off" name="phone" id="phone" value={values.phone || ""} onChange={handleChange} />
-                                </FormGroup>
-                              </Col>
-                              <Col md={4}>
-                                <FormGroup>
-                                  <Label htmlFor="email">Email</Label>
-                                  <Input autoComplete="off" type="email" name="email" id="email" value={values.email || ""} onChange={handleChange} />
-                                </FormGroup>
-                              </Col>
+                                </div>
+                              </div>
+                              <div className="tw-basis-1/3">
+                                <div className="tw-mb-4">
+                                  <label htmlFor="phone">Téléphone</label>
+                                  <input autoComplete="off" name="phone" id="phone" value={values.phone || ""} onChange={handleChange} />
+                                </div>
+                              </div>
+                              <div className="tw-basis-1/3">
+                                <div className="tw-mb-4">
+                                  <label htmlFor="email">Email</label>
+                                  <input autoComplete="off" type="email" name="email" id="email" value={values.email || ""} onChange={handleChange} />
+                                </div>
+                              </div>
                               {!["restricted-access"].includes(user.role) && (
-                                <Col md={12}>
-                                  <FormGroup>
-                                    <Label htmlFor="description">Description</Label>
-                                    <Input
+                                <div className="tw-basis-full">
+                                  <div className="tw-mb-4">
+                                    <label htmlFor="description">Description</label>
+                                    <input
                                       type="textarea"
                                       className="!tw-text-sm"
                                       rows={5}
@@ -277,16 +277,16 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                                       value={values.description || ""}
                                       onChange={handleChange}
                                     />
-                                  </FormGroup>
-                                </Col>
+                                  </div>
+                                </div>
                               )}
-                              <Col md={12}>
-                                <FormGroup>
+                              <div className="tw-basis-full">
+                                <div className="tw-mb-4">
                                   <div style={{ display: "flex", flexDirection: "column", marginLeft: 20 }}>
                                     <label htmlFor="person-alertness-checkbox">
                                       Personne très vulnérable, ou ayant besoin d'une attention particulière
                                     </label>
-                                    <Input
+                                    <input
                                       id="person-alertness-checkbox"
                                       type="checkbox"
                                       name="alertness"
@@ -294,9 +294,9 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                                       onChange={() => handleChange({ target: { value: !values.alertness, name: "alertness" } })}
                                     />
                                   </div>
-                                </FormGroup>
-                              </Col>
-                            </Row>
+                                </div>
+                              </div>
+                            </div>
                             {isMedicalFile && (
                               <div className="tw-flex tw-w-full tw-items-end tw-justify-end tw-gap-2">
                                 <ButtonCustom disabled={isSubmitting} color="secondary" onClick={onClose} title="Annuler" />
@@ -334,13 +334,13 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
 
                               <div className="[overflow-wrap:anywhere]">
                                 {openPanels.includes(name) && (
-                                  <Row>
+                                  <div className="tw-flex -tw-mx-4 tw-flex-wrap">
                                     {fields
                                       .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
                                       .map((field) => (
                                         <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
                                       ))}
-                                  </Row>
+                                  </div>
                                 )}
                               </div>
                             </div>
@@ -468,13 +468,13 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                             <div className="[overflow-wrap:anywhere]">
                               {openPanels.includes(key) && (
                                 <>
-                                  <Row>
+                                  <div className="tw-flex -tw-mx-4 tw-flex-wrap">
                                     {fields
                                       .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
                                       .map((field) => (
                                         <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
                                       ))}
-                                  </Row>
+                                  </div>
                                   <div className="tw-flex tw-items-end tw-justify-end tw-gap-2">
                                     <ButtonCustom disabled={isSubmitting} color="secondary" onClick={onClose} title="Annuler" />
                                     <ButtonCustom
