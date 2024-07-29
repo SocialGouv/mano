@@ -3,6 +3,7 @@ import { HOST, SCHEME } from "../config";
 import { organisationState } from "../recoil/auth";
 import { deploymentCommitState, deploymentDateState } from "../recoil/version";
 import { capture } from "./sentry";
+import { toast } from "react-toastify";
 
 class AuthError extends Error {
   constructor() {
@@ -197,6 +198,13 @@ export async function tryFetchBlob<T extends Blob>(callback: FetchCallback<T>): 
   }
 }
 
+const validateEncryptionErrors = [
+  "Les données sont en cours de chiffrement par un administrateur. Veuillez patienter, vous reconnecter et réessayer.",
+  "La clé de chiffrement a changé ou a été régénérée. Veuillez vous déconnecter et vous reconnecter avec la nouvelle clé.",
+  "Une mise-à-jour de vos données a été effectuée, veuillez recharger votre navigateur",
+  "Une mise-à-jour de vos données est en cours, veuillez recharger la page dans quelques minutes",
+];
+
 export async function tryFetch<T extends ApiResponse>(callback: FetchCallback<T>): Promise<[Error | undefined, T | undefined]> {
   try {
     const result = await callback();
@@ -207,11 +215,17 @@ export async function tryFetch<T extends ApiResponse>(callback: FetchCallback<T>
     console.log("error.name in tryFetch", error.name);
     console.log("signal aborted", API.abortController.signal.aborted);
     console.log("signal aborted reason", API.abortController.signal.reason); // Aborted by navigation
-    if (error instanceof AuthError) window.location.href = "/auth?disconnected=1";
-    else if (error.name === "BeforeUnloadAbortError") console.log("BeforeUnloadAbortError", error);
-    else if (API?.abortController?.signal?.reason?.message?.includes?.("Aborted by navigation"))
+    if (error instanceof AuthError) {
+      window.location.href = "/auth?disconnected=1";
+    } else if (error.name === "BeforeUnloadAbortError") {
+      console.log("BeforeUnloadAbortError", error);
+    } else if (API?.abortController?.signal?.reason?.message?.includes?.("Aborted by navigation")) {
       console.log("Reason Signal Aborted by navigation", error);
-    else capture(error);
+    } else if (validateEncryptionErrors.includes(error.message)) {
+      toast.error(error.message);
+    } else {
+      capture(error);
+    }
     return [error, undefined];
   }
 }
@@ -229,11 +243,17 @@ export async function tryFetchExpectOk<T extends ApiResponse>(callback: FetchCal
     console.log("error.name in tryFetchExpectOk", error.name);
     console.log("signal aborted", API.abortController.signal.aborted);
     console.log("signal aborted reason", API.abortController.signal.reason); // Aborted by navigation
-    if (error instanceof AuthError) window.location.href = "/auth?disconnected=1";
-    else if (error.name === "BeforeUnloadAbortError") console.log("BeforeUnloadAbortError", error);
-    else if (API?.abortController?.signal?.reason?.message?.includes?.("Aborted by navigation"))
+    if (error instanceof AuthError) {
+      window.location.href = "/auth?disconnected=1";
+    } else if (error.name === "BeforeUnloadAbortError") {
+      console.log("BeforeUnloadAbortError", error);
+    } else if (API?.abortController?.signal?.reason?.message?.includes?.("Aborted by navigation")) {
       console.log("Reason Signal Aborted by navigation", error);
-    else capture(error);
+    } else if (validateEncryptionErrors.includes(error.message)) {
+      toast.error(error.message);
+    } else {
+      capture(error);
+    }
     return [error, undefined];
   }
 }
