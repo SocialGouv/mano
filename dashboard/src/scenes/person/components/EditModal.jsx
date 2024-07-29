@@ -174,17 +174,29 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                         {openPanels.includes("main") && (
                           <>
                             <div className="tw-flex -tw-mx-4 tw-flex-wrap">
-                              <div className="tw-basis-1/3">
+                              <div className="tw-basis-1/3 tw-w-1/3 tw-px-4">
                                 <div className="tw-mb-4">
-                                  <label htmlFor="name">Nom prénom ou Pseudonyme</label>
-                                  <input autoComplete="off" name="name" id="name" value={values.name || ""} onChange={handleChange} />
+                                  <label className="tw-text-sm tw-font-semibold tw-text-gray-600" htmlFor="name">
+                                    Nom prénom ou Pseudonyme
+                                  </label>
+                                  <input
+                                    className="tailwindui"
+                                    autoComplete="off"
+                                    name="name"
+                                    id="name"
+                                    value={values.name || ""}
+                                    onChange={handleChange}
+                                  />
                                 </div>
                               </div>
-                              <div className="tw-basis-1/3">
+                              <div className="tw-basis-1/3 tw-w-1/3 tw-px-4">
                                 <div className="tw-mb-4">
-                                  <label htmlFor="otherNames">Autres pseudos</label>
+                                  <label className="tw-text-sm tw-font-semibold tw-text-gray-600" htmlFor="otherNames">
+                                    Autres pseudos
+                                  </label>
                                   <input
                                     autoComplete="off"
+                                    className="tailwindui"
                                     name="otherNames"
                                     id="otherNames"
                                     value={values.otherNames || ""}
@@ -192,8 +204,10 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                                   />
                                 </div>
                               </div>
-                              <div className="tw-basis-1/3">
-                                <label htmlFor="person-select-gender">Genre</label>
+                              <div className="tw-basis-1/3 tw-w-1/3 tw-px-4">
+                                <label className="tw-text-sm tw-font-semibold tw-text-gray-600" htmlFor="person-select-gender">
+                                  Genre
+                                </label>
                                 <SelectAsInput
                                   options={personFields.find((f) => f.name === "gender").options}
                                   name="gender"
@@ -204,17 +218,21 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                                 />
                               </div>
 
-                              <div className="tw-basis-1/3">
+                              <div className="tw-basis-1/3 tw-w-1/3 tw-px-4">
                                 <div className="tw-mb-4">
-                                  <label htmlFor="person-birthdate">Date de naissance</label>
+                                  <label className="tw-text-sm tw-font-semibold tw-text-gray-600" htmlFor="person-birthdate">
+                                    Date de naissance
+                                  </label>
                                   <div>
                                     <DatePicker name="birthdate" id="person-birthdate" defaultValue={values.birthdate} onChange={handleChange} />
                                   </div>
                                 </div>
                               </div>
-                              <div className="tw-basis-1/3">
+                              <div className="tw-basis-1/3 tw-w-1/3 tw-px-4">
                                 <div className="tw-mb-4">
-                                  <label htmlFor="person-wanderingAt">En rue depuis le</label>
+                                  <label className="tw-text-sm tw-font-semibold tw-text-gray-600" htmlFor="person-wanderingAt">
+                                    En rue depuis le
+                                  </label>
                                   <div>
                                     <DatePicker
                                       name="wanderingAt"
@@ -225,9 +243,11 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                                   </div>
                                 </div>
                               </div>
-                              <div className="tw-basis-1/3">
+                              <div className="tw-basis-1/3 tw-w-1/3 tw-px-4">
                                 <div className="tw-mb-4">
-                                  <label htmlFor="person-followedSince">Suivi(e) depuis le / Créé(e) le</label>
+                                  <label className="tw-text-sm tw-font-semibold tw-text-gray-600" htmlFor="person-followedSince">
+                                    Suivi(e) depuis le / Créé(e) le
+                                  </label>
                                   <div>
                                     <DatePicker
                                       id="person-followedSince"
@@ -238,9 +258,11 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                                   </div>
                                 </div>
                               </div>
-                              <div className="tw-basis-1/3">
+                              <div className="tw-basis-1/3 tw-w-1/3 tw-px-4">
                                 <div className="tw-mb-4">
-                                  <label htmlFor="person-select-assigned-team">Équipe(s) en charge</label>
+                                  <label className="tw-text-sm tw-font-semibold tw-text-gray-600" htmlFor="person-select-assigned-team">
+                                    Équipe(s) en charge
+                                  </label>
                                   <div>
                                     <SelectTeamMultiple
                                       onChange={(teamIds) => handleChange({ target: { value: teamIds, name: "assignedTeams" } })}
@@ -252,25 +274,45 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                                   </div>
                                 </div>
                               </div>
-                              <div className="tw-basis-1/3">
+                              <div className="tw-basis-1/3 tw-w-1/3 tw-px-4">
                                 <div className="tw-mb-4">
-                                  <label htmlFor="phone">Téléphone</label>
-                                  <input autoComplete="off" name="phone" id="phone" value={values.phone || ""} onChange={handleChange} />
+                                  <label className="tw-text-sm tw-font-semibold tw-text-gray-600" htmlFor="phone">
+                                    Téléphone
+                                  </label>
+                                  <input
+                                    className="tailwindui"
+                                    autoComplete="off"
+                                    name="phone"
+                                    id="phone"
+                                    value={values.phone || ""}
+                                    onChange={handleChange}
+                                  />
                                 </div>
                               </div>
-                              <div className="tw-basis-1/3">
+                              <div className="tw-basis-1/3 tw-w-1/3 tw-px-4">
                                 <div className="tw-mb-4">
-                                  <label htmlFor="email">Email</label>
-                                  <input autoComplete="off" type="email" name="email" id="email" value={values.email || ""} onChange={handleChange} />
+                                  <label className="tw-text-sm tw-font-semibold tw-text-gray-600" htmlFor="email">
+                                    Email
+                                  </label>
+                                  <input
+                                    className="tailwindui"
+                                    autoComplete="off"
+                                    type="email"
+                                    name="email"
+                                    id="email"
+                                    value={values.email || ""}
+                                    onChange={handleChange}
+                                  />
                                 </div>
                               </div>
                               {!["restricted-access"].includes(user.role) && (
-                                <div className="tw-basis-full">
+                                <div className="tw-basis-full tw-w-full tw-px-4">
                                   <div className="tw-mb-4">
-                                    <label htmlFor="description">Description</label>
-                                    <input
-                                      type="textarea"
-                                      className="!tw-text-sm"
+                                    <label className="tw-text-sm tw-font-semibold tw-text-gray-600" htmlFor="description">
+                                      Description
+                                    </label>
+                                    <textarea
+                                      className="!tw-text-sm tailwindui"
                                       rows={5}
                                       name="description"
                                       id="description"
@@ -280,21 +322,18 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                                   </div>
                                 </div>
                               )}
-                              <div className="tw-basis-full">
-                                <div className="tw-mb-4">
-                                  <div style={{ display: "flex", flexDirection: "column", marginLeft: 20 }}>
-                                    <label htmlFor="person-alertness-checkbox">
-                                      Personne très vulnérable, ou ayant besoin d'une attention particulière
-                                    </label>
-                                    <input
-                                      id="person-alertness-checkbox"
-                                      type="checkbox"
-                                      name="alertness"
-                                      checked={values.alertness}
-                                      onChange={() => handleChange({ target: { value: !values.alertness, name: "alertness" } })}
-                                    />
-                                  </div>
-                                </div>
+                              <div className="tw-basis-full tw-p-4">
+                                <label htmlFor="person-alertness-checkbox">
+                                  <input
+                                    id="person-alertness-checkbox"
+                                    type="checkbox"
+                                    name="alertness"
+                                    checked={values.alertness}
+                                    onChange={() => handleChange({ target: { value: !values.alertness, name: "alertness" } })}
+                                    className="tw-mr-2"
+                                  />
+                                  Personne très vulnérable, ou ayant besoin d'une attention particulière
+                                </label>
                               </div>
                             </div>
                             {isMedicalFile && (
