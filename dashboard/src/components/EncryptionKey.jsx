@@ -419,6 +419,10 @@ const EncryptionKey = ({ isMain }) => {
 };
 
 const recryptDocument = async (doc, personId, { fromKey, toKey }) => {
+  if (doc.type === "folder") return doc;
+  if (!doc?.file?.filename) {
+    capture("no file filename in document", { extra: { doc, personId } });
+  }
   const [error, blob] = await tryFetchBlob(() =>
     API.download(
       {
