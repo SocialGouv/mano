@@ -150,6 +150,7 @@ const TestConnexion = () => {
   const [testOneCallEvery200MS, setTestOneCallEvery200MS] = useState<"done" | "ongoing" | "not-started">("not-started");
   const [testOneCallEvery100MS, setTestOneCallEvery100MS] = useState<"done" | "ongoing" | "not-started">("not-started");
   const [testOneCallEvery50MS, setTestOneCallEvery50MS] = useState<"done" | "ongoing" | "not-started">("not-started");
+  const [testOneCallEvery10MS, setTestOneCallEvery10MS] = useState<"done" | "ongoing" | "not-started">("not-started");
 
   const responses = useRef([]);
 
@@ -157,23 +158,26 @@ const TestConnexion = () => {
     setTestLaunched(true);
     responses.current = [];
     setTestOneCallEvery2Seconds("ongoing");
-    responses.current.push(...(await testEvery(2000, 5)));
+    responses.current.push(...(await testEvery(2000, 5))); // 10 seconds
     setTestOneCallEvery2Seconds("done");
     setTestOneCallEvery1Seconds("ongoing");
-    responses.current.push(...(await testEvery(1000, 10)));
+    responses.current.push(...(await testEvery(1000, 10))); // 10 seconds
     setTestOneCallEvery1Seconds("done");
     setTestOneCallEvery500MS("ongoing");
-    responses.current.push(...(await testEvery(500, 20)));
+    responses.current.push(...(await testEvery(500, 20))); // 10 seconds
     setTestOneCallEvery500MS("done");
     setTestOneCallEvery200MS("ongoing");
-    responses.current.push(...(await testEvery(200, 50)));
+    responses.current.push(...(await testEvery(200, 50))); // 10 seconds
     setTestOneCallEvery200MS("done");
     setTestOneCallEvery100MS("ongoing");
-    responses.current.push(...(await testEvery(100, 100)));
+    responses.current.push(...(await testEvery(100, 50))); // 5 seconds
     setTestOneCallEvery100MS("done");
     setTestOneCallEvery50MS("ongoing");
-    responses.current.push(...(await testEvery(50, 100)));
+    responses.current.push(...(await testEvery(50, 100))); // 5 seconds
     setTestOneCallEvery50MS("done");
+    setTestOneCallEvery10MS("ongoing");
+    responses.current.push(...(await testEvery(10, 500))); // 5 seconds
+    setTestOneCallEvery10MS("done");
     capture("Test connexion", {
       extra: responses.current,
     });
@@ -202,6 +206,8 @@ const TestConnexion = () => {
       if (!window.confirm("Êtes-vous sûr de vouloir arrêter le test ?")) return;
       capture("Test connexion", {
         extra: responses.current,
+        tags: responses.current?.length,
+        level: "high",
       });
     }
     setOpen(false);
@@ -215,6 +221,7 @@ const TestConnexion = () => {
     setTestOneCallEvery200MS("not-started");
     setTestOneCallEvery100MS("not-started");
     setTestOneCallEvery50MS("not-started");
+    setTestOneCallEvery10MS("not-started");
   }
 
   function getTestIcon(status: "done" | "ongoing" | "not-started") {
@@ -234,7 +241,8 @@ const TestConnexion = () => {
     testOneCallEvery500MS === "done" &&
     testOneCallEvery200MS === "done" &&
     testOneCallEvery100MS === "done" &&
-    testOneCallEvery50MS === "done";
+    testOneCallEvery50MS === "done" &&
+    testOneCallEvery10MS === "done";
 
   return (
     <>
@@ -282,6 +290,7 @@ const TestConnexion = () => {
               <li>{getTestIcon(testOneCallEvery200MS)} Test 4: 1 appel toutes les 200ms pendant 10 secondes</li>
               <li>{getTestIcon(testOneCallEvery100MS)} Test 5: 1 appel toutes les 100ms pendant 10 secondes</li>
               <li>{getTestIcon(testOneCallEvery50MS)} Test 6: 1 appel toutes les 50ms pendant 5 secondes</li>
+              <li>{getTestIcon(testOneCallEvery10MS)} Test 7: 1 appel toutes les 10ms pendant 5 secondes</li>
             </ul>
           </ModalBody>
         ) : (
