@@ -30,6 +30,7 @@ import { flattenedCustomFieldsConsultationsSelector } from "../../recoil/consult
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "../../components/tailwind/Modal";
 import { useDeletePerson } from "./components/DeletePersonButton";
 import { toast } from "react-toastify";
+import DeleteButtonAndConfirmModal from "../../components/DeleteButtonAndConfirmModal";
 
 const limit = 20;
 
@@ -248,16 +249,10 @@ const List = () => {
           <button type="button" className="button-cancel" onClick={() => setDeleteMultiple(false)}>
             Annuler
           </button>
-          <button
-            type="button"
-            className="button-destructive"
-            onClick={async () => {
-              if (
-                !window.confirm(
-                  "Êtes-vous sûr de vouloir supprimer ces personnes ? Cette opération est irréversible et entrainera la suppression définitive de toutes les données liées à la personne : actions, commentaires, lieux visités, passages, rencontres, documents..."
-                )
-              )
-                return;
+          <DeleteButtonAndConfirmModal
+            title={`Voulez-vous vraiment supprimer les dossiers de ${checkedForDelete?.length} personnes ?`}
+            textToConfirm={String(checkedForDelete?.length)}
+            onConfirm={async () => {
               let errors = [];
               for (const personId of checkedForDelete) {
                 const [_error] = await deletePerson(personId);
@@ -276,8 +271,20 @@ const List = () => {
               }
             }}
           >
-            Supprimer
-          </button>
+            <p className="tw-mb-7 tw-block tw-w-full tw-text-center tw-font-semibold">
+              {checkedForDelete
+                .map((personId) => personsFilteredBySearch.find((p) => p._id === personId)?.name)
+                .filter(Boolean)
+                .join(" - ")}
+            </p>
+            <p className="tw-mb-7 tw-block tw-w-full tw-text-center">
+              Cette opération est irréversible
+              <br />
+              et entrainera la suppression définitive de toutes les données liées à la personne&nbsp;:
+              <br />
+              actions, commentaires, lieux visités, passages, rencontres, documents...
+            </p>
+          </DeleteButtonAndConfirmModal>
         </ModalFooter>
       </ModalContainer>
     </>

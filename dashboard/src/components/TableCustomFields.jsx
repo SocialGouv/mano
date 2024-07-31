@@ -196,7 +196,7 @@ const TableCustomFields = ({
                 textToConfirm={f.label}
                 onConfirm={async () => onDelete(f)}
               >
-                <span style={{ marginBottom: 30, display: "block", width: "100%", textAlign: "center" }}>
+                <span className="tw-mb-8 tw-block tw-w-full tw-text-center">
                   Cette opération est irréversible
                   <br />
                   et entrainera la suppression définitive de toutes les données enregistrées sous ce champ.
@@ -454,7 +454,7 @@ export const EditCustomField = ({ open, onDelete, data, editingField, onClose, o
             textToConfirm={editingField?.label}
             onConfirm={async () => onDelete(editingField)}
           >
-            <span style={{ marginBottom: 30, display: "block", width: "100%", textAlign: "center" }}>
+            <span className="tw-mb-8 tw-block tw-w-full tw-text-center">
               Cette opération est irréversible
               <br />
               et entrainera la suppression définitive de toutes les données enregistrées sous ce champ.

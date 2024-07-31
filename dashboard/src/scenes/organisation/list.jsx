@@ -288,7 +288,7 @@ const List = () => {
                           }
                         }}
                       >
-                        <span style={{ marginBottom: 30, display: "block", width: "100%", textAlign: "center" }}>
+                        <span className="tw-mb-8 tw-block tw-w-full tw-text-center">
                           Cette opération est irréversible
                           <br />
                           et entrainera la suppression définitive de toutes les données liées à l’organisation&nbsp;:
