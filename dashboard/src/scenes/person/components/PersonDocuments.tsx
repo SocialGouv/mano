@@ -304,13 +304,14 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
       }}
       onAddDocuments={async (newDocuments) => {
         const [personError] = await tryFetchExpectOk(async () => {
+          const oldDocuments = person.documents?.length ? [...person.documents] : [...defaultDocuments];
           return API.put({
             path: `/person/${person._id}`,
             body: await encryptPerson({
               ...person,
               // If there are no document yet and default documents are present,
               // we save the default documents since they are modified by the user.
-              documents: [...(person.documents || [...defaultDocuments]), ...newDocuments],
+              documents: [...oldDocuments, ...newDocuments],
             }),
           });
         });
