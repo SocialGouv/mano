@@ -356,6 +356,7 @@ const typeOptionsLabels = [
   "Choix dans une liste",
   "Choix multiple dans une liste",
   "Case à cocher",
+  "Durée (depuis une date)",
 ] as const;
 type TypeOptionLabel = (typeof typeOptionsLabels)[number];
 
