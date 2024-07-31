@@ -50,7 +50,7 @@ const ForgetPassword = ({ navigation }) => {
     if (!ref.current) return;
     if (!scrollViewRef.current) return;
     setTimeout(() => {
-      ref.current.measureLayout(
+      ref.current?.measureLayout?.(
         scrollViewRef.current,
         (x, y, width, height) => {
           scrollViewRef.current.scrollTo({ y: y - 100, animated: true });

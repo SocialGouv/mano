@@ -31,7 +31,7 @@ const PersonSection = ({
     if (!ref) return;
     if (!scrollViewRef.current) return;
     setTimeout(() => {
-      ref.measureLayout(
+      ref?.measureLayout?.(
         scrollViewRef.current,
         (x, y, width, height) => {
           scrollViewRef.current.scrollTo({ y: y - 100, animated: true });
