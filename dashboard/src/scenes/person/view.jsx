@@ -82,7 +82,7 @@ export default function View() {
               tabs={[
                 "Résumé",
                 Boolean(user.healthcareProfessional) && "Dossier Médical",
-                `Territoires et lieux fréquentés`,
+                organisation.territoriesEnabled ? `Territoires et lieux fréquentés` : `Lieux fréquentés`,
                 "Historique",
                 Boolean(organisation.groupsEnabled) && `Liens familiaux (${personGroup.relations.length})`,
               ].filter(Boolean)}
@@ -90,6 +90,7 @@ export default function View() {
                 if (tab.includes("Résumé")) setCurrentTab("Résumé");
                 if (tab.includes("Dossier Médical")) setCurrentTab("Dossier Médical");
                 if (tab.includes("Territoires et lieux fréquentés")) setCurrentTab("Territoires et lieux fréquentés");
+                if (tab.includes("Lieux fréquentés")) setCurrentTab("Lieux fréquentés");
                 if (tab.includes("Historique")) setCurrentTab("Historique");
                 if (tab.includes("Liens familiaux")) setCurrentTab("Liens familiaux");
                 refresh();
@@ -97,7 +98,7 @@ export default function View() {
               activeTabIndex={[
                 "Résumé",
                 Boolean(user.healthcareProfessional) && "Dossier Médical",
-                `Territoires et lieux fréquentés`,
+                organisation.territoriesEnabled ? `Territoires et lieux fréquentés` : `Lieux fréquentés`,
                 "Historique",
                 Boolean(organisation.groupsEnabled) && `Liens familiaux`,
               ]
@@ -114,6 +115,7 @@ export default function View() {
           <>
             {currentTab === "Dossier Médical" && user.healthcareProfessional && <MedicalFile person={person} />}
             {currentTab === "Territoires et lieux fréquentés" && <Places person={person} />}
+            {currentTab === "Lieux fréquentés" && <Places person={person} />}
             {currentTab === "Historique" && <History person={person} />}
             {currentTab === "Liens familiaux" && <PersonFamily person={person} />}
           </>

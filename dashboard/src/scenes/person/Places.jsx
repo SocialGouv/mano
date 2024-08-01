@@ -58,7 +58,7 @@ const PersonPlaces = ({ person }) => {
 
   return (
     <>
-      {organisation.rencontresEnabled ? (
+      {organisation.rencontresEnabled && organisation.territoriesEnabled ? (
         <div className="tw-mb-16">
           <h3 className="tw-mb-0 tw-flex tw-items-center tw-gap-5 tw-text-xl tw-font-extrabold">
             Territoires {rencontresByTerritory?.length ? `(${rencontresByTerritory?.length})` : ""}{" "}
