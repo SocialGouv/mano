@@ -31,6 +31,7 @@ import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "../../compo
 import { useDeletePerson } from "./components/DeletePersonButton";
 import { toast } from "react-toastify";
 import DeleteButtonAndConfirmModal from "../../components/DeleteButtonAndConfirmModal";
+import PersonName from "../../components/PersonName";
 
 const limit = 20;
 
@@ -223,7 +224,7 @@ const List = () => {
       />
       <div className="tw-flex tw-justify-between tw-items-center">
         <Page page={page} limit={limit} total={total} onChange={({ page }) => setPage(page, true)} />
-        {["admin", "superadmin"].includes(user.role) && (
+        {["admin", "superadmin"].includes(user.role) && total > 0 && (
           <button type="button" className="button-destructive" onClick={onDeleteMultiple}>
             Supprimer plusieurs dossiers
           </button>
@@ -271,12 +272,11 @@ const List = () => {
               }
             }}
           >
-            <p className="tw-mb-7 tw-block tw-w-full tw-text-center tw-font-semibold">
-              {checkedForDelete
-                .map((personId) => personsFilteredBySearch.find((p) => p._id === personId)?.name)
-                .filter(Boolean)
-                .join(" - ")}
-            </p>
+            <div className="tw-mb-7 tw-flex tw-flex-col tw-w-full tw-font-semibold tw-px-8">
+              {checkedForDelete.map((personId) => (
+                <PersonName item={{ person: personId }} key={personId} disabled />
+              ))}
+            </div>
             <p className="tw-mb-7 tw-block tw-w-full tw-text-center">
               Cette opération est irréversible
               <br />
