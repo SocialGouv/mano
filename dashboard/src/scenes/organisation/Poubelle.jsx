@@ -11,6 +11,8 @@ import TagTeam from "../../components/TagTeam";
 import { useDataLoader } from "../../components/DataLoader";
 import Loading from "../../components/loading";
 import { decryptItem } from "../../services/encryption";
+import DeleteButtonAndConfirmModal from "../../components/DeleteButtonAndConfirmModal";
+import PersonName from "../../components/PersonName";
 
 async function fetchPersons(organisationId) {
   const [error, response] = await tryFetchExpectOk(async () => API.get({ path: "/organisation/" + organisationId + "/deleted-data" }));
@@ -102,30 +104,22 @@ export default function Poubelle() {
 
   const permanentDeletePerson = async (id) => {
     const associatedData = getAssociatedData(id);
-    const associatedDataAsText = getAssociatedDataAsText(associatedData);
 
-    if (
-      confirm(
-        "Voulez-vous supprimer DÉFINITIVEMENT cette personne ? L'équipe de Mano sera INCAPABLE DE RÉCUPÉRER LES DONNÉES. Les données associées seront également supprimées :\n" +
-          associatedDataAsText.join(", ")
-      )
-    ) {
-      tryFetchExpectOk(() =>
-        API.delete({
-          path: "/organisation/" + organisation._id + "/permanent-delete-data",
-          body: { ...associatedData, persons: [id] },
-        })
-      ).then(([error]) => {
-        if (!error) {
-          refresh().then(() => {
-            toast.success("La personne a été supprimée définitivement avec succès, ainsi que ses données associées !");
-            setRefreshKey(refreshKey + 1);
-          });
-        } else {
-          toast.error("Impossible de supprimer définitivement la personne");
-        }
-      });
-    }
+    tryFetchExpectOk(() =>
+      API.delete({
+        path: "/organisation/" + organisation._id + "/permanent-delete-data",
+        body: { ...associatedData, persons: [id] },
+      })
+    ).then(([error]) => {
+      if (!error) {
+        refresh().then(() => {
+          toast.success("La personne a été supprimée définitivement avec succès, ainsi que ses données associées !");
+          setRefreshKey(refreshKey + 1);
+        });
+      } else {
+        toast.error("Impossible de supprimer définitivement la personne");
+      }
+    });
   };
 
   if (!persons)
@@ -139,6 +133,52 @@ export default function Poubelle() {
   return (
     <div>
       <Disclaimer />
+      <div className="tw-flex tw-justify-end tw-items-center tw-mb-4">
+        <DeleteButtonAndConfirmModal
+          title={`Supprimer définitivement ${persons.length} personnes`}
+          buttonText="Supprimer définitivement toute la liste"
+          textToConfirm={String(
+            persons.length +
+              data.actions.length +
+              data.comments.length +
+              data.relsPersonPlace.length +
+              data.passages.length +
+              data.rencontres.length +
+              data.consultations.length +
+              data.treatments.length +
+              data.medicalFiles.length +
+              data.groups.length
+          )}
+          onConfirm={async () => {
+            for (const p of persons) {
+              await permanentDeletePerson(p._id);
+            }
+          }}
+        >
+          <p className="tw-mb-7 tw-block tw-w-full tw-text-center">
+            Voulez-vous supprimer DÉFINITIVEMENT ces {persons.length} personnes ?<br />
+            <br />
+            L'équipe de Mano sera
+            <br />
+            <strong className="tw-text-xl">INCAPABLE DE RÉCUPÉRER LES DONNÉES</strong>.<br />
+            <br />
+          </p>
+          <div className="tw-mb-7 tw-flex tw-flex-col tw-w-full tw-px-8 tw-text-center">
+            Les données associées seront également supprimées :
+            <ul className="tw-text-center tw-font-semibold">
+              <li>{data.actions.length} actions</li>
+              <li>{data.comments.length} commentaires</li>
+              <li>{data.relsPersonPlace.length} lieux fréquentés</li>
+              <li>{data.passages.length} passages</li>
+              <li>{data.rencontres.length} rencontres</li>
+              <li>{data.consultations.length} consultations</li>
+              <li>{data.treatments.length} traitements</li>
+              <li>{data.medicalFiles.length} dossiers médicaux</li>
+              <li>{data.groups.length} groupes</li>
+            </ul>
+          </div>
+        </DeleteButtonAndConfirmModal>
+      </div>
       <div className="mt-8">
         <Table
           data={persons}
@@ -250,11 +290,27 @@ export default function Poubelle() {
               title: "Supprimer",
               dataKey: "action-delete",
               render: (p) => {
+                const associatedData = getAssociatedData(p._id);
+                const associatedDataAsText = getAssociatedDataAsText(associatedData);
                 return (
                   <>
-                    <button onClick={() => permanentDeletePerson(p._id)} className="button-destructive ml-0">
-                      Suppr.&nbsp;définitivement
-                    </button>
+                    <DeleteButtonAndConfirmModal
+                      title={`Supprimer définitivement ${p.name}`}
+                      buttonText="Suppr.&nbsp;définitivement"
+                      textToConfirm={p.name}
+                      onConfirm={() => permanentDeletePerson(p._id)}
+                    >
+                      <p className="tw-mb-7 tw-block tw-w-full tw-text-center">
+                        Voulez-vous supprimer DÉFINITIVEMENT cette personne ?<br />
+                        <br />
+                        L'équipe de Mano sera
+                        <br />
+                        <strong className="tw-text-xl">INCAPABLE DE RÉCUPÉRER LES DONNÉES</strong>.<br />
+                        <br />
+                        Les données associées seront également supprimées
+                        {associatedDataAsText.join(", ")}
+                      </p>
+                    </DeleteButtonAndConfirmModal>
                   </>
                 );
               },

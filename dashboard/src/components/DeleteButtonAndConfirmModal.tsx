@@ -34,6 +34,7 @@ const DeleteButtonAndConfirmModal = ({
   disabledTitle = "Vous n'avez pas le droit de supprimer cet élément",
 }: DeleteButtonAndConfirmModalProps) => {
   const user = useRecoilValue(userState);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -80,8 +81,10 @@ const DeleteButtonAndConfirmModal = ({
               if (_textToConfirm.trim() !== textToConfirm.trim()) {
                 return toast.error("Veuillez respecter les minuscules/majuscules");
               }
+              setIsDeleting(true);
               await onConfirm();
               setOpen(false);
+              setIsDeleting(false);
             }}
             className="tw-flex tw-w-full tw-items-center tw-justify-center tw-px-12"
           >
@@ -89,10 +92,16 @@ const DeleteButtonAndConfirmModal = ({
           </form>
         </ModalBody>
         <ModalFooter>
-          <button type="button" name="cancel" className="button-cancel" onClick={() => setOpen(false)}>
+          <button type="button" name="cancel" className="button-cancel" onClick={() => setOpen(false)} disabled={isDeleting}>
             Annuler
           </button>
-          <button type="submit" className="button-destructive" data-test-id={`button-delete-${textToConfirm}`} form={`delete-${textToConfirm}`}>
+          <button
+            type="submit"
+            className="button-destructive"
+            data-test-id={`button-delete-${textToConfirm}`}
+            form={`delete-${textToConfirm}`}
+            disabled={isDeleting}
+          >
             Supprimer
           </button>
         </ModalFooter>
