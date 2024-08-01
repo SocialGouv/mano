@@ -48,6 +48,34 @@ export function formatAge(date: PossibleDate): string | null {
   return `${years} ans`;
 }
 
+export function formatDuration(date: PossibleDate): string | null {
+  const years = dayjs().diff(date, "years");
+  const months = dayjs().add(-years, "years").diff(date, "months");
+  const days = dayjs().add(-years, "years").add(-months, "months").diff(date, "days");
+  const yearsString = years > 0 ? `${years} an${years > 1 ? "s" : ""}` : "";
+  const monthsString = months > 0 ? `${months} mois` : "";
+  const daysString = days > 0 ? `${days} jour${days > 1 ? "s" : ""}` : "";
+  if (years > 0) {
+    if (months > 0) {
+      if (days > 0) {
+        return `${yearsString}, ${monthsString} et ${daysString}`;
+      }
+      return `${yearsString} et ${monthsString}`;
+    }
+    if (days > 0) {
+      return `${yearsString} et ${daysString}`;
+    }
+    return yearsString;
+  }
+  if (months > 0) {
+    if (days > 0) {
+      return `${monthsString} et ${daysString}`;
+    }
+    return monthsString;
+  }
+  return daysString;
+}
+
 export function ageFromBirthdateAsYear(date: PossibleDate): number | null {
   if (!date) return null;
   const birthDate = dayjs(date);

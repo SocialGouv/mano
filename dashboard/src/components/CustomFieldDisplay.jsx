@@ -1,5 +1,5 @@
 import React from "react";
-import { dayjsInstance, formatAge, formatDateTimeWithNameOfDay, formatDateWithNameOfDay } from "../services/date";
+import { dayjsInstance, formatDateTimeWithNameOfDay, formatDateWithNameOfDay, formatDuration } from "../services/date";
 
 const showBoolean = (value) => {
   if (value === null) return "";
@@ -26,7 +26,7 @@ const CustomFieldDisplay = ({ type, value }) => {
       {!!["date"].includes(type) && !!value && <span>{formatDateWithNameOfDay(value)}</span>}
       {!!["duration"].includes(type) && !!value && (
         <span>
-          {formatAge(value)} ({dayjsInstance(value).format("DD/MM/YYYY")})
+          {formatDuration(value)} ({dayjsInstance(value).format("DD/MM/YYYY")})
         </span>
       )}
       {!!["boolean"].includes(type) && <span>{showBoolean(value)}</span>}
