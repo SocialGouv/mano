@@ -76,6 +76,17 @@ export const statsPresets: Array<Preset> = [
   },
 ];
 
+if (import.meta.env.VITE_TEST_PLAYWRIGHT) {
+  statsPresets.push({
+    label: "2020",
+    period: { startDate: dayjsInstance("2020-01-01"), endDate: dayjsInstance("2020-12-31") },
+  });
+  statsPresets.push({
+    label: "2021",
+    period: { startDate: dayjsInstance("2021-01-01"), endDate: dayjsInstance("2021-12-31") },
+  });
+}
+
 export const reportsPresets: Array<Preset> = [
   {
     label: "Aujourd'hui",

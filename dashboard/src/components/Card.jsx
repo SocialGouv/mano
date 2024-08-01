@@ -2,6 +2,8 @@ import React from "react";
 import HelpButtonAndModal from "./HelpButtonAndModal";
 
 const Card = ({ title, count, unit, children, countId, dataTestId, help, onClick = null }) => {
+  dataTestId = dataTestId || title.toLocaleLowerCase().split(" ").join("-");
+
   const Component = onClick ? "button" : "div";
   const props = onClick ? { onClick, type: "button", name: "card", className: "button-cancel" } : {};
   return (

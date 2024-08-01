@@ -48,7 +48,7 @@ describe("Stats evolutives", () => {
     });
 
     // Verify capture was called with "Incoherent snapshot history"
-    const incoherentSnapshotHistoryCall = mockedCapture.mock.calls.find((call) => call[0].message === "Incoherent snapshot history");
+    const incoherentSnapshotHistoryCall = mockedCapture.mock.calls.find((call) => call[0].message === "Incoherent snapshot history 2");
     expect(incoherentSnapshotHistoryCall).toBeTruthy();
 
     // Verify mockedCapture was called with "Incoherent history"

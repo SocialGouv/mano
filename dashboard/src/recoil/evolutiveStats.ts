@@ -12,6 +12,8 @@ import { personFieldsIncludingCustomFieldsSelector } from "./persons";
 import type { Dayjs } from "dayjs";
 import { currentTeamState } from "./auth";
 import { mergedPersonAssignedTeamPeriodsWithQueryPeriod } from "../utils/person-merge-assigned-team-periods-with-query-period";
+import { getPersonSnapshotAtDate } from "../utils/person-snapshot";
+import { getValueByField } from "../utils/person-get-value-by-field";
 
 export const evolutiveStatsIndicatorsBaseSelector = selector({
   key: "evolutiveStatsIndicatorsBaseSelector",
@@ -45,88 +47,6 @@ export const evolutiveStatsIndicatorsBaseSelector = selector({
 });
 
 export const startHistoryFeatureDate = "2022-09-23";
-
-function getValueByField(indicator: IndicatorsSelection[0], value: any): string | Array<string> {
-  if (!indicator) return "";
-  if (["yes-no"].includes(indicator.type)) {
-    if (value === "Oui") return "Oui";
-    return "Non";
-  }
-  if (["boolean"].includes(indicator.type)) {
-    if (value === true || value === "Oui") return "Oui";
-    return "Non";
-  }
-  if (indicator?.fieldName === "outOfActiveList") {
-    if (value === true) return "Oui";
-    return "Non";
-  }
-  if (indicator.type === "multi-choice") {
-    if (Array.isArray(value)) {
-      if (value.length === 0) {
-        return ["Non renseigné"];
-      }
-      return value;
-    }
-    if (value == null || value === "") {
-      return ["Non renseigné"];
-    }
-    return [value];
-  }
-  if (value == null || value === "") {
-    return "Non renseigné"; // we cover the case of undefined, null, empty string
-  }
-  if (value?.includes("Choisissez un genre")) return "Non renseigné";
-  return value;
-}
-
-export function getPersonSnapshotAtDate({
-  person,
-  snapshotDate,
-  indicator,
-}: {
-  person: PersonPopulated;
-  indicator: IndicatorsSelection[0];
-  snapshotDate: string; // YYYY-MM-DD
-}): PersonPopulated | null {
-  if (!person.history?.length) return person;
-  const reversedHistory = [...person.history].reverse();
-  let snapshot = structuredClone(person);
-  for (const historyItem of reversedHistory) {
-    const historyDate = dayjsInstance(historyItem.date).format("YYYY-MM-DD");
-    // history is: before the date
-    // snapshot is: after the date
-    // what should we do for a history change on the same day as the snapshot ?
-    // 2 options: we keep the snapshot, or we keep the history change
-    // we keep the snapshot because it's more coherent with L258-L259
-    if (historyDate <= snapshotDate) return snapshot; // if snapshot's day is history's day, we return the snapshot
-    for (const historyChangeField of Object.keys(historyItem.data)) {
-      if (historyChangeField !== indicator.fieldName) continue; // we support only one indicator for now
-      const oldValue = getValueByField(indicator, historyItem.data[historyChangeField].oldValue);
-      const historyNewValue = getValueByField(indicator, historyItem.data[historyChangeField].newValue);
-      const currentPersonValue = getValueByField(indicator, snapshot[historyChangeField]);
-      if (JSON.stringify(historyNewValue) !== JSON.stringify(currentPersonValue)) {
-        capture(new Error("Incoherent snapshot history"), {
-          extra: {
-            historyItem,
-            historyChangeField,
-            oldValue,
-            historyNewValue,
-            currentPersonValue,
-            snapshotDate,
-            // person: process.env.NODE_ENV === "development" ? person : undefined,
-            // snapshot: process.env.NODE_ENV === "development" ? snapshot : undefined,
-          },
-        });
-      }
-      if (oldValue === "") continue;
-      snapshot = {
-        ...snapshot,
-        [historyChangeField]: oldValue,
-      };
-    }
-  }
-  return snapshot;
-}
 
 type EvolutiveStatRenderData = {
   indicatorFieldLabel: CustomOrPredefinedField["label"];
@@ -184,11 +104,15 @@ export function computeEvolutiveStatsForPersons({
 
   // for now we only support one indicator
   const indicator = evolutiveStatsIndicators[0];
-  const indicatorFieldName = indicator?.fieldName; // ex: custom-field-1
-  const indicatorFieldLabel = evolutiveStatsIndicatorsBase.find((f) => f.name === indicatorFieldName)?.label; // exemple: "Ressources"
+  const field = evolutiveStatsIndicatorsBase.find((f) => f.name === indicator.fieldName);
+  const indicatorFieldName = field?.name;
+  const indicatorFieldLabel = field?.label; // exemple: "Ressources"
+  const indicatorFieldType = field?.type;
 
   const valueStart = indicator?.fromValue;
   const valueEnd = indicator?.toValue;
+
+  const typesByFields = { [indicatorFieldName]: indicatorFieldType };
 
   // FIXME: should we have evolutive stats on a single day ?
   if (startDateConsolidated.isSame(endDateConsolidated))
@@ -218,10 +142,16 @@ export function computeEvolutiveStatsForPersons({
       const periodStartDate = dayjsInstance(period.isoStartDate).format("YYYY-MM-DD");
       if (periodStartDate > queryEndDateFormatted) continue;
       const initSnapshotDate = periodStartDate > queryStartDateFormatted ? periodStartDate : queryStartDateFormatted;
-      const initSnapshot = getPersonSnapshotAtDate({ person, snapshotDate: initSnapshotDate, indicator });
+      const initSnapshot = getPersonSnapshotAtDate({
+        person,
+        snapshotDate: initSnapshotDate,
+        typesByFields,
+        onlyForFieldName: indicatorFieldName,
+        replaceNullishWithNonRenseigne: true,
+      });
       let countSwitchedValueDuringThePeriod = 0;
 
-      const currentRawValue = getValueByField(indicator, initSnapshot[indicatorFieldName ?? ""]);
+      const currentRawValue = getValueByField(indicatorFieldName, indicatorFieldType, initSnapshot[indicatorFieldName ?? ""]);
       let currentValue = Array.isArray(currentRawValue) ? currentRawValue : [currentRawValue].filter(Boolean);
       let currentPerson = initSnapshot;
 
@@ -234,9 +164,9 @@ export function computeEvolutiveStatsForPersons({
         let nextPerson = structuredClone(currentPerson);
         for (const historyChangeField of Object.keys(historyItem.data)) {
           if (historyChangeField !== indicatorFieldName) continue; // we support only one indicator for now
-          const oldValue = getValueByField(indicator, historyItem.data[historyChangeField].oldValue);
-          const historyNewValue = getValueByField(indicator, historyItem.data[historyChangeField].newValue);
-          const currentPersonValue = getValueByField(indicator, currentPerson[historyChangeField]);
+          const oldValue = getValueByField(indicatorFieldName, indicatorFieldType, historyItem.data[historyChangeField].oldValue);
+          const historyNewValue = getValueByField(indicatorFieldName, indicatorFieldType, historyItem.data[historyChangeField].newValue);
+          const currentPersonValue = getValueByField(indicatorFieldName, indicatorFieldType, currentPerson[historyChangeField]);
           if (JSON.stringify(oldValue) !== JSON.stringify(currentPersonValue)) {
             capture(new Error("Incoherent history in computeEvolutiveStatsForPersons"), {
               extra: {
@@ -263,7 +193,7 @@ export function computeEvolutiveStatsForPersons({
             [historyChangeField]: historyNewValue,
           };
         }
-        const nextRawValue = getValueByField(indicator, nextPerson[indicatorFieldName ?? ""]);
+        const nextRawValue = getValueByField(indicatorFieldName, indicatorFieldType, nextPerson[indicatorFieldName ?? ""]);
         const nextValue = Array.isArray(nextRawValue) ? nextRawValue : [nextRawValue].filter(Boolean);
 
         if (historyDate >= queryStartDateFormatted) {

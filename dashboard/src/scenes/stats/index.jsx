@@ -6,6 +6,7 @@ import {
   filterPersonsBaseSelector,
   personFieldsSelector,
   flattenedCustomFieldsPersonsSelector,
+  personTypesByFieldsNamesSelector,
 } from "../../recoil/persons";
 import { customFieldsObsSelector, territoryObservationsState } from "../../recoil/territoryObservations";
 import { currentTeamState, organisationState, teamsState, userState } from "../../recoil/auth";
@@ -13,7 +14,7 @@ import { actionsCategoriesSelector, DONE, flattenedActionsCategoriesSelector } f
 import { reportsState } from "../../recoil/reports";
 import { territoriesState } from "../../recoil/territory";
 import { customFieldsMedicalFileSelector } from "../../recoil/medicalFiles";
-import { personsForStatsSelector, populatedPassagesSelector } from "../../recoil/selectors";
+import { arrayOfitemsGroupedByPersonSelector, populatedPassagesSelector } from "../../recoil/selectors";
 import useTitle from "../../services/useTitle";
 import DateRangePickerWithPresets, { formatPeriod, statsPresets } from "../../components/DateRangePickerWithPresets";
 import { useDataLoader } from "../../components/DataLoader";
@@ -36,6 +37,8 @@ import { filterItem } from "../../components/Filters";
 import TabsNav from "../../components/tailwind/TabsNav";
 import { filterPersonByAssignedTeam } from "../../utils/filter-person";
 import { flattenedCustomFieldsConsultationsSelector } from "../../recoil/consultations";
+import { getPersonSnapshotAtDate } from "../../utils/person-snapshot";
+import { dayjsInstance } from "../../services/date";
 
 const tabs = [
   "Général",
@@ -85,12 +88,62 @@ const StatsLoader = () => {
   return <Stats />;
 };
 
+const personsForStatsSelector = selectorFamily({
+  key: "personsForStatsSelector",
+  get:
+    ({ period }) =>
+    ({ get }) => {
+      const allRawPersons = get(arrayOfitemsGroupedByPersonSelector);
+      const personTypesByFieldsNames = get(personTypesByFieldsNamesSelector);
+
+      const snapshotDate = dayjsInstance(period.endDate).format("YYYY-MM-DD");
+
+      const allPersons = allRawPersons.map((person) => {
+        const flattenedPerson = {
+          ...(person.medicalFile || {}),
+          ...(person.flattenedConsultations || {}),
+          ...person,
+        };
+        const snapshotAtDate = getPersonSnapshotAtDate({
+          person: flattenedPerson,
+          snapshotDate: snapshotDate,
+          typesByFields: personTypesByFieldsNames,
+        });
+        return {
+          ...snapshotAtDate,
+          followSinceMonths: dayjsInstance(snapshotDate).diff(person.followedSince || person.createdAt, "months"),
+        };
+      });
+
+      return allPersons;
+    },
+});
+
 const itemsForStatsSelector = selectorFamily({
   key: "itemsForStatsSelector",
   get:
     ({ period, filterPersons, selectedTeamsObjectWithOwnPeriod, viewAllOrganisationData }) =>
     ({ get }) => {
-      const activeFilters = filterPersons.filter((f) => f.value);
+      const allPersons = get(personsForStatsSelector({ period }));
+
+      const relativeFilters = [
+        "hasAtLeastOneConsultation",
+        "numberOfConsultations",
+        "numberOfActions",
+        "numberOfTreatments",
+        "numberOfPassages",
+        "numberOfRencontres",
+      ];
+
+      const activeFilters = filterPersons.filter((f) => f.value && !relativeFilters.includes(f.field) && f.field !== "outOfActiveList");
+      const outOfActiveListFilter = filterPersons.find((f) => f.field === "outOfActiveList")?.value;
+      const filterByNumberOfActions = filterPersons.filter((f) => f.field === "numberOfActions");
+      const filterByNumberOfConsultations = filterPersons.filter((f) => f.field === "numberOfConsultations");
+      const filterHasAtLeastOneConsultation = filterPersons.filter((f) => f.field === "hasAtLeastOneConsultation");
+      const filterByNumberOfPassages = filterPersons.filter((f) => f.field === "numberOfPassages");
+      const filterByNumberOfRencontres = filterPersons.filter((f) => f.field === "numberOfRencontres");
+      const filterByNumberOfTreatments = filterPersons.filter((f) => f.field === "numberOfTreatments");
+
       const filterItemByTeam = (item, key) => {
         if (viewAllOrganisationData) return true;
         if (Array.isArray(item[key])) {
@@ -100,10 +153,6 @@ const itemsForStatsSelector = selectorFamily({
         }
         return !!selectedTeamsObjectWithOwnPeriod[item[key]];
       };
-      const filtersExceptOutOfActiveList = activeFilters.filter((f) => f.field !== "outOfActiveList");
-      const outOfActiveListFilter = activeFilters.find((f) => f.field === "outOfActiveList")?.value;
-
-      const allPersons = get(personsForStatsSelector);
 
       const personsCreated = [];
       const personsUpdated = [];
@@ -125,9 +174,28 @@ const itemsForStatsSelector = selectorFamily({
       };
       for (let person of allPersons) {
         // get the persons concerned by filters
-        if (!filterItem(filtersExceptOutOfActiveList)(person)) continue;
+        if (!filterItem(activeFilters)(person)) continue;
         if (outOfActiveListFilter === "Oui" && !person.outOfActiveList) continue;
         if (outOfActiveListFilter === "Non" && !!person.outOfActiveList) continue;
+
+        if (filterByNumberOfTreatments.length) {
+          let numberOfTreatments = 0;
+          if (person.treatments?.length) {
+            for (const treatment of person.treatments) {
+              if (noPeriodSelected) {
+                numberOfTreatments++;
+                continue;
+              }
+              const date = treatment.date;
+              const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[treatment.team] ?? defaultIsoDates;
+              if (date < isoStartDate) continue;
+              if (date >= isoEndDate) continue;
+              numberOfTreatments++;
+            }
+          }
+          if (!filterItem(filterByNumberOfTreatments)({ numberOfTreatments })) continue;
+        }
+
         // get persons for stats for period
         const createdDate = person.followedSince || person.createdAt;
 
@@ -149,11 +217,13 @@ const itemsForStatsSelector = selectorFamily({
             }
           }
         }
-        // get actions for stats for period
+
+        let numberOfActions = 0;
         for (const action of person.actions || []) {
           if (!filterItemByTeam(action, "teams")) continue;
           if (noPeriodSelected) {
             actionsFilteredByPersons[action._id] = action;
+            numberOfActions++;
             // On veut seulement les personnes considérées comme suivies
             // Pour ne pas avoir plus de personnes suivies concernées par les actions que de personnes suivies
             if (personsUpdated[person._id]) personsUpdatedWithActions[person._id] = person;
@@ -174,14 +244,29 @@ const itemsForStatsSelector = selectorFamily({
             if (date < isoStartDate) continue;
             if (date >= isoEndDate) continue;
           }
+          numberOfActions++;
           actionsFilteredByPersons[action._id] = action;
           // Voir ci-dessus (pourquoi on limite aux personnes suivies)
           if (personsUpdated[person._id]) personsUpdatedWithActions[person._id] = person;
         }
+        if (filterByNumberOfActions.length) {
+          if (!filterItem(filterByNumberOfActions)({ numberOfActions })) {
+            delete personsUpdated[person._id];
+            delete personsCreated[person._id];
+            delete personsUpdatedWithActions[person._id];
+            for (const action of person.actions || []) {
+              delete actionsFilteredByPersons[action._id];
+            }
+            continue;
+          }
+        }
+
+        let numberOfConsultations = 0;
         for (const consultation of person.consultations || []) {
           if (!filterItemByTeam(consultation, "teams")) continue;
           if (noPeriodSelected) {
             consultationsFilteredByPersons.push(consultation);
+            numberOfConsultations++;
             personsWithConsultations[person._id] = person;
             continue;
           }
@@ -200,21 +285,56 @@ const itemsForStatsSelector = selectorFamily({
             if (date < isoStartDate) continue;
             if (date >= isoEndDate) continue;
           }
+          numberOfConsultations++;
           consultationsFilteredByPersons.push(consultation);
           personsWithConsultations[person._id] = person;
         }
+        if (filterByNumberOfConsultations.length) {
+          if (!filterItem(filterByNumberOfConsultations)({ numberOfConsultations })) {
+            delete personsUpdated[person._id];
+            delete personsCreated[person._id];
+            delete personsUpdatedWithActions[person._id];
+            for (const action of person.actions || []) {
+              delete actionsFilteredByPersons[action._id];
+            }
+            delete personsWithConsultations[person._id];
+            for (let i = 0; i < numberOfConsultations; i++) {
+              consultationsFilteredByPersons.pop();
+            }
+            continue;
+          }
+        }
+        if (filterHasAtLeastOneConsultation.length) {
+          if (!filterItem(filterHasAtLeastOneConsultation)({ hasAtLeastOneConsultation: numberOfConsultations > 0 })) {
+            delete personsUpdated[person._id];
+            delete personsCreated[person._id];
+            delete personsUpdatedWithActions[person._id];
+            for (const action of person.actions || []) {
+              delete actionsFilteredByPersons[action._id];
+            }
+            delete personsWithConsultations[person._id];
+            for (let i = 0; i < numberOfConsultations; i++) {
+              consultationsFilteredByPersons.pop();
+            }
+            continue;
+          }
+        }
+
+        let numberOfPassages = 0;
         if (person.passages?.length) {
           for (const passage of person.passages) {
             if (!filterItemByTeam(passage, "team")) continue;
             if (noPeriodSelected) {
               passagesFilteredByPersons.push(passage);
               personsWithPassages[person._id] = person;
+              numberOfPassages++;
               continue;
             }
             const date = passage.date;
             const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[passage.team] ?? defaultIsoDates;
             if (date < isoStartDate) continue;
             if (date >= isoEndDate) continue;
+            numberOfPassages++;
             passagesFilteredByPersons.push(passage);
             personsWithPassages[person._id] = person;
             if (createdDate < isoStartDate) {
@@ -222,21 +342,70 @@ const itemsForStatsSelector = selectorFamily({
             }
           }
         }
+        if (filterByNumberOfPassages.length) {
+          if (!filterItem(filterByNumberOfPassages)({ numberOfPassages })) {
+            delete personsUpdated[person._id];
+            delete personsCreated[person._id];
+            delete personsUpdatedWithActions[person._id];
+            for (const action of person.actions || []) {
+              delete actionsFilteredByPersons[action._id];
+            }
+            delete personsWithConsultations[person._id];
+            for (let i = 0; i < numberOfConsultations; i++) {
+              consultationsFilteredByPersons.pop();
+            }
+            delete personsWithPassages[person._id];
+            delete personsInPassagesBeforePeriod[person._id];
+            for (let i = 0; i < numberOfPassages; i++) {
+              passagesFilteredByPersons.pop();
+            }
+            continue;
+          }
+        }
+
+        let numberOfRencontres = 0;
         if (person.rencontres?.length) {
           for (const rencontre of person.rencontres) {
             if (!filterItemByTeam(rencontre, "team")) continue;
             if (noPeriodSelected) {
               rencontresFilteredByPersons.push({ ...rencontre, gender: person.gender });
               personsWithRencontres[person._id] = person;
+              numberOfRencontres++;
               continue;
             }
             const date = rencontre.date;
             const { isoStartDate, isoEndDate } = selectedTeamsObjectWithOwnPeriod[rencontre.team] ?? defaultIsoDates;
             if (date < isoStartDate) continue;
             if (date >= isoEndDate) continue;
+            numberOfRencontres++;
             rencontresFilteredByPersons.push({ ...rencontre, gender: person.gender });
             personsWithRencontres[person._id] = person;
             if (createdDate < isoStartDate) personsInRencontresBeforePeriod[person._id] = person;
+          }
+        }
+        if (filterByNumberOfRencontres.length) {
+          if (!filterItem(filterByNumberOfRencontres)({ numberOfRencontres })) {
+            delete personsUpdated[person._id];
+            delete personsCreated[person._id];
+            delete personsUpdatedWithActions[person._id];
+            for (const action of person.actions || []) {
+              delete actionsFilteredByPersons[action._id];
+            }
+            delete personsWithConsultations[person._id];
+            for (let i = 0; i < numberOfConsultations; i++) {
+              consultationsFilteredByPersons.pop();
+            }
+            delete personsWithPassages[person._id];
+            delete personsInPassagesBeforePeriod[person._id];
+            for (let i = 0; i < numberOfPassages; i++) {
+              passagesFilteredByPersons.pop();
+            }
+            delete personsWithRencontres[person._id];
+            delete personsInRencontresBeforePeriod[person._id];
+            for (let i = 0; i < numberOfRencontres; i++) {
+              rencontresFilteredByPersons.pop();
+            }
+            continue;
           }
         }
       }

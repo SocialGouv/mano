@@ -224,7 +224,11 @@ const Filters = ({
             };
 
             return (
-              <div className="tw-mx-auto tw-mb-2.5 tw-flex tw-items-center tw-gap-2" key={`${filter.field || "empty"}${index}`}>
+              <div
+                data-test-id={`filter-${index}`}
+                className="tw-mx-auto tw-mb-2.5 tw-flex tw-items-center tw-gap-2"
+                key={`${filter.field || "empty"}${index}`}
+              >
                 <div className="tw-min-w-[85px] tw-shrink-0">
                   <p className="tw-m-0 tw-w-full tw-pr-4 tw-text-right">{index === 0 ? "Filtrer par" : "ET"}</p>
                 </div>
@@ -237,10 +241,19 @@ const Filters = ({
                     getOptionValue={(_option) => _option.field}
                     isClearable={true}
                     isMulti={false}
+                    inputId={`filter-field-${index}`}
+                    classNamePrefix={`filter-field-${index}`}
                   />
                 </div>
                 <div className="tw-grow">
-                  <ValueSelector field={filter.field} filterValues={filterValues} value={filter.value} base={base} onChangeValue={onChangeValue} />
+                  <ValueSelector
+                    index={index}
+                    field={filter.field}
+                    filterValues={filterValues}
+                    value={filter.value}
+                    base={base}
+                    onChangeValue={onChangeValue}
+                  />
                 </div>
                 <div className="tw-shrink-0">
                   {!!filters.filter((_filter: Filter) => Boolean(_filter.field)).length && (
@@ -315,7 +328,7 @@ const numberOptions = [
   },
 ];
 
-const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
+const ValueSelector = ({ index, field, filterValues, value, onChangeValue, base }) => {
   const [comparator, setComparator] = useState(null);
   const [unfilledChecked, setUnfilledChecked] = useState(value === "Non renseigné");
   if (!field) return <></>;
@@ -452,6 +465,8 @@ const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
           onChange={(newValue) => onChangeValue(newValue?.map((option) => option.value))}
           isClearable={!value?.length}
           isMulti
+          inputId={`filter-value-${index}`}
+          classNamePrefix={`filter-value-${index}`}
           components={{
             MultiValueContainer: (props) => {
               if (props.selectProps?.value?.length <= 1) {
@@ -483,6 +498,8 @@ const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
       getOptionValue={(f) => f.value}
       onChange={(f) => onChangeValue(f.value)}
       isClearable={!value}
+      inputId={`filter-value-${index}`}
+      classNamePrefix={`filter-value-${index}`}
     />
   );
 };

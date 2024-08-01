@@ -15,6 +15,8 @@ fileignoreconfig:
   checksum: 705052edbac7a842f439e66bf6b28f9232ba50c7a19b1da058ce288d4c016405
 - filename: website/.yarnrc.yml
   checksum: 67aa1e699cae0e970cd67128e0d83e792c2d589d96df8a1d2dd5e6cc8d40b64d
+- filename: e2e/scripts/populate-db.ts
+  checksum: 4dcf8959d9b95e0451eebbfa0bc372ada4b5186f8fbd65286454016c1434095d
 scopeconfig:
 - scope: node
 threshold: high

@@ -24,12 +24,12 @@ async function createUsersAndOrgas() {
 
   for (let i = 1; i < 12; i++) {
     const orgId = uuidv4();
-    const adminId = uuidv4();
+    const adminId = i === 11 ? "33400b35-7b77-406b-bb4d-da9bc2dc1832" : uuidv4();
     const healthProfessionalId = uuidv4();
     const normalUserId = uuidv4();
     const restrictedUserId = uuidv4();
     const statsOnlyUserId = uuidv4();
-    const teamId = uuidv4();
+    const teamId = i === 11 ? "33400b35-7b77-406b-bb4d-da9bc2dc1831" : uuidv4();
 
     await client.query(
       `INSERT INTO mano."Organisation" (
@@ -360,6 +360,33 @@ async function createUsersAndOrgas() {
       );`,
       [uuidv4(), statsOnlyUserId, teamId, date, orgId]
     );
+    if (i === 11) {
+      await client.query(
+        `INSERT INTO mano."Person" (
+          _id,
+          "createdAt",
+          "updatedAt",
+          "organisation",
+          "encrypted",
+          "encryptedEntityKey"
+        ) VALUES (
+          $1,
+          $2,
+          $3,
+          $4,
+          $5,
+          $6
+        );`,
+        [
+          "88eadc54-0f10-49ab-8da7-7b4290fe2866",
+          "2020-06-01",
+          "2021-07-01",
+          orgId,
+          "GjzLbXN8Xu1IgA3vGAZUcz2kGrVCjFUowewc5r4f7BuypsfbdYDsGiYr6QdBMMJkO/Cd87qWUWkjd+cXUYx8FjDSg/lOPopHayTSz6F1nZowk9WCwQcRs6AnzW62lKyS+A8/kjl5tgvGoaEVjG+XQENcNun2zsWnjZYf6uHnZteukOefDhCMlrKWrXSNqZ24E/ipLgmUjcrJzJfvitQyqVdg6d4fONyNqqsowaQ//6T+nIoX3G0SW43Hyy25qtR80ZdhuHSvDdfjD/YMtaJ7w8bRNgUyeurwGxQWOpwNrsIkgFK7b8nj+EmRIcDt8wJY6Zx1LGYAP9lnsyojqLlcmbKegr7QqH4ZpzDUCATAKW0R1Ya0kz4hSmxJO3vKNp1HNHoiKRQrHviw1xxUzKAiljFARhxBw3++rZ7cfUSv+WLNsKSlYj41bkfNEmV32pA4uxzg6XcgFU4FCj+02TD7C+brMtpNJ3Kzl50OQfgrT+js4qGVPGBdns7vc8SRhiHugcbESed2Up74WsTcc1ziL+Xcug33B3uqnWjgV9oKCbiJSzQb1Lw3TovBYTLcOaaYI5SXiISZtaoAlBT3vLVXVQ4IkQQeTr8X/WmuGsuAqirJyoEw0+/DGruri+QwXUHNb9qsQ2uSperXN9FhUVvtJjZajcmDEKupH/sa0Yjyo7IMOKvRHhlNPuyhaxk7KyDEKTpThnMNYhPrG937oXJXpaVBEnRzYkWzCLTGIoTH6gACGJNr0IKjYIe3OjYNK+C2f1fusHDtdfadficCnaIwJCTlAYFkSSOFOU8wsstmMepFRywt98jBuAZV1fc8lAQAdfHzqMxlBuJW7swPCWOtnvVYO78O8ahKY0xQKrNz/mscY4ZAT5Wt5bLmnkjvZChQpkdIFqMxpMlgXN26xtLEcuiTNqrJCWnTF+m+CmOF2SvYTh+4W2Jak03VgO+C7FVDRmK0QamRwvuHFQFeZHA1L/5S1WIWa6I905PPlB1UucmHpgEAyygLXAgsL5I0j3FuTaut077xzHPH5hi6jOxbl3GkxynkpV1kMNUdVcviMJSEyuQGwtgvToILG4QZiW9s1+d101UmYxuv3QvZz8ixx7cArrkse8nDI1UhjNAwLSobm8yAgE54pu/diSvTMYoIbK2PF12Zcq7xfyWakqKas/JPGWnBmRQzuZJLUHJ8y3VvtERu2cYKArJ5hBDjbvCg4khde93DK8sroGQvopZHjaR1kT6+E2JeMOKHBfkQnicx499w2y4+J6pcb9HfkgF+JECpIdAVI0B/0d3ky+2ruQ/3nmF0v/pN34OkFavEWM/teWf0Yo4xqLt1KEDuYrMbIbqJIcwq0Ac/WSj+rS6fCqvCWeSDTS7WsjFONhyE+8ddG4P7pyg6kucxOIup8osvrzcft5i4acWAXWESa1//Pjr9F5hOyD0N4kOLFBjWd2+JVYvAJHSC9dh6NL1Z5MKlwc0/SrRFS+ORqsmPktE2vBaS/iq55V61LWqme+sOUG5nPZAKTMQoTLhcJSPE2r66tbbP8flnFZbew/zkBUhliMAzTKBF3ySBjO6iylvZwBvjFMHCgetHT5bTFXg6fp3MiM9decW7o08PSzArYtdj65zHQLz0HS1QrQfL75WdtN+OA8oVChmv2AJwQltcZSXNLNIhpURubuOK9bBF1qUYkZtxB6Vk2+l8FoIfOnthy/1+MmE7oj7JCq9376WFLbWnWzxzjTFiZ6UWpSdsDvqQ9as13eHfS2tyWAmD/Q==",
+          "2EuzoRd53dgitngJyLiRUEaIbqGLt/0PGQ07sl/sk4RURP/IfgE5t+IpMIUmtCi6xDfjVelNtLyk735uAbDtG4U7L/HGjNtY",
+        ]
+      );
+    }
   }
 
   // Get first organisation ID

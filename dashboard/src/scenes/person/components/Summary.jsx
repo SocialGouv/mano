@@ -17,6 +17,8 @@ export default function Summary({ person }) {
   const customFieldsPersons = useRecoilValue(customFieldsPersonsSelector);
   const organisation = useRecoilValue(organisationState);
 
+  console.log({ person });
+
   return (
     <>
       {!import.meta.env.VITE_TEST_PLAYWRIGHT && <SummaryPrint person={person} />}

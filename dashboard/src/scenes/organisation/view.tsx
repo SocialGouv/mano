@@ -67,6 +67,67 @@ const getSettingTitle = (tabId) => {
   return "";
 };
 
+const testPerson = {
+  _id: "88eadc54-0f10-49ab-8da7-7b4290fe2866",
+  organisation: "00000000-5f5a-89e2-2e60-88fa20cc50bf",
+  createdAt: new Date("2020-06-01T12:32:41.459Z"),
+  updatedAt: new Date("2021-07-01T12:32:41.459Z"),
+  user: "33400b35-7b77-406b-bb4d-da9bc2dc1832",
+  name: "Personne test",
+  gender: "Femme",
+  birthdate: new Date("2000-07-31T12:00:00.000Z"),
+  alertness: true,
+  wanderingAt: new Date("2015-07-31T12:00:00.000Z"),
+  assignedTeams: ["33400b35-7b77-406b-bb4d-da9bc2dc1831"],
+  followedSince: new Date("2020-05-16T12:00:00.000Z"),
+  outOfActiveList: false,
+  outOfActiveListDate: null,
+  history: [
+    {
+      date: new Date("2020-07-01T12:32:54.742Z"),
+      user: "33400b35-7b77-406b-bb4d-da9bc2dc1832",
+      userName: "Arnaud (compte technique)",
+      data: {
+        followedSince: {
+          oldValue: new Date("2020-06-01T12:32:41.459Z"),
+          newValue: new Date("2020-05-16T12:00:00.000Z"),
+        },
+        gender: {
+          oldValue: undefined,
+          newValue: "Homme",
+        },
+        birthdate: {
+          oldValue: undefined,
+          newValue: new Date("2000-07-31T12:00:00.000Z"),
+        },
+        wanderingAt: {
+          oldValue: undefined,
+          newValue: new Date("2015-07-31T12:00:00.000Z"),
+        },
+        alertness: {
+          oldValue: undefined,
+          newValue: true,
+        },
+      },
+    },
+    {
+      date: new Date("2021-07-01T12:32:54.742Z"),
+      user: "33400b35-7b77-406b-bb4d-da9bc2dc1832",
+      userName: "Arnaud (compte technique)",
+      data: {
+        gender: {
+          oldValue: "Homme",
+          newValue: "Femme",
+        },
+        alertness: {
+          oldValue: true,
+          newValue: false,
+        },
+      },
+    },
+  ],
+};
+
 function TabTitle({ children }) {
   return <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">{children}</h3>;
 }
@@ -94,6 +155,11 @@ const View = () => {
   const { preparePersonForEncryption } = usePreparePersonForEncryption();
   const [refreshErrorKey, setRefreshErrorKey] = useState(0);
   const { refresh } = useDataLoader();
+
+  useEffect(() => {
+    // @ts-expect-error - test code
+    encryptItem(preparePersonForEncryption(testPerson)).then(console.log);
+  }, []);
 
   const [tab, setTab] = useState(() => {
     if (!organisation.encryptionEnabled) return "encryption";

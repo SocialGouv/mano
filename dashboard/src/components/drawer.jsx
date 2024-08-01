@@ -120,13 +120,6 @@ const Drawer = () => {
                   Statistiques
                 </NavLink>
               </li>
-              {organisation._id === MANO_TEST_ORG_ID && (
-                <li>
-                  <NavLink to="/stats-new" activeClassName="active">
-                    Statistiques NEW
-                  </NavLink>
-                </li>
-              )}
             </>
           )}
           {["admin"].includes(role) && isDesktop && (

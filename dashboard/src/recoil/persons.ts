@@ -94,6 +94,18 @@ export const personFieldsIncludingCustomFieldsSelector = selector({
   },
 });
 
+export const personTypesByFieldsNamesSelector = selector({
+  key: "personTypesByFieldsNamesSelector",
+  get: ({ get }) => {
+    const personFieldsIncludingCustomFields = get(personFieldsIncludingCustomFieldsSelector);
+    const personTypesByFieldsNames = {};
+    for (const field of personFieldsIncludingCustomFields) {
+      personTypesByFieldsNames[field.name] = field.type;
+    }
+    return personTypesByFieldsNames;
+  },
+});
+
 export const allowedPersonFieldsInHistorySelector = selector({
   key: "allowedPersonFieldsInHistorySelector",
   get: ({ get }) => {

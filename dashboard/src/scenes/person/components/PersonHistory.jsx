@@ -30,6 +30,7 @@ export default function PersonHistory({ person }) {
     const medicalFileHistory = person.medicalFile?.history || [];
     return cleanHistory([...personHistory, ...medicalFileHistory]).sort((a, b) => new Date(b.date) - new Date(a.date));
   }, [person.history, person.medicalFile?.history, user.healthcareProfessional]);
+  const [calendarDayCreatedAt, timeCreatedAt] = dayjsInstance(person.createdAt).format("DD/MM/YYYY HH:mm").split(" ");
 
   return (
     <div>
@@ -47,9 +48,13 @@ export default function PersonHistory({ person }) {
         </thead>
         <tbody className="small">
           {history.map((h) => {
+            const [calendarDay, time] = dayjsInstance(h.date).format("DD/MM/YYYY HH:mm").split(" ");
             return (
               <tr key={h.date} className="tw-cursor-default">
-                <td>{dayjsInstance(h.date).format("DD/MM/YYYY HH:mm")}</td>
+                <td>
+                  <span>{calendarDay}</span>
+                  <span className="tw-ml-4">{time}</span>
+                </td>
                 <td>
                   <UserName id={h.user} name={h.userName} />
                 </td>
@@ -149,7 +154,10 @@ export default function PersonHistory({ person }) {
           })}
           {person?.createdAt && (
             <tr key={person.createdAt} className="tw-cursor-default">
-              <td>{dayjsInstance(person.createdAt).format("DD/MM/YYYY HH:mm")}</td>
+              <td>
+                <span>{calendarDayCreatedAt}</span>
+                <span className="tw-ml-4">{timeCreatedAt}</span>
+              </td>
               <td>
                 <UserName id={person.user} />
               </td>

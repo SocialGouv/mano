@@ -75,6 +75,11 @@ export interface PersonPopulated extends PersonInstance {
   relsPersonPlace?: any[];
   consultations?: ConsultationInstance[];
   hasAtLeastOneConsultation?: boolean;
+  numberOfConsultations?: number;
+  numberOfActions?: number;
+  numberOfTreatments?: number;
+  numberOfPassages?: number;
+  numberOfRencontres?: number;
   treatments?: TreatmentInstance[];
   commentsMedical?: any[];
   medicalFile?: MedicalFileInstance;
