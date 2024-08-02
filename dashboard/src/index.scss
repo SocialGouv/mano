@@ -36,6 +36,32 @@
   cursor: wait !important;
 }
 
+.my-tooltip {
+  position: relative;
+}
+
+.my-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  font-weight: 400;
+  bottom: 100%;
+  left: 0;
+  width: max-content;
+  // transform: translateX(-500px);
+  background-color: #333;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  white-space: pre-wrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.1s ease-in-out;
+}
+
+.my-tooltip:hover::after {
+  opacity: 1;
+}
+
 /* inspired from https://tailwindui.com/components/application-ui/forms/input-groups#component-2607d970262ada86428f063c72b1e7bd */
 div.tailwindui,
 input.tailwindui,

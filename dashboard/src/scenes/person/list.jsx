@@ -31,7 +31,7 @@ import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from "../../compo
 import { useDeletePerson } from "./components/DeletePersonButton";
 import { toast } from "react-toastify";
 import DeleteButtonAndConfirmModal from "../../components/DeleteButtonAndConfirmModal";
-import PersonName from "../../components/PersonName";
+import PersonName, { getPersonInfo } from "../../components/PersonName";
 
 const limit = 20;
 
@@ -378,7 +378,7 @@ const PersonsTable = ({ data, setSortOrder, setSortBy, sortOrder, sortBy, histor
           render: (p) => {
             if (p.outOfActiveList)
               return (
-                <div className="tw-max-w-md tw-text-black50">
+                <div className="tw-max-w-md tw-text-black50 my-tooltip" data-tooltip={getPersonInfo(p)}>
                   <p className="tw-mb-0 tw-items-center tw-gap-1 tw-font-bold [overflow-wrap:anywhere]">
                     {p.name}
                     {p.otherNames ? <small className="tw-inline tw-text-main"> - {p.otherNames}</small> : null}
@@ -387,7 +387,10 @@ const PersonsTable = ({ data, setSortOrder, setSortBy, sortOrder, sortBy, histor
                 </div>
               );
             return (
-              <p className="tw-mb-0 tw-max-w-md tw-items-center tw-gap-1 tw-font-bold [overflow-wrap:anywhere]">
+              <p
+                className="tw-mb-0 tw-max-w-md tw-items-center tw-gap-1 tw-font-bold [overflow-wrap:anywhere] my-tooltip"
+                data-tooltip={getPersonInfo(p)}
+              >
                 {p.name}
                 {p.otherNames ? <small className="tw-inline tw-text-main"> - {p.otherNames}</small> : null}
               </p>
