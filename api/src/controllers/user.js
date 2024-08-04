@@ -671,7 +671,7 @@ router.get(
         gaveFeedbackEarly2023: user.gaveFeedbackEarly2023,
         lastLoginAt: user.lastLoginAt,
         decryptAttempts: user.decryptAttempts,
-        teams: user.teams ? user.teams.map(serializeTeam) : [],
+        teams: user.Teams ? user.Teams.map(serializeTeam) : [],
       };
     });
 

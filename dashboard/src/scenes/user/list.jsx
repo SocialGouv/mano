@@ -150,6 +150,7 @@ const List = () => {
             title: "Équipes",
             dataKey: "teams",
             render: (user) => {
+              console.log("user", user);
               return (
                 <div className="tw-flex tw-flex-col tw-gap-1">
                   {(user.teams || []).map((t) => (
