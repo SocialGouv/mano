@@ -724,8 +724,8 @@ function DocumentModal<T extends DocumentWithLinkedItem>({
                   try {
                     const fileURL = await viewBlobInNewWindow(url);
                     window.open(fileURL, "_blank");
-                  } catch (error) {
-                  }
+                    // eslint-disable-next-line no-empty
+                  } catch (_error) {}
                 }}
               >
                 Ouvrir dans une nouvelle fenêtre

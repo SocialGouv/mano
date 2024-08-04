@@ -24,6 +24,7 @@ import { checkEncryptedVerificationKey, resetOrgEncryptionKey, setOrgEncryptionK
 import { errorMessage } from "../../utils";
 import KeyInput from "../../components/KeyInput";
 import { capture } from "../../services/sentry";
+import { saveLogToSessionStorage } from "../../utils/copy-logs-in-sessionstorage";
 
 const SignIn = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
@@ -100,7 +101,7 @@ const SignIn = () => {
         setAuthViaCookie(true);
         const { organisation } = user;
         const storedOrganisationId = window.localStorage.getItem("mano-organisationId");
-        console.log(
+        saveLogToSessionStorage(
           "storedOrganisationId",
           storedOrganisationId,
           "organisation._id",
@@ -110,7 +111,7 @@ const SignIn = () => {
         if (storedOrganisationId && storedOrganisationId !== organisation._id) {
           await resetCache("call ResetCache from useEffect in signin.jsx");
         } else {
-          console.log("no need to reset cache from useEffect in signin.jsx");
+          saveLogToSessionStorage("no need to reset cache from useEffect in signin.jsx");
         }
         setOrganisation(organisation);
         setUserName(user.name);
@@ -170,7 +171,7 @@ const SignIn = () => {
     if (!ok) return setIsSubmitting(false);
     const { organisation } = user;
     const storedOrganisationId = window.localStorage.getItem("mano-organisationId");
-    console.log(
+    saveLogToSessionStorage(
       "storedOrganisationId",
       storedOrganisationId,
       "organisation._id",
@@ -180,7 +181,7 @@ const SignIn = () => {
     if (storedOrganisationId && storedOrganisationId !== organisation._id) {
       await resetCache("call ResetCache from handleSubmit in signin.jsx");
     } else {
-      console.log("no need to reset cache from handleSubmit in signin.jsx");
+      saveLogToSessionStorage("no need to reset cache from handleSubmit in signin.jsx");
     }
     setOrganisation(organisation);
     setUser(user);

@@ -7,7 +7,7 @@ import * as Sentry from "@sentry/react";
 import { fr } from "date-fns/esm/locale";
 import { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import copyLogsToSessionStorage from "./utils/copy-logs-in-sessionstorage";
+import { saveLogToSessionStorage } from "./utils/copy-logs-in-sessionstorage";
 import Account from "./scenes/account";
 import Auth from "./scenes/auth";
 import Organisation from "./scenes/organisation";
@@ -44,8 +44,6 @@ import { getHashedOrgEncryptionKey } from "./services/encryption";
 import { deploymentCommitState, deploymentDateState, showOutdateAlertBannerState } from "./recoil/version";
 
 RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = import.meta.env.VITE_DISABLE_RECOIL_DUPLICATE_ATOM_KEY_CHECKING ? false : true;
-
-copyLogsToSessionStorage();
 
 const ToastifyFastTransition = cssTransition({
   enter: "Toastify--animate Toastify__hack-force-fast Toastify__bounce-enter",
@@ -100,7 +98,7 @@ function abortRequests() {
     // reset new abort controller ?
     // API.abortController = new AbortController();
   } catch (e) {
-    console.log("Aborting requests failed", e);
+    saveLogToSessionStorage("Aborting requests failed", e);
     console.error(e);
   }
 }
@@ -143,7 +141,7 @@ const App = () => {
   const deploymentDate = useRecoilValue(deploymentDateState);
 
   if (!user && showOutdateAlertBanner && !window.localStorage.getItem("automaticReload")) {
-    console.log("automatic force reload 🤖💪🆙");
+    saveLogToSessionStorage("automatic force reload 🤖💪🆙");
     abortRequests();
     window.localStorage.setItem("deploymentDate", deploymentDate);
     window.localStorage.setItem("deploymentCommit", deploymentCommit);

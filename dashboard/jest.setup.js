@@ -8,6 +8,7 @@ global.window.localStorage = {
 
 global.window.sessionStorage = {
   clear: jest.fn(),
+  removeItem: jest.fn(),
 };
 
 global.window.indexedDB = {

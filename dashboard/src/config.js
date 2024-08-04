@@ -50,7 +50,7 @@ const SCHEME =
     : "https";
 const ENV = process.env.NODE_ENV || "production";
 const VERSION = process.env.SHA || packageInfo.version;
-console.log(VERSION); // remove me!
+
 const DEFAULT_ORGANISATION_KEY =
   process.env.NODE_ENV === "development" && import.meta.env.VITE_TEST !== "true" ? import.meta.env.VITE_DEFAULT_ORGANISATION_KEY : "";
 
