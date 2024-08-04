@@ -356,8 +356,6 @@ const BlockCreatedAt = ({ persons }) => {
         }
       }
 
-      if (isNaN(totalFollowedTime)) console.log("person", person);
-
       return total + totalFollowedTime;
     }, 0) / (persons.length || 1);
 

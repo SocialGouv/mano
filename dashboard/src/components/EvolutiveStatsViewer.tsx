@@ -106,7 +106,6 @@ export default function EvolutiveStatsViewer({
             user.role === "stats-only"
               ? undefined
               : (newSlice) => {
-                  console.log("newSlice", newSlice);
                   setPersonsModalOpened(true);
                   setModalValueEnd(newSlice);
                 }

@@ -44,10 +44,8 @@ const getRawValue = (field, value) => {
     if (field.type === "enum") return <span>{value}</span>;
     if (field.type === "multi-choice") return <span>{(value || []).join(", ")}</span>;
     if (field.type === "boolean") return <input type="checkbox" defaultChecked={value} />;
-  } catch (e) {
-    console.log(e);
-    console.log(field, value);
-  }
+    // eslint-disable-next-line no-empty
+  } catch (_e) {}
   return "";
 };
 

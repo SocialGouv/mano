@@ -597,7 +597,6 @@ const CreateUser = ({ onChange, open, setOpen, organisation }) => {
               onChange();
               setOpen(false);
             } catch (orgCreationError) {
-              console.log("error in creating organisation", orgCreationError);
               actions.setSubmitting(false);
               toast.error(orgCreationError.message);
             }

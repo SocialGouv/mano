@@ -160,7 +160,6 @@ const AddField = ({ groupTitle: typeName }) => {
         refresh();
       }
     } catch (orgUpdateError) {
-      console.log("error in updating organisation", orgUpdateError);
       toast.error(orgUpdateError.message);
     }
     setIsAddingField(false);
@@ -241,7 +240,6 @@ const ConsultationCustomField = ({ item: customField, groupTitle: typeName }) =>
         refresh();
       }
     } catch (orgUpdateError) {
-      console.log("error in updating organisation", orgUpdateError);
       toast.error(orgUpdateError.message);
     }
     setIsEditingField(false);
@@ -304,7 +302,6 @@ const ConsultationCustomField = ({ item: customField, groupTitle: typeName }) =>
         refresh();
       }
     } catch (orgUpdateError) {
-      console.log("error in updating organisation", orgUpdateError);
       toast.error(orgUpdateError.message);
     }
     setIsEditingField(false);

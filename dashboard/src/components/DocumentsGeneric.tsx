@@ -725,7 +725,6 @@ function DocumentModal<T extends DocumentWithLinkedItem>({
                     const fileURL = await viewBlobInNewWindow(url);
                     window.open(fileURL, "_blank");
                   } catch (error) {
-                    console.log(error);
                   }
                 }}
               >

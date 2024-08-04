@@ -90,7 +90,6 @@ const View = () => {
             actions.setSubmitting(false);
             toast.success("Mis à jour !");
           } catch (errorUpdatingUser) {
-            console.log("error in updating user", errorUpdatingUser);
             toast.error(errorUpdatingUser.message);
           }
         }}

@@ -35,7 +35,6 @@ export const filterItem =
           }
         }
         if (comparator === "equals") {
-          console.log({ itemNumber, number }, Number(itemNumber), Number(number), Number(itemNumber) === Number(number));
           if (Number(itemNumber) === Number(number)) continue;
           return false;
         }
@@ -484,9 +483,8 @@ const ValueSelector = ({ index, field, filterValues, value, onChangeValue, base 
           }}
         />
       );
-    } catch (e) {
-      console.log(e);
-    }
+      // eslint-disable-next-line no-empty
+    } catch (_e) {}
     return null;
   }
 

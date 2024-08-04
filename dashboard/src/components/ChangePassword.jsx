@@ -81,7 +81,6 @@ const ChangePassword = ({ onSubmit, onFinished, withCurrentPassword, centerButto
       }
       onFinished(false);
     } catch (errorUpdatePassword) {
-      console.log("error in updating password", errorUpdatePassword);
       toast.error(errorUpdatePassword);
     }
   };

@@ -116,8 +116,7 @@ export default function ImportStructures() {
 
       setStructuresToImport(structures);
       setShowImportSummary(true);
-    } catch (e) {
-      console.log(e);
+    } catch (_e) {
       toast.error("Désolé, nous n'avons pas pu lire votre fichier. Mais vous pouvez réssayer !");
     }
     setReloadKey((k) => k + 1);

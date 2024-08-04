@@ -243,7 +243,6 @@ const Create = ({ onChange, users }) => {
       setData(initialState);
       return true;
     } catch (errorCreatingUser) {
-      console.log("error in creating user", errorCreatingUser);
       toast.error(errorCreatingUser.message);
       setIsSubmitting(false);
       return false;

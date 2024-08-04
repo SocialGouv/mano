@@ -20,7 +20,6 @@ export function getUmapGeoJSONFromOrgs(organisations: Array<OrganisationInstance
     const city = organisation.city;
     if (!city) continue;
     const [cityAndDepartment, stringifiedCoordinates] = city.split(" - ");
-    console.log({ cityAndDepartment, stringifiedCoordinates });
     const coordinates = JSON.parse(stringifiedCoordinates) as [number, number];
     if (!geoJSONs[cityAndDepartment]) {
       geoJSONs[cityAndDepartment] = {

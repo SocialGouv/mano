@@ -19,7 +19,6 @@ export default function CitySelect({ name, id, value, onChange }: { value: City;
     const response: Array<GeoApiResponse> = await fetch(
       `https://geo.api.gouv.fr/communes?nom=${inputValue}&fields=codeDepartement,centre&boost=population&limit=5`
     ).then((res) => res.json());
-    console.log({ response });
     const options = response.map((city) => {
       const cityAndDepartment = `${city.nom} (${city.codeDepartement})`;
       return { value: `${cityAndDepartment} - ${JSON.stringify(city.centre.coordinates)}`, label: cityAndDepartment };

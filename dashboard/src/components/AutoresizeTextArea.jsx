@@ -15,9 +15,8 @@ export default function AutoResizeTextarea({ name, value, onChange, rows = 1, pl
         if (textarea && heightObserver?.unobserve) {
           heightObserver?.unobserve?.(textarea);
         }
-      } catch (error) {
-        console.log(error);
-      }
+        // eslint-disable-next-line no-empty
+      } catch (_error) {}
     };
   }, []);
 

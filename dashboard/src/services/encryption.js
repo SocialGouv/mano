@@ -135,17 +135,12 @@ export const _encrypt_and_prepend_nonce_uint8array = async (message_string_or_ui
 };
 
 export const encodeContent = (content) => {
-  try {
-    const purifiedContent = content
-      // https://stackoverflow.com/a/31652607/5225096
-      .replace(/[\u007F-\uFFFF]/g, (chr) => "\\u" + ("0000" + chr.charCodeAt(0).toString(16)).substr(-4))
-      .replace(/\//g, "\\/");
-    const base64PurifiedContent = window.btoa(purifiedContent);
-    return base64PurifiedContent;
-  } catch (errorPurifying) {
-    console.log("error purifying content", errorPurifying);
-    throw errorPurifying;
-  }
+  const purifiedContent = content
+    // https://stackoverflow.com/a/31652607/5225096
+    .replace(/[\u007F-\uFFFF]/g, (chr) => "\\u" + ("0000" + chr.charCodeAt(0).toString(16)).substr(-4))
+    .replace(/\//g, "\\/");
+  const base64PurifiedContent = window.btoa(purifiedContent);
+  return base64PurifiedContent;
 };
 
 export const encrypt = async (content, entityKey, masterKey) => {
@@ -195,9 +190,8 @@ export const checkEncryptedVerificationKey = async (encryptedVerificationKey, ma
     const decryptedVerificationKey = window.atob(new TextDecoder().decode(decryptedVerificationKey_uint8array));
 
     return decryptedVerificationKey === verificationPassphrase;
-  } catch (e) {
-    console.log("error checkEncryptedVerificationKey", e);
-  }
+    // eslint-disable-next-line no-empty
+  } catch (_e) {}
   return false;
 };
 

@@ -142,8 +142,7 @@ export default function ImportPersons() {
       const encryptedMedicalFiles = await Promise.all(medicalFiles.map(prepareMedicalFileForEncryption(customFieldsMedicalFile)).map(encryptItem));
       setMedicalFilesToImport(encryptedMedicalFiles);
       setShowImportSummary(true);
-    } catch (e) {
-      console.log(e);
+    } catch (_e) {
       toast.error("Désolé, nous n'avons pas pu lire votre fichier. Mais vous pouvez réssayer !");
     }
     setReloadKey((k) => k + 1);

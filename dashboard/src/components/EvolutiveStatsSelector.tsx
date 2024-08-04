@@ -306,9 +306,8 @@ const ValueSelector = ({ fieldName, indicatorValues, value, onChangeValue, base 
           isClearable
         />
       );
-    } catch (e) {
-      console.log(e);
-    }
+      // eslint-disable-next-line no-empty
+    } catch (_e) {}
     return null;
   }
 
