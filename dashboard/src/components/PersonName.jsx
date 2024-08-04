@@ -6,8 +6,9 @@ import { dayjsInstance, formatAge } from "../services/date";
 
 export function getPersonInfo(person) {
   let infos = [];
-  if (person?.birthdate) {
-    infos.push(`Âge : ${formatAge(person?.birthdate)} (${dayjsInstance(person.birthdate).format("DD/MM/YYYY")})`);
+  if (!person) return "";
+  if (person.birthdate) {
+    infos.push(`Âge : ${formatAge(person.birthdate)} (${dayjsInstance(person.birthdate).format("DD/MM/YYYY")})`);
   }
   infos.push(`Genre : ${person.gender ?? ""}`);
   infos.push(`Suivi·e depuis le : ${dayjsInstance(person.followedSince || person.createdAt).format("DD/MM/YYYY")}`);
