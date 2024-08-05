@@ -14,6 +14,7 @@ export const userState = atom<UserInstance | null>({
         AppSentry.setUser({
           id: user?._id,
           email: user?.email,
+          organisation: user?.organisation,
         })
       ),
   ],
