@@ -24,7 +24,7 @@ import { checkEncryptedVerificationKey, resetOrgEncryptionKey, setOrgEncryptionK
 import { errorMessage } from "../../utils";
 import KeyInput from "../../components/KeyInput";
 import { capture } from "../../services/sentry";
-import { saveLogToSessionStorage } from "../../utils/copy-logs-in-sessionstorage";
+import { addToDebugMixedOrgsBug } from "../../utils/debug-mixed-orgs-bug";
 
 const SignIn = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
@@ -101,17 +101,15 @@ const SignIn = () => {
         setAuthViaCookie(true);
         const { organisation } = user;
         const storedOrganisationId = window.localStorage.getItem("mano-organisationId");
-        saveLogToSessionStorage(
-          "storedOrganisationId",
-          storedOrganisationId,
-          "organisation._id",
-          organisation._id,
-          storedOrganisationId && storedOrganisationId !== organisation._id
-        );
+        addToDebugMixedOrgsBug({
+          logFrom: "useEffect signin.jsx",
+          "organisation._id": organisation._id,
+          "storedOrganisationId && storedOrganisationId !== organisation._id": storedOrganisationId && storedOrganisationId !== organisation._id,
+        });
         if (storedOrganisationId && storedOrganisationId !== organisation._id) {
           await resetCache("call ResetCache from useEffect in signin.jsx");
         } else {
-          saveLogToSessionStorage("no need to reset cache from useEffect in signin.jsx");
+          addToDebugMixedOrgsBug("no need to reset cache from useEffect in signin.jsx");
         }
         setOrganisation(organisation);
         setUserName(user.name);
@@ -171,17 +169,15 @@ const SignIn = () => {
     if (!ok) return setIsSubmitting(false);
     const { organisation } = user;
     const storedOrganisationId = window.localStorage.getItem("mano-organisationId");
-    saveLogToSessionStorage(
-      "storedOrganisationId",
-      storedOrganisationId,
-      "organisation._id",
-      organisation._id,
-      storedOrganisationId && storedOrganisationId !== organisation._id
-    );
+    addToDebugMixedOrgsBug({
+      logFrom: "handleSubmit in signin.jsx",
+      "organisation._id": organisation._id,
+      "storedOrganisationId && storedOrganisationId !== organisation._id": storedOrganisationId && storedOrganisationId !== organisation._id,
+    });
     if (storedOrganisationId && storedOrganisationId !== organisation._id) {
       await resetCache("call ResetCache from handleSubmit in signin.jsx");
     } else {
-      saveLogToSessionStorage("no need to reset cache from handleSubmit in signin.jsx");
+      addToDebugMixedOrgsBug("no need to reset cache from handleSubmit in signin.jsx");
     }
     setOrganisation(organisation);
     setUser(user);

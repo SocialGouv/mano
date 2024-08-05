@@ -4,7 +4,7 @@ import { organisationState } from "../recoil/auth";
 import { deploymentCommitState, deploymentDateState } from "../recoil/version";
 import { capture } from "./sentry";
 import { toast } from "react-toastify";
-import { saveLogToSessionStorage } from "../utils/copy-logs-in-sessionstorage";
+import { addToDebugMixedOrgsBug } from "../utils/debug-mixed-orgs-bug";
 
 class AuthError extends Error {
   constructor() {
@@ -191,7 +191,10 @@ export async function tryFetchBlob<T extends Blob>(callback: FetchCallback<T>): 
     const result = await callback();
     return [undefined, result];
   } catch (error) {
-    saveLogToSessionStorage("error in tryFetchBlob", error);
+    addToDebugMixedOrgsBug({
+      logFrom: "error in tryFetchBlob",
+      error,
+    });
     console.log("error.name in tryFetchBlob", error.name);
     if (error instanceof AuthError) window.location.href = "/auth?disconnected=1";
     else capture(error);
@@ -212,7 +215,10 @@ export async function tryFetch<T extends ApiResponse>(callback: FetchCallback<T>
     if (result && !result.ok) return [new Error(result.error), result];
     return [undefined, result];
   } catch (error) {
-    saveLogToSessionStorage("error in tryFetch", error);
+    addToDebugMixedOrgsBug({
+      logFrom: "error in tryFetch",
+      error,
+    });
     console.log("error.name in tryFetch", error.name);
     console.log("signal aborted", API.abortController.signal.aborted);
     console.log("signal aborted reason", API.abortController.signal.reason); // Aborted by navigation
@@ -240,7 +246,10 @@ export async function tryFetchExpectOk<T extends ApiResponse>(callback: FetchCal
     if (result && result?.ok === false) throw new Error(result.error);
     return [undefined, result];
   } catch (error) {
-    console.log("error in tryFetchExpectOk", error);
+    addToDebugMixedOrgsBug({
+      logFrom: "error in tryFetchExpectOk",
+      error,
+    });
     console.log("error.name in tryFetchExpectOk", error.name);
     console.log("signal aborted", API.abortController.signal.aborted);
     console.log("signal aborted reason", API.abortController.signal.reason); // Aborted by navigation

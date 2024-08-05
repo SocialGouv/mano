@@ -1,6 +1,6 @@
 import { type UseStore, set, get, createStore, keys, delMany, clear } from "idb-keyval";
 import { capture } from "./sentry";
-import { saveLogToSessionStorage } from "../utils/copy-logs-in-sessionstorage";
+import { addToDebugMixedOrgsBug } from "../utils/debug-mixed-orgs-bug";
 
 export const dashboardCurrentCacheKey = "mano_last_refresh_2024_06_11";
 const legacyStoreName = "mano_last_refresh_2022_01_11";
@@ -34,14 +34,14 @@ async function deleteDB() {
 }
 
 export async function clearCache(calledFrom = "not defined", iteration = 0) {
-  saveLogToSessionStorage("clearing cache from ", calledFrom, "iteration", iteration);
+  addToDebugMixedOrgsBug(`clearing cache from ${calledFrom}, iteration ${iteration}`);
   if (iteration > 10) {
     throw new Error("Failed to clear cache");
   }
   await deleteDB().catch(capture);
-  saveLogToSessionStorage("clearing localStorage");
+  addToDebugMixedOrgsBug("clearing localStorage");
   window.localStorage?.clear();
-  saveLogToSessionStorage("cleared localStorage");
+  addToDebugMixedOrgsBug("cleared localStorage");
   // window.sessionStorage?.clear();
 
   // wait 200ms to make sure the cache is cleared
@@ -59,9 +59,9 @@ export async function clearCache(calledFrom = "not defined", iteration = 0) {
       setupDB();
       resolve(true);
     } else {
-      if (!localStorageEmpty) saveLogToSessionStorage("localStorage not empty", window.localStorage.key(0));
-      // if (!sessionStorageEmpty) saveLogToSessionStorage("sessionStorage not empty");
-      if (!indexedDBEmpty) saveLogToSessionStorage("indexedDB not empty");
+      if (!localStorageEmpty) addToDebugMixedOrgsBug(`localStorage not empty ${window.localStorage.key(0)}`);
+      // if (!sessionStorageEmpty) addToDebugMixedOrgsBug("sessionStorage not empty");
+      if (!indexedDBEmpty) addToDebugMixedOrgsBug("indexedDB not empty");
       clearCache("try again clearCache", iteration + 1).then(resolve);
     }
   });

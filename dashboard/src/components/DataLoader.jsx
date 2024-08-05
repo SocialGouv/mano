@@ -27,6 +27,7 @@ import useDataMigrator from "./DataMigrator";
 import { decryptItem } from "../services/encryption";
 import { errorMessage } from "../utils";
 import { capture } from "../services/sentry";
+import { getDebugMixedOrgsBug } from "../utils/debug-mixed-orgs-bug";
 
 // Update to flush cache.
 
@@ -257,7 +258,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
           const personsFromOtherOrgs = newPersons.filter((p) => p.organisation !== organisationId);
           if (personsFromOtherOrgs.length) {
             // get the logs to try to understand what happened
-            const logs = window.getConsoleLogs();
+            const logs = getDebugMixedOrgsBug();
             capture("DataLoader: personsFromOtherOrgs", { extra: { logs } });
           }
           setPersons(newPersons);
