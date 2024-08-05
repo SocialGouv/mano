@@ -49,7 +49,7 @@ export function getPersonSnapshotAtDate({
         ? getValueByField(fieldName, typesByFields[fieldName], snapshot[fieldName])
         : snapshot[fieldName];
       if (JSON.stringify(historyNewValue) !== JSON.stringify(currentPersonValue)) {
-        capture(new Error("Incoherent snapshot history 2"), {
+        capture(new Error("Incoherent snapshot history 3"), {
           extra: {
             historyItem,
             fieldName,
@@ -59,6 +59,9 @@ export function getPersonSnapshotAtDate({
             snapshotDate,
             // person: process.env.NODE_ENV === "development" ? person : undefined,
             // snapshot: process.env.NODE_ENV === "development" ? snapshot : undefined,
+          },
+          tags: {
+            personId: person._id,
           },
         });
       }
