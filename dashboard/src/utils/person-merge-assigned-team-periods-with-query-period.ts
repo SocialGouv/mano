@@ -18,12 +18,19 @@ export function mergedPersonAssignedTeamPeriodsWithQueryPeriod({
   assignedTeamsPeriods,
 }: GetPersonPeriodsArguments): Array<{ isoStartDate: string; isoEndDate: string }> {
   if (viewAllOrganisationData) {
-    return [
-      {
-        isoStartDate: assignedTeamsPeriods.all[0].isoStartDate > isoStartDate ? assignedTeamsPeriods.all[0].isoStartDate : isoStartDate,
-        isoEndDate: assignedTeamsPeriods.all[0].isoEndDate < isoEndDate ? assignedTeamsPeriods.all[0].isoEndDate : isoEndDate,
-      },
-    ];
+    const personIsoStartDate = assignedTeamsPeriods.all[0].isoStartDate;
+    const personIsoEndDate = assignedTeamsPeriods.all[0].isoEndDate;
+    if (isoStartDate > personIsoEndDate || isoEndDate < personIsoStartDate) {
+      return [];
+    } else if (isoStartDate < personIsoStartDate && isoEndDate > personIsoEndDate) {
+      return [{ isoStartDate: personIsoStartDate, isoEndDate: personIsoEndDate }];
+    } else if (isoStartDate < personIsoStartDate && isoEndDate <= personIsoEndDate) {
+      return [{ isoStartDate: personIsoStartDate, isoEndDate: isoEndDate }];
+    } else if (isoStartDate >= personIsoStartDate && isoEndDate > personIsoEndDate) {
+      return [{ isoStartDate: isoStartDate, isoEndDate: personIsoEndDate }];
+    } else {
+      return [{ isoStartDate: isoStartDate, isoEndDate: isoEndDate }];
+    }
   }
   const eachTeamPeriods = [];
   for (const [teamId, teamPeriods] of Object.entries(assignedTeamsPeriods)) {
@@ -76,5 +83,7 @@ export function filterPersonByAssignedTeamDuringQueryPeriod({
     selectedTeamsObjectWithOwnPeriod,
     assignedTeamsPeriods,
   });
+
+  console.log(periods);
   return periods.length > 0;
 }

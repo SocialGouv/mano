@@ -4,6 +4,7 @@ global.window.localStorage = {
   getItem: jest.fn(),
   setItem: jest.fn(),
   clear: jest.fn(),
+  key: jest.fn(),
 };
 
 global.window.sessionStorage = {

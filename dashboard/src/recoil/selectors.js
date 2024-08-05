@@ -15,6 +15,7 @@ import { treatmentsState } from "./treatments";
 import { rencontresState } from "./rencontres";
 import { groupsState } from "./groups";
 import { territoriesState } from "./territory";
+import { extractInfosFromHistory } from "../utils/person-history";
 
 const tomorrow = dayjsInstance().add(1, "day").format("YYYY-MM-DD");
 
@@ -92,31 +93,7 @@ export const itemsGroupedByPersonSelector = selector({
     const usersObject = get(usersObjectSelector);
     const today = startOfToday().toISOString();
     for (const person of persons) {
-      // FIXME: replace forTeamFiltering logic with assignedTeamsPeriods logic
-      let latestTeamFilteringItem = {
-        date: today,
-        assignedTeams: person.assignedTeams?.length ? person.assignedTeams : allTeamIds,
-        outOfActiveList: person.outOfActiveList, // organisation level
-        def: "today",
-      };
-      // assignedTeamsPeriods
-      // final format example, after looping the whole history: { teamIdA: [{ endDate: startDate: }, { endDate: startDate: }] }
-      // current format: { teamIdA: [{ endDate: now,  startDate: undefined }] }
-      const assignedTeamsPeriods = (person.assignedTeams || []).reduce(
-        (acc, teamId) => {
-          acc[teamId] = [{ isoEndDate: dayjsInstance().startOf("day").toISOString(), isoStartDate: undefined }];
-          return acc;
-        },
-        {
-          all: [
-            {
-              isoEndDate: dayjsInstance().startOf("day").toISOString(),
-              isoStartDate: dayjsInstance(person.followedSince || person.createdAt).toISOString(),
-            },
-          ],
-        }
-      );
-      let oldestTeams = person.assignedTeams || [];
+      const { interactions, assignedTeamsPeriods } = extractInfosFromHistory(person, allTeamIds);
       personsObject[person._id] = {
         ...person,
         followedSince: person.followedSince || person.createdAt,
@@ -125,66 +102,16 @@ export const itemsGroupedByPersonSelector = selector({
         formattedBirthDate: formatBirthDate(person.birthdate),
         age: ageFromBirthdateAsYear(person.birthdate),
         formattedPhoneNumber: person.phone?.replace(/\D/g, ""),
-        interactions: [person.followedSince || person.createdAt],
+        interactions,
+        assignedTeamsPeriods,
         lastUpdateCheckForGDPR: person.followedSince || person.createdAt,
         // BUG FIX: we used to set an `outOfActiveListDate` even if `outOfActiveList` was false.
         // https://github.com/SocialGouv/mano/blob/34a86a3e6900b852e0b3fe828a03e6721d200973/dashboard/src/scenes/person/OutOfActiveList.js#L22
         // This was causing a bug in the "person suivies" stats, where people who were not out of active list were counted as out of active list.
         outOfActiveListDate: person.outOfActiveList ? person.outOfActiveListDate : null,
-        forTeamFiltering: [latestTeamFilteringItem], // FIXME: replace forTeamFiltering logic with assignedTeamsPeriods logic
       };
-      // FIXME: replace forTeamFiltering logic with assignedTeamsPeriods logic
-      if (person.history?.length) {
-        for (const historyEntry of person.history) {
-          if (historyEntry.data.assignedTeams) {
-            let nextTeamFilteringItem = {
-              date: dayjsInstance(historyEntry.date).startOf("day").toISOString(),
-              assignedTeams: historyEntry.data.assignedTeams.newValue?.length ? historyEntry.data.assignedTeams.newValue : allTeamIds,
-              outOfActiveList: latestTeamFilteringItem.outOfActiveList,
-              def: "change-teams",
-            };
-            latestTeamFilteringItem = nextTeamFilteringItem;
-            personsObject[person._id].forTeamFiltering.push(nextTeamFilteringItem);
-          }
-        }
-      }
-      personsObject[person._id].forTeamFiltering.push({
-        date: person.createdAt,
-        assignedTeams: latestTeamFilteringItem.assignedTeams,
-        outOfActiveList: latestTeamFilteringItem.outOfActiveList,
-        def: "created",
-      });
-      if (person.history?.length) {
-        // history is sorted by date from the oldest to the newest (ascending order)
-        // we want to loop it from the newest to the oldest (descending order)
-        for (let i = person.history.length - 1; i >= 0; i--) {
-          const historyEntry = person.history[i];
-          personsObject[person._id].interactions.push(historyEntry.date);
-          if (historyEntry.data.assignedTeams) {
-            const currentTeams = historyEntry.data.assignedTeams.newValue || allTeamIds;
-            const previousTeams = historyEntry.data.assignedTeams.oldValue || allTeamIds;
-            const newlyAddedTeams = currentTeams.filter((t) => !previousTeams.includes(t));
-            const removedTeams = previousTeams.filter((t) => !currentTeams.includes(t));
-            for (const teamId of newlyAddedTeams) {
-              assignedTeamsPeriods[teamId] = (assignedTeamsPeriods[teamId] || []).map((period) => {
-                if (period.startDate) return period;
-                return { ...period, isoStartDate: dayjsInstance(historyEntry.date).toISOString() };
-              });
-            }
-            for (const teamId of removedTeams) {
-              if (!assignedTeamsPeriods[teamId]) assignedTeamsPeriods[teamId] = [];
-              assignedTeamsPeriods[teamId].unshift({ isoEndDate: dayjsInstance(historyEntry.date).toISOString() });
-            }
-            oldestTeams = previousTeams;
-          }
-        }
-      }
-      for (const teamId of oldestTeams) {
-        if (!assignedTeamsPeriods[teamId]) assignedTeamsPeriods[teamId] = [];
-        assignedTeamsPeriods[teamId].push({ startDate: person.followedSince || person.createdAt });
-      }
-      personsObject[person._id].assignedTeamsPeriods = assignedTeamsPeriods;
     }
+
     const actions = Object.values(get(actionsWithCommentsSelector));
     const comments = get(commentsState);
 

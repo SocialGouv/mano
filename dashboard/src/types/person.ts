@@ -3,6 +3,7 @@ import type { Document, DocumentWithLinkedItem, Folder } from "./document";
 import type { UserInstance } from "./user";
 import type { GroupInstance } from "./group";
 import type { TreatmentInstance } from "./treatment";
+import type { TeamInstance } from "./team";
 import type { ConsultationInstance } from "./consultation";
 import type { MedicalFileInstance } from "./medicalFile";
 import type { CustomField } from "./field";
@@ -39,6 +40,13 @@ export interface PersonHistoryEntry {
   >;
 }
 
+type AssignedTypePeriod = {
+  isoEndDate: string | null;
+  isoStartDate: string | null;
+};
+
+export type AssignedTeamsPeriods = Record<TeamInstance["_id"] | "all", Array<AssignedTypePeriod>>;
+
 export interface PersonInstance extends PersonInstanceBase {
   _id: UUIDV4;
   organisation: UUIDV4;
@@ -49,13 +57,6 @@ export interface PersonInstance extends PersonInstanceBase {
   [key: CustomField["name"]]: any;
 }
 
-export type ForTeamFilteringType = Array<{
-  date: string;
-  assignedTeams: UUIDV4[];
-  outOfActiveList: boolean;
-  def: "today" | "change-teams" | "created";
-}>;
-
 export interface PersonPopulated extends PersonInstance {
   userPopulated: UserInstance;
   formattedBirthDate: string;
@@ -65,8 +66,7 @@ export interface PersonPopulated extends PersonInstance {
   interactions: Date[];
   lastUpdateCheckForGDPR: Date;
   group?: GroupInstance;
-  forTeamFiltering: ForTeamFilteringType;
-  assignedTeamsPeriods: Record<UUIDV4, Array<{ isoStartDate: string; isoEndDate: string }>>;
+  assignedTeamsPeriods: AssignedTeamsPeriods;
   documentsForModule?: DocumentWithLinkedItem[];
   groupDocuments?: DocumentWithLinkedItem[];
   actions?: any[];

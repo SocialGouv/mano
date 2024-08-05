@@ -35,10 +35,10 @@ import ButtonCustom from "../../components/ButtonCustom";
 import dayjs from "dayjs";
 import { filterItem } from "../../components/Filters";
 import TabsNav from "../../components/tailwind/TabsNav";
-import { filterPersonByAssignedTeam } from "../../utils/filter-person";
 import { flattenedCustomFieldsConsultationsSelector } from "../../recoil/consultations";
 import { getPersonSnapshotAtDate } from "../../utils/person-snapshot";
 import { dayjsInstance } from "../../services/date";
+import { filterPersonByAssignedTeamDuringQueryPeriod } from "../../utils/person-merge-assigned-team-periods-with-query-period";
 
 const tabs = [
   "Général",
@@ -199,7 +199,14 @@ const itemsForStatsSelector = selectorFamily({
         // get persons for stats for period
         const createdDate = person.followedSince || person.createdAt;
 
-        if (filterPersonByAssignedTeam(viewAllOrganisationData, selectedTeamsObjectWithOwnPeriod, person.assignedTeams, person.forTeamFiltering)) {
+        const personIsInAssignedTeamDuringPeriod = filterPersonByAssignedTeamDuringQueryPeriod({
+          viewAllOrganisationData,
+          selectedTeamsObjectWithOwnPeriod,
+          assignedTeamsPeriods: person.assignedTeamsPeriods,
+          isoEndDate: defaultIsoDates.isoEndDate,
+          isoStartDate: defaultIsoDates.isoStartDate,
+        });
+        if (personIsInAssignedTeamDuringPeriod) {
           if (noPeriodSelected) {
             personsUpdated[person._id] = person;
             personsCreated[person._id] = person;
