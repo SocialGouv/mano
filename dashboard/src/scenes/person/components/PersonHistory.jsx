@@ -32,8 +32,6 @@ export default function PersonHistory({ person }) {
   }, [person.history, person.medicalFile?.history, user.healthcareProfessional]);
   const [calendarDayCreatedAt, timeCreatedAt] = dayjsInstance(person.createdAt).format("DD/MM/YYYY HH:mm").split(" ");
 
-  console.log("PersonHistory", { history });
-
   return (
     <div>
       <PersonTeamHistory person={person} history={history} teams={teams} />
