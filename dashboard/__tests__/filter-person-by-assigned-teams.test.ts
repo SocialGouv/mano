@@ -597,4 +597,135 @@ describe("Filter person by assigned teams within a period - Jan 2023 until dec 2
       ).toBe(false);
     });
   });
+  describe("filter filterByStartFollowBySelectedTeamDuringPeriod", () => {
+    describe("viewAllOrganisationData is true", () => {
+      test("if person start to be followed within the period, it should be included", () => {
+        const assignedTeamsPeriods = {
+          all: [
+            {
+              isoStartDate: addToDate(startDate, 1, "month"),
+              isoEndDate: dayjs().add(22, "year").toISOString(),
+            },
+          ],
+        };
+        expect(
+          filterPersonByAssignedTeamDuringQueryPeriod({
+            viewAllOrganisationData: true,
+            selectedTeamsObjectWithOwnPeriod: {},
+            assignedTeamsPeriods,
+            isoEndDate: period.isoEndDate,
+            isoStartDate: period.isoStartDate,
+            filterByStartFollowBySelectedTeamDuringPeriod: true,
+          })
+        ).toBe(true);
+      });
+      test("if person start to be followed before the period, it should NOT be included", () => {
+        const assignedTeamsPeriods = {
+          all: [
+            {
+              isoStartDate: addToDate(startDate, -1, "month"),
+              isoEndDate: dayjs().add(22, "year").toISOString(),
+            },
+          ],
+        };
+        expect(
+          filterPersonByAssignedTeamDuringQueryPeriod({
+            viewAllOrganisationData: true,
+            selectedTeamsObjectWithOwnPeriod: {},
+            assignedTeamsPeriods,
+            isoEndDate: period.isoEndDate,
+            isoStartDate: period.isoStartDate,
+            filterByStartFollowBySelectedTeamDuringPeriod: true,
+          })
+        ).toBe(false);
+      });
+
+      test("if person start to be followed after the period, it should NOT be included", () => {
+        const assignedTeamsPeriods = {
+          all: [
+            {
+              isoStartDate: addToDate(endDate, 1, "month"),
+              isoEndDate: dayjs().add(22, "year").toISOString(),
+            },
+          ],
+        };
+        expect(
+          filterPersonByAssignedTeamDuringQueryPeriod({
+            viewAllOrganisationData: true,
+            selectedTeamsObjectWithOwnPeriod: {},
+            assignedTeamsPeriods,
+            isoEndDate: period.isoEndDate,
+            isoStartDate: period.isoStartDate,
+            filterByStartFollowBySelectedTeamDuringPeriod: true,
+          })
+        ).toBe(false);
+      });
+    });
+    describe("viewAllOrganisationData is false", () => {
+      const selectedTeamsObjectWithOwnPeriod: Partial<Record<TeamId, typeof period>> = {
+        TEAM_ID_A: period,
+      };
+      test("if person start to be followed within the period, it should be included", () => {
+        const assignedTeamsPeriods = {
+          TEAM_ID_A: [
+            {
+              isoStartDate: addToDate(startDate, 1, "month"),
+              isoEndDate: dayjs().add(22, "year").toISOString(),
+            },
+          ],
+        };
+        expect(
+          filterPersonByAssignedTeamDuringQueryPeriod({
+            viewAllOrganisationData: false,
+            selectedTeamsObjectWithOwnPeriod,
+            assignedTeamsPeriods,
+            isoEndDate: period.isoEndDate,
+            isoStartDate: period.isoStartDate,
+            filterByStartFollowBySelectedTeamDuringPeriod: true,
+          })
+        ).toBe(true);
+      });
+      test("if person start to be followed before the period, it should NOT be included", () => {
+        const assignedTeamsPeriods = {
+          TEAM_ID_A: [
+            {
+              isoStartDate: addToDate(startDate, -1, "month"),
+              isoEndDate: dayjs().add(22, "year").toISOString(),
+            },
+          ],
+        };
+        expect(
+          filterPersonByAssignedTeamDuringQueryPeriod({
+            viewAllOrganisationData: false,
+            selectedTeamsObjectWithOwnPeriod,
+            assignedTeamsPeriods,
+            isoEndDate: period.isoEndDate,
+            isoStartDate: period.isoStartDate,
+            filterByStartFollowBySelectedTeamDuringPeriod: true,
+          })
+        ).toBe(false);
+      });
+
+      test("if person start to be followed after the period, it should NOT be included", () => {
+        const assignedTeamsPeriods = {
+          TEAM_ID_A: [
+            {
+              isoStartDate: addToDate(endDate, 1, "month"),
+              isoEndDate: dayjs().add(22, "year").toISOString(),
+            },
+          ],
+        };
+        expect(
+          filterPersonByAssignedTeamDuringQueryPeriod({
+            viewAllOrganisationData: false,
+            selectedTeamsObjectWithOwnPeriod,
+            assignedTeamsPeriods,
+            isoEndDate: period.isoEndDate,
+            isoStartDate: period.isoStartDate,
+            filterByStartFollowBySelectedTeamDuringPeriod: true,
+          })
+        ).toBe(false);
+      });
+    });
+  });
 });

@@ -142,6 +142,12 @@ export const filterPersonsBaseSelector = selector({
       type: "number",
     };
     filterPersonsBase.push(followUpFilter);
+    const followBySelectedTeamDuringPeriodFilter: Filter = {
+      field: "startFollowBySelectedTeamDuringPeriod",
+      label: "Début de suivi par l'équipe(s) sélectionnée(s) pendant la période définie",
+      type: "boolean",
+    };
+    filterPersonsBase.push(followBySelectedTeamDuringPeriodFilter);
     const hasAtLeastOneConsultationFilter: Filter = {
       field: "hasAtLeastOneConsultation",
       label: "A eu une consultation",

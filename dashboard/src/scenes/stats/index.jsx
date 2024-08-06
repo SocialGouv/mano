@@ -127,6 +127,7 @@ const itemsForStatsSelector = selectorFamily({
       const allPersons = get(personsForStatsSelector({ period }));
 
       const relativeFilters = [
+        "startFollowBySelectedTeamDuringPeriod",
         "hasAtLeastOneConsultation",
         "numberOfConsultations",
         "numberOfActions",
@@ -137,6 +138,7 @@ const itemsForStatsSelector = selectorFamily({
 
       const activeFilters = filterPersons.filter((f) => f.value && !relativeFilters.includes(f.field) && f.field !== "outOfActiveList");
       const outOfActiveListFilter = filterPersons.find((f) => f.field === "outOfActiveList")?.value;
+      const filterByStartFollowBySelectedTeamDuringPeriod = filterPersons.filter((f) => f.field === "startFollowBySelectedTeamDuringPeriod").length;
       const filterByNumberOfActions = filterPersons.filter((f) => f.field === "numberOfActions");
       const filterByNumberOfConsultations = filterPersons.filter((f) => f.field === "numberOfConsultations");
       const filterHasAtLeastOneConsultation = filterPersons.filter((f) => f.field === "hasAtLeastOneConsultation");
@@ -205,6 +207,7 @@ const itemsForStatsSelector = selectorFamily({
           assignedTeamsPeriods: person.assignedTeamsPeriods,
           isoEndDate: defaultIsoDates.isoEndDate,
           isoStartDate: defaultIsoDates.isoStartDate,
+          filterByStartFollowBySelectedTeamDuringPeriod,
         });
         if (personIsInAssignedTeamDuringPeriod) {
           if (noPeriodSelected) {

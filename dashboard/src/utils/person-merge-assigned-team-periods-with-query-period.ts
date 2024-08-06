@@ -8,6 +8,7 @@ interface GetPersonPeriodsArguments {
   isoEndDate: string;
   selectedTeamsObjectWithOwnPeriod: Record<UUIDV4, PeriodISODate>;
   assignedTeamsPeriods: PersonPopulated["assignedTeamsPeriods"];
+  filterByStartFollowBySelectedTeamDuringPeriod?: boolean;
 }
 
 export function mergedPersonAssignedTeamPeriodsWithQueryPeriod({
@@ -75,7 +76,24 @@ export function filterPersonByAssignedTeamDuringQueryPeriod({
   isoEndDate,
   selectedTeamsObjectWithOwnPeriod,
   assignedTeamsPeriods,
+  filterByStartFollowBySelectedTeamDuringPeriod,
 }: GetPersonPeriodsArguments): boolean {
+  if (filterByStartFollowBySelectedTeamDuringPeriod) {
+    if (viewAllOrganisationData) {
+      const startFollow = assignedTeamsPeriods.all[0].isoStartDate;
+      if (startFollow > isoEndDate) return false;
+      if (startFollow < isoStartDate) return false;
+      return true;
+    }
+    for (const [teamId, teamPeriods] of Object.entries(assignedTeamsPeriods)) {
+      if (teamId === "all") continue;
+      const earliestPeriod = teamPeriods[0];
+      if (earliestPeriod.isoStartDate > isoEndDate) continue;
+      if (earliestPeriod.isoStartDate < isoStartDate) continue;
+      return true;
+    }
+    return false;
+  }
   const periods = mergedPersonAssignedTeamPeriodsWithQueryPeriod({
     viewAllOrganisationData,
     isoStartDate,
@@ -84,6 +102,5 @@ export function filterPersonByAssignedTeamDuringQueryPeriod({
     assignedTeamsPeriods,
   });
 
-  console.log(periods);
   return periods.length > 0;
 }
