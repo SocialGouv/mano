@@ -26,6 +26,10 @@ export const cleanHistory = (history: Array<PersonHistoryEntry> = []): Array<Per
         newEntry.data[fieldName] = { ...h.data[fieldName] };
         continue;
       }
+      if (fieldName === "outOfTeamsInformations") {
+        newEntry.data[fieldName] = [...h.data[fieldName]];
+        continue;
+      }
       if (forbiddenPersonFieldsInHistory.includes(fieldName)) continue; // fix a bug where still some technical fields were saved in the history
       if (!h.data[fieldName]?.oldValue && !h.data[fieldName]?.newValue) {
         // fix a behavior where in the app we were saving defaults values
