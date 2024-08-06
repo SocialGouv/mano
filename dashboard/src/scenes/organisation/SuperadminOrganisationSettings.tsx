@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import CitySelect from "../../components/CitySelect";
 import SelectCustom from "../../components/SelectCustom";
 
-export default function OrganisationSuperadminSettings({
+export default function SuperadminOrganisationSettings({
   organisation,
   setOpen,
   open,

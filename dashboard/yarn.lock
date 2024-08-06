@@ -5536,7 +5536,7 @@ __metadata:
     ts-jest: "npm:^29.1.2"
     typescript: "npm:^5.2.2"
     urijs: "npm:^1.19.11"
-    use-debounce: "npm:^10.0.0"
+    use-debounce: "npm:^10.0.2"
     uuid: "npm:^9.0.0"
     validator: "npm:^13.7.0"
     vite: "npm:^5.2.12"
@@ -11746,12 +11746,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"use-debounce@npm:^10.0.0":
-  version: 10.0.0
-  resolution: "use-debounce@npm:10.0.0"
+"use-debounce@npm:^10.0.2":
+  version: 10.0.2
+  resolution: "use-debounce@npm:10.0.2"
   peerDependencies:
     react: ">=16.8.0"
-  checksum: c1166cba52dedeab17e3e29275af89c57a3e8981b75f6e38ae2896ac36ecd4ed7d8fff5f882ba4b2f91eac7510d5ae0dd89fa4f7d081622ed436c3c89eda5cd1
+  checksum: 2d992108557a0ad3e59bc35028c0dbc6ad12088a08d992fd52aad3881dd24663606fe71f7fd925327fb98599c6252bfa4c143649351d48e6243d7a3332594fd6
   languageName: node
   linkType: hard
 

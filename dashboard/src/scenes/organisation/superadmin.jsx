@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { ModalBody, ModalHeader, ModalFooter, ModalContainer } from "../../components/tailwind/Modal";
 import { Formik } from "formik";
 import { toast } from "react-toastify";
-import Table from "../../components/table";
-import OrganisationUsers from "./OrganisationUsers";
-import Loading from "../../components/loading";
 import API, { tryFetch, tryFetchExpectOk } from "../../services/api";
 import { formatAge, formatDateWithFullMonth } from "../../services/date";
 import useTitle from "../../services/useTitle";
-import DeleteButtonAndConfirmModal from "../../components/DeleteButtonAndConfirmModal";
 import { download, emailRegex, errorMessage } from "../../utils";
+import { getUmapGeoJSONFromOrgs } from "./utils";
+import DeleteButtonAndConfirmModal from "../../components/DeleteButtonAndConfirmModal";
+import Table from "../../components/table";
+import Loading from "../../components/loading";
 import SelectRole from "../../components/SelectRole";
 import SelectCustom from "../../components/SelectCustom";
-import OrganisationSuperadminSettings from "./OrganisationSuperadminSettings";
-import { getUmapGeoJSONFromOrgs } from "./utils";
 import CitySelect from "../../components/CitySelect";
+import { ModalBody, ModalHeader, ModalFooter, ModalContainer } from "../../components/tailwind/Modal";
 import { checkEncryptedVerificationKey, derivedMasterKey } from "../../services/encryption";
+import SuperadminOrganisationSettings from "./SuperadminOrganisationSettings";
+import SuperadminUsersManagement from "./SuperadminUsersManagement";
 
 const List = () => {
   const [organisations, setOrganisations] = useState(null);
@@ -23,6 +23,7 @@ const List = () => {
   const [sortBy, setSortBy] = useState("countersTotal");
   const [sortOrder, setSortOrder] = useState("DESC");
   const [refresh, setRefresh] = useState(true);
+  const [searchUserModal, setSearchUserModal] = useState(false);
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [openMergeModal, setOpenMergeModal] = useState(false);
   const [openOrgSettingsModal, setOpenOrgSettingsModal] = useState(false);
@@ -61,14 +62,24 @@ const List = () => {
     <>
       <Create onChange={() => setRefresh(true)} open={openCreateModal} setOpen={setOpenCreateModal} />
       <MergeOrganisations onChange={() => setRefresh(true)} open={openMergeModal} setOpen={setOpenMergeModal} organisations={organisations} />
-      <OrganisationUsers
-        open={openUserListModal}
-        organisation={selectedOrganisation}
+      <SuperadminUsersManagement
+        open={searchUserModal}
         setOpen={setOpenUserListModal}
         setOpenCreateUserModal={setOpenCreateUserModal}
         openCreateUserModal={openCreateUserModal}
+        forSearch
+        setSearchUserModal={setSearchUserModal}
+        setSelectedOrganisation={setSelectedOrganisation}
       />
-      <OrganisationSuperadminSettings
+      <SuperadminUsersManagement
+        open={openUserListModal && !!selectedOrganisation}
+        organisation={selectedOrganisation}
+        setOpen={setOpenUserListModal}
+        setOpenCreateUserModal={setOpenCreateUserModal}
+        setSelectedOrganisation={setSelectedOrganisation}
+        openCreateUserModal={openCreateUserModal}
+      />
+      <SuperadminOrganisationSettings
         key={selectedOrganisation?._id}
         organisation={selectedOrganisation}
         open={openOrgSettingsModal}
@@ -89,6 +100,15 @@ const List = () => {
       <div className="tw-mb-10 tw-mt-4 tw-flex tw-w-full tw-justify-between">
         <h2 className="tw-text-2xl">Organisations ({total})</h2>
         <div>
+          <button
+            className="button-classic"
+            type="button"
+            onClick={() => {
+              setSearchUserModal(true);
+            }}
+          >
+            🧐 Rechercher un utilisateur
+          </button>
           <button
             className="button-classic"
             type="button"
@@ -709,4 +729,5 @@ const CreateUser = ({ onChange, open, setOpen, organisation }) => {
     </>
   );
 };
+
 export default List;

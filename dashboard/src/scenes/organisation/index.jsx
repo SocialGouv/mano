@@ -1,14 +1,14 @@
 import { Switch } from "react-router-dom";
 import SentryRoute from "../../components/Sentryroute";
 
-import List from "./list";
+import Superadmin from "./superadmin";
 import View from "./view";
 
 const Router = () => {
   return (
     <Switch>
       <SentryRoute path="/organisation/:id" component={View} />
-      <SentryRoute path="/" component={List} />
+      <SentryRoute path="/" component={Superadmin} />
     </Switch>
   );
 };

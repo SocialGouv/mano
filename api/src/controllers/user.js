@@ -145,12 +145,12 @@ router.get(
   validateUser(["admin", "normal", "superadmin", "restricted-access", "stats-only"]),
   catchErrors(async (req, res) => {
     const user = await User.findOne({ where: { _id: req.user._id } });
-    const treams = await user.getTeams();
+    const teams = await user.getTeams();
     const organisation = await user.getOrganisation();
     const orgTeams = await Team.findAll({ where: { organisation: organisation._id } });
     return res.status(200).send({
       ok: true,
-      user: serializeUserWithTeamsAndOrganisation(user, treams, organisation, orgTeams),
+      user: serializeUserWithTeamsAndOrganisation(user, teams, organisation, orgTeams),
     });
   })
 );
@@ -577,6 +577,50 @@ router.post(
       action: "decrypt-attempt-success",
     });
     return res.status(200).send({ ok: true });
+  })
+);
+
+router.get(
+  "/search",
+  passport.authenticate("user", { session: false, failWithError: true }),
+  validateUser(["superadmin"]),
+  catchErrors(async (req, res) => {
+    const search = req.query.search || "";
+    const users = await User.findAll({
+      where: {
+        [Op.or]: [{ name: { [Op.iLike]: `%${search}%` } }, { email: { [Op.iLike]: `%${search}%` } }],
+      },
+      include: [
+        { model: Team, as: "Teams" },
+        { model: Organisation, as: "Organisation", attributes: ["_id", "name"] },
+      ],
+    });
+
+    const data = users.map((user) => {
+      return {
+        _id: user._id,
+        name: user.name,
+        phone: user.phone,
+        email: user.email,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+        role: user.role,
+        healthcareProfessional: user.healthcareProfessional,
+        lastChangePasswordAt: user.lastChangePasswordAt,
+        termsAccepted: user.termsAccepted,
+        cgusAccepted: user.cgusAccepted,
+        gaveFeedbackEarly2023: user.gaveFeedbackEarly2023,
+        lastLoginAt: user.lastLoginAt,
+        decryptAttempts: user.decryptAttempts,
+        teams: user.Teams ? user.Teams.map(serializeTeam) : [],
+        organisationPopulated: user.Organisation,
+      };
+    });
+
+    return res.status(200).send({
+      ok: true,
+      data,
+    });
   })
 );
 
