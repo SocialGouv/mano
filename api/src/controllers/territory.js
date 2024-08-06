@@ -4,7 +4,7 @@ const passport = require("passport");
 const { z } = require("zod");
 const { looseUuidRegex, positiveIntegerRegex } = require("../utils");
 const { catchErrors } = require("../errors");
-const { Territory, Organisation, sequelize } = require("../db/sequelize");
+const { Territory, TerritoryObservation, Organisation, sequelize } = require("../db/sequelize");
 const { Op } = require("sequelize");
 const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
 const validateUser = require("../middleware/validateUser");
@@ -231,12 +231,28 @@ router.delete(
       error.status = 400;
       return next(error);
     }
-    const query = { where: { _id: req.params._id, organisation: req.user.organisation } };
+    // FIXME: not compatible with app versions below 3.5.4
+    // try {
+    //   z.array(z.string().regex(looseUuidRegex)).parse(req.body.observationIds);
+    // } catch (e) {
+    //   const error = new Error(`Invalid request in territory delete comments: ${e}`);
+    //   error.status = 400;
+    //   return next(error);
+    // }
 
-    const territory = await Territory.findOne(query);
-    if (!territory) return res.status(404).send({ ok: false, error: "Not Found" });
+    await sequelize.transaction(async (tx) => {
+      const territory = await Territory.findOne({
+        where: {
+          _id: req.params._id,
+          organisation: req.user.organisation,
+        },
+      });
+      if (territory) await territory.destroy({ transaction: tx });
+      for (let _id of req.body.observationIds || []) {
+        await TerritoryObservation.destroy({ where: { _id, organisation: req.user.organisation }, transaction: tx });
+      }
+    });
 
-    await territory.destroy();
     res.status(200).send({ ok: true });
   })
 );

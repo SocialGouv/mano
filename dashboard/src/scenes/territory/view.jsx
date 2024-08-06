@@ -93,19 +93,14 @@ const View = () => {
                   const [error] = await tryFetchExpectOk(async () =>
                     API.delete({
                       path: `/territory/${id}`,
+                      body: {
+                        observationIds: observations.map((o) => o._id).filter(Boolean),
+                      },
                     })
                   );
                   if (error) {
                     toast.error(errorMessage(error));
                     return;
-                  }
-                  for (let observation of observations) {
-                    if (!observation._id) continue;
-                    const [error] = await tryFetchExpectOk(() => API.delete({ path: `/territory-observation/${observation._id}` }));
-                    if (error) {
-                      toast.error(errorMessage(error));
-                      // On ne break pas pour supprimer le maximum d'observations.
-                    }
                   }
                   await refresh();
                   toast.success("Suppression réussie");

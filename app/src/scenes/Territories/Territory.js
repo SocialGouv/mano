@@ -90,17 +90,19 @@ const Territory = ({ route, navigation }) => {
   };
 
   const onDelete = async () => {
-    const response = await API.delete({ path: `/territory/${territoryDB._id}` });
+    const response = await API.delete({
+      path: `/territory/${territoryDB._id}`,
+      body: {
+        observationIds: territoryObservations.filter((o) => o.territory === territoryDB._id).map((o) => o._id),
+      },
+    });
     if (response.error) {
       Alert.alert(response.error);
       return false;
     }
     if (!response.ok) return false;
-    for (let obs of territoryObservations.filter((o) => o.territory === territoryDB._id)) {
-      await API.delete({ path: `/territory-observation/${obs._id}` });
-      setTerritoryObservations((obs) => obs.filter((o) => o.territory !== territoryDB._id));
-    }
     setTerritories((territories) => territories.filter((t) => t._id !== territoryDB._id));
+    setTerritoryObservations((obs) => obs.filter((o) => o.territory !== territoryDB._id));
     Alert.alert('Territoire supprimé !');
     return true;
   };
