@@ -354,16 +354,13 @@ const Action = ({ navigation, route }) => {
   };
 
   const deleteAction = async (id) => {
-    const res = await API.delete({ path: `/action/${id}` });
-    if (res.ok) {
-      for (let comment of comments.filter((c) => c.action === id)) {
-        const res = await API.delete({ path: `/comment/${comment._id}` });
-        if (res.ok) {
-          setComments((comments) => comments.filter((p) => p._id !== comment._id));
-        }
-      }
-      onRefresh();
-    }
+    const res = await API.delete({
+      path: `/action/${id}`,
+      body: {
+        commentIdsToDelete: comments.filter((c) => c.action === id).map((c) => c._id),
+      },
+    });
+    if (res.ok) onRefresh();
     return res;
   };
 

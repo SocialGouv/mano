@@ -6,7 +6,7 @@ const { Op } = require("sequelize");
 const { catchErrors } = require("../errors");
 const validateUser = require("../middleware/validateUser");
 const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
-const { Action, sequelize } = require("../db/sequelize");
+const { Action, Comment, sequelize } = require("../db/sequelize");
 const { looseUuidRegex, positiveIntegerRegex } = require("../utils");
 
 const TODO = "A FAIRE";
@@ -271,16 +271,27 @@ router.delete(
       error.status = 400;
       return next(error);
     }
+    // FIXME: not compatible with app versions below 3.5.4
+    // try {
+    //   z.array(z.string().regex(looseUuidRegex)).parse(req.body.commentIdsToDelete);
+    // } catch (e) {
+    //   const error = new Error(`Invalid request in action delete comments: ${e}`);
+    //   error.status = 400;
+    //   return next(error);
+    // }
 
-    const action = await Action.findOne({
-      where: {
-        _id: req.params._id,
-        organisation: req.user.organisation,
-      },
+    await sequelize.transaction(async (tx) => {
+      const action = await Action.findOne({
+        where: {
+          _id: req.params._id,
+          organisation: req.user.organisation,
+        },
+      });
+      if (action) await action.destroy({ transaction: tx });
+      for (let _id of req.body.commentIdsToDelete || []) {
+        await Comment.destroy({ where: { _id, organisation: req.user.organisation }, transaction: tx });
+      }
     });
-    if (!action) return res.status(404).send({ ok: false, error: "Not Found" });
-
-    await action.destroy();
 
     res.status(200).send({ ok: true });
   })

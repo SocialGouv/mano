@@ -749,19 +749,18 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
               e.stopPropagation();
               if (!window.confirm("Voulez-vous supprimer cette action ?")) return;
               setIsDeleting(true);
-              const [error] = await tryFetchExpectOk(() => API.delete({ path: `/action/${action._id}` }));
+              const [error] = await tryFetchExpectOk(() =>
+                API.delete({
+                  path: `/action/${action._id}`,
+                  body: {
+                    commentIdsToDelete: action.comments.map((c) => c._id),
+                  },
+                })
+              );
               if (error) {
                 toast.error("Erreur lors de la suppression de l'action");
                 setIsDeleting(false);
                 return;
-              }
-              for (let comment of action.comments) {
-                if (!comment._id) continue;
-                const [error] = await tryFetchExpectOk(() => API.delete({ path: `/comment/${comment._id}` }));
-                if (error) {
-                  toast.error("Erreur lors de la suppression des commentaires liés à l'action");
-                  return;
-                }
               }
               refresh();
               toast.success("Suppression réussie");
