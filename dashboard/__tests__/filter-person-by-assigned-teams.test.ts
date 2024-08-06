@@ -1,6 +1,4 @@
 import dayjs from "dayjs";
-// import type { ForTeamFilteringType } from "../src/types/person";
-// import { filterPersonByAssignedTeam } from "../src/utils/filter-person";
 import { filterPersonByAssignedTeamDuringQueryPeriod } from "../src/utils/person-merge-assigned-team-periods-with-query-period";
 
 type TeamId = "TEAM_ID_A" | "TEAM_ID_B" | "TEAM_ID_C";
@@ -615,7 +613,7 @@ describe("Filter person by assigned teams within a period - Jan 2023 until dec 2
             assignedTeamsPeriods,
             isoEndDate: period.isoEndDate,
             isoStartDate: period.isoStartDate,
-            filterByStartFollowBySelectedTeamDuringPeriod: true,
+            filterByStartFollowBySelectedTeamDuringPeriod: [{ field: "startFollowBySelectedTeamDuringPeriod", value: "Oui", type: "boolean" }],
           })
         ).toBe(true);
       });
@@ -635,7 +633,7 @@ describe("Filter person by assigned teams within a period - Jan 2023 until dec 2
             assignedTeamsPeriods,
             isoEndDate: period.isoEndDate,
             isoStartDate: period.isoStartDate,
-            filterByStartFollowBySelectedTeamDuringPeriod: true,
+            filterByStartFollowBySelectedTeamDuringPeriod: [{ field: "startFollowBySelectedTeamDuringPeriod", value: "Oui", type: "boolean" }],
           })
         ).toBe(false);
       });
@@ -656,7 +654,7 @@ describe("Filter person by assigned teams within a period - Jan 2023 until dec 2
             assignedTeamsPeriods,
             isoEndDate: period.isoEndDate,
             isoStartDate: period.isoStartDate,
-            filterByStartFollowBySelectedTeamDuringPeriod: true,
+            filterByStartFollowBySelectedTeamDuringPeriod: [{ field: "startFollowBySelectedTeamDuringPeriod", value: "Oui", type: "boolean" }],
           })
         ).toBe(false);
       });
@@ -681,7 +679,7 @@ describe("Filter person by assigned teams within a period - Jan 2023 until dec 2
             assignedTeamsPeriods,
             isoEndDate: period.isoEndDate,
             isoStartDate: period.isoStartDate,
-            filterByStartFollowBySelectedTeamDuringPeriod: true,
+            filterByStartFollowBySelectedTeamDuringPeriod: [{ field: "startFollowBySelectedTeamDuringPeriod", value: "Oui", type: "boolean" }],
           })
         ).toBe(true);
       });
@@ -701,7 +699,7 @@ describe("Filter person by assigned teams within a period - Jan 2023 until dec 2
             assignedTeamsPeriods,
             isoEndDate: period.isoEndDate,
             isoStartDate: period.isoStartDate,
-            filterByStartFollowBySelectedTeamDuringPeriod: true,
+            filterByStartFollowBySelectedTeamDuringPeriod: [{ field: "startFollowBySelectedTeamDuringPeriod", value: "Oui", type: "boolean" }],
           })
         ).toBe(false);
       });
@@ -722,7 +720,7 @@ describe("Filter person by assigned teams within a period - Jan 2023 until dec 2
             assignedTeamsPeriods,
             isoEndDate: period.isoEndDate,
             isoStartDate: period.isoStartDate,
-            filterByStartFollowBySelectedTeamDuringPeriod: true,
+            filterByStartFollowBySelectedTeamDuringPeriod: [{ field: "startFollowBySelectedTeamDuringPeriod", value: "Oui", type: "boolean" }],
           })
         ).toBe(false);
       });

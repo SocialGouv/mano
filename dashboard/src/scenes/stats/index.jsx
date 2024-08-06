@@ -138,7 +138,7 @@ const itemsForStatsSelector = selectorFamily({
 
       const activeFilters = filterPersons.filter((f) => f.value && !relativeFilters.includes(f.field) && f.field !== "outOfActiveList");
       const outOfActiveListFilter = filterPersons.find((f) => f.field === "outOfActiveList")?.value;
-      const filterByStartFollowBySelectedTeamDuringPeriod = filterPersons.filter((f) => f.field === "startFollowBySelectedTeamDuringPeriod").length;
+      const filterByStartFollowBySelectedTeamDuringPeriod = filterPersons.filter((f) => f.field === "startFollowBySelectedTeamDuringPeriod");
       const filterByNumberOfActions = filterPersons.filter((f) => f.field === "numberOfActions");
       const filterByNumberOfConsultations = filterPersons.filter((f) => f.field === "numberOfConsultations");
       const filterHasAtLeastOneConsultation = filterPersons.filter((f) => f.field === "hasAtLeastOneConsultation");

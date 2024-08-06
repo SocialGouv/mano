@@ -43,10 +43,7 @@ export const cleanHistory = (history: Array<PersonHistoryEntry> = []): Array<Per
   return newHistory;
 };
 
-export function extractInfosFromHistory(
-  person: PersonInstance,
-  allTeamIds: Array<TeamInstance["_id"]>
-): {
+export function extractInfosFromHistory(person: PersonInstance): {
   interactions: Array<Date>;
   assignedTeamsPeriods: AssignedTeamsPeriods;
 } {
@@ -56,7 +53,12 @@ export function extractInfosFromHistory(
   // current format: { teamIdA: [{ endDate: now,  startDate: undefined }] }
   const assignedTeamsPeriods: AssignedTeamsPeriods = (person.assignedTeams || []).reduce(
     (acc, teamId) => {
-      acc[teamId] = [{ isoEndDate: dayjsInstance().startOf("day").toISOString(), isoStartDate: undefined }];
+      acc[teamId] = [
+        {
+          isoEndDate: dayjsInstance().startOf("day").toISOString(),
+          isoStartDate: null,
+        },
+      ];
       return acc;
     },
     {
@@ -77,34 +79,39 @@ export function extractInfosFromHistory(
       const historyEntry = person.history[i];
       interactions.push(historyEntry.date);
       const data = historyEntry.data as FieldChangeData;
-      if (data.assignedTeams) {
-        const currentTeams = (data.assignedTeams.newValue || allTeamIds) as Array<TeamInstance["_id"]>;
-        const previousTeams = (data.assignedTeams.oldValue || allTeamIds) as Array<TeamInstance["_id"]>;
-        const newlyAddedTeams = currentTeams.filter((t) => !previousTeams.includes(t));
-        const removedTeams = previousTeams.filter((t) => !currentTeams.includes(t));
-        for (const teamId of newlyAddedTeams) {
-          assignedTeamsPeriods[teamId] = (assignedTeamsPeriods[teamId] || []).map((period) => {
-            if (period.isoStartDate) return period;
-            return {
-              ...period,
-              isoStartDate: dayjsInstance(historyEntry.date).toISOString(),
-            };
-          });
-        }
-        for (const teamId of removedTeams) {
-          if (!assignedTeamsPeriods[teamId]) assignedTeamsPeriods[teamId] = [];
-          assignedTeamsPeriods[teamId].unshift({
-            isoStartDate: null,
-            isoEndDate: dayjsInstance(historyEntry.date).toISOString(),
-          });
-        }
-        oldestTeams = previousTeams;
+      if (!data.assignedTeams) continue;
+      const currentTeams = (data.assignedTeams.newValue || []) as Array<TeamInstance["_id"]>;
+      const previousTeams = (data.assignedTeams.oldValue || []) as Array<TeamInstance["_id"]>;
+      const newlyAddedTeams = currentTeams.filter((t) => !previousTeams.includes(t));
+      const removedTeams = previousTeams.filter((t) => !currentTeams.includes(t));
+      for (const teamId of newlyAddedTeams) {
+        assignedTeamsPeriods[teamId] = (assignedTeamsPeriods[teamId] || []).map((period) => {
+          if (period.isoStartDate) return period;
+          return {
+            ...period,
+            isoStartDate: dayjsInstance(historyEntry.date).toISOString(),
+          };
+        });
       }
+      for (const teamId of removedTeams) {
+        if (!assignedTeamsPeriods[teamId]) assignedTeamsPeriods[teamId] = [];
+        assignedTeamsPeriods[teamId].unshift({
+          isoStartDate: null,
+          isoEndDate: dayjsInstance(historyEntry.date).toISOString(),
+        });
+      }
+      oldestTeams = previousTeams;
     }
   }
   for (const teamId of oldestTeams) {
     if (!assignedTeamsPeriods[teamId]) assignedTeamsPeriods[teamId] = [];
-    assignedTeamsPeriods[teamId].push({ isoStartDate: dayjsInstance(person.followedSince || person.createdAt).toISOString(), isoEndDate: null });
+    assignedTeamsPeriods[teamId] = (assignedTeamsPeriods[teamId] || []).map((period) => {
+      if (period.isoStartDate) return period;
+      return {
+        ...period,
+        isoStartDate: dayjsInstance(person.followedSince || person.createdAt).toISOString(),
+      };
+    });
   }
   return {
     interactions,

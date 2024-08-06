@@ -1,9 +1,9 @@
-import { currentTeamState, teamsState, userState, usersState } from "./auth";
+import { currentTeamState, userState, usersState } from "./auth";
 import { personsState } from "./persons";
 import { placesState } from "./places";
 import { relsPersonPlaceState } from "./relPersonPlace";
 import { reportsState } from "./reports";
-import { ageFromBirthdateAsYear, dayjsInstance, formatBirthDate, startOfToday } from "../services/date";
+import { ageFromBirthdateAsYear, dayjsInstance, formatBirthDate } from "../services/date";
 import { customFieldsObsSelector, territoryObservationsState } from "./territoryObservations";
 import { selector } from "recoil";
 import { actionsState } from "./actions";
@@ -88,12 +88,9 @@ export const itemsGroupedByPersonSelector = selector({
     const persons = get(personsState);
     const personsObject = {};
     const user = get(userState);
-    const allTeams = get(teamsState);
-    const allTeamIds = allTeams.map((t) => t._id);
     const usersObject = get(usersObjectSelector);
-    const today = startOfToday().toISOString();
     for (const person of persons) {
-      const { interactions, assignedTeamsPeriods } = extractInfosFromHistory(person, allTeamIds);
+      const { interactions, assignedTeamsPeriods } = extractInfosFromHistory(person);
       personsObject[person._id] = {
         ...person,
         followedSince: person.followedSince || person.createdAt,

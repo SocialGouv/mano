@@ -1,6 +1,7 @@
 import type { PersonPopulated } from "../types/person";
 import type { UUIDV4 } from "../types/uuid";
 import type { PeriodISODate } from "../types/date";
+import type { Filter } from "../types/field";
 
 interface GetPersonPeriodsArguments {
   viewAllOrganisationData: boolean;
@@ -8,7 +9,7 @@ interface GetPersonPeriodsArguments {
   isoEndDate: string;
   selectedTeamsObjectWithOwnPeriod: Record<UUIDV4, PeriodISODate>;
   assignedTeamsPeriods: PersonPopulated["assignedTeamsPeriods"];
-  filterByStartFollowBySelectedTeamDuringPeriod?: boolean;
+  filterByStartFollowBySelectedTeamDuringPeriod?: Array<Filter>;
 }
 
 export function mergedPersonAssignedTeamPeriodsWithQueryPeriod({
@@ -78,21 +79,41 @@ export function filterPersonByAssignedTeamDuringQueryPeriod({
   assignedTeamsPeriods,
   filterByStartFollowBySelectedTeamDuringPeriod,
 }: GetPersonPeriodsArguments): boolean {
-  if (filterByStartFollowBySelectedTeamDuringPeriod) {
-    if (viewAllOrganisationData) {
-      const startFollow = assignedTeamsPeriods.all[0].isoStartDate;
-      if (startFollow > isoEndDate) return false;
-      if (startFollow < isoStartDate) return false;
-      return true;
+  if (filterByStartFollowBySelectedTeamDuringPeriod?.length > 0) {
+    const filter = filterByStartFollowBySelectedTeamDuringPeriod[0];
+    const yes = filter.value === "Oui";
+    const no = filter.value === "Non";
+    if (yes) {
+      if (viewAllOrganisationData) {
+        const startFollow = assignedTeamsPeriods.all[0].isoStartDate;
+        if (startFollow > isoEndDate) return false;
+        if (startFollow < isoStartDate) return false;
+        return true;
+      }
+      for (const [teamId, teamPeriods] of Object.entries(assignedTeamsPeriods)) {
+        if (teamId === "all") continue;
+        const earliestPeriod = teamPeriods[0];
+        if (earliestPeriod.isoStartDate > isoEndDate) continue;
+        if (earliestPeriod.isoStartDate < isoStartDate) continue;
+        return true;
+      }
+      return false;
     }
-    for (const [teamId, teamPeriods] of Object.entries(assignedTeamsPeriods)) {
-      if (teamId === "all") continue;
-      const earliestPeriod = teamPeriods[0];
-      if (earliestPeriod.isoStartDate > isoEndDate) continue;
-      if (earliestPeriod.isoStartDate < isoStartDate) continue;
-      return true;
+    if (no) {
+      if (viewAllOrganisationData) {
+        const startFollow = assignedTeamsPeriods.all[0].isoStartDate;
+        if (startFollow > isoEndDate) return true;
+        if (startFollow < isoStartDate) return true;
+        return false;
+      }
+      for (const [teamId, teamPeriods] of Object.entries(assignedTeamsPeriods)) {
+        if (teamId === "all") continue;
+        const earliestPeriod = teamPeriods[0];
+        if (earliestPeriod.isoStartDate > isoEndDate) return true;
+        if (earliestPeriod.isoStartDate < isoStartDate) return true;
+      }
+      return false;
     }
-    return false;
   }
   const periods = mergedPersonAssignedTeamPeriodsWithQueryPeriod({
     viewAllOrganisationData,
