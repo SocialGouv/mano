@@ -59,8 +59,8 @@ export function extractInfosFromHistory(person: PersonInstance): {
     (acc, teamId) => {
       acc[teamId] = [
         {
-          isoEndDate: dayjsInstance().startOf("day").toISOString(),
           isoStartDate: null,
+          isoEndDate: dayjsInstance().startOf("day").toISOString(),
         },
       ];
       return acc;
@@ -68,8 +68,8 @@ export function extractInfosFromHistory(person: PersonInstance): {
     {
       all: [
         {
-          isoEndDate: dayjsInstance().startOf("day").toISOString(),
           isoStartDate: dayjsInstance(person.followedSince || person.createdAt).toISOString(),
+          isoEndDate: dayjsInstance().startOf("day").toISOString(),
         },
       ],
     }
@@ -92,8 +92,8 @@ export function extractInfosFromHistory(person: PersonInstance): {
         assignedTeamsPeriods[teamId] = (assignedTeamsPeriods[teamId] || []).map((period) => {
           if (period.isoStartDate) return period;
           return {
-            ...period,
             isoStartDate: dayjsInstance(historyEntry.date).toISOString(),
+            isoEndDate: period.isoEndDate,
           };
         });
       }
@@ -112,8 +112,8 @@ export function extractInfosFromHistory(person: PersonInstance): {
     assignedTeamsPeriods[teamId] = (assignedTeamsPeriods[teamId] || []).map((period) => {
       if (period.isoStartDate) return period;
       return {
-        ...period,
         isoStartDate: dayjsInstance(person.followedSince || person.createdAt).toISOString(),
+        isoEndDate: period.isoEndDate,
       };
     });
   }
