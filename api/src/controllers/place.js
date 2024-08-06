@@ -6,7 +6,7 @@ const { z } = require("zod");
 const { catchErrors } = require("../errors");
 const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
 const validateUser = require("../middleware/validateUser");
-const { Place } = require("../db/sequelize");
+const { Place, RelPersonPlace, sequelize } = require("../db/sequelize");
 const { looseUuidRegex, positiveIntegerRegex } = require("../utils");
 
 router.post(
@@ -152,12 +152,29 @@ router.delete(
       error.status = 400;
       return next(error);
     }
-    const query = { where: { _id: req.params._id, organisation: req.user.organisation } };
 
-    const place = await Place.findOne(query);
-    if (!place) return res.status(404).send({ ok: false, error: "Not Found" });
+    // FIXME: not compatible with app versions below 3.5.4
+    // try {
+    //   z.array(z.string().regex(looseUuidRegex)).parse(req.body.relsPersonPlaceIds);
+    // } catch (e) {
+    //   const error = new Error(`Invalid request in action delete comments: ${e}`);
+    //   error.status = 400;
+    //   return next(error);
+    // }
 
-    await place.destroy();
+    await sequelize.transaction(async (tx) => {
+      const place = await Place.findOne({
+        where: {
+          _id: req.params._id,
+          organisation: req.user.organisation,
+        },
+      });
+      if (place) await place.destroy({ transaction: tx });
+      for (let _id of req.body.relsPersonPlaceIds || []) {
+        await RelPersonPlace.destroy({ where: { _id, organisation: req.user.organisation }, transaction: tx });
+      }
+    });
+
     res.status(200).send({ ok: true });
   })
 );

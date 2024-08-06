@@ -85,7 +85,12 @@ const Place = ({ navigation, route }) => {
 
   const onDelete = async () => {
     setUpdating(true);
-    const response = await API.delete({ path: `/place/${placeDB._id}` });
+    const response = await API.delete({
+      path: `/place/${placeDB._id}`,
+      body: {
+        relsPersonPlaceIds: relsPersonPlace.filter((rel) => rel.place === placeDB._id).map((rel) => rel._id),
+      },
+    });
     if (response.error) {
       setUpdating(false);
       Alert.alert(response.error);
@@ -93,9 +98,6 @@ const Place = ({ navigation, route }) => {
     }
     if (response.ok) {
       setPlaces((places) => places.filter((p) => p._id !== placeDB._id));
-      for (let relPersonPlace of relsPersonPlace.filter((rel) => rel.place === placeDB._id)) {
-        await API.delete({ path: `/relPersonPlace/${relPersonPlace._id}` });
-      }
       setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel.place !== placeDB._id));
       setUpdating(false);
       Alert.alert('Lieu supprimé !');

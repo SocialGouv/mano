@@ -379,17 +379,18 @@ const EditRelPersonPlaceModal = ({ open, setOpen, placeToEdit }) => {
       return;
     }
     setUpdating(true);
-    const [error] = await tryFetchExpectOk(async () => API.delete({ path: `/place/${placeToEdit._id}` }));
+    const [error] = await tryFetchExpectOk(async () =>
+      API.delete({
+        path: `/place/${placeToEdit._id}`,
+        body: {
+          relsPersonPlaceIds: relsPersonPlace.filter((rel) => rel.place === placeToEdit._id).map((rel) => rel._id),
+        },
+      })
+    );
     setUpdating(false);
     if (error) {
       toast.error(errorMessage(error));
       return;
-    }
-    for (let relPersonPlace of relsPersonPlace.filter((rel) => rel.place === placeToEdit._id)) {
-      const [error] = await tryFetchExpectOk(async () => API.delete({ path: `/relPersonPlace/${relPersonPlace._id}` }));
-      if (error) {
-        toast.error(errorMessage(error));
-      }
     }
     await refresh();
     toast.success("Lieu supprimé !");
