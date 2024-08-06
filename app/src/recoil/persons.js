@@ -80,11 +80,13 @@ export const personFieldsIncludingCustomFieldsSelector = selector({
   },
 });
 
+export const forbiddenPersonFieldsInHistory = ['history', 'createdAt', 'updatedAt', 'documents'];
+
 export const allowedPersonFieldsInHistorySelector = selector({
   key: 'allowedPersonFieldsInHistorySelector',
   get: ({ get }) => {
     const allFields = get(personFieldsIncludingCustomFieldsSelector);
-    return allFields.map((f) => f.name).filter((f) => f !== 'history');
+    return allFields.map((f) => f.name).filter((f) => !forbiddenPersonFieldsInHistory.includes(f));
   },
 });
 

@@ -1,25 +1,46 @@
 import { dayjsInstance } from "../services/date";
-import type { PersonInstance, AssignedTeamsPeriods } from "../types/person";
+import type { PersonInstance, AssignedTeamsPeriods, PersonHistoryEntry, FieldChangeData } from "../types/person";
 import type { TeamInstance } from "../types/team";
+import { forbiddenPersonFieldsInHistory } from "../recoil/persons";
 
-type HistoryEntry<T> = {
-  date: string;
-  data: T;
-};
-
-export const cleanHistory = <T>(history: Array<HistoryEntry<T>> = []): Array<HistoryEntry<T>> => {
+export const cleanHistory = (history: Array<PersonHistoryEntry> = []): Array<PersonHistoryEntry> => {
   const alreadyExisting = {};
-  return history.filter((h) => {
+  const newHistory = [];
+  for (const h of history) {
     const stringifiedEntry = JSON.stringify(h.data);
     // FIX: there was a bug in history at some point, where the whole person was saved in the history
     // below it removes removes those entries
-    if (stringifiedEntry.includes("encryptedEntityKey")) return false;
+    if (stringifiedEntry.includes("encryptedEntityKey")) continue;
     // FIX: there was a bug in history at some point, where person's history was saved in the medicalFile history
     // below it removes those duplicated entries
-    if (alreadyExisting[`${h.date}-${stringifiedEntry}`]) return false;
+    if (alreadyExisting[`${h.date}-${stringifiedEntry}`]) continue;
     alreadyExisting[`${h.date}-${stringifiedEntry}`] = true;
-    return true;
-  });
+
+    const newEntry = {
+      ...h,
+      data: {},
+    };
+
+    for (const fieldName of Object.keys(h.data)) {
+      if (fieldName === "merge") {
+        newEntry.data[fieldName] = { ...h.data[fieldName] };
+        continue;
+      }
+      if (forbiddenPersonFieldsInHistory.includes(fieldName)) continue; // fix a bug where still some technical fields were saved in the history
+      if (!h.data[fieldName]?.oldValue && !h.data[fieldName]?.newValue) {
+        // fix a behavior where in the app we were saving defaults values
+        continue;
+      }
+      if (Array.isArray(h.data[fieldName]?.newValue) && !h.data[fieldName]?.oldValue?.length && !h.data[fieldName]?.newValue?.length) {
+        // fix a behavior where in the app we were saving defaults values
+        continue;
+      }
+      newEntry.data[fieldName] = { ...h.data[fieldName] };
+    }
+    if (Object.keys(newEntry.data).length === 0) continue;
+    newHistory.push(newEntry);
+  }
+  return newHistory;
 };
 
 export function extractInfosFromHistory(
@@ -55,9 +76,10 @@ export function extractInfosFromHistory(
     for (let i = person.history.length - 1; i >= 0; i--) {
       const historyEntry = person.history[i];
       interactions.push(historyEntry.date);
-      if (historyEntry.data.assignedTeams) {
-        const currentTeams = (historyEntry.data.assignedTeams.newValue || allTeamIds) as Array<TeamInstance["_id"]>;
-        const previousTeams = (historyEntry.data.assignedTeams.oldValue || allTeamIds) as Array<TeamInstance["_id"]>;
+      const data = historyEntry.data as FieldChangeData;
+      if (data.assignedTeams) {
+        const currentTeams = (data.assignedTeams.newValue || allTeamIds) as Array<TeamInstance["_id"]>;
+        const previousTeams = (data.assignedTeams.oldValue || allTeamIds) as Array<TeamInstance["_id"]>;
         const newlyAddedTeams = currentTeams.filter((t) => !previousTeams.includes(t));
         const removedTeams = previousTeams.filter((t) => !currentTeams.includes(t));
         for (const teamId of newlyAddedTeams) {

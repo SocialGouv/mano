@@ -4,6 +4,7 @@ import type { PersonPopulated } from "../types/person";
 import type { CustomOrPredefinedField } from "../types/field";
 import { dayjsInstance } from "../services/date";
 import { getValueByField } from "./person-get-value-by-field";
+import { forbiddenPersonFieldsInHistory } from "../recoil/persons";
 
 export function getPersonSnapshotAtDate({
   person,
@@ -37,6 +38,7 @@ export function getPersonSnapshotAtDate({
       return snapshot; // if snapshot's day is history's day, we return the snapshot
     }
     for (const fieldName of Object.keys(historyItem.data)) {
+      if (forbiddenPersonFieldsInHistory.includes(fieldName)) continue;
       if (onlyForFieldName && fieldName !== onlyForFieldName) continue; // we support only one indicator for now
       if (!typesByFields[fieldName]) continue; // this is a deleted custom field
       const oldValue = replaceNullishWithNonRenseigne
@@ -62,6 +64,7 @@ export function getPersonSnapshotAtDate({
           },
           tags: {
             personId: person._id,
+            fieldName,
           },
         });
       }

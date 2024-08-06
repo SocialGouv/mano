@@ -1,7 +1,7 @@
 import { formatDateWithFullMonth, dayjsInstance } from "../../../services/date";
 import { borderColors, teamsColors } from "../../../components/TagTeam";
 import { TeamInstance } from "../../../types/team";
-import { PersonHistoryEntry, PersonInstance } from "../../../types/person";
+import { PersonHistoryEntry, PersonInstance, FieldChangeData } from "../../../types/person";
 
 interface TeamHistorySlice {
   team: string;
@@ -13,13 +13,13 @@ function getPersonTeamHistory(changes: Array<PersonHistoryEntry>, creationDate: 
   const teamHistory = {};
   const result: Array<TeamHistorySlice> = [];
 
-  changes = changes.filter((change) => change.data && change.data.assignedTeams);
+  changes = changes.filter((change) => change.data && (change.data as FieldChangeData).assignedTeams);
   changes.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   if (changes.length === 0) return [];
 
   if (changes.length > 0) {
-    const initialTeams = changes[0].data.assignedTeams.oldValue || [];
+    const initialTeams = (changes[0].data as FieldChangeData).assignedTeams.oldValue || [];
     for (const team of initialTeams) {
       teamHistory[team] = { startDate: creationDate, endDate: null };
     }
@@ -27,8 +27,8 @@ function getPersonTeamHistory(changes: Array<PersonHistoryEntry>, creationDate: 
 
   for (const change of changes) {
     const date = change.date;
-    const oldTeams = change.data.assignedTeams.oldValue || [];
-    const newTeams = change.data.assignedTeams.newValue;
+    const oldTeams = ((change.data as FieldChangeData).assignedTeams.oldValue || []) as Array<TeamInstance["_id"]>;
+    const newTeams = ((change.data as FieldChangeData).assignedTeams.newValue || []) as Array<TeamInstance["_id"]>;
 
     // Équipes quittées
     for (const team of oldTeams) {

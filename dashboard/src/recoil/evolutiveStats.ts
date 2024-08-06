@@ -8,7 +8,7 @@ import type { EvolutiveStatOption } from "../types/evolutivesStats";
 import type { UUIDV4 } from "../types/uuid";
 import type { PeriodISODate } from "../types/date";
 import { dayjsInstance } from "../services/date";
-import { personFieldsIncludingCustomFieldsSelector } from "./persons";
+import { forbiddenPersonFieldsInHistory, personFieldsIncludingCustomFieldsSelector } from "./persons";
 import type { Dayjs } from "dayjs";
 import { currentTeamState } from "./auth";
 import { mergedPersonAssignedTeamPeriodsWithQueryPeriod } from "../utils/person-merge-assigned-team-periods-with-query-period";
@@ -164,6 +164,8 @@ export function computeEvolutiveStatsForPersons({
         let nextPerson = structuredClone(currentPerson);
         for (const historyChangeField of Object.keys(historyItem.data)) {
           if (historyChangeField !== indicatorFieldName) continue; // we support only one indicator for now
+          if (forbiddenPersonFieldsInHistory.includes(indicatorFieldName)) continue;
+          if (indicatorFieldName === "merge") continue;
           const oldValue = getValueByField(indicatorFieldName, indicatorFieldType, historyItem.data[historyChangeField].oldValue);
           const historyNewValue = getValueByField(indicatorFieldName, indicatorFieldType, historyItem.data[historyChangeField].newValue);
           const currentPersonValue = getValueByField(indicatorFieldName, indicatorFieldType, currentPerson[historyChangeField]);

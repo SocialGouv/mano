@@ -79,7 +79,7 @@ test("Add history to merged person", async ({ page }) => {
   await page.locator(".Toastify__close-button").last().click();
   await page.getByRole("button", { name: "Historique" }).click();
 
-  await expect(page.locator(`[data-test-id="Autres pseudos\\: \\"${originPersonOtherName}\\" ➔ \\"${mergedPersonOtherName}\\""]`)).toBeVisible();
   await expect(page.locator(`[data-test-id="Autres pseudos\\: \\"\\" ➔ \\"${originPersonOtherName}\\""]`)).toBeVisible();
+  await expect(page.locator(`[data-test-id="Autres pseudos\\: \\"${originPersonOtherName}\\" ➔ \\"${mergedPersonOtherName}\\""]`)).toBeVisible();
   await expect(page.getByText(`Fusion avec : "${mergePersonName}"`)).toBeVisible();
 });

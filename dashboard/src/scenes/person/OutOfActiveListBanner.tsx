@@ -2,15 +2,7 @@ import { Alert } from "reactstrap";
 import { formatDateWithFullMonth } from "../../services/date";
 import { currentTeamState } from "../../recoil/auth";
 import { useRecoilValue } from "recoil";
-import { PersonInstance } from "../../types/person";
-
-type outOfTeamsInformation = {
-  team: string;
-  reasons: string[];
-};
-type HistoryEntryForOutOfTeamsInformations = {
-  outOfTeamsInformations: outOfTeamsInformation[];
-};
+import { HistoryEntryForOutOfTeamsInformations, OutOfTeamsInformation, PersonInstance, FieldChangeData } from "../../types/person";
 
 export default function OutOfActiveListBanner({ person }: { person: PersonInstance }) {
   const team = useRecoilValue(currentTeamState);
@@ -37,9 +29,12 @@ export default function OutOfActiveListBanner({ person }: { person: PersonInstan
   if (!isInSelectedTeam && person.history) {
     for (let i = person.history.length - 1; i >= 0; i--) {
       const history = person.history[i];
-      if (history.data.assignedTeams?.oldValue?.includes(team._id) && !history.data.assignedTeams?.newValue?.includes(team._id)) {
+      if (
+        (history.data as FieldChangeData).assignedTeams?.oldValue?.includes(team._id) &&
+        !(history.data as FieldChangeData).assignedTeams?.newValue?.includes(team._id)
+      ) {
         const outOfTeamsInformations = (
-          ((history.data as unknown as HistoryEntryForOutOfTeamsInformations).outOfTeamsInformations || []) as outOfTeamsInformation[]
+          ((history.data as unknown as HistoryEntryForOutOfTeamsInformations).outOfTeamsInformations || []) as OutOfTeamsInformation[]
         ).find((reason) => reason.team === team._id);
         return (
           <Alert color="warning" className="noprint">

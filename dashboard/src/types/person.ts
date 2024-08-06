@@ -26,18 +26,38 @@ interface PersonInstanceBase {
   documents?: Array<Document | Folder>;
 }
 
-type PersonField = keyof PersonInstanceBase | CustomField["name"];
+type MergeData = {
+  merge: {
+    _id: UUIDV4;
+    name: string;
+  };
+};
+
+export type OutOfTeamsInformation = {
+  team: TeamInstance["_id"];
+  reasons: Array<string>;
+};
+
+export type HistoryEntryForOutOfTeamsInformations = {
+  outOfTeamsInformations: Array<OutOfTeamsInformation>;
+};
+
+export type FieldChangeData = {
+  [key: string]: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    oldValue?: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    newValue?: any;
+  };
+};
+
+type PersonHistoryData = MergeData | FieldChangeData | HistoryEntryForOutOfTeamsInformations;
 
 export interface PersonHistoryEntry {
   date: Date;
   user: UUIDV4;
-  data: Record<
-    PersonField,
-    {
-      oldValue: any;
-      newValue: any;
-    }
-  >;
+  userName?: string;
+  data: PersonHistoryData;
 }
 
 type AssignedTypePeriod = {
