@@ -11,6 +11,7 @@ import UserName from "../../components/UserName";
 import { currentTeamAuthentifiedState, userAuthentifiedState } from "../../recoil/auth";
 import CustomFieldDisplay from "../../components/CustomFieldDisplay";
 import TagTeam from "../../components/TagTeam";
+import { useSessionStorage } from "../../services/useSessionStorage";
 
 const List = ({ territory = {} }) => {
   const [sortBy, setSortBy] = useLocalStorage("territory-obs-sortBy", "name");
@@ -19,7 +20,7 @@ const List = ({ territory = {} }) => {
   const team = useRecoilValue(currentTeamAuthentifiedState);
   const user = useRecoilValue(userAuthentifiedState);
   const [observation, setObservation] = useState(undefined);
-  const [openObservationModale, setOpenObservationModale] = useState(false);
+  const [openObservationModale, setOpenObservationModale] = useSessionStorage("create-observation-modal-open", false);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
 
   const observations = useMemo(
@@ -117,7 +118,7 @@ const List = ({ territory = {} }) => {
           },
         ]}
       />
-      <CreateObservation observation={observation} open={openObservationModale} setOpen={setOpenObservationModale} />
+      <CreateObservation observation={observation} open={openObservationModale} setOpen={setOpenObservationModale} id="territory" />
     </>
   );
 };

@@ -1,4 +1,4 @@
-import { useMediaQuery } from "@react-hookz/web/esm/useMediaQuery";
+import { useMediaQuery } from "@react-hookz/web";
 import { useMemo } from "react";
 
 // Breakpoint prefix	Minimum width	CSS

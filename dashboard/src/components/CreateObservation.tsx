@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Formik, FormikHelpers } from "formik";
 import { toast } from "react-toastify";
 
@@ -14,7 +14,6 @@ import { dayjsInstance, outOfBoundariesDate } from "../services/date";
 import API, { tryFetchExpectOk } from "../services/api";
 import DatePicker from "./DatePicker";
 import { ModalBody, ModalContainer, ModalHeader, ModalFooter } from "./tailwind/Modal";
-import SelectAndCreatePerson from "../scenes/reception/SelectAndCreatePerson";
 import Rencontre from "./Rencontre";
 import { encryptRencontre, rencontresState } from "../recoil/rencontres";
 import { useLocalStorage } from "../services/useLocalStorage";
@@ -26,14 +25,16 @@ import Table from "./table";
 import { useDataLoader } from "./DataLoader";
 import type { TerritoryObservationInstance } from "../types/territoryObs";
 import type { RencontreInstance } from "../types/rencontre";
+import FormikPersist from "./FormikPersist";
 
 interface CreateObservationProps {
   observation: TerritoryObservationInstance | null;
   open: boolean;
   setOpen: (open: boolean) => void;
+  id: string;
 }
 
-const CreateObservation = ({ observation, open, setOpen }: CreateObservationProps) => {
+const CreateObservation = ({ id, observation, open, setOpen }: CreateObservationProps) => {
   const user = useRecoilValue(userAuthentifiedState);
   const teams = useRecoilValue(teamsState);
   const organisation = useRecoilValue(organisationAuthentifiedState);
@@ -44,10 +45,29 @@ const CreateObservation = ({ observation, open, setOpen }: CreateObservationProp
   const fieldsGroupNames = groupedCustomFieldsObs.map((f) => f.name).filter((f) => f);
   const [newRencontre, setNewRencontre] = useState(false);
   const [rencontre, setRencontre] = useState<RencontreInstance>();
-  const [activeTab, setActiveTab] = useState(fieldsGroupNames[0]);
-  const [rencontresInProgress, setRencontresInProgress] = useState<Array<RencontreInstance>>([]);
+  const [activeTab, setActiveTab] = useState(() => {
+    const stored = window.sessionStorage.getItem("create-observation-active-tab");
+    return stored ? stored : fieldsGroupNames[0];
+  });
+  const [rencontresInProgress, setRencontresInProgress] = useState<Array<RencontreInstance>>(() => {
+    const stored = window.sessionStorage.getItem("create-observation-rencontres");
+    return stored ? JSON.parse(stored) : [];
+  });
   const rencontres = useRecoilValue<Array<RencontreInstance>>(rencontresState);
   const { refresh } = useDataLoader();
+
+  useEffect(() => {
+    const savedObs = window.sessionStorage.getItem("create-observation");
+    if (savedObs) {
+      const savedTerritory = JSON.parse(savedObs)?.territory;
+      const currentTerritory = observation?.territory;
+      if (savedTerritory && savedTerritory !== currentTerritory) {
+        alert(
+          "Une observation était en cours de création sur un autre territoire. Veuillez vérifier les informations, ou la fermer si ça n'est plus d'actualité"
+        );
+      }
+    }
+  }, [observation]);
 
   const [sortBy, setSortBy] = useLocalStorage("in-observation-rencontre-sortBy", "dueAt");
   const [sortOrder, setSortOrder] = useLocalStorage("in-observation-rencontre-sortOrder", "ASC");
@@ -89,19 +109,31 @@ const CreateObservation = ({ observation, open, setOpen }: CreateObservationProp
     }
   };
 
+  const onClose = () => {
+    setOpen(false);
+  };
+
+  const reset = () => {
+    setRencontresInProgress([]);
+    window.sessionStorage.removeItem("create-observation-rencontres");
+    window.sessionStorage.removeItem("create-observation-active-tab");
+    window.sessionStorage.removeItem("create-observation-modal-open");
+    window.sessionStorage.removeItem("create-observation");
+  };
+
   const currentRencontres = [...rencontresInProgress, ...rencontresForObs];
 
   const initObs = {
     user: user._id,
     team: null,
-    observedAt: dayjsInstance().toDate(),
-    createdAt: dayjsInstance().toDate(),
+    observedAt: null,
+    createdAt: null,
     territory: null,
   };
 
   return (
-    <div className="tw-w-full tw-flex tw-justify-end">
-      <ModalContainer open={open} onClose={() => setOpen(false)} size="full">
+    <>
+      <ModalContainer dataTestId={`create-observation-from-${id}`} open={open} onClose={onClose} size="full" onAfterLeave={reset}>
         <ModalHeader title={observation?._id ? "Modifier l'observation" : "Créer une nouvelle observation"} />
         <Formik
           initialValues={observation ?? initObs}
@@ -126,7 +158,7 @@ const CreateObservation = ({ observation, open, setOpen }: CreateObservationProp
             actions.setSubmitting(false);
             if (res.ok) {
               toast.success(observation?._id ? "Observation mise à jour" : "Création réussie !");
-              setOpen(false);
+              onClose();
               if (res.data._id && rencontresInProgress.length > 0) {
                 let rencontreSuccess = true;
                 for (const rencontre of rencontresInProgress) {
@@ -144,13 +176,13 @@ const CreateObservation = ({ observation, open, setOpen }: CreateObservationProp
                 else toast.error("Une ou plusieurs rencontres n'ont pas pu être sauvegardées");
                 await refresh();
               }
-              setRencontresInProgress([]);
             }
           }}
         >
           {({ values, handleChange, handleSubmit, isSubmitting }) => (
             <>
               <ModalBody>
+                <FormikPersist name="create-observation" />
                 <div className="tw-flex tw-h-full tw-w-full tw-flex-col">
                   <nav className="noprint tw-flex tw-w-full" aria-label="Tabs">
                     <ul className={`tw-w-full tw-list-none tw-flex tw-gap-2 tw-px-3 tw-py-2 tw-border-b tw-border-main tw-border-opacity-20`}>
@@ -160,6 +192,7 @@ const CreateObservation = ({ observation, open, setOpen }: CreateObservationProp
                             type="button"
                             onClick={() => {
                               setActiveTab(name);
+                              window.sessionStorage.setItem("create-observation-active-tab", name);
                             }}
                             className={[
                               activeTab === name ? "tw-bg-main/10 tw-text-black" : "tw-hover:text-gray-700 tw-text-main",
@@ -178,6 +211,7 @@ const CreateObservation = ({ observation, open, setOpen }: CreateObservationProp
                             type="button"
                             onClick={() => {
                               setActiveTab("_rencontres");
+                              window.sessionStorage.setItem("create-observation-active-tab", "_rencontres");
                             }}
                             className={[
                               activeTab === "_rencontres" ? "tw-bg-main/10 tw-text-black" : "tw-hover:text-gray-700 tw-text-main",
@@ -194,7 +228,7 @@ const CreateObservation = ({ observation, open, setOpen }: CreateObservationProp
                   </nav>
                   <div className="tw-p-4 tw-min-h-[30vh] tw-grow">
                     {groupedCustomFieldsObs.map((group) => (
-                      <div className="tw-flex tw-flex-row tw-flex-wrap" key={group.name} hidden={group.name !== activeTab}>
+                      <div className="tw-flex tw-flex-row tw-flex-wrap" hidden={group.name !== activeTab} key={group.name}>
                         {group.fields
                           .filter((f) => f)
                           .filter((f) => f.enabled || (f.enabledTeams || []).includes(team._id))
@@ -276,9 +310,9 @@ const CreateObservation = ({ observation, open, setOpen }: CreateObservationProp
                                   <button
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      setRencontresInProgress((rencontresInProgress) =>
-                                        rencontresInProgress.filter((r) => r.person !== rencontre.person)
-                                      );
+                                      const nextRencontres = rencontresInProgress.filter((r) => r.person !== rencontre.person);
+                                      setRencontresInProgress(nextRencontres);
+                                      window.sessionStorage.setItem("create-observation-rencontres", JSON.stringify(nextRencontres));
                                     }}
                                     className="button-destructive"
                                   >
@@ -359,13 +393,7 @@ const CreateObservation = ({ observation, open, setOpen }: CreateObservationProp
                 </div>
               </ModalBody>
               <ModalFooter>
-                <button
-                  className="button-cancel"
-                  onClick={() => {
-                    setRencontresInProgress([]);
-                    setOpen(false);
-                  }}
-                >
+                <button className="button-cancel" onClick={onClose}>
                   Annuler
                 </button>
                 {observation?._id ? (
@@ -392,10 +420,9 @@ const CreateObservation = ({ observation, open, setOpen }: CreateObservationProp
           }}
           onSave={(rencontres: Array<RencontreInstance>) => {
             if (!rencontres.length) return;
-            setRencontresInProgress((rencontresInProgress) => [
-              ...rencontresInProgress.filter((r) => !rencontres.map((e: RencontreInstance) => e.person).includes(r.person)),
-              ...rencontres,
-            ]);
+            const nextRencontres = [...rencontresInProgress.filter((r) => !rencontres.map((e) => e.person).includes(r.person)), ...rencontres];
+            setRencontresInProgress(nextRencontres);
+            window.sessionStorage.setItem("create-observation-rencontres", JSON.stringify(nextRencontres));
           }}
         />
       )}
@@ -408,7 +435,7 @@ const CreateObservation = ({ observation, open, setOpen }: CreateObservationProp
           }}
         />
       )}
-    </div>
+    </>
   );
 };
 

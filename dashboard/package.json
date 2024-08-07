@@ -12,7 +12,7 @@
     "@nivo/line": "0.85.1",
     "@nivo/pie": "^0.85.1",
     "@nivo/stream": "^0.85.1",
-    "@react-hookz/web": "^23.0.0",
+    "@react-hookz/web": "^24.0.4",
     "@sentry/browser": "^6.19.7",
     "@sentry/react": "^7.116.0",
     "@sentry/vite-plugin": "^2.17.0",

@@ -12,6 +12,7 @@ import { dayjsInstance } from "../../../services/date";
 import { currentTeamAuthentifiedState, currentTeamState, teamsState, userAuthentifiedState, usersState } from "../../../recoil/auth";
 import { customFieldsObsSelector } from "../../../recoil/territoryObservations";
 import CustomFieldDisplay from "../../../components/CustomFieldDisplay";
+import { useSessionStorage } from "../../../services/useSessionStorage";
 
 export const ObservationsReport = ({ observations, period, selectedTeams }) => {
   const [fullScreen, setFullScreen] = useState(false);
@@ -43,7 +44,7 @@ export const ObservationsReport = ({ observations, period, selectedTeams }) => {
       <ModalContainer open={!!fullScreen} className="" size="full" onClose={() => setFullScreen(false)}>
         <ModalHeader title={`Observations (${observations.length})`} onClose={() => setFullScreen(false)} />
         <ModalBody>
-          <ObservationsTable observations={observations} period={period} selectedTeams={selectedTeams} />
+          <ObservationsTable observations={observations} period={period} selectedTeams={selectedTeams} fullscreen />
         </ModalBody>
         <ModalFooter>
           <button type="button" name="cancel" className="button-cancel" onClick={() => setFullScreen(false)}>
@@ -55,9 +56,9 @@ export const ObservationsReport = ({ observations, period, selectedTeams }) => {
   );
 };
 
-const ObservationsTable = ({ period, observations, selectedTeams }) => {
+const ObservationsTable = ({ period, observations, selectedTeams, fullscreen }) => {
   const [observationToEdit, setObservationToEdit] = useState(undefined);
-  const [openObservationModale, setOpenObservationModale] = useState(false);
+  const [openObservationModale, setOpenObservationModale] = useSessionStorage("create-observation-modal-open", false);
   const territories = useRecoilValue(territoriesState);
   const teams = useRecoilValue(teamsState);
   const team = useRecoilValue(currentTeamAuthentifiedState);
@@ -195,7 +196,9 @@ const ObservationsTable = ({ period, observations, selectedTeams }) => {
           />
         )}
       </div>
-      <CreateObservation observation={observationToEdit} open={openObservationModale} setOpen={setOpenObservationModale} />
+      {fullscreen && (
+        <CreateObservation id="report" observation={observationToEdit} open={openObservationModale} setOpen={setOpenObservationModale} />
+      )}
     </>
   );
 };

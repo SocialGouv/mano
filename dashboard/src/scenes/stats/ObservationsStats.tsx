@@ -21,6 +21,7 @@ import type { Period } from "../../types/date";
 import type { TeamInstance } from "../../types/team";
 import type { PersonPopulated } from "../../types/person";
 import Card from "../../components/Card";
+import { useSessionStorage } from "../../services/useSessionStorage";
 
 interface ObservationsStatsProps {
   territories: Array<TerritoryInstance>;
@@ -193,7 +194,7 @@ const ObservationsStats = ({
 
 const SelectedObsModal = ({ open, onClose, observations, territories, title, onAfterLeave, selectedTeams, period }) => {
   const [observationToEdit, setObservationToEdit] = useState(undefined);
-  const [openObservationModale, setOpenObservationModale] = useState(false);
+  const [openObservationModale, setOpenObservationModale] = useSessionStorage("create-observation-modal-open", false);
   const teams = useRecoilValue(teamsState);
   const team = useRecoilValue(currentTeamState);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
@@ -329,7 +330,7 @@ const SelectedObsModal = ({ open, onClose, observations, territories, title, onA
           </button>
         </ModalFooter>
       </ModalContainer>
-      <CreateObservation observation={observationToEdit} open={openObservationModale} setOpen={setOpenObservationModale} />
+      <CreateObservation id="stats" observation={observationToEdit} open={openObservationModale} setOpen={setOpenObservationModale} />
     </>
   );
 };

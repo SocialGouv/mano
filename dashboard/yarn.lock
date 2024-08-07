@@ -2732,19 +2732,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-hookz/web@npm:^23.0.0":
-  version: 23.0.0
-  resolution: "@react-hookz/web@npm:23.0.0"
+"@react-hookz/web@npm:^24.0.4":
+  version: 24.0.4
+  resolution: "@react-hookz/web@npm:24.0.4"
   dependencies:
     "@react-hookz/deep-equal": "npm:^1.0.4"
   peerDependencies:
-    js-cookie: ^3.0.1
+    js-cookie: ^3.0.5
     react: ^16.8 || ^17 || ^18
     react-dom: ^16.8 || ^17 || ^18
   peerDependenciesMeta:
     js-cookie:
       optional: true
-  checksum: 7807994282bc55d8ac8cf6d3a4b55033f79a4ac7f1beba3e8d3f18f3d1337ffa3fa66dec06681f89bec42782569f80e4f6dd755e58e30a7d269574e7b5220c15
+  checksum: 894419b88601938b6b2027c8bc77a7e470de4cf196a2d461d53842b037cae57a2abe8e7279edd01ab56d7c671dd155de7795f6e717331c7fdb89734eafac8769
   languageName: node
   linkType: hard
 
@@ -5473,7 +5473,7 @@ __metadata:
     "@nivo/line": "npm:0.85.1"
     "@nivo/pie": "npm:^0.85.1"
     "@nivo/stream": "npm:^0.85.1"
-    "@react-hookz/web": "npm:^23.0.0"
+    "@react-hookz/web": "npm:^24.0.4"
     "@sentry/browser": "npm:^6.19.7"
     "@sentry/react": "npm:^7.116.0"
     "@sentry/vite-plugin": "npm:^2.17.0"
