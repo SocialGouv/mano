@@ -28,7 +28,8 @@ router.get("/version", async (req, res) => {
     inAppMessage: [
       `La nouvelle version ${MOBILE_APP_VERSION} de Mano est disponible !`,
       `Vous avez la version ${req.headers.version} actuellement sur votre téléphone.
-Cette nouvelle fixe l'accès aux comptes-rendus pour certaines organisations.
+Nouveautés: vous pouver ajouter un passage non-anonyme.
+Cette version apporte aussi quelques corrections de bugs mineurs et améliorations.
 `,
       [
         { text: "Télécharger", link: `https://mano.sesan.fr/download?ts=${Date.now()}` },
