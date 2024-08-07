@@ -6,7 +6,15 @@ export const Block = ({ data, title = "Nombre de personnes suivies", help = null
 );
 
 export const BlockDateWithTime = ({ data, field, help }) => {
-  if (!data.filter((item) => Boolean(item[field.name])).length) return null;
+  if (!data.filter((item) => Boolean(item[field.name])).length) {
+    return (
+      <Card title={field.label} unit="" help={help}>
+        <div className="mx-auto tw-pb-4 tw-text-center tw-text-gray-400">
+          <p className="tw-text-lg tw-font-bold">Pas de donnée à afficher</p>
+        </div>
+      </Card>
+    );
+  }
 
   const filteredData = data.filter((item) => Boolean(item[field.name]));
   const total = filteredData.reduce((acc, item) => acc + Date.parse(item[field.name]), 0);
@@ -22,7 +30,13 @@ const twoDecimals = (number) => Math.round(number * 100) / 100;
 
 export const BlockTotal = ({ title, unit, data, field, help }) => {
   if (!data.length) {
-    return <Card title={title} unit={unit} count={0} help={help} />;
+    return (
+      <Card title={title} unit={unit} help={help}>
+        <div className="mx-auto tw-pb-4 tw-text-center tw-text-gray-400">
+          <p className="tw-text-lg tw-font-bold">Pas de donnée à afficher</p>
+        </div>
+      </Card>
+    );
   }
   const dataWithOnlyNumbers = data.filter((item) => Boolean(item[field])).filter((e) => !isNaN(Number(e[field])));
   const total = dataWithOnlyNumbers.reduce((total, item) => total + Number(item[field]), 0);

@@ -5,7 +5,7 @@ import HelpButtonAndModal from "../../components/HelpButtonAndModal";
 
 function EmptyData({ title, help }) {
   return (
-    <div className="tw-mx-0 tw-my-4 tw-grid tw-gap-12 tw-w-full tw-flex-wrap tw-items-center tw-justify-center tw-rounded-2xl tw-border tw-border-main25 tw-bg-white tw-p-4  print:tw-break-before-all print:tw-break-inside-avoid">
+    <div className="tw-m-0 tw-grid tw-gap-12 tw-w-full tw-flex-wrap tw-items-center tw-justify-center tw-rounded-2xl tw-border tw-border-main25 tw-bg-white tw-p-4  print:tw-break-before-all print:tw-break-inside-avoid">
       <div className="tw-mx-auto tw-text-center tw-text-lg tw-font-medium tw-text-black tw-mt-4 tw-flex tw-justify-center print:tw-basis-0 print:tw-mb-0">
         <div>
           {title} {!!help && <HelpButtonAndModal title={title} help={help} />}
@@ -44,7 +44,7 @@ export const CustomResponsivePie = ({
   if (data.length === 0) return <EmptyData title={title} help={help} />;
 
   return (
-    <div className="tw-mx-0 tw-my-4 tw-grid tw-grid-cols-7 print:tw-grid-cols-1 tw-gap-12 tw-w-full tw-flex-wrap tw-items-center tw-justify-between tw-rounded-2xl tw-border tw-border-main25 tw-bg-white tw-p-4  print:tw-break-before-all print:tw-break-inside-avoid">
+    <div className="tw-m-0 tw-grid tw-grid-cols-7 print:tw-grid-cols-1 tw-gap-12 tw-w-full tw-flex-wrap tw-items-center tw-justify-between tw-rounded-2xl tw-border tw-border-main25 tw-bg-white tw-p-4  print:tw-break-before-all print:tw-break-inside-avoid">
       <div
         className={[
           "tw-relative tw-col-span-7 print:tw-col-span-1 tw-mt-4 tw-flex tw-basis-full tw-justify-center print:tw-basis-0 print:tw-mb-0",
@@ -183,7 +183,7 @@ export const CustomResponsiveBar = ({
   if (data.length === 0) return <EmptyData title={title} help={help} />;
 
   return (
-    <div className="tw-mx-0 tw-my-4 tw-grid tw-grid-cols-7 print:tw-grid-cols-1 tw-gap-12 tw-w-full tw-flex-wrap tw-items-center tw-justify-between tw-rounded-2xl tw-border tw-border-main25 tw-bg-white tw-p-4  print:tw-break-before-all print:tw-break-inside-avoid">
+    <div className="tw-m-0 tw-grid tw-grid-cols-7 print:tw-grid-cols-1 tw-gap-12 tw-w-full tw-flex-wrap tw-items-center tw-justify-between tw-rounded-2xl tw-border tw-border-main25 tw-bg-white tw-p-4  print:tw-break-before-all print:tw-break-inside-avoid">
       <div className="tw-relative tw-col-span-7 print:tw-col-span-1 tw-mt-4 tw-flex tw-basis-full tw-justify-center print:tw-basis-0 print:tw-mb-0">
         <p className="tw-m-0 tw-inline-block tw-text-center tw-text-lg tw-font-medium tw-text-black">
           {title} {!!help && <HelpButtonAndModal title={title} help={help} />}

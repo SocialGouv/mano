@@ -119,16 +119,18 @@ const ServicesStats = ({ period, teamIds }) => {
           />
         </div>
       </div>
-      <CustomResponsivePie
-        title="Répartition des services par groupe"
-        help={`Groupes de services enregistrés dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des services.`}
-        data={groupsData}
-      />
-      <CustomResponsivePie
-        title="Services"
-        help={`Services enregistrés dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des services.`}
-        data={servicesData}
-      />
+      <div className="tw-flex tw-flex-col tw-gap-4">
+        <CustomResponsivePie
+          title="Répartition des services par groupe"
+          help={`Groupes de services enregistrés dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des services.`}
+          data={groupsData}
+        />
+        <CustomResponsivePie
+          title="Services"
+          help={`Services enregistrés dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des services.`}
+          data={servicesData}
+        />
+      </div>
     </>
   );
 };

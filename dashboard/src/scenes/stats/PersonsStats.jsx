@@ -113,115 +113,117 @@ export default function PersonStats({
             <summary className="tw-mx-0 tw-my-8">
               <h4 className="tw-inline tw-text-xl tw-text-black75">Général</h4>
             </summary>
-            <div className="tw-grid tw-grid-cols-2 2xl:tw-grid-cols-4 tw-gap-4 tw-mb-8">
-              <Block data={personsForStats} title={`Nombre de ${title}`} help={firstBlockHelp} />
-              <BlockCreatedAt persons={personsForStats} />
-              <BlockWanderingAt persons={personsForStats} />
-              <BlockGroup groups={groupsForPersons} title={`Nombre de familles dans lesquelles se trouvent des ${title}`} />
+            <div className="tw-flex tw-flex-col tw-gap-4">
+              <div className="tw-grid tw-grid-cols-2 2xl:tw-grid-cols-4 tw-gap-4">
+                <Block data={personsForStats} title={`Nombre de ${title}`} help={firstBlockHelp} />
+                <BlockCreatedAt persons={personsForStats} />
+                <BlockWanderingAt persons={personsForStats} />
+                <BlockGroup groups={groupsForPersons} title={`Nombre de familles dans lesquelles se trouvent des ${title}`} />
+              </div>
+              <CustomResponsivePie
+                title="Genre"
+                field="gender"
+                onItemClick={
+                  user.role === "stats-only"
+                    ? undefined
+                    : (newSlice) => {
+                        onSliceClick(newSlice, "gender");
+                      }
+                }
+                data={getPieData(personsForStats, "gender", { options: personFields.find((f) => f.name === "gender").options })}
+                help={`Genre des ${title} dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
+              />
+              <AgeRangeBar
+                persons={personsForStats}
+                onItemClick={
+                  user.role === "stats-only"
+                    ? undefined
+                    : (newSlice, data) => {
+                        setSliceField(personFields.find((f) => f.name === "birthdate"));
+                        setSliceValue(newSlice);
+                        setSlicedData(data);
+                        setPersonsModalOpened(true);
+                      }
+                }
+              />
+              <StatsCreatedAtRangeBar
+                persons={personsForStats}
+                onItemClick={
+                  user.role === "stats-only"
+                    ? undefined
+                    : (newSlice, data) => {
+                        setSliceField(personFields.find((f) => f.name === "followedSince"));
+                        setSliceValue(newSlice);
+                        setSlicedData(data);
+                        setPersonsModalOpened(true);
+                      }
+                }
+              />
+              <StatsWanderingAtRangeBar
+                persons={personsForStats}
+                onItemClick={
+                  user.role === "stats-only"
+                    ? undefined
+                    : (newSlice, data) => {
+                        setSliceField(personFields.find((f) => f.name === "wanderingAt"));
+                        setSliceValue(newSlice);
+                        setSlicedData(data);
+                        setPersonsModalOpened(true);
+                      }
+                }
+              />
+              <CustomResponsivePie
+                title="Personnes très vulnérables"
+                field="alertness"
+                onItemClick={
+                  user.role === "stats-only"
+                    ? undefined
+                    : (newSlice) => {
+                        onSliceClick(newSlice, "alertness");
+                      }
+                }
+                data={getPieData(personsForStats, "alertness", { isBoolean: true })}
+                help={`${title.capitalize()} vulnérables dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
+              />
+              <CustomResponsivePie
+                title="Sortie de file active"
+                field="outOfActiveList"
+                onItemClick={
+                  user.role === "stats-only"
+                    ? undefined
+                    : (newSlice) => {
+                        onSliceClick(newSlice, "outOfActiveList");
+                      }
+                }
+                data={getPieData(personsForStats, "outOfActiveList", { isBoolean: true })}
+                help={`${title} dans la période définie, sorties de la file active. La date de sortie de la file active n'est pas nécessairement dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
+              />
+              <CustomResponsiveBar
+                title="Raison de sortie de file active"
+                help={`Raisons de sortie de file active des ${title} dans la période définie, sorties de la file active. La date de sortie de la file active n'est pas nécessairement dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
+                onItemClick={
+                  user.role === "stats-only"
+                    ? undefined
+                    : (newSlice) => {
+                        onSliceClick(
+                          newSlice,
+                          "outOfActiveListReasons",
+                          personsForStats.filter((p) => !!p.outOfActiveList)
+                        );
+                      }
+                }
+                axisTitleY="File active"
+                axisTitleX="Raison de sortie de file active"
+                isMultiChoice
+                totalForMultiChoice={personsForStats.filter((p) => !!p.outOfActiveList).length}
+                totalTitleForMultiChoice={<span className="tw-font-bold">Nombre de personnes concernées</span>}
+                data={getMultichoiceBarData(
+                  personsForStats.filter((p) => !!p.outOfActiveList),
+                  "outOfActiveListReasons"
+                )}
+              />
+              <StatsPersonsByFamille groupsForPersons={groupsForPersons} />
             </div>
-            <CustomResponsivePie
-              title="Genre"
-              field="gender"
-              onItemClick={
-                user.role === "stats-only"
-                  ? undefined
-                  : (newSlice) => {
-                      onSliceClick(newSlice, "gender");
-                    }
-              }
-              data={getPieData(personsForStats, "gender", { options: personFields.find((f) => f.name === "gender").options })}
-              help={`Genre des ${title} dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
-            />
-            <AgeRangeBar
-              persons={personsForStats}
-              onItemClick={
-                user.role === "stats-only"
-                  ? undefined
-                  : (newSlice, data) => {
-                      setSliceField(personFields.find((f) => f.name === "birthdate"));
-                      setSliceValue(newSlice);
-                      setSlicedData(data);
-                      setPersonsModalOpened(true);
-                    }
-              }
-            />
-            <StatsCreatedAtRangeBar
-              persons={personsForStats}
-              onItemClick={
-                user.role === "stats-only"
-                  ? undefined
-                  : (newSlice, data) => {
-                      setSliceField(personFields.find((f) => f.name === "followedSince"));
-                      setSliceValue(newSlice);
-                      setSlicedData(data);
-                      setPersonsModalOpened(true);
-                    }
-              }
-            />
-            <StatsWanderingAtRangeBar
-              persons={personsForStats}
-              onItemClick={
-                user.role === "stats-only"
-                  ? undefined
-                  : (newSlice, data) => {
-                      setSliceField(personFields.find((f) => f.name === "wanderingAt"));
-                      setSliceValue(newSlice);
-                      setSlicedData(data);
-                      setPersonsModalOpened(true);
-                    }
-              }
-            />
-            <CustomResponsivePie
-              title="Personnes très vulnérables"
-              field="alertness"
-              onItemClick={
-                user.role === "stats-only"
-                  ? undefined
-                  : (newSlice) => {
-                      onSliceClick(newSlice, "alertness");
-                    }
-              }
-              data={getPieData(personsForStats, "alertness", { isBoolean: true })}
-              help={`${title.capitalize()} vulnérables dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
-            />
-            <CustomResponsivePie
-              title="Sortie de file active"
-              field="outOfActiveList"
-              onItemClick={
-                user.role === "stats-only"
-                  ? undefined
-                  : (newSlice) => {
-                      onSliceClick(newSlice, "outOfActiveList");
-                    }
-              }
-              data={getPieData(personsForStats, "outOfActiveList", { isBoolean: true })}
-              help={`${title} dans la période définie, sorties de la file active. La date de sortie de la file active n'est pas nécessairement dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
-            />
-            <CustomResponsiveBar
-              title="Raison de sortie de file active"
-              help={`Raisons de sortie de file active des ${title} dans la période définie, sorties de la file active. La date de sortie de la file active n'est pas nécessairement dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
-              onItemClick={
-                user.role === "stats-only"
-                  ? undefined
-                  : (newSlice) => {
-                      onSliceClick(
-                        newSlice,
-                        "outOfActiveListReasons",
-                        personsForStats.filter((p) => !!p.outOfActiveList)
-                      );
-                    }
-              }
-              axisTitleY="File active"
-              axisTitleX="Raison de sortie de file active"
-              isMultiChoice
-              totalForMultiChoice={personsForStats.filter((p) => !!p.outOfActiveList).length}
-              totalTitleForMultiChoice={<span className="tw-font-bold">Nombre de personnes concernées</span>}
-              data={getMultichoiceBarData(
-                personsForStats.filter((p) => !!p.outOfActiveList),
-                "outOfActiveListReasons"
-              )}
-            />
-            <StatsPersonsByFamille groupsForPersons={groupsForPersons} />
           </details>
           {customFieldsPersons.map((section) => {
             return (

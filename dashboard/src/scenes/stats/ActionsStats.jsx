@@ -131,50 +131,51 @@ const ActionsStats = ({
           </div>
         </div>
       </div>
-
-      <CustomResponsiveBar
-        title="Répartition des actions par groupe"
-        help={`Si une action a plusieurs catégories appartenant à plusieurs groupes, elle est comptabilisée dans chaque groupe.\n\nSi une action a plusieurs catégories appartenant au même groupe, elle est comptabilisée autant de fois dans ce groupe.\n\nAinsi, le total affiché peut être supérieur au nombre total d'actions.`}
-        onItemClick={
-          user.role === "stats-only"
-            ? undefined
-            : (newGroupSlice) => {
-                setActionsModalOpened(true);
-                setGroupSlice(newGroupSlice);
-              }
-        }
-        isMultiChoice
-        axisTitleY="Actions"
-        axisTitleX="Groupe"
-        data={getMultichoiceBarData(actionsWithDetailedGroupAndCategories, "categoryGroup", {
-          options: groupsCategories.map((group) => group.groupTitle),
-          debug: true,
-        })}
-        // here we decide that the total is NOT the total of actions
-        // but the total of actions splitted by category
-        totalForMultiChoice={actionsWithDetailedGroupAndCategories.length}
-        totalTitleForMultiChoice={<span className="tw-font-bold">Total</span>}
-      />
-      <CustomResponsiveBar
-        title="Répartition des actions par catégorie"
-        help={`Si une action a plusieurs catégories, elle est comptabilisée dans chaque catégorie.\n\nAinsi, le total affiché peut être supérieur au nombre total d'actions.`}
-        onItemClick={
-          user.role === "stats-only"
-            ? undefined
-            : (newCategorySlice) => {
-                setActionsModalOpened(true);
-                setCategorySlice(newCategorySlice);
-              }
-        }
-        isMultiChoice
-        axisTitleY="Actions"
-        axisTitleX="Catégorie"
-        data={getMultichoiceBarData(actionsWithDetailedGroupAndCategories, "category")}
-        // here we decide that the total is NOT the total of actions
-        // but the total of actions splitted by category
-        totalForMultiChoice={actionsWithDetailedGroupAndCategories.length}
-        totalTitleForMultiChoice={<span className="tw-font-bold">Total</span>}
-      />
+      <div className="tw-flex tw-flex-col tw-gap-4">
+        <CustomResponsiveBar
+          title="Répartition des actions par groupe"
+          help={`Si une action a plusieurs catégories appartenant à plusieurs groupes, elle est comptabilisée dans chaque groupe.\n\nSi une action a plusieurs catégories appartenant au même groupe, elle est comptabilisée autant de fois dans ce groupe.\n\nAinsi, le total affiché peut être supérieur au nombre total d'actions.`}
+          onItemClick={
+            user.role === "stats-only"
+              ? undefined
+              : (newGroupSlice) => {
+                  setActionsModalOpened(true);
+                  setGroupSlice(newGroupSlice);
+                }
+          }
+          isMultiChoice
+          axisTitleY="Actions"
+          axisTitleX="Groupe"
+          data={getMultichoiceBarData(actionsWithDetailedGroupAndCategories, "categoryGroup", {
+            options: groupsCategories.map((group) => group.groupTitle),
+            debug: true,
+          })}
+          // here we decide that the total is NOT the total of actions
+          // but the total of actions splitted by category
+          totalForMultiChoice={actionsWithDetailedGroupAndCategories.length}
+          totalTitleForMultiChoice={<span className="tw-font-bold">Total</span>}
+        />
+        <CustomResponsiveBar
+          title="Répartition des actions par catégorie"
+          help={`Si une action a plusieurs catégories, elle est comptabilisée dans chaque catégorie.\n\nAinsi, le total affiché peut être supérieur au nombre total d'actions.`}
+          onItemClick={
+            user.role === "stats-only"
+              ? undefined
+              : (newCategorySlice) => {
+                  setActionsModalOpened(true);
+                  setCategorySlice(newCategorySlice);
+                }
+          }
+          isMultiChoice
+          axisTitleY="Actions"
+          axisTitleX="Catégorie"
+          data={getMultichoiceBarData(actionsWithDetailedGroupAndCategories, "category")}
+          // here we decide that the total is NOT the total of actions
+          // but the total of actions splitted by category
+          totalForMultiChoice={actionsWithDetailedGroupAndCategories.length}
+          totalTitleForMultiChoice={<span className="tw-font-bold">Total</span>}
+        />
+      </div>
       <SelectedActionsModal
         open={actionsModalOpened}
         onClose={() => {
