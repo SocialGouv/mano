@@ -123,7 +123,7 @@ const ObservationsStats = ({
     <>
       <h3 className="tw-my-5 tw-text-xl">Statistiques des observations de territoire</h3>
       <Filters base={filterBase} filters={filterObs} onChange={setFilterObs} />
-      <div>
+      <div className="tw-flex tw-flex-col tw-gap-4">
         <div className="tw-py-2">
           <Card
             title="Nombre d'observations de territoire"
@@ -153,25 +153,25 @@ const ObservationsStats = ({
           }
           totalTitleForMultiChoice={<span className="tw-font-bold">Nombre d'observations concernées</span>}
         />
+        <CustomResponsivePie
+          title="Nombre de personnes suivies différentes rencontrées (sur les territoires)"
+          help={`Répartition par territoire du nombre de personnes suivies ayant été rencontrées lors de la saisie d'une observation dans la période définie. Si une personne est rencontrée plusieurs fois sur un même territoire, elle n'est comptabilisée qu'une seule fois. Si elle est rencontrée sur deux territoires différents, elle sera comptée indépendamment sur chaque territoire.\n\nSi aucune période n'est définie, on considère l'ensemble des observations.`}
+          data={Object.entries(filteredPersonsRencontresByTerritories).map(([territory, persons]) => ({
+            id: territory,
+            label: territory,
+            value: Object.keys(persons).length,
+          }))}
+        />
+        <CustomResponsivePie
+          title="Nombre de rencontres de personnes suivies (dans les territoires)"
+          help={`Répartition par territoire du nombre de rencontres lors de la saisie d'une observation dans la période définie. Chaque rencontre est comptabilisée, même si plusieurs rencontres avec une même personne ont eu lieu sur un même territoire.\n\nSi aucune période n'est définie, on considère l'ensemble des observations.`}
+          data={Object.entries(filteredRencontresByTerritories).map(([territory, rencontres]) => ({
+            id: territory,
+            label: territory,
+            value: Number(rencontres || 0),
+          }))}
+        />
       </div>
-      <CustomResponsivePie
-        title="Nombre de personnes suivies différentes rencontrées (sur les territoires)"
-        help={`Répartition par territoire du nombre de personnes suivies ayant été rencontrées lors de la saisie d'une observation dans la période définie. Si une personne est rencontrée plusieurs fois sur un même territoire, elle n'est comptabilisée qu'une seule fois. Si elle est rencontrée sur deux territoires différents, elle sera comptée indépendamment sur chaque territoire.\n\nSi aucune période n'est définie, on considère l'ensemble des observations.`}
-        data={Object.entries(filteredPersonsRencontresByTerritories).map(([territory, persons]) => ({
-          id: territory,
-          label: territory,
-          value: Object.keys(persons).length,
-        }))}
-      />
-      <CustomResponsivePie
-        title="Nombre de rencontres de personnes suivies (dans les territoires)"
-        help={`Répartition par territoire du nombre de rencontres lors de la saisie d'une observation dans la période définie. Chaque rencontre est comptabilisée, même si plusieurs rencontres avec une même personne ont eu lieu sur un même territoire.\n\nSi aucune période n'est définie, on considère l'ensemble des observations.`}
-        data={Object.entries(filteredRencontresByTerritories).map(([territory, rencontres]) => ({
-          id: territory,
-          label: territory,
-          value: Number(rencontres || 0),
-        }))}
-      />
       <SelectedObsModal
         open={obsModalOpened}
         onClose={() => {
