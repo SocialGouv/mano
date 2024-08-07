@@ -13,25 +13,25 @@ const CustomFieldsStats = ({ customFields, data, help, onSliceClick, totalTitleF
     .filter((f) => f.showInStats);
 
   return (
-    <div className="tw-grid tw-grid-cols-3 sm:tw-grid-cols-6 lg:tw-grid-cols-12 tw-gap-4">
+    <div className="tw-flex tw-flex-wrap tw-justify-center tw-items-stretch tw-gap-4">
       {customFieldsInStats.map((field) => {
         if (["number"].includes(field.type)) {
           return (
-            <div className="tw-col-span-3 tw-justify-self-center tw-place-self-center" key={field.name}>
+            <div className="tw-basis-64 tw-shrink-0 tw-grow-0" key={field.name}>
               <BlockTotal title={field.label} data={data} field={field.name} help={help?.(field.label.capitalize())} />
             </div>
           );
         }
         if (["date", "date-with-time", "duration"].includes(field.type)) {
           return (
-            <div className="tw-col-span-3 tw-justify-self-center tw-place-self-center" key={field.name}>
+            <div className="tw-basis-64 tw-shrink-0 tw-grow-0" key={field.name}>
               <BlockDateWithTime data={data} field={field} help={help?.(field.label.capitalize())} />
             </div>
           );
         }
         if (["boolean", "yes-no", "enum"].includes(field.type)) {
           return (
-            <div className="tw-col-span-12 tw-row-span-3" key={field.name}>
+            <div className="tw-basis-full tw-shrink-0" key={field.name}>
               <CustomResponsivePie
                 title={field.label}
                 help={help?.(field.label.capitalize())}
@@ -46,7 +46,7 @@ const CustomFieldsStats = ({ customFields, data, help, onSliceClick, totalTitleF
         }
         if (["multi-choice"].includes(field.type)) {
           return (
-            <div className="tw-col-span-12 tw-row-span-3" key={field.name}>
+            <div className="tw-basis-full tw-shrink-0" key={field.name}>
               <CustomResponsiveBar
                 title={field.label}
                 help={help?.(field.label.capitalize())}
