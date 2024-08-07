@@ -56,18 +56,18 @@ const CreateObservation = ({ id, observation, open, setOpen }: CreateObservation
   const rencontres = useRecoilValue<Array<RencontreInstance>>(rencontresState);
   const { refresh } = useDataLoader();
 
-  useEffect(() => {
-    const savedObs = window.sessionStorage.getItem("create-observation");
-    if (savedObs) {
-      const savedTerritory = JSON.parse(savedObs)?.territory;
-      const currentTerritory = observation?.territory;
-      if (savedTerritory && savedTerritory !== currentTerritory) {
-        alert(
-          "Une observation était en cours de création sur un autre territoire. Veuillez vérifier les informations, ou la fermer si ça n'est plus d'actualité"
-        );
-      }
-    }
-  }, [observation]);
+  // useEffect(() => {
+  //   const savedObs = window.sessionStorage.getItem("create-observation");
+  //   if (savedObs) {
+  //     const savedTerritory = JSON.parse(savedObs)?.territory;
+  //     const currentTerritory = observation?.territory;
+  //     if (savedTerritory && savedTerritory !== currentTerritory) {
+  //       alert(
+  //         "Une observation était en cours de création sur un autre territoire. Veuillez vérifier les informations, ou la fermer si ça n'est plus d'actualité"
+  //       );
+  //     }
+  //   }
+  // }, [observation]);
 
   const [sortBy, setSortBy] = useLocalStorage("in-observation-rencontre-sortBy", "dueAt");
   const [sortOrder, setSortOrder] = useLocalStorage("in-observation-rencontre-sortOrder", "ASC");
