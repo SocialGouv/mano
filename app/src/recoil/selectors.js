@@ -15,6 +15,7 @@ import { medicalFileState } from './medicalFiles';
 import dayjs from 'dayjs';
 import { groupsState } from './groups';
 import { formatAge, formatBirthDate } from '../services/dateDayjs';
+import { passagesState } from './passages';
 
 export const actionsObjectSelector = selector({
   key: 'actionsObjectSelector',
@@ -85,6 +86,7 @@ export const itemsGroupedByPersonSelector = selector({
     const relsPersonPlace = get(relsPersonPlaceState);
     const places = get(placesObjectSelector);
     const rencontres = get(rencontresState);
+    const passages = get(passagesState);
     const groups = get(groupsState);
 
     for (const group of groups) {
@@ -187,14 +189,12 @@ export const itemsGroupedByPersonSelector = selector({
         personsObject[medicalFile.person].medicalFile = medicalFile;
       }
     }
-    // we don't use passages in the app - no use, no load
-    // but we keep it here just to be aware of that app specificity
 
-    // for (const passage of passages) {
-    //   if (!personsObject[passage.person]) continue;
-    //   personsObject[passage.person].passages = personsObject[passage.person].passages || [];
-    //   personsObject[passage.person].passages.push(passage);
-    // }
+    for (const passage of passages) {
+      if (!personsObject[passage.person]) continue;
+      personsObject[passage.person].passages = personsObject[passage.person].passages || [];
+      personsObject[passage.person].passages.push(passage);
+    }
     for (const rencontre of rencontres) {
       if (!personsObject[rencontre.person]) continue;
       personsObject[rencontre.person].rencontres = personsObject[rencontre.person].rencontres || [];

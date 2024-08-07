@@ -78,7 +78,7 @@ class ApiService {
       }
 
       const url = this.getUrl(path, query);
-      // console.log({ url });
+      console.log({ url });
       const response =
         method === 'GET'
           ? await fetchWithFetchRetry(url, {

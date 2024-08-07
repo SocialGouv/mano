@@ -57,6 +57,9 @@ const PersonRow = ({ onPress, person, isPersonsSearchRow = false, showActionShee
     if (organisation.rencontresEnabled) {
       options.unshift('Ajouter une rencontre');
     }
+    if (organisation.passagesEnabled) {
+      options.unshift('Ajouter un passage');
+    }
 
     showActionSheetWithOptions(
       {
@@ -67,6 +70,9 @@ const PersonRow = ({ onPress, person, isPersonsSearchRow = false, showActionShee
         Sentry.setContext('person', { _id: person._id });
         if (options[buttonIndex] === 'Ajouter une rencontre') {
           navigation.push('Rencontre', { person, commentTitle: person.name, fromRoute: 'PersonsList' });
+        }
+        if (options[buttonIndex] === 'Ajouter un passage') {
+          navigation.push('Passage', { person, commentTitle: person.name, fromRoute: 'PersonsList' });
         }
         if (options[buttonIndex] === 'Ajouter une action') {
           navigation.push('NewActionForm', { person, commentTitle: person.name, fromRoute: 'PersonsList' });

@@ -344,14 +344,14 @@ export const DataLoader = () => {
     */
     if (response.data.passages) {
       setLoading('Chargement des passages');
-      const refreshedRencontres = await getData({
+      const refreshedPassages = await getData({
         collectionName: 'passage',
         data: passages,
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
       });
-      if (refreshedRencontres) {
-        setPassages((oldPassages) => mergeItems(oldPassages, refreshedRencontres));
+      if (refreshedPassages) {
+        setPassages((oldPassages) => mergeItems(oldPassages, refreshedPassages));
       }
     }
     /*

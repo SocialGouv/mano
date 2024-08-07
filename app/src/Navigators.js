@@ -65,6 +65,7 @@ import useResetAllCachedDataRecoilStates from './recoil/reset';
 import CGUsAcceptance from './scenes/Login/CGUsAcceptance';
 import TerritoryObservationRencontre from './scenes/Territories/TerritoryObservationRencontre';
 import Consultations from './scenes/Reports/Consultations';
+import Passage from './scenes/Persons/Passage';
 
 const ActionsStack = createStackNavigator();
 const ActionsNavigator = () => {
@@ -79,6 +80,7 @@ const ActionsNavigator = () => {
       <ActionsStack.Screen name="Person" component={Person} />
       <ActionsStack.Screen name="PersonsOutOfActiveListReason" component={PersonsOutOfActiveListReason} />
       <ActionsStack.Screen name="Rencontre" component={Rencontre} />
+      <ActionsStack.Screen name="Passage" component={Passage} />
       <ActionsStack.Screen name="PersonPlace" component={Place} />
       <ActionsStack.Screen name="NewPersonPlaceForm" component={NewPlaceForm} />
       <ActionsStack.Screen name="PersonComment" component={Comment} />
@@ -99,6 +101,7 @@ const PersonsNavigator = () => {
       <PersonsStack.Screen name="PersonsFilter" component={PersonsFilter} />
       <PersonsStack.Screen name="PersonsOutOfActiveListReason" component={PersonsOutOfActiveListReason} />
       <PersonsStack.Screen name="Rencontre" component={Rencontre} />
+      <PersonsStack.Screen name="Passage" component={Passage} />
       <PersonsStack.Screen name="PersonPlace" component={Place} />
       <PersonsStack.Screen name="NewPersonPlaceForm" component={NewPlaceForm} />
       <PersonsStack.Screen name="PersonComment" component={Comment} />
@@ -164,6 +167,7 @@ const ReportsNavigator = () => {
       <ReportsStack.Screen name="Person" component={Person} />
       <ReportsStack.Screen name="PersonsOutOfActiveListReason" component={PersonsOutOfActiveListReason} />
       <ReportsStack.Screen name="Rencontre" component={Rencontre} />
+      <ReportsStack.Screen name="Passage" component={Passage} />
       <ReportsStack.Screen name="PersonPlace" component={Place} />
       <ReportsStack.Screen name="NewPersonPlaceForm" component={NewPlaceForm} />
       <ReportsStack.Screen name="PersonComment" component={Comment} />

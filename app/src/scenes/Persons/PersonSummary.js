@@ -29,6 +29,7 @@ import { formatDateWithFullMonth, getRelativeTimeFrench } from '../../services/d
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import { groupsState } from '../../recoil/groups';
 import API from '../../services/api';
+import PassageRow from './PassageRow';
 
 const PersonSummary = ({
   navigation,
@@ -74,13 +75,16 @@ const PersonSummary = ({
   const onAddRencontre = async () => navigation.push('Rencontre', { person: personDB, fromRoute: 'Person' });
   const onUpdateRencontre = async (rencontre) => navigation.push('Rencontre', { person: personDB, fromRoute: 'Person', rencontre: rencontre });
 
+  const onAddPassage = async () => navigation.push('Passage', { person: personDB, fromRoute: 'Person' });
+  const onUpdatePassage = async (passage) => navigation.push('Passage', { person: personDB, fromRoute: 'Person', passage: passage });
+
   const onGetBackToActiveList = async () => {
     await onUpdatePerson(false, { outOfActiveListReasons: [], outOfActiveList: false });
   };
 
   const populatedPersons = useRecoilValue(itemsGroupedByPersonSelector);
   const populatedPerson = useMemo(() => populatedPersons[personDB?._id] || {}, [populatedPersons, personDB?._id]);
-  const { actions, comments, rencontres, relsPersonPlace } = populatedPerson;
+  const { actions, comments, rencontres, passages, relsPersonPlace } = populatedPerson;
 
   const sortedActions = useMemo(() => [...(actions || [])].sort((p1, p2) => (p1.dueAt > p2.dueAt ? -1 : 1)), [actions]);
   const sortedComments = useMemo(
@@ -88,6 +92,7 @@ const PersonSummary = ({
     [comments]
   );
   const sortedRencontres = useMemo(() => [...(rencontres || [])].sort((r1, r2) => (r1.date > r2.date ? -1 : 1)), [rencontres]);
+  const sortedPassages = useMemo(() => [...(passages || [])].sort((r1, r2) => (r1.date > r2.date ? -1 : 1)), [passages]);
   const sortedRelPersonPlace = useMemo(
     () => [...(relsPersonPlace || [])].sort((r1, r2) => (r1.createdAt > r2.createdAt ? -1 : 1)),
     [relsPersonPlace]
@@ -339,7 +344,16 @@ const PersonSummary = ({
           onAdd={onAddRencontre}
           data={sortedRencontres}
           renderItem={(rencontre) => <RencontreRow key={rencontre._id} rencontre={rencontre} onUpdate={() => onUpdateRencontre(rencontre)} />}
-          ifEmpty="Pas de rencontres"
+          ifEmpty="Pas encore de rencontre"
+        />
+      )}
+      {organisation.passagesEnabled && (
+        <SubList
+          label="Passages"
+          onAdd={onAddPassage}
+          data={sortedPassages}
+          renderItem={(passage) => <PassageRow key={passage._id} passage={passage} onUpdate={() => onUpdatePassage(passage)} />}
+          ifEmpty="Pas encore de passage"
         />
       )}
       <SubList
