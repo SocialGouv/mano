@@ -7,6 +7,7 @@ import SelectAndCreateCollaboration from "../SelectAndCreateCollaboration";
 import { dayjsInstance } from "../../../services/date";
 import { useDataLoader } from "../../../components/DataLoader";
 import { errorMessage } from "../../../utils";
+import { useSessionStorage } from "../../../services/useSessionStorage";
 
 export default function Transmissions({ period, selectedTeamsObject, reports }) {
   const days = useMemo(() => {
@@ -110,20 +111,10 @@ function TransmissionPrint({ report, team }) {
 function Transmission({ report, team, day, teamId, reactSelectInputId }) {
   const [isEditingTransmission, setIsEditingTransmission] = useState(false);
   const [collaborations, setCollaborations] = useState(report?.collaborations ?? []);
+  const [transmission, setTransmission] = useSessionStorage("transmission", "");
   const { refresh } = useDataLoader();
 
-  async function onEditTransmission(event) {
-    event.preventDefault();
-    const form = event.target;
-    const formData = new FormData(form);
-    const description = formData.get("description");
-    onSaveReport({
-      ...report,
-      description,
-      team: teamId,
-      date: day,
-    });
-  }
+  console.log({ transmission });
 
   const onSaveReport = async (body) => {
     const [error] = await tryFetchExpectOk(async () =>
@@ -137,6 +128,7 @@ function Transmission({ report, team, day, teamId, reactSelectInputId }) {
     }
     await refresh();
     setIsEditingTransmission(false);
+    setTransmission("");
   };
 
   return (
@@ -197,7 +189,19 @@ function Transmission({ report, team, day, teamId, reactSelectInputId }) {
           title={`Transmission du ${dayjsInstance(day).format("dddd D MMM")} - ${team?.nightSession ? "🌒" : "☀️ "} ${team?.name || ""}`}
         />
         <ModalBody className="tw-py-4">
-          <form id={`edit-transmission-${day}-${teamId}`} className="tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8" onSubmit={onEditTransmission}>
+          <form
+            id={`edit-transmission-${day}-${teamId}`}
+            className="tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8"
+            onSubmit={(e) => {
+              e.preventDefault();
+              onSaveReport({
+                ...report,
+                description: transmission,
+                team: teamId,
+                date: day,
+              });
+            }}
+          >
             <div>
               <label htmlFor="description" className="tailwindui">
                 Transmission
@@ -208,15 +212,24 @@ function Transmission({ report, team, day, teamId, reactSelectInputId }) {
                 autoComplete="off"
                 id="description"
                 name="description"
+                onChange={(e) => setTransmission(e.target.value)}
                 type="text"
                 placeholder="Entrez ici votre transmission de la journée"
-                defaultValue={report?.description}
+                defaultValue={transmission || report?.description}
               />
             </div>
           </form>
         </ModalBody>
         <ModalFooter>
-          <button type="button" name="cancel" className="button-cancel" onClick={() => setIsEditingTransmission(false)}>
+          <button
+            type="button"
+            name="cancel"
+            className="button-cancel"
+            onClick={() => {
+              setIsEditingTransmission(false);
+              setTransmission("");
+            }}
+          >
             Annuler
           </button>
           <button type="submit" className="button-submit" form={`edit-transmission-${day}-${teamId}`}>
