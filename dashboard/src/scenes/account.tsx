@@ -141,16 +141,18 @@ const LinkToChangePassword = () => {
   );
 };
 
+type TestConnexionStatus = "done" | "ongoing" | "not-started";
+
 const TestConnexion = () => {
   const [open, setOpen] = useState(false);
   const [testLaunched, setTestLaunched] = useState(false);
-  const [testOneCallEvery2Seconds, setTestOneCallEvery2Seconds] = useState<"done" | "ongoing" | "not-started">("not-started");
-  const [testOneCallEvery1Seconds, setTestOneCallEvery1Seconds] = useState<"done" | "ongoing" | "not-started">("not-started");
-  const [testOneCallEvery500MS, setTestOneCallEvery500MS] = useState<"done" | "ongoing" | "not-started">("not-started");
-  const [testOneCallEvery200MS, setTestOneCallEvery200MS] = useState<"done" | "ongoing" | "not-started">("not-started");
-  const [testOneCallEvery100MS, setTestOneCallEvery100MS] = useState<"done" | "ongoing" | "not-started">("not-started");
-  const [testOneCallEvery50MS, setTestOneCallEvery50MS] = useState<"done" | "ongoing" | "not-started">("not-started");
-  const [testOneCallEvery10MS, setTestOneCallEvery10MS] = useState<"done" | "ongoing" | "not-started">("not-started");
+  const [testOneCallEvery2Seconds, setTestOneCallEvery2Seconds] = useState<TestConnexionStatus>("not-started");
+  const [testOneCallEvery1Seconds, setTestOneCallEvery1Seconds] = useState<TestConnexionStatus>("not-started");
+  const [testOneCallEvery500MS, setTestOneCallEvery500MS] = useState<TestConnexionStatus>("not-started");
+  const [testOneCallEvery200MS, setTestOneCallEvery200MS] = useState<TestConnexionStatus>("not-started");
+  const [testOneCallEvery100MS, setTestOneCallEvery100MS] = useState<TestConnexionStatus>("not-started");
+  const [testOneCallEvery50MS, setTestOneCallEvery50MS] = useState<TestConnexionStatus>("not-started");
+  const [testOneCallEvery10MS, setTestOneCallEvery10MS] = useState<TestConnexionStatus>("not-started");
 
   const responses = useRef([]);
 
