@@ -202,7 +202,8 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
       }
 
       const actionCancelled = action.status !== CANCEL && body.status === CANCEL;
-      toast.success("Mise à jour !");
+      // On affiche le toast de mise à jour uniquement si on a fermé la modale.
+      if (closeOnSubmit) toast.success("Mise à jour !");
       if (actionCancelled) {
         const { name, person, dueAt, withTime, description, categories, urgent, teams } = data;
         const comments = action.comments.filter((c) => c.action === action._id);
@@ -321,7 +322,11 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
       }
       toast.success("Création réussie !");
     }
-    if (closeOnSubmit) onClose();
+    if (closeOnSubmit) {
+      onClose();
+    } else {
+      setIsSubmitting(false);
+    }
     refresh();
     return true;
   }
@@ -683,8 +688,8 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                     toast.error("Erreur lors de la suppression du commentaire");
                     return false;
                   }
-                  toast.success("Suppression réussie");
-                  refresh();
+                  const ok = await handleSubmit({ newData });
+                  if (ok) toast.success("Suppression réussie");
                   return true;
                 }
               }}
@@ -702,9 +707,10 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
                       toast.error("Erreur lors de l'ajout du commentaire");
                       return;
                     }
-                    setData({ ...data, comments: [{ ...comment, _id: response.data._id }, ...data.comments] });
-                    toast.success("Commentaire ajouté !");
-                    refresh();
+                    const newData = { ...data, comments: [{ ...comment, _id: response.data._id }, ...data.comments] };
+                    setData(newData);
+                    const ok = await handleSubmit({ newData });
+                    if (ok) toast.success("Commentaire ajouté !");
                   }
                 } else {
                   setData({ ...data, comments: data.comments.map((c) => (c._id === comment._id ? comment : c)) });
