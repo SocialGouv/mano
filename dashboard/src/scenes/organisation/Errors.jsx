@@ -95,10 +95,6 @@ export default function Errors() {
           data={data}
           rowKey={"_id"}
           noData="Aucune donnée en erreur"
-          onRowClick={(row) => {
-            setItem(row);
-            setOpen(true);
-          }}
           columns={[
             { title: "_id", dataKey: "_id" },
             { title: "Type", dataKey: "type" },
