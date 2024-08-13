@@ -9,7 +9,7 @@ import { capture } from "../../../services/sentry";
 import { DocumentsModule } from "../../../components/DocumentsGeneric";
 import { groupsState } from "../../../recoil/groups";
 import type { PersonPopulated, PersonInstance } from "../../../types/person";
-import type { Document, FolderWithLinkedItem } from "../../../types/document";
+import type { Document, FolderWithLinkedItem, LinkedItem } from "../../../types/document";
 import type { UUIDV4 } from "../../../types/uuid";
 import { personsObjectSelector } from "../../../recoil/selectors";
 import { encryptAction } from "../../../recoil/actions";
@@ -46,22 +46,21 @@ const PersonDocuments = ({ person }: PersonDocumentsProps) => {
     createdBy: "admin",
   };
 
-  let defaultDocuments: Array<FolderWithLinkedItem> = [];
-  if ((person.documentsForModule || []).length === 0 && (person.groupDocuments || []).length === 0) {
-    defaultDocuments = organisation.defaultPersonsFolders.map((folder) => ({
-      ...folder,
-      linkedItem: {
-        _id: person._id,
-        type: "person",
-      },
-    }));
-  }
+  const defaultDocuments: Array<FolderWithLinkedItem> = (organisation.defaultPersonsFolders || []).map((folder) => ({
+    ...folder,
+    movable: false,
+    linkedItem: {
+      _id: person._id,
+      type: "person",
+    } as LinkedItem,
+  }));
+  const defaultDocumentsIds = defaultDocuments.map((d) => d._id);
 
   const documents = [
     // Le dossier "Actions" est ajouté si nécessaire, il s'affichera toujours en premier
     needsActionsFolder ? actionsFolder : undefined,
-    // Les documents et dossiers de la personne
-    ...(person.documentsForModule || []),
+    // Les documents et dossiers de la personne (auxquels on supprime les dossiers par défaut)
+    ...(person.documentsForModule || []).filter((d) => !defaultDocumentsIds.includes(d._id)),
     // Les documents et dossier du groupe (famille)
     ...(person.groupDocuments || []),
     // Les dossiers par défaut configurés par l'organisation

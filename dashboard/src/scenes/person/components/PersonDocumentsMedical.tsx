@@ -31,11 +31,13 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
 
   const defaultDocuments: Array<FolderWithLinkedItem> = organisation.defaultMedicalFolders.map((folder) => ({
     ...folder,
+    movable: false,
     linkedItem: {
       _id: person._id,
       type: "person",
     },
   }));
+  const defaultDocumentsIds = defaultDocuments.map((d) => d._id);
 
   const allMedicalDocuments = useMemo(() => {
     if (!medicalFile) return [];
@@ -119,10 +121,13 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
       otherDocs.push(docWithLinkedItem);
     }
 
-    return [...treatmentsDocs, ...consultationsDocs, ...otherDocs, ...(otherDocs?.length > 0 ? [] : defaultDocuments)].sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-  }, [consultations, defaultDocuments, medicalFile, treatments, user._id]);
+    return [
+      ...treatmentsDocs,
+      ...consultationsDocs,
+      ...otherDocs.filter((d) => !defaultDocumentsIds.includes(d._id)),
+      ...(defaultDocuments || []),
+    ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }, [consultations, defaultDocuments, medicalFile, treatments, user._id, defaultDocumentsIds]);
 
   return (
     <DocumentsModule
@@ -305,8 +310,7 @@ const PersonDocumentsMedical = ({ person }: PersonDocumentsProps) => {
             "medical-file": {},
           };
           for (const document of nextDocuments) {
-            if (document._id === "treatment") continue; // it's the non movable Treatments folder
-            if (document._id === "consultation") continue; // it's the non movable Consultations folder
+            if (document.movable === false) continue;
             if (!groupedById[document.linkedItem.type][document.linkedItem._id]) groupedById[document.linkedItem.type][document.linkedItem._id] = [];
             groupedById[document.linkedItem.type][document.linkedItem._id].push(document);
           }

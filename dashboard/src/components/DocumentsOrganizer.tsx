@@ -237,7 +237,7 @@ function Branch({
           <div className="tw-flex tw-w-full tw-justify-between tw-overflow-hidden">
             <div className="tw-flex tw-flex-1 tw-items-center tw-overflow-hidden tw-pr-5">
               <small
-                className={`tw-mr-1 tw-inline-block tw-w-3 tw-cursor-pointer tw-text-${color}`}
+                className={`hover:tw-scale-110 tw-transition tw-mr-1 tw-inline-block tw-w-3 tw-cursor-pointer tw-text-${color}`}
                 onClick={() => {
                   if (open) {
                     setOpenedFolderIds(openedFolderIds.filter((id) => id !== folder._id));
@@ -256,12 +256,17 @@ function Branch({
                   const notRootFolder = folder as FolderForTree;
                   onFolderClick(notRootFolder);
                 }}
-                className={["tw-inline-flex tw-flex-1 tw-gap-x-2 tw-overflow-hidden", movable ? "tw-cursor-default" : "!tw-cursor-not-allowed"].join(
+                className={["tw-inline-flex tw-flex-1 tw-gap-x-2 tw-overflow-hidden", movable ? "!tw-cursor-pointer" : "!tw-cursor-default"].join(
                   " "
                 )}
               >
                 <span>{open ? "📂" : "📁"}</span>
                 <span className="tw-truncate">{folder.name}</span>
+                {!movable ? (
+                  <span className="tw-opacity-50" title="Ce dossier est configuré par défaut. Il ne peut pas être déplacé ou renommé.">
+                    🔒
+                  </span>
+                ) : null}
                 <span>({folder.children?.length || 0})</span>
               </button>
             </div>
