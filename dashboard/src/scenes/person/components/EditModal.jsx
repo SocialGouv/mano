@@ -145,7 +145,7 @@ export default function EditModal({ person, selectedPanel, onClose, isMedicalFil
                 setUpdatedPersonFormValues(body);
 
                 // Ouverture de la modale si et seulement si il y a des équipes qui ont été retirées
-                const teamsRemoved = person.assignedTeams.filter((t) => !body.assignedTeams.includes(t));
+                const teamsRemoved = (person.assignedTeams || []).filter((t) => !body.assignedTeams.includes(t));
                 if (teamsRemoved.length) {
                   return setIsOutOfTeamsModalOpen(true);
                 } else {
