@@ -17,6 +17,7 @@ import { ModalContainer, ModalBody, ModalFooter } from "./tailwind/Modal";
 import PersonName from "./PersonName";
 import BellIconWithNotifications from "../assets/icons/BellIconWithNotifications";
 import { useDataLoader } from "./DataLoader";
+import ActionOrConsultationName from "./ActionOrConsultationName";
 
 export default function Notification() {
   const [showModal, setShowModal] = useState(false);
@@ -138,7 +139,15 @@ const Actions = ({ setShowModal, actions, setSortOrder, setSortBy, sortBy, sortO
               return formatTime(action.dueAt);
             },
           },
-          { title: "Nom", dataKey: "name", onSortOrder: setSortOrder, onSortBy: setSortBy, sortBy, sortOrder },
+          {
+            title: "Nom",
+            dataKey: "name",
+            onSortOrder: setSortOrder,
+            onSortBy: setSortBy,
+            sortBy,
+            sortOrder,
+            render: (action) => <ActionOrConsultationName item={action} />,
+          },
           {
             title: "Personne suivie",
             dataKey: "person",
