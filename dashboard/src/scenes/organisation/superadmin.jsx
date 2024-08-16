@@ -17,7 +17,7 @@ import { checkEncryptedVerificationKey, derivedMasterKey } from "../../services/
 import SuperadminOrganisationSettings from "./SuperadminOrganisationSettings";
 import SuperadminUsersManagement from "./SuperadminUsersManagement";
 
-const List = () => {
+const SuperAdmin = () => {
   const [organisations, setOrganisations] = useState(null);
   const [updateKey, setUpdateKey] = useState(null);
   const [sortBy, setSortBy] = useState("countersTotal");
@@ -730,4 +730,4 @@ const CreateUser = ({ onChange, open, setOpen, organisation }) => {
   );
 };
 
-export default List;
+export default SuperAdmin;
