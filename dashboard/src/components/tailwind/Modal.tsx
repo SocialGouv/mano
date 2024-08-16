@@ -144,7 +144,13 @@ const ModalHeader = ({ children, title, onClose }: ModalHeaderProps) => {
           )}
           {children}
           {!!onClose && (
-            <button type="button" aria-label="Fermer" className="tw-absolute tw-right-0 tw-top-4 tw-text-gray-900 sm:tw-px-6" onClick={onClose}>
+            <button
+              type="button"
+              aria-label="Fermer"
+              className="tw-absolute tw-right-0 tw-top-4 tw-text-gray-900 sm:tw-px-6"
+              onClick={onClose}
+              tabIndex={-1}
+            >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="tw-h-6 tw-w-6">
                 <path
                   fillRule="evenodd"
