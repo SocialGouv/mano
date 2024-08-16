@@ -217,9 +217,11 @@ export default function SuperadminUsersManagement({
         <button className="button-cancel" onClick={onClose}>
           Fermer
         </button>
-        <button className="button-submit" onClick={() => setOpenCreateUserModal(true)}>
-          Ajouter un utilisateur
-        </button>
+        {!forSearch ? (
+          <button className="button-submit" onClick={() => setOpenCreateUserModal(true)}>
+            Ajouter un utilisateur
+          </button>
+        ) : null}
       </ModalFooter>
     </ModalContainer>
   );
