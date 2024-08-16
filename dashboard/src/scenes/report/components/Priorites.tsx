@@ -79,7 +79,9 @@ export default function Priorites({ actions, comments }) {
           />
         </ModalBody>
         <ModalFooter>
-          <ButtonCustom className="tw-mx-auto tw-my-4" title="OK, merci" onClick={() => setShowModal(false)} />
+          <button type="button" name="cancel" className="button-cancel" onClick={() => setShowModal(false)}>
+            Fermer
+          </button>
         </ModalFooter>
       </ModalContainer>
     </>
