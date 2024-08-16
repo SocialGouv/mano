@@ -10,96 +10,74 @@ import { toast } from "react-toastify";
 import { errorMessage } from "../../utils";
 import Search from "../../components/search";
 
-export default function SuperadminUsersManagement({
-  organisation,
+export default function SuperadminUsersSearch({
   open,
   setOpen,
-  openCreateUserModal,
-  setOpenCreateUserModal,
   setSelectedOrganisation,
-  setSearchUserModal,
-  forSearch = false,
 }: {
-  organisation: OrganisationInstance;
+  open: boolean;
   setOpen: (open: boolean) => void;
-  setOpenCreateUserModal: (open: boolean) => void;
   setSelectedOrganisation: (organisation: OrganisationInstance) => void;
   setSearchUserModal: (open: boolean) => void;
-  open: boolean;
-  openCreateUserModal: boolean;
-  forSearch: boolean;
 }) {
   const [search, setSearch] = useState("");
   const [users, setUsers] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [isGeneratingLinkForUser, setIsGeneratingLinkForUser] = useState<false | string>(false);
   const [generatedLink, setGeneratedLink] = useState<[string, string] | undefined>();
 
   const onClose = useCallback(() => {
-    if (organisation) {
-      setSelectedOrganisation(null);
-      setOpen(false);
-    }
-    if (forSearch) setSearchUserModal(false);
-  }, [organisation, forSearch, setSelectedOrganisation, setSearchUserModal, setOpen]);
+    setOpen(false);
+  }, [setOpen]);
 
   useEffect(() => {
-    if (organisation?._id && open && !openCreateUserModal) {
-      tryFetchExpectOk(() => API.get({ path: `/user`, query: { organisation: organisation._id } })).then(([error, response]) => {
-        if (!error) {
-          setUsers(response.data);
-        }
-      });
+    if (!search?.length || search.length < 3) {
+      setUsers([]);
+      return;
     }
-  }, [organisation?._id, open, openCreateUserModal]);
-
-  useEffect(() => {
-    let isStale = false;
-    if (!open || !search?.length || search.length < 3) {
-      return () => {
-        isStale = true;
-      };
-    }
-    if (!openCreateUserModal) {
-      tryFetchExpectOk(() => API.get({ path: `/user/search`, query: { search } })).then(([error, response]) => {
-        if (isStale) return;
-        if (error) {
-          return toast.error(errorMessage(error));
-        }
-        setUsers(response.data);
-      });
-    }
-    return () => {
-      isStale = true;
-    };
-  }, [open, openCreateUserModal, search]);
+    setIsLoading(true);
+    tryFetchExpectOk(() => API.get({ path: `/user/search`, query: { search } })).then(([error, response]) => {
+      if (error) {
+        return toast.error(errorMessage(error));
+      }
+      setUsers(response.data);
+      setIsLoading(false);
+    });
+  }, [open, search]);
 
   return (
-    <ModalContainer open={open} onClose={onClose} size="full">
-      <ModalHeader
-        title={forSearch ? "Rechercher un utilisateur" : `Utilisateurs de l'organisation ${organisation?.name} (${users.length})`}
-        key={organisation?._id + forSearch}
-        onClose={onClose}
-      />
+    <ModalContainer
+      open={open}
+      onClose={onClose}
+      size="full"
+      onAfterLeave={() => {
+        setIsLoading(false);
+        setSearch("");
+        setUsers([]);
+      }}
+    >
+      <ModalHeader title={"Rechercher un utilisateur"} onClose={onClose} />
       <ModalBody>
         <div className="tw-w-full tw-flex tw-flex-col tw-items-center tw-justify-center">
-          {forSearch && (
-            <div className="tw-w-full tw-flex tw-flex-col tw-items-center tw-justify-center [&>div]:tw-max-w-96 tw-mb-4">
-              <Search placeholder={`Rechercher par nom ou email...`} value={search} onChange={setSearch} />
+          <div className="tw-w-full tw-flex tw-flex-col tw-items-center tw-justify-center [&>div]:tw-max-w-96 tw-my-4">
+            <Search placeholder={`Rechercher par nom ou email...`} value={search} onChange={setSearch} />
+          </div>
+          {users.length === 0 && (
+            <div>
+              <div className="tw-p-4 tw-text-center">
+                Aucun résultat
+                {search.length < 3 ? " (minimum 3 caractères)" : ""}
+                {isLoading ? <span className="tw-animate-pulse"> (recherche en cours...)</span> : ""}
+              </div>
+              <img src="https://gifsec.com/wp-content/uploads/2022/09/waiting-gif-13-1.gif" className="tw-h-72 tw-w-96 tw-m-4 tw-object-cover" />
             </div>
           )}
-          {users.length === 0 && (
-            <img src="https://gifsec.com/wp-content/uploads/2022/09/waiting-gif-13-1.gif" className="tw-h-72 tw-w-96 tw-m-4 tw-object-cover" />
-          )}
-          {forSearch && users.length > 0 && (
-            <>
-              <p className="tw-font-bold">
+          {users.length > 0 && (
+            <div>
+              <div className="tw-font-bold tw-p-4 tw-text-center">
                 {users.length} utilisateur(rice){users.length > 1 ? "s" : ""} 🤩
-              </p>
-              <img
-                src="https://64.media.tumblr.com/80d77b2ee92f3f319199ffd5004d607b/e480692c75386e1a-a1/s540x810/7f5723453c8bc0f92e0dd63eda16699701ae9995.gif"
-                className="tw-h-72 tw-w-96 tw-m-4 tw-object-cover"
-              />
-            </>
+              </div>
+            </div>
           )}
           {users.length > 0 && (
             <table className="table table-striped table-bordered tw-text-sm">
@@ -109,7 +87,7 @@ export default function SuperadminUsersManagement({
                   <th>Email</th>
                   <th>Rôle</th>
                   <th>Équipes</th>
-                  {forSearch && <th>Organisation</th>}
+                  <th>Organisation</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -176,20 +154,19 @@ export default function SuperadminUsersManagement({
                         ))}
                       </div>
                     </td>
-                    {forSearch && (
-                      <td>
-                        <button
-                          onClick={() => {
-                            setSelectedOrganisation(user.organisationPopulated);
-                            setOpen(true);
-                          }}
-                          type="button"
-                          className="hover:tw-underline focus:tw-underline tw-text-left"
-                        >
-                          {user.organisationPopulated?.name}
-                        </button>
-                      </td>
-                    )}
+
+                    <td>
+                      <button
+                        onClick={() => {
+                          setSelectedOrganisation(user.organisationPopulated);
+                          setOpen(true);
+                        }}
+                        type="button"
+                        className="hover:tw-underline focus:tw-underline tw-text-left"
+                      >
+                        {user.organisationPopulated?.name}
+                      </button>
+                    </td>
                     <td>
                       <div className="tw-grid tw-gap-1">
                         <DeleteButtonAndConfirmModal
@@ -217,11 +194,6 @@ export default function SuperadminUsersManagement({
         <button className="button-cancel" onClick={onClose}>
           Fermer
         </button>
-        {!forSearch ? (
-          <button className="button-submit" onClick={() => setOpenCreateUserModal(true)}>
-            Ajouter un utilisateur
-          </button>
-        ) : null}
       </ModalFooter>
     </ModalContainer>
   );

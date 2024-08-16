@@ -15,7 +15,8 @@ import CitySelect from "../../components/CitySelect";
 import { ModalBody, ModalHeader, ModalFooter, ModalContainer } from "../../components/tailwind/Modal";
 import { checkEncryptedVerificationKey, derivedMasterKey } from "../../services/encryption";
 import SuperadminOrganisationSettings from "./SuperadminOrganisationSettings";
-import SuperadminUsersManagement from "./SuperadminUsersManagement";
+import SuperadminOrganisationUsers from "./SuperadminOrgationsationUsers";
+import SuperadminUsersSearch from "./SuperadminUsersSearch";
 
 const SuperAdmin = () => {
   const [organisations, setOrganisations] = useState(null);
@@ -62,22 +63,21 @@ const SuperAdmin = () => {
     <>
       <Create onChange={() => setRefresh(true)} open={openCreateModal} setOpen={setOpenCreateModal} />
       <MergeOrganisations onChange={() => setRefresh(true)} open={openMergeModal} setOpen={setOpenMergeModal} organisations={organisations} />
-      <SuperadminUsersManagement
-        open={searchUserModal}
+      <SuperadminOrganisationUsers
+        open={openUserListModal}
         setOpen={setOpenUserListModal}
         setOpenCreateUserModal={setOpenCreateUserModal}
         openCreateUserModal={openCreateUserModal}
-        forSearch
-        setSearchUserModal={setSearchUserModal}
+        organisation={selectedOrganisation}
         setSelectedOrganisation={setSelectedOrganisation}
       />
-      <SuperadminUsersManagement
-        open={openUserListModal && !!selectedOrganisation}
-        organisation={selectedOrganisation}
-        setOpen={setOpenUserListModal}
-        setOpenCreateUserModal={setOpenCreateUserModal}
-        setSelectedOrganisation={setSelectedOrganisation}
-        openCreateUserModal={openCreateUserModal}
+      <SuperadminUsersSearch
+        open={searchUserModal}
+        setOpen={setSearchUserModal}
+        setSelectedOrganisation={(o) => {
+          setSelectedOrganisation(o);
+          setOpenUserListModal(true);
+        }}
       />
       <SuperadminOrganisationSettings
         key={selectedOrganisation?._id}
