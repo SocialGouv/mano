@@ -585,13 +585,13 @@ const MergeOrganisations = ({ open, setOpen, organisations, onChange }) => {
 };
 
 const CreateUser = ({ onChange, open, setOpen, organisation }) => {
-  const [team, setTeam] = useState([]);
+  const [organisationTeams, setOrganisationTeams] = useState([]);
   useEffect(() => {
     if (!organisation?._id) return;
     (async () => {
       const [error, response] = await tryFetchExpectOk(async () => API.get({ path: `organisation/${organisation._id}/teams` }));
       if (error) return toast.error(errorMessage(error));
-      setTeam(response.data);
+      setOrganisationTeams(response.data);
     })();
   }, [organisation?._id]);
 
@@ -601,7 +601,7 @@ const CreateUser = ({ onChange, open, setOpen, organisation }) => {
     <>
       <ModalContainer open={open} onClose={() => setOpen(false)} size="3xl" blurryBackground>
         <Formik
-          initialValues={{ name: "", email: "", phone: "", team, healthcareProfessional: false }}
+          initialValues={{ name: "", email: "", phone: "", team: [], healthcareProfessional: false }}
           onSubmit={async (body, actions) => {
             try {
               if (!body.email) return toast.error("L'email est obligatoire");
@@ -669,13 +669,13 @@ const CreateUser = ({ onChange, open, setOpen, organisation }) => {
                         <div>
                           <SelectCustom
                             name="name"
-                            options={team}
+                            options={organisationTeams}
                             onChange={(teams) => handleChange({ target: { value: teams?.map((t) => t._id) || [], name: "team" } })}
-                            value={values.team.map((_teamId) => team.find((_team) => _team._id === _teamId))}
+                            value={values.team.map((_teamId) => organisationTeams.find((_team) => _team._id === _teamId))}
                             getOptionValue={(team) => team._id}
                             getOptionLabel={(team) => team.name}
                             isMulti
-                            isDisabled={team.length === 0}
+                            isDisabled={organisationTeams.length === 0}
                             inputId="team"
                           />
                         </div>
