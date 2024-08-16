@@ -21,6 +21,7 @@ import { PersonsReport } from "./components/PersonsReport";
 import Transmissions from "./components/Transmissions";
 import { useLocalStorage } from "../../services/useLocalStorage";
 import { filterPersonByAssignedTeamDuringQueryPeriod } from "../../utils/person-merge-assigned-team-periods-with-query-period";
+import Priorites from "./components/Priorites";
 
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithNameOfDay(date)}`;
@@ -426,6 +427,9 @@ const View = () => {
                   <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-main tw-shadow print:tw-border-none print:tw-bg-transparent print:tw-shadow-none">
                     <PersonsReport personsCreated={personsCreated} period={period} selectedTeams={selectedTeams} />
                   </div>
+                </div>
+                <div className="tw-flex tw-items-center tw-justify-center no-print">
+                  <Priorites period={period} selectedTeams={selectedTeams} actions={actions} comments={comments} />
                 </div>
                 {organisation.receptionEnabled && (
                   <div className="tw-rounded-lg tw-border tw-border-zinc-200 tw-bg-white tw-shadow print:tw-border-none print:tw-bg-transparent print:tw-shadow-none">

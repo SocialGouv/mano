@@ -18,6 +18,7 @@ import PersonName from "./PersonName";
 import BellIconWithNotifications from "../assets/icons/BellIconWithNotifications";
 import { useDataLoader } from "./DataLoader";
 import ActionOrConsultationName from "./ActionOrConsultationName";
+import TagTeam from "./TagTeam";
 
 export default function Notification() {
   const [showModal, setShowModal] = useState(false);
@@ -81,7 +82,7 @@ export default function Notification() {
       </button>
       <ModalContainer open={showModal} onClose={() => setShowModal(false)} size="full">
         <ModalBody className="relative tw-mb-6">
-          <Actions
+          <NotificationActionList
             setShowModal={setShowModal}
             actions={actionsFiltered}
             setSortOrder={setActionsSortOrder}
@@ -89,7 +90,7 @@ export default function Notification() {
             sortBy={actionsSortBy}
             sortOrder={actionsSortOrder}
           />
-          <Comments setShowModal={setShowModal} comments={commentsFiltered} />
+          <NotificationCommentList setShowModal={setShowModal} comments={commentsFiltered} />
         </ModalBody>
         <ModalFooter>
           <ButtonCustom className="tw-mx-auto tw-my-4" title="OK, merci" onClick={() => setShowModal(false)} />
@@ -99,7 +100,7 @@ export default function Notification() {
   );
 }
 
-const Actions = ({ setShowModal, actions, setSortOrder, setSortBy, sortBy, sortOrder }) => {
+export const NotificationActionList = ({ setShowModal, actions, setSortOrder, setSortBy, sortBy, sortOrder, title, showTeam = false }) => {
   const history = useHistory();
   const user = useRecoilValue(userState);
   const { refresh } = useDataLoader();
@@ -107,7 +108,7 @@ const Actions = ({ setShowModal, actions, setSortOrder, setSortBy, sortBy, sortO
   return (
     <div role="dialog" title="Actions urgentes et vigilance" name="Actions urgentes et vigilance">
       <h3 className="tw-mb-0 tw-flex tw-w-full tw-max-w-full tw-shrink-0 tw-items-center tw-justify-between tw-rounded-t-lg tw-border-b tw-border-gray-200 tw-bg-white tw-px-4 tw-py-4 tw-text-lg tw-font-medium tw-leading-6 tw-text-gray-900 sm:tw-px-6">
-        Actions urgentes et vigilance
+        {title || "Actions urgentes et vigilance de l'équipe"}
       </h3>
       <Table
         data={actions}
@@ -165,6 +166,24 @@ const Actions = ({ setShowModal, actions, setSortOrder, setSortBy, sortBy, sortO
               />
             ),
           },
+          ...(showTeam
+            ? [
+                {
+                  title: "Équipe(s) en charge",
+                  dataKey: "team",
+                  render: (a) => {
+                    if (!Array.isArray(a?.teams)) return <TagTeam teamId={a?.team} />;
+                    return (
+                      <div className="tw-flex tw-flex-col">
+                        {a.teams.map((e) => (
+                          <TagTeam key={e} teamId={e} />
+                        ))}
+                      </div>
+                    );
+                  },
+                },
+              ]
+            : []),
           {
             title: "",
             dataKey: "urgent",
@@ -199,7 +218,7 @@ const Actions = ({ setShowModal, actions, setSortOrder, setSortBy, sortBy, sortO
   );
 };
 
-const Comments = ({ setShowModal, comments }) => {
+export const NotificationCommentList = ({ setShowModal, comments, title, showTeam = false }) => {
   const history = useHistory();
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
@@ -209,7 +228,7 @@ const Comments = ({ setShowModal, comments }) => {
   return (
     <div role="dialog" title="Commentaires urgents et vigilance" name="Commentaires urgents et vigilance">
       <h3 className="tw-mb-0 tw-flex tw-w-full tw-max-w-full tw-shrink-0 tw-items-center tw-justify-between tw-rounded-t-lg tw-border-y tw-border-gray-200 tw-bg-white tw-px-4 tw-py-4 tw-text-lg tw-font-medium tw-leading-6 tw-text-gray-900 sm:tw-px-6">
-        Commentaires urgents et vigilance
+        {title || "Commentaires urgents et vigilance de l'équipe"}
       </h3>
       <Table
         data={comments}
@@ -295,6 +314,19 @@ const Comments = ({ setShowModal, comments }) => {
               );
             },
           },
+          ...(showTeam
+            ? [
+                {
+                  title: "Équipe en charge",
+                  dataKey: "team",
+                  render: (comment) => (
+                    <div className="tw-flex tw-flex-col">
+                      <TagTeam teamId={comment?.team} />
+                    </div>
+                  ),
+                },
+              ]
+            : []),
           {
             title: "",
             dataKey: "urgent",
