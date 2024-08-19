@@ -269,6 +269,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
       }
     } else {
       let actionsId = [];
+      setIsSubmitting(true);
       if (Array.isArray(body.person)) {
         const [actionError, actionResponse] = await tryFetchExpectOk(async () =>
           API.post({
@@ -784,7 +785,7 @@ function ActionContent({ onClose, action, personId = null, personIds = null, isM
             form="add-action-form"
             disabled={isDeleting || isSubmitting}
           >
-            Sauvegarder
+            {isSubmitting ? "Sauvegarde..." : "Sauvegarder"}
           </button>
         )}
         {!isEditing && (
