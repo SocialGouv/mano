@@ -230,9 +230,6 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
     return false;
   }, [data, initialState]);
 
-  // const canEdit = useMemo(() => !consultation || consultation.user === user._id, [consultation, user._id]);
-  const canEdit = true;
-
   const handleChange = (event) => {
     const target = event.currentTarget || event.target;
     const { name, value } = target;
@@ -432,59 +429,42 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
               )}
               <hr className="tw-basis-full" />
               <div className="tw-flex tw-basis-1/2 tw-flex-col tw-px-4 tw-py-2">
-                <label className={canEdit ? "" : "tw-text-sm tw-font-semibold tw-text-blue-900"} htmlFor="new-consultation-select-status">
-                  Statut
-                </label>
-                {canEdit ? (
-                  <SelectStatus
-                    name="status"
-                    value={data.status || ""}
-                    onChange={handleChange}
-                    inputId="new-consultation-select-status"
-                    classNamePrefix="new-consultation-select-status"
-                  />
-                ) : (
-                  <CustomFieldDisplay type="text" value={data.status} />
-                )}
+                <label htmlFor="new-consultation-select-status">Statut</label>
+
+                <SelectStatus
+                  name="status"
+                  value={data.status || ""}
+                  onChange={handleChange}
+                  inputId="new-consultation-select-status"
+                  classNamePrefix="new-consultation-select-status"
+                />
               </div>
               <div className="tw-basis-1/2 tw-px-4 tw-py-2">
-                <label className={canEdit ? "" : "tw-text-sm tw-font-semibold tw-text-blue-900"} htmlFor="create-consultation-dueat">
-                  Date prévue
-                </label>
+                <label htmlFor="create-consultation-dueat">Date prévue</label>
                 <div>
-                  {canEdit ? (
-                    <DatePicker
-                      withTime
-                      id="create-consultation-dueat"
-                      name="dueAt"
-                      defaultValue={data.dueAt ?? new Date()}
-                      onChange={handleChange}
-                      onInvalid={() => setActiveTab("Informations")}
-                    />
-                  ) : (
-                    <CustomFieldDisplay type="date-with-time" value={data.dueAt} />
-                  )}
+                  <DatePicker
+                    withTime
+                    id="create-consultation-dueat"
+                    name="dueAt"
+                    defaultValue={data.dueAt ?? new Date()}
+                    onChange={handleChange}
+                    onInvalid={() => setActiveTab("Informations")}
+                  />
                 </div>
               </div>
 
               <div className={["tw-basis-1/2 tw-px-4 tw-py-2", [DONE, CANCEL].includes(data.status) ? "tw-visible" : "tw-invisible"].join(" ")} />
               <div className={["tw-basis-1/2 tw-px-4 tw-py-2", [DONE, CANCEL].includes(data.status) ? "tw-visible" : "tw-invisible"].join(" ")}>
-                <label className={canEdit ? "" : "tw-text-sm tw-font-semibold tw-text-blue-900"} htmlFor="create-consultation-completedAt">
-                  Date réalisée
-                </label>
+                <label htmlFor="create-consultation-completedAt">Date réalisée</label>
                 <div>
-                  {canEdit ? (
-                    <DatePicker
-                      withTime
-                      id="create-consultation-completedAt"
-                      name="completedAt"
-                      defaultValue={data.completedAt ?? new Date()}
-                      onChange={handleChange}
-                      onInvalid={() => setActiveTab("Informations")}
-                    />
-                  ) : (
-                    <CustomFieldDisplay type="date-with-time" value={data.completedAt} />
-                  )}
+                  <DatePicker
+                    withTime
+                    id="create-consultation-completedAt"
+                    name="completedAt"
+                    defaultValue={data.completedAt ?? new Date()}
+                    onChange={handleChange}
+                    onInvalid={() => setActiveTab("Informations")}
+                  />
                 </div>
               </div>
             </div>
@@ -809,7 +789,6 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
           <button
             type="button"
             name="cancel"
-            disabled={!canEdit}
             title="Supprimer cette consultation - seul le créateur peut supprimer une consultation"
             className="button-destructive"
             onClick={async (e) => {
@@ -829,13 +808,7 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
           </button>
         )}
         {(isEditing || canSave) && (
-          <button
-            title="Sauvegarder cette consultation"
-            type="submit"
-            className="button-submit !tw-bg-blue-900"
-            form="add-consultation-form"
-            disabled={!canEdit}
-          >
+          <button title="Sauvegarder cette consultation" type="submit" className="button-submit !tw-bg-blue-900" form="add-consultation-form">
             Sauvegarder
           </button>
         )}
@@ -851,7 +824,6 @@ function ConsultationContent({ personId, consultation, date, onClose }) {
               "button-submit !tw-bg-blue-900",
               activeTab === "Informations" || activeTab === "Constantes" ? "tw-visible" : "tw-invisible",
             ].join(" ")}
-            disabled={!canEdit}
           >
             Modifier
           </button>
