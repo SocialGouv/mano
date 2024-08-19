@@ -207,7 +207,7 @@ function Transmission({ report, team, day, teamId, reactSelectInputId }) {
                 Transmission
               </label>
               <textarea
-                rows={27}
+                rows={20}
                 className="tailwindui"
                 autoComplete="off"
                 id="description"
