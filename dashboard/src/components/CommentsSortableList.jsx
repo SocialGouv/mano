@@ -17,7 +17,10 @@ export default function CommentsSortableList({ data, className = "" }) {
   const [sortOrder, setSortOrder] = useLocalStorage("comments-reports-sortOrder", "ASC");
   const [sortBy, setSortBy] = useLocalStorage("comments-reports-sortBy", "ASC");
   const dataSorted = useMemo(() => {
-    return [...data].sort(sortComments(sortBy, sortOrder));
+    return [...data].sort(sortComments(sortBy, sortOrder)).map((c) => {
+      if (c.urgent) return { ...c, style: { backgroundColor: "#fecaca99" } };
+      return c;
+    });
   }, [data, sortBy, sortOrder]);
 
   if (!dataSorted.length) {
