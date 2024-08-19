@@ -155,7 +155,7 @@ export const ActionsOrConsultationsReport = ({ actions, consultations, actionsCr
               history.push(`?${searchParams.toString()}`);
             }}
           >
-            ＋ Ajouter une action
+            {activeTab.includes("Actions") ? "＋ Ajouter une action" : "＋ Ajouter une consultation"}
           </button>
         </ModalFooter>
       </ModalContainer>
