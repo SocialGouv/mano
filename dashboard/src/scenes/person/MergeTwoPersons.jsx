@@ -251,7 +251,14 @@ const MergeTwoPersons = ({ person }) => {
 
                 const mergedComments = comments
                   .filter((c) => c.person === personToMergeAndDelete._id)
-                  .map((comment) => prepareCommentForEncryption({ ...comment, person: originPerson._id, user: comment.user || user._id }));
+                  .map((comment) =>
+                    prepareCommentForEncryption({
+                      ...comment,
+                      person: originPerson._id,
+                      user: comment.user || user._id,
+                      team: comment.team || currentTeam?._id,
+                    })
+                  );
 
                 const mergedRelsPersonPlace = relsPersonPlace
                   .filter((rel) => rel.person === personToMergeAndDelete._id)
