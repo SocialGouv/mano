@@ -1,3 +1,10 @@
+## [1.309.1](https://github.com/SocialGouv/mano/compare/v1.309.0...v1.309.1) (2025-02-03)
+
+
+### Bug Fixes
+
+* **ci-cd:** use token-bureau ([#1914](https://github.com/SocialGouv/mano/issues/1914)) ([7ab4b98](https://github.com/SocialGouv/mano/commit/7ab4b98bddde680b4f5afe89b51a07541a2b029e))
+
 # [1.309.0](https://github.com/SocialGouv/mano/compare/v1.308.0...v1.309.0) (2024-03-05)
 
 
